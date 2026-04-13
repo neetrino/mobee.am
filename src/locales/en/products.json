@@ -1,0 +1,65 @@
+{
+  "filters": {
+    "price": {
+      "title": "Filter by Price",
+      "priceLabel": "Price:"
+    },
+    "color": {
+      "title": "Filter by Color",
+      "noColors": "No colors available",
+      "loading": "Loading..."
+    },
+    "size": {
+      "title": "Filter by Size",
+      "noSizes": "No sizes available",
+      "loading": "Loading..."
+    },
+    "brand": {
+      "title": "Filter by Brand",
+      "searchPlaceholder": "Find brand",
+      "noBrands": "No brands found",
+      "loading": "Loading..."
+    }
+  },
+  "header": {
+    "allProducts": "All Products ({total})",
+    "clearFilters": "Clear Filters",
+    "show": "Show",
+    "all": "All",
+    "sort": {
+      "default": "Default Sort",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "nameAsc": "Name: A-Z",
+      "nameDesc": "Name: Z-A"
+    },
+    "viewModes": {
+      "list": "List View",
+      "grid2": "Grid View 2x2",
+      "grid3": "Grid View 3x3"
+    },
+    "filters": "Filters",
+    "sortProducts": "Sort Products"
+  },
+  "grid": {
+    "noProducts": "No products found."
+  },
+  "mobileFilters": {
+    "title": "Filters",
+    "close": "Close Filters"
+  },
+  "categoryNavigation": {
+    "all": "All",
+    "shopAll": "Shop All",
+    "newArrivals": "New Arrivals",
+    "sale": "Sale",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right",
+    "labels": {
+      "all": "ALL",
+      "new": "NEW",
+      "sale": "SALE"
+    }
+  }
+}
+

@@ -1,0 +1,11 @@
+{
+  "phone": "+374 XX XXX XXX",
+  "email": "info@shop.am",
+  "address": "г. Ереван, ул. Абовяна 10",
+  "workingHours": "Пн-Пт 10:00-19:00",
+  "social": { "instagram": "", "facebook": "", "linkedin": "" },
+  "callToUs": {"title":"Позвоните нам:","description":"Мы доступны 24/7, 7 дней в неделю."},
+  "writeToUs": {"title":"Напишите нам:","description":"Заполните нашу форму, и мы свяжемся с вами в течение 24 часов.","emailLabel":"Электронная почта:"},
+  "headquarter": {"title":"Главный офис:","hours":{"weekdays":"Понедельник - Пятница: 9:00-20:00","saturday":"Суббота: 11:00 - 15:00"}},
+  "form": {"name":"Имя *","namePlaceholder":"Ваше имя","email":"E-mail *","emailPlaceholder":"your@email.com","subject":"Тема *","subjectPlaceholder":"О чем это?","message":"Сообщение","messagePlaceholder":"Ваше сообщение...","submit":"Отправить","submitting":"Отправка...","submitSuccess":"Ваше сообщение успешно отправлено","submitError":"Ошибка: Не удалось отправить сообщение"}
+}

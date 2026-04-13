@@ -1,0 +1,71 @@
+{
+  "title": "Delivery and Returns",
+  "methods": [
+    { "id": "standard", "enabled": true, "name": "Standard Delivery", "price": 2000, "freeAbove": 50000, "estimatedDays": 3, "locations": [] },
+    { "id": "express", "enabled": true, "name": "Express Delivery", "price": 5000, "freeAbove": 100000, "estimatedDays": 1, "locations": [] },
+    { "id": "pickup", "enabled": true, "name": "Store Pickup", "price": 0, "freeAbove": null, "estimatedDays": 0, "locations": [{ "name": "Main Store", "address": "Yerevan, Armenia", "workingHours": "Mon-Sat: 10:00-20:00" }] }
+  ],
+  "deliveryInformation": {
+    "title": "Delivery Information",
+    "freeDelivery": "Free Delivery",
+    "deliveryCost": "Delivery Cost: {price}",
+    "freeForOrdersAbove": "Free for orders above {amount}",
+    "estimatedDelivery": "Estimated Delivery: {days} {daysText}",
+    "day": "day",
+    "days": "days",
+    "pickupLocations": "Pickup Locations:"
+  },
+  "returnPolicy": {
+    "title": "Return Policy",
+    "thirtyDayPolicy": {
+      "title": "30-Day Return Policy",
+      "description": "You have 30 days from the date of purchase to return items in their original condition with tags attached."
+    },
+    "returnConditions": {
+      "title": "Return Conditions",
+      "items": [
+        "Items must be unworn, unwashed and in original packaging",
+        "All tags and labels must be attached",
+        "Items must be in saleable condition",
+        "Proof of purchase required"
+      ]
+    },
+    "howToReturn": {
+      "title": "How to Return",
+      "steps": [
+        "Contact our customer service team to initiate a return",
+        "Get a return authorization number",
+        "Package items securely with return form",
+        "Ship the package to our return address",
+        "After receipt we will process your return within 5-7 business days"
+      ]
+    },
+    "refundProcess": {
+      "title": "Refund Process",
+      "description": "Refunds will be processed to the original payment method. Please allow 5-7 business days for the refund to appear on your account."
+    },
+    "nonReturnableItems": {
+      "title": "Non-Returnable Items",
+      "items": [
+        "Personalized or custom-made items",
+        "Items without original packaging",
+        "Items damaged due to misuse",
+        "Discounted items (unless defective)"
+      ]
+    }
+  },
+  "contact": {
+    "title": "Need Help?",
+    "description": "If you have questions about delivery or returns, please don't hesitate to contact us.",
+    "email": "Email:",
+    "phone": "Phone:",
+    "hours": "Business Hours:",
+    "hoursValue": "Monday - Friday, 9:00 - 18:00"
+  }
+}
+
+
+
+
+
+

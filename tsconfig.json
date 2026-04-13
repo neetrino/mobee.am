@@ -1,0 +1,64 @@
+    {
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "types": [
+      "node"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "forceConsistentCasingInFileNames": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@shop/ui": [
+        "./shared/ui"
+      ],
+      "@shop/ui/*": [
+        "./shared/ui/*"
+      ],
+      "@shop/design-tokens": [
+        "./shared/design-tokens"
+      ],
+      "@shop/design-tokens/*": [
+        "./shared/design-tokens/*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "react.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+
+
+
+
+
+
