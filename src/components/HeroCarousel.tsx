@@ -53,15 +53,19 @@ export function HeroCarousel() {
     >
       <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-8 sm:px-6 md:px-10 lg:px-16 xl:px-20">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:gap-5">
-          {/* Main banner — Figma node 1:226 */}
-          <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-[40px] bg-[#e9ecf0] sm:min-h-[346px]">
-            <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-8 md:right-10 md:top-10">
+          {/* Main banner — Figma node 1:226; background is a layer so headphones can overflow the rounded rect */}
+          <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px]">
+            <div
+              className="absolute inset-0 z-0 rounded-[40px] bg-[#e9ecf0]"
+              aria-hidden
+            />
+            <div className="absolute right-4 top-4 z-30 sm:right-8 sm:top-8 md:right-10 md:top-10">
               <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[12px] font-normal leading-normal text-[#14ae5c]">
                 {t('home.hero_free_shipping')}
               </span>
             </div>
 
-            <div className="relative z-10 flex h-full min-h-[inherit] flex-col px-6 pb-4 pt-12 sm:max-w-[min(52%,20rem)] sm:px-10 sm:pb-10 sm:pt-14 md:max-w-[55%] md:px-[54px] md:pb-8">
+            <div className="relative z-20 flex h-full min-h-[inherit] flex-col px-6 pb-4 pt-12 sm:max-w-[min(52%,20rem)] sm:px-10 sm:pb-10 sm:pt-14 md:max-w-[55%] md:px-[54px] md:pb-8">
               <h2
                 id="hero-promo-heading"
                 className={`${headlineClass} text-[clamp(2.75rem,8vw,5.125rem)] font-black leading-none tracking-tight text-black`}
@@ -87,7 +91,7 @@ export function HeroCarousel() {
               </div>
             </div>
 
-            <div className="relative mx-auto mt-2 h-52 w-full max-w-[280px] sm:absolute sm:bottom-0 sm:right-0 sm:mx-0 sm:mt-0 sm:h-[min(85%,359px)] sm:w-[273px] sm:max-w-none">
+            <div className="pointer-events-none relative z-10 mx-auto mt-2 h-52 w-full max-w-[280px] -translate-x-1/2 -translate-y-[40%] sm:absolute sm:bottom-0 sm:right-0 sm:mx-0 sm:mt-0 sm:h-[min(85%,359px)] sm:w-[273px] sm:max-w-none">
               <Image
                 src={IMG_AIRPODS}
                 alt=""
