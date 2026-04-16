@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import type { FormEvent, ReactNode, CSSProperties } from 'react';
-import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, formatPrice, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
+import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage } from '../lib/language';
 import { useInstantSearch } from './hooks/useInstantSearch';
@@ -12,8 +12,7 @@ import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
 import { apiClient } from '../lib/api-client';
 import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCounts';
-import { LanguageSwitcherHeader } from './LanguageSwitcherHeader';
-import { Instagram, Facebook, Linkedin } from 'lucide-react';
+import { LanguageSwitcherPill } from './LanguageSwitcherPill';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 
@@ -105,21 +104,9 @@ interface BadgeIconProps {
 
 const BadgeIcon = ({ icon, badge = 0, className = '', iconClassName = '' }: BadgeIconProps) => (
   <div className={`relative ${className}`}>
-    <div className={iconClassName}>
-      {icon}
-    </div>
+    <div className={iconClassName}>{icon}</div>
     {badge > 0 && (
-      <span className="
-      absolute 
-      -top-5 
-      -right-5 
-      bg-gradient-to-br from-red-500 to-red-600 
-      text-white text-[10px] font-bold 
-      rounded-full min-w-[20px] h-5 px-1.5 
-      flex items-center justify-center 
-      leading-none shadow-lg border-2 border-white 
-      animate-pulse
-    ">
+      <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#2db2ff] px-0.5 text-[10px] font-normal leading-none text-white">
         {badge > 99 ? '99+' : badge}
       </span>
     )}
@@ -341,6 +328,7 @@ function CategoryMenuItem({
 
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { isLoggedIn, logout, isAdmin } = useAuth();
   const { t } = useTranslation();
   const [compareCount, setCompareCount] = useState(0);
@@ -358,6 +346,17 @@ export function Header() {
   const [, setSelectedCategory] = useState<Category | null>(null);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const currentYear = new Date().getFullYear();
+
+  const isNavActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href === '/products') return pathname.startsWith('/products');
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const navTextClass = (href: string) =>
+    isNavActive(href)
+      ? 'text-[#00a1ff] font-black tracking-[0.2px] text-sm whitespace-nowrap'
+      : 'text-gray-700 font-semibold tracking-[0.2px] text-sm whitespace-nowrap hover:text-gray-900';
 
   const currencyRef = useRef<HTMLDivElement>(null);
   const mobileCurrencyRef = useRef<HTMLDivElement>(null);
@@ -690,7 +689,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-gradient-to-b from-gray-50 to-white sticky top-0 z-50 border-b border-gray-200/80 shadow-sm backdrop-blur-sm bg-white/95">
+    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
       <Suspense fallback={null}>
         <HeaderSearchSync
           setSearchQuery={setSearchQuery}
@@ -698,139 +697,55 @@ export function Header() {
           categories={categories}
         />
       </Suspense>
-      {/* Top Bar */}
-      <div className="bg-white border-b border-gray-200 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-3 py-3 text-sm text-gray-700 sm:flex-row sm:items-center sm:justify-between">
-            {/* Phone + Social */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-              <div className="flex items-center gap-2 text-gray-700">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 3C2 2.44772 2.44772 2 3 2H5.15287C5.64171 2 6.0589 2.35341 6.13927 2.8356L6.87858 7.27147C6.95075 7.70451 6.73206 8.13397 6.3394 8.3303L4.79126 9.10437C5.90715 11.8783 8.12168 14.0929 10.8956 15.2088L11.6697 13.6606C11.866 13.2679 12.2955 13.0493 12.7285 13.1214L17.1644 13.8607C17.6466 13.9411 18 14.3583 18 14.8471V17C18 17.5523 17.5523 18 17 18H15C7.8203 18 2 12.1797 2 5V3Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span className="font-medium">{t('contact.phone')}</span>
-              </div>
-              <div className="flex items-center gap-3 text-gray-600">
-                <a
-                  href={t('contact.social.instagram') || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-pink-600 transition-colors"
-                  aria-label={t('common.ariaLabels.instagram')}
-                >
-                  <Instagram className="w-4 h-4" />
-                </a>
-                <a
-                  href={t('contact.social.facebook') || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-blue-600 transition-colors"
-                  aria-label={t('common.ariaLabels.facebook')}
-                >
-                  <Facebook className="w-4 h-4" />
-                </a>
-                <a
-                  href={t('contact.social.linkedin') || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-blue-700 transition-colors"
-                  aria-label={t('common.ariaLabels.linkedin')}
-                >
-                  <Linkedin className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
 
-            {/* Currency and Language Switcher */}
-            <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-              <LanguageSwitcherHeader />
-              <div className="relative" ref={currencyRef}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCurrency(!showCurrency);
-                  }}
-                  className="flex items-center gap-2 bg-white px-3 py-2 text-gray-800 transition-colors"
-                >
-                  <span className="text-base font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
-                  <span className="text-sm font-medium leading-none">{selectedCurrency}</span>
-                  <ChevronDownIcon />
-                </button>
-                {showCurrency && (
-                  <div className="absolute top-full right-0 mt-2 w-40 bg-white z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    {Object.values(CURRENCIES).map((currency) => (
-                      <button
-                        key={currency.code}
-                        onClick={() => handleCurrencyChange(currency.code)}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-all duration-150 ${selectedCurrency === currency.code
-                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900 font-semibold'
-                            : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span>{currency.code}</span>
-                          <span className="text-gray-500">{currency.symbol}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Header */}
-      <div className="max-w-7xl mx-auto pl-2 sm:pl-4 md:pl-6 lg:pl-8 pr-2 sm:pr-4 md:pr-6 lg:pr-8">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 py-4 md:py-3">
-          {/* Logo + Mobile Menu */}
-          <div className="flex w-full items-center justify-between md:w-auto md:justify-start">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-y-3 py-4 md:flex-nowrap md:gap-6 lg:gap-8">
+          {/* Logo + mobile controls */}
+          <div className="flex w-full min-w-0 items-center justify-between md:w-auto md:justify-start md:gap-8 lg:gap-[76px]">
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-gray-200 bg-white text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 md:hidden sm:h-10 sm:w-10"
                 aria-label={t('common.ariaLabels.openMenu')}
                 aria-expanded={mobileMenuOpen}
               >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
                 </svg>
               </button>
-              <Link href="/" className="flex items-center flex-shrink-0 group">
-                <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent group-hover:from-gray-800 group-hover:to-gray-600 transition-all duration-300">
-                  White-Shop
-                </span>
+              <Link href="/" className="group flex shrink-0 items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                  <span className="text-[20px] font-bold leading-7 text-white">M</span>
+                </div>
+                <span className="text-[20px] font-bold tracking-[-0.5px] text-gray-900">Mobee</span>
               </Link>
             </div>
-            {/* Mobile Currency and Language - on same line as logo */}
-            <div className="flex items-center gap-1 sm:gap-2 md:hidden">
-              {/* Currency Switcher */}
+
+            <div className="flex items-center gap-2 md:hidden">
               <div className="relative" ref={mobileCurrencyRef}>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowMobileCurrency(!showMobileCurrency);
-                  }}
-                  className="flex h-9 sm:h-10 items-center justify-center gap-1 sm:gap-2 bg-transparent md:bg-white px-2 sm:px-3 text-xs sm:text-sm font-medium text-gray-800 shadow-none md:shadow-sm transition-colors cursor-pointer"
+                  onClick={() => setShowMobileCurrency(!showMobileCurrency)}
+                  className="flex h-9 cursor-pointer items-center justify-center gap-1 bg-transparent px-2 text-xs font-medium text-gray-800 shadow-none transition-colors sm:h-10 sm:gap-2 sm:px-3 sm:text-sm"
                 >
-                  <span className="text-sm sm:text-base font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
-                  <span className="text-xs sm:text-sm font-medium leading-none">{selectedCurrency}</span>
+                  <span className="text-sm font-semibold leading-none sm:text-base">{selectedCurrencyInfo.symbol}</span>
+                  <span className="text-xs font-medium leading-none sm:text-sm">{selectedCurrency}</span>
                   <ChevronDownIcon />
                 </button>
                 {showMobileCurrency && (
-                  <div className="absolute top-full right-0 mt-2 w-40 bg-white shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute right-0 top-full z-50 mt-2 w-40 animate-in overflow-hidden bg-white shadow-2xl fade-in slide-in-from-top-2 duration-200">
                     {Object.values(CURRENCIES).map((currency) => (
                       <button
                         key={currency.code}
+                        type="button"
                         onClick={() => {
                           handleCurrencyChange(currency.code);
                           setShowMobileCurrency(false);
                         }}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-all duration-150 ${
+                        className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
                           selectedCurrency === currency.code
-                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900 font-semibold'
+                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
                             : 'text-gray-700 hover:bg-gray-50'
                         }`}
                       >
@@ -843,20 +758,17 @@ export function Header() {
                   </div>
                 )}
               </div>
-              {/* Language Switcher */}
-              <div className="flex h-9 sm:h-10 items-center justify-center">
-                <LanguageSwitcherHeader />
-              </div>
+              <LanguageSwitcherPill />
             </div>
           </div>
 
-          {/* Navigation Links - Centered */}
-          <nav className="order-3 hidden w-full items-center justify-center gap-1 md:order-none md:flex md:flex-1">
-            <Link href="/" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap">
+          {/* Primary navigation (Figma Top Bar) */}
+          <nav className="order-3 hidden w-full items-center justify-center gap-8 text-sm md:order-none md:flex md:flex-1 md:justify-start lg:gap-[60px]">
+            <Link href="/" className={`flex items-center py-2 leading-7 ${navTextClass('/')}`}>
               {t('common.navigation.home')}
             </Link>
-            <div 
-              className="relative" 
+            <div
+              className="relative flex items-center"
               ref={productsMenuRef}
               onMouseEnter={() => {
                 if (productsMenuTimeoutRef.current) {
@@ -873,16 +785,16 @@ export function Header() {
             >
               <Link
                 href="/products"
-                className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap flex items-center gap-1"
+                className={`flex items-center gap-1 py-2 leading-7 ${navTextClass('/products')}`}
               >
                 {t('common.navigation.products')}
                 <ChevronDownIcon />
               </Link>
               {showProductsMenu && (
                 <>
-                  <div className="absolute top-full left-0 w-full h-2" />
-                  <div className="absolute top-full left-0 pt-2 w-64 z-50">
-                    <div className="bg-white rounded-xl shadow-2xl border border-gray-200/80 overflow-visible">
+                  <div className="absolute left-0 top-full h-2 w-full" />
+                  <div className="absolute left-0 top-full z-50 w-64 pt-2">
+                    <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
                       {loadingCategories ? (
                         <div className="px-4 py-2 text-sm text-gray-500">{t('common.messages.loading')}</div>
                       ) : (
@@ -899,105 +811,166 @@ export function Header() {
                 </>
               )}
             </div>
-            <Link href="/about" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap">
+            <Link href="/about" className={`py-2 leading-7 ${navTextClass('/about')}`}>
               {t('common.navigation.about')}
             </Link>
-            <Link href="/contact" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap">
+            <Link href="/contact" className={`py-2 leading-7 ${navTextClass('/contact')}`}>
               {t('common.navigation.contact')}
             </Link>
           </nav>
 
-
-          {/* Right Side Actions - Icons Only */}
-          <div className="ml-auto hidden items-center gap-2 md:flex">
-            {/* Search Icon Button */}
+          {/* Desktop: icon + label utilities (Figma) */}
+          <div className="ml-auto hidden shrink-0 items-center gap-6 lg:gap-[70px] md:flex">
             <button
+              type="button"
               onClick={() => {
                 setShowSearchModal(!showSearchModal);
                 setShowCurrency(false);
               }}
-              className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150"
+              className="flex min-w-0 flex-col items-center gap-1 text-center text-[#4b5563] transition-colors hover:text-gray-900"
               aria-label={t('common.ariaLabels.search')}
             >
-              <SearchIcon />
+              <span className="flex h-6 w-6 items-center justify-center text-gray-600">
+                <SearchIcon />
+              </span>
+              <span className="max-w-[4.5rem] text-[13px] font-medium leading-[15px]">{t('common.buttons.search')}</span>
             </button>
 
-            {/* Icons */}
-              {/* Profile / User Menu */}
-              <div className="relative" ref={userMenuRef}>
-                {isLoggedIn ? (
-                  <>
-                    <button
-                      onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="w-11 h-11 flex items-center justify-center transition-all duration-200 group"
-                    >
+            <Link
+              href="/compare"
+              className="flex min-w-0 flex-col items-center gap-1 text-center text-[#4b5563] transition-colors hover:text-gray-900"
+            >
+              <BadgeIcon
+                className="flex h-6 w-6 items-center justify-center text-gray-600"
+                iconClassName="flex items-center justify-center"
+                icon={<CompareIcon size={24} />}
+                badge={compareCount}
+              />
+              <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.compare')}</span>
+            </Link>
+
+            <Link
+              href="/cart"
+              className="flex min-w-0 flex-col items-center gap-1 text-center text-[#4b5563] transition-colors hover:text-gray-900"
+            >
+              <span className="relative flex h-6 w-6 items-center justify-center text-gray-600">
+                <BadgeIcon icon={<CartIcon size={24} />} badge={cartCount} />
+              </span>
+              <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.cart')}</span>
+            </Link>
+
+            <Link
+              href="/wishlist"
+              className="flex min-w-0 flex-col items-center gap-1 text-center text-[#4b5563] transition-colors hover:text-gray-900"
+            >
+              <BadgeIcon
+                className="flex h-6 w-6 items-center justify-center text-gray-600"
+                iconClassName="flex items-center justify-center"
+                icon={<WishlistIcon />}
+                badge={wishlistCount}
+              />
+              <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.wishlist')}</span>
+            </Link>
+
+            <div className="relative flex flex-col items-center gap-1" ref={userMenuRef}>
+              {isLoggedIn ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="group flex flex-col items-center gap-1 text-[#4b5563] transition-colors hover:text-gray-900"
+                  >
+                    <span className="flex h-6 w-6 items-center justify-center text-gray-600">
                       <ProfileIconFilled />
-                    </button>
-                    {showUserMenu && (
-                      <div className="absolute top-full right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl border border-gray-200/80 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    </span>
+                    <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.profile')}</span>
+                  </button>
+                  {showUserMenu && (
+                    <div className="absolute right-0 top-full z-50 mt-2 w-52 animate-in overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-2xl fade-in slide-in-from-top-2 duration-200">
+                      <Link
+                        href="/profile"
+                        className="block border-b border-gray-100 px-5 py-3 text-sm font-medium text-gray-700 transition-all duration-150 hover:bg-gradient-to-r hover:from-gray-50 hover:to-white"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        {t('common.navigation.profile')}
+                      </Link>
+                      {isAdmin && (
                         <Link
-                          href="/profile"
-                          className="block px-5 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-white transition-all duration-150 font-medium border-b border-gray-100"
+                          href="/admin"
+                          className="block border-b border-gray-100 px-5 py-3 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-gradient-to-r hover:from-blue-50 hover:to-white"
                           onClick={() => setShowUserMenu(false)}
                         >
-                          {t('common.navigation.profile')}
+                          <div className="flex items-center">
+                            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {t('common.navigation.adminPanel')}
+                          </div>
                         </Link>
-                        {isAdmin && (
-                          <Link
-                            href="/admin"
-                            className="block px-5 py-3 text-sm text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-white transition-all duration-150 font-medium border-b border-gray-100"
-                            onClick={() => setShowUserMenu(false)}
-                          >
-                            <div className="flex items-center">
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              {t('common.navigation.adminPanel')}
-                            </div>
-                          </Link>
-                        )}
-                        <button
-                          onClick={() => {
-                            setShowUserMenu(false);
-                            logout();
-                          }}
-                          className="block w-full text-left px-5 py-3 text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-white transition-all duration-150 font-medium"
-                        >
-                          {t('common.navigation.logout')}
-                        </button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <Link href="/login" className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150 group">
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          logout();
+                        }}
+                        className="block w-full px-5 py-3 text-left text-sm font-medium text-red-600 transition-all duration-150 hover:bg-gradient-to-r hover:from-red-50 hover:to-white"
+                      >
+                        {t('common.navigation.logout')}
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex flex-col items-center gap-1 text-[#4b5563] transition-colors hover:text-gray-900"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center text-gray-600">
                     <ProfileIconOutline />
-                  </Link>
-                )}
-              </div>
+                  </span>
+                  <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.login')}</span>
+                </Link>
+              )}
+            </div>
 
-              {/* Compare */}
-              <Link href="/compare" className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150 relative group">
-                <BadgeIcon icon={<CompareIcon size={18} />} badge={compareCount} />
-              </Link>
+            <LanguageSwitcherPill />
 
-              {/* Wishlist */}
-              <Link href="/wishlist" className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150 relative group">
-                <BadgeIcon icon={<WishlistIcon />} badge={wishlistCount} />
-              </Link>
-
-              {/* Shopping Cart */}
-              <Link href="/cart" className="flex items-center gap-[0.hpx] group">
-                <div className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150 relative">
-                  <BadgeIcon icon={<CartIcon size={19} />} badge={cartCount} />
+            <div className="relative" ref={currencyRef}>
+              <button
+                type="button"
+                onClick={() => setShowCurrency(!showCurrency)}
+                className="flex items-center gap-1.5 px-1 py-1 text-sm font-medium text-gray-800 transition-colors"
+              >
+                <span className="text-base font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
+                <span className="leading-none">{selectedCurrency}</span>
+                <ChevronDownIcon />
+              </button>
+              {showCurrency && (
+                <div className="absolute right-0 top-full z-50 mt-2 w-40 animate-in overflow-hidden bg-white fade-in slide-in-from-top-2 duration-200">
+                  {Object.values(CURRENCIES).map((currency) => (
+                    <button
+                      key={currency.code}
+                      type="button"
+                      onClick={() => handleCurrencyChange(currency.code)}
+                      className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
+                        selectedCurrency === currency.code
+                          ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{currency.code}</span>
+                        <span className="text-gray-500">{currency.symbol}</span>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-                <span className="text-gray-800 font-bold text-sm hidden sm:block min-w-[3.25rem] group-hover:text-gray-900 transition-colors">
-                  {formatPrice(cartTotal, selectedCurrency)}
-                </span>
-              </Link>
+              )}
             </div>
           </div>
-
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -1158,7 +1131,7 @@ export function Header() {
                 </div>
 
                 <div className="border-t border-gray-200 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
-                  © {currentYear} White-Shop
+                  © {currentYear} Mobee
                 </div>
               </nav>
             </div>
