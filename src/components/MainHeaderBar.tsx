@@ -143,7 +143,7 @@ function MegaNavItem({ category }: { category: Category }) {
     >
       <Link
         href={`/products?category=${encodeURIComponent(category.slug)}`}
-        className="flex items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+        className="flex items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
       >
         <span>{category.title}</span>
         <NavChevron />
@@ -262,13 +262,13 @@ export function MainHeaderBar() {
       className={`border-x border-b border-[#e5e7eb] bg-[rgba(255,255,255,0.7)] backdrop-blur-[6px] ${montserrat.className}`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-3 py-3 sm:py-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-4 xl:gap-10">
-          <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 lg:w-auto lg:max-w-none">
+        <div className="flex flex-col gap-[0.45rem] py-[0.45rem] sm:py-[0.6rem] lg:flex-row lg:items-center lg:justify-between lg:gap-[0.9rem] lg:py-[0.6rem] xl:gap-[1.5rem]">
+          <div className="flex w-full min-w-0 shrink-0 flex-col gap-[0.45rem] sm:flex-row sm:items-center sm:gap-4 lg:w-auto lg:max-w-none">
             <div className="min-w-0 w-full sm:flex-1 lg:max-w-[253px] lg:flex-[0_0_253px]">
               <button
                 type="button"
                 onClick={openSearch}
-                className="relative w-full cursor-text rounded-[9999px] border border-[#e5e7eb] bg-[rgba(255,255,255,0.5)] py-3 pl-12 pr-4 text-left transition-colors hover:bg-[rgba(255,255,255,0.85)]"
+                className="relative w-full cursor-text rounded-[9999px] border border-[#e5e7eb] bg-[rgba(255,255,255,0.5)] py-[0.45rem] pl-12 pr-4 text-left transition-colors hover:bg-[rgba(255,255,255,0.85)]"
                 aria-label={t('common.ariaLabels.search')}
               >
                 <span className="pointer-events-none absolute left-4 top-1/2 size-6 -translate-y-1/2">
@@ -288,7 +288,7 @@ export function MainHeaderBar() {
             <div className="flex flex-wrap items-center gap-4 sm:gap-10 sm:ml-12 lg:ml-[4.2rem]">
               <Link
                 href={phonesCategoryHref}
-                className="flex shrink-0 items-center gap-1 self-start py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
+                className="flex shrink-0 items-center gap-1 self-start py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
               >
                 <span>{t('common.mainHeader.phonesLink')}</span>
                 <NavChevron />
@@ -298,7 +298,7 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.tabletsLink')}</span>
                   <NavChevron />
@@ -309,7 +309,7 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.computersLink')}</span>
                   <NavChevron />
@@ -320,7 +320,7 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.watchesLink')}</span>
                   <NavChevron />
@@ -331,7 +331,7 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.headphonesLink')}</span>
                   <NavChevron />
@@ -342,7 +342,7 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.accessoriesLink')}</span>
                   <NavChevron />
@@ -352,7 +352,7 @@ export function MainHeaderBar() {
           </div>
 
           <nav
-            className="flex min-w-0 flex-1 items-center gap-x-4 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] sm:gap-x-6 lg:justify-end lg:gap-x-8 lg:pb-0 xl:gap-x-10 scrollbar-hide"
+            className="flex min-w-0 flex-1 items-center gap-x-4 overflow-x-auto pb-[0.15rem] [-webkit-overflow-scrolling:touch] sm:gap-x-6 lg:justify-end lg:gap-x-8 lg:pb-0 xl:gap-x-10 scrollbar-hide"
             aria-label={t('common.navigation.categories')}
           >
             <div className="flex min-w-0 items-center gap-x-4 sm:gap-x-6 lg:gap-x-8 xl:gap-x-10 sm:ml-12 lg:ml-[4.2rem]">
@@ -362,7 +362,7 @@ export function MainHeaderBar() {
             </div>
             <Link
               href="/products"
-              className="shrink-0 py-1 text-[14px] font-bold leading-5 whitespace-nowrap text-[#ef4444] hover:text-[#dc2626]"
+              className="shrink-0 py-[0.15rem] text-[14px] font-bold leading-5 whitespace-nowrap text-[#ef4444] hover:text-[#dc2626]"
             >
               {t('common.mainHeader.specialOffers')}
             </Link>
