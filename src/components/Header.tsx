@@ -15,6 +15,7 @@ import { apiClient } from '../lib/api-client';
 import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCounts';
 import { LanguageSwitcherPill } from './LanguageSwitcherPill';
 import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
+import { HEADER_STRIP_MIN_HEIGHT_LG, HEADER_STRIP_PADDING_Y } from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 
@@ -334,8 +335,8 @@ export function Header() {
 
   const navTextClass = (href: string) =>
     isNavActive(href)
-      ? 'whitespace-nowrap text-[13px] font-black leading-7 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
-      : 'whitespace-nowrap text-[13px] font-semibold leading-7 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
+      ? 'whitespace-nowrap text-[13px] font-black leading-5 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
+      : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
 
   /** Icon captions hidden below `xl` so the desktop bar fits down to `lg`. */
   const utilityLabelClass =
@@ -683,7 +684,9 @@ export function Header() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Mobile: logo row — Figma omits search/currency in bar; currency stays for small screens */}
-        <div className="flex items-center justify-between py-4 lg:hidden">
+        <div
+          className={`flex items-center justify-between ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} lg:hidden`}
+        >
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
@@ -697,10 +700,10 @@ export function Header() {
               </svg>
             </button>
             <Link href="/" className="flex shrink-0 items-center gap-2">
-              <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
-                <span className="text-[20px] font-bold leading-7 text-white">M</span>
+              <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                <span className="text-[18px] font-bold leading-6 text-white">M</span>
               </div>
-              <span className="text-[20px] font-bold tracking-[-0.5px] text-[#111827]">Mobee</span>
+              <span className="text-[18px] font-bold leading-6 tracking-[-0.5px] text-[#111827]">Mobee</span>
             </Link>
           </div>
           <div className="flex items-center gap-2">
@@ -744,13 +747,15 @@ export function Header() {
         </div>
 
         {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
-        <div className="hidden items-center justify-between gap-4 py-4 lg:flex">
+        <div
+          className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`}
+        >
           <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
-            <Link href="/" className="flex w-[113px] shrink-0 items-center gap-2">
-              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
-                <span className="text-[20px] font-bold leading-[28px] text-white">M</span>
+            <Link href="/" className="flex w-[104px] shrink-0 items-center gap-2">
+              <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                <span className="text-[18px] font-bold leading-6 text-white">M</span>
               </div>
-              <span className="text-[20px] font-bold leading-[28px] tracking-[-0.5px] text-[#111827]">Mobee</span>
+              <span className="text-[18px] font-bold leading-6 tracking-[-0.5px] text-[#111827]">Mobee</span>
             </Link>
             <nav
               className="flex min-w-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[60px]"
@@ -758,7 +763,7 @@ export function Header() {
             >
               <Link
                 href="/"
-                className={`flex items-center justify-center py-[10px] ${navTextClass('/')}`}
+                className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/')}`}
               >
                 {t('common.navigation.home')}
               </Link>
@@ -780,7 +785,7 @@ export function Header() {
               >
                 <Link
                   href="/products"
-                  className={`flex items-center justify-center py-[10px] ${navTextClass('/products')}`}
+                  className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/products')}`}
                   aria-haspopup="true"
                   aria-expanded={showProductsMenu}
                 >
@@ -807,10 +812,10 @@ export function Header() {
                   </>
                 )}
               </div>
-              <Link href="/about" className={`flex items-center justify-center py-[10px] ${navTextClass('/about')}`}>
+              <Link href="/about" className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/about')}`}>
                 {t('common.navigation.about')}
               </Link>
-              <Link href="/contact" className={`flex items-center justify-center py-[10px] ${navTextClass('/contact')}`}>
+              <Link href="/contact" className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/contact')}`}>
                 {t('common.navigation.contact')}
               </Link>
             </nav>
@@ -819,31 +824,31 @@ export function Header() {
           <div className="flex min-w-0 shrink-0 items-center justify-end gap-2 lg:gap-3 xl:gap-6 2xl:gap-[70px]">
             <Link
               href="/compare"
-              className="flex w-[35px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
+              className="flex w-[32px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
             >
-                <span className="relative h-6 w-6 shrink-0">
+                <span className="relative h-5 w-5 shrink-0">
                 <img
                   src={HEADER_FIGMA_ASSETS.compare}
                   alt=""
-                  width={24}
-                  height={24}
-                  className="absolute inset-0 block size-6 max-w-none"
+                  width={20}
+                  height={20}
+                  className="absolute inset-0 block size-5 max-w-none"
                 />
               </span>
               <span className={utilityLabelClass}>{t('common.navigation.compare')}</span>
             </Link>
 
-            <Link href="/cart" className="relative flex w-[33px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90">
-              <span className="relative h-6 w-6 shrink-0">
+            <Link href="/cart" className="relative flex w-[30px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90">
+              <span className="relative h-5 w-5 shrink-0">
                 <img
                   src={HEADER_FIGMA_ASSETS.cart}
                   alt=""
-                  width={24}
-                  height={24}
-                  className="block size-6 max-w-none"
+                  width={20}
+                  height={20}
+                  className="block size-5 max-w-none"
                 />
                 {cartCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#2db2ff] pb-px text-[10px] font-normal leading-[15px] text-white">
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#2db2ff] pb-px text-[9px] font-normal leading-[13px] text-white">
                     {cartCount > 99 ? '99+' : cartCount}
                   </span>
                 )}
@@ -853,21 +858,21 @@ export function Header() {
 
             <Link
               href="/wishlist"
-              className="flex w-[53px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
+              className="flex w-[49px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
             >
-              <span className="relative h-6 w-6 shrink-0">
+              <span className="relative h-5 w-5 shrink-0">
                 <img
                   src={HEADER_FIGMA_ASSETS.wishlist}
                   alt=""
-                  width={24}
-                  height={24}
-                  className="absolute inset-0 block size-6 max-w-none"
+                  width={20}
+                  height={20}
+                  className="absolute inset-0 block size-5 max-w-none"
                 />
               </span>
               <span className={utilityLabelClass}>{t('common.navigation.wishlist')}</span>
             </Link>
 
-            <div className="relative flex w-[47px] flex-col items-center" ref={userMenuRef}>
+            <div className="relative flex w-[44px] flex-col items-center" ref={userMenuRef}>
               {isLoggedIn ? (
                 <>
                   <button
@@ -876,13 +881,13 @@ export function Header() {
                     className="flex w-full flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
                     aria-expanded={showUserMenu}
                   >
-                    <span className="relative h-6 w-6 shrink-0">
+                    <span className="relative h-5 w-5 shrink-0">
                       <img
                         src={HEADER_FIGMA_ASSETS.account}
                         alt=""
-                        width={24}
-                        height={24}
-                        className="absolute inset-0 block size-6 max-w-none"
+                        width={20}
+                        height={20}
+                        className="absolute inset-0 block size-5 max-w-none"
                       />
                     </span>
                     <span className={utilityLabelClass}>{t('common.navigation.profile')}</span>
@@ -929,13 +934,13 @@ export function Header() {
                   href="/login"
                   className="flex flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
                 >
-                  <span className="relative h-6 w-6 shrink-0">
+                  <span className="relative h-5 w-5 shrink-0">
                     <img
                       src={HEADER_FIGMA_ASSETS.account}
                       alt=""
-                      width={24}
-                      height={24}
-                      className="absolute inset-0 block size-6 max-w-none"
+                      width={20}
+                      height={20}
+                      className="absolute inset-0 block size-5 max-w-none"
                     />
                   </span>
                   <span className={`${utilityLabelClass} max-w-[60px]`}>{t('common.navigation.login')}</span>

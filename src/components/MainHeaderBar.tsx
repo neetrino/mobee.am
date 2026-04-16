@@ -7,6 +7,7 @@ import { apiClient } from '../lib/api-client';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage } from '../lib/language';
 import { MAIN_HEADER_FIGMA_ASSETS } from './main-header-figma-assets';
+import { HEADER_STRIP_MIN_HEIGHT_LG, HEADER_STRIP_PADDING_Y } from './header-strip-layout';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -262,7 +263,9 @@ export function MainHeaderBar() {
       className={`border-x border-b border-[#e5e7eb] bg-[rgba(255,255,255,0.7)] backdrop-blur-[6px] ${montserrat.className}`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-[0.45rem] py-[0.45rem] sm:py-[0.6rem] lg:flex-row lg:items-center lg:justify-between lg:gap-[0.9rem] lg:py-[0.6rem] xl:gap-[1.5rem]">
+        <div
+          className={`flex flex-col gap-[0.45rem] ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} lg:flex-row lg:items-center lg:justify-between lg:gap-[0.9rem] xl:gap-[1.5rem]`}
+        >
           <div className="flex w-full min-w-0 shrink-0 flex-col gap-[0.45rem] sm:flex-row sm:items-center sm:gap-4 lg:w-auto lg:max-w-none">
             <div className="min-w-0 w-full sm:flex-1 lg:max-w-[253px] lg:flex-[0_0_253px]">
               <button
