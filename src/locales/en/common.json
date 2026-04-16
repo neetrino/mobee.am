@@ -43,6 +43,10 @@
     "delivery": "Delivery",
     "stores": "Stores"
   },
+  "mainHeader": {
+    "searchPlaceholder": "Find the best",
+    "specialOffers": "Special offers"
+  },
   "stock": {
     "inStock": "In Stock",
     "outOfStock": "Out of Stock"

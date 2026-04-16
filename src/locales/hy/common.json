@@ -43,6 +43,10 @@
     "delivery": "Առաքում",
     "stores": "Խանութներ"
   },
+  "mainHeader": {
+    "searchPlaceholder": "Գտիր լավագույնը",
+    "specialOffers": "Հատուկ առաջարկներ"
+  },
   "stock": {
     "inStock": "Պահեստում",
     "outOfStock": "Արտադրված"

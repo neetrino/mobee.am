@@ -43,6 +43,10 @@
     "delivery": "Доставка",
     "stores": "Магазины"
   },
+  "mainHeader": {
+    "searchPlaceholder": "Найди лучшее",
+    "specialOffers": "Специальные предложения"
+  },
   "stock": {
     "inStock": "В наличии",
     "outOfStock": "Нет в наличии"

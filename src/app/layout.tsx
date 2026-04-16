@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
 import { Header } from '../components/Header';
+import { MainHeaderBar } from '../components/MainHeaderBar';
 import { Footer } from '../components/Footer';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { MobileBottomNav } from '../components/MobileBottomNav';
@@ -27,6 +28,7 @@ export default function RootLayout({
           <ClientProviders>
             <div className="flex min-h-screen flex-col pb-16 lg:pb-0">
               <Header />
+              <MainHeaderBar />
               <Breadcrumb />
               <main className="flex-1 w-full">
                 {children}
