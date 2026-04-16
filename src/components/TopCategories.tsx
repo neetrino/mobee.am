@@ -58,7 +58,7 @@ const CATEGORY_STRIP_SLOTS: readonly CategorySlot[] = [
     labelKey: 'common.mainHeader.computersLink',
     tall: true,
     imageWrapperClassName:
-      'absolute left-[22px] top-[41px] flex size-[146px] items-center justify-center',
+      'absolute left-[31px] top-[24px] flex size-[146px] items-center justify-center',
     imageClassName: 'object-contain',
   },
   {
@@ -201,17 +201,6 @@ export function TopCategories() {
                 href={href}
                 className={`group relative flex w-[197px] shrink-0 snap-start flex-col ${cardHeight} overflow-hidden rounded-[30px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99]`}
               >
-                {slot.key === 'computers' && (
-                  <div className="pointer-events-none absolute inset-0" aria-hidden>
-                    <Image
-                      src="/images/home/category-strip/computers-bg.png"
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="197px"
-                    />
-                  </div>
-                )}
                 <div
                   className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-2 pb-[22px] pt-2 text-center ${
                     slot.tall ? 'pb-[25px]' : ''
@@ -222,17 +211,7 @@ export function TopCategories() {
                   </span>
                 </div>
                 <div className={`pointer-events-none z-[2] ${slot.imageWrapperClassName}`}>
-                  {slot.key === 'computers' ? (
-                    <div className="-scale-y-100 flex size-[146px] rotate-180 items-center justify-center">
-                      <Image
-                        src={slot.imageSrc}
-                        alt=""
-                        width={146}
-                        height={146}
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-                  ) : slot.key === 'watches' ? (
+                  {slot.key === 'watches' ? (
                     <div className="flex size-full items-center justify-center">
                       <div className="flex-none -rotate-[5.85deg]">
                         <div className="relative size-[140px]">
@@ -247,7 +226,13 @@ export function TopCategories() {
                       </div>
                     </div>
                   ) : (
-                    <div className="relative size-full">
+                    <div
+                      className={
+                        slot.key === 'computers'
+                          ? 'relative size-full -scale-x-100'
+                          : 'relative size-full'
+                      }
+                    >
                       <Image
                         src={slot.imageSrc}
                         alt=""
