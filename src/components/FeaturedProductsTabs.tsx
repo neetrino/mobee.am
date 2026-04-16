@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage, type LanguageCode } from '../lib/language';
 import { ProductCard } from './ProductCard';
+import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { t } from '../lib/i18n';
 import type { ProductLabel } from './ProductLabels';
 
@@ -40,8 +41,9 @@ interface ProductsResponse {
 
 const PRODUCTS_PER_PAGE = 10;
 const DEFAULT_HOME_FILTER = 'new' as const;
+/** Fewer columns than catalog-style grids so home “best choice” cards read larger. */
 const MOBILE_GRID_LAYOUT =
-  'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
+  'grid grid-cols-2 gap-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4';
 
 /**
  * Featured products grid for the home page (single curated list).
@@ -114,8 +116,8 @@ export function FeaturedProductsTabs() {
   }, [fetchProducts]);
 
   return (
-    <section className="bg-gray-50 pb-16 pt-8" aria-labelledby="featured-products-tabs">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="bg-gray-50 pb-16 pt-6" aria-labelledby="featured-products-tabs">
+      <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <h2 id="featured-products-tabs" className="sr-only">
           {t(language, 'home.featured_products.title')}
         </h2>
@@ -149,7 +151,7 @@ export function FeaturedProductsTabs() {
         ) : products.length > 0 ? (
           <div className={MOBILE_GRID_LAYOUT}>
             {products.slice(0, PRODUCTS_PER_PAGE).map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} viewMode="grid-2" />
             ))}
           </div>
         ) : (
