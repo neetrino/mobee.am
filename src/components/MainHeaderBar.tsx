@@ -40,6 +40,19 @@ const PHONES_SLUG_PARTS = [
 
 const TABLETS_SLUG_PARTS = ['tablets', 'tablet', 'planshetner', 'planshety', 'ipad'] as const;
 
+const COMPUTERS_SLUG_PARTS = [
+  'computers',
+  'computer',
+  'pcs',
+  'pc',
+  'laptops',
+  'laptop',
+  'notebooks',
+  'notebook',
+  'hamakargichner',
+  'hamakargich',
+] as const;
+
 function categoryMatchesSlugParts(category: Category, parts: readonly string[]): boolean {
   const tokens = category.slug.toLowerCase().split(/[-_/]/);
   return parts.some((p) => tokens.includes(p));
@@ -161,8 +174,6 @@ export function MainHeaderBar() {
     window.dispatchEvent(new Event('mobee:open-search'));
   };
 
-  const megaRoots = categories.slice(0, MEGA_ROOT_LIMIT);
-
   const phonesCategory = useMemo(
     () => findCategoryBySlugParts(categories, PHONES_SLUG_PARTS),
     [categories],
@@ -171,6 +182,18 @@ export function MainHeaderBar() {
     () => findCategoryBySlugParts(categories, TABLETS_SLUG_PARTS),
     [categories],
   );
+  const computersCategory = useMemo(
+    () => findCategoryBySlugParts(categories, COMPUTERS_SLUG_PARTS),
+    [categories],
+  );
+
+  const megaRoots = useMemo(() => {
+    const quickIds = new Set<string>();
+    if (phonesCategory) quickIds.add(phonesCategory.id);
+    if (tabletsCategory) quickIds.add(tabletsCategory.id);
+    if (computersCategory) quickIds.add(computersCategory.id);
+    return categories.filter((c) => !quickIds.has(c.id)).slice(0, MEGA_ROOT_LIMIT);
+  }, [categories, phonesCategory, tabletsCategory, computersCategory]);
 
   const phonesCategoryHref = useMemo(() => {
     if (phonesCategory) return `/products?category=${encodeURIComponent(phonesCategory.slug)}`;
@@ -220,6 +243,16 @@ export function MainHeaderBar() {
                   className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   {t('common.mainHeader.tabletsLink')}
+                </Link>
+              )}
+              {computersCategory ? (
+                <MegaNavItem category={computersCategory} />
+              ) : (
+                <Link
+                  href="/products"
+                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                >
+                  {t('common.mainHeader.computersLink')}
                 </Link>
               )}
             </div>
