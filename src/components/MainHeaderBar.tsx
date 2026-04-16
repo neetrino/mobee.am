@@ -97,6 +97,20 @@ function findCategoryBySlugParts(categories: Category[], parts: readonly string[
   return null;
 }
 
+function NavChevron() {
+  return (
+    <span className="relative size-3 shrink-0">
+      <img
+        src={MAIN_HEADER_FIGMA_ASSETS.chevronDown}
+        alt=""
+        width={12}
+        height={12}
+        className="pointer-events-none absolute inset-0 block size-3 max-w-none"
+      />
+    </span>
+  );
+}
+
 function MegaNavItem({ category }: { category: Category }) {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -132,17 +146,7 @@ function MegaNavItem({ category }: { category: Category }) {
         className="flex items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
       >
         <span>{category.title}</span>
-        {hasChildren && (
-          <span className="relative size-3 shrink-0">
-            <img
-              src={MAIN_HEADER_FIGMA_ASSETS.chevronDown}
-              alt=""
-              width={12}
-              height={12}
-              className="pointer-events-none absolute inset-0 block size-3 max-w-none"
-            />
-          </span>
-        )}
+        <NavChevron />
       </Link>
       {hasChildren && open && (
         <div
@@ -284,18 +288,20 @@ export function MainHeaderBar() {
             <div className="flex flex-wrap items-center gap-4 sm:gap-10 sm:ml-12 lg:ml-[4.2rem]">
               <Link
                 href={phonesCategoryHref}
-                className="shrink-0 self-start py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
+                className="flex shrink-0 items-center gap-1 self-start py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
               >
-                {t('common.mainHeader.phonesLink')}
+                <span>{t('common.mainHeader.phonesLink')}</span>
+                <NavChevron />
               </Link>
               {tabletsCategory ? (
                 <MegaNavItem category={tabletsCategory} />
               ) : (
                 <Link
                   href="/products"
-                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
-                  {t('common.mainHeader.tabletsLink')}
+                  <span>{t('common.mainHeader.tabletsLink')}</span>
+                  <NavChevron />
                 </Link>
               )}
               {computersCategory ? (
@@ -303,9 +309,10 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
-                  {t('common.mainHeader.computersLink')}
+                  <span>{t('common.mainHeader.computersLink')}</span>
+                  <NavChevron />
                 </Link>
               )}
               {watchesCategory ? (
@@ -313,9 +320,10 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
-                  {t('common.mainHeader.watchesLink')}
+                  <span>{t('common.mainHeader.watchesLink')}</span>
+                  <NavChevron />
                 </Link>
               )}
               {headphonesCategory ? (
@@ -323,9 +331,10 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
-                  {t('common.mainHeader.headphonesLink')}
+                  <span>{t('common.mainHeader.headphonesLink')}</span>
+                  <NavChevron />
                 </Link>
               )}
               {accessoriesCategory ? (
@@ -333,9 +342,10 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
-                  {t('common.mainHeader.accessoriesLink')}
+                  <span>{t('common.mainHeader.accessoriesLink')}</span>
+                  <NavChevron />
                 </Link>
               )}
             </div>
