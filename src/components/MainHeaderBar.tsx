@@ -8,6 +8,16 @@ import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage } from '../lib/language';
 import { MAIN_HEADER_FIGMA_ASSETS } from './main-header-figma-assets';
 import { HEADER_STRIP_MIN_HEIGHT_LG, HEADER_STRIP_PADDING_Y } from './header-strip-layout';
+import {
+  ACCESSORIES_SLUG_PARTS,
+  COMPUTERS_SLUG_PARTS,
+  findCategoryBySlugParts,
+  HEADPHONES_SLUG_PARTS,
+  PHONES_SLUG_PARTS,
+  TABLETS_SLUG_PARTS,
+  type CategoryTreeNode,
+  WATCHES_SLUG_PARTS,
+} from '../lib/category-nav';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -15,88 +25,13 @@ const montserrat = Montserrat({
   display: 'swap',
 });
 
-interface Category {
-  id: string;
-  slug: string;
-  title: string;
-  fullPath: string;
-  children: Category[];
-}
+type Category = CategoryTreeNode;
 
 interface CategoriesResponse {
   data: Category[];
 }
 
 const MEGA_ROOT_LIMIT = 6;
-
-const PHONES_SLUG_PARTS = [
-  'phones',
-  'phone',
-  'smartphones',
-  'smartphone',
-  'herakhosner',
-  'mobile-phones',
-  'cell-phones',
-] as const;
-
-const TABLETS_SLUG_PARTS = ['tablets', 'tablet', 'planshetner', 'planshety', 'ipad'] as const;
-
-const COMPUTERS_SLUG_PARTS = [
-  'computers',
-  'computer',
-  'pcs',
-  'pc',
-  'laptops',
-  'laptop',
-  'notebooks',
-  'notebook',
-  'hamakargichner',
-  'hamakargich',
-] as const;
-
-const WATCHES_SLUG_PARTS = [
-  'watches',
-  'watch',
-  'smartwatches',
-  'smartwatch',
-  'jamacuyjer',
-  'jamacuyc',
-  'clock',
-  'clocks',
-] as const;
-
-const HEADPHONES_SLUG_PARTS = [
-  'headphones',
-  'headphone',
-  'earphones',
-  'earbuds',
-  'headsets',
-  'headset',
-  'akanjakalner',
-  'akanjakal',
-] as const;
-
-const ACCESSORIES_SLUG_PARTS = [
-  'accessories',
-  'accessory',
-  'aksessuary',
-  'aksesuarner',
-  'aksessuarner',
-] as const;
-
-function categoryMatchesSlugParts(category: Category, parts: readonly string[]): boolean {
-  const tokens = category.slug.toLowerCase().split(/[-_/]/);
-  return parts.some((p) => tokens.includes(p));
-}
-
-function findCategoryBySlugParts(categories: Category[], parts: readonly string[]): Category | null {
-  for (const cat of categories) {
-    if (categoryMatchesSlugParts(cat, parts)) return cat;
-    const nested = findCategoryBySlugParts(cat.children, parts);
-    if (nested) return nested;
-  }
-  return null;
-}
 
 function NavChevron() {
   return (
