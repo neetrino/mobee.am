@@ -28,11 +28,7 @@
   },
   "featured_products": {
     "title": "Featured Products",
-    "subtitle": "Three quick choices: New Arrivals, Best Sellers and Featured Selections",
-    "tab_new": "NEW",
-    "tab_bestseller": "BESTSELLER",
-    "tab_featured": "FEATURED",
-    "ariaShowProducts": "Show {label} products",
+    "subtitle": "Handpicked highlights from our catalog",
     "errorLoading": "Failed to load products",
     "tryAgain": "Try Again",
     "noProducts": "No products in this category."

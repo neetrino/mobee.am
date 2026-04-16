@@ -37,30 +37,18 @@ interface ProductsResponse {
   };
 }
 
-type FilterType = 'new' | 'featured' | 'bestseller';
-
-interface Tab {
-  id: FilterType;
-  label: string;
-  filter: string | null;
-}
-
-// Tabs will be generated dynamically with translations
-
 const PRODUCTS_PER_PAGE = 10;
+const DEFAULT_HOME_FILTER = 'new' as const;
 const MOBILE_GRID_LAYOUT =
   'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
 
 /**
- * FeaturedProductsTabs Component
- * Displays products with tabs for filtering (NEW OFFERS, NEW, FEATURED, TOP SELLERS)
- * Similar to the reference design with underlined active tab
+ * Featured products grid for the home page (single curated list).
  */
 export function FeaturedProductsTabs() {
   // Use state for language to prevent hydration mismatch
   // Start with 'en' on server, update on client mount
   const [language, setLanguage] = useState<LanguageCode>('en');
-  const [activeTab, setActiveTab] = useState<FilterType>('new');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,15 +74,8 @@ export function FeaturedProductsTabs() {
     };
   }, []);
 
-  // Generate tabs with translations (memoized based on language)
-  const tabs: Tab[] = [
-    { id: 'new', label: t(language, 'home.featured_products.tab_new'), filter: 'new' },
-    { id: 'bestseller', label: t(language, 'home.featured_products.tab_bestseller'), filter: 'bestseller' },
-    { id: 'featured', label: t(language, 'home.featured_products.tab_featured'), filter: 'featured' },
-  ];
-
   /**
-   * Fetch products based on active filter
+   * Fetch products for the home featured section
    */
   const fetchProducts = useCallback(async (filter: string | null) => {
     try {
@@ -127,18 +108,8 @@ export function FeaturedProductsTabs() {
     }
   }, [language]);
 
-  /**
-   * Handle tab change
-   */
-  const handleTabChange = (tabId: FilterType) => {
-    setActiveTab(tabId);
-    const tab = tabs.find((t) => t.id === tabId);
-    fetchProducts(tab?.filter || null);
-  };
-
-  // Load products on mount (default "NEW")
   useEffect(() => {
-    fetchProducts('new');
+    fetchProducts(DEFAULT_HOME_FILTER);
   }, [fetchProducts]);
 
   return (
@@ -147,37 +118,6 @@ export function FeaturedProductsTabs() {
         <h2 id="featured-products-tabs" className="sr-only">
           {t(language, 'home.featured_products.title')}
         </h2>
-
-        {/* Tabs Navigation */}
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-6 md:gap-8">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`
-                  relative px-4 py-2 text-sm font-medium transition-colors duration-200
-                  ${isActive 
-                    ? 'text-blue-600' 
-                    : 'text-gray-600 hover:text-gray-900'
-                  }
-                `}
-                aria-label={t(language, 'home.featured_products.ariaShowProducts').replace('{label}', tab.label)}
-                aria-pressed={isActive}
-              >
-                {tab.label}
-                {/* Active indicator - underline */}
-                {isActive && (
-                  <span 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
-                    aria-hidden="true"
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
 
         {/* Products Grid */}
         {loading ? (
@@ -198,8 +138,7 @@ export function FeaturedProductsTabs() {
             <p className="text-red-600 mb-4">{error}</p>
             <button
               onClick={() => {
-                const tab = tabs.find((t) => t.id === activeTab);
-                fetchProducts(tab?.filter || null);
+                fetchProducts(DEFAULT_HOME_FILTER);
               }}
               className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors"
             >
