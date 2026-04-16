@@ -170,7 +170,7 @@ export function TopCategories() {
   if (loading) {
     return (
       <section className={`bg-white ${montserrat.className}`} aria-hidden>
-        <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-6 sm:px-6 md:px-10 lg:px-16 xl:px-20">
+        <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-12 sm:px-6 md:px-10 lg:px-16 xl:px-20">
           <div className="flex items-end gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
             {CATEGORY_STRIP_SLOTS.map((slot) => (
               <div
@@ -188,7 +188,7 @@ export function TopCategories() {
 
   return (
     <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
-      <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-6 sm:px-6 md:px-10 lg:px-16 xl:px-20">
+      <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-12 sm:px-6 md:px-10 lg:px-16 xl:px-20">
         <div className="flex items-end justify-start gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory sm:justify-center sm:overflow-visible sm:pb-0">
           {CATEGORY_STRIP_SLOTS.map((slot) => {
             const resolved = resolvedBySlot[slot.key];

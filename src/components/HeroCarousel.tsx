@@ -51,7 +51,7 @@ export function HeroCarousel() {
       className={`bg-white ${montserrat.className}`}
       aria-labelledby="hero-promo-heading"
     >
-      <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-[calc(theme(spacing.8)*4)] sm:px-6 md:px-10 lg:px-16 xl:px-20">
+      <div className="mx-auto w-full max-w-[1440px] px-4 pb-20 pt-[calc(theme(spacing.8)*4)] sm:px-6 md:px-10 lg:px-16 xl:px-20">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:gap-5">
           {/* Main banner — Figma 1:226; headphones 1:229 (+20% vs base); ~10% of icon height past card top */}
           <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px]">
