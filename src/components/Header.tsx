@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import type { FormEvent, ReactNode, CSSProperties } from 'react';
@@ -13,8 +14,15 @@ import { useAuth } from '../lib/auth/AuthContext';
 import { apiClient } from '../lib/api-client';
 import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCounts';
 import { LanguageSwitcherPill } from './LanguageSwitcherPill';
+import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['500', '600', '800', '900'],
+  display: 'swap',
+});
 
 // Navigation links will be translated dynamically using useTranslation hook
 const primaryNavLinks = [
@@ -51,16 +59,6 @@ const ArrowRightIcon = () => (
 );
 
 /**
- * Profile icon for logged out state (outline style)
- */
-const ProfileIconOutline = () => (
-  <svg width="19" height="19" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="7" r="3.2" stroke="currentColor" strokeWidth="1.8" fill="none" />
-    <path d="M5 17C5 14.5 7.5 12.5 10 12.5C12.5 12.5 15 14.5 15 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-  </svg>
-);
-
-/**
  * Profile icon for logged in state (filled style with background)
  */
 const ProfileIconFilled = () => (
@@ -93,24 +91,6 @@ const SearchIcon = () => (
     <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
     <path d="M15.5 15.5L19 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
-);
-
-interface BadgeIconProps {
-  icon: ReactNode;
-  badge?: number;
-  className?: string;
-  iconClassName?: string;
-}
-
-const BadgeIcon = ({ icon, badge = 0, className = '', iconClassName = '' }: BadgeIconProps) => (
-  <div className={`relative ${className}`}>
-    <div className={iconClassName}>{icon}</div>
-    {badge > 0 && (
-      <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#2db2ff] px-0.5 text-[10px] font-normal leading-none text-white">
-        {badge > 99 ? '99+' : badge}
-      </span>
-    )}
-  </div>
 );
 
 /**
@@ -335,7 +315,6 @@ export function Header() {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
-  const [showCurrency, setShowCurrency] = useState(false);
   const [showMobileCurrency, setShowMobileCurrency] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showProductsMenu, setShowProductsMenu] = useState(false);
@@ -355,10 +334,11 @@ export function Header() {
 
   const navTextClass = (href: string) =>
     isNavActive(href)
-      ? 'text-[#00a1ff] font-black tracking-[0.2px] text-sm whitespace-nowrap'
-      : 'text-gray-700 font-semibold tracking-[0.2px] text-sm whitespace-nowrap hover:text-gray-900';
+      ? 'whitespace-nowrap text-[14px] font-black leading-7 tracking-[0.2px] text-[#00a1ff]'
+      : 'whitespace-nowrap text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151] hover:text-gray-900';
 
-  const currencyRef = useRef<HTMLDivElement>(null);
+  const utilityLabelClass =
+    'mt-1 max-w-[92px] text-center text-[14px] font-medium leading-[15px] text-[#4b5563]';
   const mobileCurrencyRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const productsMenuRef = useRef<HTMLDivElement>(null);
@@ -576,9 +556,6 @@ export function Header() {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (currencyRef.current && !currencyRef.current.contains(event.target as Node)) {
-        setShowCurrency(false);
-      }
       if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(event.target as Node)) {
         setShowMobileCurrency(false);
       }
@@ -597,6 +574,12 @@ export function Header() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, []);
+
+  useEffect(() => {
+    const openSearch = () => setShowSearchModal(true);
+    window.addEventListener('mobee:open-search', openSearch);
+    return () => window.removeEventListener('mobee:open-search', openSearch);
   }, []);
 
   useEffect(() => {
@@ -683,13 +666,12 @@ export function Header() {
     });
     setStoredCurrency(currency);
     setSelectedCurrency(currency);
-    setShowCurrency(false);
     // Trigger currency update event to refresh prices
     window.dispatchEvent(new Event('currency-updated'));
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
+    <header className={`sticky top-0 z-50 border-b border-gray-200 bg-white ${montserrat.className}`}>
       <Suspense fallback={null}>
         <HeaderSearchSync
           setSearchQuery={setSearchQuery}
@@ -699,191 +681,207 @@ export function Header() {
       </Suspense>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-y-3 py-4 md:flex-nowrap md:gap-6 lg:gap-8">
-          {/* Logo + mobile controls */}
-          <div className="flex w-full min-w-0 items-center justify-between md:w-auto md:justify-start md:gap-8 lg:gap-[76px]">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(true)}
-                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-gray-200 bg-white text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 md:hidden sm:h-10 sm:w-10"
-                aria-label={t('common.ariaLabels.openMenu')}
-                aria-expanded={mobileMenuOpen}
-              >
-                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
-                </svg>
-              </button>
-              <Link href="/" className="group flex shrink-0 items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
-                  <span className="text-[20px] font-bold leading-7 text-white">M</span>
-                </div>
-                <span className="text-[20px] font-bold tracking-[-0.5px] text-gray-900">Mobee</span>
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-2 md:hidden">
-              <div className="relative" ref={mobileCurrencyRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowMobileCurrency(!showMobileCurrency)}
-                  className="flex h-9 cursor-pointer items-center justify-center gap-1 bg-transparent px-2 text-xs font-medium text-gray-800 shadow-none transition-colors sm:h-10 sm:gap-2 sm:px-3 sm:text-sm"
-                >
-                  <span className="text-sm font-semibold leading-none sm:text-base">{selectedCurrencyInfo.symbol}</span>
-                  <span className="text-xs font-medium leading-none sm:text-sm">{selectedCurrency}</span>
-                  <ChevronDownIcon />
-                </button>
-                {showMobileCurrency && (
-                  <div className="absolute right-0 top-full z-50 mt-2 w-40 animate-in overflow-hidden bg-white shadow-2xl fade-in slide-in-from-top-2 duration-200">
-                    {Object.values(CURRENCIES).map((currency) => (
-                      <button
-                        key={currency.code}
-                        type="button"
-                        onClick={() => {
-                          handleCurrencyChange(currency.code);
-                          setShowMobileCurrency(false);
-                        }}
-                        className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
-                          selectedCurrency === currency.code
-                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span>{currency.code}</span>
-                          <span className="text-gray-500">{currency.symbol}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <LanguageSwitcherPill />
-            </div>
-          </div>
-
-          {/* Primary navigation (Figma Top Bar) */}
-          <nav className="order-3 hidden w-full items-center justify-center gap-8 text-sm md:order-none md:flex md:flex-1 md:justify-start lg:gap-[60px]">
-            <Link href="/" className={`flex items-center py-2 leading-7 ${navTextClass('/')}`}>
-              {t('common.navigation.home')}
-            </Link>
-            <div
-              className="relative flex items-center"
-              ref={productsMenuRef}
-              onMouseEnter={() => {
-                if (productsMenuTimeoutRef.current) {
-                  clearTimeout(productsMenuTimeoutRef.current);
-                  productsMenuTimeoutRef.current = null;
-                }
-                setShowProductsMenu(true);
-              }}
-              onMouseLeave={() => {
-                productsMenuTimeoutRef.current = setTimeout(() => {
-                  setShowProductsMenu(false);
-                }, 150);
-              }}
-            >
-              <Link
-                href="/products"
-                className={`flex items-center gap-1 py-2 leading-7 ${navTextClass('/products')}`}
-              >
-                {t('common.navigation.products')}
-                <ChevronDownIcon />
-              </Link>
-              {showProductsMenu && (
-                <>
-                  <div className="absolute left-0 top-full h-2 w-full" />
-                  <div className="absolute left-0 top-full z-50 w-64 pt-2">
-                    <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
-                      {loadingCategories ? (
-                        <div className="px-4 py-2 text-sm text-gray-500">{t('common.messages.loading')}</div>
-                      ) : (
-                        getRootCategories(categories).map((category) => (
-                          <CategoryMenuItem
-                            key={category.id}
-                            category={category}
-                            onClose={() => setShowProductsMenu(false)}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-            <Link href="/about" className={`py-2 leading-7 ${navTextClass('/about')}`}>
-              {t('common.navigation.about')}
-            </Link>
-            <Link href="/contact" className={`py-2 leading-7 ${navTextClass('/contact')}`}>
-              {t('common.navigation.contact')}
-            </Link>
-          </nav>
-
-          {/* Desktop: icon + label utilities (Figma) */}
-          <div className="ml-auto hidden shrink-0 items-center gap-6 lg:gap-[70px] md:flex">
+        {/* Mobile: logo row — Figma omits search/currency in bar; currency stays for small screens */}
+        <div className="flex items-center justify-between py-4 md:hidden">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
-              onClick={() => {
-                setShowSearchModal(!showSearchModal);
-                setShowCurrency(false);
-              }}
-              className="flex min-w-0 flex-col items-center gap-1 text-center text-[#4b5563] transition-colors hover:text-gray-900"
-              aria-label={t('common.ariaLabels.search')}
+              onClick={() => setMobileMenuOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-gray-200 bg-white text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 sm:h-10 sm:w-10"
+              aria-label={t('common.ariaLabels.openMenu')}
+              aria-expanded={mobileMenuOpen}
             >
-              <span className="flex h-6 w-6 items-center justify-center text-gray-600">
-                <SearchIcon />
-              </span>
-              <span className="max-w-[4.5rem] text-[13px] font-medium leading-[15px]">{t('common.buttons.search')}</span>
+              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
             </button>
+            <Link href="/" className="flex shrink-0 items-center gap-2">
+              <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                <span className="text-[20px] font-bold leading-7 text-white">M</span>
+              </div>
+              <span className="text-[20px] font-bold tracking-[-0.5px] text-[#111827]">Mobee</span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative" ref={mobileCurrencyRef}>
+              <button
+                type="button"
+                onClick={() => setShowMobileCurrency(!showMobileCurrency)}
+                className="flex h-9 cursor-pointer items-center justify-center gap-1 bg-transparent px-2 text-xs font-medium text-gray-800 transition-colors sm:h-10 sm:gap-2 sm:px-3 sm:text-sm"
+              >
+                <span className="text-sm font-semibold leading-none sm:text-base">{selectedCurrencyInfo.symbol}</span>
+                <span className="text-xs font-medium leading-none sm:text-sm">{selectedCurrency}</span>
+                <ChevronDownIcon />
+              </button>
+              {showMobileCurrency && (
+                <div className="absolute right-0 top-full z-50 mt-2 w-40 animate-in overflow-hidden bg-white shadow-2xl fade-in slide-in-from-top-2 duration-200">
+                  {Object.values(CURRENCIES).map((currency) => (
+                    <button
+                      key={currency.code}
+                      type="button"
+                      onClick={() => {
+                        handleCurrencyChange(currency.code);
+                        setShowMobileCurrency(false);
+                      }}
+                      className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
+                        selectedCurrency === currency.code
+                          ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{currency.code}</span>
+                        <span className="text-gray-500">{currency.symbol}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <LanguageSwitcherPill />
+          </div>
+        </div>
 
+        {/* Desktop — Figma node 1:408: py-[16px], gap 76 | 60 | 70 */}
+        <div className="hidden items-center justify-between py-4 md:flex">
+          <div className="flex min-w-0 items-center gap-[76px]">
+            <Link href="/" className="flex w-[113px] shrink-0 items-center gap-2">
+              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                <span className="text-[20px] font-bold leading-[28px] text-white">M</span>
+              </div>
+              <span className="text-[20px] font-bold leading-[28px] tracking-[-0.5px] text-[#111827]">Mobee</span>
+            </Link>
+            <nav className="flex items-center gap-[60px]" aria-label="Primary">
+              <Link
+                href="/"
+                className={`flex items-center justify-center py-[10px] ${navTextClass('/')}`}
+              >
+                {t('common.navigation.home')}
+              </Link>
+              <div
+                className="relative flex items-center"
+                ref={productsMenuRef}
+                onMouseEnter={() => {
+                  if (productsMenuTimeoutRef.current) {
+                    clearTimeout(productsMenuTimeoutRef.current);
+                    productsMenuTimeoutRef.current = null;
+                  }
+                  setShowProductsMenu(true);
+                }}
+                onMouseLeave={() => {
+                  productsMenuTimeoutRef.current = setTimeout(() => {
+                    setShowProductsMenu(false);
+                  }, 150);
+                }}
+              >
+                <Link
+                  href="/products"
+                  className={`flex items-center justify-center py-[10px] ${navTextClass('/products')}`}
+                  aria-haspopup="true"
+                  aria-expanded={showProductsMenu}
+                >
+                  {t('common.navigation.products')}
+                </Link>
+                {showProductsMenu && (
+                  <>
+                    <div className="absolute left-0 top-full h-2 w-full" />
+                    <div className="absolute left-0 top-full z-50 w-64 pt-2">
+                      <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
+                        {loadingCategories ? (
+                          <div className="px-4 py-2 text-sm text-gray-500">{t('common.messages.loading')}</div>
+                        ) : (
+                          getRootCategories(categories).map((category) => (
+                            <CategoryMenuItem
+                              key={category.id}
+                              category={category}
+                              onClose={() => setShowProductsMenu(false)}
+                            />
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+              <Link href="/about" className={`flex items-center justify-center py-[10px] ${navTextClass('/about')}`}>
+                {t('common.navigation.about')}
+              </Link>
+              <Link href="/contact" className={`flex items-center justify-center py-[10px] ${navTextClass('/contact')}`}>
+                {t('common.navigation.contact')}
+              </Link>
+            </nav>
+          </div>
+
+          <div className="flex min-w-0 shrink-0 items-center justify-end gap-[70px]">
             <Link
               href="/compare"
-              className="flex min-w-0 flex-col items-center gap-1 text-center text-[#4b5563] transition-colors hover:text-gray-900"
+              className="flex w-[35px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
             >
-              <BadgeIcon
-                className="flex h-6 w-6 items-center justify-center text-gray-600"
-                iconClassName="flex items-center justify-center"
-                icon={<CompareIcon size={24} />}
-                badge={compareCount}
-              />
-              <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.compare')}</span>
+                <span className="relative h-6 w-6 shrink-0">
+                <img
+                  src={HEADER_FIGMA_ASSETS.compare}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="absolute inset-0 block size-6 max-w-none"
+                />
+              </span>
+              <span className={utilityLabelClass}>{t('common.navigation.compare')}</span>
             </Link>
 
-            <Link
-              href="/cart"
-              className="flex min-w-0 flex-col items-center gap-1 text-center text-[#4b5563] transition-colors hover:text-gray-900"
-            >
-              <span className="relative flex h-6 w-6 items-center justify-center text-gray-600">
-                <BadgeIcon icon={<CartIcon size={24} />} badge={cartCount} />
+            <Link href="/cart" className="relative flex w-[33px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90">
+              <span className="relative h-6 w-6 shrink-0">
+                <img
+                  src={HEADER_FIGMA_ASSETS.cart}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="block size-6 max-w-none"
+                />
+                {cartCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#2db2ff] pb-px text-[10px] font-normal leading-[15px] text-white">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
               </span>
-              <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.cart')}</span>
+              <span className={utilityLabelClass}>{t('common.navigation.cart')}</span>
             </Link>
 
             <Link
               href="/wishlist"
-              className="flex min-w-0 flex-col items-center gap-1 text-center text-[#4b5563] transition-colors hover:text-gray-900"
+              className="flex w-[53px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
             >
-              <BadgeIcon
-                className="flex h-6 w-6 items-center justify-center text-gray-600"
-                iconClassName="flex items-center justify-center"
-                icon={<WishlistIcon />}
-                badge={wishlistCount}
-              />
-              <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.wishlist')}</span>
+              <span className="relative h-6 w-6 shrink-0">
+                <img
+                  src={HEADER_FIGMA_ASSETS.wishlist}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="absolute inset-0 block size-6 max-w-none"
+                />
+              </span>
+              <span className={utilityLabelClass}>{t('common.navigation.wishlist')}</span>
             </Link>
 
-            <div className="relative flex flex-col items-center gap-1" ref={userMenuRef}>
+            <div className="relative flex w-[47px] flex-col items-center" ref={userMenuRef}>
               {isLoggedIn ? (
                 <>
                   <button
                     type="button"
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="group flex flex-col items-center gap-1 text-[#4b5563] transition-colors hover:text-gray-900"
+                    className="flex w-full flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
+                    aria-expanded={showUserMenu}
                   >
-                    <span className="flex h-6 w-6 items-center justify-center text-gray-600">
-                      <ProfileIconFilled />
+                    <span className="relative h-6 w-6 shrink-0">
+                      <img
+                        src={HEADER_FIGMA_ASSETS.account}
+                        alt=""
+                        width={24}
+                        height={24}
+                        className="absolute inset-0 block size-6 max-w-none"
+                      />
                     </span>
-                    <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.profile')}</span>
+                    <span className={utilityLabelClass}>{t('common.navigation.profile')}</span>
                   </button>
                   {showUserMenu && (
                     <div className="absolute right-0 top-full z-50 mt-2 w-52 animate-in overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-2xl fade-in slide-in-from-top-2 duration-200">
@@ -925,50 +923,23 @@ export function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="flex flex-col items-center gap-1 text-[#4b5563] transition-colors hover:text-gray-900"
+                  className="flex flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
                 >
-                  <span className="flex h-6 w-6 items-center justify-center text-gray-600">
-                    <ProfileIconOutline />
+                  <span className="relative h-6 w-6 shrink-0">
+                    <img
+                      src={HEADER_FIGMA_ASSETS.account}
+                      alt=""
+                      width={24}
+                      height={24}
+                      className="absolute inset-0 block size-6 max-w-none"
+                    />
                   </span>
-                  <span className="max-w-[5rem] text-[13px] font-medium leading-[15px]">{t('common.navigation.login')}</span>
+                  <span className={`${utilityLabelClass} max-w-[60px]`}>{t('common.navigation.login')}</span>
                 </Link>
               )}
             </div>
 
             <LanguageSwitcherPill />
-
-            <div className="relative" ref={currencyRef}>
-              <button
-                type="button"
-                onClick={() => setShowCurrency(!showCurrency)}
-                className="flex items-center gap-1.5 px-1 py-1 text-sm font-medium text-gray-800 transition-colors"
-              >
-                <span className="text-base font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
-                <span className="leading-none">{selectedCurrency}</span>
-                <ChevronDownIcon />
-              </button>
-              {showCurrency && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-40 animate-in overflow-hidden bg-white fade-in slide-in-from-top-2 duration-200">
-                  {Object.values(CURRENCIES).map((currency) => (
-                    <button
-                      key={currency.code}
-                      type="button"
-                      onClick={() => handleCurrencyChange(currency.code)}
-                      className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
-                        selectedCurrency === currency.code
-                          ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{currency.code}</span>
-                        <span className="text-gray-500">{currency.symbol}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
@@ -1015,6 +986,23 @@ export function Header() {
                       </svg>
                     </Link>
                   ))}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setShowSearchModal(true);
+                    }}
+                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 normal-case font-medium text-gray-700"
+                  >
+                    <span className="flex items-center gap-2">
+                      <SearchIcon />
+                      {t('common.buttons.search')}
+                    </span>
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
 
                   <Link
                     href="/wishlist"

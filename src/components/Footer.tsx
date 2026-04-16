@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslation } from '../lib/i18n-client';
+import { FooterCurrency } from './FooterCurrency';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -48,6 +49,19 @@ export function Footer() {
                 >
                   {t('common.navigation.contact')}
                 </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.dispatchEvent(new CustomEvent('mobee:open-search'));
+                    }
+                  }}
+                  className="text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  {t('common.buttons.search')}
+                </button>
               </li>
             </ul>
           </div>
@@ -173,11 +187,16 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="mt-8 pt-8 border-t border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-300">
-              {t('common.footer.copyright').replace('{year}', new Date().getFullYear().toString())}
-            </p>
-            
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-6">
+              <p className="text-sm text-gray-300">
+                {t('common.footer.copyright').replace('{year}', new Date().getFullYear().toString())}
+              </p>
+              <div className="hidden md:block">
+                <FooterCurrency />
+              </div>
+            </div>
+
             {/* Payment Methods */}
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-400 mr-2">{t('common.footer.paymentMethods')}</span>
