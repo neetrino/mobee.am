@@ -15,7 +15,11 @@ import { apiClient } from '../lib/api-client';
 import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCounts';
 import { LanguageSwitcherPill } from './LanguageSwitcherPill';
 import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
-import { HEADER_STRIP_MIN_HEIGHT_LG, HEADER_STRIP_PADDING_Y } from './header-strip-layout';
+import {
+  HEADER_STRIP_MIN_HEIGHT_LG,
+  HEADER_STRIP_PADDING_Y,
+  SITE_CONTENT_GUTTERS_CLASS,
+} from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 
@@ -682,7 +686,7 @@ export function Header() {
         />
       </Suspense>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className={SITE_CONTENT_GUTTERS_CLASS}>
         {/* Mobile: logo row — Figma omits search/currency in bar; currency stays for small screens */}
         <div
           className={`flex items-center justify-between ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} lg:hidden`}

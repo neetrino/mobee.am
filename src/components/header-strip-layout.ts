@@ -9,3 +9,7 @@ export const HEADER_STRIP_PADDING_Y =
 export const HEADER_STRIP_MIN_HEIGHT_LG = 'lg:min-h-[62px]';
 
 export const HEADER_STRIP_INNER_ROW = `items-center ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`;
+
+/** Max width + horizontal padding; matches hero/promo ({@link HeroCarousel}) so nav strips align with content. */
+export const SITE_CONTENT_GUTTERS_CLASS =
+  'mx-auto w-full max-w-[1440px] px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20';
