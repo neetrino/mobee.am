@@ -50,7 +50,8 @@
     "tabletsLink": "Tablets",
     "computersLink": "Computers",
     "watchesLink": "Watches",
-    "headphonesLink": "Headphones"
+    "headphonesLink": "Headphones",
+    "accessoriesLink": "Accessories"
   },
   "stock": {
     "inStock": "In Stock",

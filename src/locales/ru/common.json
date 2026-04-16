@@ -50,7 +50,8 @@
     "tabletsLink": "Планшеты",
     "computersLink": "Компьютеры",
     "watchesLink": "Часы",
-    "headphonesLink": "Наушники"
+    "headphonesLink": "Наушники",
+    "accessoriesLink": "Аксессуары"
   },
   "stock": {
     "inStock": "В наличии",
