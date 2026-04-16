@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { apiClient } from '../lib/api-client';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage } from '../lib/language';
@@ -27,6 +27,32 @@ interface CategoriesResponse {
 }
 
 const MEGA_ROOT_LIMIT = 6;
+
+const PHONES_SLUG_PARTS = [
+  'phones',
+  'phone',
+  'smartphones',
+  'smartphone',
+  'herakhosner',
+  'mobile-phones',
+  'cell-phones',
+] as const;
+
+const TABLETS_SLUG_PARTS = ['tablets', 'tablet', 'planshetner', 'planshety', 'ipad'] as const;
+
+function categoryMatchesSlugParts(category: Category, parts: readonly string[]): boolean {
+  const tokens = category.slug.toLowerCase().split(/[-_/]/);
+  return parts.some((p) => tokens.includes(p));
+}
+
+function findCategoryBySlugParts(categories: Category[], parts: readonly string[]): Category | null {
+  for (const cat of categories) {
+    if (categoryMatchesSlugParts(cat, parts)) return cat;
+    const nested = findCategoryBySlugParts(cat.children, parts);
+    if (nested) return nested;
+  }
+  return null;
+}
 
 function MegaNavItem({ category }: { category: Category }) {
   const [open, setOpen] = useState(false);
@@ -137,32 +163,66 @@ export function MainHeaderBar() {
 
   const megaRoots = categories.slice(0, MEGA_ROOT_LIMIT);
 
+  const phonesCategory = useMemo(
+    () => findCategoryBySlugParts(categories, PHONES_SLUG_PARTS),
+    [categories],
+  );
+  const tabletsCategory = useMemo(
+    () => findCategoryBySlugParts(categories, TABLETS_SLUG_PARTS),
+    [categories],
+  );
+
+  const phonesCategoryHref = useMemo(() => {
+    if (phonesCategory) return `/products?category=${encodeURIComponent(phonesCategory.slug)}`;
+    return '/products';
+  }, [phonesCategory]);
+
   return (
     <div
       className={`border-x border-b border-[#e5e7eb] bg-[rgba(255,255,255,0.7)] backdrop-blur-[6px] ${montserrat.className}`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-3 py-3 sm:py-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-4 xl:gap-10">
-          <div className="w-full shrink-0 lg:max-w-[253px] lg:flex-[0_0_253px]">
-            <button
-              type="button"
-              onClick={openSearch}
-              className="relative w-full cursor-text rounded-[9999px] border border-[#e5e7eb] bg-[rgba(255,255,255,0.5)] py-3 pl-12 pr-4 text-left transition-colors hover:bg-[rgba(255,255,255,0.85)]"
-              aria-label={t('common.ariaLabels.search')}
-            >
-              <span className="pointer-events-none absolute left-4 top-1/2 size-6 -translate-y-1/2">
-                <img
-                  src={MAIN_HEADER_FIGMA_ASSETS.searchIcon}
-                  alt=""
-                  width={24}
-                  height={24}
-                  className="block size-6 max-w-none"
-                />
-              </span>
-              <span className="block text-[14px] font-normal leading-normal text-[#6b7280]">
-                {t('common.mainHeader.searchPlaceholder')}
-              </span>
-            </button>
+          <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 lg:w-auto lg:max-w-none">
+            <div className="min-w-0 w-full sm:flex-1 lg:max-w-[253px] lg:flex-[0_0_253px]">
+              <button
+                type="button"
+                onClick={openSearch}
+                className="relative w-full cursor-text rounded-[9999px] border border-[#e5e7eb] bg-[rgba(255,255,255,0.5)] py-3 pl-12 pr-4 text-left transition-colors hover:bg-[rgba(255,255,255,0.85)]"
+                aria-label={t('common.ariaLabels.search')}
+              >
+                <span className="pointer-events-none absolute left-4 top-1/2 size-6 -translate-y-1/2">
+                  <img
+                    src={MAIN_HEADER_FIGMA_ASSETS.searchIcon}
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="block size-6 max-w-none"
+                  />
+                </span>
+                <span className="block text-[14px] font-normal leading-normal text-[#6b7280]">
+                  {t('common.mainHeader.searchPlaceholder')}
+                </span>
+              </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-10">
+              <Link
+                href={phonesCategoryHref}
+                className="shrink-0 self-start py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
+              >
+                {t('common.mainHeader.phonesLink')}
+              </Link>
+              {tabletsCategory ? (
+                <MegaNavItem category={tabletsCategory} />
+              ) : (
+                <Link
+                  href="/products"
+                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                >
+                  {t('common.mainHeader.tabletsLink')}
+                </Link>
+              )}
+            </div>
           </div>
 
           <nav

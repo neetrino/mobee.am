@@ -45,7 +45,9 @@
   },
   "mainHeader": {
     "searchPlaceholder": "Найди лучшее",
-    "specialOffers": "Специальные предложения"
+    "specialOffers": "Специальные предложения",
+    "phonesLink": "Телефоны",
+    "tabletsLink": "Планшеты"
   },
   "stock": {
     "inStock": "В наличии",

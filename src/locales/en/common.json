@@ -45,7 +45,9 @@
   },
   "mainHeader": {
     "searchPlaceholder": "Find the best",
-    "specialOffers": "Special offers"
+    "specialOffers": "Special offers",
+    "phonesLink": "Phones",
+    "tabletsLink": "Tablets"
   },
   "stock": {
     "inStock": "In Stock",

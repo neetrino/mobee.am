@@ -45,7 +45,9 @@
   },
   "mainHeader": {
     "searchPlaceholder": "Գտիր լավագույնը",
-    "specialOffers": "Հատուկ առաջարկներ"
+    "specialOffers": "Հատուկ առաջարկներ",
+    "phonesLink": "Հեռախոսներ",
+    "tabletsLink": "Պլանշետներ"
   },
   "stock": {
     "inStock": "Պահեստում",
