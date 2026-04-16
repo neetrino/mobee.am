@@ -20,10 +20,10 @@ export function LanguageSwitcherPill() {
   const hySelected = lang === 'hy';
 
   return (
-    <div className="relative h-[41px] w-[89px] shrink-0" role="group" aria-label="Language">
-      <div className="pointer-events-none absolute inset-0 rounded-[22px] border-[1.2px] border-solid border-[#4b5563]" />
+    <div className="relative h-[30px] w-[68px] shrink-0" role="group" aria-label="Language">
+      <div className="pointer-events-none absolute inset-0 rounded-[15px] border border-solid border-[#4b5563]" />
       <div
-        className={`pointer-events-none absolute rounded-[18px] bg-[#136dec] transition-all duration-200 ease-out ${
+        className={`pointer-events-none absolute rounded-[12px] bg-[#136dec] transition-all duration-200 ease-out ${
           hySelected
             ? 'inset-[10.81%_5.62%_10.81%_50.56%]'
             : 'inset-[10.81%_50.56%_10.81%_5.62%]'
@@ -32,7 +32,7 @@ export function LanguageSwitcherPill() {
       <div className="relative z-10 flex h-full items-stretch px-0.5">
         <button
           type="button"
-          className={`flex flex-1 items-center justify-center rounded-[18px] text-[14px] font-medium leading-[15px] ${
+          className={`flex flex-1 items-center justify-center rounded-[12px] text-[11px] font-medium leading-none ${
             enSelected ? 'text-[#f5f5f5]' : 'text-[#4b5563]'
           }`}
           onClick={() => {
@@ -43,7 +43,7 @@ export function LanguageSwitcherPill() {
         </button>
         <button
           type="button"
-          className={`flex flex-1 items-center justify-center rounded-[18px] text-[14px] font-medium leading-[15px] ${
+          className={`flex flex-1 items-center justify-center rounded-[12px] text-[11px] font-medium leading-none ${
             hySelected ? 'text-[#f5f5f5]' : 'text-[#4b5563]'
           }`}
           onClick={() => {
