@@ -56,7 +56,7 @@ const CATEGORY_STRIP_SLOTS: readonly CategorySlot[] = [
     imageWidth: 146,
     imageHeight: 146,
     labelKey: 'common.mainHeader.computersLink',
-    tall: true,
+    tall: false,
     imageWrapperClassName:
       'absolute left-[31px] top-[24px] flex size-[146px] items-center justify-center',
     imageClassName: 'object-contain',
