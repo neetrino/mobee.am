@@ -281,7 +281,7 @@ export function MainHeaderBar() {
                 </span>
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-4 sm:gap-10">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-10 sm:ml-12 lg:ml-[4.2rem]">
               <Link
                 href={phonesCategoryHref}
                 className="shrink-0 self-start py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
@@ -345,9 +345,11 @@ export function MainHeaderBar() {
             className="flex min-w-0 flex-1 items-center gap-x-4 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] sm:gap-x-6 lg:justify-end lg:gap-x-8 lg:pb-0 xl:gap-x-10 scrollbar-hide"
             aria-label={t('common.navigation.categories')}
           >
-            {megaRoots.map((cat) => (
-              <MegaNavItem key={cat.id} category={cat} />
-            ))}
+            <div className="flex min-w-0 items-center gap-x-4 sm:gap-x-6 lg:gap-x-8 xl:gap-x-10 sm:ml-12 lg:ml-[4.2rem]">
+              {megaRoots.map((cat) => (
+                <MegaNavItem key={cat.id} category={cat} />
+              ))}
+            </div>
             <Link
               href="/products"
               className="shrink-0 py-1 text-[14px] font-bold leading-5 whitespace-nowrap text-[#ef4444] hover:text-[#dc2626]"
