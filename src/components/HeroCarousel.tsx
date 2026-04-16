@@ -53,7 +53,7 @@ export function HeroCarousel() {
     >
       <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-8 sm:px-6 md:px-10 lg:px-16 xl:px-20">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:gap-5">
-          {/* Main banner — Figma node 1:226; background is a layer so headphones can overflow the rounded rect */}
+          {/* Main banner — Figma 1:226; headphones 1:229 (+20% vs base); ~10% of icon height past card top */}
           <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px]">
             <div
               className="absolute inset-0 z-0 rounded-[40px] bg-[#e9ecf0]"
@@ -91,13 +91,14 @@ export function HeroCarousel() {
               </div>
             </div>
 
-            <div className="pointer-events-none relative z-10 mx-auto mt-2 h-52 w-full max-w-[280px] -translate-x-1/2 -translate-y-[40%] sm:absolute sm:bottom-0 sm:right-0 sm:mx-0 sm:mt-0 sm:h-[min(85%,359px)] sm:w-[273px] sm:max-w-none">
+            {/* Headphones: 280×369; sm: −47% self-width; sm vertical −20.5px (up 25px vs prior +4.5px). */}
+            <div className="pointer-events-none relative z-10 mx-auto mt-2 h-[214px] w-full max-w-[287px] -translate-x-1/2 -translate-y-[40%] sm:absolute sm:bottom-0 sm:right-0 sm:mx-0 sm:mt-0 sm:h-[369px] sm:w-[280px] sm:max-w-none sm:-translate-x-[47%] sm:-translate-y-[20.5px]">
               <Image
                 src={IMG_AIRPODS}
                 alt=""
                 fill
                 className="object-contain object-center sm:object-right-bottom"
-                sizes="(max-width: 640px) 280px, 273px"
+                sizes="(max-width: 640px) 287px, 280px"
                 priority
               />
             </div>
