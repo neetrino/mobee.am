@@ -142,18 +142,14 @@ export function FeaturedProductsTabs() {
   }, [fetchProducts]);
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
-        <h2 className="text-3xl font-bold text-gray-900 text-center">
+    <section className="bg-gray-50 pb-16 pt-8" aria-labelledby="featured-products-tabs">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 id="featured-products-tabs" className="sr-only">
           {t(language, 'home.featured_products.title')}
         </h2>
-        <p className="mt-3 mb-8 text-base text-gray-600 text-center">
-          {t(language, 'home.featured_products.subtitle')}
-        </p>
 
         {/* Tabs Navigation */}
-        <div className="flex justify-center items-center gap-6 md:gap-8 mb-8 flex-wrap">
+        <div className="mb-8 flex flex-wrap items-center justify-center gap-6 md:gap-8">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (

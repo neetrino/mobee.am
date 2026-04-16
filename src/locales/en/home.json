@@ -21,6 +21,11 @@
   "feature_best_quality_description": "This is a content strategy that went wrong from the very beginning.",
   "feature_free_return_title": "Free Return",
   "feature_free_return_description": "This is true, but that's not all that's needed to get things back on track.",
+  "featured_intro": {
+    "title": "The best choice",
+    "subtitle": "A simple choice from the best",
+    "cta": "More"
+  },
   "featured_products": {
     "title": "Featured Products",
     "subtitle": "Three quick choices: New Arrivals, Best Sellers and Featured Selections",

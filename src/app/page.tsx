@@ -1,6 +1,7 @@
 import { HeroCarousel } from '../components/HeroCarousel';
 import { FeaturesSection } from '../components/FeaturesSection';
 import { TopCategories } from '../components/TopCategories';
+import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
 import { FeaturedProductsTabs } from '../components/FeaturedProductsTabs';
 
 export default async function HomePage() {
@@ -14,6 +15,8 @@ export default async function HomePage() {
 
       {/* Top Categories */}
       <TopCategories />
+
+      <FeaturedIntroHeading />
 
       {/* Featured Products with Tabs */}
       <FeaturedProductsTabs />
