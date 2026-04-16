@@ -64,6 +64,17 @@ const WATCHES_SLUG_PARTS = [
   'clocks',
 ] as const;
 
+const HEADPHONES_SLUG_PARTS = [
+  'headphones',
+  'headphone',
+  'earphones',
+  'earbuds',
+  'headsets',
+  'headset',
+  'akanjakalner',
+  'akanjakal',
+] as const;
+
 function categoryMatchesSlugParts(category: Category, parts: readonly string[]): boolean {
   const tokens = category.slug.toLowerCase().split(/[-_/]/);
   return parts.some((p) => tokens.includes(p));
@@ -201,6 +212,10 @@ export function MainHeaderBar() {
     () => findCategoryBySlugParts(categories, WATCHES_SLUG_PARTS),
     [categories],
   );
+  const headphonesCategory = useMemo(
+    () => findCategoryBySlugParts(categories, HEADPHONES_SLUG_PARTS),
+    [categories],
+  );
 
   const megaRoots = useMemo(() => {
     const quickIds = new Set<string>();
@@ -208,8 +223,16 @@ export function MainHeaderBar() {
     if (tabletsCategory) quickIds.add(tabletsCategory.id);
     if (computersCategory) quickIds.add(computersCategory.id);
     if (watchesCategory) quickIds.add(watchesCategory.id);
+    if (headphonesCategory) quickIds.add(headphonesCategory.id);
     return categories.filter((c) => !quickIds.has(c.id)).slice(0, MEGA_ROOT_LIMIT);
-  }, [categories, phonesCategory, tabletsCategory, computersCategory, watchesCategory]);
+  }, [
+    categories,
+    phonesCategory,
+    tabletsCategory,
+    computersCategory,
+    watchesCategory,
+    headphonesCategory,
+  ]);
 
   const phonesCategoryHref = useMemo(() => {
     if (phonesCategory) return `/products?category=${encodeURIComponent(phonesCategory.slug)}`;
@@ -279,6 +302,16 @@ export function MainHeaderBar() {
                   className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   {t('common.mainHeader.watchesLink')}
+                </Link>
+              )}
+              {headphonesCategory ? (
+                <MegaNavItem category={headphonesCategory} />
+              ) : (
+                <Link
+                  href="/products"
+                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                >
+                  {t('common.mainHeader.headphonesLink')}
                 </Link>
               )}
             </div>
