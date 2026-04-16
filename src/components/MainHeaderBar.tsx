@@ -53,6 +53,17 @@ const COMPUTERS_SLUG_PARTS = [
   'hamakargich',
 ] as const;
 
+const WATCHES_SLUG_PARTS = [
+  'watches',
+  'watch',
+  'smartwatches',
+  'smartwatch',
+  'jamacuyjer',
+  'jamacuyc',
+  'clock',
+  'clocks',
+] as const;
+
 function categoryMatchesSlugParts(category: Category, parts: readonly string[]): boolean {
   const tokens = category.slug.toLowerCase().split(/[-_/]/);
   return parts.some((p) => tokens.includes(p));
@@ -186,14 +197,19 @@ export function MainHeaderBar() {
     () => findCategoryBySlugParts(categories, COMPUTERS_SLUG_PARTS),
     [categories],
   );
+  const watchesCategory = useMemo(
+    () => findCategoryBySlugParts(categories, WATCHES_SLUG_PARTS),
+    [categories],
+  );
 
   const megaRoots = useMemo(() => {
     const quickIds = new Set<string>();
     if (phonesCategory) quickIds.add(phonesCategory.id);
     if (tabletsCategory) quickIds.add(tabletsCategory.id);
     if (computersCategory) quickIds.add(computersCategory.id);
+    if (watchesCategory) quickIds.add(watchesCategory.id);
     return categories.filter((c) => !quickIds.has(c.id)).slice(0, MEGA_ROOT_LIMIT);
-  }, [categories, phonesCategory, tabletsCategory, computersCategory]);
+  }, [categories, phonesCategory, tabletsCategory, computersCategory, watchesCategory]);
 
   const phonesCategoryHref = useMemo(() => {
     if (phonesCategory) return `/products?category=${encodeURIComponent(phonesCategory.slug)}`;
@@ -253,6 +269,16 @@ export function MainHeaderBar() {
                   className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   {t('common.mainHeader.computersLink')}
+                </Link>
+              )}
+              {watchesCategory ? (
+                <MegaNavItem category={watchesCategory} />
+              ) : (
+                <Link
+                  href="/products"
+                  className="shrink-0 py-1 text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                >
+                  {t('common.mainHeader.watchesLink')}
                 </Link>
               )}
             </div>
