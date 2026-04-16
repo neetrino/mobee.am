@@ -334,11 +334,12 @@ export function Header() {
 
   const navTextClass = (href: string) =>
     isNavActive(href)
-      ? 'whitespace-nowrap text-[14px] font-black leading-7 tracking-[0.2px] text-[#00a1ff]'
-      : 'whitespace-nowrap text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151] hover:text-gray-900';
+      ? 'whitespace-nowrap text-[13px] font-black leading-7 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
+      : 'whitespace-nowrap text-[13px] font-semibold leading-7 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
 
+  /** Icon captions hidden below `xl` so the desktop bar fits down to `lg`. */
   const utilityLabelClass =
-    'mt-1 max-w-[92px] text-center text-[14px] font-medium leading-[15px] text-[#4b5563]';
+    'mt-1 hidden max-w-[92px] text-center text-[14px] font-medium leading-[15px] text-[#4b5563] xl:block';
   const mobileCurrencyRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const productsMenuRef = useRef<HTMLDivElement>(null);
@@ -682,7 +683,7 @@ export function Header() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Mobile: logo row — Figma omits search/currency in bar; currency stays for small screens */}
-        <div className="flex items-center justify-between py-4 md:hidden">
+        <div className="flex items-center justify-between py-4 lg:hidden">
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
@@ -742,16 +743,19 @@ export function Header() {
           </div>
         </div>
 
-        {/* Desktop — Figma node 1:408: py-[16px], gap 76 | 60 | 70 */}
-        <div className="hidden items-center justify-between py-4 md:flex">
-          <div className="flex min-w-0 items-center gap-[76px]">
+        {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
+        <div className="hidden items-center justify-between gap-4 py-4 lg:flex">
+          <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
             <Link href="/" className="flex w-[113px] shrink-0 items-center gap-2">
               <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
                 <span className="text-[20px] font-bold leading-[28px] text-white">M</span>
               </div>
               <span className="text-[20px] font-bold leading-[28px] tracking-[-0.5px] text-[#111827]">Mobee</span>
             </Link>
-            <nav className="flex items-center gap-[60px]" aria-label="Primary">
+            <nav
+              className="flex min-w-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[60px]"
+              aria-label="Primary"
+            >
               <Link
                 href="/"
                 className={`flex items-center justify-center py-[10px] ${navTextClass('/')}`}
@@ -812,7 +816,7 @@ export function Header() {
             </nav>
           </div>
 
-          <div className="flex min-w-0 shrink-0 items-center justify-end gap-[70px]">
+          <div className="flex min-w-0 shrink-0 items-center justify-end gap-2 lg:gap-3 xl:gap-6 2xl:gap-[70px]">
             <Link
               href="/compare"
               className="flex w-[35px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
@@ -947,7 +951,7 @@ export function Header() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 flex md:hidden bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm lg:hidden"
           role="dialog"
           aria-modal="true"
           onClick={() => setMobileMenuOpen(false)}
