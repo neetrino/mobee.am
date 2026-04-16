@@ -15,6 +15,7 @@ interface Product {
   id: string;
   slug: string;
   title: string;
+  subtitle?: string | null;
   price: number;
   image: string | null;
   inStock: boolean;

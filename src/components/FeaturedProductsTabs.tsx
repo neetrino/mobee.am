@@ -11,6 +11,7 @@ interface Product {
   id: string;
   slug: string;
   title: string;
+  subtitle?: string | null;
   price: number;
   compareAtPrice?: number | null;
   image: string | null;

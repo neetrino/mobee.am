@@ -25,6 +25,7 @@
     "db:migrate": "pnpm --filter @white-shop/db db:migrate",
     "db:studio": "pnpm --filter @white-shop/db db:studio",
     "db:seed": "node shared/db/prisma/seed.cjs",
+    "db:seed:figma": "node shared/db/prisma/seed-figma-products.cjs",
     "db:migrate:deploy": "node src/scripts/run-migrations.js"
   },
   "dependencies": {

@@ -14,6 +14,7 @@ interface ProductCardGridProps {
     id: string;
     slug: string;
     title: string;
+    subtitle?: string | null;
     price: number;
     image: string | null;
     inStock: boolean;
@@ -86,6 +87,7 @@ export function ProductCardGrid({
       <ProductCardInfo
         slug={product.slug}
         title={product.title}
+        subtitle={product.subtitle}
         brandName={product.brand?.name}
         price={product.price}
         originalPrice={product.originalPrice}

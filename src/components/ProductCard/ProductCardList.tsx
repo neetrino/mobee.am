@@ -33,6 +33,7 @@ interface ProductCardListProps {
     id: string;
     slug: string;
     title: string;
+    subtitle?: string | null;
     price: number;
     image: string | null;
     inStock: boolean;
@@ -101,12 +102,18 @@ export function ProductCardList({
         {/* Product Info */}
         <div className="flex-1 min-w-0 w-full sm:w-auto">
           <Link href={`/products/${product.slug}`} className="block">
-            <h3 className="text-lg sm:text-xl font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2">
-              {product.title}
-            </h3>
-            <p className="text-base sm:text-lg text-gray-500 mt-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400">
               {product.brand?.name || t('common.defaults.category')}
             </p>
+            <h3 className="text-lg sm:text-xl font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 mt-0.5">
+              {product.title}
+            </h3>
+            {product.subtitle ? (
+              <p className="flex items-center gap-2 text-[11px] text-gray-500 mt-1">
+                <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
+                <span className="line-clamp-2">{product.subtitle}</span>
+              </p>
+            ) : null}
           </Link>
           {/* Available Colors */}
           {product.colors && product.colors.length > 0 && (
