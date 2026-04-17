@@ -6,8 +6,9 @@ import type { LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
 
 const MOBILE_GRID_LAYOUT =
-  'grid grid-cols-2 gap-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 justify-items-center';
-const BEST_CHOICE_CARD_WIDTH = 'w-[90%] max-w-full';
+  'grid grid-cols-2 gap-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4';
+/** Full grid track width — matches site content gutters (same as main header bar). */
+const BEST_CHOICE_CARD_WIDTH = 'w-full min-w-0';
 const BEST_CHOICE_FIRST_CARD_IMAGE = '/images/home/best-choice-first.png';
 
 function BestChoiceSkeleton({ productsPerPage }: { productsPerPage: number }) {
