@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { FeaturedBestChoiceGrid } from './FeaturedBestChoiceGrid';
 import { SpecialOffersProductGrid } from './SpecialOffersProductGrid';
 import { SpecialOffersSectionHeading } from './SpecialOffersSectionHeading';
+import { WhyChooseUsSection } from './WhyChooseUsSection';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { t } from '../lib/i18n';
 import { FEATURED_HOME_FILTER_DEFAULT, useFeaturedHomeProducts } from './useFeaturedHomeProducts';
@@ -64,6 +65,8 @@ export function FeaturedProductsTabs() {
             />
           </div>
         </SpecialOffersSectionHeading>
+
+        <WhyChooseUsSection />
       </div>
     </section>
   );
