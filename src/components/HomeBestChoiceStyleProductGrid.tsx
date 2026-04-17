@@ -9,28 +9,21 @@ export const HOME_BEST_CHOICE_GRID_LAYOUT =
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'w-full min-w-0';
 
-/** Hero tile for the first card — identical visual to the “best choice” row. */
-export const HOME_BEST_CHOICE_FIRST_CARD_IMAGE = '/images/home/best-choice-first.png';
-
 type HomeBestChoiceStyleProductGridProps = {
   products: FeaturedHomeProduct[];
   productsPerPage: number;
-  firstCardHeroImage?: string;
 };
 
 export function HomeBestChoiceStyleProductGrid({
   products,
   productsPerPage,
-  firstCardHeroImage = HOME_BEST_CHOICE_FIRST_CARD_IMAGE,
 }: HomeBestChoiceStyleProductGridProps) {
   return (
     <div className={HOME_BEST_CHOICE_GRID_LAYOUT}>
-      {products.slice(0, productsPerPage).map((product, index) => (
+      {products.slice(0, productsPerPage).map((product) => (
         <div key={product.id} className={HOME_BEST_CHOICE_CARD_WIDTH}>
           <ProductCard
-            product={
-              index === 0 ? { ...product, image: firstCardHeroImage } : product
-            }
+            product={product}
             viewMode="grid-2"
             shiftImageInFrame
             smallerFooterPrice

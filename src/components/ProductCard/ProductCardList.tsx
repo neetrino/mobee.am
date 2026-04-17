@@ -10,6 +10,7 @@ import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { WishlistHeartIcon } from '../icons/WishlistHeartIcon';
 import { ProductColors } from './ProductColors';
 import type { CurrencyCode } from '../../lib/currency';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
 import type { ProductLabel } from '../ProductLabels';
 
 interface ProductCardListProps {
@@ -64,9 +65,9 @@ export function ProductCardList({
           href={`/products/${product.slug}`}
           className="w-20 h-20 bg-white border border-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden self-start sm:self-center"
         >
-          {product.image && !imageError ? (
+          {!imageError ? (
             <Image
-              src={product.image}
+              src={PRODUCT_CARD_DISPLAY_IMAGE_SRC}
               alt={product.title}
               fill
               className="object-contain"

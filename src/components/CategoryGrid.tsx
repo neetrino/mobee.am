@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../lib/productCardDisplayImage';
 
 interface Category {
   id: string;
@@ -316,10 +317,10 @@ export function CategoryGrid() {
               >
                 {/* Product Image or Icon */}
                 <div className="transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1 relative">
-                  {product?.image ? (
+                  {product ? (
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-white shadow-md border-2 border-gray-200 group-hover:border-gray-400 transition-all duration-300">
                       <Image
-                        src={product.image}
+                        src={PRODUCT_CARD_DISPLAY_IMAGE_SRC}
                         alt={category.title}
                         width={80}
                         height={80}

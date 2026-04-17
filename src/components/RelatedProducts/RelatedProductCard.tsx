@@ -8,6 +8,7 @@ import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import type { CurrencyCode } from '../../lib/currency';
 import type { LanguageCode } from '../../lib/language';
 import { t } from '../../lib/i18n';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
 
 interface RelatedProduct {
   id: string;
@@ -56,7 +57,7 @@ export function RelatedProductCard({
   imageError,
   width,
 }: RelatedProductCardProps) {
-  const hasImage = product.image && !imageError;
+  const hasImage = !imageError;
   const categoryName = product.categories && product.categories.length > 0 
     ? product.categories.map(c => c.title).join(', ')
     : product.brand?.name || 'Product';
@@ -85,7 +86,7 @@ export function RelatedProductCard({
             <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden flex-shrink-0">
               {hasImage ? (
                 <Image
-                  src={product.image!}
+                  src={PRODUCT_CARD_DISPLAY_IMAGE_SRC}
                   alt={product.title}
                   fill
                   className="object-contain group-hover:scale-105 transition-transform duration-300"
