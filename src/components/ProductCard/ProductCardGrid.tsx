@@ -5,6 +5,7 @@ import { ProductCardImage } from './ProductCardImage';
 import { ProductCardInfo } from './ProductCardInfo';
 import { ProductCardActions } from './ProductCardActions';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
+import { ProductLabels } from '../ProductLabels';
 import { useTranslation } from '../../lib/i18n-client';
 import type { CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
@@ -57,19 +58,25 @@ export function ProductCardGrid({
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow relative group">
-      {/* Product Image */}
-      <div className="aspect-square bg-gray-100 relative overflow-hidden">
-        <ProductCardImage
-          slug={product.slug}
-          image={product.image}
-          title={product.title}
-          labels={product.labels}
-          imageError={imageError}
-          onImageError={onImageError}
-          isCompact={isCompact}
-        />
-        
-        {/* Action Icons - appear on hover */}
+      {/* Product image: card inset + gray panel + centered asset (Figma mobee-new) */}
+      <div className="aspect-square relative">
+        <div className="absolute inset-0 p-5">
+          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-gray-50 py-8">
+            <ProductCardImage
+              slug={product.slug}
+              image={product.image}
+              title={product.title}
+              imageError={imageError}
+              onImageError={onImageError}
+              isCompact={isCompact}
+            />
+          </div>
+        </div>
+        {product.labels && product.labels.length > 0 ? (
+          <div className="pointer-events-none absolute inset-0 z-20">
+            <ProductLabels labels={product.labels} />
+          </div>
+        ) : null}
         <ProductCardActions
           isInWishlist={isInWishlist}
           isInCompare={isInCompare}

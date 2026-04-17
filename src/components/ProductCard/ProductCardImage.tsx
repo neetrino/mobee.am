@@ -2,41 +2,43 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ProductLabels } from "../ProductLabels";
 import { ProductImagePlaceholder } from "../ProductImagePlaceholder";
-import type { ProductLabel } from "../ProductLabels";
 
 interface ProductCardImageProps {
   slug: string;
   image: string | null;
   title: string;
-  labels?: ProductLabel[];
   imageError: boolean;
   onImageError: () => void;
   isCompact?: boolean;
 }
 
 /**
- * Component for displaying product image with labels.
- * Shows placeholder icon when no image or image failed to load.
+ * Centered product image for the grid card — portrait frame (vertical rectangle), object-contain.
  */
 export function ProductCardImage({
   slug,
   image,
   title,
-  labels,
   imageError,
   onImageError,
   isCompact = false,
 }: ProductCardImageProps) {
   const showPlaceholder = !image || imageError;
+  const frameClass = isCompact
+    ? "w-[min(160px,72%)] max-w-[85%]"
+    : "w-[min(198px,78%)] max-w-[85%]";
 
   return (
-    <div className="aspect-square bg-gray-100 relative overflow-hidden">
-      <Link href={`/products/${slug}`} className="block w-full h-full">
+    <div className={`relative aspect-[3/4] shrink-0 ${frameClass}`}>
+      <Link
+        href={`/products/${slug}`}
+        className="absolute inset-0 block"
+        aria-label={title}
+      >
         {showPlaceholder ? (
           <ProductImagePlaceholder
-            className="w-full h-full"
+            className="h-full w-full"
             aria-label={title ? `No image for ${title}` : "No image"}
           />
         ) : (
@@ -44,14 +46,13 @@ export function ProductCardImage({
             src={image}
             alt={title}
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            className="object-contain"
+            sizes="(max-width: 768px) 78vw, (max-width: 1200px) 35vw, 198px"
             unoptimized
             onError={onImageError}
           />
         )}
       </Link>
-      {labels && labels.length > 0 && <ProductLabels labels={labels} />}
     </div>
   );
 }
