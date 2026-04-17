@@ -192,18 +192,13 @@
     "category": "Бакалея"
   },
   "footer": {
+    "visitUs": "Посетите нас",
+    "productsHeading": "Товары",
+    "sectionsHeading": "Разделы",
+    "connectHeading": "Связь",
+    "openInMaps": "Открыть адрес в Google Картах",
     "shop": "Магазин",
-    "description": "Профессиональная платформа электронной коммерции для современного опыта покупок.",
-    "quickLinks": "Быстрые ссылки",
-    "legal": "Юридическая информация",
-    "contactInfo": "Контактная информация",
-    "privacyPolicy": "Политика конфиденциальности",
-    "termsOfService": "Условия использования",
-    "cookiePolicy": "Политика использования файлов cookie",
-    "refundPolicy": "Политика возврата",
-    "deliveryTerms": "Условия доставки",
-    "copyright": "© {year} Shop. Все права защищены.",
-    "paymentMethods": "Способы оплаты:"
+    "copyright": "© {year} Mobee. Все права защищены."
   },
   "product": {
     "product": "товар",

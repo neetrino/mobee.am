@@ -193,18 +193,13 @@
     "category": "Մթերք"
   },
   "footer": {
+    "visitUs": "Այցելիր մեզ",
+    "productsHeading": "Ապրանք",
+    "sectionsHeading": "Բաժիններ",
+    "connectHeading": "Կապ",
+    "openInMaps": "Բացել հասցեն Google Քարտեզներում",
     "shop": "Խանութ",
-    "description": "Պրոֆեսիոնալ էլեկտրոնային առևտրի հարթակ ժամանակակից գնումների փորձի համար:",
-    "quickLinks": "Արագ հղումներ",
-    "legal": "Իրավական",
-    "contactInfo": "Կոնտակտային տեղեկատվություն",
-    "privacyPolicy": "Գաղտնիության քաղաքականություն",
-    "termsOfService": "Ծառայությունների պայմաններ",
-    "cookiePolicy": "Cookie քաղաքականություն",
-    "refundPolicy": "Փոխհատուցման քաղաքականություն",
-    "deliveryTerms": "Առաքման պայմաններ",
-    "copyright": "© {year} Խանութ: Բոլոր իրավունքները պաշտպանված են:",
-    "paymentMethods": "Վճարման եղանակներ:"
+    "copyright": "© {year} Mobee: Բոլոր իրավունքները պաշտպանված են:"
   },
   "product": {
     "product": "ապրանք",

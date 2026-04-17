@@ -51,7 +51,7 @@ export function FooterCurrency() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-2 rounded-md border border-gray-600 bg-transparent px-3 py-1.5 text-sm text-gray-300 transition-colors hover:border-gray-400 hover:text-white"
+        className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-transparent px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-gray-500 hover:text-gray-900"
         aria-expanded={open}
       >
         <span className="font-semibold">{selected.symbol}</span>
@@ -59,7 +59,7 @@ export function FooterCurrency() {
         <ChevronDownIcon />
       </button>
       {open && (
-        <div className="absolute bottom-full left-0 z-50 mb-2 w-40 overflow-hidden rounded-md border border-gray-600 bg-gray-900 shadow-xl">
+        <div className="absolute bottom-full left-0 z-50 mb-2 w-40 overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl">
           {Object.values(CURRENCIES).map((currency) => (
             <button
               key={currency.code}
@@ -67,13 +67,13 @@ export function FooterCurrency() {
               onClick={() => handleChange(currency.code)}
               className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
                 selectedCurrency === currency.code
-                  ? 'bg-gray-800 font-semibold text-white'
-                  : 'text-gray-200 hover:bg-gray-800'
+                  ? 'bg-gray-100 font-semibold text-gray-900'
+                  : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span>{currency.code}</span>
-                <span className="text-gray-400">{currency.symbol}</span>
+                <span className="text-gray-500">{currency.symbol}</span>
               </div>
             </button>
           ))}

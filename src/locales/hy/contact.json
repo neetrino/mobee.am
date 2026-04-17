@@ -3,7 +3,7 @@
   "email": "info@shop.am",
   "address": "Երևան, Աբովյան 10",
   "workingHours": "Երկ-Ուրբ 10:00-19:00",
-  "social": { "instagram": "", "facebook": "", "linkedin": "" },
+  "social": { "instagram": "", "facebook": "", "linkedin": "", "telegram": "", "whatsapp": "" },
   "callToUs": {"title":"Զանգահարեք մեզ:","description":"Մենք հասանելի ենք շաբաթվա 7 օր, օրվա 24 ժամ:"},
   "writeToUs": {"title":"Գրեք մեզ:","description":"Լրացրեք մեր ձևը, և մենք կկապվենք ձեզ հետ 24 ժամվա ընթացքում:","emailLabel":"Էլ. փոստ:"},
   "headquarter": {"title":"Գլխավոր գրասենյակ:","hours":{"weekdays":"Երկուշաբթի - Ուրբաթ: 9:00-20:00","saturday":"Շաբաթ: 11:00 - 15:00"}},

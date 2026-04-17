@@ -195,18 +195,13 @@
     "category": "Grocery"
   },
   "footer": {
+    "visitUs": "Visit us",
+    "productsHeading": "Products",
+    "sectionsHeading": "Sections",
+    "connectHeading": "Connect",
+    "openInMaps": "Open address in Google Maps",
     "shop": "Shop",
-    "description": "Professional e-commerce platform for modern shopping experience.",
-    "quickLinks": "Quick Links",
-    "legal": "Legal",
-    "contactInfo": "Contact Information",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "cookiePolicy": "Cookie Policy",
-    "refundPolicy": "Refund Policy",
-    "deliveryTerms": "Delivery Terms",
-    "copyright": "© {year} Shop. All rights reserved.",
-    "paymentMethods": "Payment Methods:"
+    "copyright": "© {year} Mobee. All rights reserved."
   },
   "product": {
     "product": "product",
