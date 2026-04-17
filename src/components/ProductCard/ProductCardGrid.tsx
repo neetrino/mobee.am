@@ -34,6 +34,8 @@ interface ProductCardGridProps {
   isCompact?: boolean;
   shiftImageInFrame?: boolean;
   squareImageFrame?: boolean;
+  /** Smaller footer price (home “best choice”; ~15% under default grid-2). */
+  smallerFooterPrice?: boolean;
   onImageError: () => void;
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
@@ -53,6 +55,7 @@ export function ProductCardGrid({
   isCompact = false,
   shiftImageInFrame = false,
   squareImageFrame = true,
+  smallerFooterPrice = false,
   onImageError,
   onWishlistToggle,
   onCompareToggle,
@@ -117,12 +120,30 @@ export function ProductCardGrid({
         <div className="min-w-0 flex flex-col">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`font-bold tabular-nums text-gray-900 ${isCompact ? 'text-lg leading-7' : 'text-xl leading-7'}`}
+              className={`font-bold tabular-nums text-gray-900 ${
+                smallerFooterPrice
+                  ? isCompact
+                    ? 'text-[0.961875rem] leading-[1.49625rem]'
+                    : 'text-[1.06875rem] leading-[1.49625rem]'
+                  : isCompact
+                    ? 'text-lg leading-7'
+                    : 'text-xl leading-7'
+              }`}
             >
               {formatPrice(product.price || 0, currency)}
             </span>
             {product.discountPercent && product.discountPercent > 0 ? (
-              <span className={`font-semibold text-blue-600 ${isCompact ? 'text-xs' : 'text-sm'}`}>
+              <span
+                className={`font-semibold text-blue-600 ${
+                  smallerFooterPrice
+                    ? isCompact
+                      ? 'text-[0.64125rem]'
+                      : 'text-[0.748125rem]'
+                    : isCompact
+                      ? 'text-xs'
+                      : 'text-sm'
+                }`}
+              >
                 -{product.discountPercent}%
               </span>
             ) : null}

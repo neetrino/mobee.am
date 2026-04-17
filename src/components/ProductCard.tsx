@@ -41,6 +41,8 @@ interface ProductCardProps {
   shiftImageInFrame?: boolean;
   /** Use a square image frame; set false for portrait 3:4. */
   squareImageFrame?: boolean;
+  /** Smaller footer price (e.g. home “best choice” grid). */
+  smallerFooterPrice?: boolean;
 }
 
 /**
@@ -52,6 +54,7 @@ export function ProductCard({
   viewMode = 'grid-3',
   shiftImageInFrame = false,
   squareImageFrame = true,
+  smallerFooterPrice = false,
 }: ProductCardProps) {
   const isCompact = viewMode === 'grid-3';
   const router = useRouter();
@@ -125,6 +128,7 @@ export function ProductCard({
       isCompact={isCompact}
       shiftImageInFrame={shiftImageInFrame}
       squareImageFrame={squareImageFrame}
+      smallerFooterPrice={smallerFooterPrice}
       onImageError={() => setImageError(true)}
       onWishlistToggle={handleWishlistToggle}
       onCompareToggle={handleCompareToggle}
