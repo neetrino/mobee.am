@@ -2,10 +2,15 @@
 
 import { useCallback } from 'react';
 import { FeaturedBestChoiceGrid } from './FeaturedBestChoiceGrid';
+import { SpecialOffersProductGrid } from './SpecialOffersProductGrid';
 import { SpecialOffersSectionHeading } from './SpecialOffersSectionHeading';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { t } from '../lib/i18n';
 import { FEATURED_HOME_FILTER_DEFAULT, useFeaturedHomeProducts } from './useFeaturedHomeProducts';
+import {
+  SPECIAL_OFFERS_HOME_FILTER_DEFAULT,
+  useSpecialOffersHomeProducts,
+} from './useSpecialOffersHomeProducts';
 
 /**
  * Featured products grid for the home page (single curated list).
@@ -14,9 +19,22 @@ export function FeaturedProductsTabs() {
   const { language, products, loading, error, fetchProducts, productsPerPage } =
     useFeaturedHomeProducts();
 
+  const {
+    language: specialOffersLanguage,
+    products: specialOffersProducts,
+    loading: specialOffersLoading,
+    error: specialOffersError,
+    fetchProducts: fetchSpecialOffersProducts,
+    productsPerPage: specialOffersProductsPerPage,
+  } = useSpecialOffersHomeProducts();
+
   const onRetry = useCallback(() => {
     fetchProducts(FEATURED_HOME_FILTER_DEFAULT);
   }, [fetchProducts]);
+
+  const onRetrySpecialOffers = useCallback(() => {
+    fetchSpecialOffersProducts(SPECIAL_OFFERS_HOME_FILTER_DEFAULT);
+  }, [fetchSpecialOffersProducts]);
 
   return (
     <section className="bg-gray-50 pb-16 pt-6" aria-labelledby="featured-products-tabs">
@@ -34,7 +52,18 @@ export function FeaturedProductsTabs() {
           onRetry={onRetry}
         />
 
-        <SpecialOffersSectionHeading />
+        <SpecialOffersSectionHeading>
+          <div className="mt-10">
+            <SpecialOffersProductGrid
+              language={specialOffersLanguage}
+              loading={specialOffersLoading}
+              error={specialOffersError}
+              products={specialOffersProducts}
+              productsPerPage={specialOffersProductsPerPage}
+              onRetry={onRetrySpecialOffers}
+            />
+          </div>
+        </SpecialOffersSectionHeading>
       </div>
     </section>
   );

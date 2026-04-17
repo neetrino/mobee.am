@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
@@ -32,10 +33,15 @@ function ArrowRightIcon({ className }: { className?: string }) {
   );
 }
 
+type SpecialOffersSectionHeadingProps = {
+  /** Product grid — same card system as “best choice”, placed under the title row. */
+  children?: ReactNode;
+};
+
 /**
  * Row below the home “best choice” grid — same typography/rhythm as {@link FeaturedIntroHeading}.
  */
-export function SpecialOffersSectionHeading() {
+export function SpecialOffersSectionHeading({ children }: SpecialOffersSectionHeadingProps) {
   const { t } = useTranslation();
 
   return (
@@ -67,6 +73,7 @@ export function SpecialOffersSectionHeading() {
           </span>
         </Link>
       </div>
+      {children}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import type { LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
 
-type FeaturedBestChoiceGridProps = {
+type SpecialOffersProductGridProps = {
   language: LanguageCode;
   loading: boolean;
   error: string | null;
@@ -17,14 +17,17 @@ type FeaturedBestChoiceGridProps = {
   onRetry: () => void;
 };
 
-export function FeaturedBestChoiceGrid({
+/**
+ * Same card treatment as {@link FeaturedBestChoiceGrid} — grid-2, shifted art, compact price, first hero tile.
+ */
+export function SpecialOffersProductGrid({
   language,
   loading,
   error,
   products,
   productsPerPage,
   onRetry,
-}: FeaturedBestChoiceGridProps) {
+}: SpecialOffersProductGridProps) {
   if (loading) {
     return <HomeBestChoiceStyleProductGridSkeleton productsPerPage={productsPerPage} />;
   }
