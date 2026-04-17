@@ -36,6 +36,16 @@
     "subtitle": "Решения, удобные для повседневного использования",
     "cta": "Ещё"
   },
+  "why_choose_us_benefits": {
+    "warranty_title": "Гарантия",
+    "warranty_description": "Все товары поставляются с официальной гарантией.",
+    "delivery_title": "Быстрая доставка",
+    "delivery_description": "Доставка в день заказа или максимально быстро.",
+    "installment_title": "Рассрочка",
+    "installment_description": "Удобная оплата частями.",
+    "original_title": "Оригинальная техника",
+    "original_description": "Только оригинальная и проверенная техника."
+  },
   "featured_products": {
     "title": "Рекомендуемые товары",
     "subtitle": "Подборка из нашего каталога",

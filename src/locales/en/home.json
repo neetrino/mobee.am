@@ -36,6 +36,16 @@
     "subtitle": "Solutions that work for your everyday use",
     "cta": "More"
   },
+  "why_choose_us_benefits": {
+    "warranty_title": "Warranty",
+    "warranty_description": "All products come with an official warranty.",
+    "delivery_title": "Fast delivery",
+    "delivery_description": "Same-day delivery or as fast as possible.",
+    "installment_title": "Installment payment",
+    "installment_description": "Convenient payments in installments.",
+    "original_title": "Original products",
+    "original_description": "Only original and verified devices."
+  },
   "featured_products": {
     "title": "Featured Products",
     "subtitle": "Handpicked highlights from our catalog",

@@ -36,6 +36,16 @@
     "subtitle": "Լուծումներ, որոնք հարմար են քո ամենօրյա օգտագործման համար",
     "cta": "Ավելին"
   },
+  "why_choose_us_benefits": {
+    "warranty_title": "Երաշխիք",
+    "warranty_description": "Բոլոր ապրանքները գալիս են պաշտոնական երաշխիքով։",
+    "delivery_title": "Արագ առաքում",
+    "delivery_description": "Առաքում նույն օրը կամ հնարավորինս արագ։",
+    "installment_title": "Տարաժամկետ վճարում",
+    "installment_description": "Հարմար վճարումներ՝ մաս-մաս տարբերակով։",
+    "original_title": "Օրիգինալ ապրանքներ",
+    "original_description": "Միայն բնօրինակ և ստուգված տեխնիկա։"
+  },
   "featured_products": {
     "title": "Առաջարկվող ապրանքներ",
     "subtitle": "Ընտրված առաջարկներ մեր կատալոգից",
