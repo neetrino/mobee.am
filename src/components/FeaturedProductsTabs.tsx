@@ -43,7 +43,9 @@ const PRODUCTS_PER_PAGE = 10;
 const DEFAULT_HOME_FILTER = 'new' as const;
 /** Fewer columns than catalog-style grids so home “best choice” cards read larger. */
 const MOBILE_GRID_LAYOUT =
-  'grid grid-cols-2 gap-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4';
+  'grid grid-cols-2 gap-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 justify-items-center';
+/** Each card is slightly narrower than the grid cell (centered). */
+const BEST_CHOICE_CARD_WIDTH = 'w-[90%] max-w-full';
 
 /**
  * Featured products grid for the home page (single curated list).
@@ -126,7 +128,10 @@ export function FeaturedProductsTabs() {
         {loading ? (
           <div className={MOBILE_GRID_LAYOUT}>
             {[...Array(PRODUCTS_PER_PAGE)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg overflow-hidden animate-pulse">
+              <div
+                key={i}
+                className={`${BEST_CHOICE_CARD_WIDTH} bg-white rounded-lg overflow-hidden animate-pulse`}
+              >
                 <div className="aspect-square bg-gray-200"></div>
                 <div className="p-4 space-y-2">
                   <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -151,7 +156,9 @@ export function FeaturedProductsTabs() {
         ) : products.length > 0 ? (
           <div className={MOBILE_GRID_LAYOUT}>
             {products.slice(0, PRODUCTS_PER_PAGE).map((product) => (
-              <ProductCard key={product.id} product={product} viewMode="grid-2" />
+              <div key={product.id} className={BEST_CHOICE_CARD_WIDTH}>
+                <ProductCard product={product} viewMode="grid-2" />
+              </div>
             ))}
           </div>
         ) : (
