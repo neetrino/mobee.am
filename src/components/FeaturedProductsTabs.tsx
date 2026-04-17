@@ -46,6 +46,8 @@ const MOBILE_GRID_LAYOUT =
   'grid grid-cols-2 gap-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 justify-items-center';
 /** Each card is slightly narrower than the grid cell (centered). */
 const BEST_CHOICE_CARD_WIDTH = 'w-[90%] max-w-full';
+/** Hero image for the first “best choice” card (curated asset). */
+const BEST_CHOICE_FIRST_CARD_IMAGE = '/images/home/best-choice-first.png';
 
 /**
  * Featured products grid for the home page (single curated list).
@@ -155,9 +157,17 @@ export function FeaturedProductsTabs() {
           </div>
         ) : products.length > 0 ? (
           <div className={MOBILE_GRID_LAYOUT}>
-            {products.slice(0, PRODUCTS_PER_PAGE).map((product) => (
+            {products.slice(0, PRODUCTS_PER_PAGE).map((product, index) => (
               <div key={product.id} className={BEST_CHOICE_CARD_WIDTH}>
-                <ProductCard product={product} viewMode="grid-2" />
+                <ProductCard
+                  product={
+                    index === 0
+                      ? { ...product, image: BEST_CHOICE_FIRST_CARD_IMAGE }
+                      : product
+                  }
+                  viewMode="grid-2"
+                  shiftImageInFrame
+                />
               </div>
             ))}
           </div>

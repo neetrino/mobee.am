@@ -37,13 +37,19 @@ type ViewMode = 'list' | 'grid-2' | 'grid-3';
 interface ProductCardProps {
   product: Product;
   viewMode?: ViewMode;
+  /** Nudge product art in the frame (e.g. home “best choice” grid). */
+  shiftImageInFrame?: boolean;
 }
 
 /**
  * Product card component with Compare, Wishlist and Cart icons
  * Displays product image, title, category, price and action buttons
  */
-export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) {
+export function ProductCard({
+  product,
+  viewMode = 'grid-3',
+  shiftImageInFrame = false,
+}: ProductCardProps) {
   const isCompact = viewMode === 'grid-3';
   const router = useRouter();
   const { isLoggedIn } = useAuth();
@@ -114,6 +120,7 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
       isAddingToCart={isAddingToCart}
       imageError={imageError}
       isCompact={isCompact}
+      shiftImageInFrame={shiftImageInFrame}
       onImageError={() => setImageError(true)}
       onWishlistToggle={handleWishlistToggle}
       onCompareToggle={handleCompareToggle}

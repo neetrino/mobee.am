@@ -32,6 +32,7 @@ interface ProductCardGridProps {
   isAddingToCart: boolean;
   imageError: boolean;
   isCompact?: boolean;
+  shiftImageInFrame?: boolean;
   onImageError: () => void;
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
@@ -49,6 +50,7 @@ export function ProductCardGrid({
   isAddingToCart,
   imageError,
   isCompact = false,
+  shiftImageInFrame = false,
   onImageError,
   onWishlistToggle,
   onCompareToggle,
@@ -69,6 +71,7 @@ export function ProductCardGrid({
               imageError={imageError}
               onImageError={onImageError}
               isCompact={isCompact}
+              shiftImageInFrame={shiftImageInFrame}
             />
           </div>
         </div>

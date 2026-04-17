@@ -11,6 +11,8 @@ interface ProductCardImageProps {
   imageError: boolean;
   onImageError: () => void;
   isCompact?: boolean;
+  /** Shift focal point ~10% from center (home “best choice” cards). */
+  shiftImageInFrame?: boolean;
 }
 
 /**
@@ -23,6 +25,7 @@ export function ProductCardImage({
   imageError,
   onImageError,
   isCompact = false,
+  shiftImageInFrame = false,
 }: ProductCardImageProps) {
   const showPlaceholder = !image || imageError;
   const frameClass = isCompact
@@ -46,7 +49,11 @@ export function ProductCardImage({
             src={image}
             alt={title}
             fill
-            className="object-contain"
+            className={
+              shiftImageInFrame
+                ? 'object-contain object-[60%_60%]'
+                : 'object-contain'
+            }
             sizes="(max-width: 768px) 78vw, (max-width: 1200px) 35vw, 198px"
             unoptimized
             onError={onImageError}
