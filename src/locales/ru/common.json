@@ -198,7 +198,18 @@
     "connectHeading": "Связь",
     "openInMaps": "Открыть адрес в Google Картах",
     "shop": "Магазин",
-    "copyright": "© {year} Mobee. Все права защищены."
+    "copyright": "© {year} Mobee. Все права защищены.",
+    "legalBar": {
+      "brand": "MOBEE",
+      "copyrightLead": "Авторское право © {year} | Все права защищены,",
+      "createdBy": "Создано",
+      "creditCompany": "Neetrino IT Company",
+      "privacyPolicy": "Политика конфиденциальности",
+      "shippingPolicy": "Политика доставки",
+      "returnPolicy": "Политика возврата",
+      "termsOfUse": "Условия использования",
+      "policiesNavLabel": "Правовая информация"
+    }
   },
   "product": {
     "product": "товар",

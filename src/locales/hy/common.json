@@ -199,7 +199,18 @@
     "connectHeading": "Կապ",
     "openInMaps": "Բացել հասցեն Google Քարտեզներում",
     "shop": "Խանութ",
-    "copyright": "© {year} Mobee: Բոլոր իրավունքները պաշտպանված են:"
+    "copyright": "© {year} Mobee: Բոլոր իրավունքները պաշտպանված են:",
+    "legalBar": {
+      "brand": "MOBEE",
+      "copyrightLead": "Հեղինակային իրավունք © {year} | Բոլոր իրավունքները պաշտպանված են,",
+      "createdBy": "Ստեղծված է",
+      "creditCompany": "Neetrino IT Company",
+      "privacyPolicy": "Գաղտնիության քաղաքականություն",
+      "shippingPolicy": "Առաքման քաղաքականություն",
+      "returnPolicy": "Վերադարձի քաղաքականություն",
+      "termsOfUse": "Օգտագործման պայմաններ",
+      "policiesNavLabel": "Իրավական և քաղաքականություն"
+    }
   },
   "product": {
     "product": "ապրանք",

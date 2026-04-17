@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
-import { FooterCurrency } from './FooterCurrency';
+import { FooterLegalBar } from './FooterLegalBar';
 import { useFooterCategoryHrefs } from './useFooterCategoryHrefs';
 
 const montserrat = Montserrat({
@@ -126,16 +126,9 @@ export function Footer() {
             </div>
           </div>
         </div>
-
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-8 md:flex-row">
-          <p className="text-sm text-[#64748b]">
-            {t('common.footer.copyright').replace('{year}', String(new Date().getFullYear()))}
-          </p>
-          <div className="hidden md:block">
-            <FooterCurrency />
-          </div>
-        </div>
       </div>
+
+      <FooterLegalBar />
     </footer>
   );
 }

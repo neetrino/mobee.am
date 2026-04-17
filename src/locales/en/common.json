@@ -201,7 +201,18 @@
     "connectHeading": "Connect",
     "openInMaps": "Open address in Google Maps",
     "shop": "Shop",
-    "copyright": "© {year} Mobee. All rights reserved."
+    "copyright": "© {year} Mobee. All rights reserved.",
+    "legalBar": {
+      "brand": "MOBEE",
+      "copyrightLead": "Copyright © {year} | All Rights Reserved,",
+      "createdBy": "Created by",
+      "creditCompany": "Neetrino IT Company",
+      "privacyPolicy": "Privacy policy",
+      "shippingPolicy": "Shipping policy",
+      "returnPolicy": "Return policy",
+      "termsOfUse": "Terms of use",
+      "policiesNavLabel": "Legal and policies"
+    }
   },
   "product": {
     "product": "product",
