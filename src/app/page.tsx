@@ -1,5 +1,4 @@
 import { HeroCarousel } from '../components/HeroCarousel';
-import { FeaturesSection } from '../components/FeaturesSection';
 import { TopCategories } from '../components/TopCategories';
 import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
 import { FeaturedProductsTabs } from '../components/FeaturedProductsTabs';
@@ -23,9 +22,6 @@ export default async function HomePage() {
       <FeaturedProductsTabs />
 
       <PartnerLogosSection />
-
-      {/* Features Section */}
-      <FeaturesSection />
     </div>
   );
 }
