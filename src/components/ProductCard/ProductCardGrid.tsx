@@ -1,11 +1,10 @@
 'use client';
 
 import type { MouseEvent } from 'react';
-import { ShoppingBag } from 'lucide-react';
 import { ProductCardImage } from './ProductCardImage';
 import { ProductCardInfo } from './ProductCardInfo';
 import { ProductCardActions } from './ProductCardActions';
-import { CartIcon as CartPngIcon } from '../icons/CartIcon';
+import { CartIcon } from '../icons/CartIcon';
 import { ProductLabels } from '../ProductLabels';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
@@ -183,11 +182,7 @@ export function ProductCardGrid({
             </svg>
           ) : (
             <>
-              {isCompact ? (
-                <CartPngIcon size={18} />
-              ) : (
-                <ShoppingBag className="h-[16.2px] w-[16.2px] shrink-0" strokeWidth={2} aria-hidden />
-              )}
+              <CartIcon className="shrink-0" size={isCompact ? 18 : 16.2} />
               <span className="whitespace-nowrap">{t('common.buttons.addToCart')}</span>
             </>
           )}
