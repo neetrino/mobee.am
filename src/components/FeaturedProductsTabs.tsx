@@ -53,7 +53,7 @@ export function FeaturedProductsTabs() {
         />
 
         <SpecialOffersSectionHeading>
-          <div className="mt-10">
+          <div className="mt-[7.5rem]">
             <SpecialOffersProductGrid
               language={specialOffersLanguage}
               loading={specialOffersLoading}
