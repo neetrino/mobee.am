@@ -86,7 +86,7 @@ export function ProductCardGrid({
           onWishlistToggle={onWishlistToggle}
           onCompareToggle={onCompareToggle}
           onAddToCart={onAddToCart}
-          showOnHover
+          cornerOnImage
         />
       </div>
       

@@ -15,7 +15,8 @@ interface ProductCardActionsProps {
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
-  showOnHover?: boolean;
+  /** Stack wishlist + compare at the top-right of the product image (always visible; not hover-only). */
+  cornerOnImage?: boolean;
 }
 
 /**
@@ -30,7 +31,7 @@ export function ProductCardActions({
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
-  showOnHover = false,
+  cornerOnImage = false,
 }: ProductCardActionsProps) {
   const { t } = useTranslation();
   const iconSize = isCompact ? 18 : 24;
@@ -76,21 +77,21 @@ export function ProductCardActions({
     </>
   );
 
-  if (showOnHover) {
+  if (cornerOnImage) {
     return (
       <div
-        className={`absolute flex flex-col z-30 ${
-          isCompact ? 'top-[11px] right-5 gap-1.5' : 'top-[11px] right-5 gap-2'
+        className={`pointer-events-auto absolute z-[40] flex flex-col opacity-100 ${
+          isCompact ? 'top-[11px] right-4 gap-1.5' : 'top-[11px] right-4 gap-[7px]'
         }`}
       >
-        {/* Wishlist first (top), Compare below — matches Figma; always visible */}
+        {/* Figma mobee-new 53:684 — heart above compare, ~11px from top, light blue circles */}
         <button
           type="button"
           onClick={onWishlistToggle}
           className={`${gridCornerSize} flex shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
             isInWishlist
               ? 'bg-red-600 text-white shadow-md'
-              : 'bg-[#e8f0f8] text-gray-800 shadow-sm hover:bg-[#dbe8f5]'
+              : 'bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]'
           }`}
           title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
           aria-label={isInWishlist ? t('common.ariaLabels.removeFromWishlist') : t('common.ariaLabels.addToWishlist')}
@@ -103,7 +104,7 @@ export function ProductCardActions({
           className={`${gridCornerSize} flex shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
             isInCompare
               ? 'border-gray-900 bg-white text-gray-900 shadow-sm'
-              : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+              : 'border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]'
           }`}
           title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
           aria-label={isInCompare ? t('common.ariaLabels.removeFromCompare') : t('common.ariaLabels.addToCompare')}
