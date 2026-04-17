@@ -26,6 +26,11 @@
     "subtitle": "A simple choice from the best",
     "cta": "More"
   },
+  "special_offers_heading": {
+    "title": "Special offers",
+    "subtitle": "Selected devices with special conditions",
+    "cta": "More"
+  },
   "featured_products": {
     "title": "Featured Products",
     "subtitle": "Handpicked highlights from our catalog",
