@@ -13,8 +13,6 @@ import type { Product, ProductVariant } from './types';
 interface ProductInfoAndActionsProps {
   product: Product;
   price: number;
-  originalPrice: number | null;
-  compareAtPrice: number | null;
   discountPercent: number | null;
   currency: string;
   language: LanguageCode;
@@ -54,8 +52,6 @@ interface ProductInfoAndActionsProps {
 export function ProductInfoAndActions({
   product,
   price,
-  originalPrice,
-  compareAtPrice,
   discountPercent,
   currency,
   language,
@@ -109,12 +105,6 @@ export function ProductInfoAndActions({
                 </span>
               )}
             </div>
-            {/* Original price below discounted price - full width, not inline */}
-            {(originalPrice || (compareAtPrice && compareAtPrice > price)) && (
-              <p className="text-xl text-gray-500 line-through decoration-gray-400 mt-1">
-                {formatPrice(originalPrice || compareAtPrice || 0, currency as CurrencyCode)}
-              </p>
-            )}
           </div>
         </div>
         <div className="text-gray-600 mb-8 prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }} />

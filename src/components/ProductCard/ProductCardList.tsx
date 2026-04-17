@@ -121,17 +121,6 @@ export function ProductCardList({
                 </span>
               ) : null}
             </div>
-            {(product.originalPrice && product.originalPrice > product.price) || 
-             (product.compareAtPrice && product.compareAtPrice > product.price) ? (
-              <span className="text-base sm:text-lg text-gray-500 line-through mt-0.5">
-                {formatPrice(
-                  (product.originalPrice && product.originalPrice > product.price) 
-                    ? product.originalPrice 
-                    : (product.compareAtPrice || 0), 
-                  currency
-                )}
-              </span>
-            ) : null}
           </div>
 
           {/* Action Buttons */}

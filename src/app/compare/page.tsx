@@ -365,16 +365,6 @@ export default function ComparePage() {
                         <p className="text-lg font-bold text-gray-900 select-none">
                           {formatPrice(product.price, currency)}
                         </p>
-                        {(product.originalPrice && product.originalPrice > product.price) && (
-                          <p className="text-sm text-gray-500 line-through select-none">
-                            {formatPrice(product.originalPrice, currency)}
-                          </p>
-                        )}
-                        {!product.originalPrice && product.compareAtPrice && product.compareAtPrice > product.price && (
-                          <p className="text-sm text-gray-500 line-through select-none">
-                            {formatPrice(product.compareAtPrice, currency)}
-                          </p>
-                        )}
                       </div>
                     </td>
                   ))}

@@ -7,7 +7,7 @@ import { ProductCardActions } from './ProductCardActions';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { ProductLabels } from '../ProductLabels';
 import { useTranslation } from '../../lib/i18n-client';
-import type { CurrencyCode } from '../../lib/currency';
+import { formatPrice, type CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
 
 interface ProductCardGridProps {
@@ -103,34 +103,63 @@ export function ProductCardGrid({
         subtitle={product.subtitle}
         brandName={product.brand?.name}
         price={product.price}
-        originalPrice={product.originalPrice}
-        compareAtPrice={product.compareAtPrice}
         discountPercent={product.discountPercent}
         currency={currency}
         colors={product.colors}
         isCompact={isCompact}
+        hidePrice
       />
 
-      {/* Cart Button in Price Row */}
-      <div className={`px-4 pb-4 flex items-center justify-end ${isCompact ? 'gap-2' : 'gap-4'}`}>
+      {/* Figma mobee-new 53:684 — price left, pill CTA right, top divider */}
+      <div
+        className={`flex items-center justify-between gap-3 border-t border-gray-50 pt-[17px] ${isCompact ? 'px-3 pb-3' : 'px-5 pb-5'}`}
+      >
+        <div className="min-w-0 flex flex-col">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`font-bold tabular-nums text-gray-900 ${isCompact ? 'text-lg leading-7' : 'text-xl leading-7'}`}
+            >
+              {formatPrice(product.price || 0, currency)}
+            </span>
+            {product.discountPercent && product.discountPercent > 0 ? (
+              <span className={`font-semibold text-blue-600 ${isCompact ? 'text-xs' : 'text-sm'}`}>
+                -{product.discountPercent}%
+              </span>
+            ) : null}
+          </div>
+        </div>
         <button
+          type="button"
           onClick={onAddToCart}
           disabled={!product.inStock || isAddingToCart}
-          className={`${isCompact ? 'w-10 h-10' : 'w-12 h-12'} rounded-full flex items-center justify-center transition-all duration-200 ${
+          className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-[20px] bg-[#2db2ff] font-medium text-white transition-opacity ${
             product.inStock && !isAddingToCart
-              ? 'bg-transparent text-gray-600 hover:bg-green-600 hover:text-white hover:shadow-md'
-              : 'bg-transparent text-gray-400 cursor-not-allowed'
-          }`}
+              ? 'hover:opacity-90'
+              : 'cursor-not-allowed opacity-50'
+          } ${isCompact ? 'h-10 min-w-[110px] px-3 text-xs tracking-wide' : 'h-12 min-w-[132px] px-4 text-sm tracking-[0.2px]'}`}
           title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
           aria-label={product.inStock ? t('common.ariaLabels.addToCart') : t('common.ariaLabels.outOfStock')}
         >
           {isAddingToCart ? (
-            <svg className={`animate-spin ${isCompact ? 'h-5 w-5' : 'h-6 w-6'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              className={`animate-spin ${isCompact ? 'h-4 w-4' : 'h-5 w-5'}`}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
           ) : (
-            <CartPngIcon size={isCompact ? 18 : 24} />
+            <>
+              <CartPngIcon size={isCompact ? 18 : 20} />
+              <span className="whitespace-nowrap">{t('common.buttons.addToCart')}</span>
+            </>
           )}
         </button>
       </div>

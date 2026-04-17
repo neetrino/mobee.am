@@ -12,12 +12,12 @@ interface ProductCardInfoProps {
   subtitle?: string | null;
   brandName?: string | null;
   price: number;
-  originalPrice?: number | null;
-  compareAtPrice?: number | null;
   discountPercent?: number | null;
   currency: CurrencyCode;
   colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
   isCompact?: boolean;
+  /** Figma mobee-new: price lives in the bordered footer row with the add button */
+  hidePrice?: boolean;
 }
 
 /**
@@ -29,17 +29,23 @@ export function ProductCardInfo({
   subtitle,
   brandName,
   price,
-  originalPrice,
-  compareAtPrice,
   discountPercent,
   currency,
   colors,
   isCompact = false,
+  hidePrice = false,
 }: ProductCardInfoProps) {
   const { t } = useTranslation();
 
+  const paddingClass = (() => {
+    if (hidePrice) {
+      return isCompact ? 'px-3 pt-2.5 pb-2' : 'px-5 pt-4 pb-3';
+    }
+    return isCompact ? 'p-2.5' : 'p-4';
+  })();
+
   return (
-    <div className={isCompact ? 'p-2.5' : 'p-4'}>
+    <div className={paddingClass}>
       <Link href={`/products/${slug}`} className="block">
         {/* Product line (Figma: small caps category) */}
         <p
@@ -65,32 +71,22 @@ export function ProductCardInfo({
         <ProductColors colors={colors} isCompact={isCompact} />
       )}
 
-      {/* Price */}
-      <div className={`mt-2 flex items-center justify-between ${isCompact ? 'gap-2' : 'gap-4'}`}>
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <span className={`${isCompact ? 'text-lg' : 'text-2xl'} font-semibold text-gray-900`}>
-              {formatPrice(price || 0, currency)}
-            </span>
-            {discountPercent && discountPercent > 0 ? (
-              <span className={`${isCompact ? 'text-xs' : 'text-sm'} font-semibold text-blue-600`}>
-                -{discountPercent}%
+      {!hidePrice ? (
+        <div className={`mt-2 flex items-center justify-between ${isCompact ? 'gap-2' : 'gap-4'}`}>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className={`${isCompact ? 'text-lg' : 'text-2xl'} font-semibold text-gray-900`}>
+                {formatPrice(price || 0, currency)}
               </span>
-            ) : null}
+              {discountPercent && discountPercent > 0 ? (
+                <span className={`${isCompact ? 'text-xs' : 'text-sm'} font-semibold text-blue-600`}>
+                  -{discountPercent}%
+                </span>
+              ) : null}
+            </div>
           </div>
-          {(originalPrice && originalPrice > price) || 
-           (compareAtPrice && compareAtPrice > price) ? (
-            <span className={`${isCompact ? 'text-sm' : 'text-lg'} text-gray-500 line-through`}>
-              {formatPrice(
-                (originalPrice && originalPrice > price) 
-                  ? originalPrice 
-                  : (compareAtPrice || 0), 
-                currency
-              )}
-            </span>
-          ) : null}
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

@@ -304,16 +304,6 @@ export default function WishlistPage() {
                     <span className="text-base font-semibold text-blue-600">
                       {formatPrice(product.price, currency)}
                     </span>
-                    {(product.originalPrice && product.originalPrice > product.price) && (
-                      <span className="text-sm text-gray-500 line-through">
-                        {formatPrice(product.originalPrice, currency)}
-                      </span>
-                    )}
-                    {!product.originalPrice && product.compareAtPrice && product.compareAtPrice > product.price && (
-                      <span className="text-sm text-gray-500 line-through">
-                        {formatPrice(product.compareAtPrice, currency)}
-                      </span>
-                    )}
                   </div>
                 </div>
 

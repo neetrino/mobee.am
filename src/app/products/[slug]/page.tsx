@@ -45,8 +45,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     sizeGroups,
     currentVariant,
     price,
-    originalPrice,
-    compareAtPrice,
     discountPercent,
     maxQuantity,
     isOutOfStock,
@@ -116,8 +114,6 @@ export default function ProductPage({ params }: ProductPageProps) {
           <ProductInfoAndActions
             product={product}
             price={price}
-            originalPrice={originalPrice}
-            compareAtPrice={compareAtPrice}
             discountPercent={discountPercent}
             currency={currency}
             language={language}
