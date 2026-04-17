@@ -167,6 +167,7 @@ export function FeaturedProductsTabs() {
                   }
                   viewMode="grid-2"
                   shiftImageInFrame
+                  squareImageFrame
                 />
               </div>
             ))}

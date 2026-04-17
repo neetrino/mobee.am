@@ -39,6 +39,8 @@ interface ProductCardProps {
   viewMode?: ViewMode;
   /** Nudge product art in the frame (e.g. home “best choice” grid). */
   shiftImageInFrame?: boolean;
+  /** Use a square image frame (e.g. home “best choice”). */
+  squareImageFrame?: boolean;
 }
 
 /**
@@ -49,6 +51,7 @@ export function ProductCard({
   product,
   viewMode = 'grid-3',
   shiftImageInFrame = false,
+  squareImageFrame = false,
 }: ProductCardProps) {
   const isCompact = viewMode === 'grid-3';
   const router = useRouter();
@@ -121,6 +124,7 @@ export function ProductCard({
       imageError={imageError}
       isCompact={isCompact}
       shiftImageInFrame={shiftImageInFrame}
+      squareImageFrame={squareImageFrame}
       onImageError={() => setImageError(true)}
       onWishlistToggle={handleWishlistToggle}
       onCompareToggle={handleCompareToggle}

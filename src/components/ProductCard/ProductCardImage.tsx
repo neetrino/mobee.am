@@ -13,10 +13,12 @@ interface ProductCardImageProps {
   isCompact?: boolean;
   /** Shift focal point ~10% from center (home “best choice” cards). */
   shiftImageInFrame?: boolean;
+  /** Square image frame (e.g. home “best choice”); default is portrait 3:4. */
+  squareImageFrame?: boolean;
 }
 
 /**
- * Centered product image for the grid card — portrait frame (vertical rectangle), object-contain.
+ * Centered product image for the grid card — object-contain in a portrait (3:4) or square frame.
  */
 export function ProductCardImage({
   slug,
@@ -26,14 +28,16 @@ export function ProductCardImage({
   onImageError,
   isCompact = false,
   shiftImageInFrame = false,
+  squareImageFrame = false,
 }: ProductCardImageProps) {
   const showPlaceholder = !image || imageError;
   const frameClass = isCompact
     ? "w-[min(160px,72%)] max-w-[85%]"
     : "w-[min(198px,78%)] max-w-[85%]";
+  const aspectClass = squareImageFrame ? "aspect-square" : "aspect-[3/4]";
 
   return (
-    <div className={`relative aspect-[3/4] shrink-0 ${frameClass}`}>
+    <div className={`relative ${aspectClass} shrink-0 ${frameClass}`}>
       <Link
         href={`/products/${slug}`}
         className="absolute inset-0 block"
