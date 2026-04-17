@@ -82,13 +82,13 @@ export function RelatedProductCard({
         >
           <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
             {/* Product Image */}
-            <div className="relative aspect-square bg-gray-100 overflow-hidden flex-shrink-0">
+            <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden flex-shrink-0">
               {hasImage ? (
                 <Image
                   src={product.image!}
                   alt={product.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-contain group-hover:scale-105 transition-transform duration-300"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   unoptimized
                   onError={() => onImageError(product.id)}

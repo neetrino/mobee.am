@@ -52,7 +52,7 @@ export function ProductCardGrid({
   imageError,
   isCompact = false,
   shiftImageInFrame = false,
-  squareImageFrame = false,
+  squareImageFrame = true,
   onImageError,
   onWishlistToggle,
   onCompareToggle,
@@ -62,10 +62,10 @@ export function ProductCardGrid({
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow relative">
-      {/* Product image: card inset + gray panel + centered asset (Figma mobee-new) */}
+      {/* Product image: square inset + white panel + centered asset (object-contain for clear silhouette) */}
       <div className="aspect-square relative">
         <div className="absolute inset-0 p-5">
-          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-gray-50 py-8">
+          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-white py-8">
             <ProductCardImage
               slug={product.slug}
               image={product.image}

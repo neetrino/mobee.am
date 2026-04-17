@@ -39,7 +39,7 @@ interface ProductCardProps {
   viewMode?: ViewMode;
   /** Nudge product art in the frame (e.g. home “best choice” grid). */
   shiftImageInFrame?: boolean;
-  /** Use a square image frame (e.g. home “best choice”). */
+  /** Use a square image frame; set false for portrait 3:4. */
   squareImageFrame?: boolean;
 }
 
@@ -51,7 +51,7 @@ export function ProductCard({
   product,
   viewMode = 'grid-3',
   shiftImageInFrame = false,
-  squareImageFrame = false,
+  squareImageFrame = true,
 }: ProductCardProps) {
   const isCompact = viewMode === 'grid-3';
   const router = useRouter();

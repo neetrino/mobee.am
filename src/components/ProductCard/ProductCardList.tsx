@@ -62,14 +62,14 @@ export function ProductCardList({
         {/* Product Image */}
         <Link
           href={`/products/${product.slug}`}
-          className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden self-start sm:self-center"
+          className="w-20 h-20 bg-white border border-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden self-start sm:self-center"
         >
           {product.image && !imageError ? (
             <Image
               src={product.image}
               alt={product.title}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="80px"
               unoptimized
               onError={onImageError}
