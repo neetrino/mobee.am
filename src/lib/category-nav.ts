@@ -9,6 +9,7 @@ export interface CategoryTreeNode {
 export const PHONES_SLUG_PARTS = [
   'phones',
   'phone',
+  'iphone',
   'smartphones',
   'smartphone',
   'herakhosner',
