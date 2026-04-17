@@ -3,6 +3,7 @@ import { FeaturesSection } from '../components/FeaturesSection';
 import { TopCategories } from '../components/TopCategories';
 import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
 import { FeaturedProductsTabs } from '../components/FeaturedProductsTabs';
+import { PartnerLogosSection } from '../components/PartnerLogosSection';
 
 export default async function HomePage() {
 
@@ -20,6 +21,8 @@ export default async function HomePage() {
 
       {/* Featured Products with Tabs */}
       <FeaturedProductsTabs />
+
+      <PartnerLogosSection />
 
       {/* Features Section */}
       <FeaturesSection />

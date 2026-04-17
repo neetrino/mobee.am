@@ -46,6 +46,13 @@
     "original_title": "Оригинальная техника",
     "original_description": "Только оригинальная и проверенная техника."
   },
+  "partner_logos": {
+    "heading": "Бренды",
+    "apple": "Apple",
+    "lg": "LG",
+    "samsung": "Samsung",
+    "xiaomi": "Xiaomi"
+  },
   "featured_products": {
     "title": "Рекомендуемые товары",
     "subtitle": "Подборка из нашего каталога",

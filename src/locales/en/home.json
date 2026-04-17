@@ -46,6 +46,13 @@
     "original_title": "Original products",
     "original_description": "Only original and verified devices."
   },
+  "partner_logos": {
+    "heading": "Featured brands",
+    "apple": "Apple",
+    "lg": "LG",
+    "samsung": "Samsung",
+    "xiaomi": "Xiaomi"
+  },
   "featured_products": {
     "title": "Featured Products",
     "subtitle": "Handpicked highlights from our catalog",

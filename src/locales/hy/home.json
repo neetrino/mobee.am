@@ -46,6 +46,13 @@
     "original_title": "Օրիգինալ ապրանքներ",
     "original_description": "Միայն բնօրինակ և ստուգված տեխնիկա։"
   },
+  "partner_logos": {
+    "heading": "Բրենդներ",
+    "apple": "Apple",
+    "lg": "LG",
+    "samsung": "Samsung",
+    "xiaomi": "Xiaomi"
+  },
   "featured_products": {
     "title": "Առաջարկվող ապրանքներ",
     "subtitle": "Ընտրված առաջարկներ մեր կատալոգից",
