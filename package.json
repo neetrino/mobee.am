@@ -4,6 +4,7 @@
   "private": true,
   "description": "WhiteShop.am — Next.js app at root, pnpm workspace",
   "scripts": {
+    "prisma": "node scripts/prisma-cli.cjs",
     "postinstall": "pnpm run db:generate",
     "dev": "next dev",
     "dev:webpack": "next dev --no-turbo",
@@ -19,6 +20,9 @@
     "test:watch": "vitest",
     "clean": "node -e \"require('fs').rmSync('.next', {recursive: true, force: true})\"",
     "prisma:generate": "cd shared/db && pnpm run db:generate",
+    "prisma:migrate": "pnpm db:migrate",
+    "prisma:push": "pnpm db:push",
+    "prisma:studio": "pnpm db:studio",
     "reset": "node -e \"require('fs').rmSync('.next', {recursive: true, force: true})\" && cd shared/db && pnpm run db:generate",
     "db:generate": "pnpm --filter @white-shop/db db:generate",
     "db:push": "pnpm --filter @white-shop/db db:push",
