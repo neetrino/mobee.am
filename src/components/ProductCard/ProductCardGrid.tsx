@@ -57,7 +57,7 @@ export function ProductCardGrid({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow relative group">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow relative">
       {/* Product image: card inset + gray panel + centered asset (Figma mobee-new) */}
       <div className="aspect-square relative">
         <div className="absolute inset-0 p-5">

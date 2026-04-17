@@ -7,26 +7,10 @@ import { formatPrice } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import { CompareIcon } from '../icons/CompareIcon';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
+import { WishlistHeartIcon } from '../icons/WishlistHeartIcon';
 import { ProductColors } from './ProductColors';
 import type { CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
-
-interface WishlistIconProps {
-  filled?: boolean;
-}
-
-const WishlistIcon = ({ filled = false }: WishlistIconProps) => (
-  <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path 
-      d="M10 17L8.55 15.7C4.4 12.2 2 10.1 2 7.5C2 5.4 3.4 4 5.5 4C6.8 4 8.1 4.6 9 5.5C9.9 4.6 11.2 4 12.5 4C14.6 4 16 5.4 16 7.5C16 10.1 13.6 12.2 9.45 15.7L10 17Z" 
-      stroke="currentColor" 
-      strokeWidth="1.8" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      fill={filled ? "currentColor" : "none"} 
-    />
-  </svg>
-);
 
 interface ProductCardListProps {
   product: {
@@ -177,7 +161,7 @@ export function ProductCardList({
               title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
               aria-label={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
             >
-              <WishlistIcon filled={isInWishlist} />
+              <WishlistHeartIcon filled={isInWishlist} />
             </button>
 
             {/* Cart Icon */}
