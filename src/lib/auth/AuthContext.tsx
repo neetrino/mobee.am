@@ -110,6 +110,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadAuthState();
   }, []);
 
+  const persistAuthResponse = (response: AuthResponse) => {
+    if (!response?.token || !response.user?.id) {
+      throw new Error('Invalid response from server');
+    }
+    localStorage.setItem(AUTH_TOKEN_KEY, response.token);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
+    setToken(response.token);
+    setUser(response.user);
+    window.dispatchEvent(new Event('auth-updated'));
+  };
+
   /**
    * Login user
    */
@@ -136,15 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin: response.user.roles?.includes('admin')
       });
 
-      // Store auth data
-      localStorage.setItem(AUTH_TOKEN_KEY, response.token);
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
-
-      setToken(response.token);
-      setUser(response.user);
-
-      // Trigger auth update event
-      window.dispatchEvent(new Event('auth-updated'));
+      persistAuthResponse(response);
 
       // Don't redirect here - let the login page handle redirect based on query params
     } catch (error: any) {
@@ -202,32 +205,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log('✅ [AUTH] Registration response received:', response);
 
-      if (!response || !response.user || !response.token) {
-        console.error('❌ [AUTH] Invalid response structure:', response);
-        throw new Error('Invalid response from server');
-      }
-
+      persistAuthResponse(response);
       console.log('✅ [AUTH] Registration successful:', { userId: response.user.id });
 
-      // Store auth data
-      try {
-        localStorage.setItem(AUTH_TOKEN_KEY, response.token);
-        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
-        console.log('💾 [AUTH] Auth data stored in localStorage');
-      } catch (storageError) {
-        console.error('❌ [AUTH] Failed to store auth data:', storageError);
-        throw new Error('Failed to save authentication data');
-      }
-
-      setToken(response.token);
-      setUser(response.user);
-
-      // Trigger auth update event
-      window.dispatchEvent(new Event('auth-updated'));
-
       console.log('🔄 [AUTH] Redirecting to home page...');
-      // Redirect to home page
-      router.push('/');
+      router.refresh();
+      router.replace('/');
     } catch (error: any) {
       console.error('❌ [AUTH] Registration error:', error);
       console.error('❌ [AUTH] Error details:', {

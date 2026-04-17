@@ -1,6 +1,13 @@
 import { ApiError } from "./types";
 import type { RequestOptions } from "./types";
 import { buildUrl } from "./url-builder";
+
+/** App-only fields must not be passed to native `fetch` (invalid RequestInit). */
+function fetchInitWithoutCustomOptions(options?: RequestOptions): RequestInit {
+  if (!options) return {};
+  const { skipAuth: _skipAuth, params: _params, ...init } = options;
+  return init;
+}
 import { getHeaders } from "./headers";
 import { handleUnauthorized } from "./auth-utils";
 import { shouldLogError, shouldLogWarning, parseErrorResponse, createApiError } from "./error-handler";
@@ -117,7 +124,7 @@ export async function getRequest<T>(
         headers: getHeaders(options),
         cache: 'no-store', // Disable caching for server components
         signal: controller.signal,
-        ...options,
+        ...fetchInitWithoutCustomOptions(options),
       });
       clearTimeout(timeoutId);
     } catch (fetchError: unknown) {
@@ -207,7 +214,7 @@ export async function postRequest<T>(
       method: 'POST',
       headers: getHeaders(options),
       body: data ? JSON.stringify(data) : undefined,
-      ...options,
+      ...fetchInitWithoutCustomOptions(options),
     });
 
     console.log('📥 [API CLIENT] Response status:', response.status, response.statusText);
@@ -275,7 +282,7 @@ export async function putRequest<T>(
     method: 'PUT',
     headers: getHeaders(options),
     body: data ? JSON.stringify(data) : undefined,
-    ...options,
+    ...fetchInitWithoutCustomOptions(options),
   });
 
   console.log('📥 [API CLIENT] PUT response status:', response.status, response.statusText);
@@ -313,7 +320,7 @@ export async function patchRequest<T>(
     method: 'PATCH',
     headers: getHeaders(options),
     body: data ? JSON.stringify(data) : undefined,
-    ...options,
+    ...fetchInitWithoutCustomOptions(options),
   });
 
   if (!response.ok) {
@@ -341,7 +348,7 @@ export async function deleteRequest<T>(
   const response = await fetch(url, {
     method: 'DELETE',
     headers: getHeaders(options),
-    ...options,
+    ...fetchInitWithoutCustomOptions(options),
   });
 
   if (!response.ok) {

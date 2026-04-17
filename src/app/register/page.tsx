@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button, Input, Card } from '@shop/ui';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth/AuthContext';
@@ -21,7 +22,14 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, isLoading } = useAuth();
+  const { register, isLoading, isLoggedIn } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoggedIn && !isLoading) {
+      router.replace('/');
+    }
+  }, [isLoggedIn, isLoading, router]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
