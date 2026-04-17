@@ -39,7 +39,7 @@ export function SpecialOffersSectionHeading() {
   const { t } = useTranslation();
 
   return (
-    <div className={`mt-10 ${montserrat.className}`} aria-labelledby="special-offers-heading">
+    <div className={`mt-[9rem] ${montserrat.className}`} aria-labelledby="special-offers-heading">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
         <div className="flex min-w-0 flex-col gap-2">
           <h2
