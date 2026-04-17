@@ -34,7 +34,7 @@ interface ProductCardGridProps {
   isCompact?: boolean;
   shiftImageInFrame?: boolean;
   squareImageFrame?: boolean;
-  /** Smaller footer price (home “best choice”; ~15% under default grid-2). */
+  /** Smaller footer price (home “best choice”; ~23% under default grid-2). */
   smallerFooterPrice?: boolean;
   onImageError: () => void;
   onWishlistToggle: (e: MouseEvent) => void;
@@ -123,8 +123,8 @@ export function ProductCardGrid({
               className={`font-bold tabular-nums text-gray-900 ${
                 smallerFooterPrice
                   ? isCompact
-                    ? 'text-[0.961875rem] leading-[1.49625rem]'
-                    : 'text-[1.06875rem] leading-[1.49625rem]'
+                    ? 'text-[0.8680921875rem] leading-[1.350365625rem]'
+                    : 'text-[0.964546875rem] leading-[1.350365625rem]'
                   : isCompact
                     ? 'text-lg leading-7'
                     : 'text-xl leading-7'
@@ -137,8 +137,8 @@ export function ProductCardGrid({
                 className={`font-semibold text-blue-600 ${
                   smallerFooterPrice
                     ? isCompact
-                      ? 'text-[0.64125rem]'
-                      : 'text-[0.748125rem]'
+                      ? 'text-[0.578728125rem]'
+                      : 'text-[0.6751828125rem]'
                     : isCompact
                       ? 'text-xs'
                       : 'text-sm'
