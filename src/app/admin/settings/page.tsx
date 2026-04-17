@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -131,7 +131,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -168,7 +168,7 @@ export default function SettingsPage() {
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                 defaultValue={t('admin.settings.siteNamePlaceholder')}
               />
             </div>
@@ -177,7 +177,7 @@ export default function SettingsPage() {
                 {t('admin.settings.siteDescription')}
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                 rows={3}
                 defaultValue={t('admin.settings.siteDescriptionPlaceholder')}
               />
@@ -196,7 +196,7 @@ export default function SettingsPage() {
               <select 
                 value={settings.defaultCurrency || 'AMD'}
                 onChange={(e) => setSettings({ ...settings, defaultCurrency: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
               >
                 <option value="AMD">{t('admin.settings.amd')}</option>
                 <option value="USD">{t('admin.settings.usd')}</option>
@@ -237,7 +237,7 @@ export default function SettingsPage() {
                       USD: parseFloat(e.target.value) || 1,
                     },
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   disabled
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.baseCurrency')}</p>
@@ -284,7 +284,7 @@ export default function SettingsPage() {
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   placeholder="400"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.rateToUSD')}</p>
@@ -331,7 +331,7 @@ export default function SettingsPage() {
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   placeholder="0.92"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.rateToUSD')}</p>
@@ -378,7 +378,7 @@ export default function SettingsPage() {
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   placeholder="90"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.rateToUSD')}</p>
@@ -425,7 +425,7 @@ export default function SettingsPage() {
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   placeholder="2.7"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.rateToUSD')}</p>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Card } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -20,7 +20,7 @@ export function OrdersByDayChart({ ordersByDay }: OrdersByDayChartProps) {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.analytics.ordersByDay')}</h2>
           <p className="text-sm text-gray-500 font-medium">{t('admin.analytics.dailyOrderTrends')}</p>
         </div>
-        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+        <div className="w-12 h-12 bg-gradient-to-br from-admin-500 to-admin-800 rounded-xl flex items-center justify-center shadow-md">
           <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
@@ -52,7 +52,7 @@ export function OrdersByDayChart({ ordersByDay }: OrdersByDayChartProps) {
               return (
                 <div 
                   key={day._id} 
-                  className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all duration-300 group"
+                  className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:border-admin-300 hover:shadow-md transition-all duration-300 group"
                 >
                   <div className="w-32 text-sm font-semibold text-gray-700 flex-shrink-0">
                     {formatDateShort(day._id)}
@@ -61,7 +61,7 @@ export function OrdersByDayChart({ ordersByDay }: OrdersByDayChartProps) {
                     <div className="flex items-center gap-4">
                       <div className="flex-1 bg-gray-200 rounded-full h-10 relative overflow-hidden shadow-inner">
                         <div
-                          className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 h-10 rounded-full flex items-center justify-between px-4 transition-all duration-700 group-hover:shadow-lg"
+                          className="bg-gradient-to-r from-admin-400 via-admin-500 to-admin-700 h-10 rounded-full flex items-center justify-between px-4 transition-all duration-700 group-hover:shadow-lg"
                           style={{ width: `${percentage}%` }}
                         >
                           <span className="text-xs text-white font-bold">{t('admin.analytics.ordersLabel').replace('{count}', day.count.toString())}</span>

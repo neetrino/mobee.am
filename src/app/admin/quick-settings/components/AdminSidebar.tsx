@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../../components/AdminMenuDrawer';
@@ -34,7 +34,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
                   tab.isSubCategory ? 'pl-12' : ''
                 } ${
                   isActive
-                    ? 'bg-gray-900 text-white'
+                    ? 'bg-admin text-white'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >

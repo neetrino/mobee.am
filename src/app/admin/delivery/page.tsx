@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -101,7 +101,7 @@ export default function DeliveryPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -138,7 +138,7 @@ export default function DeliveryPage() {
                       tab.isSubCategory ? 'pl-12' : ''
                     } ${
                       isActive
-                        ? 'bg-gray-900 text-white'
+                        ? 'bg-admin text-white'
                         : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >
@@ -197,7 +197,7 @@ export default function DeliveryPage() {
                             type="text"
                             value={location.country}
                             onChange={(e) => handleUpdateLocation(index, 'country', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                             placeholder={t('admin.delivery.countryPlaceholder')}
                           />
                         </div>
@@ -209,7 +209,7 @@ export default function DeliveryPage() {
                             type="text"
                             value={location.city}
                             onChange={(e) => handleUpdateLocation(index, 'city', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                             placeholder={t('admin.delivery.cityPlaceholder')}
                           />
                         </div>
@@ -222,7 +222,7 @@ export default function DeliveryPage() {
                               type="number"
                               value={location.price}
                               onChange={(e) => handleUpdateLocation(index, 'price', parseFloat(e.target.value) || 0)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                             placeholder={t('admin.delivery.pricePlaceholder')}
                             min="0"
                             step="100"

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -47,7 +47,7 @@ export function ProductDiscountsCard({
 
       {productsLoading ? (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.quickSettings.loadingProducts')}</p>
         </div>
       ) : products.length === 0 ? (
@@ -66,7 +66,7 @@ export function ProductDiscountsCard({
             return (
               <div
                 key={product.id}
-                className="flex items-center gap-4 p-4 border-2 border-blue-300 rounded-lg hover:bg-blue-50 transition-colors bg-blue-50/30"
+                className="flex items-center gap-4 p-4 border-2 border-admin-300 rounded-lg hover:bg-admin-50 transition-colors bg-admin-50/30"
               >
                 {product.image && (
                   <div className="flex-shrink-0">
@@ -82,7 +82,7 @@ export function ProductDiscountsCard({
                   <div className="flex items-center gap-2 mt-1">
                     {currentDiscount > 0 && originalPrice > 0 ? (
                       <>
-                        <span className="text-xs font-semibold text-blue-600 select-none">
+                        <span className="text-xs font-semibold text-admin-600 select-none">
                           {formatPrice(discountedPrice)}
                         </span>
                         <span className="text-xs text-gray-400 line-through select-none">

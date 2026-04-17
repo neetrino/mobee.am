@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
@@ -74,7 +74,7 @@ export function OrdersFilters({
     <Card className="p-4 mb-6">
       <div className="flex gap-4 items-center flex-wrap">
         <select
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
           value={statusFilter}
           onChange={(e) => handleStatusChange(e.target.value)}
         >
@@ -85,7 +85,7 @@ export function OrdersFilters({
           <option value="cancelled">{t('admin.orders.cancelled')}</option>
         </select>
         <select
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
           value={paymentStatusFilter}
           onChange={(e) => handlePaymentStatusChange(e.target.value)}
         >
@@ -97,7 +97,7 @@ export function OrdersFilters({
         <input
           type="text"
           placeholder={t('admin.orders.searchPlaceholder')}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-[200px]"
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin flex-1 min-w-[200px]"
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
         />

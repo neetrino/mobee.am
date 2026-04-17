@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Card } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -16,8 +16,8 @@ export function TopProducts({ products }: TopProductsProps) {
     <Card className="p-6 bg-white shadow-sm border border-gray-200 rounded-xl">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900">{t('admin.analytics.topSellingProducts')}</h2>
-        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-10 h-10 bg-admin-100 rounded-lg flex items-center justify-center">
+          <svg className="w-5 h-5 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
         </div>
@@ -31,7 +31,7 @@ export function TopProducts({ products }: TopProductsProps) {
           products.map((product, index) => (
             <div
               key={product.variantId}
-              className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200 bg-gray-50 hover:bg-white group"
+              className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-admin-300 hover:shadow-md transition-all duration-200 bg-gray-50 hover:bg-white group"
             >
               <div className="flex-shrink-0">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${

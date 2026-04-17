@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { RefObject } from 'react';
 import { useTranslation } from '../../../../../lib/i18n-client';
@@ -39,7 +39,7 @@ export function AttributesSelection({
           <button
             type="button"
             onClick={onAttributesDropdownToggle}
-            className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm flex items-center justify-between"
+            className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin bg-white text-sm flex items-center justify-between"
           >
             <span className="text-gray-700">
               {selectedAttributesForVariants.size === 0
@@ -81,7 +81,7 @@ export function AttributesSelection({
                         key={attribute.id}
                         className={`flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-3 rounded-lg border transition-colors ${
                           selectedAttributesForVariants.has(attribute.id)
-                            ? 'bg-blue-50 border-blue-300'
+                            ? 'bg-admin-50 border-admin-300'
                             : 'border-gray-200 bg-white'
                         }`}
                       >
@@ -89,7 +89,7 @@ export function AttributesSelection({
                           type="checkbox"
                           checked={selectedAttributesForVariants.has(attribute.id)}
                           onChange={(e) => onAttributeToggle(attribute.id, e.target.checked)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
                         />
                         <span className="text-sm font-medium text-gray-900">{attribute.name}</span>
                       </label>
@@ -123,7 +123,7 @@ export function AttributesSelection({
                 return (
                   <span
                     key={attributeId}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-admin-50 text-admin-700 rounded-lg text-sm font-medium border border-admin-200"
                   >
                     {previewImage ? (
                       <img
@@ -139,14 +139,14 @@ export function AttributesSelection({
                     ) : null}
                     {attribute.name}
                     {selectedValues.length > 0 && (
-                      <span className="text-xs text-blue-600">
+                      <span className="text-xs text-admin-600">
                         ({selectedValues.length})
                       </span>
                     )}
                     <button
                       type="button"
                       onClick={() => onAttributeRemove(attributeId)}
-                      className="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none"
+                      className="ml-1 text-admin-600 hover:text-admin-800 focus:outline-none"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

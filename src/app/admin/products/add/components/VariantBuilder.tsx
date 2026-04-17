@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { ChangeEvent, RefObject } from 'react';
 import { Button, Input } from '@shop/ui';
@@ -220,14 +220,14 @@ export function VariantBuilder({
                                   onClick={() => {
                                     onOpenValueModal({ variantId: variant.id, attributeId });
                                   }}
-                                  className="w-full text-left flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className="w-full text-left flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-admin"
                                 >
                                   <div className="flex-1 flex flex-wrap items-center gap-1 min-w-0">
                                     {selectedValues.length > 0 ? (
                                       selectedValues.map((val) => (
                                         <span
                                           key={val.id}
-                                          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded text-xs"
+                                          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-admin-50 text-admin-700 rounded text-xs"
                                         >
                                           {val.imageUrl ? (
                                             <img
@@ -356,7 +356,7 @@ export function VariantBuilder({
                                 type="button"
                                 onClick={() => variantImageInputRefs.current?.[variant.id]?.click()}
                                 disabled={imageUploadLoading}
-                                className="px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                className="px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-admin disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

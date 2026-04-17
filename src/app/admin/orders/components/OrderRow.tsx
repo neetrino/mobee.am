@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
@@ -71,7 +71,7 @@ export function OrderRow({
         {order.customerPhone && (
           <div className="text-sm text-gray-500">{order.customerPhone}</div>
         )}
-        <div className="mt-1 text-xs text-blue-600">{t('admin.orders.viewOrderDetails')}</div>
+        <div className="mt-1 text-xs text-admin-600">{t('admin.orders.viewOrderDetails')}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {calculateTotalWithoutShipping()}
@@ -83,14 +83,14 @@ export function OrderRow({
         <div className="flex items-center gap-2">
           {updatingStatus ? (
             <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
               <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
             </div>
           ) : (
             <select
               value={order.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${getStatusColor(order.status)}`}
+              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getStatusColor(order.status)}`}
             >
               <option value="pending">{t('admin.orders.pending')}</option>
               <option value="processing">{t('admin.orders.processing')}</option>
@@ -104,14 +104,14 @@ export function OrderRow({
         <div className="flex items-center gap-2">
           {updatingPaymentStatus ? (
             <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
               <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
             </div>
           ) : (
             <select
               value={order.paymentStatus}
               onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
+              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
             >
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>

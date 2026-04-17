@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ export default function AdminError({
           <button
             type="button"
             onClick={reset}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 font-medium"
+            className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 font-medium"
           >
             Try again
           </button>

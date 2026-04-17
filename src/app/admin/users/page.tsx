@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -164,7 +164,7 @@ export default function UsersPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -277,7 +277,7 @@ export default function UsersPage() {
         <Card className="p-6">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
               <p className="text-gray-600">{t('admin.users.loadingUsers')}</p>
             </div>
           ) : filteredUsers.length === 0 ? (
@@ -349,7 +349,7 @@ export default function UsersPage() {
                             {user.roles?.map((role) => (
                               <span
                                 key={role}
-                                className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                                className="px-2 py-1 text-xs font-medium bg-admin-100 text-admin-800 rounded-full"
                               >
                                 {role}
                               </span>

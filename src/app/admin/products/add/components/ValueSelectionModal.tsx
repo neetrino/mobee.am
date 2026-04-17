@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Button } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
@@ -147,7 +147,7 @@ export function ValueSelectionModal({
               type="checkbox"
               checked={attribute.values.length > 0 && selectedValueIds.length === attribute.values.length}
               onChange={(e) => handleSelectAll(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
             />
             <span className="text-sm font-medium text-gray-900">All</span>
           </label>
@@ -170,7 +170,7 @@ export function ValueSelectionModal({
                   key={value.id}
                   className={`flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all border-2 ${
                     isSelected
-                      ? 'bg-blue-50 border-blue-600'
+                      ? 'bg-admin-50 border-admin-600'
                       : 'bg-gray-50 border-transparent hover:bg-gray-100 hover:border-gray-300'
                   }`}
                 >
@@ -178,7 +178,7 @@ export function ValueSelectionModal({
                     type="checkbox"
                     checked={isSelected}
                     onChange={(e) => handleValueToggle(value.id, e.target.checked)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
+                    className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin flex-shrink-0"
                   />
                   {/* Display image, color, or nothing */}
                   {value.imageUrl ? (

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -302,7 +302,7 @@ export default function ProductsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -364,7 +364,7 @@ export default function ProductsPage() {
                       tab.isSubCategory ? 'pl-12' : ''
                     } ${
                       isActive
-                        ? 'bg-gray-900 text-white'
+                        ? 'bg-admin text-white'
                         : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >
@@ -409,7 +409,7 @@ export default function ProductsPage() {
             <div className="mb-6">
               <button
                 onClick={() => router.push('/admin/products/add')}
-                className="w-full px-4 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 font-medium text-sm"
+                className="w-full px-4 py-3 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors flex items-center justify-center gap-2 font-medium text-sm"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

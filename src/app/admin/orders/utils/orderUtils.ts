@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Order utilities - helper functions for order status colors and formatting
  */
 
@@ -7,7 +7,7 @@ export function getStatusColor(status: string): string {
     case 'pending':
       return 'bg-yellow-100 text-yellow-800';
     case 'processing':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-admin-100 text-admin-800';
     case 'completed':
       return 'bg-green-100 text-green-800';
     case 'cancelled':
