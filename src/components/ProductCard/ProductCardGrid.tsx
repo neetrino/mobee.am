@@ -1,6 +1,7 @@
 'use client';
 
 import type { MouseEvent } from 'react';
+import { ShoppingBag } from 'lucide-react';
 import { ProductCardImage } from './ProductCardImage';
 import { ProductCardInfo } from './ProductCardInfo';
 import { ProductCardActions } from './ProductCardActions';
@@ -153,17 +154,21 @@ export function ProductCardGrid({
           type="button"
           onClick={onAddToCart}
           disabled={!product.inStock || isAddingToCart}
-          className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-[20px] bg-[#2db2ff] font-medium text-white transition-opacity ${
+          className={`inline-flex shrink-0 items-center justify-center bg-[#2db2ff] font-medium text-white transition-opacity ${
             product.inStock && !isAddingToCart
               ? 'hover:opacity-90'
               : 'cursor-not-allowed opacity-50'
-          } ${isCompact ? 'h-10 min-w-[110px] px-3 text-xs tracking-wide' : 'h-12 min-w-[132px] px-4 text-sm tracking-[0.2px]'}`}
+          } ${
+            isCompact
+              ? 'h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide'
+              : 'h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]'
+          }`}
           title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
           aria-label={product.inStock ? t('common.ariaLabels.addToCart') : t('common.ariaLabels.outOfStock')}
         >
           {isAddingToCart ? (
             <svg
-              className={`animate-spin ${isCompact ? 'h-4 w-4' : 'h-5 w-5'}`}
+              className={`animate-spin ${isCompact ? 'h-4 w-4' : 'h-[16.2px] w-[16.2px]'}`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -178,7 +183,11 @@ export function ProductCardGrid({
             </svg>
           ) : (
             <>
-              <CartPngIcon size={isCompact ? 18 : 20} />
+              {isCompact ? (
+                <CartPngIcon size={18} />
+              ) : (
+                <ShoppingBag className="h-[16.2px] w-[16.2px] shrink-0" strokeWidth={2} aria-hidden />
+              )}
               <span className="whitespace-nowrap">{t('common.buttons.addToCart')}</span>
             </>
           )}
