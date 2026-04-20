@@ -120,7 +120,7 @@ function MegaNavItem({ category, label }: { category: Category; label?: string }
 }
 
 export function MainHeaderBar() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
 
   const loadCategories = useCallback(async () => {
@@ -305,7 +305,9 @@ export function MainHeaderBar() {
             </div>
             <Link
               href="/products"
-              className="relative shrink-0 py-[0.15rem] text-[13.3px] font-bold leading-5 whitespace-nowrap text-[#ef4444] hover:text-[#dc2626] lg:-left-[10%]"
+              className={`relative shrink-0 py-[0.15rem] text-[13.3px] font-bold leading-5 whitespace-nowrap text-[#ef4444] hover:text-[#dc2626] ${
+                lang === 'en' ? 'lg:ml-auto lg:left-0' : 'lg:-left-[10%]'
+              }`}
             >
               {t('common.mainHeader.specialOffers')}
             </Link>
