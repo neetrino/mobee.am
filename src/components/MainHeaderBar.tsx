@@ -39,13 +39,13 @@ const MEGA_ROOT_LIMIT = 6;
 
 function NavChevron() {
   return (
-    <span className="relative size-3 shrink-0">
+    <span className="relative size-[11.4px] shrink-0">
       <img
         src={MAIN_HEADER_FIGMA_ASSETS.chevronDown}
         alt=""
-        width={12}
-        height={12}
-        className="pointer-events-none absolute inset-0 block size-3 max-w-none"
+        width={11.4}
+        height={11.4}
+        className="pointer-events-none absolute inset-0 block size-[11.4px] max-w-none"
       />
     </span>
   );
@@ -84,7 +84,7 @@ function MegaNavItem({ category, label }: { category: Category; label?: string }
     >
       <Link
         href={`/products?category=${encodeURIComponent(category.slug)}`}
-        className="flex items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+        className="flex items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
       >
         <span>{displayLabel}</span>
         <NavChevron />
@@ -204,9 +204,9 @@ export function MainHeaderBar() {
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <div
-          className={`flex flex-col gap-[0.45rem] ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} lg:flex-row lg:items-center lg:justify-between lg:gap-[0.9rem] xl:gap-[1.5rem]`}
+          className={`flex flex-col gap-[0.288rem] ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} lg:flex-row lg:items-center lg:justify-start lg:gap-[0.576rem] xl:gap-[0.96rem]`}
         >
-          <div className="flex w-full min-w-0 shrink-0 flex-col gap-[0.45rem] sm:flex-row sm:items-center sm:gap-4 lg:w-auto lg:max-w-none">
+          <div className="flex w-full min-w-0 shrink-0 flex-col gap-[0.288rem] sm:flex-row sm:items-center sm:gap-[0.64rem] lg:w-auto lg:max-w-none">
             <div className="min-w-0 w-full sm:flex-1 lg:max-w-[253px] lg:flex-[0_0_253px]">
               <button
                 type="button"
@@ -228,10 +228,10 @@ export function MainHeaderBar() {
                 </span>
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-4 sm:gap-10 sm:ml-12 lg:ml-[4.2rem]">
+            <div className="flex flex-wrap items-center gap-[0.64rem] sm:gap-[1.28rem] lg:gap-[1.6rem]">
               <Link
                 href={phonesCategoryHref}
-                className="flex shrink-0 items-center gap-1 self-start py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
+                className="flex shrink-0 items-center gap-1 self-start py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
               >
                 <span>{t('common.mainHeader.phonesLink')}</span>
                 <NavChevron />
@@ -241,7 +241,7 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.tabletsLink')}</span>
                   <NavChevron />
@@ -252,18 +252,18 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.computersLink')}</span>
                   <NavChevron />
                 </Link>
               )}
               {watchesCategory ? (
-                <MegaNavItem category={watchesCategory} />
+                <MegaNavItem category={watchesCategory} label={t('common.mainHeader.watchesLink')} />
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.watchesLink')}</span>
                   <NavChevron />
@@ -274,7 +274,7 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.headphonesLink')}</span>
                   <NavChevron />
@@ -285,7 +285,7 @@ export function MainHeaderBar() {
               ) : (
                 <Link
                   href="/products"
-                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
+                  className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.accessoriesLink')}</span>
                   <NavChevron />
@@ -295,17 +295,17 @@ export function MainHeaderBar() {
           </div>
 
           <nav
-            className="flex min-w-0 flex-1 items-center gap-x-4 overflow-x-auto pb-[0.15rem] [-webkit-overflow-scrolling:touch] sm:gap-x-6 lg:justify-end lg:gap-x-8 lg:pb-0 xl:gap-x-10 scrollbar-hide"
+            className="flex min-w-0 flex-1 items-center gap-x-[0.64rem] overflow-x-auto pb-[0.15rem] [-webkit-overflow-scrolling:touch] sm:gap-x-[0.96rem] lg:justify-start lg:gap-x-[1.28rem] lg:pb-0 xl:gap-x-[1.6rem] scrollbar-hide"
             aria-label={t('common.navigation.categories')}
           >
-            <div className="flex min-w-0 items-center gap-x-4 sm:gap-x-6 lg:gap-x-8 xl:gap-x-10 sm:ml-12 lg:ml-[4.2rem]">
+            <div className="flex min-w-0 items-center gap-x-[0.64rem] sm:gap-x-[0.96rem] lg:gap-x-[1.28rem] xl:gap-x-[1.6rem]">
               {megaRoots.map((cat) => (
                 <MegaNavItem key={cat.id} category={cat} />
               ))}
             </div>
             <Link
               href="/products"
-              className="shrink-0 py-[0.15rem] text-[14px] font-bold leading-5 whitespace-nowrap text-[#ef4444] hover:text-[#dc2626]"
+              className="relative shrink-0 py-[0.15rem] text-[13.3px] font-bold leading-5 whitespace-nowrap text-[#ef4444] hover:text-[#dc2626] lg:-left-[10%]"
             >
               {t('common.mainHeader.specialOffers')}
             </Link>
