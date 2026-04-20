@@ -202,8 +202,8 @@
     "copyright": "© {year} Mobee: Բոլոր իրավունքները պաշտպանված են:",
     "legalBar": {
       "brand": "MOBEE",
-      "copyrightLead": "Հեղինակային իրավունք © {year} | Բոլոր իրավունքները պաշտպանված են,",
-      "createdBy": "Ստեղծված է",
+      "copyrightLead": "Copyright © {year} | All Rights Reserved,",
+      "createdBy": "Created by",
       "creditCompany": "Neetrino IT Company",
       "privacyPolicy": "Գաղտնիության քաղաքականություն",
       "shippingPolicy": "Առաքման քաղաքականություն",
