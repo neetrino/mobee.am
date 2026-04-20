@@ -139,7 +139,7 @@ export const translations = {
     },
     breadcrumb: {
       home: 'Գլխավոր',
-      products: 'Ապրանքներ',
+      products: 'խանութ',
       categories: 'Կատեգորիաներ',
       cart: 'Զամբյուղ',
       wishlist: 'Լավագույն',
