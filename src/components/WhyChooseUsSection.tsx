@@ -19,11 +19,30 @@ const BENEFITS: readonly {
   width: number;
   height: number;
 }[] = [
-  { id: 'warranty', src: '/images/home/why-choose-us/warranty.png', width: 44, height: 42 },
+  { id: 'warranty', src: '/images/home/why-choose-us/warranty.svg', width: 44, height: 42 },
   { id: 'delivery', src: '/images/home/why-choose-us/delivery.png', width: 49, height: 39 },
   { id: 'installment', src: '/images/home/why-choose-us/installment.png', width: 57, height: 42 },
   { id: 'original', src: '/images/home/why-choose-us/original.png', width: 37, height: 48 },
 ];
+
+function WarrantyIcon() {
+  return (
+    <svg
+      width="44"
+      height="42"
+      viewBox="0 0 44 42"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-auto w-auto max-h-[48px]"
+      aria-hidden
+    >
+      <path
+        d="M15.2074 42L11.4056 35.5977L4.18696 34.0175L4.89162 26.5918L0 21L4.89162 15.4082L4.18696 7.98245L11.4056 6.40234L15.2074 0L22 2.88187L28.7926 0L32.5944 6.40234L39.813 7.98245L39.1084 15.4082L44 21L39.1084 26.5918L39.813 34.0175L32.5944 35.5977L28.7926 42L22 39.1181L15.2074 42ZM16.5676 37.9229L22 35.6223L27.498 37.9229L30.5215 32.8141L36.38 31.4714L35.8474 25.4702L39.7885 21L35.8474 16.4643L36.38 10.4631L30.5215 9.18591L27.4324 4.07711L22 6.37771L16.502 4.07711L13.4785 9.18591L7.62004 10.4631L8.15263 16.4643L4.21146 21L8.15263 25.4702L7.62004 31.5369L13.4785 32.8141L16.5676 37.9229ZM19.7631 27.8199L31.0622 16.5298L28.8172 14.2211L19.7631 23.2679L15.1828 18.7568L12.9378 21L19.7631 27.8199Z"
+        fill="#1A1C1D"
+      />
+    </svg>
+  );
+}
 
 function ArrowRightIcon({ className }: { className?: string }) {
   return (
@@ -56,13 +75,17 @@ function WhyChooseUsBenefitsList({ t }: { t: (path: string) => string }) {
       {BENEFITS.map((item) => (
         <li key={item.id} className="flex max-w-[289px] flex-col items-start">
           <div className="mb-6 shrink-0">
-            <Image
-              src={item.src}
-              alt=""
-              width={item.width}
-              height={item.height}
-              className="h-auto max-h-[48px] w-auto object-contain object-left"
-            />
+            {item.id === 'warranty' ? (
+              <WarrantyIcon />
+            ) : (
+              <Image
+                src={item.src}
+                alt=""
+                width={item.width}
+                height={item.height}
+                className="h-auto max-h-[48px] w-auto object-contain object-left"
+              />
+            )}
           </div>
           <h3 className="mb-3 text-[14px] font-bold uppercase leading-[21px] tracking-[0.7px] text-[#1a1c1d]">
             {t(`home.why_choose_us_benefits.${item.id}_title`)}
