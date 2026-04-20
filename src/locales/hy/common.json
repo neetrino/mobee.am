@@ -1,6 +1,6 @@
 {
   "buttons": {
-    "addToCart": "Ավելացնել զամբյուղ",
+    "addToCart": "Ավելացնել",
     "addToWishlist": "Ավելացնել լավագույն",
     "viewProduct": "Դիտել ապրանքը",
     "viewDetails": "Դիտել մանրամասները",
@@ -158,7 +158,7 @@
     "failedToAddToCart": "Չհաջողվեց ավելացնել ապրանքը զամբյուղ: Խնդրում ենք կրկին փորձել:"
   },
   "ariaLabels": {
-    "addToCart": "Ավելացնել զամբյուղ",
+    "addToCart": "Ավելացնել",
     "removeFromCart": "Հեռացնել զամբյուղից",
     "addToWishlist": "Ավելացնել լավագույն",
     "removeFromWishlist": "Հեռացնել լավագույնից",

@@ -130,7 +130,7 @@ export const translations = {
       product: 'ապրանք',
     },
     product: {
-      addToCart: 'Ավելացնել զամբյուղ',
+      addToCart: 'Ավելացնել',
       addToWishlist: 'Ավելացնել լավագույն',
       viewProduct: 'Դիտել ապրանքը',
       viewDetails: 'Դիտել մանրամասները',
