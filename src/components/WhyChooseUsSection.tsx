@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
+import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -150,7 +151,12 @@ function WhyChooseUsBenefitsList({ t }: { t: (path: string) => string }) {
       aria-labelledby="why-choose-us-heading"
     >
       {BENEFITS.map((item) => (
-        <li key={item.id} className="flex max-w-[289px] flex-col items-start">
+        <li
+          key={item.id}
+          className={`flex max-w-[289px] flex-col items-start ${
+            item.id === 'installment' || item.id === 'original' ? 'translate-x-[20%]' : ''
+          }`}
+        >
           <div className="mb-6 shrink-0">
             {item.id === 'warranty' ? (
               <WarrantyIcon />
@@ -190,39 +196,38 @@ export function WhyChooseUsSection() {
   const { t } = useTranslation();
 
   return (
-    <div
-      className={`mt-[7.5rem] flex flex-col gap-[103.68px] ${montserrat.className}`}
-      aria-labelledby="why-choose-us-heading"
-    >
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-        <div className="flex min-w-0 flex-col gap-[18px]">
-          <h2
-            id="why-choose-us-heading"
-            className="text-[30px] font-bold leading-[60px] text-[#1a1c1d]"
+    <section className="mt-[7.5rem]" aria-labelledby="why-choose-us-heading">
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-[103.68px] ${montserrat.className}`}>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+          <div className="flex min-w-0 flex-col gap-[18px]">
+            <h2
+              id="why-choose-us-heading"
+              className="text-[30px] font-bold leading-[60px] text-[#1a1c1d]"
+            >
+              {t('home.why_choose_us_heading.title')}
+            </h2>
+            <p className="max-w-[416px] text-base font-normal leading-6 text-[#6b7280]">
+              {t('home.why_choose_us_heading.subtitle')}
+            </p>
+          </div>
+          <Link
+            href="/about"
+            className="flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between rounded-full bg-[#2db2ff] pl-5 pr-0.5 transition-opacity hover:opacity-95 active:scale-[0.99] sm:w-[159px]"
           >
-            {t('home.why_choose_us_heading.title')}
-          </h2>
-          <p className="max-w-[416px] text-base font-normal leading-6 text-[#6b7280]">
-            {t('home.why_choose_us_heading.subtitle')}
-          </p>
+            <span className="text-right text-[12px] font-medium leading-none text-[#1e1e1e]">
+              {t('home.why_choose_us_heading.cta')}
+            </span>
+            <span
+              className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#1e1e1e] text-white"
+              aria-hidden
+            >
+              <ArrowRightIcon className="size-2" />
+            </span>
+          </Link>
         </div>
-        <Link
-          href="/about"
-          className="flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between rounded-full bg-[#2db2ff] pl-5 pr-0.5 transition-opacity hover:opacity-95 active:scale-[0.99] sm:w-[159px]"
-        >
-          <span className="text-right text-[12px] font-medium leading-none text-[#1e1e1e]">
-            {t('home.why_choose_us_heading.cta')}
-          </span>
-          <span
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#1e1e1e] text-white"
-            aria-hidden
-          >
-            <ArrowRightIcon className="size-2" />
-          </span>
-        </Link>
-      </div>
 
-      <WhyChooseUsBenefitsList t={t} />
-    </div>
+        <WhyChooseUsBenefitsList t={t} />
+      </div>
+    </section>
   );
 }

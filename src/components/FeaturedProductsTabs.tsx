@@ -66,8 +66,9 @@ export function FeaturedProductsTabs() {
           </div>
         </SpecialOffersSectionHeading>
 
-        <WhyChooseUsSection />
       </div>
+
+      <WhyChooseUsSection />
     </section>
   );
 }
