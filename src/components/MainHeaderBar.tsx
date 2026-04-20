@@ -51,10 +51,11 @@ function NavChevron() {
   );
 }
 
-function MegaNavItem({ category }: { category: Category }) {
+function MegaNavItem({ category, label }: { category: Category; label?: string }) {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasChildren = category.children && category.children.length > 0;
+  const displayLabel = label ?? category.title;
 
   const clearClose = () => {
     if (closeTimer.current) {
@@ -85,7 +86,7 @@ function MegaNavItem({ category }: { category: Category }) {
         href={`/products?category=${encodeURIComponent(category.slug)}`}
         className="flex items-center gap-1 py-[0.15rem] text-[14px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
       >
-        <span>{category.title}</span>
+        <span>{displayLabel}</span>
         <NavChevron />
       </Link>
       {hasChildren && open && (
@@ -99,7 +100,7 @@ function MegaNavItem({ category }: { category: Category }) {
               href={`/products?category=${encodeURIComponent(category.slug)}`}
               className="block px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50"
             >
-              {category.title}
+              {displayLabel}
             </Link>
             <div className="border-t border-gray-100" />
             {category.children.map((child) => (
@@ -236,7 +237,7 @@ export function MainHeaderBar() {
                 <NavChevron />
               </Link>
               {tabletsCategory ? (
-                <MegaNavItem category={tabletsCategory} />
+                <MegaNavItem category={tabletsCategory} label={t('common.mainHeader.tabletsLink')} />
               ) : (
                 <Link
                   href="/products"
