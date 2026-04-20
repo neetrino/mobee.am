@@ -191,7 +191,7 @@ export function WhyChooseUsSection() {
 
   return (
     <div
-      className={`mt-[7.5rem] flex flex-col gap-[50px] ${montserrat.className}`}
+      className={`mt-[7.5rem] flex flex-col gap-[103.68px] ${montserrat.className}`}
       aria-labelledby="why-choose-us-heading"
     >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
