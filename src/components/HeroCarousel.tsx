@@ -55,7 +55,7 @@ export function HeroCarousel() {
       <div
         className={`${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-[calc(theme(spacing.8)*4)]`}
       >
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:gap-5">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:gap-5">
           {/* Main banner — Figma 1:226; headphones 1:229 (+20% vs base); ~10% of icon height past card top */}
           <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px]">
             <div
@@ -108,7 +108,7 @@ export function HeroCarousel() {
           </div>
 
           {/* Right column — Figma nodes 1:234–1:246 */}
-          <div className="flex w-full shrink-0 flex-col gap-5 lg:w-[min(100%,413px)]">
+          <div className="flex w-full shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:justify-between lg:gap-0">
             <div className="flex min-h-[166px] flex-col justify-between rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:px-12 sm:pb-8 sm:pt-8">
               <p className="max-w-[276px] text-[12px] font-normal leading-4 text-[#111]">
                 <span className="block">{t('home.hero_chat_line1')}</span>
