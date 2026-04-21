@@ -36,7 +36,11 @@ function EnglishDesktopEmptyCart({ t }: EmptyCartContentProps) {
             </p>
           </div>
           <Link href="/products" className="w-full">
-            <Button variant="primary" size="lg" className="h-14 w-full rounded-[50px] text-sm font-semibold">
+            <Button
+              variant="primary"
+              size="lg"
+              className="h-14 w-full rounded-[50px] bg-[#2DB2FF] px-[10px] text-[14px] font-semibold leading-normal text-white hover:bg-[#2DB2FF] focus:ring-[#2DB2FF]"
+            >
               {t('common.cart.exploreCategories')}
             </Button>
           </Link>
