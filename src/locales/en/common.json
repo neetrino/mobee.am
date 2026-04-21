@@ -60,6 +60,8 @@
   "cart": {
     "title": "Shopping Cart",
     "empty": "Your cart is empty",
+    "emptyDescription": "Looks like you have not added anything in your cart. Go ahead and explore top categories.",
+    "exploreCategories": "Explore Categories",
     "orderSummary": "Order Summary",
     "subtotal": "Subtotal",
     "shipping": "Shipping",
