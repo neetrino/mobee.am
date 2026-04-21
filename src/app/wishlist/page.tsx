@@ -7,9 +7,10 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
-import { getStoredLanguage } from '../../lib/language';
+import { getStoredLanguage, type LanguageCode } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
+import { EmptyWishlist } from './empty-wishlist';
 
 interface Product {
   id: string;
@@ -50,6 +51,7 @@ export default function WishlistPage() {
   const [loading, setLoading] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [currency, setCurrency] = useState(getStoredCurrency());
+  const [language, setLanguage] = useState<LanguageCode>(getStoredLanguage());
   const [addingToCart, setAddingToCart] = useState<Set<string>>(new Set());
   // Track if we updated locally to prevent unnecessary re-fetch
   const isLocalUpdateRef = useRef(false);
@@ -120,11 +122,17 @@ export default function WishlistPage() {
       setCurrency(getStoredCurrency());
     };
 
+    const handleLanguageUpdate = () => {
+      setLanguage(getStoredLanguage());
+    };
+
     window.addEventListener('wishlist-updated', handleWishlistUpdate);
     window.addEventListener('currency-updated', handleCurrencyUpdate);
+    window.addEventListener('language-updated', handleLanguageUpdate);
     return () => {
       window.removeEventListener('wishlist-updated', handleWishlistUpdate);
       window.removeEventListener('currency-updated', handleCurrencyUpdate);
+      window.removeEventListener('language-updated', handleLanguageUpdate);
     };
   }, [fetchWishlistProducts]);
 
@@ -349,34 +357,7 @@ export default function WishlistPage() {
         </div>
         </>
       ) : (
-        <div className="text-center py-16">
-          <div className="max-w-md mx-auto">
-            <svg
-              className="mx-auto h-24 w-24 text-gray-400 mb-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {t('common.wishlist.empty')}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {t('common.wishlist.emptyDescription')}
-            </p>
-            <Link href="/products">
-              <Button variant="primary" size="lg">
-                {t('common.buttons.browseProducts')}
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <EmptyWishlist t={t} lang={language} />
       )}
     </div>
   );
