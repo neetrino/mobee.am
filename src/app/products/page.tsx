@@ -212,7 +212,7 @@ export default async function ProductsPage({ searchParams }: any) {
           minPrice={params?.minPrice}
           maxPrice={params?.maxPrice}
         >
-        <aside className="hidden lg:block lg:w-[400px] lg:flex-shrink-0">
+        <aside className="hidden lg:block lg:w-[352px] lg:flex-shrink-0">
           <div className="sticky top-4 rounded-xl bg-[#F8FAFC] p-6">
             <div className="mb-6">
               <h2 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#0F172B]">
