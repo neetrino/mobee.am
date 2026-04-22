@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { Button } from '@shop/ui';
 import { getStoredLanguage } from '../../lib/language';
 import { t } from '../../lib/i18n';
 import { PriceFilter } from '../../components/PriceFilter';
@@ -239,66 +238,68 @@ export default async function ProductsPage({ searchParams }: any) {
 
               {productsData.meta.totalPages > 1 && (
                 <nav
-                  className="mt-12 flex flex-wrap items-center justify-center gap-6 rounded-[40px] bg-[#f6f7f9] px-8 py-4"
+                  className="mt-12 flex w-full items-center justify-center"
                   aria-label="Pagination"
                 >
-                  {page > 1 ? (
-                    <Link href={buildPaginationUrl(page - 1)}>
-                      <Button
-                        variant="outline"
-                        className="min-w-[90px] rounded-lg border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
+                  <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-[9999px] border border-[#4B5563] px-2 py-2 sm:px-3">
+                    {page > 1 ? (
+                      <Link
+                        href={buildPaginationUrl(page - 1)}
+                        className="inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9]"
                       >
                         {t(language, 'common.pagination.previous')}
-                      </Button>
-                    </Link>
-                  ) : (
-                    <span className="min-w-[90px] rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center text-sm font-medium text-neutral-400">
-                      {t(language, 'common.pagination.previous')}
-                    </span>
-                  )}
+                      </Link>
+                    ) : (
+                      <span className="inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium text-[#9AA4B2]">
+                        {t(language, 'common.pagination.previous')}
+                      </span>
+                    )}
 
-                  <div className="flex items-center gap-1">
+                    <div className="mx-1 h-6 w-px bg-[#E2E8F0]" aria-hidden />
+
                     {getPaginationPages().map((item, idx) =>
                       item === "ellipsis" ? (
-                        <span key={`ellipsis-${idx}`} className="px-2 text-neutral-400" aria-hidden>
-                          …
+                        <span
+                          key={`ellipsis-${idx}`}
+                          className="inline-flex h-10 min-w-10 items-center justify-center text-sm font-medium text-[#9AA4B2]"
+                          aria-hidden
+                        >
+                          ...
+                        </span>
+                      ) : item === page ? (
+                        <span
+                          key={item}
+                          className="inline-flex h-10 min-w-10 items-center justify-center rounded-[9999px] bg-[#2DB2FF] px-3 text-sm font-semibold text-white"
+                          aria-current="page"
+                        >
+                          {item}
                         </span>
                       ) : (
-                        <span key={item}>
-                          {item === page ? (
-                            <span
-                              className="flex h-9 min-w-[2.25rem] items-center justify-center rounded-lg bg-neutral-800 px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
-                              aria-current="page"
-                            >
-                              {item}
-                            </span>
-                          ) : (
-                            <Link
-                              href={buildPaginationUrl(item)}
-                              className="flex h-9 min-w-[2.25rem] items-center justify-center rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
-                            >
-                              {item}
-                            </Link>
-                          )}
-                        </span>
+                        <Link
+                          key={item}
+                          href={buildPaginationUrl(item)}
+                          className="inline-flex h-10 min-w-10 items-center justify-center rounded-[9999px] border border-transparent px-3 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9]"
+                        >
+                          {item}
+                        </Link>
                       )
                     )}
-                  </div>
 
-                  {page < productsData.meta.totalPages ? (
-                    <Link href={buildPaginationUrl(page + 1)}>
-                      <Button
-                        variant="outline"
-                        className="min-w-[90px] rounded-lg border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
+                    <div className="mx-1 h-6 w-px bg-[#E2E8F0]" aria-hidden />
+
+                    {page < productsData.meta.totalPages ? (
+                      <Link
+                        href={buildPaginationUrl(page + 1)}
+                        className="inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9]"
                       >
                         {t(language, 'common.pagination.next')}
-                      </Button>
-                    </Link>
-                  ) : (
-                    <span className="min-w-[90px] rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center text-sm font-medium text-neutral-400">
-                      {t(language, 'common.pagination.next')}
-                    </span>
-                  )}
+                      </Link>
+                    ) : (
+                      <span className="inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium text-[#9AA4B2]">
+                        {t(language, 'common.pagination.next')}
+                      </span>
+                    )}
+                  </div>
                 </nav>
               )}
             </>
