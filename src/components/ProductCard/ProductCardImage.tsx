@@ -33,8 +33,8 @@ export function ProductCardImage({
 }: ProductCardImageProps) {
   const showPlaceholder = imageError;
   const frameClass = isCompact
-    ? "w-[min(160px,72%)] max-w-[85%]"
-    : "w-[min(198px,78%)] max-w-[85%]";
+    ? "w-[160px] max-w-[82%]"
+    : "w-[198px] max-w-[82%]";
   const aspectClass = squareImageFrame ? "aspect-square" : "aspect-[3/4]";
 
   return (

@@ -39,7 +39,7 @@ export function ProductCardInfo({
 
   const paddingClass = (() => {
     if (hidePrice) {
-      return isCompact ? 'px-3 pt-2.5 pb-2' : 'px-5 pt-4 pb-3';
+      return isCompact ? 'px-3 pt-2 pb-2' : 'px-5 pt-0 pb-4';
     }
     return isCompact ? 'p-2.5' : 'p-4';
   })();
@@ -54,7 +54,7 @@ export function ProductCardInfo({
           {brandName || t('common.defaults.category')}
         </p>
         <h3
-          className={`${isCompact ? 'text-base' : 'text-xl'} font-medium text-gray-900 line-clamp-2 ${subtitle ? (isCompact ? 'mb-0.5' : 'mb-1') : isCompact ? 'mb-1' : 'mb-2'}`}
+          className={`${isCompact ? 'text-base' : 'text-[18px] leading-7'} font-bold text-gray-900 line-clamp-2 ${subtitle ? (isCompact ? 'mb-0.5' : 'mb-1') : isCompact ? 'mb-1' : 'mb-2'}`}
         >
           {title}
         </h3>

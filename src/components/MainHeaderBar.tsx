@@ -204,10 +204,10 @@ export function MainHeaderBar() {
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <div
-          className={`flex flex-col gap-[0.288rem] ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} lg:flex-row lg:items-center lg:justify-start lg:gap-[0.576rem] xl:gap-[0.96rem]`}
+          className={`flex flex-col gap-[0.288rem] ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} lg:min-h-[74px] lg:flex-row lg:items-center lg:justify-start lg:gap-[1.25rem] xl:gap-[2.5rem]`}
         >
           <div className="flex w-full min-w-0 shrink-0 flex-col gap-[0.288rem] sm:flex-row sm:items-center sm:gap-[0.64rem] lg:w-auto lg:max-w-none">
-            <div className="min-w-0 w-full sm:flex-1 lg:max-w-[253px] lg:flex-[0_0_253px]">
+            <div className="min-w-0 w-full sm:flex-1 lg:max-w-[505px] lg:flex-[0_0_505px]">
               <button
                 type="button"
                 onClick={openSearch}
@@ -228,7 +228,7 @@ export function MainHeaderBar() {
                 </span>
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-[0.64rem] sm:gap-[1.28rem] lg:gap-[1.6rem]">
+            <div className="flex flex-wrap items-center gap-[0.64rem] sm:gap-[1.28rem] lg:gap-[2.5rem]">
               <Link
                 href={phonesCategoryHref}
                 className="flex shrink-0 items-center gap-1 self-start py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900 sm:self-auto"
@@ -295,10 +295,10 @@ export function MainHeaderBar() {
           </div>
 
           <nav
-            className="flex min-w-0 flex-1 items-center gap-x-[0.64rem] overflow-x-auto pb-[0.15rem] [-webkit-overflow-scrolling:touch] sm:gap-x-[0.96rem] lg:justify-start lg:gap-x-[1.28rem] lg:pb-0 xl:gap-x-[1.6rem] scrollbar-hide"
+            className="flex min-w-0 flex-1 items-center gap-x-[0.64rem] overflow-x-auto pb-[0.15rem] [-webkit-overflow-scrolling:touch] sm:gap-x-[0.96rem] lg:justify-start lg:gap-x-[2.5rem] lg:pb-0 scrollbar-hide"
             aria-label={t('common.navigation.categories')}
           >
-            <div className="flex min-w-0 items-center gap-x-[0.64rem] sm:gap-x-[0.96rem] lg:gap-x-[1.28rem] xl:gap-x-[1.6rem]">
+            <div className="flex min-w-0 items-center gap-x-[0.64rem] sm:gap-x-[0.96rem] lg:gap-x-[2.5rem]">
               {megaRoots.map((cat) => (
                 <MegaNavItem key={cat.id} category={cat} />
               ))}

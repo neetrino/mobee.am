@@ -64,11 +64,11 @@ export function ProductCardGrid({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow relative">
-      {/* Product image: square inset + white panel + centered asset (object-contain for clear silhouette) */}
-      <div className="aspect-square relative">
-        <div className="absolute inset-0 p-5">
-          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-white py-8">
+    <div className="relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[545px]">
+      {/* Figma desktop card geometry: 302x545 with top visual block at 299px */}
+      <div className="relative lg:h-[355px]">
+        <div className="absolute inset-x-5 top-5 lg:h-[299px]">
+          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-[31px]">
             <ProductCardImage
               slug={product.slug}
               image={product.image}
@@ -114,9 +114,7 @@ export function ProductCardGrid({
       />
 
       {/* Figma mobee-new 53:684 — price left, pill CTA right, top divider */}
-      <div
-        className={`flex items-center justify-between gap-3 border-t border-gray-50 pt-[17px] ${isCompact ? 'px-3 pb-3' : 'px-5 pb-5'}`}
-      >
+      <div className={`flex items-center justify-between gap-3 border-t border-[#e5e5e5] pt-[17px] ${isCompact ? 'px-3 pb-3' : 'px-5 pb-5'}`}>
         <div className="min-w-0 flex flex-col">
           <div className="flex flex-wrap items-center gap-2">
             <span

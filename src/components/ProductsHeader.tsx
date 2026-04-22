@@ -135,11 +135,11 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4">
+    <div className="mx-auto w-full px-0 pt-6 pb-4">
       {/* Desktop: All elements in one horizontal line */}
-      <div className="hidden sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <div className="hidden sm:flex sm:items-center sm:justify-between sm:gap-6">
         {/* Left side: Clear filters + All products title */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           {hasActiveFilters && (
             <button
               type="button"
@@ -172,14 +172,14 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
         </div>
 
         {/* Right side: Show + View toggles + Sort */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {/* Show dropdown */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-[9999px] border border-[#4b5563] px-[21px] py-3">
             <span className="text-sm text-gray-900">{t('products.header.show')}</span>
             <select
               value={String(currentLimit)}
               onChange={(event) => handleLimitChange(event.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 min-w-[70px]"
+              className="min-w-[90px] bg-transparent text-sm text-gray-900 focus:outline-none"
             >
               <option value="12">12</option>
               <option value="24">24</option>
@@ -189,7 +189,7 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
           </div>
 
           {/* View Mode Icons: List, Grid (2x2), and Grid (3x3) */}
-          <div className="flex items-center gap-1">
+          <div className="flex h-12 items-center gap-[13px] rounded-[90px] border border-[#4b5563] px-5">
             {/* List View */}
             <button
               onClick={() => handleViewModeChange('list')}
@@ -253,7 +253,7 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
           <div className="relative" ref={sortDropdownRef}>
             <button
               onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors text-sm text-gray-900 min-w-[160px]"
+              className="flex h-12 min-w-[226px] items-center gap-2 rounded-[9999px] border border-[#4b5563] bg-white px-[21px] text-sm text-gray-900 transition-colors hover:bg-gray-50"
             >
               <span>{sortOptions.find(opt => opt.value === sortBy)?.label || t('products.header.sort.default')}</span>
               <svg

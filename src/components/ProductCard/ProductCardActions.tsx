@@ -81,7 +81,7 @@ export function ProductCardActions({
     return (
       <div
         className={`pointer-events-auto absolute z-[40] flex flex-col opacity-100 ${
-          isCompact ? 'top-[11px] right-4 gap-1.5' : 'top-[11px] right-4 gap-[7px]'
+          isCompact ? 'top-[11px] right-4 gap-1.5' : 'top-[12px] right-[18px] gap-[7px]'
         }`}
       >
         {/* Figma mobee-new 53:684 — heart above compare, ~11px from top, light blue circles */}

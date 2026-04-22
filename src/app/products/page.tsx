@@ -14,7 +14,7 @@ import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 
-const PAGE_CONTAINER = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
+const PAGE_CONTAINER = 'mx-auto w-full max-w-[1917px] px-4 sm:px-6 lg:px-[53px]';
 // Container for filters section to align with Header logo (same Y-axis)
 // Header logo uses: pl-2 sm:pl-4 md:pl-6 lg:pl-8
 
@@ -205,15 +205,15 @@ export default async function ProductsPage({ searchParams }: any) {
         />
       </div>
 
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 pl-2 pr-4 sm:pl-4 sm:pr-6 md:pl-6 lg:flex-row lg:items-start lg:pl-8 lg:pr-8">
+      <div className="mx-auto flex w-full max-w-[1917px] flex-col gap-6 px-4 sm:px-6 lg:flex-row lg:items-start lg:px-[53px]">
         <ProductsFiltersProvider
           category={params?.category}
           search={params?.search}
           minPrice={params?.minPrice}
           maxPrice={params?.maxPrice}
         >
-        <aside className="hidden lg:block lg:w-[352px] lg:flex-shrink-0">
-          <div className="sticky top-4 rounded-xl bg-[#F8FAFC] p-6">
+        <aside className="hidden lg:block lg:w-[448px] lg:flex-shrink-0 lg:border-r lg:border-[#e7e7e7] lg:pr-0">
+          <div className="sticky top-0 h-[1255px] bg-[#f3f4f6] px-6 pt-6">
             <div className="mb-6">
               <h2 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#0F172B]">
                 {t(language, 'products.filters.sidebar.title')}
@@ -231,7 +231,7 @@ export default async function ProductsPage({ searchParams }: any) {
           </div>
         </aside>
 
-        <div className="flex-1 min-w-0 w-full lg:w-auto py-4 overflow-x-hidden">
+        <div className="min-w-0 flex-1 w-full overflow-x-hidden py-4 lg:pl-[53px]">
 
           {normalizedProducts.length > 0 ? (
             <>
@@ -239,7 +239,7 @@ export default async function ProductsPage({ searchParams }: any) {
 
               {productsData.meta.totalPages > 1 && (
                 <nav
-                  className="mt-10 flex flex-wrap items-center justify-center gap-2"
+                  className="mt-12 flex flex-wrap items-center justify-center gap-6 rounded-[40px] bg-[#f6f7f9] px-8 py-4"
                   aria-label="Pagination"
                 >
                   {page > 1 ? (
