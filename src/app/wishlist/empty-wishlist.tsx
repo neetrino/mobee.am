@@ -27,7 +27,7 @@ function EnglishDesktopEmptyWishlist({ t }: EmptyWishlistContentProps) {
             alt={t('common.wishlist.empty')}
             width={428}
             height={384}
-            className="mx-auto h-[384px] w-[428px] max-w-none object-cover object-center"
+            className="mx-auto h-[384px] w-[428px] max-w-none -translate-x-[15%] object-cover object-center"
             loading="eager"
           />
         </div>
