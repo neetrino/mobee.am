@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { getStoredCurrency, formatPrice as formatCurrencyPrice, type CurrencyCode } from '../lib/currency';
@@ -24,6 +24,7 @@ interface PriceRange {
 
 export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: PriceFilterProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
   const { t } = useTranslation();
@@ -203,15 +204,24 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
         // Reset page to 1 when filters change
         params.delete('page');
         
+        const nextQueryString = params.toString();
+        const currentQueryString = searchParams.toString();
+
+        // Avoid navigation loop when query already matches current URL.
+        if (nextQueryString === currentQueryString) {
+          return;
+        }
+
         // Use a small delay to debounce rapid changes
         const timeoutId = setTimeout(() => {
-          router.push(`/products?${params.toString()}`);
+          const nextUrl = nextQueryString ? `${pathname}?${nextQueryString}` : pathname;
+          router.replace(nextUrl, { scroll: false });
         }, 300);
         
         return () => clearTimeout(timeoutId);
       }
     }
-  }, [isDragging, minPrice, maxPrice, priceRange, searchParams, router]);
+  }, [isDragging, minPrice, maxPrice, priceRange, pathname, searchParams, router]);
 
   // Используем функцию форматирования из currency.ts для консистентности
   const formatPrice = (price: number) => {
@@ -310,4 +320,3 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
     </section>
   );
 }
-
