@@ -448,7 +448,11 @@ export default function ComparePage() {
               {t('common.compare.emptyDescription')}
             </p>
             <Link href="/products">
-              <Button variant="primary" size="md">
+              <Button
+                variant="primary"
+                size="md"
+                className="bg-[#2DB2FF] hover:bg-[#1CA8F9]"
+              >
                 {t('common.compare.browseProducts')}
               </Button>
             </Link>
