@@ -1,13 +1,12 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { Button } from '@shop/ui';
-import { apiClient } from '../../lib/api-client';
 import { getStoredLanguage } from '../../lib/language';
 import { t } from '../../lib/i18n';
 import { PriceFilter } from '../../components/PriceFilter';
 import { ColorFilter } from '../../components/ColorFilter';
-import { SizeFilter } from '../../components/SizeFilter';
 import { BrandFilter } from '../../components/BrandFilter';
+import { CategoryFilter } from '../../components/CategoryFilter';
 import { ProductsHeader } from '../../components/ProductsHeader';
 import { ProductsGrid } from '../../components/ProductsGrid';
 import { CategoryNavigation } from '../../components/CategoryNavigation';
@@ -157,10 +156,8 @@ export default async function ProductsPage({ searchParams }: any) {
 
   // FILTERS
   const colors = params?.colors;
-  const sizes = params?.sizes;
   const brands = params?.brand;
   const selectedColors = colors ? colors.split(',').map((c: string) => c.trim().toLowerCase()) : [];
-  const selectedSizes = sizes ? sizes.split(',').map((s: string) => s.trim()) : [];
   const selectedBrands = brands ? brands.split(',').map((b: string) => b.trim()) : [];
 
   // PAGINATION: 12 per page by default, preserve limit in URLs
@@ -208,20 +205,28 @@ export default async function ProductsPage({ searchParams }: any) {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto pl-2 sm:pl-4 md:pl-6 lg:pl-8 pr-4 sm:pr-6 lg:pr-8 flex flex-col lg:flex-row gap-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 pl-2 pr-4 sm:pl-4 sm:pr-6 md:pl-6 lg:flex-row lg:items-start lg:pl-8 lg:pr-8">
         <ProductsFiltersProvider
           category={params?.category}
           search={params?.search}
           minPrice={params?.minPrice}
           maxPrice={params?.maxPrice}
         >
-        <aside className="w-64 hidden lg:block bg-gray-50 rounded-xl flex-shrink-0">
-          <div className="sticky top-4 p-4 space-y-6">
+        <aside className="hidden lg:block lg:w-[400px] lg:flex-shrink-0">
+          <div className="sticky top-4 rounded-xl bg-[#F8FAFC] p-6">
+            <div className="mb-6">
+              <h2 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#0F172B]">
+                {t(language, 'products.filters.sidebar.title')}
+              </h2>
+              <p className="mt-1 text-sm leading-5 tracking-[-0.01em] text-[#62748E]">
+                {t(language, 'products.filters.sidebar.subtitle')}
+              </p>
+            </div>
             <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
               <PriceFilter currentMinPrice={params?.minPrice} currentMaxPrice={params?.maxPrice} category={params?.category} search={params?.search} />
-              <ColorFilter category={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} selectedColors={selectedColors} />
-              <SizeFilter category={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} selectedSizes={selectedSizes} />
+              <CategoryFilter currentCategory={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} />
               <BrandFilter category={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} selectedBrands={selectedBrands} />
+              <ColorFilter category={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} selectedColors={selectedColors} />
             </Suspense>
           </div>
         </aside>
@@ -310,9 +315,9 @@ export default async function ProductsPage({ searchParams }: any) {
         <div className="p-4 space-y-6">
           <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
             <PriceFilter currentMinPrice={params?.minPrice} currentMaxPrice={params?.maxPrice} category={params?.category} search={params?.search} />
-            <ColorFilter category={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} selectedColors={selectedColors} />
-            <SizeFilter category={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} selectedSizes={selectedSizes} />
+            <CategoryFilter currentCategory={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} />
             <BrandFilter category={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} selectedBrands={selectedBrands} />
+            <ColorFilter category={params?.category} search={params?.search} minPrice={params?.minPrice} maxPrice={params?.maxPrice} selectedColors={selectedColors} />
           </Suspense>
         </div>
       </MobileFiltersDrawer>

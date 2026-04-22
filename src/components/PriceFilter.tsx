@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Card } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { getStoredCurrency, formatPrice as formatCurrencyPrice, type CurrencyCode } from '../lib/currency';
@@ -229,14 +228,20 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
   const maxPercentage = getPercentage(safeMaxPrice);
 
   return (
-    <Card className="p-4 mb-6">
-      <h3 className="text-base font-bold text-gray-800 mb-4 text-center uppercase tracking-wide">{t('products.filters.price.title')}</h3>
-      
-      {/* Range Slider */}
-      <div className="mb-4">
+    <section className="border-b border-[#E2E8F0] pb-6">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#314158]">
+          {t('products.filters.price.sectionTitle')}
+        </h3>
+        <p className="text-base font-bold leading-6 tracking-[-0.02em] text-black">
+          {formatPrice(Number(safeMinPrice) || 0)} - {formatPrice(Number(safeMaxPrice) || 100000)}
+        </p>
+      </div>
+
+      <div className="mt-4">
         <div
           ref={sliderRef}
-          className="relative h-1 bg-gray-200 cursor-pointer"
+          className="relative h-2 cursor-pointer rounded-full bg-[#E2E8F0]"
           onMouseDown={(e) => {
             const rect = sliderRef.current?.getBoundingClientRect();
             if (!rect) return;
@@ -259,16 +264,14 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
             }
           }}
         >
-          {/* Active range - light blue */}
           <div
-            className="absolute h-1 bg-sky-400"
+            className="absolute h-2 rounded-full bg-[#3BA3E3]"
             style={{
               left: `${minPercentage}%`,
               width: `${maxPercentage - minPercentage}%`,
             }}
           />
-          
-          {/* Min handle - T-shaped marker */}
+
           <div
             className="absolute cursor-grab active:cursor-grabbing z-10"
             style={{ left: `${minPercentage}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
@@ -281,11 +284,9 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
               handleMouseDown('min');
             }}
           >
-            {/* T-shaped marker - vertical line extending above and below the horizontal line */}
-            <div className="w-1 h-5 bg-sky-400" />
+            <div className="h-5 w-5 rounded-full border border-[#E2E8F0] bg-white shadow-sm" />
           </div>
-          
-          {/* Max handle - T-shaped marker */}
+
           <div
             className="absolute cursor-grab active:cursor-grabbing z-10"
             style={{ left: `${maxPercentage}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
@@ -298,20 +299,15 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
               handleMouseDown('max');
             }}
           >
-            {/* T-shaped marker - vertical line extending above and below the horizontal line */}
-            <div className="w-1 h-5 bg-sky-400" />
+            <div className="h-5 w-5 rounded-full border border-[#E2E8F0] bg-white shadow-sm" />
           </div>
         </div>
       </div>
 
-      {/* Price Display */}
-      <div className="text-gray-700 text-center">
-        <span className="text-sm text-gray-500">{t('products.filters.price.priceLabel')} </span>
-        <span className="text-sm font-semibold text-gray-900">
-          {formatPrice(Number(safeMinPrice) || 0)} - {formatPrice(Number(safeMaxPrice) || 100000)}
-        </span>
-      </div>
-    </Card>
+      <p className="mt-3 text-sm leading-5 tracking-[-0.01em] text-[#62748E]">
+        {t('products.filters.price.priceLabel')}
+      </p>
+    </section>
   );
 }
 

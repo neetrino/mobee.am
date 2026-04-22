@@ -1,11 +1,19 @@
 {
   "filters": {
+    "sidebar": {
+      "title": "Filter",
+      "subtitle": "Find what fits you best"
+    },
     "price": {
       "title": "Filter by Price",
+      "sectionTitle": "Price",
       "priceLabel": "Price:"
     },
+    "category": {
+      "title": "Categories"
+    },
     "color": {
-      "title": "Filter by Color",
+      "title": "Colors",
       "noColors": "No colors available",
       "loading": "Loading..."
     },
@@ -15,7 +23,7 @@
       "loading": "Loading..."
     },
     "brand": {
-      "title": "Filter by Brand",
+      "title": "Brands",
       "searchPlaceholder": "Find brand",
       "noBrands": "No brands found",
       "loading": "Loading..."

@@ -1,11 +1,19 @@
 {
   "filters": {
+    "sidebar": {
+      "title": "Фильтр",
+      "subtitle": "Find what fits you best"
+    },
     "price": {
       "title": "Фильтр по цене",
+      "sectionTitle": "Цена",
       "priceLabel": "Цена:"
     },
+    "category": {
+      "title": "Категории"
+    },
     "color": {
-      "title": "Фильтр по цвету",
+      "title": "Цвета",
       "noColors": "Цвета недоступны",
       "loading": "Загрузка..."
     },
@@ -15,7 +23,7 @@
       "loading": "Загрузка..."
     },
     "brand": {
-      "title": "Фильтр по бренду",
+      "title": "Бренды",
       "searchPlaceholder": "Найти бренд",
       "noBrands": "Бренды не найдены",
       "loading": "Загрузка..."

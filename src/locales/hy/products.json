@@ -1,11 +1,19 @@
 {
   "filters": {
+    "sidebar": {
+      "title": "Ֆիլտր",
+      "subtitle": "Find what fits you best"
+    },
     "price": {
       "title": "Զտել ըստ գնի",
+      "sectionTitle": "Գին",
       "priceLabel": "Գին:"
     },
+    "category": {
+      "title": "Կատեգորիաներ"
+    },
     "color": {
-      "title": "Զտել ըստ գույնի",
+      "title": "Գույներ",
       "noColors": "Գույներ չկան",
       "loading": "Բեռնվում է..."
     },
@@ -15,7 +23,7 @@
       "loading": "Բեռնվում է..."
     },
     "brand": {
-      "title": "Զտել ըստ բրենդի",
+      "title": "Բրենդեր",
       "searchPlaceholder": "Գտնել բրենդ",
       "noBrands": "Բրենդներ չգտնվեցին",
       "loading": "Բեռնվում է..."
