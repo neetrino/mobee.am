@@ -33,8 +33,8 @@ export function ProductCardImage({
 }: ProductCardImageProps) {
   const showPlaceholder = imageError;
   const frameClass = isCompact
-    ? "w-[160px] max-w-[82%]"
-    : "w-[198px] max-w-[82%]";
+    ? "w-[171px] max-w-[84%]"
+    : "w-[212px] max-w-[84%]";
   const aspectClass = squareImageFrame ? "aspect-square" : "aspect-[3/4]";
 
   return (
@@ -59,7 +59,7 @@ export function ProductCardImage({
                 ? 'object-contain object-[60%_60%]'
                 : 'object-contain'
             }
-            sizes="(max-width: 768px) 78vw, (max-width: 1200px) 35vw, 198px"
+            sizes="(max-width: 768px) 78vw, (max-width: 1200px) 35vw, 212px"
             unoptimized
             onError={onImageError}
           />

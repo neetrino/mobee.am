@@ -64,11 +64,11 @@ export function ProductCardGrid({
   const { t } = useTranslation();
 
   return (
-    <div className="relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[545px]">
+    <div className="relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[583px]">
       {/* Figma desktop card geometry: 302x545 with top visual block at 299px */}
-      <div className="relative lg:h-[355px]">
-        <div className="absolute inset-x-5 top-5 lg:h-[299px]">
-          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-[31px]">
+      <div className="relative lg:h-[380px]">
+        <div className="absolute inset-x-5 top-5 lg:h-[320px]">
+          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-[33px]">
             <ProductCardImage
               slug={product.slug}
               image={product.image}
