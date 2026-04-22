@@ -180,6 +180,22 @@ class ProductsFiltersService {
         products = [];
       }
 
+    // Compute price range from the base result set (before price filter is applied),
+    // so slider bounds remain stable while users adjust min/max values.
+    let rangeMin = Infinity;
+    let rangeMax = 0;
+    products.forEach((product: ProductWithRelations) => {
+      if (!product || !product.variants || !Array.isArray(product.variants)) {
+        return;
+      }
+      product.variants.forEach((v: { price?: number }) => {
+        if (typeof v?.price === 'number') {
+          if (v.price < rangeMin) rangeMin = v.price;
+          if (v.price > rangeMax) rangeMax = v.price;
+        }
+      });
+    });
+
     // Filter by price in memory
     if (filters.minPrice || filters.maxPrice) {
       const min = filters.minPrice || 0;
@@ -207,8 +223,6 @@ class ProductsFiltersService {
     }>();
     const sizeMap = new Map<string, number>();
     const brandMap = new Map<string, { id: string; name: string; count: number }>();
-    let rangeMin = Infinity;
-    let rangeMax = 0;
 
     products.forEach((product: ProductWithRelations & { brand?: { id: string; translations?: Array<{ locale: string; name?: string }>; name?: string } | null }) => {
       if (!product || !product.variants || !Array.isArray(product.variants)) {
@@ -221,12 +235,6 @@ class ProductsFiltersService {
           brandMap.set(product.brand.id, { id: product.brand.id, name, count: (existing?.count || 0) + 1 });
         }
       }
-      product.variants.forEach((v: { price?: number }) => {
-        if (typeof v?.price === 'number') {
-          if (v.price < rangeMin) rangeMin = v.price;
-          if (v.price > rangeMax) rangeMax = v.price;
-        }
-      });
       product.variants.forEach((variant: any) => {
         if (!variant || !variant.options || !Array.isArray(variant.options)) {
           return;
