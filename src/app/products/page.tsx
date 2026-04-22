@@ -241,7 +241,7 @@ export default async function ProductsPage({ searchParams }: any) {
                   className="mt-12 flex w-full items-center justify-center"
                   aria-label="Pagination"
                 >
-                  <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-[9999px] border border-[#4B5563] px-2 py-2 sm:px-3">
+                  <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-[9999px] px-2 py-2 sm:px-3">
                     {page > 1 ? (
                       <Link
                         href={buildPaginationUrl(page - 1)}
