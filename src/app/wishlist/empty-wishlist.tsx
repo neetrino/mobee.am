@@ -19,16 +19,18 @@ interface EmptyWishlistContentProps {
 
 function EnglishDesktopEmptyWishlist({ t }: EmptyWishlistContentProps) {
   return (
-    <div className="hidden py-8 lg:flex lg:justify-center">
+    <div className="hidden pb-8 pt-4 lg:flex lg:justify-center">
       <div className="flex w-[328px] flex-col items-center gap-[15px]">
-        <img
-          src={ENGLISH_DESKTOP_EMPTY_WISHLIST_IMAGE}
-          alt={t('common.wishlist.empty')}
-          width={285}
-          height={256}
-          className="h-auto w-[285px]"
-          loading="eager"
-        />
+        <div className="w-[328px] overflow-hidden">
+          <img
+            src={ENGLISH_DESKTOP_EMPTY_WISHLIST_IMAGE}
+            alt={t('common.wishlist.empty')}
+            width={428}
+            height={384}
+            className="mx-auto h-[384px] w-[428px] max-w-none object-cover object-center"
+            loading="eager"
+          />
+        </div>
         <div className="flex w-full flex-col gap-6">
           <div className="flex w-full flex-col items-center gap-4 text-center">
             <h2 className="w-[284px] text-[24px] font-bold leading-[1.2] text-[#1c1b1b]">
