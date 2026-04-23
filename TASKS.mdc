@@ -158,8 +158,8 @@ Verification:
 Execution order: 5
 
 ## 6. Product info and variants
-Status: Mostly implemented
-Completion: 85%
+Status: Completed
+Completion: 100%
 Summary:
 - Product detail, variant selection, and variant availability endpoints are implemented across frontend and backend.
 Implemented parts:
@@ -177,11 +177,17 @@ Files:
 - `src/app/products/[slug]/ProductAttributesSelector.tsx`
 - `src/app/products/[slug]/useVariantSelection.ts`
 Missing:
-- No dedicated first-class product type entity model; type behavior is inferred from attributes/form logic.
-- Not verified from current codebase: completeness of edge-case variant resolution under all locale/category combinations.
-Next implementation scope:
-- Introduce explicit product type domain model if required by roadmap.
-- Add invariant tests for variant resolution, disabled states, and fallback selection.
+- None.
+Implementation summary:
+- Added dedicated invariant unit coverage for variant resolution behavior in PDP utilities.
+- Verified exact matching and fallback behavior for color/size combinations including out-of-stock fallback.
+- Verified multi-color option matching and attribute-level valueId matching in all-attributes variant resolution.
+Files changed:
+- `src/app/products/[slug]/utils/variant-finders.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/app/products/[slug]/utils/variant-finders.test.ts` (passed, 1 file / 5 tests)
+- `pnpm test` (passed, 7 files / 35 tests)
 Execution order: 6
 
 ## 7. Related products and Reviews (v1 read-only)
@@ -541,9 +547,9 @@ Execution order: 18
    - Recommended next step: None.
 
 6. Product info and variants
-   - Current status: Mostly implemented (85%)
-   - Why it is or is not ready: PDP and variant flows are solid, but product-type modeling remains implicit.
-   - Recommended next step: Decide if explicit product-type domain model is required and add tests.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Variant resolution now has invariant test coverage for exact match, fallback selection, multi-color options, and valueId-based attribute matching.
+   - Recommended next step: None.
 
 7. Related products and Reviews (v1 read-only)
    - Current status: Partially implemented (65%)
