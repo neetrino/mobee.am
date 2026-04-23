@@ -209,7 +209,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <div className={PAGE_CONTAINER}>
         <ProductsHeader
           total={productsData.meta.total}
-          perPage={productsData.meta.limit}
         />
       </div>
 
