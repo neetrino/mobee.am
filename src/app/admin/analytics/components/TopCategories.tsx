@@ -7,9 +7,10 @@ import type { AnalyticsData } from '../types';
 
 interface TopCategoriesProps {
   categories: AnalyticsData['topCategories'];
+  currency: string;
 }
 
-export function TopCategories({ categories }: TopCategoriesProps) {
+export function TopCategories({ categories, currency }: TopCategoriesProps) {
   const { t } = useTranslation();
 
   return (
@@ -62,7 +63,7 @@ export function TopCategories({ categories }: TopCategoriesProps) {
               </div>
               <div className="text-right">
                 <p className="text-base font-bold text-gray-900">
-                  {formatCurrency(category.totalRevenue)}
+                  {formatCurrency(category.totalRevenue, currency)}
                 </p>
               </div>
             </div>

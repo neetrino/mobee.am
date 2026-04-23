@@ -8,9 +8,10 @@ import type { AnalyticsData } from '../types';
 
 interface OrdersByDayChartProps {
   ordersByDay: AnalyticsData['ordersByDay'];
+  currency: string;
 }
 
-export function OrdersByDayChart({ ordersByDay }: OrdersByDayChartProps) {
+export function OrdersByDayChart({ ordersByDay, currency }: OrdersByDayChartProps) {
   const { t } = useTranslation();
 
   return (
@@ -70,7 +71,7 @@ export function OrdersByDayChart({ ordersByDay }: OrdersByDayChartProps) {
                       </div>
                       <div className="w-36 text-right flex-shrink-0">
                         <p className="text-sm font-bold text-gray-900">
-                          {formatCurrency(day.revenue)}
+                          {formatCurrency(day.revenue, currency)}
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">{t('admin.analytics.revenue')}</p>
                       </div>

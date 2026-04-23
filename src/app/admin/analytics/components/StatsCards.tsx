@@ -55,7 +55,7 @@ export function StatsCards({ analytics, totalUsers }: StatsCardsProps) {
         </div>
         <p className="text-sm font-medium text-green-700 mb-1">{t('admin.analytics.totalRevenue')}</p>
         <p className="text-2xl font-bold text-green-900">
-          {formatCurrency(analytics.orders.totalRevenue)}
+          {formatCurrency(analytics.orders.totalRevenue, analytics.orders.currency)}
         </p>
       </Card>
 

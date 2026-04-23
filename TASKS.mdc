@@ -607,10 +607,10 @@ Verification:
 Execution order: 16
 
 ## 17. Analytics Dashboard
-Status: Mostly implemented
-Completion: 80%
+Status: Completed
+Completion: 100%
 Summary:
-- Admin analytics APIs and UI are present with period-based metrics and charts; there is overlap with main admin dashboard summaries.
+- Admin analytics APIs and UI now share a typed contract with dashboard stats, with validated period handling and normalized currency across analytics metrics.
 Implemented parts:
 - Analytics endpoint with period/date filters.
 - Stats endpoint and dashboard widget endpoints are available.
@@ -629,11 +629,30 @@ Files:
 - `src/app/admin/page.tsx`
 - `src/app/admin/hooks/useAdminDashboard.ts`
 Missing:
-- Potential duplication/overlap between `/admin` and `/admin/analytics` surfaces is not consolidated.
-- Not verified from current codebase: metric accuracy against real production data and timezone/business-calendar expectations.
-Next implementation scope:
-- Define a single analytics source-of-truth contract reused by both dashboard surfaces.
-- Add metric definitions/tests for period boundaries and currency normalization.
+- None.
+Implementation summary:
+- Added a shared admin analytics contract (`AdminStatsSummary`, `AdminAnalyticsData`, typed periods) and reused it across `/admin` and `/admin/analytics` data hooks.
+- Added currency normalization (`normalizeCurrencyCode`) to enforce stable ISO-like currency values with safe `AMD` fallback.
+- Added period parsing/validation for `GET /api/v1/admin/analytics` and typed period propagation into analytics service.
+- Extended analytics response orders summary with normalized `currency`, then wired charts/cards/product/category revenue displays to use this currency instead of implicit defaults.
+- Added unit coverage for analytics period boundary behavior and currency normalization fallback/normalization scenarios.
+Files changed:
+- `src/lib/contracts/admin-analytics.ts`
+- `src/lib/services/admin/admin-stats/analytics.ts`
+- `src/lib/services/admin/admin-stats/analytics.test.ts`
+- `src/lib/services/admin/admin-stats.service.ts`
+- `src/app/api/v1/admin/analytics/route.ts`
+- `src/app/admin/analytics/types.ts`
+- `src/app/admin/hooks/useAdminDashboard.ts`
+- `src/app/admin/analytics/components/StatsCards.tsx`
+- `src/app/admin/analytics/components/TopProducts.tsx`
+- `src/app/admin/analytics/components/TopCategories.tsx`
+- `src/app/admin/analytics/components/OrdersByDayChart.tsx`
+- `src/app/admin/analytics/page.tsx`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/services/admin/admin-stats/analytics.test.ts` (passed, 1 file / 5 tests)
+- `pnpm test` (passed, 22 files / 86 tests)
 Execution order: 17
 
 ## 18. Global search
@@ -746,9 +765,9 @@ Execution order: 18
    - Recommended next step: None.
 
 17. Analytics Dashboard
-   - Current status: Mostly implemented (80%)
-   - Why it is or is not ready: Analytics features exist but overlap and metric governance remain.
-   - Recommended next step: Consolidate analytics contracts and add metric verification tests.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Both admin dashboard surfaces now reuse a shared analytics contract, analytics period boundaries and currency normalization are covered by tests, and UI/API currency handling is explicit.
+   - Recommended next step: None.
 
 18. Global search
    - Current status: Mostly implemented (90%)

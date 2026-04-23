@@ -1,9 +1,18 @@
 import { db } from "@white-shop/db";
+import {
+  normalizeCurrencyCode,
+  type AdminAnalyticsData,
+  type AdminAnalyticsPeriod,
+} from "@/lib/contracts/admin-analytics";
 
 /**
  * Calculate date range based on period
  */
-function calculateDateRange(period: string, startDate?: string, endDate?: string): { start: Date; end: Date } {
+export function calculateDateRange(
+  period: AdminAnalyticsPeriod,
+  startDate?: string,
+  endDate?: string
+): { start: Date; end: Date } {
   let start: Date;
   let end: Date = new Date();
   end.setHours(23, 59, 59, 999);
@@ -207,10 +216,19 @@ function calculateOrdersByDay(orders: Array<{
     .sort((a, b) => a._id.localeCompare(b._id));
 }
 
+function resolveOrdersCurrency(orders: Array<{ currency: string | null }>): string {
+  const paidOrder = orders.find((order) => Boolean(order.currency));
+  return normalizeCurrencyCode(paidOrder?.currency);
+}
+
 /**
  * Get analytics data
  */
-export async function getAnalytics(period: string = 'week', startDate?: string, endDate?: string) {
+export async function getAnalytics(
+  period: AdminAnalyticsPeriod = "week",
+  startDate?: string,
+  endDate?: string
+): Promise<AdminAnalyticsData> {
   const { start, end } = calculateDateRange(period, startDate, endDate);
 
   // Get orders in date range
@@ -257,6 +275,7 @@ export async function getAnalytics(period: string = 'week', startDate?: string, 
   const totalRevenue = orders
     .filter((o: { paymentStatus: string }) => o.paymentStatus === 'paid')
     .reduce((sum: number, o: { total: number }) => sum + o.total, 0);
+  const currency = resolveOrdersCurrency(orders as Array<{ currency: string | null }>);
 
   // Calculate top products
   const topProducts = calculateTopProducts(orders as Parameters<typeof calculateTopProducts>[0]);
@@ -279,6 +298,7 @@ export async function getAnalytics(period: string = 'week', startDate?: string, 
       paidOrders,
       pendingOrders,
       completedOrders,
+      currency,
     },
     topProducts,
     topCategories,

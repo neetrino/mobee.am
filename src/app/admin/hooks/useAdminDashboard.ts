@@ -4,13 +4,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { apiClient } from '../../../lib/api-client';
-
-interface Stats {
-  users: { total: number };
-  products: { total: number; lowStock: number };
-  orders: { total: number; recent: number; pending: number };
-  revenue: { total: number; currency: string };
-}
+import type { AdminStatsSummary } from '@/lib/contracts/admin-analytics';
 
 interface ActivityItem {
   type: string;
@@ -71,7 +65,7 @@ interface UseAdminDashboardProps {
 }
 
 export function useAdminDashboard({ isLoggedIn, isAdmin, isLoading }: UseAdminDashboardProps) {
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [stats, setStats] = useState<AdminStatsSummary | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
@@ -87,7 +81,7 @@ export function useAdminDashboard({ isLoggedIn, isAdmin, isLoading }: UseAdminDa
       console.log('📊 [ADMIN] Fetching statistics...');
       setStatsLoading(true);
 
-      const data = await apiClient.get<Stats>('/api/v1/admin/stats');
+      const data = await apiClient.get<AdminStatsSummary>('/api/v1/admin/stats');
       console.log('✅ [ADMIN] Statistics fetched:', data);
 
       if (data && typeof data === 'object') {

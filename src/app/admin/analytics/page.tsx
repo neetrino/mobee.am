@@ -84,11 +84,11 @@ export default function AnalyticsPage() {
                 <StatsCards analytics={analytics} totalUsers={totalUsers} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                  <TopProducts products={analytics.topProducts} />
-                  <TopCategories categories={analytics.topCategories} />
+                  <TopProducts products={analytics.topProducts} currency={analytics.orders.currency} />
+                  <TopCategories categories={analytics.topCategories} currency={analytics.orders.currency} />
                 </div>
 
-                <OrdersByDayChart ordersByDay={analytics.ordersByDay} />
+                <OrdersByDayChart ordersByDay={analytics.ordersByDay} currency={analytics.orders.currency} />
               </>
             ) : (
               <Card className="p-6">
