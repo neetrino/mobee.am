@@ -1,12 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Maximize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minus, Plus } from "lucide-react";
 import { ProductLabels } from "../../../components/ProductLabels";
 import { ProductImagePlaceholder } from "../../../components/ProductImagePlaceholder";
 import { t } from "../../../lib/i18n";
 import type { LanguageCode } from "../../../lib/language";
 import type { Product } from "./types";
+import {
+  detectSwipeDirection,
+  getNextImageIndex,
+  getPreviousImageIndex,
+  zoomIn,
+  zoomOut,
+} from "./product-image-gallery.utils";
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -33,6 +40,8 @@ export function ProductImageGallery({
 }: ProductImageGalleryProps) {
   const [showZoom, setShowZoom] = useState(false);
   const [failedIndices, setFailedIndices] = useState<Set<number>>(new Set());
+  const [zoomScale, setZoomScale] = useState(1);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const markFailed = (index: number) => {
     setFailedIndices((prev) => new Set(prev).add(index));
@@ -40,6 +49,15 @@ export function ProductImageGallery({
 
   const mainImageFailed = failedIndices.has(currentImageIndex);
   const currentSrc = images[currentImageIndex];
+  const hasMultipleImages = images.length > 1;
+
+  const goToPreviousImage = () => {
+    onImageIndexChange(getPreviousImageIndex(currentImageIndex, images.length));
+  };
+
+  const goToNextImage = () => {
+    onImageIndexChange(getNextImageIndex(currentImageIndex, images.length));
+  };
 
   // Auto-scroll thumbnails to show selected image
   useEffect(() => {
@@ -56,6 +74,33 @@ export function ProductImageGallery({
 
   // Show only 3 thumbnails at a time, scrollable with navigation arrows
   const visibleThumbnails = images.slice(thumbnailStartIndex, thumbnailStartIndex + THUMBNAILS_PER_VIEW);
+
+  useEffect(() => {
+    if (!showZoom) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowZoom(false);
+      }
+
+      if (!hasMultipleImages) {
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        goToPreviousImage();
+      }
+
+      if (event.key === "ArrowRight") {
+        goToNextImage();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showZoom, hasMultipleImages, currentImageIndex, images.length]);
 
   return (
     <>
@@ -194,7 +239,10 @@ export function ProductImageGallery({
           <div className="absolute bottom-4 left-4 flex flex-col gap-3 z-10">
             {/* Fullscreen Button */}
             <button 
-              onClick={() => setShowZoom(true)} 
+              onClick={() => {
+                setZoomScale(1);
+                setShowZoom(true);
+              }}
               className="w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50 shadow-[0_2px_8px_rgba(0,0,0,0.15)] hover:bg-white/90 transition-all duration-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
               aria-label={t(language, 'common.ariaLabels.fullscreenImage')}
             >
@@ -208,12 +256,98 @@ export function ProductImageGallery({
       {/* Zoom Modal */}
       {showZoom && images.length > 0 && !failedIndices.has(currentImageIndex) && (
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" onClick={() => setShowZoom(false)}>
-          <img src={currentSrc} alt="" className="max-w-full max-h-full object-contain" />
+          <div
+            className="relative w-full h-full flex items-center justify-center"
+            onTouchStart={(event) => {
+              setTouchStartX(event.changedTouches[0]?.clientX ?? null);
+            }}
+            onTouchEnd={(event) => {
+              if (touchStartX === null || !hasMultipleImages) {
+                return;
+              }
+
+              const endX = event.changedTouches[0]?.clientX ?? touchStartX;
+              const swipeDirection = detectSwipeDirection(endX - touchStartX);
+
+              if (swipeDirection === "next") {
+                goToNextImage();
+              } else if (swipeDirection === "previous") {
+                goToPreviousImage();
+              }
+
+              setTouchStartX(null);
+            }}
+          >
+            <img
+              src={currentSrc}
+              alt=""
+              className="max-w-full max-h-full object-contain transition-transform duration-150"
+              style={{ transform: `scale(${zoomScale})` }}
+              onWheel={(event) => {
+                event.preventDefault();
+                setZoomScale((prev) => (event.deltaY < 0 ? zoomIn(prev) : zoomOut(prev)));
+              }}
+            />
+
+            {hasMultipleImages && (
+              <>
+                <button
+                  type="button"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-black/40 hover:bg-black/60 rounded-full p-2"
+                  aria-label={t(language, "common.ariaLabels.previousImage")}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    goToPreviousImage();
+                  }}
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  type="button"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-black/40 hover:bg-black/60 rounded-full p-2"
+                  aria-label={t(language, "common.ariaLabels.nextImage")}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    goToNextImage();
+                  }}
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/45 rounded-full px-3 py-2">
+              <button
+                type="button"
+                aria-label="Zoom out"
+                className="text-white p-1 rounded hover:bg-white/20"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setZoomScale((prev) => zoomOut(prev));
+                }}
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="text-white text-xs min-w-12 text-center">{Math.round(zoomScale * 100)}%</span>
+              <button
+                type="button"
+                aria-label="Zoom in"
+                className="text-white p-1 rounded hover:bg-white/20"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setZoomScale((prev) => zoomIn(prev));
+                }}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
           <button 
             className="absolute top-4 right-4 text-white text-2xl"
             aria-label={t(language, 'common.buttons.close')}
             onClick={(e) => {
               e.stopPropagation();
+              setZoomScale(1);
               setShowZoom(false);
             }}
           >
