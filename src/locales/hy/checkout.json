@@ -5,6 +5,9 @@
   "shippingAddress": "Առաքման հասցե",
   "paymentMethod": "Վճարման եղանակ",
   "orderSummary": "Պատվերի ամփոփում",
+  "promoCode": {
+    "title": "Պրոմոկոդ"
+  },
   "form": {
     "firstName": "Անուն",
     "lastName": "Ազգանուն",
@@ -17,7 +20,8 @@
     "cardNumber": "Քարտի համար",
     "expiryDate": "Վավերականության ժամկետ",
     "cvv": "CVV",
-    "cardHolderName": "Քարտի տիրոջ անուն"
+    "cardHolderName": "Քարտի տիրոջ անուն",
+    "promoCode": "Պրոմոկոդ"
   },
   "placeholders": {
     "phone": "+374XXXXXXXX",
@@ -27,7 +31,8 @@
     "cardNumber": "1234 5678 9012 3456",
     "expiryDate": "ԱԱ/ՏՏ",
     "cvv": "123",
-    "cardHolderName": "Արամ Պետրոսյան"
+    "cardHolderName": "Արամ Պետրոսյան",
+    "promoCode": "Մուտքագրեք պրոմոկոդը"
   },
   "shipping": {
     "storePickup": "Խանութից վերցնել",
@@ -94,7 +99,9 @@
     "fillShippingAddress": "Խնդրում ենք լրացնել բոլոր առաքման հասցեի դաշտերը",
     "cartEmpty": "Զամբյուղը դատարկ է",
     "failedToLoadCart": "Չհաջողվեց բեռնել զամբյուղը",
-    "failedToCreateOrder": "Չհաջողվեց ստեղծել պատվերը: Խնդրում ենք կրկին փորձել:"
+    "failedToCreateOrder": "Չհաջողվեց ստեղծել պատվերը: Խնդրում ենք կրկին փորձել:",
+    "invalidPromoCode": "Պրոմոկոդը կարող է պարունակել միայն տառեր, թվեր, ընդգծում և գծիկ",
+    "promoCodeTooLong": "Պրոմոկոդը չափազանց երկար է"
   }
 }
 

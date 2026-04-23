@@ -11,6 +11,8 @@ describe("checkout.schema", () => {
       phone: "+37499123456",
       shippingMethod: "pickup",
       paymentMethod: "idram",
+      locale: "hy",
+      promoCode: "SPRING10",
     };
 
     expect(parseCheckoutBody(payload)).toEqual(payload);
@@ -60,6 +62,19 @@ describe("checkout.schema", () => {
     };
 
     expect(() => parseCheckoutBody(payload)).toThrow();
+    expect(safeParseCheckout(payload).success).toBe(false);
+  });
+
+  it("rejects unsupported locale", () => {
+    const payload = {
+      cartId: "cart-123",
+      email: "user@example.com",
+      phone: "+37499123456",
+      shippingMethod: "pickup",
+      paymentMethod: "idram",
+      locale: "de",
+    };
+
     expect(safeParseCheckout(payload).success).toBe(false);
   });
 });

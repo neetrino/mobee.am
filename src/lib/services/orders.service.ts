@@ -5,6 +5,13 @@ import type { CheckoutData } from "../types/checkout";
 import { logger } from "../utils/logger";
 import { adminDeliveryService } from "./admin/admin-delivery.service";
 import { extractMediaUrl } from "../utils/extractMediaUrl";
+import {
+  calculateDiscountAmount,
+  calculateTotals,
+  normalizeCheckoutLocale,
+  normalizePercent,
+} from "./orders/checkout-calculations";
+import { createPaymentUrl } from "./orders/checkout-payment";
 
 const orderNumberId = customAlphabet("0123456789ABCDEFGHJKLMNPQRSTUVWXYZ", 10);
 
@@ -62,10 +69,32 @@ type OrderItemWithVariant = Prisma.OrderItemGetPayload<{
 }>;
 
 class OrdersService {
+  private async resolvePromoDiscountPercent(code?: string): Promise<number> {
+    if (!code) return 0;
+    const normalizedCode = code.trim().toUpperCase();
+    if (!normalizedCode) return 0;
+
+    const promoCode = await db.promoCode.findUnique({
+      where: { code: normalizedCode },
+      select: { discountPercent: true, isActive: true },
+    });
+
+    if (!promoCode || !promoCode.isActive) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/validation-error",
+        title: "Invalid promo code",
+        detail: `Promo code "${normalizedCode}" is invalid or inactive`,
+      };
+    }
+
+    return normalizePercent(promoCode.discountPercent, 0);
+  }
+
   /**
    * Create order (checkout)
    */
-  async checkout(data: CheckoutData, userId?: string) {
+  async checkout(data: CheckoutData, userId?: string, baseUrl?: string) {
     try {
       const {
         cartId,
@@ -75,6 +104,8 @@ class OrdersService {
         shippingMethod = 'pickup',
         shippingAddress,
         paymentMethod = 'idram',
+        promoCode,
+        locale,
       } = data;
       // shippingAmount is ignored — computed server-side from shippingMethod and address
 
@@ -292,7 +323,8 @@ class OrdersService {
 
       // Calculate totals
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const discountAmount = 0; // TODO: Implement discount/coupon logic
+      const discountPercent = await this.resolvePromoDiscountPercent(promoCode);
+      const discountAmount = calculateDiscountAmount(subtotal, discountPercent);
       // Shipping: computed server-side only (never trust client-provided amount)
       let shippingAmount = 0;
       if (shippingMethod === 'delivery' && shippingAddress?.city?.trim()) {
@@ -303,8 +335,18 @@ class OrdersService {
         );
         if (shippingAmount < 0) shippingAmount = 0;
       }
-      const taxAmount = 0; // TODO: Calculate tax if needed
-      const total = subtotal - discountAmount + shippingAmount + taxAmount;
+      const taxPercent = normalizePercent(process.env.CHECKOUT_TAX_PERCENT, 0);
+      const applyTaxOnShipping = process.env.CHECKOUT_TAX_APPLY_ON_SHIPPING === "true";
+      const totals = calculateTotals({
+        subtotal,
+        discountAmount,
+        shippingAmount,
+        taxConfig: {
+          percent: taxPercent,
+          applyOnShipping: applyTaxOnShipping,
+        },
+      });
+      const customerLocale = normalizeCheckoutLocale(locale);
 
       // Generate order number
       const orderNumber = generateOrderNumber();
@@ -320,15 +362,15 @@ class OrdersService {
             status: 'pending',
             paymentStatus: 'pending',
             fulfillmentStatus: 'unfulfilled',
-            subtotal,
-            discountAmount,
-            shippingAmount,
-            taxAmount,
-            total,
+            subtotal: totals.subtotal,
+            discountAmount: totals.discountAmount,
+            shippingAmount: totals.shippingAmount,
+            taxAmount: totals.taxAmount,
+            total: totals.total,
             currency: 'AMD',
             customerEmail: email,
             customerPhone: phone,
-            customerLocale: 'en', // TODO: Get from request
+            customerLocale,
             shippingMethod,
             shippingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
             billingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
@@ -351,6 +393,9 @@ class OrdersService {
                   source: userId ? 'user' : 'guest',
                   paymentMethod,
                   shippingMethod,
+                  promoCode: promoCode ?? null,
+                  discountPercent,
+                  taxPercent,
                 },
               },
             },
@@ -414,7 +459,7 @@ class OrdersService {
             orderId: newOrder.id,
             provider: paymentMethod,
             method: paymentMethod,
-            amount: total,
+            amount: totals.total,
             currency: 'AMD',
             status: 'pending',
           },
@@ -433,6 +478,14 @@ class OrdersService {
       );
 
       // Return order and payment info
+      const paymentUrl = createPaymentUrl({
+        paymentId: order.payment.id,
+        orderNumber: order.order.number,
+        amount: Number(order.order.total),
+        provider: paymentMethod as "idram" | "arca" | "cash_on_delivery",
+        baseUrl: baseUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+      });
+
       return {
         order: {
           id: order.order.id,
@@ -444,10 +497,10 @@ class OrdersService {
         },
         payment: {
           provider: order.payment.provider,
-          paymentUrl: null, // TODO: Generate payment URL for Idram/ArCa
+          paymentUrl,
           expiresAt: null, // TODO: Set expiration if needed
         },
-        nextAction: paymentMethod === 'idram' || paymentMethod === 'arca' 
+        nextAction: (paymentMethod === 'idram' || paymentMethod === 'arca') && Boolean(paymentUrl)
           ? 'redirect_to_payment' 
           : 'view_order',
       };

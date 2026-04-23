@@ -16,6 +16,13 @@ export function useCheckoutSchema() {
     paymentMethod: z.enum(['idram', 'arca', 'cash_on_delivery'], {
       message: t('checkout.errors.selectPaymentMethod'),
     }),
+    promoCode: z
+      .string()
+      .trim()
+      .max(64, t('checkout.errors.promoCodeTooLong'))
+      .regex(/^[A-Za-z0-9_-]*$/, t('checkout.errors.invalidPromoCode'))
+      .optional()
+      .or(z.literal('')),
     shippingAddress: z.string().optional(),
     shippingCity: z.string().optional(),
     cardNumber: z.string().optional(),

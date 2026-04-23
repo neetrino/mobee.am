@@ -312,8 +312,8 @@ Verification:
 Execution order: 9
 
 ## 10. Order summary and validations
-Status: Partially implemented
-Completion: 75%
+Status: Completed
+Completion: 100%
 Summary:
 - Order summary UI and substantial backend order validation/stock checks exist, but discount/tax/payment URL logic is still placeholder-level.
 Implemented parts:
@@ -329,14 +329,32 @@ Files:
 - `src/app/api/v1/orders/route.ts`
 - `src/app/api/v1/orders/[number]/route.ts`
 Missing:
-- `discountAmount` is hardcoded to `0` with TODO for coupon logic.
-- `taxAmount` is hardcoded to `0` with TODO.
-- Payment URL generation for Idram/ArCa is TODO and currently `null`.
-- Locale in order creation is hardcoded to `en`.
-Next implementation scope:
-- Implement promo-code discount application and tax calculation path.
-- Implement payment session URL generation and secure callback verification.
-- Pass and persist actual user locale during checkout.
+- None.
+Implementation summary:
+- Added checkout pricing utilities for promo discount, tax-percent normalization, money rounding, and locale normalization.
+- Implemented promo-code discount application in checkout flow using active promo records from `promo_codes`.
+- Implemented server-side tax calculation path using env-driven tax settings (`CHECKOUT_TAX_PERCENT`, `CHECKOUT_TAX_APPLY_ON_SHIPPING`).
+- Added signed online payment session URL generation for Idram/ArCa and secure callback signature verification.
+- Added callback route `GET /api/v1/payments/callback` with signature + timestamp validation and transactional payment/order status updates.
+- Propagated actual checkout locale from request/user context and persisted it in `order.customerLocale`.
+- Extended checkout request schema and submission payload to support `promoCode` and `locale`.
+Files changed:
+- `src/lib/services/orders.service.ts`
+- `src/lib/services/orders/checkout-calculations.ts`
+- `src/lib/services/orders/checkout-payment.ts`
+- `src/app/api/v1/payments/callback/route.ts`
+- `src/app/api/v1/orders/checkout/route.ts`
+- `src/lib/schemas/checkout.schema.ts`
+- `src/lib/types/checkout.ts`
+- `src/app/checkout/hooks/useOrderSubmission.ts`
+- `src/app/checkout/types.ts`
+- `src/lib/services/orders/checkout-calculations.test.ts`
+- `src/lib/services/orders/checkout-payment.test.ts`
+- `src/lib/schemas/checkout.schema.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/services/orders/checkout-calculations.test.ts src/lib/services/orders/checkout-payment.test.ts src/lib/schemas/checkout.schema.test.ts` (passed, 3 files / 12 tests)
+- `pnpm test` (passed, 11 files / 53 tests)
 Execution order: 10
 
 ## 11. Profile and address management
@@ -607,9 +625,9 @@ Execution order: 18
    - Recommended next step: None.
 
 10. Order summary and validations
-   - Current status: Partially implemented (75%)
-   - Why it is or is not ready: Core totals/stock checks exist, but discount/tax/payment URL remain TODO.
-   - Recommended next step: Implement promo/tax/payment computation paths and locale propagation.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Promo discount, tax calculation, payment session URL generation with signed callback verification, and checkout locale propagation are now implemented and tested.
+   - Recommended next step: None.
 
 11. Profile and address management
    - Current status: Mostly implemented (80%)

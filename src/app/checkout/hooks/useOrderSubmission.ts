@@ -18,7 +18,7 @@ export function useOrderSubmission({
   setError,
 }: UseOrderSubmissionProps) {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   const submitOrder = async (data: CheckoutFormData) => {
     setError(null);
@@ -77,6 +77,8 @@ export function useOrderSubmission({
         ...(shippingAddress ? { shippingAddress } : {}),
         shippingAmount: shippingAmount,
         paymentMethod: data.paymentMethod,
+        promoCode: data.promoCode,
+        locale: lang,
       });
 
       if (!isLoggedIn) {

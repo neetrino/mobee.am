@@ -5,6 +5,7 @@ export type CheckoutFormData = {
   phone: string;
   shippingMethod: 'pickup' | 'delivery';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  promoCode?: string;
   shippingAddress?: string;
   shippingCity?: string;
   cardNumber?: string;

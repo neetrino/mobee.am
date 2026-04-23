@@ -3,6 +3,7 @@ import { ZodError } from "zod";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { parseCheckoutBody } from "@/lib/schemas/checkout.schema";
 import { ordersService } from "@/lib/services/orders.service";
+import { normalizeCheckoutLocale } from "@/lib/services/orders/checkout-calculations";
 import { toApiError } from "@/lib/types/errors";
 import { logger } from "@/lib/utils/logger";
 
@@ -12,6 +13,9 @@ export async function POST(req: NextRequest) {
     const user = await authenticateToken(req);
     const body = await req.json();
     const data = parseCheckoutBody(body);
+    const acceptLanguage = req.headers.get("accept-language");
+    const requestLocale = normalizeCheckoutLocale(data.locale || user?.locale || acceptLanguage);
+    const checkoutData = { ...data, locale: requestLocale };
     
     logger.debug("Checkout data", {
       userId: user?.id,
@@ -21,9 +25,10 @@ export async function POST(req: NextRequest) {
       phone: data.phone,
       paymentMethod: data.paymentMethod,
       shippingMethod: data.shippingMethod,
+      locale: requestLocale,
     });
     
-    const result = await ordersService.checkout(data, user?.id);
+    const result = await ordersService.checkout(checkoutData, user?.id, req.nextUrl.origin);
     
     logger.info("Checkout successful", {
       orderNumber: result.order?.number,

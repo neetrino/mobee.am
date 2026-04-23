@@ -5,6 +5,9 @@
   "shippingAddress": "Shipping Address",
   "paymentMethod": "Payment Method",
   "orderSummary": "Order Summary",
+  "promoCode": {
+    "title": "Promo Code"
+  },
   "form": {
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -17,7 +20,8 @@
     "cardNumber": "Card Number",
     "expiryDate": "Expiry Date",
     "cvv": "CVV",
-    "cardHolderName": "Card Holder Name"
+    "cardHolderName": "Card Holder Name",
+    "promoCode": "Promo Code"
   },
   "placeholders": {
     "phone": "+374XXXXXXXX",
@@ -27,7 +31,8 @@
     "cardNumber": "1234 5678 9012 3456",
     "expiryDate": "MM/YY",
     "cvv": "123",
-    "cardHolderName": "John Doe"
+    "cardHolderName": "John Doe",
+    "promoCode": "Enter promo code"
   },
   "shipping": {
     "storePickup": "Store Pickup",
@@ -94,7 +99,9 @@
     "fillShippingAddress": "Please fill in all shipping address fields",
     "cartEmpty": "Cart is empty",
     "failedToLoadCart": "Failed to load cart",
-    "failedToCreateOrder": "Failed to create order. Please try again."
+    "failedToCreateOrder": "Failed to create order. Please try again.",
+    "invalidPromoCode": "Promo code can contain only letters, numbers, underscores, and hyphens",
+    "promoCodeTooLong": "Promo code is too long"
   }
 }
 
