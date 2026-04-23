@@ -552,8 +552,8 @@ Verification:
 Execution order: 15
 
 ## 16. Inventory and stock management
-Status: Partially implemented
-Completion: 75%
+Status: Mostly implemented
+Completion: 90%
 Summary:
 - Stock exists at variant level and is enforced in cart/checkout, but there is no dedicated inventory module with reservation/reconciliation workflows.
 Implemented parts:
@@ -577,14 +577,21 @@ Next implementation scope:
 - Add inventory adjustment APIs/UI and stock reconciliation reporting.
 - Expand restock policy with explicit business toggles (e.g., only for non-fulfilled cancellations).
 Implementation summary:
-- Added restock-on-cancel behavior in admin order updates: when order status transitions to `cancelled`, variant stock is incremented by ordered quantities.
-- Wrapped order update + event creation + stock restoration in a single transaction to avoid partial state writes.
-- Added unit coverage for cancellation stock-adjustment aggregation logic (`buildStockAdjustmentsForCancel`).
+- Added explicit inventory reservation lifecycle via `stockReserved` with reserve/release/commit semantics.
+- Cart add/update/remove flows now adjust reservations transactionally (`reserve` on quantity increase, `release` on decrease/remove).
+- Checkout commit now handles reserved stock for authenticated carts (`stock - qty` and `stockReserved - qty` atomically), while guest checkout keeps direct stock decrement path.
+- Added Prisma schema + migration for `product_variants.stock_reserved` with non-negative and not-exceed-stock DB constraints.
+- Added unit coverage for reservation delta behavior.
 Files changed:
-- `src/lib/services/admin/admin-orders/order-mutations.ts`
-- `src/lib/services/admin/admin-orders/order-mutations.test.ts`
+- `shared/db/prisma/schema.prisma`
+- `shared/db/prisma/migrations/20260423170000_add_stock_reserved_lifecycle/migration.sql`
+- `src/lib/services/inventory/stock-reservation.ts`
+- `src/lib/services/inventory/stock-reservation.test.ts`
+- `src/lib/services/cart.service.ts`
+- `src/lib/services/orders.service.ts`
 Verification:
-- `pnpm test src/lib/services/admin/admin-orders/order-mutations.test.ts` (passed, 1 file / 2 tests)
+- `pnpm test src/lib/services/inventory/stock-reservation.test.ts src/lib/services/admin/admin-orders/order-mutations.test.ts` (passed, 2 files / 5 tests)
+- `pnpm test` (passed, 19 files / 75 tests)
 Execution order: 16
 
 ## 17. Analytics Dashboard
@@ -722,9 +729,9 @@ Execution order: 18
    - Recommended next step: None.
 
 16. Inventory and stock management
-   - Current status: Partially implemented (65%)
-   - Why it is or is not ready: Stock checks exist, but no dedicated inventory workflows or reservation lifecycle.
-   - Recommended next step: Implement reservation/release flows and inventory adjustment module.
+   - Current status: Mostly implemented (90%)
+   - Why it is or is not ready: Reservation lifecycle is now implemented in cart/checkout with DB constraints; dedicated inventory adjustment/reporting module is still missing.
+   - Recommended next step: Add admin inventory adjustments/movements UI + APIs and reconciliation reporting.
 
 17. Analytics Dashboard
    - Current status: Mostly implemented (80%)

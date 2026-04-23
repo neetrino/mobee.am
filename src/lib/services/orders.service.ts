@@ -144,8 +144,9 @@ class OrdersService {
         sku: string;
         imageUrl?: string;
       }> = [];
+      const isUserCartCheckout = Boolean(userId && cartId && cartId !== "guest-cart");
 
-      if (userId && cartId && cartId !== 'guest-cart') {
+      if (isUserCartCheckout) {
         // Get items from user's cart
         const cart = await db.cart.findFirst({
           where: { id: cartId, userId },
@@ -222,7 +223,7 @@ class OrdersService {
             // Get image URL
             const imageUrl = extractMediaUrl(product.media) ?? undefined;
 
-            // Check stock availability
+            // Check stock availability for reserved cart item quantity
             if (variant.stock < item.quantity) {
               throw {
                 status: 422,
@@ -436,9 +437,20 @@ class OrdersService {
 
             const quantity = Number(item.quantity);
             const variantId = item.variantId;
-            const updated = await tx.$executeRaw(
-              Prisma.sql`UPDATE product_variants SET stock = stock - ${quantity} WHERE id = ${variantId} AND stock >= ${quantity}`
-            );
+            const updated = isUserCartCheckout
+              ? await tx.$executeRaw(
+                  Prisma.sql`UPDATE product_variants
+                             SET stock = stock - ${quantity},
+                                 stock_reserved = stock_reserved - ${quantity}
+                             WHERE id = ${variantId}
+                               AND stock >= ${quantity}
+                               AND stock_reserved >= ${quantity}`
+                )
+              : await tx.$executeRaw(
+                  Prisma.sql`UPDATE product_variants
+                             SET stock = stock - ${quantity}
+                             WHERE id = ${variantId} AND stock >= ${quantity}`
+                );
             if (updated === 0) {
               const variant = await tx.productVariant.findUnique({
                 where: { id: variantId },
