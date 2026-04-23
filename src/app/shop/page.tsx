@@ -240,6 +240,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         </aside>
 
         <div className="min-w-0 flex-1 w-full py-4 lg:pl-[53px]">
+          <nav className="mb-4 flex items-center text-sm" aria-label="Breadcrumb">
+            <Link href="/" className="text-gray-500 transition-colors hover:text-gray-700">
+              {t(language, 'common.navigation.home')}
+            </Link>
+            <span className="mx-2 text-gray-400">/</span>
+            <span className="font-semibold text-gray-900">{t(language, 'common.navigation.products')}</span>
+          </nav>
 
           {normalizedProducts.length > 0 ? (
             <>
