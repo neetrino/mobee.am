@@ -6,6 +6,7 @@ export interface OrderFilters {
   limit?: number;
   status?: string;
   paymentStatus?: string;
+  fulfillmentStatus?: string;
   search?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';

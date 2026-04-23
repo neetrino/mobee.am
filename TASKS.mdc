@@ -510,30 +510,45 @@ Verification:
 Execution order: 14
 
 ## 15. Orders list and status management
-Status: Mostly implemented
-Completion: 82%
+Status: Completed
+Completion: 100%
 Summary:
-- Admin order listing, filtering, status updates, payment status updates, and order detail/delete APIs are implemented; fulfillment status is backend-ready but not surfaced in admin UI controls.
+- Admin order listing now supports status, payment, and fulfillment workflows end-to-end in both backend filtering and admin UI controls.
 Implemented parts:
 - Admin orders list API with pagination and filters.
 - Admin order id API with GET/PUT/DELETE.
 - Mutation layer validates status/paymentStatus/fulfillmentStatus values.
-- Admin orders table UI supports status/payment updates.
+- Admin orders table UI supports status/payment/fulfillment updates.
 Files:
 - `src/app/api/v1/admin/orders/route.ts`
 - `src/app/api/v1/admin/orders/[id]/route.ts`
 - `src/lib/services/admin/admin-orders.service.ts`
 - `src/lib/services/admin/admin-orders/order-mutations.ts`
 - `src/lib/services/admin/admin-orders/query-builder.ts`
+- `src/lib/services/admin/admin-orders/types.ts`
+- `src/lib/services/admin/admin-orders/query-builder.test.ts`
 - `src/app/admin/orders/useOrders.ts`
+- `src/app/admin/orders/OrdersPageContent.tsx`
+- `src/app/admin/orders/components/OrdersFilters.tsx`
+- `src/app/admin/orders/components/OrdersTable.tsx`
 - `src/app/admin/orders/components/OrderRow.tsx`
 - `src/app/admin/orders/components/OrderDetailsModal.tsx`
+ - `src/app/admin/orders/utils/orderUtils.ts`
+ - `src/locales/en/admin.json`
+ - `src/locales/hy/admin.json`
+ - `src/locales/ru/admin.json`
 Missing:
-- Fulfillment status management is not exposed in current admin order row UI despite backend support.
 - Not verified from current codebase: business policy correctness for hard delete of orders.
-Next implementation scope:
-- Add fulfillment status UI controls and filters.
-- Add audit-safe delete policy (soft delete or role/audit constraints) if required.
+Implementation summary:
+- Added `fulfillmentStatus` as a first-class admin orders filter from URL params through API route parsing to Prisma where-clause generation.
+- Added fulfillment status filter dropdown in admin orders filters UI and persisted it in URL query params.
+- Added fulfillment status inline update control per order row, with loading state and success/error feedback.
+- Added fulfillment status color mapping for table badges/selects and aligned table columns with a dedicated fulfillment column.
+- Added locale keys for fulfillment labels/messages in English, Armenian, and Russian.
+- Added unit test coverage for admin orders query builder fulfillment filtering behavior.
+Verification:
+- `pnpm test src/lib/services/admin/admin-orders/query-builder.test.ts` (passed, 1 file / 2 tests)
+- `pnpm test` (passed, 17 files / 70 tests)
 Execution order: 15
 
 ## 16. Inventory and stock management
@@ -694,9 +709,9 @@ Execution order: 18
    - Recommended next step: None.
 
 15. Orders list and status management
-   - Current status: Mostly implemented (82%)
-   - Why it is or is not ready: List/status/payment updates exist, but fulfillment controls are missing in UI.
-   - Recommended next step: Expose fulfillment status management in admin UI and enforce policy constraints.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Fulfillment status filters and update controls are now wired end-to-end across API and admin UI, with test coverage for query filtering behavior.
+   - Recommended next step: None.
 
 16. Inventory and stock management
    - Current status: Partially implemented (65%)

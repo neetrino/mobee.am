@@ -2,7 +2,11 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
-import { getStatusColor, getPaymentStatusColor } from '../utils/orderUtils';
+import {
+  getFulfillmentStatusColor,
+  getPaymentStatusColor,
+  getStatusColor,
+} from '../utils/orderUtils';
 import type { Order } from '../useOrders';
 
 interface OrderRowProps {
@@ -10,10 +14,12 @@ interface OrderRowProps {
   selected: boolean;
   updatingStatus: boolean;
   updatingPaymentStatus: boolean;
+  updatingFulfillmentStatus: boolean;
   onToggleSelect: () => void;
   onViewDetails: () => void;
   onStatusChange: (newStatus: string) => void;
   onPaymentStatusChange: (newPaymentStatus: string) => void;
+  onFulfillmentStatusChange: (newFulfillmentStatus: string) => void;
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
 }
 
@@ -22,10 +28,12 @@ export function OrderRow({
   selected,
   updatingStatus,
   updatingPaymentStatus,
+  updatingFulfillmentStatus,
   onToggleSelect,
   onViewDetails,
   onStatusChange,
   onPaymentStatusChange,
+  onFulfillmentStatusChange,
   formatCurrency,
 }: OrderRowProps) {
   const { t } = useTranslation();
@@ -116,6 +124,27 @@ export function OrderRow({
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>
               <option value="failed">{t('admin.orders.failed')}</option>
+            </select>
+          )}
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center gap-2">
+          {updatingFulfillmentStatus ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
+              <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
+            </div>
+          ) : (
+            <select
+              value={order.fulfillmentStatus}
+              onChange={(e) => onFulfillmentStatusChange(e.target.value)}
+              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getFulfillmentStatusColor(order.fulfillmentStatus)}`}
+            >
+              <option value="unfulfilled">{t('admin.orders.unfulfilled')}</option>
+              <option value="fulfilled">{t('admin.orders.fulfilled')}</option>
+              <option value="shipped">{t('admin.orders.shipped')}</option>
+              <option value="delivered">{t('admin.orders.delivered')}</option>
             </select>
           )}
         </div>

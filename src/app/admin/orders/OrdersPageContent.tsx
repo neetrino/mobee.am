@@ -15,6 +15,7 @@ export function OrdersPageContent() {
     currency,
     statusFilter,
     paymentStatusFilter,
+    fulfillmentStatusFilter,
     searchQuery,
     page,
     meta,
@@ -22,6 +23,7 @@ export function OrdersPageContent() {
     sortOrder,
     updatingStatuses,
     updatingPaymentStatuses,
+    updatingFulfillmentStatuses,
     updateMessage,
     selectedIds,
     bulkDeleting,
@@ -30,6 +32,7 @@ export function OrdersPageContent() {
     loadingOrderDetails,
     setStatusFilter,
     setPaymentStatusFilter,
+    setFulfillmentStatusFilter,
     setSearchQuery,
     setPage,
     formatCurrency,
@@ -41,6 +44,7 @@ export function OrdersPageContent() {
     handleBulkDelete,
     handleStatusChange,
     handlePaymentStatusChange,
+    handleFulfillmentStatusChange,
     router,
     searchParams,
   } = useOrders();
@@ -64,10 +68,12 @@ export function OrdersPageContent() {
         <OrdersFilters
           statusFilter={statusFilter}
           paymentStatusFilter={paymentStatusFilter}
+          fulfillmentStatusFilter={fulfillmentStatusFilter}
           searchQuery={searchQuery}
           updateMessage={updateMessage}
           setStatusFilter={setStatusFilter}
           setPaymentStatusFilter={setPaymentStatusFilter}
+          setFulfillmentStatusFilter={setFulfillmentStatusFilter}
           setSearchQuery={setSearchQuery}
           setPage={setPage}
           router={router}
@@ -86,6 +92,7 @@ export function OrdersPageContent() {
           selectedIds={selectedIds}
           updatingStatuses={updatingStatuses}
           updatingPaymentStatuses={updatingPaymentStatuses}
+          updatingFulfillmentStatuses={updatingFulfillmentStatuses}
           sortBy={sortBy}
           sortOrder={sortOrder}
           page={page}
@@ -96,6 +103,7 @@ export function OrdersPageContent() {
           onViewDetails={handleViewOrderDetails}
           onStatusChange={handleStatusChange}
           onPaymentStatusChange={handlePaymentStatusChange}
+          onFulfillmentStatusChange={handleFulfillmentStatusChange}
           onPageChange={(newPage) => setPage(newPage)}
           formatCurrency={formatCurrency}
         />

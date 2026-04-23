@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20', 10);
     const status = searchParams.get('status') || undefined;
     const paymentStatus = searchParams.get('paymentStatus') || undefined;
+    const fulfillmentStatus = searchParams.get('fulfillmentStatus') || undefined;
     const search = searchParams.get('search') || undefined;
     const sortBy = searchParams.get('sortBy') || undefined;
     const sortOrder = searchParams.get('sortOrder') || undefined;
@@ -33,6 +34,7 @@ export async function GET(req: NextRequest) {
       limit,
       ...(status && { status }),
       ...(paymentStatus && { paymentStatus }),
+      ...(fulfillmentStatus && { fulfillmentStatus }),
       ...(search && { search }),
       ...(sortBy && { sortBy }),
       ...(sortOrder && { sortOrder: sortOrder as 'asc' | 'desc' }),

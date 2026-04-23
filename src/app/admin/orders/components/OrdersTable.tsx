@@ -13,6 +13,7 @@ interface OrdersTableProps {
   selectedIds: Set<string>;
   updatingStatuses: Set<string>;
   updatingPaymentStatuses: Set<string>;
+  updatingFulfillmentStatuses: Set<string>;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
   page: number;
@@ -23,6 +24,7 @@ interface OrdersTableProps {
   onViewDetails: (orderId: string) => void;
   onStatusChange: (orderId: string, newStatus: string) => void;
   onPaymentStatusChange: (orderId: string, newPaymentStatus: string) => void;
+  onFulfillmentStatusChange: (orderId: string, newFulfillmentStatus: string) => void;
   onPageChange: (newPage: number) => void;
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
 }
@@ -33,6 +35,7 @@ export function OrdersTable({
   selectedIds,
   updatingStatuses,
   updatingPaymentStatuses,
+  updatingFulfillmentStatuses,
   sortBy,
   sortOrder,
   page,
@@ -43,6 +46,7 @@ export function OrdersTable({
   onViewDetails,
   onStatusChange,
   onPaymentStatusChange,
+  onFulfillmentStatusChange,
   onPageChange,
   formatCurrency,
 }: OrdersTableProps) {
@@ -122,6 +126,9 @@ export function OrdersTable({
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {t('admin.orders.payment')}
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {t('admin.orders.fulfillment')}
+              </th>
               <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
                 onClick={() => onSort('createdAt')}
@@ -156,10 +163,14 @@ export function OrdersTable({
                 selected={selectedIds.has(order.id)}
                 updatingStatus={updatingStatuses.has(order.id)}
                 updatingPaymentStatus={updatingPaymentStatuses.has(order.id)}
+                updatingFulfillmentStatus={updatingFulfillmentStatuses.has(order.id)}
                 onToggleSelect={() => onToggleSelect(order.id)}
                 onViewDetails={() => onViewDetails(order.id)}
                 onStatusChange={(newStatus) => onStatusChange(order.id, newStatus)}
                 onPaymentStatusChange={(newPaymentStatus) => onPaymentStatusChange(order.id, newPaymentStatus)}
+                onFulfillmentStatusChange={(newFulfillmentStatus) =>
+                  onFulfillmentStatusChange(order.id, newFulfillmentStatus)
+                }
                 formatCurrency={formatCurrency}
               />
             ))}

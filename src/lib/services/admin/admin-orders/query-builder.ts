@@ -17,6 +17,11 @@ export function buildOrderWhereClause(filters: OrderFilters): Prisma.OrderWhereI
     andConditions.push({ paymentStatus: filters.paymentStatus });
   }
 
+  // Apply fulfillment status filter
+  if (filters.fulfillmentStatus) {
+    andConditions.push({ fulfillmentStatus: filters.fulfillmentStatus });
+  }
+
   // Apply search filter
   if (filters.search && filters.search.trim()) {
     const searchTerm = filters.search.trim();
