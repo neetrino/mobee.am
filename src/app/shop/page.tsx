@@ -8,7 +8,6 @@ import { BrandFilter } from '../../components/BrandFilter';
 import { CategoryFilter } from '../../components/CategoryFilter';
 import { ProductsHeader } from '../../components/ProductsHeader';
 import { ProductsGrid } from '../../components/ProductsGrid';
-import { CategoryNavigation } from '../../components/CategoryNavigation';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
@@ -206,9 +205,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   return (
     <div className="w-full max-w-full">
-      {/* Category Navigation - Full Width */}
-      <CategoryNavigation />
-      
       {/* Products Header - With Container */}
       <div className={PAGE_CONTAINER}>
         <ProductsHeader
