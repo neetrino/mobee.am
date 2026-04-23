@@ -358,8 +358,8 @@ Verification:
 Execution order: 10
 
 ## 11. Profile and address management
-Status: Mostly implemented
-Completion: 80%
+Status: Completed
+Completion: 100%
 Summary:
 - Profile and address CRUD endpoints plus profile page hooks/components are implemented, but payload validation and typing are weak on the service layer.
 Implemented parts:
@@ -376,11 +376,25 @@ Files:
 - `src/app/profile/hooks/useAddresses.ts`
 - `src/app/profile/hooks/useProfile.ts`
 Missing:
-- Service methods use `any` payloads and spread data directly to DB updates in address/profile methods.
-- Not verified from current codebase: full frontend constraints for address field completeness/format.
-Next implementation scope:
-- Add strict request DTO validation (Zod or equivalent) for profile and addresses.
-- Replace `any` in service layer with explicit typed contracts.
+- None.
+Implementation summary:
+- Added strict profile/address request schemas with Zod (`safeParseProfileUpdate`, `safeParseAddressCreate`, `safeParseAddressUpdate`) including strict payload shape checks.
+- Wired profile and addresses API routes to validate bodies and return consistent `400 validation-error` responses when payloads are invalid.
+- Replaced `any` payloads in `users.service` with explicit typed contracts and removed unsafe DB update spread usage by mapping allowed fields explicitly.
+- Hardened default-address mutation by verifying ownership (`userId` + `addressId`) before changing defaults.
+- Standardized users address route error handling to `toApiError` + logger.
+Files changed:
+- `src/lib/schemas/users.schema.ts`
+- `src/lib/schemas/users.schema.test.ts`
+- `src/lib/services/users.service.ts`
+- `src/app/api/v1/users/profile/route.ts`
+- `src/app/api/v1/users/addresses/route.ts`
+- `src/app/api/v1/users/addresses/[addressId]/route.ts`
+- `src/app/api/v1/users/addresses/[addressId]/default/route.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/schemas/users.schema.test.ts` (passed, 1 file / 5 tests)
+- `pnpm test` (passed, 12 files / 58 tests)
 Execution order: 11
 
 ## 12. Order history and reorder
@@ -630,9 +644,9 @@ Execution order: 18
    - Recommended next step: None.
 
 11. Profile and address management
-   - Current status: Mostly implemented (80%)
-   - Why it is or is not ready: Full CRUD exists but service payload typing/validation is weak.
-   - Recommended next step: Add strict DTO validation and remove `any` from profile/address service APIs.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Profile/address APIs now enforce strict request schemas and service contracts are typed without `any` or unsafe payload spreading.
+   - Recommended next step: None.
 
 12. Order history and reorder
    - Current status: Mostly implemented (88%)

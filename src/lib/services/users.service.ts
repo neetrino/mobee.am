@@ -1,5 +1,10 @@
 import { db } from "@white-shop/db";
 import * as bcrypt from "bcryptjs";
+import type {
+  AddressCreateInput,
+  AddressUpdateInput,
+  ProfileUpdateInput,
+} from "@/lib/schemas/users.schema";
 
 class UsersService {
   /**
@@ -43,7 +48,7 @@ class UsersService {
   /**
    * Update user profile
    */
-  async updateProfile(userId: string, data: any) {
+  async updateProfile(userId: string, data: ProfileUpdateInput) {
     const user = await db.user.update({
       where: { id: userId },
       data: {
@@ -187,7 +192,7 @@ class UsersService {
   /**
    * Add address
    */
-  async addAddress(userId: string, data: any) {
+  async addAddress(userId: string, data: AddressCreateInput) {
     // If this is the first address, set it as default
     const existingAddresses = await db.address.findMany({
       where: { userId },
@@ -195,7 +200,16 @@ class UsersService {
 
     const address = await db.address.create({
       data: {
-        ...data,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        company: data.company,
+        addressLine1: data.addressLine1,
+        addressLine2: data.addressLine2,
+        city: data.city,
+        state: data.state,
+        postalCode: data.postalCode,
+        countryCode: data.countryCode,
+        phone: data.phone,
         userId,
         isDefault: existingAddresses.length === 0,
       },
@@ -207,7 +221,7 @@ class UsersService {
   /**
    * Update address
    */
-  async updateAddress(userId: string, addressId: string, data: any) {
+  async updateAddress(userId: string, addressId: string, data: AddressUpdateInput) {
     const address = await db.address.findFirst({
       where: { id: addressId, userId },
     });
@@ -222,7 +236,18 @@ class UsersService {
 
     return await db.address.update({
       where: { id: addressId },
-      data,
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        company: data.company,
+        addressLine1: data.addressLine1,
+        addressLine2: data.addressLine2,
+        city: data.city,
+        state: data.state,
+        postalCode: data.postalCode,
+        countryCode: data.countryCode,
+        phone: data.phone,
+      },
     });
   }
 
@@ -253,6 +278,18 @@ class UsersService {
    * Set default address
    */
   async setDefaultAddress(userId: string, addressId: string) {
+    const address = await db.address.findFirst({
+      where: { id: addressId, userId },
+    });
+
+    if (!address) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "Address not found",
+      };
+    }
+
     // Unset all other default addresses
     await db.address.updateMany({
       where: { userId, isDefault: true },
