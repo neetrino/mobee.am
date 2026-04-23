@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient, ApiError } from '../api-client';
+import { mergeGuestCartIntoUserCart } from '../cart/guest-cart';
 
 /**
  * User interface
@@ -121,6 +122,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.dispatchEvent(new Event('auth-updated'));
   };
 
+  const mergeGuestCartAfterAuth = async () => {
+    const result = await mergeGuestCartIntoUserCart();
+    if (result.failed.length > 0) {
+      console.warn('⚠️ [AUTH] Guest cart merge partially failed', {
+        merged: result.merged.length,
+        failed: result.failed.length,
+      });
+      return;
+    }
+
+    if (result.merged.length > 0) {
+      console.log('✅ [AUTH] Guest cart merged into user cart', {
+        merged: result.merged.length,
+      });
+    }
+  };
+
   /**
    * Login user
    */
@@ -148,6 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       persistAuthResponse(response);
+      await mergeGuestCartAfterAuth();
 
       // Don't redirect here - let the login page handle redirect based on query params
     } catch (error: any) {
@@ -206,6 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('✅ [AUTH] Registration response received:', response);
 
       persistAuthResponse(response);
+      await mergeGuestCartAfterAuth();
       console.log('✅ [AUTH] Registration successful:', { userId: response.user.id });
 
       console.log('🔄 [AUTH] Redirecting to home page...');

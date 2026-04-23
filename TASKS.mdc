@@ -237,8 +237,8 @@ Verification:
 Execution order: 7
 
 ## 8. Cart actions and persistence
-Status: Mostly implemented
-Completion: 85%
+Status: Completed
+Completion: 100%
 Summary:
 - Cart actions exist for authenticated users via API and for guests via localStorage; checkout also supports guest items.
 Implemented parts:
@@ -257,12 +257,25 @@ Files:
 - `src/app/checkout/hooks/useCart.ts`
 - `src/lib/services/orders.service.ts`
 Missing:
-- Server-side guest cart via `guestToken` model path is not implemented in cart service logic.
-- Guest cart merge-to-user on login is Not verified from current codebase.
-- Duplicate guest-cart assembly logic exists between cart and checkout paths.
+- None.
 Next implementation scope:
-- Choose one persistence strategy for guest carts (localStorage-only vs DB guestToken) and align all flows.
-- Implement deterministic guest-to-user cart merge policy and tests.
+- None.
+Implementation summary:
+- Standardized on a single **localStorage-only** guest cart persistence strategy and moved guest cart read/write/hydration helpers into `src/lib/cart/guest-cart.ts`.
+- Removed duplicated guest-cart hydration logic by reusing shared guest-cart utilities from both cart and checkout flows.
+- Added deterministic guest-to-user merge on auth success (sorted item merge order, keep failed items in guest cart, clear successfully merged items only).
+- Refactored guest cart add/update/remove flows to use shared guest-cart helpers, reducing divergence between storefront paths.
+Files changed:
+- `src/lib/cart/guest-cart.ts`
+- `src/lib/cart/guest-cart.test.ts`
+- `src/lib/auth/AuthContext.tsx`
+- `src/components/hooks/useAddToCart.ts`
+- `src/app/cart/cart-fetcher.ts`
+- `src/app/cart/cart-handlers.ts`
+- `src/app/checkout/checkoutUtils.ts`
+Verification:
+- `pnpm test src/lib/cart/guest-cart.test.ts` (passed, 1 file / 6 tests)
+- `pnpm test` (passed, 8 files / 41 tests)
 Execution order: 8
 
 ## 9. Checkout form implementation
@@ -577,9 +590,9 @@ Execution order: 18
    - Recommended next step: None.
 
 8. Cart actions and persistence
-   - Current status: Mostly implemented (85%)
-   - Why it is or is not ready: Auth + guest carts work, but persistence strategy is split and merge behavior is unclear.
-   - Recommended next step: Unify guest cart strategy and implement guest-to-user merge semantics.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Guest cart persistence is now unified under shared localStorage helpers, and deterministic merge-to-user flow is implemented and tested.
+   - Recommended next step: None.
 
 9. Checkout form implementation
    - Current status: Mostly implemented (88%)
