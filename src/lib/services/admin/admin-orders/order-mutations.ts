@@ -1,6 +1,31 @@
 import { db } from "@white-shop/db";
+import { Prisma } from "@prisma/client";
 import { logger } from "../../../utils/logger";
 import type { UpdateOrderData } from "./types";
+
+interface RestockOrderItem {
+  variantId: string;
+  quantity: number;
+}
+
+interface StockAdjustment {
+  variantId: string;
+  quantity: number;
+}
+
+export function buildStockAdjustmentsForCancel(items: RestockOrderItem[]): StockAdjustment[] {
+  const quantityByVariant = new Map<string, number>();
+
+  for (const item of items) {
+    const existingQuantity = quantityByVariant.get(item.variantId) ?? 0;
+    quantityByVariant.set(item.variantId, existingQuantity + item.quantity);
+  }
+
+  return Array.from(quantityByVariant.entries()).map(([variantId, quantity]) => ({
+    variantId,
+    quantity,
+  }));
+}
 
 /**
  * Delete order
@@ -199,26 +224,53 @@ export async function updateOrder(orderId: string, data: UpdateOrderData) {
       updateData.paidAt = new Date();
     }
 
-    const order = await db.order.update({
-      where: { id: orderId },
-      data: updateData,
-      include: {
-        items: true,
-        payments: true,
-      },
-    });
+    const isTransitionToCancelled = data.status === 'cancelled' && existing.status !== 'cancelled';
 
-    // Create order event
-    await db.orderEvent.create({
-      data: {
-        orderId: order.id,
-        type: 'order_updated',
-        data: {
-          updatedFields: Object.keys(updateData),
-          previousStatus: existing.status,
-          newStatus: data.status || existing.status,
+    const order = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: updateData,
+        include: {
+          items: true,
+          payments: true,
         },
-      },
+      });
+
+      if (isTransitionToCancelled) {
+        const orderItems = await tx.orderItem.findMany({
+          where: { orderId },
+          select: {
+            variantId: true,
+            quantity: true,
+          },
+        });
+        const adjustments = buildStockAdjustmentsForCancel(orderItems);
+
+        for (const adjustment of adjustments) {
+          await tx.productVariant.updateMany({
+            where: { id: adjustment.variantId },
+            data: {
+              stock: {
+                increment: adjustment.quantity,
+              },
+            },
+          });
+        }
+      }
+
+      await tx.orderEvent.create({
+        data: {
+          orderId: updatedOrder.id,
+          type: 'order_updated',
+          data: {
+            updatedFields: Object.keys(updateData),
+            previousStatus: existing.status,
+            newStatus: data.status || existing.status,
+          },
+        },
+      });
+
+      return updatedOrder;
     });
 
     return order;

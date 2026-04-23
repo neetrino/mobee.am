@@ -553,7 +553,7 @@ Execution order: 15
 
 ## 16. Inventory and stock management
 Status: Partially implemented
-Completion: 65%
+Completion: 75%
 Summary:
 - Stock exists at variant level and is enforced in cart/checkout, but there is no dedicated inventory module with reservation/reconciliation workflows.
 Implemented parts:
@@ -572,11 +572,19 @@ Files:
 Missing:
 - `stockReserved` is not used in live inventory reservation logic.
 - No dedicated inventory admin module for adjustments, movements, or reservation views.
-- Order cancel/update flow does not restore stock quantities.
 Next implementation scope:
 - Introduce reservation lifecycle (`stockReserved`) and release/commit semantics.
 - Add inventory adjustment APIs/UI and stock reconciliation reporting.
-- Implement restock-on-cancel policy where business rules require it.
+- Expand restock policy with explicit business toggles (e.g., only for non-fulfilled cancellations).
+Implementation summary:
+- Added restock-on-cancel behavior in admin order updates: when order status transitions to `cancelled`, variant stock is incremented by ordered quantities.
+- Wrapped order update + event creation + stock restoration in a single transaction to avoid partial state writes.
+- Added unit coverage for cancellation stock-adjustment aggregation logic (`buildStockAdjustmentsForCancel`).
+Files changed:
+- `src/lib/services/admin/admin-orders/order-mutations.ts`
+- `src/lib/services/admin/admin-orders/order-mutations.test.ts`
+Verification:
+- `pnpm test src/lib/services/admin/admin-orders/order-mutations.test.ts` (passed, 1 file / 2 tests)
 Execution order: 16
 
 ## 17. Analytics Dashboard
