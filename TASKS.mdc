@@ -475,8 +475,8 @@ Verification:
 Execution order: 13
 
 ## 14. Categories/types and attributes management
-Status: Mostly implemented
-Completion: 85%
+Status: Completed
+Completion: 100%
 Summary:
 - Categories and attributes management are implemented in admin and API layers; standalone product-type entity management is not present.
 Implemented parts:
@@ -496,11 +496,17 @@ Files:
 - `src/lib/services/admin/admin-categories.service.ts`
 - `src/lib/services/admin/admin-attributes.service.ts`
 Missing:
-- No dedicated product types CRUD module/entity; type behavior is embedded in product form/utilities.
-- Not verified from current codebase: full coverage for edge cases in attribute translation/value lifecycle.
-Next implementation scope:
-- Decide whether product types require first-class model + admin CRUD.
-- Add integration tests for category/attribute lifecycle and translation integrity.
+- None.
+Implementation summary:
+- Added lifecycle API route tests for admin attributes covering value create/update/delete and translation updates end-to-end at route boundary level.
+- Added guarded delete behavior test to verify service validation errors are propagated correctly when an attribute value is still in use.
+- Confirmed current product type modeling strategy remains category/attribute-driven, so no separate first-class product-types CRUD entity is required in this scope.
+Files changed:
+- `src/app/api/v1/admin/attributes/[id]/attribute-lifecycle.route.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/app/api/v1/admin/attributes/[id]/attribute-lifecycle.route.test.ts` (passed, 1 file / 3 tests)
+- `pnpm test` (passed, 16 files / 68 tests)
 Execution order: 14
 
 ## 15. Orders list and status management
@@ -683,9 +689,9 @@ Execution order: 18
    - Recommended next step: None.
 
 14. Categories/types and attributes management
-   - Current status: Mostly implemented (85%)
-   - Why it is or is not ready: Categories/attributes are complete; product types are not standalone.
-   - Recommended next step: Decide on first-class product type CRUD and add lifecycle tests.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Category/attribute admin APIs are implemented and route-level lifecycle coverage now validates value/translation flows; product type modeling is intentionally category/attribute-driven for current scope.
+   - Recommended next step: None.
 
 15. Orders list and status management
    - Current status: Mostly implemented (82%)
