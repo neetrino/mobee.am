@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../lib/api-client';
-import { getStoredLanguage, type LanguageCode } from '../../lib/language';
+import type { LanguageCode } from '../../lib/language';
 
 interface RelatedProduct {
   id: string;
@@ -32,15 +32,14 @@ interface RelatedProduct {
 }
 
 interface UseRelatedProductsProps {
-  categorySlug?: string;
-  currentProductId: string;
+  currentProductSlug: string;
   language: LanguageCode;
 }
 
 /**
  * Hook for fetching related products
  */
-export function useRelatedProducts({ categorySlug, currentProductId, language }: UseRelatedProductsProps) {
+export function useRelatedProducts({ currentProductSlug, language }: UseRelatedProductsProps) {
   const [products, setProducts] = useState<RelatedProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,35 +48,18 @@ export function useRelatedProducts({ categorySlug, currentProductId, language }:
       try {
         setLoading(true);
         
-        // Build params - if no categorySlug, fetch all products
         const params: Record<string, string> = {
-          limit: '30', // Fetch more to ensure we have 10 after filtering
+          limit: '10',
           lang: language,
         };
-        
-        if (categorySlug) {
-          params.category = categorySlug;
-          console.log('[RelatedProducts] Fetching related products for category:', categorySlug);
-        } else {
-          console.log('[RelatedProducts] No categorySlug, fetching all products');
-        }
-        
+
         const response = await apiClient.get<{
           data: RelatedProduct[];
-          meta: {
-            total: number;
-          };
-        }>('/api/v1/products', {
+        }>(`/api/v1/products/${encodeURIComponent(currentProductSlug)}/related`, {
           params,
         });
 
-        console.log('[RelatedProducts] Received products:', response.data.length);
-        // Filter out current product and take exactly 10
-        const filtered = response.data.filter(p => p.id !== currentProductId);
-        console.log('[RelatedProducts] After filtering current product:', filtered.length);
-        const finalProducts = filtered.slice(0, 10);
-        console.log('[RelatedProducts] Final products to display:', finalProducts.length);
-        setProducts(finalProducts);
+        setProducts(response.data.slice(0, 10));
       } catch (error) {
         console.error('[RelatedProducts] Error fetching related products:', error);
         setProducts([]);
@@ -87,7 +69,7 @@ export function useRelatedProducts({ categorySlug, currentProductId, language }:
     };
 
     fetchRelatedProducts();
-  }, [categorySlug, currentProductId, language]);
+  }, [currentProductSlug, language]);
 
   return { products, loading };
 }

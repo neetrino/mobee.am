@@ -12,6 +12,7 @@ import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
 import { useProductPage } from './useProductPage';
 import type { ProductPageProps } from './types';
+import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
 
 export default function ProductPage({ params }: ProductPageProps) {
   const router = useRouter();
@@ -68,14 +69,12 @@ export default function ProductPage({ params }: ProductPageProps) {
     setIsAddingToCart(true);
     try {
       if (!isLoggedIn) {
-        const stored = localStorage.getItem('shop_cart_guest');
-        const cart = stored ? JSON.parse(stored) : [];
-        const existing = cart.find((i: unknown): i is { variantId: string; quantity: number; productId?: string; productSlug?: string } => 
-          typeof i === 'object' && i !== null && 'variantId' in i && i.variantId === currentVariant.id
-        );
-        if (existing) existing.quantity += quantity;
-        else cart.push({ productId: product.id, productSlug: product.slug, variantId: currentVariant.id, quantity });
-        localStorage.setItem('shop_cart_guest', JSON.stringify(cart));
+        upsertGuestCartItem({
+          productId: product.id,
+          productSlug: product.slug,
+          variantId: currentVariant.id,
+          quantity,
+        });
       } else {
         await apiClient.post('/api/v1/cart/items', { productId: product.id, variantId: currentVariant.id, quantity });
       }
@@ -155,7 +154,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         <ProductReviews productSlug={slug} productId={product.id} />
       </div>
       <div className="mt-16">
-        <RelatedProducts categorySlug={product.categories?.[0]?.slug} currentProductId={product.id} />
+        <RelatedProducts currentProductSlug={product.slug} />
       </div>
     </div>
   );

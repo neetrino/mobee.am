@@ -79,100 +79,20 @@ export async function GET(
   }
 }
 
-/**
- * POST /api/v1/products/[slug]/reviews
- * Create a new review for a product (by slug)
- */
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  try {
-    // Authenticate user
-    const user = await authenticateToken(req);
-    if (!user) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/unauthorized",
-          title: "Unauthorized",
-          status: 401,
-          detail: "Authentication required",
-          instance: req.url,
-        },
-        { status: 401 }
-      );
-    }
-
-    const { slug } = await params;
-    const { searchParams } = new URL(req.url);
-    const lang = searchParams.get("lang") || "en";
-    const body = await req.json();
-
-    console.log('📝 [REVIEWS API] POST request:', { slug, userId: user.id, rating: body.rating });
-
-    // First, get the product by slug to get the productId
-    const product = await productsService.findBySlug(slug, lang);
-    if (!product || !product.id) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/not-found",
-          title: "Product not found",
-          status: 404,
-          detail: `Product with slug '${slug}' does not exist`,
-          instance: req.url,
-        },
-        { status: 404 }
-      );
-    }
-
-    // Validate request body
-    if (!body.rating || typeof body.rating !== 'number') {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          status: 400,
-          detail: "Rating is required and must be a number",
-          instance: req.url,
-        },
-        { status: 400 }
-      );
-    }
-
-    if (body.rating < 1 || body.rating > 5) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          status: 400,
-          detail: "Rating must be between 1 and 5",
-          instance: req.url,
-        },
-        { status: 400 }
-      );
-    }
-
-    // Create review
-    const review = await reviewsService.createReview(product.id, user.id, {
-      rating: body.rating,
-      comment: body.comment,
-    });
-
-    console.log('✅ [REVIEWS API] Review created:', review.id);
-
-    return NextResponse.json(review, { status: 201 });
-  } catch (error: any) {
-    console.error("❌ [REVIEWS API] POST Error:", error);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  const { slug } = await params;
+  return NextResponse.json(
+    {
+      type: "https://api.shop.am/problems/method-not-allowed",
+      title: "Method Not Allowed",
+      status: 405,
+      detail: `Review creation is disabled for v1 read-only scope on product '${slug}'`,
+      instance: req.url,
+    },
+    { status: 405 }
+  );
 }
 

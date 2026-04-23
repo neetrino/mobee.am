@@ -191,29 +191,49 @@ Verification:
 Execution order: 6
 
 ## 7. Related products and Reviews (v1 read-only)
-Status: Partially implemented
-Completion: 65%
+Status: Completed
+Completion: 100%
 Summary:
-- Related products are implemented through generic product list filtering; reviews include read and write flows, so v1 read-only scope is exceeded.
+- Related products now use a dedicated backend contract based on the current product slug, and reviews are strictly read-only in both API and UI layers.
 Implemented parts:
-- Related products hook fetches `/api/v1/products` by category and filters out current product.
+- Related products API exists at `GET /api/v1/products/[slug]/related`.
+- Related products hook fetches dedicated related data from slug-based backend contract.
+- Related products add-to-cart now matches PDP guest behavior via shared guest cart helper.
 - Reviews GET by product slug exists.
-- Reviews UI renders summary/list.
+- Reviews UI renders read-only summary/list without write/edit actions.
 Files:
+- `src/app/api/v1/products/[slug]/related/route.ts`
 - `src/components/hooks/useRelatedProducts.ts`
 - `src/components/RelatedProducts.tsx`
 - `src/app/api/v1/products/[slug]/reviews/route.ts`
 - `src/lib/services/reviews.service.ts`
 - `src/components/ProductReviews.tsx`
+- `src/components/ProductReviews/ReviewList.tsx`
+- `src/components/ProductReviews/ReviewItem.tsx`
 - `src/components/ProductReviews/hooks/useReviews.ts`
 - `src/app/api/v1/reviews/[reviewId]/route.ts`
-Missing:
-- No dedicated backend related-products strategy/endpoint (manual mapping, co-purchase, relevance scoring).
-- Reviews are not read-only: POST/PUT/DELETE flows are present.
-- Behavior inconsistency: related-product add-to-cart guest flow differs from PDP guest cart behavior.
-Next implementation scope:
-- Decide and enforce strict v1 read-only review scope (disable write routes/UI if required).
-- Add dedicated related-products backend contract and ranking strategy.
+Implementation summary:
+- Added `GET /api/v1/products/[slug]/related` route to derive related products server-side from the current product and its primary category.
+- Switched storefront related-products hook from generic `/api/v1/products` queries to the dedicated slug-based related-products endpoint.
+- Enforced v1 read-only reviews by returning `405 Method Not Allowed` for review create/update/delete endpoints.
+- Removed write/edit review controls from storefront UI, leaving reviews list and summary read-only.
+- Unified guest add-to-cart behavior between PDP and related products via shared `guest-cart` helper.
+Files changed:
+- `src/app/api/v1/products/[slug]/related/route.ts`
+- `src/components/hooks/useRelatedProducts.ts`
+- `src/components/RelatedProducts.tsx`
+- `src/app/products/[slug]/page.tsx`
+- `src/lib/cart/guest-cart.ts`
+- `src/lib/cart/guest-cart.test.ts`
+- `src/app/api/v1/products/[slug]/reviews/route.ts`
+- `src/app/api/v1/reviews/[reviewId]/route.ts`
+- `src/components/ProductReviews.tsx`
+- `src/components/ProductReviews/ReviewList.tsx`
+- `src/components/ProductReviews/ReviewItem.tsx`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/cart/guest-cart.test.ts` (passed, 1 file / 2 tests)
+- `pnpm test` (passed, 8 files / 37 tests)
 Execution order: 7
 
 ## 8. Cart actions and persistence
@@ -552,9 +572,9 @@ Execution order: 18
    - Recommended next step: None.
 
 7. Related products and Reviews (v1 read-only)
-   - Current status: Partially implemented (65%)
-   - Why it is or is not ready: Related products are heuristic and reviews exceed read-only scope.
-   - Recommended next step: Enforce v1 read-only policy and build dedicated related-products backend contract.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Dedicated related-products backend contract is in place and review write flows are disabled across API/UI for strict v1 read-only scope.
+   - Recommended next step: None.
 
 8. Cart actions and persistence
    - Current status: Mostly implemented (85%)
