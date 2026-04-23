@@ -14,9 +14,9 @@ import {
 } from './useSpecialOffersHomeProducts';
 
 /**
- * Featured products grid for the home page (single curated list).
+ * Product sections for the home page (stacked curated lists).
  */
-export function FeaturedProductsTabs() {
+export function HomeProductSections() {
   const { language, products, loading, error, fetchProducts, productsPerPage } =
     useFeaturedHomeProducts();
 
@@ -38,9 +38,9 @@ export function FeaturedProductsTabs() {
   }, [fetchSpecialOffersProducts]);
 
   return (
-    <section className="bg-gray-50 pb-16 pt-6" aria-labelledby="featured-products-tabs">
+    <section className="bg-gray-50 pb-16 pt-6" aria-labelledby="home-product-sections">
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        <h2 id="featured-products-tabs" className="sr-only">
+        <h2 id="home-product-sections" className="sr-only">
           {t(language, 'home.featured_products.title')}
         </h2>
 
@@ -72,3 +72,5 @@ export function FeaturedProductsTabs() {
     </section>
   );
 }
+
+export const FeaturedProductsTabs = HomeProductSections;

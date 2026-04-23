@@ -73,8 +73,8 @@ Verification:
 Execution order: 2
 
 ## 3. Home page sections
-Status: Mostly implemented
-Completion: 88%
+Status: Completed
+Completion: 100%
 Summary:
 - Home page sections are assembled and rendered end-to-end in the storefront with modular section components and locale-backed content.
 Implemented parts:
@@ -90,12 +90,18 @@ Files:
 - `src/components/useFeaturedHomeProducts.ts`
 - `src/components/useSpecialOffersHomeProducts.ts`
 - `src/locales/en/home.json`
-Missing:
-- Not verified from current codebase: whether all sections are backed by dynamic CMS/admin controls versus static or semi-static data.
-- Component naming suggests tabs, but behavior appears section-based in current UI composition.
-Next implementation scope:
-- Audit data source ownership per section (API/admin-controlled vs static).
-- Align naming/UX semantics for tabbed vs stacked section behavior.
+Implementation summary:
+- Added explicit home-section ownership mapping (`adminApi` vs `localeStatic`) with source contracts per section.
+- Aligned homepage semantics from tab-oriented naming to stacked section naming via `HomeProductSections` export.
+- Kept backwards compatibility by preserving `FeaturedProductsTabs` as an alias export to avoid integration breakage.
+Files changed:
+- `src/components/homeSections.ts`
+- `src/components/homeSections.test.ts`
+- `src/components/FeaturedProductsTabs.tsx`
+- `src/components/useFeaturedHomeProducts.ts`
+- `src/app/page.tsx`
+Verification:
+- `pnpm test` (passed, 3 files / 19 tests)
 Execution order: 3
 
 ## 4. Sorting options
@@ -509,9 +515,9 @@ Execution order: 18
    - Recommended next step: None.
 
 3. Home page sections
-   - Current status: Mostly implemented (88%)
-   - Why it is or is not ready: Sections render fully, but source-of-truth ownership is not fully explicit.
-   - Recommended next step: Confirm dynamic content ownership and align section component semantics.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Data ownership is explicit per section and section naming now matches stacked UX behavior.
+   - Recommended next step: None.
 
 4. Sorting options
    - Current status: Partially implemented (78%)

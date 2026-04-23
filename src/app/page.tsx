@@ -1,7 +1,7 @@
 import { HeroCarousel } from '../components/HeroCarousel';
 import { TopCategories } from '../components/TopCategories';
 import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
-import { FeaturedProductsTabs } from '../components/FeaturedProductsTabs';
+import { HomeProductSections } from '../components/FeaturedProductsTabs';
 import { PartnerLogosSection } from '../components/PartnerLogosSection';
 
 export default async function HomePage() {
@@ -18,8 +18,8 @@ export default async function HomePage() {
 
       <FeaturedIntroHeading />
 
-      {/* Featured Products with Tabs */}
-      <FeaturedProductsTabs />
+      {/* Stacked curated home product sections */}
+      <HomeProductSections />
 
       <PartnerLogosSection />
     </div>

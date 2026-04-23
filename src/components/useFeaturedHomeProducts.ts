@@ -81,7 +81,7 @@ export function useFeaturedHomeProducts() {
         setError(null);
         setProducts(await fetchFeaturedHomePage(language, filter));
       } catch (err) {
-        console.error('[FeaturedProductsTabs] Error:', err);
+        console.error("[HomeProductSections] Error:", err);
         setError(t(language, 'home.featured_products.errorLoading'));
         setProducts([]);
       } finally {
