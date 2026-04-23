@@ -9,6 +9,20 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v6
 
@@ -26,6 +40,16 @@ jobs:
 
       - name: Generate Prisma Client
         run: pnpm run db:generate
+
+      - name: Apply migrations (test DB)
+        run: pnpm run db:migrate:deploy
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+
+      - name: Migration health check
+        run: pnpm run db:migrate:health
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
 
       - name: Lint
         run: pnpm run lint

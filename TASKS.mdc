@@ -3,6 +3,7 @@
 ## 1. Define data model and migrations
 Status: Mostly implemented
 Completion: 90%
+Progress state: Partially completed
 Summary:
 - Prisma data model is broad and production-oriented; migration SQL files are present and ordered, but runtime migration state cannot be confirmed from repository code alone.
 Implemented parts:
@@ -23,6 +24,20 @@ Missing:
 Next implementation scope:
 - Add migration health check/verification command to CI and document rollout status.
 - Either implement `stockReserved` reservation flow or remove the unused field in a future migration.
+Implementation summary:
+- Added a dedicated migration health script (`prisma migrate status`) that fails when migration state is unhealthy or `DATABASE_URL` is missing.
+- Wired CI to start PostgreSQL service, apply migrations, and run migration health verification.
+- Replaced migration README with rollout/verification documentation covering local and CI checks.
+- Verified command behavior locally: health check correctly reports unapplied migrations for the current connected DB.
+Files changed:
+- `.github/workflows/ci.yml`
+- `package.json`
+- `src/scripts/check-migrations-health.js`
+- `shared/db/prisma/migrations/README_MIGRATION.md`
+- `TASKS.mdc`
+Remaining:
+- Implement and operationalize `stockReserved` reservation lifecycle, or remove the field via a forward migration.
+- Record per-environment (staging/production) rollout results after running `pnpm run db:migrate:deploy` and `pnpm run db:migrate:health` in those environments.
 Execution order: 1
 
 ## 2. Global layout: Header/Footer and navigation
