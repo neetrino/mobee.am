@@ -68,6 +68,20 @@ type OrderItemWithVariant = Prisma.OrderItemGetPayload<{
   };
 }>;
 
+interface ReorderSkippedItem {
+  variantId: string;
+  productTitle: string;
+  quantity: number;
+  reason: "variant_not_found" | "variant_unpublished" | "insufficient_stock";
+  availableStock?: number;
+}
+
+interface ReorderAddedItem {
+  variantId: string;
+  productId: string;
+  quantity: number;
+}
+
 class OrdersService {
   private async resolvePromoDiscountPercent(code?: string): Promise<number> {
     if (!code) return 0;
@@ -752,6 +766,178 @@ class OrdersService {
       trackingNumber: order.trackingNumber || undefined,
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
+    };
+  }
+
+  /**
+   * Reorder items from a previous order into the user's cart.
+   * Adds all valid items in one transaction and reports skipped items.
+   */
+  async reorder(orderNumber: string, userId: string) {
+    const order = await db.order.findFirst({
+      where: {
+        number: orderNumber,
+        userId,
+      },
+      include: {
+        items: {
+          select: {
+            variantId: true,
+            productTitle: true,
+            quantity: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "Order not found",
+        detail: `Order with number '${orderNumber}' not found`,
+      };
+    }
+
+    if (order.items.length === 0) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/validation-error",
+        title: "Order has no items",
+        detail: "Cannot reorder an order without items",
+      };
+    }
+
+    const requestedByVariant = new Map<
+      string,
+      { variantId: string; productTitle: string; quantity: number }
+    >();
+
+    for (const item of order.items) {
+      const existing = requestedByVariant.get(item.variantId);
+      if (!existing) {
+        requestedByVariant.set(item.variantId, {
+          variantId: item.variantId,
+          productTitle: item.productTitle,
+          quantity: item.quantity,
+        });
+        continue;
+      }
+
+      existing.quantity += item.quantity;
+    }
+
+    const variantIds = Array.from(requestedByVariant.keys());
+    const variants = await db.productVariant.findMany({
+      where: { id: { in: variantIds } },
+      select: {
+        id: true,
+        productId: true,
+        stock: true,
+        published: true,
+      },
+    });
+    const variantsById = new Map(variants.map((variant) => [variant.id, variant]));
+
+    const skipped: ReorderSkippedItem[] = [];
+    const toAdd: ReorderAddedItem[] = [];
+
+    for (const requested of requestedByVariant.values()) {
+      const variant = variantsById.get(requested.variantId);
+
+      if (!variant) {
+        skipped.push({
+          variantId: requested.variantId,
+          productTitle: requested.productTitle,
+          quantity: requested.quantity,
+          reason: "variant_not_found",
+        });
+        continue;
+      }
+
+      if (!variant.published) {
+        skipped.push({
+          variantId: requested.variantId,
+          productTitle: requested.productTitle,
+          quantity: requested.quantity,
+          reason: "variant_unpublished",
+          availableStock: variant.stock,
+        });
+        continue;
+      }
+
+      if (variant.stock < requested.quantity) {
+        skipped.push({
+          variantId: requested.variantId,
+          productTitle: requested.productTitle,
+          quantity: requested.quantity,
+          reason: "insufficient_stock",
+          availableStock: variant.stock,
+        });
+        continue;
+      }
+
+      toAdd.push({
+        variantId: requested.variantId,
+        productId: variant.productId,
+        quantity: requested.quantity,
+      });
+    }
+
+    if (toAdd.length > 0) {
+      await db.$transaction(async (tx: Prisma.TransactionClient) => {
+        const cart = await tx.cart.upsert({
+          where: { userId },
+          update: {
+            updatedAt: new Date(),
+          },
+          create: {
+            userId,
+          },
+        });
+
+        for (const item of toAdd) {
+          const existingCartItem = await tx.cartItem.findFirst({
+            where: {
+              cartId: cart.id,
+              variantId: item.variantId,
+            },
+            select: {
+              id: true,
+              quantity: true,
+            },
+          });
+
+          if (!existingCartItem) {
+            await tx.cartItem.create({
+              data: {
+                cartId: cart.id,
+                productId: item.productId,
+                variantId: item.variantId,
+                quantity: item.quantity,
+              },
+            });
+            continue;
+          }
+
+          await tx.cartItem.update({
+            where: { id: existingCartItem.id },
+            data: {
+              quantity: existingCartItem.quantity + item.quantity,
+            },
+          });
+        }
+      });
+    }
+
+    return {
+      orderNumber,
+      added: toAdd.length,
+      skipped: skipped.length,
+      totalRequested: requestedByVariant.size,
+      addedItems: toAdd,
+      skippedItems: skipped,
+      hasPartialFailure: skipped.length > 0,
     };
   }
 }

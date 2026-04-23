@@ -398,14 +398,14 @@ Verification:
 Execution order: 11
 
 ## 12. Order history and reorder
-Status: Mostly implemented
-Completion: 88%
+Status: Completed
+Completion: 100%
 Summary:
-- Customer order history and reorder flow are implemented, with reorder executed as client-driven cart re-add operations.
+- Customer order history and reorder flow are implemented with a dedicated backend reorder endpoint and structured partial-failure reporting.
 Implemented parts:
 - Orders listing and order-by-number detail APIs exist.
 - Profile orders hook fetches orders/details and supports reorder flow.
-- Reorder checks variant availability via variant endpoint before adding to cart.
+- Reorder uses dedicated server endpoint with stock/publish validation and batch cart updates.
 Files:
 - `src/app/api/v1/orders/route.ts`
 - `src/app/api/v1/orders/[number]/route.ts`
@@ -414,11 +414,22 @@ Files:
 - `src/app/api/v1/products/variants/[id]/route.ts`
 - `src/app/api/v1/cart/items/route.ts`
 Missing:
-- No dedicated atomic backend reorder endpoint; logic is distributed in frontend loop calls.
-- Partial failure handling exists, but robust transaction-like reorder semantics are missing.
-Next implementation scope:
-- Add `POST /api/v1/orders/{number}/reorder` with server-side stock validation and batch add.
-- Return structured success/partial-failure report for UI messaging.
+- None.
+Implementation summary:
+- Added `POST /api/v1/orders/[number]/reorder` route secured by auth and wired to `ordersService.reorder`.
+- Implemented backend reorder service flow that aggregates order items by variant, validates variant existence/published state/stock, and adds valid items to user cart in one transaction.
+- Added structured reorder response payload (`added`, `skipped`, `addedItems`, `skippedItems`, `hasPartialFailure`) for reliable UI messaging.
+- Refactored profile reorder action to call the new backend endpoint instead of client-side per-item variant/cart API loops.
+- Added API route tests covering unauthorized and successful reorder response paths.
+Files changed:
+- `src/lib/services/orders.service.ts`
+- `src/app/api/v1/orders/[number]/reorder/route.ts`
+- `src/app/api/v1/orders/[number]/reorder/route.test.ts`
+- `src/app/profile/hooks/useOrders.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/app/api/v1/orders/[number]/reorder/route.test.ts` (passed, 1 file / 2 tests)
+- `pnpm test` (passed, 13 files / 60 tests)
 Execution order: 12
 
 ## 13. Products CRUD and media management
@@ -649,9 +660,9 @@ Execution order: 18
    - Recommended next step: None.
 
 12. Order history and reorder
-   - Current status: Mostly implemented (88%)
-   - Why it is or is not ready: History works; reorder is client-loop based and non-atomic.
-   - Recommended next step: Add dedicated atomic reorder endpoint with structured partial-failure response.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Reorder now runs through a dedicated backend endpoint with server-side validation, transactional cart writes, and structured partial-failure reporting.
+   - Recommended next step: None.
 
 13. Products CRUD and media management
    - Current status: Mostly implemented (88%)
