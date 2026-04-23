@@ -10,6 +10,7 @@ import { ProductsHeader } from '../../components/ProductsHeader';
 import { ProductsGrid } from '../../components/ProductsGrid';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
+import { ShopSortFilter } from '../../components/ShopSortFilter';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { parseProductSortOption, type ProductSortOption } from '@/lib/products/sort';
 
@@ -246,6 +247,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <span className="mx-2 text-gray-400">/</span>
             <span className="font-semibold text-gray-900">{t(language, 'common.navigation.products')}</span>
           </nav>
+          <div className="mb-6 pt-2">
+            <ShopSortFilter />
+          </div>
 
           {normalizedProducts.length > 0 ? (
             <>

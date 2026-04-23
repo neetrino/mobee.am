@@ -32,6 +32,7 @@
   "header": {
     "allProducts": "All Products ({total})",
     "clearFilters": "Clear Filters",
+    "sortBy": "Sort by",
     "show": "Show",
     "all": "All",
     "sort": {
