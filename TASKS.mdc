@@ -2,7 +2,7 @@
 
 ## 1. Define data model and migrations
 Status: Mostly implemented
-Completion: 90%
+Completion: 95%
 Progress state: Partially completed
 Summary:
 - Prisma data model is broad and production-oriented; migration SQL files are present and ordered, but runtime migration state cannot be confirmed from repository code alone.
@@ -20,24 +20,28 @@ Files:
 - `src/scripts/run-migrations.js`
 Missing:
 - Applied migration state per environment is Not verified from current codebase.
-- `stockReserved` exists in schema but is not used by service logic.
+- Connected database appears to be pre-existing and not baselined for Prisma migration history (`P3005`), so migration health cannot pass until baseline strategy is applied.
 Next implementation scope:
-- Add migration health check/verification command to CI and document rollout status.
-- Either implement `stockReserved` reservation flow or remove the unused field in a future migration.
+- Baseline existing database(s) for Prisma migration history and then run deploy + health checks.
+- Record per-environment rollout status after successful baseline/deploy.
 Implementation summary:
 - Added a dedicated migration health script (`prisma migrate status`) that fails when migration state is unhealthy or `DATABASE_URL` is missing.
 - Wired CI to start PostgreSQL service, apply migrations, and run migration health verification.
 - Replaced migration README with rollout/verification documentation covering local and CI checks.
 - Verified command behavior locally: health check correctly reports unapplied migrations for the current connected DB.
+- Removed unused `stockReserved` from Prisma schema and added a forward migration to drop the column.
+- Validated schema and ran test suite after migration update.
 Files changed:
 - `.github/workflows/ci.yml`
 - `package.json`
 - `src/scripts/check-migrations-health.js`
 - `shared/db/prisma/migrations/README_MIGRATION.md`
+- `shared/db/prisma/migrations/20260423143000_remove_stock_reserved/migration.sql`
+- `shared/db/prisma/schema.prisma`
 - `TASKS.mdc`
 Remaining:
-- Implement and operationalize `stockReserved` reservation lifecycle, or remove the field via a forward migration.
-- Record per-environment (staging/production) rollout results after running `pnpm run db:migrate:deploy` and `pnpm run db:migrate:health` in those environments.
+- Baseline existing database(s) before migration deploy (current deploy fails with `P3005`).
+- Record per-environment (staging/production) rollout results after successful baseline plus `pnpm run db:migrate:deploy` and `pnpm run db:migrate:health`.
 Execution order: 1
 
 ## 2. Global layout: Header/Footer and navigation
@@ -494,9 +498,9 @@ Execution order: 18
 # IMPLEMENTATION QUEUE
 
 1. Define data model and migrations
-   - Current status: Mostly implemented (90%)
-   - Why it is or is not ready: Schema and migrations exist, but deployment/state verification and unused reservation fields need closure.
-   - Recommended next step: Verify migration state per environment and decide `stockReserved` lifecycle.
+   - Current status: Mostly implemented (95%)
+   - Why it is or is not ready: Schema/migrations are in place and unused reservation field was removed, but migration history is not baselined in the connected DB.
+   - Recommended next step: Baseline target databases, then run deploy + health checks and record rollout status.
 
 2. Global layout: Header/Footer and navigation
    - Current status: Mostly implemented (92%)

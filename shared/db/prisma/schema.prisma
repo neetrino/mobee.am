@@ -258,7 +258,6 @@ model ProductVariant {
   compareAtPrice Float?
   cost           Float?
   stock          Int                    @default(0)
-  stockReserved  Int                    @default(0)
   weightGrams    Int?
   imageUrl       String?
   position       Int                    @default(0)
