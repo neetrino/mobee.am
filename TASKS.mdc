@@ -1,0 +1,569 @@
+# TASKS AUDIT
+
+## 1. Define data model and migrations
+Status: Mostly implemented
+Completion: 90%
+Summary:
+- Prisma data model is broad and production-oriented; migration SQL files are present and ordered, but runtime migration state cannot be confirmed from repository code alone.
+Implemented parts:
+- Core domain models exist in Prisma: users, addresses, categories, brands, attributes/values/translations, products/translations/variants/options/labels, carts/items, orders/items/payments/events, reviews, promo codes, settings, contact messages.
+- Migration chain exists with 10 SQL migrations including init, product attributes, variant attributes, stock constraints, FK/index improvements, and promo codes.
+- Migration runner and migration notes exist for operational use.
+Files:
+- `shared/db/prisma/schema.prisma`
+- `shared/db/prisma/migrations/20251204093152_init/migration.sql`
+- `shared/db/prisma/migrations/20251222195036_add_product_attributes/migration.sql`
+- `shared/db/prisma/migrations/20260115040503_add_attributes_to_product_variant/migration.sql`
+- `shared/db/prisma/migrations/20260223100000_add_stock_non_negative_check/migration.sql`
+- `shared/db/prisma/migrations/20260423120000_add_promo_codes/migration.sql`
+- `src/scripts/run-migrations.js`
+Missing:
+- Applied migration state per environment is Not verified from current codebase.
+- `stockReserved` exists in schema but is not used by service logic.
+Next implementation scope:
+- Add migration health check/verification command to CI and document rollout status.
+- Either implement `stockReserved` reservation flow or remove the unused field in a future migration.
+Execution order: 1
+
+## 2. Global layout: Header/Footer and navigation
+Status: Mostly implemented
+Completion: 92%
+Summary:
+- A shared global storefront shell with header, secondary nav, breadcrumb, footer, and mobile bottom nav is implemented and wired in root layout.
+Implemented parts:
+- Root layout wraps pages with `SiteChrome`.
+- `SiteChrome` conditionally skips chrome for `/admin` routes.
+- Header includes search entry and nav structure; footer and mobile nav are present.
+- `/products` route redirects to `/shop`, preserving query params.
+Files:
+- `src/app/layout.tsx`
+- `src/components/SiteChrome.tsx`
+- `src/components/Header.tsx`
+- `src/components/MainHeaderBar.tsx`
+- `src/components/Breadcrumb.tsx`
+- `src/components/Footer.tsx`
+- `src/components/MobileBottomNav.tsx`
+- `src/app/products/page.tsx`
+Missing:
+- Minor consistency gap: `MobileBottomNav` labels are not fully i18n-driven like the rest of the shell.
+- Navigation implementation overlaps between `/products` and `/shop` route semantics (redirect + canonical page split).
+Next implementation scope:
+- Unify navigation target usage to canonical `/shop`.
+- Align all nav labels and aria text with locale resources.
+Execution order: 2
+
+## 3. Home page sections
+Status: Mostly implemented
+Completion: 88%
+Summary:
+- Home page sections are assembled and rendered end-to-end in the storefront with modular section components and locale-backed content.
+Implemented parts:
+- Hero, top categories, featured intro, featured/special sections, and partner logos are rendered.
+- Home data hooks exist for featured and special offers content selection.
+Files:
+- `src/app/page.tsx`
+- `src/components/HeroCarousel.tsx`
+- `src/components/TopCategories.tsx`
+- `src/components/FeaturedIntroHeading.tsx`
+- `src/components/FeaturedProductsTabs.tsx`
+- `src/components/PartnerLogosSection.tsx`
+- `src/components/useFeaturedHomeProducts.ts`
+- `src/components/useSpecialOffersHomeProducts.ts`
+- `src/locales/en/home.json`
+Missing:
+- Not verified from current codebase: whether all sections are backed by dynamic CMS/admin controls versus static or semi-static data.
+- Component naming suggests tabs, but behavior appears section-based in current UI composition.
+Next implementation scope:
+- Audit data source ownership per section (API/admin-controlled vs static).
+- Align naming/UX semantics for tabbed vs stacked section behavior.
+Execution order: 3
+
+## 4. Sorting options
+Status: Partially implemented
+Completion: 78%
+Summary:
+- Sorting UI and client-side sorting exist, but server-side global sorting is not fully wired for catalog APIs.
+Implemented parts:
+- Sort dropdown supports default/price/name asc-desc and writes `sort` to query params.
+- Product grid applies sort in browser on fetched dataset.
+- Shop page passes sort to grid component.
+Files:
+- `src/components/ProductsHeader.tsx`
+- `src/components/ProductsGrid.tsx`
+- `src/app/shop/page.tsx`
+- `src/app/products/page.tsx`
+Missing:
+- `getProducts` in shop page does not forward `sort` to `/api/v1/products`, so sorting is page-local, not backend-global.
+- Route usage still pushes sort to `/products?...` and relies on redirect.
+Next implementation scope:
+- Add validated sort params to `/api/v1/products` query pipeline and DB ordering.
+- Keep client sort only as fallback for already-fetched local arrays.
+Execution order: 4
+
+## 5. Gallery and Zoom
+Status: Mostly implemented
+Completion: 82%
+Summary:
+- Product detail gallery with thumbnails and fullscreen modal zoom is implemented.
+Implemented parts:
+- Vertical thumbnail strip with scrolling and selected-image synchronization.
+- Main image area with hover scale and fullscreen modal open/close flow.
+- Placeholder/error handling for failed images.
+Files:
+- `src/app/products/[slug]/ProductImageGallery.tsx`
+- `src/components/ProductImagePlaceholder.tsx`
+Missing:
+- No lens zoom, pan, pinch, or in-modal multi-image navigation.
+- Zoom is a fullscreen image viewer rather than advanced zoom interaction.
+Next implementation scope:
+- Add richer zoom interactions (pan/lens/swipe) behind progressive enhancement.
+- Keep modal behavior accessible and keyboard-navigable.
+Execution order: 5
+
+## 6. Product info and variants
+Status: Mostly implemented
+Completion: 85%
+Summary:
+- Product detail, variant selection, and variant availability endpoints are implemented across frontend and backend.
+Implemented parts:
+- Product slug API and service query/transform layers exist.
+- Variant detail endpoint provides stock/availability snapshot.
+- PDP variant and attribute selectors are wired in frontend.
+Files:
+- `src/app/api/v1/products/[slug]/route.ts`
+- `src/lib/services/products.service.ts`
+- `src/lib/services/products-slug.service.ts`
+- `src/lib/services/products-slug/product-query-builder.ts`
+- `src/lib/services/products-slug/product-transformer.ts`
+- `src/app/api/v1/products/variants/[id]/route.ts`
+- `src/app/products/[slug]/ProductInfoAndActions.tsx`
+- `src/app/products/[slug]/ProductAttributesSelector.tsx`
+- `src/app/products/[slug]/useVariantSelection.ts`
+Missing:
+- No dedicated first-class product type entity model; type behavior is inferred from attributes/form logic.
+- Not verified from current codebase: completeness of edge-case variant resolution under all locale/category combinations.
+Next implementation scope:
+- Introduce explicit product type domain model if required by roadmap.
+- Add invariant tests for variant resolution, disabled states, and fallback selection.
+Execution order: 6
+
+## 7. Related products and Reviews (v1 read-only)
+Status: Partially implemented
+Completion: 65%
+Summary:
+- Related products are implemented through generic product list filtering; reviews include read and write flows, so v1 read-only scope is exceeded.
+Implemented parts:
+- Related products hook fetches `/api/v1/products` by category and filters out current product.
+- Reviews GET by product slug exists.
+- Reviews UI renders summary/list.
+Files:
+- `src/components/hooks/useRelatedProducts.ts`
+- `src/components/RelatedProducts.tsx`
+- `src/app/api/v1/products/[slug]/reviews/route.ts`
+- `src/lib/services/reviews.service.ts`
+- `src/components/ProductReviews.tsx`
+- `src/components/ProductReviews/hooks/useReviews.ts`
+- `src/app/api/v1/reviews/[reviewId]/route.ts`
+Missing:
+- No dedicated backend related-products strategy/endpoint (manual mapping, co-purchase, relevance scoring).
+- Reviews are not read-only: POST/PUT/DELETE flows are present.
+- Behavior inconsistency: related-product add-to-cart guest flow differs from PDP guest cart behavior.
+Next implementation scope:
+- Decide and enforce strict v1 read-only review scope (disable write routes/UI if required).
+- Add dedicated related-products backend contract and ranking strategy.
+Execution order: 7
+
+## 8. Cart actions and persistence
+Status: Mostly implemented
+Completion: 85%
+Summary:
+- Cart actions exist for authenticated users via API and for guests via localStorage; checkout also supports guest items.
+Implemented parts:
+- Authenticated cart APIs: get/add/update/delete item.
+- Guest cart persistence in localStorage with hydration from product API.
+- Cart page handlers support optimistic updates.
+- Checkout can submit guest items array.
+Files:
+- `src/app/api/v1/cart/route.ts`
+- `src/app/api/v1/cart/items/route.ts`
+- `src/app/api/v1/cart/items/[id]/route.ts`
+- `src/lib/services/cart.service.ts`
+- `src/app/cart/cart-fetcher.ts`
+- `src/app/cart/cart-handlers.ts`
+- `src/app/cart/constants.ts`
+- `src/app/checkout/hooks/useCart.ts`
+- `src/lib/services/orders.service.ts`
+Missing:
+- Server-side guest cart via `guestToken` model path is not implemented in cart service logic.
+- Guest cart merge-to-user on login is Not verified from current codebase.
+- Duplicate guest-cart assembly logic exists between cart and checkout paths.
+Next implementation scope:
+- Choose one persistence strategy for guest carts (localStorage-only vs DB guestToken) and align all flows.
+- Implement deterministic guest-to-user cart merge policy and tests.
+Execution order: 8
+
+## 9. Checkout form implementation
+Status: Mostly implemented
+Completion: 88%
+Summary:
+- Checkout UI, form state, validation, delivery price integration, and order submission wiring are implemented.
+Implemented parts:
+- Checkout form sections and payment/shipping controls exist.
+- Form uses `react-hook-form` with Zod schema via resolver.
+- Delivery pricing hook and order submission hooks are integrated.
+- Route for checkout submission exists and calls order service.
+Files:
+- `src/app/checkout/page.tsx`
+- `src/app/checkout/CheckoutForm.tsx`
+- `src/app/checkout/useCheckout.ts`
+- `src/app/checkout/utils/validation-schema.ts`
+- `src/app/checkout/hooks/useOrderSubmission.ts`
+- `src/app/checkout/hooks/useDeliveryPrice.ts`
+- `src/app/api/v1/orders/checkout/route.ts`
+Missing:
+- API route does not apply explicit request schema validation before service call (service-level validation is partial).
+- Not verified from current codebase: external payment provider redirect lifecycle.
+Next implementation scope:
+- Add shared DTO schema validation in route handler for strict API boundary checks.
+- Finalize payment flow orchestration and callback/redirect handling.
+Execution order: 9
+
+## 10. Order summary and validations
+Status: Partially implemented
+Completion: 75%
+Summary:
+- Order summary UI and substantial backend order validation/stock checks exist, but discount/tax/payment URL logic is still placeholder-level.
+Implemented parts:
+- Checkout order summary component and summary calculation hook exist.
+- Service validates cart/guest items, checks stock, computes server-side shipping, creates order/payment in transaction, decrements stock atomically.
+- Order list/detail APIs for customers are implemented.
+Files:
+- `src/app/checkout/OrderSummary.tsx`
+- `src/app/checkout/hooks/useOrderSummary.ts`
+- `src/app/checkout/utils/validation-schema.ts`
+- `src/app/api/v1/orders/checkout/route.ts`
+- `src/lib/services/orders.service.ts`
+- `src/app/api/v1/orders/route.ts`
+- `src/app/api/v1/orders/[number]/route.ts`
+Missing:
+- `discountAmount` is hardcoded to `0` with TODO for coupon logic.
+- `taxAmount` is hardcoded to `0` with TODO.
+- Payment URL generation for Idram/ArCa is TODO and currently `null`.
+- Locale in order creation is hardcoded to `en`.
+Next implementation scope:
+- Implement promo-code discount application and tax calculation path.
+- Implement payment session URL generation and secure callback verification.
+- Pass and persist actual user locale during checkout.
+Execution order: 10
+
+## 11. Profile and address management
+Status: Mostly implemented
+Completion: 80%
+Summary:
+- Profile and address CRUD endpoints plus profile page hooks/components are implemented, but payload validation and typing are weak on the service layer.
+Implemented parts:
+- Profile GET/PUT routes and service methods exist.
+- Address list/create/update/delete/default routes and service methods exist.
+- Profile page tabs and hooks consume these APIs.
+Files:
+- `src/app/api/v1/users/profile/route.ts`
+- `src/app/api/v1/users/addresses/route.ts`
+- `src/app/api/v1/users/addresses/[addressId]/route.ts`
+- `src/app/api/v1/users/addresses/[addressId]/default/route.ts`
+- `src/lib/services/users.service.ts`
+- `src/app/profile/page.tsx`
+- `src/app/profile/hooks/useAddresses.ts`
+- `src/app/profile/hooks/useProfile.ts`
+Missing:
+- Service methods use `any` payloads and spread data directly to DB updates in address/profile methods.
+- Not verified from current codebase: full frontend constraints for address field completeness/format.
+Next implementation scope:
+- Add strict request DTO validation (Zod or equivalent) for profile and addresses.
+- Replace `any` in service layer with explicit typed contracts.
+Execution order: 11
+
+## 12. Order history and reorder
+Status: Mostly implemented
+Completion: 88%
+Summary:
+- Customer order history and reorder flow are implemented, with reorder executed as client-driven cart re-add operations.
+Implemented parts:
+- Orders listing and order-by-number detail APIs exist.
+- Profile orders hook fetches orders/details and supports reorder flow.
+- Reorder checks variant availability via variant endpoint before adding to cart.
+Files:
+- `src/app/api/v1/orders/route.ts`
+- `src/app/api/v1/orders/[number]/route.ts`
+- `src/app/profile/hooks/useOrders.ts`
+- `src/app/profile/OrderDetailsModal.tsx`
+- `src/app/api/v1/products/variants/[id]/route.ts`
+- `src/app/api/v1/cart/items/route.ts`
+Missing:
+- No dedicated atomic backend reorder endpoint; logic is distributed in frontend loop calls.
+- Partial failure handling exists, but robust transaction-like reorder semantics are missing.
+Next implementation scope:
+- Add `POST /api/v1/orders/{number}/reorder` with server-side stock validation and batch add.
+- Return structured success/partial-failure report for UI messaging.
+Execution order: 12
+
+## 13. Products CRUD and media management
+Status: Mostly implemented
+Completion: 88%
+Summary:
+- Admin product management is feature-rich with list/create/update/delete and media upload, wired to backend services.
+Implemented parts:
+- Admin products API supports filtered list and create.
+- Product by id API supports read/update/delete.
+- Upload images route exists (R2 storage).
+- Admin product UI includes create/edit and variant/media helpers.
+Files:
+- `src/app/api/v1/admin/products/route.ts`
+- `src/app/api/v1/admin/products/[id]/route.ts`
+- `src/app/api/v1/admin/products/upload-images/route.ts`
+- `src/app/admin/products/page.tsx`
+- `src/app/admin/products/add/page.tsx`
+- `src/app/admin/products/add/components/ProductImages.tsx`
+- `src/app/admin/products/add/components/VariantBuilder.tsx`
+- `src/lib/services/admin.service.ts`
+- `src/lib/services/admin/admin-products-create.service.ts`
+- `src/lib/services/admin/admin-products-update.service.ts`
+Missing:
+- Infra-dependent media upload readiness is Not verified from current codebase (depends on R2 env).
+- Admin list stock filtering is partially client-side and can drift from server pagination metadata.
+Next implementation scope:
+- Move stock/inventory filters to backend query contract for correct paging/counts.
+- Add explicit media health checks and fallback handling around storage configuration.
+Execution order: 13
+
+## 14. Categories/types and attributes management
+Status: Mostly implemented
+Completion: 85%
+Summary:
+- Categories and attributes management are implemented in admin and API layers; standalone product-type entity management is not present.
+Implemented parts:
+- Admin categories CRUD API and admin categories page/hook.
+- Admin attributes CRUD (including values/translations routes) and admin attributes page.
+- Supporting services in admin domain.
+Files:
+- `src/app/api/v1/admin/categories/route.ts`
+- `src/app/api/v1/admin/categories/[id]/route.ts`
+- `src/app/api/v1/admin/attributes/route.ts`
+- `src/app/api/v1/admin/attributes/[id]/route.ts`
+- `src/app/api/v1/admin/attributes/[id]/values/route.ts`
+- `src/app/api/v1/admin/attributes/values/[valueId]/route.ts`
+- `src/app/api/v1/admin/attributes/[id]/translations/route.ts`
+- `src/app/admin/categories/page.tsx`
+- `src/app/admin/attributes/page.tsx`
+- `src/lib/services/admin/admin-categories.service.ts`
+- `src/lib/services/admin/admin-attributes.service.ts`
+Missing:
+- No dedicated product types CRUD module/entity; type behavior is embedded in product form/utilities.
+- Not verified from current codebase: full coverage for edge cases in attribute translation/value lifecycle.
+Next implementation scope:
+- Decide whether product types require first-class model + admin CRUD.
+- Add integration tests for category/attribute lifecycle and translation integrity.
+Execution order: 14
+
+## 15. Orders list and status management
+Status: Mostly implemented
+Completion: 82%
+Summary:
+- Admin order listing, filtering, status updates, payment status updates, and order detail/delete APIs are implemented; fulfillment status is backend-ready but not surfaced in admin UI controls.
+Implemented parts:
+- Admin orders list API with pagination and filters.
+- Admin order id API with GET/PUT/DELETE.
+- Mutation layer validates status/paymentStatus/fulfillmentStatus values.
+- Admin orders table UI supports status/payment updates.
+Files:
+- `src/app/api/v1/admin/orders/route.ts`
+- `src/app/api/v1/admin/orders/[id]/route.ts`
+- `src/lib/services/admin/admin-orders.service.ts`
+- `src/lib/services/admin/admin-orders/order-mutations.ts`
+- `src/lib/services/admin/admin-orders/query-builder.ts`
+- `src/app/admin/orders/useOrders.ts`
+- `src/app/admin/orders/components/OrderRow.tsx`
+- `src/app/admin/orders/components/OrderDetailsModal.tsx`
+Missing:
+- Fulfillment status management is not exposed in current admin order row UI despite backend support.
+- Not verified from current codebase: business policy correctness for hard delete of orders.
+Next implementation scope:
+- Add fulfillment status UI controls and filters.
+- Add audit-safe delete policy (soft delete or role/audit constraints) if required.
+Execution order: 15
+
+## 16. Inventory and stock management
+Status: Partially implemented
+Completion: 65%
+Summary:
+- Stock exists at variant level and is enforced in cart/checkout, but there is no dedicated inventory module with reservation/reconciliation workflows.
+Implemented parts:
+- Variant stock field in schema and non-negative DB check migration.
+- Cart add/update validates against available stock.
+- Checkout decrements stock atomically in transaction.
+- Admin product forms expose stock editing for simple/variant products.
+Files:
+- `shared/db/prisma/schema.prisma`
+- `shared/db/prisma/migrations/20260223100000_add_stock_non_negative_check/migration.sql`
+- `src/lib/services/cart.service.ts`
+- `src/lib/services/orders.service.ts`
+- `src/app/admin/products/add/components/VariantBuilder.tsx`
+- `src/app/admin/products/add/components/SimpleProductFields.tsx`
+- `src/lib/services/admin/admin-stats/stats-calculator.ts`
+Missing:
+- `stockReserved` is not used in live inventory reservation logic.
+- No dedicated inventory admin module for adjustments, movements, or reservation views.
+- Order cancel/update flow does not restore stock quantities.
+Next implementation scope:
+- Introduce reservation lifecycle (`stockReserved`) and release/commit semantics.
+- Add inventory adjustment APIs/UI and stock reconciliation reporting.
+- Implement restock-on-cancel policy where business rules require it.
+Execution order: 16
+
+## 17. Analytics Dashboard
+Status: Mostly implemented
+Completion: 80%
+Summary:
+- Admin analytics APIs and UI are present with period-based metrics and charts; there is overlap with main admin dashboard summaries.
+Implemented parts:
+- Analytics endpoint with period/date filters.
+- Stats endpoint and dashboard widget endpoints are available.
+- Analytics page and hook consume analytics/stats APIs.
+- Core aggregation logic implemented in admin stats analytics service.
+Files:
+- `src/app/api/v1/admin/analytics/route.ts`
+- `src/app/api/v1/admin/stats/route.ts`
+- `src/app/api/v1/admin/dashboard/recent-orders/route.ts`
+- `src/app/api/v1/admin/dashboard/top-products/route.ts`
+- `src/app/api/v1/admin/user-activity/route.ts`
+- `src/lib/services/admin/admin-stats.service.ts`
+- `src/lib/services/admin/admin-stats/analytics.ts`
+- `src/app/admin/analytics/page.tsx`
+- `src/app/admin/analytics/hooks/useAnalytics.ts`
+- `src/app/admin/page.tsx`
+- `src/app/admin/hooks/useAdminDashboard.ts`
+Missing:
+- Potential duplication/overlap between `/admin` and `/admin/analytics` surfaces is not consolidated.
+- Not verified from current codebase: metric accuracy against real production data and timezone/business-calendar expectations.
+Next implementation scope:
+- Define a single analytics source-of-truth contract reused by both dashboard surfaces.
+- Add metric definitions/tests for period boundaries and currency normalization.
+Execution order: 17
+
+## 18. Global search
+Status: Mostly implemented
+Completion: 90%
+Summary:
+- Storefront instant search is implemented end-to-end (hook + API + dropdown UI), while admin search remains domain-specific (products/orders) and separate.
+Implemented parts:
+- Instant search hook with debounce, cancellation, keyboard handling.
+- Public search API queries published products by title/subtitle/SKU.
+- Header and search dropdown integrate instant results.
+- Admin products and admin orders have their own contextual `search` filters.
+Files:
+- `src/components/hooks/useInstantSearch.ts`
+- `src/components/SearchDropdown.tsx`
+- `src/components/Header.tsx`
+- `src/app/api/search/instant/route.ts`
+- `src/app/api/v1/admin/products/route.ts`
+- `src/app/api/v1/admin/orders/route.ts`
+Missing:
+- Search API versioning differs from v1 APIs (`/api/search/instant` vs `/api/v1/...`).
+- No dedicated global admin-wide search experience across entities.
+- Not verified from current codebase: relevance quality, typo tolerance, and scalability behavior under large catalogs.
+Next implementation scope:
+- Decide on unified versioning strategy for search routes.
+- Add optional relevance ranking/fuzzy matching and full-text indexing strategy.
+- Define whether “global search” includes admin cross-entity search and implement accordingly.
+Execution order: 18
+
+# IMPLEMENTATION QUEUE
+
+1. Define data model and migrations
+   - Current status: Mostly implemented (90%)
+   - Why it is or is not ready: Schema and migrations exist, but deployment/state verification and unused reservation fields need closure.
+   - Recommended next step: Verify migration state per environment and decide `stockReserved` lifecycle.
+
+2. Global layout: Header/Footer and navigation
+   - Current status: Mostly implemented (92%)
+   - Why it is or is not ready: Shell is complete, but route conventions and minor i18n consistency remain.
+   - Recommended next step: Standardize on canonical shop route and finish nav text i18n parity.
+
+3. Home page sections
+   - Current status: Mostly implemented (88%)
+   - Why it is or is not ready: Sections render fully, but source-of-truth ownership is not fully explicit.
+   - Recommended next step: Confirm dynamic content ownership and align section component semantics.
+
+4. Sorting options
+   - Current status: Partially implemented (78%)
+   - Why it is or is not ready: Sorting is mostly client-side and not guaranteed globally across paginated data.
+   - Recommended next step: Add server-side validated sorting in products API and DB query layer.
+
+5. Gallery and Zoom
+   - Current status: Mostly implemented (82%)
+   - Why it is or is not ready: Basic gallery + modal zoom work, advanced zoom UX is missing.
+   - Recommended next step: Implement enhanced zoom interaction model (pan/lens/swipe).
+
+6. Product info and variants
+   - Current status: Mostly implemented (85%)
+   - Why it is or is not ready: PDP and variant flows are solid, but product-type modeling remains implicit.
+   - Recommended next step: Decide if explicit product-type domain model is required and add tests.
+
+7. Related products and Reviews (v1 read-only)
+   - Current status: Partially implemented (65%)
+   - Why it is or is not ready: Related products are heuristic and reviews exceed read-only scope.
+   - Recommended next step: Enforce v1 read-only policy and build dedicated related-products backend contract.
+
+8. Cart actions and persistence
+   - Current status: Mostly implemented (85%)
+   - Why it is or is not ready: Auth + guest carts work, but persistence strategy is split and merge behavior is unclear.
+   - Recommended next step: Unify guest cart strategy and implement guest-to-user merge semantics.
+
+9. Checkout form implementation
+   - Current status: Mostly implemented (88%)
+   - Why it is or is not ready: UI/form wiring is complete; strict API boundary validation and payment finalization are pending.
+   - Recommended next step: Add shared request schema validation and finalize payment flow callbacks.
+
+10. Order summary and validations
+   - Current status: Partially implemented (75%)
+   - Why it is or is not ready: Core totals/stock checks exist, but discount/tax/payment URL remain TODO.
+   - Recommended next step: Implement promo/tax/payment computation paths and locale propagation.
+
+11. Profile and address management
+   - Current status: Mostly implemented (80%)
+   - Why it is or is not ready: Full CRUD exists but service payload typing/validation is weak.
+   - Recommended next step: Add strict DTO validation and remove `any` from profile/address service APIs.
+
+12. Order history and reorder
+   - Current status: Mostly implemented (88%)
+   - Why it is or is not ready: History works; reorder is client-loop based and non-atomic.
+   - Recommended next step: Add dedicated atomic reorder endpoint with structured partial-failure response.
+
+13. Products CRUD and media management
+   - Current status: Mostly implemented (88%)
+   - Why it is or is not ready: CRUD/media are strong, but stock filtering and infra readiness need hardening.
+   - Recommended next step: Move stock filters server-side and add media storage readiness checks.
+
+14. Categories/types and attributes management
+   - Current status: Mostly implemented (85%)
+   - Why it is or is not ready: Categories/attributes are complete; product types are not standalone.
+   - Recommended next step: Decide on first-class product type CRUD and add lifecycle tests.
+
+15. Orders list and status management
+   - Current status: Mostly implemented (82%)
+   - Why it is or is not ready: List/status/payment updates exist, but fulfillment controls are missing in UI.
+   - Recommended next step: Expose fulfillment status management in admin UI and enforce policy constraints.
+
+16. Inventory and stock management
+   - Current status: Partially implemented (65%)
+   - Why it is or is not ready: Stock checks exist, but no dedicated inventory workflows or reservation lifecycle.
+   - Recommended next step: Implement reservation/release flows and inventory adjustment module.
+
+17. Analytics Dashboard
+   - Current status: Mostly implemented (80%)
+   - Why it is or is not ready: Analytics features exist but overlap and metric governance remain.
+   - Recommended next step: Consolidate analytics contracts and add metric verification tests.
+
+18. Global search
+   - Current status: Mostly implemented (90%)
+   - Why it is or is not ready: Storefront instant search works; versioning/admin-global-search scope is unresolved.
+   - Recommended next step: Unify search API strategy and define/implement cross-entity admin search scope.
