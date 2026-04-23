@@ -656,10 +656,10 @@ Verification:
 Execution order: 17
 
 ## 18. Global search
-Status: Mostly implemented
-Completion: 90%
+Status: Completed
+Completion: 100%
 Summary:
-- Storefront instant search is implemented end-to-end (hook + API + dropdown UI), while admin search remains domain-specific (products/orders) and separate.
+- Global search is now versioned and unified: storefront instant search uses canonical v1 API routes and admin has a dedicated cross-entity global search endpoint for products and orders.
 Implemented parts:
 - Instant search hook with debounce, cancellation, keyboard handling.
 - Public search API queries published products by title/subtitle/SKU.
@@ -673,13 +673,23 @@ Files:
 - `src/app/api/v1/admin/products/route.ts`
 - `src/app/api/v1/admin/orders/route.ts`
 Missing:
-- Search API versioning differs from v1 APIs (`/api/search/instant` vs `/api/v1/...`).
-- No dedicated global admin-wide search experience across entities.
 - Not verified from current codebase: relevance quality, typo tolerance, and scalability behavior under large catalogs.
-Next implementation scope:
-- Decide on unified versioning strategy for search routes.
-- Add optional relevance ranking/fuzzy matching and full-text indexing strategy.
-- Define whether “global search” includes admin cross-entity search and implement accordingly.
+Implementation summary:
+- Added canonical storefront instant search endpoint `GET /api/v1/search/instant` and switched the storefront search hook to use it.
+- Preserved backward compatibility for existing clients by keeping `/api/search/instant` as a compatibility re-export to the v1 handler.
+- Added admin cross-entity global search endpoint `GET /api/v1/admin/search?q=...` that aggregates matching products and orders in one response.
+- Added unit coverage for admin global-search parameter normalization and result mapping.
+Files changed:
+- `src/app/api/v1/search/instant/route.ts`
+- `src/app/api/search/instant/route.ts`
+- `src/components/hooks/useInstantSearch.ts`
+- `src/app/api/v1/admin/search/route.ts`
+- `src/lib/search/admin-global-search.ts`
+- `src/lib/search/admin-global-search.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/search/admin-global-search.test.ts` (passed, 1 file / 4 tests)
+- `pnpm test` (passed, 23 files / 90 tests)
 Execution order: 18
 
 # IMPLEMENTATION QUEUE
@@ -770,6 +780,6 @@ Execution order: 18
    - Recommended next step: None.
 
 18. Global search
-   - Current status: Mostly implemented (90%)
-   - Why it is or is not ready: Storefront instant search works; versioning/admin-global-search scope is unresolved.
-   - Recommended next step: Unify search API strategy and define/implement cross-entity admin search scope.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Storefront instant search now uses canonical `/api/v1/search/instant` with a compatibility alias, and admin cross-entity search is implemented via `/api/v1/admin/search`.
+   - Recommended next step: Optional future improvements for relevance ranking, typo tolerance, and large-catalog indexing.

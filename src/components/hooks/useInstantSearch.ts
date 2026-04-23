@@ -60,7 +60,7 @@ export function useInstantSearch(options: UseInstantSearchOptions = {}) {
           limit: String(maxResults),
           lang,
         });
-        const res = await fetch(`/api/search/instant?${params.toString()}`, {
+        const res = await fetch(`/api/v1/search/instant?${params.toString()}`, {
           signal,
           cache: 'no-store',
           headers: { 'Cache-Control': 'no-cache' },
