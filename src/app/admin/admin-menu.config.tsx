@@ -122,6 +122,21 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     ),
   },
   {
+    id: 'promocodes',
+    label: t('admin.menu.promocodes'),
+    path: '/admin/promocodes',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 14l6-6m-5.5.5h.01m4.99 4.99h.01M5 7l4-4 10 10-4 4L5 7zm0 0l-2 2a2.828 2.828 0 000 4l4 4a2.828 2.828 0 004 0l2-2"
+        />
+      </svg>
+    ),
+  },
+  {
     id: 'users',
     label: t('admin.menu.users'),
     path: '/admin/users',
