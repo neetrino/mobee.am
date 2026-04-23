@@ -14,7 +14,7 @@ import { useAdminDashboard } from './hooks/useAdminDashboard';
 
 export default function AdminPanel() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading, user } = useAuth();
+  const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -73,19 +73,15 @@ export default function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      <div className="px-4 sm:px-6 lg:px-8 mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">{t('admin.dashboard.title')}</h1>
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-8">
         <AdminSidebar currentPath={currentPath} router={router} t={t} />
 
         {/* Main Content */}
         <div className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 max-w-7xl">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">{t('admin.dashboard.title')}</h1>
-            <p className="text-gray-600 mt-2">
-              {t('admin.dashboard.welcome').replace('{name}', user?.firstName || t('admin.dashboard.title'))}
-            </p>
-          </div>
-
           <StatsGrid stats={stats} statsLoading={statsLoading} />
 
           {/* Dashboard Sections */}

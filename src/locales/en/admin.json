@@ -17,7 +17,7 @@
     "settings": "Settings"
   },
   "dashboard": {
-    "title": "Admin Page",
+    "title": "Admin",
     "welcome": "Welcome back, {name}!",
     "totalUsers": "users",
     "totalProducts": "products",
