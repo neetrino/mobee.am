@@ -77,6 +77,14 @@ export function buildProductWhereClause(filters: ProductFilters): Prisma.Product
     };
   }
 
+  if (filters.stockStatus === "inStock") {
+    where.AND = [...(where.AND ?? []), { variants: { some: { stock: { gt: 0 } } } }];
+  }
+
+  if (filters.stockStatus === "outOfStock") {
+    where.AND = [...(where.AND ?? []), { variants: { none: { stock: { gt: 0 } } } }];
+  }
+
   return where;
 }
 

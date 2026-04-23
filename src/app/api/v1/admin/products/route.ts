@@ -17,6 +17,7 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
     minPrice?: number;
     maxPrice?: number;
     sort?: string;
+    stockStatus?: "all" | "inStock" | "outOfStock";
   };
   error?: {
     type: string;
@@ -102,6 +103,9 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
   // Обработка categories
   const categoryParam = searchParams.get("category");
   const categories = categoryParam ? categoryParam.split(',').filter(Boolean) : undefined;
+  const stockParam = searchParams.get("stock")?.trim();
+  const stockStatus =
+    stockParam === "inStock" || stockParam === "outOfStock" ? stockParam : "all";
 
   return {
     filters: {
@@ -113,6 +117,7 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
       minPrice,
       maxPrice,
       sort: searchParams.get("sort")?.trim() || undefined,
+      stockStatus,
     },
   };
 }

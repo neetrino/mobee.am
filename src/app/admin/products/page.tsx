@@ -154,32 +154,15 @@ export default function ProductsPage() {
         params.sort = sortBy;
       }
 
+      if (stockFilter !== 'all') {
+        params.stock = stockFilter;
+      }
+
       const response = await apiClient.get<ProductsResponse>('/api/v1/admin/products', {
         params,
       });
-      
-      let filteredProducts = response.data || [];
 
-      // Stock filter (client-side)
-      if (stockFilter !== 'all') {
-        filteredProducts = filteredProducts.filter(product => {
-          const getTotalStock = (p: Product) => {
-            if (p.colorStocks && p.colorStocks.length > 0) {
-              return p.colorStocks.reduce((sum, cs) => sum + (cs.stock || 0), 0);
-            }
-            return p.stock ?? 0;
-          };
-          const totalStock = getTotalStock(product);
-          if (stockFilter === 'inStock') {
-            return totalStock > 0;
-          } else if (stockFilter === 'outOfStock') {
-            return totalStock === 0;
-          }
-          return true;
-        });
-      }
-
-      setProducts(filteredProducts);
+      setProducts(response.data || []);
       setMeta(response.meta || null);
     } catch (err: any) {
       console.error('❌ [ADMIN] Error fetching products:', err);

@@ -433,8 +433,8 @@ Verification:
 Execution order: 12
 
 ## 13. Products CRUD and media management
-Status: Mostly implemented
-Completion: 88%
+Status: Completed
+Completion: 100%
 Summary:
 - Admin product management is feature-rich with list/create/update/delete and media upload, wired to backend services.
 Implemented parts:
@@ -454,11 +454,24 @@ Files:
 - `src/lib/services/admin/admin-products-create.service.ts`
 - `src/lib/services/admin/admin-products-update.service.ts`
 Missing:
-- Infra-dependent media upload readiness is Not verified from current codebase (depends on R2 env).
-- Admin list stock filtering is partially client-side and can drift from server pagination metadata.
-Next implementation scope:
-- Move stock/inventory filters to backend query contract for correct paging/counts.
-- Add explicit media health checks and fallback handling around storage configuration.
+- None.
+Implementation summary:
+- Added backend stock filter contract (`stock=inStock|outOfStock`) for admin products list API and wired it into query builder logic so pagination/count metadata stays consistent with filtered result sets.
+- Removed client-side stock filtering in admin products page and forwarded stock filter to backend query params.
+- Added explicit media storage health endpoint (`GET /api/v1/admin/products/upload-images`) exposing readiness/missing R2 variables.
+- Added upload fallback behavior: when R2 is not configured, upload route returns inline image URLs with explicit fallback metadata instead of failing hard.
+Files changed:
+- `src/app/api/v1/admin/products/route.ts`
+- `src/lib/services/admin/admin-products-read/types.ts`
+- `src/lib/services/admin/admin-products-read/query-builder.ts`
+- `src/lib/services/admin/admin-products-read/query-builder.test.ts`
+- `src/app/admin/products/page.tsx`
+- `src/app/api/v1/admin/products/upload-images/route.ts`
+- `src/app/api/v1/admin/products/upload-images/route.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/services/admin/admin-products-read/query-builder.test.ts src/app/api/v1/admin/products/upload-images/route.test.ts` (passed, 2 files / 5 tests)
+- `pnpm test` (passed, 15 files / 65 tests)
 Execution order: 13
 
 ## 14. Categories/types and attributes management
@@ -665,9 +678,9 @@ Execution order: 18
    - Recommended next step: None.
 
 13. Products CRUD and media management
-   - Current status: Mostly implemented (88%)
-   - Why it is or is not ready: CRUD/media are strong, but stock filtering and infra readiness need hardening.
-   - Recommended next step: Move stock filters server-side and add media storage readiness checks.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Stock filtering now runs server-side for reliable pagination/count metadata, and media upload exposes storage health plus inline fallback when R2 is not configured.
+   - Recommended next step: None.
 
 14. Categories/types and attributes management
    - Current status: Mostly implemented (85%)

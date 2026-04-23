@@ -4,6 +4,11 @@ import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
 import { uploadToR2, isR2Configured } from "@/lib/r2";
 import { logger } from "@/lib/utils/logger";
 
+type R2HealthStatus = {
+  configured: boolean;
+  missing: string[];
+};
+
 const MIME_TO_EXT: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/jpg": "jpg",
@@ -19,6 +24,36 @@ function parseDataUrl(dataUrl: string): { mime: string; buffer: Buffer } | null 
   const base64 = match[2];
   const buffer = Buffer.from(base64, "base64");
   return { mime, buffer };
+}
+
+function getR2HealthStatus(): R2HealthStatus {
+  const requiredVars = [
+    "R2_ACCOUNT_ID",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+    "R2_BUCKET_NAME",
+    "R2_PUBLIC_URL",
+  ] as const;
+  const missing = requiredVars.filter((key) => !process.env[key]);
+  return {
+    configured: isR2Configured(),
+    missing,
+  };
+}
+
+export async function GET(req: NextRequest) {
+  const health = getR2HealthStatus();
+  return NextResponse.json(
+    {
+      storage: {
+        provider: "r2",
+        configured: health.configured,
+        mode: health.configured ? "remote" : "inline-fallback",
+        missing: health.missing,
+      },
+    },
+    { status: 200 }
+  );
 }
 
 /**
@@ -43,20 +78,6 @@ export async function POST(req: NextRequest) {
           instance: req.url,
         },
         { status: 403 }
-      );
-    }
-
-    if (!isR2Configured()) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/config-error",
-          title: "Storage not configured",
-          status: 503,
-          detail:
-            "R2 is not configured. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL in .env",
-          instance: req.url,
-        },
-        { status: 503 }
       );
     }
 
@@ -107,6 +128,24 @@ export async function POST(req: NextRequest) {
       validImages.push(image);
     }
 
+    const r2Health = getR2HealthStatus();
+    if (!r2Health.configured) {
+      logger.warn("Admin upload images: storage fallback to inline mode", {
+        missing: r2Health.missing,
+      });
+      return NextResponse.json(
+        {
+          urls: validImages,
+          storage: {
+            provider: "inline",
+            fallback: true,
+            missing: r2Health.missing,
+          },
+        },
+        { status: 200 }
+      );
+    }
+
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const urls: string[] = [];
 
@@ -146,7 +185,17 @@ export async function POST(req: NextRequest) {
     const totalTime = Date.now() - requestStartTime;
     logger.info("Admin upload images: done", { count: urls.length, totalTime });
 
-    return NextResponse.json({ urls }, { status: 200 });
+    return NextResponse.json(
+      {
+        urls,
+        storage: {
+          provider: "r2",
+          fallback: false,
+          missing: [],
+        },
+      },
+      { status: 200 }
+    );
   } catch (error: unknown) {
     const totalTime = Date.now() - requestStartTime;
     const err = error as { message?: string; status?: number; type?: string; title?: string; detail?: string };
