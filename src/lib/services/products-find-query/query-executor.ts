@@ -3,6 +3,7 @@ import { db } from "@white-shop/db";
 import { ensureProductVariantAttributesColumn } from "../../utils/db-ensure";
 import { logger } from "../../utils/logger";
 import type { ProductWithRelations } from "./types";
+import type { ProductSortOption } from "@/lib/products/sort";
 
 /**
  * Base include configuration for product queries
@@ -111,9 +112,11 @@ function isAttributeValuesColorsError(error: unknown): boolean {
 export async function executeProductQuery(
   where: Prisma.ProductWhereInput,
   limit: number,
-  skip: number = 0
+  skip: number = 0,
+  sort: ProductSortOption = "default"
 ): Promise<ProductWithRelations[]> {
   const baseInclude = getBaseInclude();
+  const orderBy = getOrderBy(sort);
 
   try {
     const products = await db.product.findMany({
@@ -122,6 +125,7 @@ export async function executeProductQuery(
         ...baseInclude,
         ...getProductAttributesInclude(),
       },
+      orderBy,
       skip,
       take: limit,
     });
@@ -133,7 +137,7 @@ export async function executeProductQuery(
       logger.warn('product_attributes table not found, fetching without it', { 
         error: error instanceof Error ? error.message : String(error) 
       });
-      return executeWithoutProductAttributes(where, limit, skip);
+      return executeWithoutProductAttributes(where, limit, skip, sort);
     }
 
     if (isVariantAttributesError(error)) {
@@ -143,13 +147,14 @@ export async function executeProductQuery(
         const products = await db.product.findMany({
           where,
           include: baseInclude,
+          orderBy,
           skip,
           take: limit,
         });
         logger.info(`Found ${products.length} products from database (after creating attributes column)`);
         return products as unknown as ProductWithRelations[];
       } catch (attributesError: unknown) {
-        return handleAttributesError(attributesError, where, limit, skip);
+        return handleAttributesError(attributesError, where, limit, skip, sort);
       }
     }
 
@@ -157,7 +162,7 @@ export async function executeProductQuery(
       logger.warn('attribute_values.colors column not found, fetching without attributeValue', { 
         error: error instanceof Error ? error.message : String(error) 
       });
-      return executeWithoutAttributeValue(where, limit, skip);
+      return executeWithoutAttributeValue(where, limit, skip, sort);
     }
 
     throw error;
@@ -170,14 +175,17 @@ export async function executeProductQuery(
 async function executeWithoutProductAttributes(
   where: Prisma.ProductWhereInput,
   limit: number,
-  skip: number = 0
+  skip: number = 0,
+  sort: ProductSortOption = "default"
 ): Promise<ProductWithRelations[]> {
   const baseInclude = getBaseInclude();
+  const orderBy = getOrderBy(sort);
 
   try {
     const products = await db.product.findMany({
       where,
       include: baseInclude,
+      orderBy,
       skip,
       take: limit,
     });
@@ -191,13 +199,14 @@ async function executeWithoutProductAttributes(
         const products = await db.product.findMany({
           where,
           include: baseInclude,
+          orderBy,
           skip,
           take: limit,
         });
         logger.info(`Found ${products.length} products from database (after creating attributes column)`);
         return products as unknown as ProductWithRelations[];
       } catch (attributesError: unknown) {
-        return handleAttributesError(attributesError, where, limit, skip);
+        return handleAttributesError(attributesError, where, limit, skip, sort);
       }
     }
 
@@ -205,7 +214,7 @@ async function executeWithoutProductAttributes(
       logger.warn('attribute_values.colors column not found, fetching without attributeValue', { 
         error: retryError instanceof Error ? retryError.message : String(retryError) 
       });
-      return executeWithoutAttributeValue(where, limit, skip);
+      return executeWithoutAttributeValue(where, limit, skip, sort);
     }
 
     throw retryError;
@@ -219,13 +228,14 @@ async function handleAttributesError(
   error: unknown,
   where: Prisma.ProductWhereInput,
   limit: number,
-  skip: number = 0
+  skip: number = 0,
+  sort: ProductSortOption = "default"
 ): Promise<ProductWithRelations[]> {
   if (isAttributeValuesColorsError(error)) {
     logger.warn('attribute_values.colors column not found, fetching without attributeValue', { 
       error: error instanceof Error ? error.message : String(error) 
     });
-    return executeWithoutAttributeValue(where, limit, skip);
+    return executeWithoutAttributeValue(where, limit, skip, sort);
   }
   throw error;
 }
@@ -236,9 +246,11 @@ async function handleAttributesError(
 async function executeWithoutAttributeValue(
   where: Prisma.ProductWhereInput,
   limit: number,
-  skip: number = 0
+  skip: number = 0,
+  sort: ProductSortOption = "default"
 ): Promise<ProductWithRelations[]> {
   const baseIncludeWithoutAttributeValue = getBaseIncludeWithoutAttributeValue();
+  const orderBy = getOrderBy(sort);
 
   // Try to include productAttributes even in fallback
   try {
@@ -248,6 +260,7 @@ async function executeWithoutAttributeValue(
         ...baseIncludeWithoutAttributeValue,
         ...getProductAttributesInclude(),
       },
+      orderBy,
       skip,
       take: limit,
     });
@@ -259,6 +272,7 @@ async function executeWithoutAttributeValue(
       const products = await db.product.findMany({
         where,
         include: baseIncludeWithoutAttributeValue,
+        orderBy,
         skip,
         take: limit,
       });
@@ -266,6 +280,17 @@ async function executeWithoutAttributeValue(
       return products as unknown as ProductWithRelations[];
     }
     throw productAttrError;
+  }
+}
+
+function getOrderBy(sort: ProductSortOption): Prisma.ProductOrderByWithRelationInput[] {
+  switch (sort) {
+    case "price-asc":
+      return [{ variants: { _min: { price: "asc" } } }, { createdAt: "desc" }];
+    case "price-desc":
+      return [{ variants: { _max: { price: "desc" } } }, { createdAt: "desc" }];
+    default:
+      return [{ createdAt: "desc" }];
   }
 }
 

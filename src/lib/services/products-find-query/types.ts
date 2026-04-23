@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import type { ProductSortOption } from "@/lib/products/sort";
 
 /**
  * Product filters interface
@@ -12,7 +13,7 @@ export interface ProductFilters {
   colors?: string;
   sizes?: string;
   brand?: string;
-  sort?: string;
+  sort?: ProductSortOption;
   page?: number;
   limit?: number;
   lang?: string;

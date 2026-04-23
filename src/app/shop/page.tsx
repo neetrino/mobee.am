@@ -12,6 +12,7 @@ import { CategoryNavigation } from '../../components/CategoryNavigation';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
+import { parseProductSortOption, type ProductSortOption } from '@/lib/products/sort';
 
 const PAGE_CONTAINER = 'mx-auto w-full max-w-[1917px] px-4 sm:px-6 lg:px-[53px]';
 // Container for filters section to align with Header logo (same Y-axis)
@@ -60,6 +61,7 @@ async function getProducts(
   colors?: string,
   sizes?: string,
   brand?: string,
+  sort: ProductSortOption = "default",
   limit: number = 12
 ): Promise<ProductsResponse> {
   try {
@@ -77,6 +79,7 @@ async function getProducts(
     if (colors?.trim()) params.colors = colors.trim();
     if (sizes?.trim()) params.sizes = sizes.trim();
     if (brand?.trim()) params.brand = brand.trim();
+    if (sort !== "default") params.sort = sort;
 
     const queryString = new URLSearchParams(params).toString();
 
@@ -114,7 +117,11 @@ async function getProducts(
 /**
  * PAGE
  */
-export default async function ProductsPage({ searchParams }: any) {
+interface ProductsPageProps {
+  searchParams?: Promise<Record<string, string | undefined>> | Record<string, string | undefined>;
+}
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = searchParams ? await searchParams : {};
   const page = parseInt(params?.page || "1", 10);
   const limitParam = params?.limit?.toString().trim();
@@ -122,6 +129,8 @@ export default async function ProductsPage({ searchParams }: any) {
     ? parseInt(limitParam, 10)
     : null;
   const perPage = parsedLimit ? Math.min(parsedLimit, 200) : 12;
+
+  const sort = parseProductSortOption(params?.sort);
 
   const productsData = await getProducts(
     page,
@@ -132,6 +141,7 @@ export default async function ProductsPage({ searchParams }: any) {
     params?.colors,
     params?.sizes,
     params?.brand,
+    sort,
     perPage
   );
 
@@ -139,7 +149,10 @@ export default async function ProductsPage({ searchParams }: any) {
   // 🔧 FIX: normalize products 
   // add missing inStock, missing image fields 
   // ------------------------------------
-  const normalizedProducts = productsData.data.map((p: any) => ({
+  const normalizedProducts = productsData.data.map((p: Product & {
+    defaultVariantId?: string | null;
+    colors?: string[];
+  }) => ({
     id: p.id,
     slug: p.slug,
     title: p.title,
@@ -234,7 +247,7 @@ export default async function ProductsPage({ searchParams }: any) {
 
           {normalizedProducts.length > 0 ? (
             <>
-              <ProductsGrid products={normalizedProducts} sortBy={params?.sort || "default"} />
+              <ProductsGrid products={normalizedProducts} sortBy={sort} />
 
               {productsData.meta.totalPages > 1 && (
                 <nav

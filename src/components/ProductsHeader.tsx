@@ -3,10 +3,9 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useTranslation } from '../lib/i18n-client';
+import { parseProductSortOption, type ProductSortOption } from '@/lib/products/sort';
 
 type ViewMode = 'list' | 'grid-2' | 'grid-3';
-type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
-
 interface ProductsHeaderProps {
   /**
    * Ընդհանուր ապրանքների քանակը՝ բոլոր էջերում (from API meta.total)
@@ -23,12 +22,12 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>('grid-2');
-  const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [sortBy, setSortBy] = useState<ProductSortOption>('default');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
   const mobileSortDropdownRef = useRef<HTMLDivElement>(null);
 
-  const sortOptions: { value: SortOption; label: string }[] = [
+  const sortOptions: { value: ProductSortOption; label: string }[] = [
     { value: 'default', label: t('products.header.sort.default') },
     { value: 'price-asc', label: t('products.header.sort.priceAsc') },
     { value: 'price-desc', label: t('products.header.sort.priceDesc') },
@@ -62,10 +61,7 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
 
   // Load sort from URL params
   useEffect(() => {
-    const sortParam = searchParams.get('sort') as SortOption;
-    if (sortParam && sortOptions.some(opt => opt.value === sortParam)) {
-      setSortBy(sortParam);
-    }
+    setSortBy(parseProductSortOption(searchParams.get('sort')));
   }, [searchParams]);
 
   // Close dropdown when clicking outside
@@ -93,7 +89,7 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
     window.dispatchEvent(new CustomEvent('view-mode-changed', { detail: mode }));
   };
 
-  const handleSortChange = (option: SortOption) => {
+  const handleSortChange = (option: ProductSortOption) => {
     setSortBy(option);
     setShowSortDropdown(false);
     
@@ -107,7 +103,8 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
     // Reset to page 1 when sorting changes
     params.delete('page');
     
-    router.push(`/products?${params.toString()}`);
+    const queryString = params.toString();
+    router.push(queryString ? `/shop?${queryString}` : '/shop');
   };
 
   const handleClearFilters = () => {
@@ -119,7 +116,7 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
     params.delete('page');
 
     const queryString = params.toString();
-    router.push(queryString ? `/products?${queryString}` : '/products');
+    router.push(queryString ? `/shop?${queryString}` : '/shop');
   };
 
   const handleLimitChange = (value: string | number) => {
@@ -131,7 +128,7 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
       params.set('limit', '12');
     }
     params.delete('page');
-    router.replace(`/products?${params.toString()}`, { scroll: false });
+    router.replace(`/shop?${params.toString()}`, { scroll: false });
   };
 
   return (

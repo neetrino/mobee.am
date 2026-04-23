@@ -144,7 +144,7 @@ class ProductsFindFilterService {
     }
 
     // Sort
-    const { filter, sort = "createdAt" } = filters;
+    const { filter, sort = "default" } = filters;
     if (filter === "bestseller" && bestsellerProductIds.length > 0) {
       const rank = new Map<string, number>();
       bestsellerProductIds.forEach((id, index) => rank.set(id, index));
@@ -153,19 +153,35 @@ class ProductsFindFilterService {
         const bRank = rank.get(b.id) ?? Number.MAX_SAFE_INTEGER;
         return aRank - bRank;
       });
-    } else if (sort === "price") {
+    } else if (sort === "price-asc" || sort === "price-desc") {
       products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
         const aVariants = Array.isArray(a.variants) ? a.variants : [];
         const bVariants = Array.isArray(b.variants) ? b.variants : [];
         const aPrice = aVariants.length > 0 ? Math.min(...aVariants.map((v: { price: number }) => v.price)) : 0;
         const bPrice = bVariants.length > 0 ? Math.min(...bVariants.map((v: { price: number }) => v.price)) : 0;
-        return bPrice - aPrice;
+        return sort === "price-asc" ? aPrice - bPrice : bPrice - aPrice;
+      });
+    } else if (sort === "name-asc" || sort === "name-desc") {
+      products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
+        const locale = filters.lang || "en";
+        const aTitle =
+          a.translations.find((translation: { locale: string }) => translation.locale === locale)?.title ||
+          a.translations[0]?.title ||
+          "";
+        const bTitle =
+          b.translations.find((translation: { locale: string }) => translation.locale === locale)?.title ||
+          b.translations[0]?.title ||
+          "";
+        const compare = aTitle.localeCompare(bTitle, locale, { sensitivity: "base" });
+        return sort === "name-asc" ? compare : -compare;
+      });
+    } else if (sort === "default") {
+      products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
     } else {
       products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
-        const aValue = a[sort as keyof typeof a] as Date;
-        const bValue = b[sort as keyof typeof b] as Date;
-        return new Date(bValue).getTime() - new Date(aValue).getTime();
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
     }
 

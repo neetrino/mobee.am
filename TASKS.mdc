@@ -105,25 +105,29 @@ Verification:
 Execution order: 3
 
 ## 4. Sorting options
-Status: Partially implemented
-Completion: 78%
+Status: Completed
+Completion: 100%
 Summary:
-- Sorting UI and client-side sorting exist, but server-side global sorting is not fully wired for catalog APIs.
+- Sorting is now validated at API boundary and consistently wired from storefront query params to backend sorting logic.
 Implemented parts:
 - Sort dropdown supports default/price/name asc-desc and writes `sort` to query params.
-- Product grid applies sort in browser on fetched dataset.
-- Shop page passes sort to grid component.
+- Shop page forwards validated `sort` to `/api/v1/products`.
+- Products API validates incoming sort option against allowed values.
+- Products query service propagates sort through query execution and in-memory fallback sorting.
+- Products header now uses canonical `/shop` routes for sort/filter/limit interactions.
 Files:
 - `src/components/ProductsHeader.tsx`
 - `src/components/ProductsGrid.tsx`
 - `src/app/shop/page.tsx`
 - `src/app/products/page.tsx`
-Missing:
-- `getProducts` in shop page does not forward `sort` to `/api/v1/products`, so sorting is page-local, not backend-global.
-- Route usage still pushes sort to `/products?...` and relies on redirect.
-Next implementation scope:
-- Add validated sort params to `/api/v1/products` query pipeline and DB ordering.
-- Keep client sort only as fallback for already-fetched local arrays.
+ - `src/app/api/v1/products/route.ts`
+ - `src/lib/products/sort.ts`
+ - `src/lib/services/products-find-query.service.ts`
+ - `src/lib/services/products-find-query/query-executor.ts`
+ - `src/lib/services/products-find-filter.service.ts`
+Verification:
+- `pnpm test src/lib/products/sort.test.ts src/lib/services/products-find-filter.service.test.ts` (passed, 2 files / 6 tests)
+- `pnpm test` (passed, 5 files / 25 tests)
 Execution order: 4
 
 ## 5. Gallery and Zoom
@@ -520,9 +524,9 @@ Execution order: 18
    - Recommended next step: None.
 
 4. Sorting options
-   - Current status: Partially implemented (78%)
-   - Why it is or is not ready: Sorting is mostly client-side and not guaranteed globally across paginated data.
-   - Recommended next step: Add server-side validated sorting in products API and DB query layer.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Sort parameters are validated end-to-end and storefront routing now uses canonical `/shop` paths.
+   - Recommended next step: None.
 
 5. Gallery and Zoom
    - Current status: Mostly implemented (82%)

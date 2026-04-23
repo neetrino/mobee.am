@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { useTranslation } from '../lib/i18n-client';
+import type { ProductSortOption } from '@/lib/products/sort';
 
 interface Product {
   id: string;
@@ -23,7 +24,7 @@ type ViewMode = 'list' | 'grid-2' | 'grid-3';
 
 interface ProductsGridProps {
   products: Product[];
-  sortBy?: string;
+  sortBy?: ProductSortOption;
 }
 
 export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
