@@ -2,8 +2,8 @@
  * Figma mobee-new Top Bar (node 1:408) — MCP asset URLs (refresh from Figma if expired).
  */
 export const HEADER_FIGMA_ASSETS = {
-  compare: 'https://www.figma.com/api/mcp/asset/904bd9f4-26a1-48ea-8116-fde9cc719851',
-  cart: 'https://www.figma.com/api/mcp/asset/9cca524c-79b1-4a28-bc01-5b32a789fbee',
-  wishlist: 'https://www.figma.com/api/mcp/asset/56872889-15a2-48ee-a93c-3a307b03802d',
-  account: 'https://www.figma.com/api/mcp/asset/17ac5159-2768-446a-98f9-0e3eec5d158c',
+  compare: 'https://www.figma.com/api/mcp/asset/c4998bc1-83db-46d4-ad13-6a74455ed4c1',
+  signIn: 'https://www.figma.com/api/mcp/asset/028fa92a-e51e-4397-8ffe-ae148fc4ebdf',
+  cart: 'https://www.figma.com/api/mcp/asset/4f27a789-0831-4a14-9c48-b955dacfdde9',
+  favorite: 'https://www.figma.com/api/mcp/asset/cfe7c5ee-e5f7-4db9-98c7-532948a38221',
 } as const;

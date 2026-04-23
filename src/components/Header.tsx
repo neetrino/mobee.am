@@ -342,9 +342,8 @@ export function Header() {
       ? 'whitespace-nowrap text-[13px] font-black leading-5 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
       : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
 
-  /** Icon captions hidden below `xl` so the desktop bar fits down to `lg`. */
   const utilityLabelClass =
-    'mt-1 hidden max-w-[92px] text-center text-[14px] font-medium leading-[15px] text-[#4b5563] xl:block';
+    'mt-1 text-center text-[13px] font-medium leading-[15px] text-[#4b5563] xl:text-[16px]';
   const mobileCurrencyRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const productsMenuRef = useRef<HTMLDivElement>(null);
@@ -825,10 +824,10 @@ export function Header() {
             </nav>
           </div>
 
-          <div className="flex min-w-0 shrink-0 items-center justify-end gap-2 lg:gap-3 xl:gap-6 2xl:gap-[70px]">
+          <div className="flex min-w-0 shrink-0 items-center justify-end gap-3 lg:gap-4 xl:gap-8 2xl:gap-12">
             <Link
               href="/compare"
-              className="flex w-[32px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
+              className="flex w-[35px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
             >
                 <span className="relative h-5 w-5 shrink-0">
                 <img
@@ -842,41 +841,7 @@ export function Header() {
               <span className={utilityLabelClass}>{t('common.navigation.compare')}</span>
             </Link>
 
-            <Link href="/cart" className="relative flex w-[30px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90">
-              <span className="relative h-5 w-5 shrink-0">
-                <img
-                  src={HEADER_FIGMA_ASSETS.cart}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="block size-5 max-w-none"
-                />
-                {cartCount > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#2db2ff] pb-px text-[9px] font-normal leading-[13px] text-white">
-                    {cartCount > 99 ? '99+' : cartCount}
-                  </span>
-                )}
-              </span>
-              <span className={utilityLabelClass}>{t('common.navigation.cart')}</span>
-            </Link>
-
-            <Link
-              href="/wishlist"
-              className="flex w-[49px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
-            >
-              <span className="relative h-5 w-5 shrink-0">
-                <img
-                  src={HEADER_FIGMA_ASSETS.wishlist}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="absolute inset-0 block size-5 max-w-none"
-                />
-              </span>
-              <span className={utilityLabelClass}>{t('common.navigation.wishlist')}</span>
-            </Link>
-
-            <div className="relative flex w-[44px] flex-col items-center" ref={userMenuRef}>
+            <div className="relative flex w-[47px] flex-col items-center" ref={userMenuRef}>
               {isLoggedIn ? (
                 <>
                   <button
@@ -887,7 +852,7 @@ export function Header() {
                   >
                     <span className="relative h-5 w-5 shrink-0">
                       <img
-                        src={HEADER_FIGMA_ASSETS.account}
+                        src={HEADER_FIGMA_ASSETS.signIn}
                         alt=""
                         width={20}
                         height={20}
@@ -940,17 +905,51 @@ export function Header() {
                 >
                   <span className="relative h-5 w-5 shrink-0">
                     <img
-                      src={HEADER_FIGMA_ASSETS.account}
+                      src={HEADER_FIGMA_ASSETS.signIn}
                       alt=""
                       width={20}
                       height={20}
                       className="absolute inset-0 block size-5 max-w-none"
                     />
                   </span>
-                  <span className={`${utilityLabelClass} max-w-[60px]`}>{t('common.navigation.login')}</span>
+                  <span className={utilityLabelClass}>{t('common.navigation.login')}</span>
                 </Link>
               )}
             </div>
+
+            <Link href="/cart" className="relative flex w-[33px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90">
+              <span className="relative h-5 w-5 shrink-0">
+                <img
+                  src={HEADER_FIGMA_ASSETS.cart}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="block size-5 max-w-none"
+                />
+                {cartCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#2db2ff] pb-px text-[9px] font-normal leading-[13px] text-white">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </span>
+              <span className={utilityLabelClass}>{t('common.navigation.cart')}</span>
+            </Link>
+
+            <Link
+              href="/wishlist"
+              className="flex w-[53px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
+            >
+              <span className="relative h-5 w-5 shrink-0">
+                <img
+                  src={HEADER_FIGMA_ASSETS.favorite}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="absolute inset-0 block size-5 max-w-none"
+                />
+              </span>
+              <span className={utilityLabelClass}>{t('common.navigation.wishlist')}</span>
+            </Link>
 
             <LanguageSwitcherPill />
           </div>
