@@ -279,8 +279,8 @@ Verification:
 Execution order: 8
 
 ## 9. Checkout form implementation
-Status: Mostly implemented
-Completion: 88%
+Status: Completed
+Completion: 100%
 Summary:
 - Checkout UI, form state, validation, delivery price integration, and order submission wiring are implemented.
 Implemented parts:
@@ -288,6 +288,7 @@ Implemented parts:
 - Form uses `react-hook-form` with Zod schema via resolver.
 - Delivery pricing hook and order submission hooks are integrated.
 - Route for checkout submission exists and calls order service.
+- Checkout API route now enforces strict shared DTO schema validation at the API boundary.
 Files:
 - `src/app/checkout/page.tsx`
 - `src/app/checkout/CheckoutForm.tsx`
@@ -296,12 +297,18 @@ Files:
 - `src/app/checkout/hooks/useOrderSubmission.ts`
 - `src/app/checkout/hooks/useDeliveryPrice.ts`
 - `src/app/api/v1/orders/checkout/route.ts`
+ - `src/lib/schemas/checkout.schema.ts`
+ - `src/lib/schemas/checkout.schema.test.ts`
 Missing:
-- API route does not apply explicit request schema validation before service call (service-level validation is partial).
 - Not verified from current codebase: external payment provider redirect lifecycle.
-Next implementation scope:
-- Add shared DTO schema validation in route handler for strict API boundary checks.
-- Finalize payment flow orchestration and callback/redirect handling.
+Implementation summary:
+- Added `checkout.schema` with strict request contracts (cart/items, email/phone, shipping/payment enums, delivery-city requirement).
+- Wired `POST /api/v1/orders/checkout` to parse request via shared schema before service execution.
+- Added explicit validation-error responses for schema failures with field-level issue details.
+- Added unit tests for valid cart/guest payloads and invalid boundary cases.
+Verification:
+- `pnpm test src/lib/schemas/checkout.schema.test.ts` (passed, 1 file / 4 tests)
+- `pnpm test` (passed, 9 files / 45 tests)
 Execution order: 9
 
 ## 10. Order summary and validations
@@ -595,9 +602,9 @@ Execution order: 18
    - Recommended next step: None.
 
 9. Checkout form implementation
-   - Current status: Mostly implemented (88%)
-   - Why it is or is not ready: UI/form wiring is complete; strict API boundary validation and payment finalization are pending.
-   - Recommended next step: Add shared request schema validation and finalize payment flow callbacks.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: UI/form wiring and strict route-level request schema validation are now implemented and verified by tests.
+   - Recommended next step: None.
 
 10. Order summary and validations
    - Current status: Partially implemented (75%)
