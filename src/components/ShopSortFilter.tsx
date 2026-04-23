@@ -59,11 +59,11 @@ export function ShopSortFilter() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-[275px]">
+    <div ref={containerRef} className="relative w-full max-w-[248px]">
       <button
         type="button"
         onClick={() => setOpen((currentOpen) => !currentOpen)}
-        className="flex w-full items-center justify-center gap-2 rounded-[9999px] border border-[#4B5563] px-[21px] pb-[13px] pt-[12px] text-left"
+        className="flex w-full items-center justify-between gap-2 rounded-[9999px] border border-[#4B5563] px-[21px] pb-[13px] pt-[12px]"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('products.header.sortProducts')}
@@ -73,7 +73,7 @@ export function ShopSortFilter() {
           <path d="M7 12H17" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
           <path d="M10 18H14" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
-        <span className="min-w-0 truncate text-[14px] font-normal leading-[20px] text-[#6B7280]">
+        <span className="min-w-0 flex-1 truncate text-left text-[14px] font-normal leading-[20px] text-[#6B7280]">
           {getSortLabel(activeSort, t)}
         </span>
         <svg
