@@ -11,6 +11,7 @@
     "users": "Users",
     "messages": "Messages",
     "analytics": "Analytics",
+    "inventory": "Inventory",
     "filterByPrice": "Filter by Price",
     "delivery": "Delivery",
     "settings": "Settings"
@@ -213,6 +214,22 @@
     "cancel": "Cancel",
     "savedSuccess": "Delivery settings successfully saved!",
     "errorSaving": "Error: {message}"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "subtitle": "Stock adjustments, reservations and reconciliation",
+    "reconciliation": "Reconciliation Summary",
+    "variants": "Variants",
+    "stockTotal": "Total Stock",
+    "stockReservedTotal": "Reserved Stock",
+    "stockAvailableTotal": "Available Stock",
+    "adjustStock": "Stock Adjustment",
+    "applyAdjustment": "Apply Adjustment",
+    "currentStock": "Current Stock",
+    "product": "Product",
+    "stock": "Stock",
+    "reserved": "Reserved",
+    "available": "Available"
   },
   "users": {
     "title": "Manage Users",

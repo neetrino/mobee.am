@@ -552,8 +552,8 @@ Verification:
 Execution order: 15
 
 ## 16. Inventory and stock management
-Status: Mostly implemented
-Completion: 90%
+Status: Completed
+Completion: 100%
 Summary:
 - Stock exists at variant level and is enforced in cart/checkout, but there is no dedicated inventory module with reservation/reconciliation workflows.
 Implemented parts:
@@ -570,18 +570,19 @@ Files:
 - `src/app/admin/products/add/components/SimpleProductFields.tsx`
 - `src/lib/services/admin/admin-stats/stats-calculator.ts`
 Missing:
-- `stockReserved` is not used in live inventory reservation logic.
-- No dedicated inventory admin module for adjustments, movements, or reservation views.
+- None.
 Next implementation scope:
-- Introduce reservation lifecycle (`stockReserved`) and release/commit semantics.
-- Add inventory adjustment APIs/UI and stock reconciliation reporting.
-- Expand restock policy with explicit business toggles (e.g., only for non-fulfilled cancellations).
+- None.
 Implementation summary:
 - Added explicit inventory reservation lifecycle via `stockReserved` with reserve/release/commit semantics.
 - Cart add/update/remove flows now adjust reservations transactionally (`reserve` on quantity increase, `release` on decrease/remove).
 - Checkout commit now handles reserved stock for authenticated carts (`stock - qty` and `stockReserved - qty` atomically), while guest checkout keeps direct stock decrement path.
 - Added Prisma schema + migration for `product_variants.stock_reserved` with non-negative and not-exceed-stock DB constraints.
 - Added unit coverage for reservation delta behavior.
+- Added admin inventory list and reconciliation APIs (`GET /api/v1/admin/inventory`, `GET /api/v1/admin/inventory?report=reconciliation`) with available/reserved stock visibility.
+- Added admin stock adjustment API (`POST /api/v1/admin/inventory/adjustments`) with strict payload validation and stock safety guards.
+- Added admin inventory page (`/admin/inventory`) and sidebar navigation entry for stock adjustments and reconciliation summary.
+- Added route-level tests for inventory list/reconciliation and stock adjustments.
 Files changed:
 - `shared/db/prisma/schema.prisma`
 - `shared/db/prisma/migrations/20260423170000_add_stock_reserved_lifecycle/migration.sql`
@@ -589,9 +590,20 @@ Files changed:
 - `src/lib/services/inventory/stock-reservation.test.ts`
 - `src/lib/services/cart.service.ts`
 - `src/lib/services/orders.service.ts`
+- `src/lib/services/admin/admin-inventory.service.ts`
+- `src/app/api/v1/admin/inventory/route.ts`
+- `src/app/api/v1/admin/inventory/route.test.ts`
+- `src/app/api/v1/admin/inventory/adjustments/route.ts`
+- `src/app/api/v1/admin/inventory/adjustments/route.test.ts`
+- `src/app/admin/inventory/page.tsx`
+- `src/app/admin/admin-menu.config.tsx`
+- `src/locales/en/admin.json`
+- `src/locales/hy/admin.json`
+- `src/locales/ru/admin.json`
 Verification:
 - `pnpm test src/lib/services/inventory/stock-reservation.test.ts src/lib/services/admin/admin-orders/order-mutations.test.ts` (passed, 2 files / 5 tests)
-- `pnpm test` (passed, 19 files / 75 tests)
+- `pnpm test src/app/api/v1/admin/inventory/route.test.ts src/app/api/v1/admin/inventory/adjustments/route.test.ts` (passed, 2 files / 6 tests)
+- `pnpm test` (passed, 21 files / 81 tests)
 Execution order: 16
 
 ## 17. Analytics Dashboard
@@ -729,9 +741,9 @@ Execution order: 18
    - Recommended next step: None.
 
 16. Inventory and stock management
-   - Current status: Mostly implemented (90%)
-   - Why it is or is not ready: Reservation lifecycle is now implemented in cart/checkout with DB constraints; dedicated inventory adjustment/reporting module is still missing.
-   - Recommended next step: Add admin inventory adjustments/movements UI + APIs and reconciliation reporting.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Reservation lifecycle, admin inventory adjustment APIs/UI, and reconciliation reporting are implemented and covered by tests.
+   - Recommended next step: None.
 
 17. Analytics Dashboard
    - Current status: Mostly implemented (80%)

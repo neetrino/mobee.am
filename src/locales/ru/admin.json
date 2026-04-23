@@ -11,6 +11,7 @@
     "users": "Пользователи",
     "messages": "Сообщения",
     "analytics": "Аналитика",
+    "inventory": "Склад",
     "filterByPrice": "Фильтр по цене",
     "delivery": "Доставка",
     "settings": "Настройки"
@@ -213,6 +214,22 @@
     "cancel": "Отмена",
     "savedSuccess": "Настройки доставки успешно сохранены!",
     "errorSaving": "Ошибка: {message}"
+  },
+  "inventory": {
+    "title": "Склад",
+    "subtitle": "Корректировки остатков, резервы и сверка",
+    "reconciliation": "Сводка сверки",
+    "variants": "Варианты",
+    "stockTotal": "Общий остаток",
+    "stockReservedTotal": "Зарезервировано",
+    "stockAvailableTotal": "Доступный остаток",
+    "adjustStock": "Корректировка остатка",
+    "applyAdjustment": "Применить корректировку",
+    "currentStock": "Текущий остаток",
+    "product": "Товар",
+    "stock": "Остаток",
+    "reserved": "Резерв",
+    "available": "Доступно"
   },
   "users": {
     "title": "Управление пользователями",

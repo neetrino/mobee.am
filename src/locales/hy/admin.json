@@ -11,6 +11,7 @@
     "users": "Օգտատերեր",
     "messages": "Հաղորդագրություններ",
     "analytics": "Վերլուծություն",
+    "inventory": "Պահեստ",
     "filterByPrice": "Զտել ըստ գնի",
     "delivery": "Առաքում",
     "settings": "Կարգավորումներ"
@@ -213,6 +214,22 @@
     "cancel": "Չեղարկել",
     "savedSuccess": "Առաքման կարգավորումները հաջողությամբ պահվեցին:",
     "errorSaving": "Սխալ: {message}"
+  },
+  "inventory": {
+    "title": "Պահեստ",
+    "subtitle": "Պաշարի փոփոխություններ, ռեզերվներ և համադրման ամփոփում",
+    "reconciliation": "Համադրման ամփոփում",
+    "variants": "Տարբերակներ",
+    "stockTotal": "Ընդհանուր պաշար",
+    "stockReservedTotal": "Ռեզերվված պաշար",
+    "stockAvailableTotal": "Հասանելի պաշար",
+    "adjustStock": "Պաշարի փոփոխություն",
+    "applyAdjustment": "Կիրառել փոփոխությունը",
+    "currentStock": "Ընթացիկ պաշար",
+    "product": "Ապրանք",
+    "stock": "Պաշար",
+    "reserved": "Ռեզերվ",
+    "available": "Հասանելի"
   },
   "users": {
     "title": "Կառավարել օգտատերերին",
