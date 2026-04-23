@@ -32,7 +32,7 @@ const montserrat = Montserrat({
 // Navigation links will be translated dynamically using useTranslation hook
 const primaryNavLinks = [
   { href: '/', translationKey: 'common.navigation.home' },
-  { href: '/products', translationKey: 'common.navigation.products' },
+  { href: '/shop', translationKey: 'common.navigation.products' },
   { href: '/about', translationKey: 'common.navigation.about' },
   { href: '/contact', translationKey: 'common.navigation.contact' },
 ];
@@ -244,7 +244,7 @@ function CategoryMenuItem({
       onMouseLeave={handleMouseLeave}
     >
       <Link
-        href={`/products?category=${category.slug}`}
+        href={`/shop?category=${category.slug}`}
         className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-all duration-150"
         onClick={onClose}
       >
@@ -282,7 +282,7 @@ function CategoryMenuItem({
                 <div key={columnIndex} className="flex flex-col">
                   <div className="mb-4 pb-2 border-b border-gray-200">
                     <Link
-                      href={`/products?category=${category.slug}`}
+                      href={`/shop?category=${category.slug}`}
                       className="text-sm font-bold text-gray-900 hover:text-gray-700 uppercase tracking-wide"
                       onClick={onClose}
                     >
@@ -293,7 +293,7 @@ function CategoryMenuItem({
                     {column.map((subCategory) => (
                       <Link
                         key={subCategory.id}
-                        href={`/products?category=${subCategory.slug}`}
+                        href={`/shop?category=${subCategory.slug}`}
                         className="block text-sm text-gray-700 hover:text-gray-900 transition-colors duration-150 py-1"
                         onClick={onClose}
                       >
@@ -333,7 +333,7 @@ export function Header() {
 
   const isNavActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    if (href === '/products') return pathname.startsWith('/products');
+    if (href === '/shop') return pathname.startsWith('/shop') || pathname.startsWith('/products');
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
@@ -659,7 +659,7 @@ export function Header() {
     }
     clearSearch();
     const queryString = params.toString();
-    router.push(queryString ? `/products?${queryString}` : '/products');
+    router.push(queryString ? `/shop?${queryString}` : '/shop');
   };
 
   /**
@@ -788,8 +788,8 @@ export function Header() {
                 }}
               >
                 <Link
-                  href="/products"
-                  className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/products')}`}
+                  href="/shop"
+                  className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/shop')}`}
                   aria-haspopup="true"
                   aria-expanded={showProductsMenu}
                 >
@@ -970,7 +970,7 @@ export function Header() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <p className="text-lg font-semibold text-gray-900">Navigation</p>
+              <p className="text-lg font-semibold text-gray-900">{t('common.navigation.categories')}</p>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
@@ -1040,7 +1040,7 @@ export function Header() {
                   >
                     <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
                       <CompareIcon size={18} />
-                      Compare
+                      {t('common.navigation.compare')}
                     </span>
                     {compareCount > 0 && (
                       <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
@@ -1056,7 +1056,7 @@ export function Header() {
                   >
                     <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
                       <CartIcon size={19} />
-                      Cart
+                      {t('common.navigation.cart')}
                     </span>
                     {cartCount > 0 && (
                       <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
@@ -1074,7 +1074,7 @@ export function Header() {
                       >
                         <span className="flex items-center gap-2">
                           <ProfileIconFilled />
-                          Profile
+                          {t('common.navigation.profile')}
                         </span>
                         <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1086,7 +1086,7 @@ export function Header() {
                           onClick={() => setMobileMenuOpen(false)}
                           className="flex items-center justify-between px-4 py-3 hover:bg-blue-50 normal-case text-blue-700"
                         >
-                          <span>Admin Panel</span>
+                          <span>{t('common.navigation.adminPanel')}</span>
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
@@ -1099,7 +1099,7 @@ export function Header() {
                         }}
                         className="flex w-full items-center justify-between px-4 py-3 text-left text-red-600 hover:bg-red-50 normal-case font-semibold"
                       >
-                        Logout
+                        {t('common.navigation.logout')}
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -1112,7 +1112,7 @@ export function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 normal-case text-gray-800"
                       >
-                        <span>Login</span>
+                        <span>{t('common.navigation.login')}</span>
                         <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -1122,7 +1122,7 @@ export function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex items-center justify-between px-4 py-3 hover:bg-gray-900 hover:text-white normal-case text-gray-900 font-semibold"
                       >
-                        <span>Create account</span>
+                        <span>{t('common.navigation.register')}</span>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>

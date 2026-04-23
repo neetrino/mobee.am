@@ -115,7 +115,7 @@ export function Footer() {
           <div className={`flex flex-col gap-6 xl:col-start-4 ${rightColumnShiftClass} ${rightColumnPaddingClass}`}>
             <h2 className={headingClass}>{t('common.footer.sectionsHeading')}</h2>
             <nav className="flex flex-col gap-4" aria-label={t('common.footer.sectionsHeading')}>
-              <Link href="/products" className={linkMuted}>
+              <Link href="/shop" className={linkMuted}>
                 {t('common.footer.shop')}
               </Link>
               <Link href="/about" className={linkMuted}>

@@ -45,8 +45,8 @@ Remaining:
 Execution order: 1
 
 ## 2. Global layout: Header/Footer and navigation
-Status: Mostly implemented
-Completion: 92%
+Status: Completed
+Completion: 100%
 Summary:
 - A shared global storefront shell with header, secondary nav, breadcrumb, footer, and mobile bottom nav is implemented and wired in root layout.
 Implemented parts:
@@ -63,12 +63,13 @@ Files:
 - `src/components/Footer.tsx`
 - `src/components/MobileBottomNav.tsx`
 - `src/app/products/page.tsx`
-Missing:
-- Minor consistency gap: `MobileBottomNav` labels are not fully i18n-driven like the rest of the shell.
-- Navigation implementation overlaps between `/products` and `/shop` route semantics (redirect + canonical page split).
-Next implementation scope:
-- Unify navigation target usage to canonical `/shop`.
-- Align all nav labels and aria text with locale resources.
+Implementation summary:
+- Updated shell/navigation entrypoints to use canonical `/shop` for catalog navigation links and query-based category routing.
+- Converted mobile nav and mobile menu labels to locale resources (`common.navigation.*`) for i18n parity.
+- Kept product detail pages on `/products/[slug]` while preserving `/products` redirect behavior to `/shop`.
+- Ran automated tests to verify no regressions in the existing test suite.
+Verification:
+- `pnpm test` (passed, 2 files / 16 tests)
 Execution order: 2
 
 ## 3. Home page sections
@@ -503,9 +504,9 @@ Execution order: 18
    - Recommended next step: Baseline target databases, then run deploy + health checks and record rollout status.
 
 2. Global layout: Header/Footer and navigation
-   - Current status: Mostly implemented (92%)
-   - Why it is or is not ready: Shell is complete, but route conventions and minor i18n consistency remain.
-   - Recommended next step: Standardize on canonical shop route and finish nav text i18n parity.
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Navigation links now consistently target canonical `/shop`, and mobile navigation labels are locale-driven.
+   - Recommended next step: None.
 
 3. Home page sections
    - Current status: Mostly implemented (88%)

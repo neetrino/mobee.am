@@ -83,7 +83,7 @@ function MegaNavItem({ category, label }: { category: Category; label?: string }
       onMouseLeave={scheduleClose}
     >
       <Link
-        href={`/products?category=${encodeURIComponent(category.slug)}`}
+        href={`/shop?category=${encodeURIComponent(category.slug)}`}
         className="flex items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
       >
         <span>{displayLabel}</span>
@@ -97,7 +97,7 @@ function MegaNavItem({ category, label }: { category: Category; label?: string }
         >
           <div className="max-h-[min(70vh,420px)] w-[min(100vw-2rem,280px)] overflow-y-auto rounded-xl border border-gray-200/80 bg-white py-2 shadow-xl">
             <Link
-              href={`/products?category=${encodeURIComponent(category.slug)}`}
+              href={`/shop?category=${encodeURIComponent(category.slug)}`}
               className="block px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50"
             >
               {displayLabel}
@@ -106,7 +106,7 @@ function MegaNavItem({ category, label }: { category: Category; label?: string }
             {category.children.map((child) => (
               <Link
                 key={child.id}
-                href={`/products?category=${encodeURIComponent(child.slug)}`}
+                href={`/shop?category=${encodeURIComponent(child.slug)}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
               >
                 {child.title}
@@ -194,8 +194,8 @@ export function MainHeaderBar() {
   ]);
 
   const phonesCategoryHref = useMemo(() => {
-    if (phonesCategory) return `/products?category=${encodeURIComponent(phonesCategory.slug)}`;
-    return '/products';
+    if (phonesCategory) return `/shop?category=${encodeURIComponent(phonesCategory.slug)}`;
+    return '/shop';
   }, [phonesCategory]);
 
   return (
@@ -240,7 +240,7 @@ export function MainHeaderBar() {
                 <MegaNavItem category={tabletsCategory} label={t('common.mainHeader.tabletsLink')} />
               ) : (
                 <Link
-                  href="/products"
+                  href="/shop"
                   className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.tabletsLink')}</span>
@@ -251,7 +251,7 @@ export function MainHeaderBar() {
                 <MegaNavItem category={computersCategory} />
               ) : (
                 <Link
-                  href="/products"
+                  href="/shop"
                   className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.computersLink')}</span>
@@ -262,7 +262,7 @@ export function MainHeaderBar() {
                 <MegaNavItem category={watchesCategory} label={t('common.mainHeader.watchesLink')} />
               ) : (
                 <Link
-                  href="/products"
+                  href="/shop"
                   className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.watchesLink')}</span>
@@ -273,7 +273,7 @@ export function MainHeaderBar() {
                 <MegaNavItem category={headphonesCategory} />
               ) : (
                 <Link
-                  href="/products"
+                  href="/shop"
                   className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.headphonesLink')}</span>
@@ -284,7 +284,7 @@ export function MainHeaderBar() {
                 <MegaNavItem category={accessoriesCategory} />
               ) : (
                 <Link
-                  href="/products"
+                  href="/shop"
                   className="flex shrink-0 items-center gap-1 py-[0.15rem] text-[13.3px] font-semibold leading-5 text-[#374151] whitespace-nowrap hover:text-gray-900"
                 >
                   <span>{t('common.mainHeader.accessoriesLink')}</span>
@@ -304,7 +304,7 @@ export function MainHeaderBar() {
               ))}
             </div>
             <Link
-              href="/products"
+              href="/shop"
               className={`relative shrink-0 py-[0.15rem] text-[13.3px] font-bold leading-5 whitespace-nowrap text-[#ef4444] hover:text-[#dc2626] ${
                 lang === 'en' ? 'lg:ml-auto lg:left-0' : 'lg:-left-[10%]'
               }`}

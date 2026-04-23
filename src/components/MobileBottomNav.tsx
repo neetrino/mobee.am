@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Home, UserRound, Store } from 'lucide-react';
 import { getCompareCount, getWishlistCount } from '../lib/storageCounts';
 import { CartIcon } from './icons/CartIcon';
+import { useTranslation } from '../lib/i18n-client';
 
 interface MobileNavItem {
   label: string;
@@ -23,7 +24,7 @@ interface MobileNavItem {
  */
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const isProductsPage = pathname?.startsWith('/products');
+  const { t } = useTranslation();
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
 
@@ -49,29 +50,26 @@ export function MobileBottomNav() {
   const navItems: MobileNavItem[] = useMemo(
     () => [
       { 
-        label: 'Home', 
+        label: t('common.navigation.home'), 
         href: '/', 
         icon: Home, 
         visible: true,
       },
-      // Shop with Store icon
       { 
-        label: 'Shop', 
-        href: '/products', 
+        label: t('common.navigation.products'), 
+        href: '/shop', 
         icon: Store, 
         visible: true,
-        onClick: () => console.info('🛒 [MobileBottomNav] Shop tapped, navigating to /products'),
       },
-      // On mobile we show Cart instead of Wishlist
       { 
-        label: 'Cart', 
+        label: t('common.navigation.cart'), 
         href: '/cart', 
         icon: CartIcon, 
         visible: true,
       },
-      { label: 'My account', href: '/profile', icon: UserRound, visible: true },
+      { label: t('common.navigation.profile'), href: '/profile', icon: UserRound, visible: true },
     ],
-    [isProductsPage]
+    [t]
   );
 
   const resolveBadgeValue = (badge?: MobileNavItem['badge']) => {
