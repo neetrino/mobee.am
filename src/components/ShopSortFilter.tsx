@@ -121,17 +121,24 @@ export function ShopSortFilter() {
           <path d="M12.5 24H24" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
 
-        <span className="flex h-[39px] w-[43px] items-center justify-center rounded-[90px] bg-[#2DB2FF] px-5 py-3">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="6" cy="6" r="1.6" fill="white" />
-            <circle cx="12" cy="6" r="1.6" fill="white" />
-            <circle cx="18" cy="6" r="1.6" fill="white" />
-            <circle cx="6" cy="12" r="1.6" fill="white" />
-            <circle cx="12" cy="12" r="1.6" fill="white" />
-            <circle cx="18" cy="12" r="1.6" fill="white" />
-            <circle cx="6" cy="18" r="1.6" fill="white" />
-            <circle cx="12" cy="18" r="1.6" fill="white" />
-            <circle cx="18" cy="18" r="1.6" fill="white" />
+        <span className="flex h-[39px] w-[43px] items-center justify-center rounded-[90px] bg-[#2DB2FF]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
+            <circle cx="4.5" cy="4.5" r="1.4" fill="white" />
+            <circle cx="10.5" cy="4.5" r="1.4" fill="white" />
+            <circle cx="16.5" cy="4.5" r="1.4" fill="white" />
+            <circle cx="22.5" cy="4.5" r="1.4" fill="white" />
+            <circle cx="4.5" cy="10.5" r="1.4" fill="white" />
+            <circle cx="10.5" cy="10.5" r="1.4" fill="white" />
+            <circle cx="16.5" cy="10.5" r="1.4" fill="white" />
+            <circle cx="22.5" cy="10.5" r="1.4" fill="white" />
+            <circle cx="4.5" cy="16.5" r="1.4" fill="white" />
+            <circle cx="10.5" cy="16.5" r="1.4" fill="white" />
+            <circle cx="16.5" cy="16.5" r="1.4" fill="white" />
+            <circle cx="22.5" cy="16.5" r="1.4" fill="white" />
+            <circle cx="4.5" cy="22.5" r="1.4" fill="white" />
+            <circle cx="10.5" cy="22.5" r="1.4" fill="white" />
+            <circle cx="16.5" cy="22.5" r="1.4" fill="white" />
+            <circle cx="22.5" cy="22.5" r="1.4" fill="white" />
           </svg>
         </span>
       </button>
