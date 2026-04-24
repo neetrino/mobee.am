@@ -109,8 +109,8 @@ export function HeroCarousel() {
 
           {/* Right column — Figma nodes 1:234–1:246 */}
           <div className="flex w-full shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:justify-between lg:gap-0">
-            <div className="flex min-h-[166px] flex-col justify-between rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:px-12 sm:pb-8 sm:pt-8">
-              <p className="max-w-[276px] text-[12px] font-normal leading-4 text-[#111]">
+            <div className="flex flex-col gap-4 rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8">
+              <p className="w-full max-w-none text-[12px] font-normal leading-4 text-[#111]">
                 <span className="block">{t('home.hero_chat_line1')}</span>
                 <span>
                   <span className="font-extrabold">{t('home.hero_chat_bold')}</span>
@@ -118,7 +118,7 @@ export function HeroCarousel() {
                 </span>
               </p>
               <div
-                className={`mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[clamp(2.5rem,10vw,3.875rem)] font-black leading-none sm:mt-2 ${headlineClass}`}
+                className={`flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[clamp(2.5rem,10vw,3.875rem)] font-black leading-none sm:flex-nowrap sm:items-end ${headlineClass}`}
               >
                 <span className="text-black">{t('home.hero_promo_headline')}</span>
                 <span className="text-[#ff490d]">{t('home.hero_discount_percent')}</span>
