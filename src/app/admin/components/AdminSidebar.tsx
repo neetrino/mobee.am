@@ -33,6 +33,9 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
       </div>
       <aside className="hidden lg:block lg:w-64 flex-shrink-0 lg:sticky lg:top-0 lg:h-screen">
         <nav className="h-full bg-white border border-gray-200 rounded-lg p-2 flex flex-col">
+          <div className="px-4 py-3 text-sm font-semibold text-gray-900">
+            Admin page
+          </div>
           <div className="space-y-1">
             {primaryTabs.map((tab) => {
             if (tab.isSubCategory && !isProductsExpanded) {
