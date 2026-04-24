@@ -4,7 +4,11 @@ import Link from 'next/link';
 import type { FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
-import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import {
+  HEADER_STRIP_MIN_HEIGHT_LG,
+  HEADER_STRIP_PADDING_Y,
+  SITE_CONTENT_GUTTERS_CLASS,
+} from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
@@ -63,7 +67,7 @@ function UserOutlineIcon({ className }: { className?: string }) {
 }
 
 const iconLinkClass =
-  'flex h-11 w-11 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
+  'flex h-10 w-10 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
 
 export interface HeaderSecondaryBarProps {
   montserratClassName: string;
@@ -142,13 +146,15 @@ export function HeaderSecondaryBar({
       className={`hidden border-t border-gray-200 bg-white lg:block ${montserratClassName}`}
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        <div className="flex items-center justify-between gap-4 py-4">
+        <div
+          className={`flex items-center justify-between gap-4 ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`}
+        >
           <div className="flex min-w-0 flex-1 items-center gap-6 xl:gap-[30px]">
             <div className="relative shrink-0" ref={categoriesWrapRef}>
               <button
                 type="button"
                 onClick={onCategoriesButtonClick}
-                className="flex h-12 w-full min-w-[180px] max-w-[241px] items-center justify-between gap-2 rounded-[70px] bg-[#2db2ff] pl-[19px] pr-4 text-left text-[#fcfcfc] shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
+                className="flex h-10 w-full min-w-[180px] max-w-[241px] items-center justify-between gap-2 rounded-[70px] bg-[#2db2ff] pl-[19px] pr-4 text-left text-[#fcfcfc] shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
                 aria-expanded={isCategoriesMenuOpen}
                 aria-haspopup="true"
               >
@@ -158,7 +164,7 @@ export function HeaderSecondaryBar({
                     <span className="h-0.5 w-full rounded-full bg-white" />
                     <span className="h-0.5 w-full rounded-full bg-white" />
                   </span>
-                  <span className="truncate text-[16px] font-bold leading-9">{categoriesLabel}</span>
+                  <span className="truncate text-[15px] font-bold leading-8">{categoriesLabel}</span>
                 </span>
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center" aria-hidden>
                   <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -177,7 +183,7 @@ export function HeaderSecondaryBar({
 
             <div className="relative min-w-0 max-w-[535px] flex-1 xl:max-w-[672px]">
               <form onSubmit={onSearchSubmit} className="relative w-full">
-                <div className="pointer-events-none absolute bottom-1/4 left-4 top-1/4 z-[1] flex items-center">
+                <div className="pointer-events-none absolute inset-y-0 left-3 z-[1] flex items-center">
                   <SecondarySearchGlyph className="text-gray-400" />
                 </div>
                 <input
@@ -190,7 +196,7 @@ export function HeaderSecondaryBar({
                   onKeyDown={onSearchKeyDown}
                   placeholder={searchPlaceholder}
                   autoComplete="off"
-                  className="h-12 w-full rounded-full border border-[#e5e7eb] bg-white/50 py-3 pl-[49px] pr-4 text-[14px] leading-normal text-gray-900 placeholder:text-[#6b7280] shadow-sm transition-shadow focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2db2ff]/25"
+                  className="h-10 w-full rounded-full border border-[#e5e7eb] bg-white/50 py-2 pl-[44px] pr-3.5 text-[14px] leading-normal text-gray-900 placeholder:text-[#6b7280] shadow-sm transition-shadow focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2db2ff]/25"
                   aria-controls={SECONDARY_SEARCH_LISTBOX_ID}
                   aria-expanded={searchDropdownOpen && searchResults.length > 0}
                   aria-autocomplete="list"
