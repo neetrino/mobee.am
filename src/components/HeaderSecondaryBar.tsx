@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { forwardRef } from 'react';
 import type { FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
@@ -99,47 +100,62 @@ export interface HeaderSecondaryBarProps {
   profileAria: string;
   /** When the global search modal is open, hide this dropdown so only one listbox is active. */
   suppressSearchDropdown: boolean;
+  /**
+   * Pins the bar to the viewport top with `position: fixed` (used when CSS sticky is unreliable
+   * inside flex layouts). Parent renders a same-height flow spacer while this is true.
+   */
+  dockToViewportTop?: boolean;
 }
 
 const SECONDARY_SEARCH_LISTBOX_ID = 'header-secondary-search-results';
 
-export function HeaderSecondaryBar({
-  montserratClassName,
-  categoriesWrapRef,
-  categoriesLabel,
-  isCategoriesMenuOpen,
-  onCategoriesButtonClick,
-  categoriesMenu,
-  searchQuery,
-  onSearchChange,
-  onSearchSubmit,
-  onSearchKeyDown,
-  searchPlaceholder,
-  searchInputRef,
-  onSearchFocus,
-  searchResults,
-  searchLoading,
-  searchError,
-  searchDropdownOpen,
-  searchSelectedIndex,
-  onSearchResultClick,
-  onSearchDropdownClose,
-  onSearchSeeAllClick,
-  compareCount,
-  wishlistCount,
-  cartCount,
-  isLoggedIn,
-  loginLabel,
-  profileLabel,
-  compareAria,
-  wishlistAria,
-  cartAria,
-  profileAria,
-  suppressSearchDropdown,
-}: HeaderSecondaryBarProps) {
-  return (
+export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarProps>(
+  function HeaderSecondaryBar(
+    {
+      montserratClassName,
+      categoriesWrapRef,
+      categoriesLabel,
+      isCategoriesMenuOpen,
+      onCategoriesButtonClick,
+      categoriesMenu,
+      searchQuery,
+      onSearchChange,
+      onSearchSubmit,
+      onSearchKeyDown,
+      searchPlaceholder,
+      searchInputRef,
+      onSearchFocus,
+      searchResults,
+      searchLoading,
+      searchError,
+      searchDropdownOpen,
+      searchSelectedIndex,
+      onSearchResultClick,
+      onSearchDropdownClose,
+      onSearchSeeAllClick,
+      compareCount,
+      wishlistCount,
+      cartCount,
+      isLoggedIn,
+      loginLabel,
+      profileLabel,
+      compareAria,
+      wishlistAria,
+      cartAria,
+      profileAria,
+      suppressSearchDropdown,
+      dockToViewportTop = false,
+    },
+    ref,
+  ) {
+    const positionClass = dockToViewportTop
+      ? 'fixed top-0 left-0 right-0 z-50'
+      : 'relative z-50';
+
+    return (
     <div
-      className={`hidden border-t border-gray-200 bg-white lg:block ${montserratClassName}`}
+      ref={ref}
+      className={`hidden w-full border-t border-b border-gray-200 bg-white lg:block ${positionClass} ${montserratClassName}`}
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <div className="flex items-center justify-between gap-3 py-2 lg:min-h-[52px]">
@@ -264,5 +280,6 @@ export function HeaderSecondaryBar({
         </div>
       </div>
     </div>
-  );
-}
+    );
+  },
+);

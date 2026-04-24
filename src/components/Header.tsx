@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
 import type { FormEvent, ReactNode, CSSProperties } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
@@ -379,7 +379,63 @@ export function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
+  const primaryStripRef = useRef<HTMLElement | null>(null);
+  const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
+  const [secondaryDocked, setSecondaryDocked] = useState(false);
+  const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
+
+  const syncSecondaryDock = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const mq = window.matchMedia('(min-width: 1024px)');
+    if (!mq.matches) {
+      setSecondaryDocked(false);
+      return;
+    }
+    const secondaryEl = secondaryBarOuterRef.current;
+    if (secondaryEl) {
+      const h = secondaryEl.offsetHeight;
+      if (h > 0) {
+        setSecondaryBarHeightPx(h);
+      }
+    }
+    const primaryEl = primaryStripRef.current;
+    if (!primaryEl) {
+      return;
+    }
+    setSecondaryDocked(primaryEl.getBoundingClientRect().bottom <= 0);
+  }, []);
+
+  useLayoutEffect(() => {
+    syncSecondaryDock();
+    const secondaryEl = secondaryBarOuterRef.current;
+    if (typeof ResizeObserver === 'undefined' || !secondaryEl) {
+      return;
+    }
+    const ro = new ResizeObserver(() => {
+      syncSecondaryDock();
+    });
+    ro.observe(secondaryEl);
+    return () => {
+      ro.disconnect();
+    };
+  }, [syncSecondaryDock]);
+
+  useEffect(() => {
+    syncSecondaryDock();
+    window.addEventListener('scroll', syncSecondaryDock, { passive: true });
+    window.addEventListener('resize', syncSecondaryDock);
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const onMq = () => syncSecondaryDock();
+    mq.addEventListener('change', onMq);
+    return () => {
+      window.removeEventListener('scroll', syncSecondaryDock);
+      window.removeEventListener('resize', syncSecondaryDock);
+      mq.removeEventListener('change', onMq);
+    };
+  }, [syncSecondaryDock]);
 
   const {
     query: searchQuery,
@@ -717,7 +773,8 @@ export function Header() {
   };
 
   return (
-    <header className={`sticky top-0 z-50 border-b border-gray-200 bg-white ${montserrat.className}`}>
+    <div className={montserrat.className}>
+    <header ref={primaryStripRef} className="border-b border-gray-200 bg-white lg:border-b-0">
       <Suspense fallback={null}>
         <HeaderSearchSync
           setSearchQuery={setSearchQuery}
@@ -871,8 +928,19 @@ export function Header() {
           </div>
         </div>
       </div>
+    </header>
+
+      {secondaryDocked ? (
+        <div
+          aria-hidden
+          className="hidden w-full shrink-0 lg:block"
+          style={{ height: Math.max(secondaryBarHeightPx, 52) }}
+        />
+      ) : null}
 
       <HeaderSecondaryBar
+        ref={secondaryBarOuterRef}
+        dockToViewportTop={secondaryDocked}
         montserratClassName={montserrat.className}
         categoriesWrapRef={categoriesPillWrapRef}
         categoriesLabel={t('common.navigation.categories')}
@@ -1185,7 +1253,7 @@ export function Header() {
           </div>
         </div>
       )}
-    </header>
+    </div>
   );
 }
 
