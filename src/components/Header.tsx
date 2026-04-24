@@ -352,7 +352,6 @@ export function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
   const [showMobileCurrency, setShowMobileCurrency] = useState(false);
-  const [showProductsMenu, setShowProductsMenu] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
@@ -373,8 +372,6 @@ export function Header() {
       : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
 
   const mobileCurrencyRef = useRef<HTMLDivElement>(null);
-  const productsMenuRef = useRef<HTMLDivElement>(null);
-  const productsMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
@@ -650,9 +647,6 @@ export function Header() {
       if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(event.target as Node)) {
         setShowMobileCurrency(false);
       }
-      if (productsMenuRef.current && !productsMenuRef.current.contains(event.target as Node)) {
-        setShowProductsMenu(false);
-      }
       if (categoriesPillWrapRef.current && !categoriesPillWrapRef.current.contains(event.target as Node)) {
         setShowCategoriesPillMenu(false);
       }
@@ -686,15 +680,6 @@ export function Header() {
       };
     }
   }, [mobileMenuOpen]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (productsMenuTimeoutRef.current) {
-        clearTimeout(productsMenuTimeoutRef.current);
-      }
-    };
-  }, []);
 
   // Focus search input when modal opens; sync dropdown with query. When modal is closed, do not
   // force-close the dropdown so the desktop secondary search bar can keep showing results.
@@ -868,52 +853,12 @@ export function Header() {
               >
                 {t('common.navigation.home')}
               </Link>
-              <div
-                className="relative flex items-center"
-                ref={productsMenuRef}
-                onMouseEnter={() => {
-                  setShowCategoriesPillMenu(false);
-                  if (productsMenuTimeoutRef.current) {
-                    clearTimeout(productsMenuTimeoutRef.current);
-                    productsMenuTimeoutRef.current = null;
-                  }
-                  setShowProductsMenu(true);
-                }}
-                onMouseLeave={() => {
-                  productsMenuTimeoutRef.current = setTimeout(() => {
-                    setShowProductsMenu(false);
-                  }, 150);
-                }}
+              <Link
+                href="/shop"
+                className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/shop')}`}
               >
-                <Link
-                  href="/shop"
-                  className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/shop')}`}
-                  aria-haspopup="true"
-                  aria-expanded={showProductsMenu}
-                >
-                  {t('common.navigation.products')}
-                </Link>
-                {showProductsMenu && (
-                  <>
-                    <div className="absolute left-0 top-full h-2 w-full" />
-                    <div className="absolute left-0 top-full z-50 w-64 pt-2">
-                      <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
-                        {loadingCategories ? (
-                          <div className="px-4 py-2 text-sm text-gray-500">{t('common.messages.loading')}</div>
-                        ) : (
-                          getRootCategories(categories).map((category) => (
-                            <CategoryMenuItem
-                              key={category.id}
-                              category={category}
-                              onClose={() => setShowProductsMenu(false)}
-                            />
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
+                {t('common.navigation.products')}
+              </Link>
               <Link href="/about" className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/about')}`}>
                 {t('common.navigation.about')}
               </Link>
@@ -946,11 +891,6 @@ export function Header() {
         categoriesLabel={t('common.navigation.categories')}
         isCategoriesMenuOpen={showCategoriesPillMenu}
         onCategoriesButtonClick={() => {
-          if (productsMenuTimeoutRef.current) {
-            clearTimeout(productsMenuTimeoutRef.current);
-            productsMenuTimeoutRef.current = null;
-          }
-          setShowProductsMenu(false);
           setShowCategoriesPillMenu((open) => !open);
         }}
         categoriesMenu={
