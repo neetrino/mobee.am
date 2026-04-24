@@ -1,13 +1,21 @@
 // Currency utilities and exchange rates
 export const CURRENCIES = {
   USD: { code: 'USD', symbol: '$', name: 'US Dollar', rate: 1 },
-  AMD: { code: 'AMD', symbol: '֏', name: 'Armenian Dram', rate: 400 }, // 1 USD = 400 AMD
+  AMD: { code: 'AMD', symbol: 'Դ', name: 'Armenian Dram', rate: 400 }, // 1 USD = 400 AMD
   EUR: { code: 'EUR', symbol: '€', name: 'Euro', rate: 0.92 }, // 1 USD = 0.92 EUR
   RUB: { code: 'RUB', symbol: '₽', name: 'Russian Ruble', rate: 90 }, // 1 USD = 90 RUB
   GEL: { code: 'GEL', symbol: '₾', name: 'Georgian Lari', rate: 2.7 }, // 1 USD = 2.7 GEL
 } as const;
 
 export type CurrencyCode = keyof typeof CURRENCIES;
+
+function formatAmdAmountWithTrailingDram(value: number): string {
+  const formatted = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+  return `${formatted} Դ`;
+}
 
 // Cache for currency rates from API
 let currencyRatesCache: Record<string, number> | null = null;
@@ -104,19 +112,20 @@ export function formatPrice(price: number, currency: CurrencyCode = 'USD'): stri
   }
   
   const convertedPrice = price * rate;
-  
-  // Show all currencies without decimals (remove .00)
+
+  if (currency === 'AMD') {
+    return formatAmdAmountWithTrailingDram(convertedPrice);
+  }
+
   const minimumFractionDigits = 0;
   const maximumFractionDigits = 0;
-  
-  const formatted = new Intl.NumberFormat('en-US', {
+
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currencyInfo.code,
     minimumFractionDigits,
     maximumFractionDigits,
   }).format(convertedPrice);
-  
-  return formatted;
 }
 
 /**
@@ -152,19 +161,20 @@ export function convertPrice(price: number, fromCurrency: CurrencyCode, toCurren
  */
 export function formatPriceInCurrency(price: number, currency: CurrencyCode = 'AMD'): string {
   const currencyInfo = CURRENCIES[currency];
-  
-  // Show all currencies without decimals (remove .00)
+
+  if (currency === 'AMD') {
+    return formatAmdAmountWithTrailingDram(price);
+  }
+
   const minimumFractionDigits = 0;
   const maximumFractionDigits = 0;
-  
-  const formatted = new Intl.NumberFormat('en-US', {
+
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currencyInfo.code,
     minimumFractionDigits,
     maximumFractionDigits,
   }).format(price);
-  
-  return formatted;
 }
 
 
