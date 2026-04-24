@@ -1,9 +1,10 @@
 ﻿'use client';
 
 import { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { AdminPageShell } from '../../components/AdminPageShell';
 import { PageHeader } from './components/PageHeader';
 import { ValueSelectionModal } from './components/ValueSelectionModal';
 import { AddProductFormContent } from './components/AddProductFormContent';
@@ -24,6 +25,7 @@ function AddProductPageContent() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const productId = searchParams.get('id');
   const isEditMode = !!productId;
@@ -187,76 +189,74 @@ function AddProductPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div>
-          <PageHeader isEditMode={isEditMode} />
+    <AdminPageShell currentPath={pathname || '/admin/products/add'} router={router} t={t}>
+      <div className="max-w-7xl">
+        <PageHeader isEditMode={isEditMode} />
 
-          <AddProductFormContent
-            formData={formState.formData}
-            productType={formState.productType}
-            simpleProductData={formState.simpleProductData}
-            categories={formState.categories}
-            brands={formState.brands}
-            attributes={formState.attributes}
-            defaultCurrency={formState.defaultCurrency}
-            isEditMode={isEditMode}
-            loading={formState.loading}
-            imageUploadLoading={formState.imageUploadLoading}
-            imageUploadError={formState.imageUploadError}
-            categoriesExpanded={formState.categoriesExpanded}
-            brandsExpanded={formState.brandsExpanded}
-            useNewCategory={formState.useNewCategory}
-            useNewBrand={formState.useNewBrand}
-            newCategoryName={formState.newCategoryName}
-            newBrandName={formState.newBrandName}
-            selectedAttributesForVariants={formState.selectedAttributesForVariants}
-            selectedAttributeValueIds={formState.selectedAttributeValueIds}
-            attributesDropdownOpen={formState.attributesDropdownOpen}
-            generatedVariants={formState.generatedVariants}
-            hasVariantsToLoad={formState.hasVariantsToLoad}
-            fileInputRef={formState.fileInputRef}
-            attributesDropdownRef={formState.attributesDropdownRef}
-            variantImageInputRefs={formState.variantImageInputRefs}
-            onTitleChange={handleTitleChange}
-            onSlugChange={(e) => formState.setFormData((prev) => ({ ...prev, slug: e.target.value }))}
-            onDescriptionChange={(e) => formState.setFormData((prev) => ({ ...prev, descriptionHtml: e.target.value }))}
-            onProductTypeChange={formState.setProductType}
-            onUploadImages={handleUploadImages}
-            onRemoveImage={removeImageUrl}
-            onSetFeaturedImage={setFeaturedImage}
-            onCategoriesExpandedChange={formState.setCategoriesExpanded}
-            onBrandsExpandedChange={formState.setBrandsExpanded}
-            onUseNewCategoryChange={formState.setUseNewCategory}
-            onUseNewBrandChange={formState.setUseNewBrand}
-            onNewCategoryNameChange={formState.setNewCategoryName}
-            onNewBrandNameChange={formState.setNewBrandName}
-            onCategoryIdsChange={(ids) => formState.setFormData((prev) => ({ ...prev, categoryIds: ids }))}
-            onBrandIdsChange={(ids) => formState.setFormData((prev) => ({ ...prev, brandIds: ids }))}
-            onPrimaryCategoryIdChange={(id) => formState.setFormData((prev) => ({ ...prev, primaryCategoryId: id }))}
-            onPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, price: value }))}
-            onCompareAtPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, compareAtPrice: value }))}
-            onSkuChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, sku: value }))}
-            onQuantityChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, quantity: value }))}
-            onAttributesDropdownToggle={() => formState.setAttributesDropdownOpen(!formState.attributesDropdownOpen)}
-            onAttributeToggle={handleAttributeToggle}
-            onAttributeRemove={handleAttributeRemove}
-            onVariantUpdate={formState.setGeneratedVariants}
-            onVariantDelete={handleVariantDelete}
-            onVariantAdd={handleVariantAdd}
-            onVariantImageUpload={(variantId, event) => handleUploadVariantImage(variantId, event)}
-            onOpenValueModal={formState.setOpenValueModal}
-            onAddLabel={addLabel}
-            onRemoveLabel={removeLabel}
-            onUpdateLabel={(index, field, value) => updateLabel(index, field, value)}
-            onFeaturedChange={(featured) => formState.setFormData((prev) => ({ ...prev, featured }))}
-            onVariantsUpdate={(updater) => formState.setFormData((prev) => ({ ...prev, variants: updater(prev.variants) }))}
-            onApplyToAllVariants={(field, value) => applyToAllVariants(field, value)}
-            isClothingCategory={isClothingCategory}
-            generateSlug={generateSlug}
-            handleSubmit={handleSubmit}
-          />
-        </div>
+        <AddProductFormContent
+          formData={formState.formData}
+          productType={formState.productType}
+          simpleProductData={formState.simpleProductData}
+          categories={formState.categories}
+          brands={formState.brands}
+          attributes={formState.attributes}
+          defaultCurrency={formState.defaultCurrency}
+          isEditMode={isEditMode}
+          loading={formState.loading}
+          imageUploadLoading={formState.imageUploadLoading}
+          imageUploadError={formState.imageUploadError}
+          categoriesExpanded={formState.categoriesExpanded}
+          brandsExpanded={formState.brandsExpanded}
+          useNewCategory={formState.useNewCategory}
+          useNewBrand={formState.useNewBrand}
+          newCategoryName={formState.newCategoryName}
+          newBrandName={formState.newBrandName}
+          selectedAttributesForVariants={formState.selectedAttributesForVariants}
+          selectedAttributeValueIds={formState.selectedAttributeValueIds}
+          attributesDropdownOpen={formState.attributesDropdownOpen}
+          generatedVariants={formState.generatedVariants}
+          hasVariantsToLoad={formState.hasVariantsToLoad}
+          fileInputRef={formState.fileInputRef}
+          attributesDropdownRef={formState.attributesDropdownRef}
+          variantImageInputRefs={formState.variantImageInputRefs}
+          onTitleChange={handleTitleChange}
+          onSlugChange={(e) => formState.setFormData((prev) => ({ ...prev, slug: e.target.value }))}
+          onDescriptionChange={(e) => formState.setFormData((prev) => ({ ...prev, descriptionHtml: e.target.value }))}
+          onProductTypeChange={formState.setProductType}
+          onUploadImages={handleUploadImages}
+          onRemoveImage={removeImageUrl}
+          onSetFeaturedImage={setFeaturedImage}
+          onCategoriesExpandedChange={formState.setCategoriesExpanded}
+          onBrandsExpandedChange={formState.setBrandsExpanded}
+          onUseNewCategoryChange={formState.setUseNewCategory}
+          onUseNewBrandChange={formState.setUseNewBrand}
+          onNewCategoryNameChange={formState.setNewCategoryName}
+          onNewBrandNameChange={formState.setNewBrandName}
+          onCategoryIdsChange={(ids) => formState.setFormData((prev) => ({ ...prev, categoryIds: ids }))}
+          onBrandIdsChange={(ids) => formState.setFormData((prev) => ({ ...prev, brandIds: ids }))}
+          onPrimaryCategoryIdChange={(id) => formState.setFormData((prev) => ({ ...prev, primaryCategoryId: id }))}
+          onPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, price: value }))}
+          onCompareAtPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, compareAtPrice: value }))}
+          onSkuChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, sku: value }))}
+          onQuantityChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, quantity: value }))}
+          onAttributesDropdownToggle={() => formState.setAttributesDropdownOpen(!formState.attributesDropdownOpen)}
+          onAttributeToggle={handleAttributeToggle}
+          onAttributeRemove={handleAttributeRemove}
+          onVariantUpdate={formState.setGeneratedVariants}
+          onVariantDelete={handleVariantDelete}
+          onVariantAdd={handleVariantAdd}
+          onVariantImageUpload={(variantId, event) => handleUploadVariantImage(variantId, event)}
+          onOpenValueModal={formState.setOpenValueModal}
+          onAddLabel={addLabel}
+          onRemoveLabel={removeLabel}
+          onUpdateLabel={(index, field, value) => updateLabel(index, field, value)}
+          onFeaturedChange={(featured) => formState.setFormData((prev) => ({ ...prev, featured }))}
+          onVariantsUpdate={(updater) => formState.setFormData((prev) => ({ ...prev, variants: updater(prev.variants) }))}
+          onApplyToAllVariants={(field, value) => applyToAllVariants(field, value)}
+          isClothingCategory={isClothingCategory}
+          generateSlug={generateSlug}
+          handleSubmit={handleSubmit}
+        />
       </div>
 
       {formState.openValueModal && (
@@ -270,7 +270,7 @@ function AddProductPageContent() {
           onAttributeValueIdsUpdate={formState.setSelectedAttributeValueIds}
         />
       )}
-    </div>
+    </AdminPageShell>
   );
 }
 

@@ -1,11 +1,12 @@
 ﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 interface User {
   id: string;
@@ -33,6 +34,7 @@ export default function UsersPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -186,8 +188,8 @@ export default function UsersPage() {
         );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath={pathname || '/admin/users'} router={router} t={t}>
+      <div className="max-w-7xl">
         <div className="mb-8">
           <button
             onClick={() => router.push('/admin')}
@@ -429,7 +431,7 @@ export default function UsersPage() {
           )}
         </Card>
       </div>
-    </div>
+    </AdminPageShell>
   );
 }
 

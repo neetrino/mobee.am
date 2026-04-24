@@ -6,6 +6,7 @@ import { OrdersFilters } from './components/OrdersFilters';
 import { BulkSelectionControls } from './components/BulkSelectionControls';
 import { OrdersTable } from './components/OrdersTable';
 import { OrderDetailsModal } from './components/OrderDetailsModal';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 export function OrdersPageContent() {
   const { t } = useTranslation();
@@ -50,8 +51,8 @@ export function OrdersPageContent() {
   } = useOrders();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath="/admin/orders" router={router} t={t}>
+      <div className="max-w-7xl">
         <div className="mb-8">
           <button
             onClick={() => router.push('/admin')}
@@ -118,6 +119,6 @@ export function OrdersPageContent() {
           />
         )}
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

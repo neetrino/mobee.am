@@ -1,13 +1,13 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card } from '@shop/ui';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useAnalytics } from './hooks/useAnalytics';
 import { AnalyticsHeader } from './components/AnalyticsHeader';
-import { AdminSidebar } from './components/AdminSidebar';
+import { AdminPageShell } from '../components/AdminPageShell';
 import { PeriodSelector } from './components/PeriodSelector';
 import { StatsCards } from './components/StatsCards';
 import { TopProducts } from './components/TopProducts';
@@ -18,6 +18,7 @@ export default function AnalyticsPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [period, setPeriod] = useState<string>('week');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
@@ -55,49 +56,42 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath={pathname || '/admin/analytics'} router={router} t={t}>
+      <div className="max-w-7xl">
         <AnalyticsHeader />
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <AdminSidebar t={t} />
+        <PeriodSelector
+          period={period}
+          startDate={startDate}
+          endDate={endDate}
+          analytics={analytics}
+          onPeriodChange={setPeriod}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+        />
 
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
-            <PeriodSelector
-              period={period}
-              startDate={startDate}
-              endDate={endDate}
-              analytics={analytics}
-              onPeriodChange={setPeriod}
-              onStartDateChange={setStartDate}
-              onEndDateChange={setEndDate}
-            />
-
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-                <p className="text-gray-600">{t('admin.analytics.loadingAnalytics')}</p>
-              </div>
-            ) : analytics ? (
-              <>
-                <StatsCards analytics={analytics} totalUsers={totalUsers} />
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                  <TopProducts products={analytics.topProducts} currency={analytics.orders.currency} />
-                  <TopCategories categories={analytics.topCategories} currency={analytics.orders.currency} />
-                </div>
-
-                <OrdersByDayChart ordersByDay={analytics.ordersByDay} currency={analytics.orders.currency} />
-              </>
-            ) : (
-              <Card className="p-6">
-                <p className="text-gray-600 text-center">{t('admin.analytics.noAnalyticsData')}</p>
-              </Card>
-            )}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
+            <p className="text-gray-600">{t('admin.analytics.loadingAnalytics')}</p>
           </div>
-        </div>
+        ) : analytics ? (
+          <>
+            <StatsCards analytics={analytics} totalUsers={totalUsers} />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <TopProducts products={analytics.topProducts} currency={analytics.orders.currency} />
+              <TopCategories categories={analytics.topCategories} currency={analytics.orders.currency} />
+            </div>
+
+            <OrdersByDayChart ordersByDay={analytics.ordersByDay} currency={analytics.orders.currency} />
+          </>
+        ) : (
+          <Card className="p-6">
+            <p className="text-gray-600 text-center">{t('admin.analytics.noAnalyticsData')}</p>
+          </Card>
+        )}
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

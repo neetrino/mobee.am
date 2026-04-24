@@ -1,10 +1,10 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
-import { AdminSidebar } from './components/AdminSidebar';
+import { AdminPageShell } from './components/AdminPageShell';
 import { StatsGrid } from './components/StatsGrid';
 import { RecentOrdersCard } from './components/RecentOrdersCard';
 import { TopProductsCard } from './components/TopProductsCard';
@@ -48,14 +48,6 @@ export default function AdminPanel() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin');
-
-  useEffect(() => {
-    if (pathname) {
-      setCurrentPath(pathname);
-    }
-  }, [pathname]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -72,25 +64,18 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9]">
-      <div className="flex flex-col lg:flex-row gap-8">
-        <AdminSidebar currentPath={currentPath} router={router} t={t} />
+    <AdminPageShell currentPath={pathname || '/admin'} router={router} t={t} mainClassName="max-w-7xl">
+      <StatsGrid stats={stats} statsLoading={statsLoading} />
 
-        {/* Main Content */}
-        <div className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <StatsGrid stats={stats} statsLoading={statsLoading} />
-
-          {/* Dashboard Sections */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <RecentOrdersCard recentOrders={recentOrders} recentOrdersLoading={recentOrdersLoading} />
-            <TopProductsCard topProducts={topProducts} topProductsLoading={topProductsLoading} />
-          </div>
-
-          <UserActivityCard userActivity={userActivity} userActivityLoading={userActivityLoading} />
-
-          <QuickActionsCard />
-        </div>
+      {/* Dashboard Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <RecentOrdersCard recentOrders={recentOrders} recentOrdersLoading={recentOrdersLoading} />
+        <TopProductsCard topProducts={topProducts} topProductsLoading={topProductsLoading} />
       </div>
-    </div>
+
+      <UserActivityCard userActivity={userActivity} userActivityLoading={userActivityLoading} />
+
+      <QuickActionsCard />
+    </AdminPageShell>
   );
 }

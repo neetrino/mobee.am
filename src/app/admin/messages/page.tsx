@@ -1,11 +1,12 @@
 ﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 interface Message {
   id: string;
@@ -30,6 +31,7 @@ export default function MessagesPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -140,8 +142,8 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath={pathname || '/admin/messages'} router={router} t={t}>
+      <div className="max-w-7xl">
         <div className="mb-8">
           <button
             onClick={() => router.push('/admin')}
@@ -269,7 +271,7 @@ export default function MessagesPage() {
           )}
         </Card>
       </div>
-    </div>
+    </AdminPageShell>
   );
 }
 

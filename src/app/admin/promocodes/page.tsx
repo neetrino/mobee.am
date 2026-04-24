@@ -6,7 +6,7 @@ import { Card, Button } from '@shop/ui';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { apiClient } from '../../../lib/api-client';
-import { AdminSidebar } from '../components/AdminSidebar';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 interface PromoCode {
   id: string;
@@ -31,7 +31,6 @@ export default function PromoCodesPage() {
   const pathname = usePathname();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
 
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin/promocodes');
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -49,12 +48,6 @@ export default function PromoCodesPage() {
       setLoading(false);
     }
   }, []);
-
-  useEffect(() => {
-    if (pathname) {
-      setCurrentPath(pathname);
-    }
-  }, [pathname]);
 
   useEffect(() => {
     if (!isLoading && (!isLoggedIn || !isAdmin)) {
@@ -170,8 +163,8 @@ export default function PromoCodesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath={pathname || '/admin/promocodes'} router={router} t={t}>
+      <div className="max-w-7xl">
         <div className="mb-8">
           <button
             onClick={() => router.push('/admin')}
@@ -185,99 +178,94 @@ export default function PromoCodesPage() {
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.promocodes.title')}</h1>
           <p className="text-gray-600 mt-2">{t('admin.promocodes.subtitle')}</p>
         </div>
+        <div className="space-y-6">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.promocodes.createTitle')}</h2>
+            <form onSubmit={handleCreatePromoCode} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+              <div>
+                <label htmlFor="promocode-code" className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('admin.promocodes.code')}
+                </label>
+                <input
+                  id="promocode-code"
+                  type="text"
+                  value={code}
+                  maxLength={64}
+                  onChange={(event) => setCode(event.target.value.toUpperCase())}
+                  placeholder={t('admin.promocodes.codePlaceholder')}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
+                />
+              </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <AdminSidebar currentPath={currentPath} router={router} t={t} />
+              <div>
+                <label htmlFor="promocode-discount" className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('admin.promocodes.discountPercent')}
+                </label>
+                <input
+                  id="promocode-discount"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="0.01"
+                  value={discountPercent}
+                  onChange={(event) => setDiscountPercent(event.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
+                />
+              </div>
 
-          <div className="flex-1 min-w-0 space-y-6">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.promocodes.createTitle')}</h2>
-              <form onSubmit={handleCreatePromoCode} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div>
-                  <label htmlFor="promocode-code" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.promocodes.code')}
-                  </label>
-                  <input
-                    id="promocode-code"
-                    type="text"
-                    value={code}
-                    maxLength={64}
-                    onChange={(event) => setCode(event.target.value.toUpperCase())}
-                    placeholder={t('admin.promocodes.codePlaceholder')}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
-                  />
-                </div>
+              <Button type="submit" disabled={submitting} variant="primary" className="w-full md:w-auto">
+                {submitting ? t('admin.promocodes.creating') : t('admin.promocodes.create')}
+              </Button>
+            </form>
+          </Card>
 
-                <div>
-                  <label htmlFor="promocode-discount" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.promocodes.discountPercent')}
-                  </label>
-                  <input
-                    id="promocode-discount"
-                    type="number"
-                    min="1"
-                    max="100"
-                    step="0.01"
-                    value={discountPercent}
-                    onChange={(event) => setDiscountPercent(event.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
-                  />
-                </div>
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.promocodes.listTitle')}</h2>
 
-                <Button type="submit" disabled={submitting} variant="primary" className="w-full md:w-auto">
-                  {submitting ? t('admin.promocodes.creating') : t('admin.promocodes.create')}
-                </Button>
-              </form>
-            </Card>
-
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.promocodes.listTitle')}</h2>
-
-              {loading ? (
-                <p className="text-sm text-gray-600">{t('admin.promocodes.loading')}</p>
-              ) : promoCodes.length === 0 ? (
-                <p className="text-sm text-gray-600">{t('admin.promocodes.empty')}</p>
-              ) : (
-                <div className="space-y-3">
-                  {promoCodes.map((promoCode) => (
-                    <div key={promoCode.id} className="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">{promoCode.code}</p>
-                        <p className="text-sm text-gray-600">
-                          {promoCode.discountPercent}% {t('admin.promocodes.discountLabel')}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {promoCode.isActive ? t('admin.promocodes.active') : t('admin.promocodes.inactive')}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={submitting}
-                          onClick={() => handleToggleStatus(promoCode.id, promoCode.isActive)}
-                        >
-                          {promoCode.isActive ? t('admin.promocodes.deactivate') : t('admin.promocodes.activate')}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={submitting}
-                          onClick={() => handleDeletePromoCode(promoCode.id, promoCode.code)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          {t('admin.promocodes.delete')}
-                        </Button>
-                      </div>
+            {loading ? (
+              <p className="text-sm text-gray-600">{t('admin.promocodes.loading')}</p>
+            ) : promoCodes.length === 0 ? (
+              <p className="text-sm text-gray-600">{t('admin.promocodes.empty')}</p>
+            ) : (
+              <div className="space-y-3">
+                {promoCodes.map((promoCode) => (
+                  <div key={promoCode.id} className="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div>
+                      <p className="text-base font-semibold text-gray-900">{promoCode.code}</p>
+                      <p className="text-sm text-gray-600">
+                        {promoCode.discountPercent}% {t('admin.promocodes.discountLabel')}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {promoCode.isActive ? t('admin.promocodes.active') : t('admin.promocodes.inactive')}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </Card>
-          </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={submitting}
+                        onClick={() => handleToggleStatus(promoCode.id, promoCode.isActive)}
+                      >
+                        {promoCode.isActive ? t('admin.promocodes.deactivate') : t('admin.promocodes.activate')}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={submitting}
+                        onClick={() => handleDeletePromoCode(promoCode.id, promoCode.code)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        {t('admin.promocodes.delete')}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
         </div>
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

@@ -4,14 +4,13 @@ import { useEffect, useState, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
-import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
-import { getAdminMenuTABS } from '../admin-menu.config';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getStoredCurrency, initializeCurrencyRates, type CurrencyCode } from '../../../lib/currency';
 import { ProductFilters } from './components/ProductFilters';
 import { ProductsTable } from './components/ProductsTable';
 import { useProductHandlers } from './hooks/useProductHandlers';
 import type { Product, ProductsResponse, Category } from './types';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 export default function ProductsPage() {
   const { t } = useTranslation();
@@ -296,12 +295,11 @@ export default function ProductsPage() {
     return null;
   }
 
-  const adminTabs = getAdminMenuTABS(t);
   const currentPath = pathname || '/admin/products';
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath={currentPath} router={router} t={t}>
+      <div className="max-w-7xl">
         <div className="mb-6">
           <button
             onClick={() => router.push('/admin')}
@@ -325,103 +323,63 @@ export default function ProductsPage() {
             )}
           </div>
         </div>
+        <ProductFilters
+          search={search}
+          setSearch={setSearch}
+          skuSearch={skuSearch}
+          setSkuSearch={setSkuSearch}
+          selectedCategories={selectedCategories}
+          setSelectedCategories={setSelectedCategories}
+          categories={categories}
+          categoriesLoading={categoriesLoading}
+          categoriesExpanded={categoriesExpanded}
+          setCategoriesExpanded={setCategoriesExpanded}
+          stockFilter={stockFilter}
+          setStockFilter={setStockFilter}
+          minPrice={minPrice}
+          setMinPrice={setMinPrice}
+          maxPrice={maxPrice}
+          setMaxPrice={setMaxPrice}
+          selectedIds={selectedIds}
+          handleSearch={handlers.handleSearch}
+          handleBulkDelete={handlers.handleBulkDelete}
+          handleClearFilters={handleClearFilters}
+          bulkDeleting={bulkDeleting}
+          setPage={setPage}
+        />
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:hidden mb-6">
-            <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
-          </div>
-          {/* Sidebar Navigation */}
-          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-            <nav className="bg-white border border-gray-200 rounded-lg p-2 space-y-1">
-              {adminTabs.map((tab) => {
-                const isActive = currentPath === tab.path || 
-                  (tab.path === '/admin' && currentPath === '/admin') ||
-                  (tab.path !== '/admin' && currentPath.startsWith(tab.path));
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      router.push(tab.path);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
-                      tab.isSubCategory ? 'pl-12' : ''
-                    } ${
-                      isActive
-                        ? 'bg-admin text-white'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
-                  >
-                    <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>
-                      {tab.icon}
-                    </span>
-                    <span className="text-left">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
-
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
-            <ProductFilters
-              search={search}
-              setSearch={setSearch}
-              skuSearch={skuSearch}
-              setSkuSearch={setSkuSearch}
-              selectedCategories={selectedCategories}
-              setSelectedCategories={setSelectedCategories}
-              categories={categories}
-              categoriesLoading={categoriesLoading}
-              categoriesExpanded={categoriesExpanded}
-              setCategoriesExpanded={setCategoriesExpanded}
-              stockFilter={stockFilter}
-              setStockFilter={setStockFilter}
-              minPrice={minPrice}
-              setMinPrice={setMinPrice}
-              maxPrice={maxPrice}
-              setMaxPrice={setMaxPrice}
-              selectedIds={selectedIds}
-              handleSearch={handlers.handleSearch}
-              handleBulkDelete={handlers.handleBulkDelete}
-              handleClearFilters={handleClearFilters}
-              bulkDeleting={bulkDeleting}
-              setPage={setPage}
-            />
-
-            {/* Add New Product Button */}
-            <div className="mb-6">
-              <button
-                onClick={() => router.push('/admin/products/add')}
-                className="w-full px-4 py-3 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors flex items-center justify-center gap-2 font-medium text-sm"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                {t('admin.products.addNewProduct')}
-              </button>
-            </div>
-
-            {/* Products Table */}
-            <ProductsTable
-              loading={loading}
-              sortedProducts={sortedProducts}
-              products={products}
-              selectedIds={selectedIds}
-              toggleSelect={handlers.toggleSelect}
-              toggleSelectAll={handlers.toggleSelectAll}
-              sortBy={sortBy}
-              handleHeaderSort={handleHeaderSort}
-              currency={currency}
-              handleDeleteProduct={handlers.handleDeleteProduct}
-              handleTogglePublished={handlers.handleTogglePublished}
-              handleToggleFeatured={handlers.handleToggleFeatured}
-              meta={meta}
-              page={page}
-              setPage={setPage}
-            />
-          </div>
+        {/* Add New Product Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => router.push('/admin/products/add')}
+            className="w-full px-4 py-3 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors flex items-center justify-center gap-2 font-medium text-sm"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('admin.products.addNewProduct')}
+          </button>
         </div>
+
+        {/* Products Table */}
+        <ProductsTable
+          loading={loading}
+          sortedProducts={sortedProducts}
+          products={products}
+          selectedIds={selectedIds}
+          toggleSelect={handlers.toggleSelect}
+          toggleSelectAll={handlers.toggleSelectAll}
+          sortBy={sortBy}
+          handleHeaderSort={handleHeaderSort}
+          currency={currency}
+          handleDeleteProduct={handlers.handleDeleteProduct}
+          handleTogglePublished={handlers.handleTogglePublished}
+          handleToggleFeatured={handlers.handleToggleFeatured}
+          meta={meta}
+          page={page}
+          setPage={setPage}
+        />
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

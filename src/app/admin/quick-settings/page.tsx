@@ -366,15 +366,6 @@ export default function QuickSettingsPage() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  // Get current path to highlight active tab
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin/quick-settings');
-  
-  useEffect(() => {
-    if (pathname) {
-      setCurrentPath(pathname);
-    }
-  }, [pathname]);
-
   if (isLoading) {
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -391,8 +382,8 @@ export default function QuickSettingsPage() {
   }
 
   return (
-    <QuickSettingsContent
-      currentPath={currentPath}
+      <QuickSettingsContent
+      currentPath={pathname || '/admin/quick-settings'}
       router={router}
       t={t}
       globalDiscount={globalDiscount}
