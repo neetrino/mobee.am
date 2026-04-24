@@ -108,9 +108,9 @@ export function HeroCarousel() {
           </div>
 
           {/* Right column — Figma nodes 1:234–1:246 */}
-          <div className="flex w-full shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:justify-between lg:gap-0">
-            <div className="flex flex-col gap-4 rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8">
-              <p className="w-full max-w-none text-[12px] font-normal leading-4 text-[#111]">
+          <div className="flex w-full min-w-0 shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:justify-between lg:gap-0">
+            <div className="flex min-w-0 flex-col gap-4 overflow-hidden rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8">
+              <p className="w-full min-w-0 max-w-full break-words text-[12px] font-normal leading-4 text-[#111]">
                 <span className="block">{t('home.hero_chat_line1')}</span>
                 <span>
                   <span className="font-extrabold">{t('home.hero_chat_bold')}</span>
@@ -118,10 +118,10 @@ export function HeroCarousel() {
                 </span>
               </p>
               <div
-                className={`flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[clamp(2.5rem,10vw,3.875rem)] font-black leading-none sm:flex-nowrap sm:items-end ${headlineClass}`}
+                className={`flex w-full min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-[clamp(2.5rem,10vw,3.875rem)] font-black leading-none [overflow-wrap:anywhere] ${headlineClass}`}
               >
-                <span className="text-black">{t('home.hero_promo_headline')}</span>
-                <span className="text-[#ff490d]">{t('home.hero_discount_percent')}</span>
+                <span className="min-w-0 break-words text-black">{t('home.hero_promo_headline')}</span>
+                <span className="min-w-0 shrink-0 text-[#ff490d]">{t('home.hero_discount_percent')}</span>
               </div>
             </div>
 
