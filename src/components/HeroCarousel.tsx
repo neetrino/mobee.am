@@ -109,7 +109,9 @@ export function HeroCarousel() {
 
           {/* Right column — Figma nodes 1:234–1:246 */}
           <div className="flex w-full min-w-0 shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:justify-between lg:gap-0">
-            <div className="flex min-w-0 flex-col gap-4 overflow-hidden rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8">
+            <div
+              className="flex min-w-0 flex-col gap-4 overflow-hidden rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8 lg:h-[178px] lg:w-full lg:shrink-0 lg:gap-2 lg:px-12 lg:py-6"
+            >
               <p className="w-full min-w-0 max-w-full break-words text-[12px] font-normal leading-4 text-[#111]">
                 <span className="block">{t('home.hero_chat_line1')}</span>
                 <span>
@@ -118,10 +120,26 @@ export function HeroCarousel() {
                 </span>
               </p>
               <div
-                className={`flex w-full min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-[clamp(2.5rem,10vw,3.875rem)] font-black leading-none [overflow-wrap:anywhere] ${headlineClass}`}
+                className={
+                  lang === 'ru'
+                    ? `${headlineClass} flex w-full min-w-0 flex-nowrap items-baseline gap-x-1.5 whitespace-nowrap text-[clamp(1.875rem,6.25vw,3rem)] font-black leading-none lg:text-[clamp(1.75rem,4vw,2.75rem)]`
+                    : `${headlineClass} flex w-full min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-[clamp(2.5rem,10vw,3.875rem)] font-black leading-none [overflow-wrap:anywhere] lg:flex-nowrap lg:text-[clamp(2rem,4vw,3rem)]`
+                }
               >
-                <span className="min-w-0 break-words text-black">{t('home.hero_promo_headline')}</span>
-                <span className="min-w-0 shrink-0 text-[#ff490d]">{t('home.hero_discount_percent')}</span>
+                <span
+                  className={
+                    lang === 'ru' ? 'shrink-0 text-black' : 'min-w-0 break-words text-black'
+                  }
+                >
+                  {t('home.hero_promo_headline')}
+                </span>
+                <span
+                  className={`min-w-0 shrink-0 text-[#ff490d] ${
+                    lang === 'ru' ? '-translate-y-[0.14em]' : ''
+                  }`}
+                >
+                  {t('home.hero_discount_percent')}
+                </span>
               </div>
             </div>
 
