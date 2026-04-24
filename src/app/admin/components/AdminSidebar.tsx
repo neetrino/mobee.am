@@ -13,6 +13,8 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
   const adminTabs = getAdminMenuTABS(t);
+  const homeTab = adminTabs.find((tab) => tab.id === 'home');
+  const primaryTabs = adminTabs.filter((tab) => tab.id !== 'home');
   const productSubmenuIds = new Set(['categories', 'brands', 'attributes']);
   const productGroupPaths = ['/admin/products', '/admin/categories', '/admin/brands', '/admin/attributes'];
   const isProductGroupActive = productGroupPaths.some((path) => currentPath.startsWith(path));
@@ -30,16 +32,20 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
         <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
       </div>
       <aside className="hidden lg:block lg:w-64 flex-shrink-0 lg:sticky lg:top-0 lg:h-screen">
-        <nav className="h-full bg-white border border-gray-200 rounded-lg p-2 space-y-1">
-          {adminTabs.map((tab) => {
+        <nav className="h-full bg-white border border-gray-200 rounded-lg p-2 flex flex-col">
+          <div className="space-y-1">
+            {primaryTabs.map((tab) => {
             if (tab.isSubCategory && !isProductsExpanded) {
               return null;
             }
 
-            const isActive = currentPath === tab.path || 
-              (tab.path === '/admin' && currentPath === '/admin') ||
-              (tab.path !== '/admin' && currentPath.startsWith(tab.path)) ||
-              (tab.id === 'products' && isProductGroupActive);
+            const isRootTab = tab.path === '/';
+            const isActive = isRootTab
+              ? currentPath === '/'
+              : currentPath === tab.path ||
+                (tab.path === '/admin' && currentPath === '/admin') ||
+                (tab.path !== '/admin' && currentPath.startsWith(tab.path)) ||
+                (tab.id === 'products' && isProductGroupActive);
 
             if (tab.id === 'products') {
               return (
@@ -104,10 +110,27 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
                 <span className="text-left">{tab.label}</span>
               </button>
             );
-          })}
+            })}
+          </div>
+          {homeTab ? (
+            <button
+              onClick={() => {
+                router.push(homeTab.path);
+              }}
+              className={`w-full mt-auto flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                currentPath === '/'
+                  ? 'bg-admin text-white'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              }`}
+            >
+              <span className={`flex-shrink-0 ${currentPath === '/' ? 'text-white' : 'text-gray-500'}`}>
+                {homeTab.icon}
+              </span>
+              <span className="text-left">{homeTab.label}</span>
+            </button>
+          ) : null}
         </nav>
       </aside>
     </>
   );
 }
-

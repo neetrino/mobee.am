@@ -14,6 +14,21 @@ import type { AdminMenuItem } from '../../components/AdminMenuDrawer';
 export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   return [
   {
+    id: 'home',
+    label: t('admin.menu.home'),
+    path: '/',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1h-5.5a.5.5 0 01-.5-.5V14h-4v7.5a.5.5 0 01-.5.5H4a1 1 0 01-1-1V9.75z"
+        />
+      </svg>
+    ),
+  },
+  {
     id: 'dashboard',
     label: t('admin.menu.dashboard'),
     path: '/admin',

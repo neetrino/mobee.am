@@ -1,5 +1,6 @@
 {
   "menu": {
+    "home": "Home",
     "dashboard": "Dashboard",
     "orders": "Orders",
     "products": "Products",
