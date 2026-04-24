@@ -72,11 +72,7 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] py-8">
-      <div className="px-4 sm:px-6 lg:px-8 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{t('admin.dashboard.title')}</h1>
-      </div>
-
+    <div className="min-h-screen bg-[#F1F5F9]">
       <div className="flex flex-col lg:flex-row gap-8">
         <AdminSidebar currentPath={currentPath} router={router} t={t} />
 
