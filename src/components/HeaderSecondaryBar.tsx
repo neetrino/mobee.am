@@ -4,22 +4,18 @@ import Link from 'next/link';
 import type { FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
-import {
-  HEADER_STRIP_MIN_HEIGHT_LG,
-  HEADER_STRIP_PADDING_Y,
-  SITE_CONTENT_GUTTERS_CLASS,
-} from './header-strip-layout';
+import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
 
-/** Figma mobee-new node 178:565 — search icon in pill (24px). */
+/** Search icon in pill (20px, secondary bar). */
 function SecondarySearchGlyph({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      width={24}
-      height={24}
+      width={20}
+      height={20}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -36,13 +32,13 @@ function SecondarySearchGlyph({ className }: { className?: string }) {
   );
 }
 
-/** Outline user icon — Figma Top Bar login (24px). */
+/** Outline user icon (20px, secondary bar). */
 function UserOutlineIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      width={24}
-      height={24}
+      width={20}
+      height={20}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +63,7 @@ function UserOutlineIcon({ className }: { className?: string }) {
 }
 
 const iconLinkClass =
-  'flex h-10 w-10 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
+  'flex h-8 w-8 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
 
 export interface HeaderSecondaryBarProps {
   montserratClassName: string;
@@ -146,28 +142,26 @@ export function HeaderSecondaryBar({
       className={`hidden border-t border-gray-200 bg-white lg:block ${montserratClassName}`}
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        <div
-          className={`flex items-center justify-between gap-4 ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`}
-        >
-          <div className="flex min-w-0 flex-1 items-center gap-6 xl:gap-[30px]">
+        <div className="flex items-center justify-between gap-3 py-2 lg:min-h-[52px]">
+          <div className="flex min-w-0 flex-1 items-center gap-4 xl:gap-6">
             <div className="relative shrink-0" ref={categoriesWrapRef}>
               <button
                 type="button"
                 onClick={onCategoriesButtonClick}
-                className="flex h-10 w-full min-w-[180px] max-w-[241px] items-center justify-between gap-2 rounded-[70px] bg-[#2db2ff] pl-[19px] pr-4 text-left text-[#fcfcfc] shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
+                className="flex h-9 w-full min-w-[156px] max-w-[210px] items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-4 pr-3 text-left text-[#fcfcfc] shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
                 aria-expanded={isCategoriesMenuOpen}
                 aria-haspopup="true"
               >
-                <span className="flex min-w-0 flex-1 items-center gap-2.5">
-                  <span className="flex h-[14px] w-[21px] shrink-0 flex-col justify-center gap-[5px]" aria-hidden>
+                <span className="flex min-w-0 flex-1 items-center gap-2">
+                  <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
                     <span className="h-0.5 w-full rounded-full bg-white" />
                     <span className="h-0.5 w-full rounded-full bg-white" />
                     <span className="h-0.5 w-full rounded-full bg-white" />
                   </span>
-                  <span className="truncate text-[15px] font-bold leading-8">{categoriesLabel}</span>
+                  <span className="truncate text-[13px] font-bold leading-7">{categoriesLabel}</span>
                 </span>
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center" aria-hidden>
-                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden>
+                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M3 4.5L6 7.5L9 4.5"
                       stroke="white"
@@ -181,9 +175,9 @@ export function HeaderSecondaryBar({
               {categoriesMenu}
             </div>
 
-            <div className="relative min-w-0 max-w-[535px] flex-1 xl:max-w-[672px]">
+            <div className="relative min-w-0 max-w-[480px] flex-1 xl:max-w-[600px]">
               <form onSubmit={onSearchSubmit} className="relative w-full">
-                <div className="pointer-events-none absolute inset-y-0 left-3 z-[1] flex items-center">
+                <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">
                   <SecondarySearchGlyph className="text-gray-400" />
                 </div>
                 <input
@@ -196,7 +190,7 @@ export function HeaderSecondaryBar({
                   onKeyDown={onSearchKeyDown}
                   placeholder={searchPlaceholder}
                   autoComplete="off"
-                  className="h-10 w-full rounded-full border border-[#e5e7eb] bg-white/50 py-2 pl-[44px] pr-3.5 text-[14px] leading-normal text-gray-900 placeholder:text-[#6b7280] shadow-sm transition-shadow focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2db2ff]/25"
+                  className="h-9 w-full rounded-full border border-[#e5e7eb] bg-white/50 py-1.5 pl-10 pr-3 text-[13px] leading-normal text-gray-900 placeholder:text-[#6b7280] shadow-sm transition-shadow focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2db2ff]/25"
                   aria-controls={SECONDARY_SEARCH_LISTBOX_ID}
                   aria-expanded={searchDropdownOpen && searchResults.length > 0}
                   aria-autocomplete="list"
@@ -220,25 +214,25 @@ export function HeaderSecondaryBar({
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-7 pl-2 xl:gap-[37px]">
-            <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-5 pl-1.5 xl:gap-7">
+            <div className="flex items-center gap-0.5 sm:gap-1.5">
               <Link href="/compare" className={iconLinkClass} aria-label={compareAria}>
-                <CompareIcon size={24} className="shrink-0" />
+                <CompareIcon size={20} className="shrink-0" />
                 {compareCount > 0 ? (
                   <span className="sr-only">{compareCount}</span>
                 ) : null}
               </Link>
               <Link href="/wishlist" className={iconLinkClass} aria-label={wishlistAria}>
-                <WishlistHeartIcon size={24} />
+                <WishlistHeartIcon size={20} />
                 {wishlistCount > 0 ? (
                   <span className="sr-only">{wishlistCount}</span>
                 ) : null}
               </Link>
               <Link href="/cart" className={`${iconLinkClass} relative`} aria-label={cartAria}>
-                <CartIcon size={22} className="shrink-0" />
+                <CartIcon size={18} className="shrink-0" />
                 {cartCount > 0 ? (
                   <span
-                    className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#2db2ff] px-1 text-[10px] font-normal leading-none text-white"
+                    className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[#2db2ff] px-0.5 text-[9px] font-normal leading-none text-white"
                     aria-hidden
                   >
                     {cartCount > 99 ? '99+' : cartCount}
@@ -250,20 +244,20 @@ export function HeaderSecondaryBar({
             {isLoggedIn ? (
               <Link
                 href="/profile"
-                className="flex items-center gap-2 text-[#4b5563] transition-colors hover:text-gray-900"
+                className="flex items-center gap-1.5 text-[#4b5563] transition-colors hover:text-gray-900"
                 aria-label={profileAria}
               >
                 <UserOutlineIcon className="shrink-0" />
-                <span className="whitespace-nowrap text-[14px] font-normal leading-normal">{profileLabel}</span>
+                <span className="whitespace-nowrap text-[13px] font-normal leading-normal">{profileLabel}</span>
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-2 pr-1 text-[#4b5563] transition-colors hover:text-gray-900"
+                className="flex items-center gap-1.5 pr-0.5 text-[#4b5563] transition-colors hover:text-gray-900"
                 aria-label={loginLabel}
               >
                 <UserOutlineIcon className="shrink-0" />
-                <span className="whitespace-nowrap text-[14px] font-normal leading-normal">{loginLabel}</span>
+                <span className="whitespace-nowrap text-[13px] font-normal leading-normal">{loginLabel}</span>
               </Link>
             )}
           </div>
