@@ -53,6 +53,11 @@
     "headphonesLink": "Headphones",
     "accessoriesLink": "Accessories"
   },
+  "header": {
+    "supportPhoneAria": "Call customer support",
+    "supportPhoneNumber": "+374 10 000000",
+    "supportPhoneTel": "+37410000000"
+  },
   "stock": {
     "inStock": "In Stock",
     "outOfStock": "Out of Stock"

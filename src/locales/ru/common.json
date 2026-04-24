@@ -53,6 +53,11 @@
     "headphonesLink": "Наушники",
     "accessoriesLink": "Аксессуары"
   },
+  "header": {
+    "supportPhoneAria": "Позвонить в поддержку",
+    "supportPhoneNumber": "+374 10 000000",
+    "supportPhoneTel": "+37410000000"
+  },
   "stock": {
     "inStock": "В наличии",
     "outOfStock": "Нет в наличии"

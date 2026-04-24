@@ -4,8 +4,16 @@ import { useEffect, useState } from 'react';
 import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
 
 /**
- * EN / ՀԱՅ — matches Figma Component 5 (mobee-new Top Bar): sliding blue inset + border pill.
+ * ՀԱՅ / EN / РУС — Figma mobee-new Component 5 (node 178:544): bordered pill, #2db2ff sliding inset.
  */
+type PillSegment = 'hy' | 'en' | 'ru';
+
+function segmentForLang(lang: LanguageCode): PillSegment {
+  if (lang === 'hy') return 'hy';
+  if (lang === 'ru') return 'ru';
+  return 'en';
+}
+
 export function LanguageSwitcherPill() {
   const [lang, setLang] = useState<LanguageCode>('en');
 
@@ -16,24 +24,37 @@ export function LanguageSwitcherPill() {
     return () => window.removeEventListener('language-updated', onUpdate);
   }, []);
 
-  const enSelected = lang === 'en' || lang === 'ru' || lang === 'ka';
-  const hySelected = lang === 'hy';
+  const seg = segmentForLang(lang);
+  const slideTranslate =
+    seg === 'hy' ? 'translateX(0%)' : seg === 'en' ? 'translateX(100%)' : 'translateX(200%)';
 
   return (
-    <div className="relative h-[30px] w-[68px] shrink-0" role="group" aria-label="Language">
-      <div className="pointer-events-none absolute inset-0 rounded-[15px] border border-solid border-[#4b5563]" />
+    <div
+      className="relative h-[41px] w-[148px] shrink-0 rounded-[22px] border-[1.2px] border-solid border-[#4b5563]"
+      role="group"
+      aria-label="Language"
+    >
       <div
-        className={`pointer-events-none absolute rounded-[12px] bg-[#136dec] transition-all duration-200 ease-out ${
-          hySelected
-            ? 'inset-[10.81%_5.62%_10.81%_50.56%]'
-            : 'inset-[10.81%_50.56%_10.81%_5.62%]'
-        }`}
+        className="pointer-events-none absolute left-[4px] top-[4px] bottom-[4px] w-[calc((100%-8px)/3)] rounded-[18px] bg-[#2db2ff] transition-transform duration-200 ease-out"
+        style={{ transform: slideTranslate }}
+        aria-hidden
       />
-      <div className="relative z-10 flex h-full items-stretch px-0.5">
+      <div className="relative z-10 grid h-full grid-cols-3 items-stretch px-[2px]">
         <button
           type="button"
-          className={`flex flex-1 items-center justify-center rounded-[12px] text-[11px] font-medium leading-none ${
-            enSelected ? 'text-[#f5f5f5]' : 'text-[#4b5563]'
+          className={`flex items-center justify-center rounded-[18px] text-[14px] font-bold leading-[15px] ${
+            seg === 'hy' ? 'text-white' : 'text-[#4b5563]'
+          }`}
+          onClick={() => {
+            if (lang !== 'hy') setStoredLanguage('hy');
+          }}
+        >
+          ՀԱՅ
+        </button>
+        <button
+          type="button"
+          className={`flex items-center justify-center rounded-[18px] text-[14px] font-bold leading-[15px] ${
+            seg === 'en' ? 'text-white' : 'text-[#4b5563]'
           }`}
           onClick={() => {
             if (lang !== 'en') setStoredLanguage('en');
@@ -43,14 +64,14 @@ export function LanguageSwitcherPill() {
         </button>
         <button
           type="button"
-          className={`flex flex-1 items-center justify-center rounded-[12px] text-[11px] font-medium leading-none ${
-            hySelected ? 'text-[#f5f5f5]' : 'text-[#4b5563]'
+          className={`flex items-center justify-center rounded-[18px] text-[14px] font-bold leading-[15px] ${
+            seg === 'ru' ? 'text-white' : 'text-[#4b5563]'
           }`}
           onClick={() => {
-            if (lang !== 'hy') setStoredLanguage('hy');
+            if (lang !== 'ru') setStoredLanguage('ru');
           }}
         >
-          ՀԱՅ
+          РУС
         </button>
       </div>
     </div>

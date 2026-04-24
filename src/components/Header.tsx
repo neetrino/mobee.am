@@ -311,6 +311,36 @@ function CategoryMenuItem({
   );
 }
 
+/** Figma mobee-new node 178:535 — support phone + language pill */
+function HeaderPhoneLangCluster({ phoneNumberVisibility }: { phoneNumberVisibility?: 'always' | 'smUp' }) {
+  const { t } = useTranslation();
+  const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
+  const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
+
+  const numberClass =
+    phoneNumberVisibility === 'smUp'
+      ? 'hidden truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151] sm:inline'
+      : 'truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151]';
+
+  return (
+    <div className="flex min-w-0 shrink-0 items-center gap-6 sm:gap-[50px]">
+      <a href={telHref} className="flex min-w-0 items-center gap-2" aria-label={t('common.header.supportPhoneAria')}>
+        <span className="relative size-6 shrink-0">
+          <img
+            src={HEADER_FIGMA_ASSETS.phoneIcon}
+            alt=""
+            width={24}
+            height={24}
+            className="absolute inset-0 block size-6 max-w-none"
+          />
+        </span>
+        <span className={numberClass}>{t('common.header.supportPhoneNumber')}</span>
+      </a>
+      <LanguageSwitcherPill />
+    </div>
+  );
+}
+
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
@@ -321,7 +351,6 @@ export function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
   const [showMobileCurrency, setShowMobileCurrency] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
   const [showProductsMenu, setShowProductsMenu] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -342,10 +371,7 @@ export function Header() {
       ? 'whitespace-nowrap text-[13px] font-black leading-5 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
       : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
 
-  const utilityLabelClass =
-    'mt-1 text-center text-[13px] font-medium leading-[15px] text-[#4b5563] xl:text-[16px]';
   const mobileCurrencyRef = useRef<HTMLDivElement>(null);
-  const userMenuRef = useRef<HTMLDivElement>(null);
   const productsMenuRef = useRef<HTMLDivElement>(null);
   const productsMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
@@ -564,9 +590,6 @@ export function Header() {
       if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(event.target as Node)) {
         setShowMobileCurrency(false);
       }
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setShowUserMenu(false);
-      }
       if (productsMenuRef.current && !productsMenuRef.current.contains(event.target as Node)) {
         setShowProductsMenu(false);
       }
@@ -745,7 +768,7 @@ export function Header() {
                 </div>
               )}
             </div>
-            <LanguageSwitcherPill />
+            <HeaderPhoneLangCluster phoneNumberVisibility="smUp" />
           </div>
         </div>
 
@@ -824,134 +847,8 @@ export function Header() {
             </nav>
           </div>
 
-          <div className="flex min-w-0 shrink-0 items-center justify-end gap-3 lg:gap-4 xl:gap-8 2xl:gap-12">
-            <Link
-              href="/compare"
-              className="flex w-[35px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
-            >
-                <span className="relative h-5 w-5 shrink-0">
-                <img
-                  src={HEADER_FIGMA_ASSETS.compare}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="absolute inset-0 block size-5 max-w-none"
-                />
-              </span>
-              <span className={utilityLabelClass}>{t('common.navigation.compare')}</span>
-            </Link>
-
-            <div className="relative flex w-[47px] flex-col items-center" ref={userMenuRef}>
-              {isLoggedIn ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex w-full flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
-                    aria-expanded={showUserMenu}
-                  >
-                    <span className="relative h-5 w-5 shrink-0">
-                      <img
-                        src={HEADER_FIGMA_ASSETS.signIn}
-                        alt=""
-                        width={20}
-                        height={20}
-                        className="absolute inset-0 block size-5 max-w-none"
-                      />
-                    </span>
-                    <span className={utilityLabelClass}>{t('common.navigation.profile')}</span>
-                  </button>
-                  {showUserMenu && (
-                    <div className="absolute right-0 top-full z-50 mt-2 w-52 animate-in overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-2xl fade-in slide-in-from-top-2 duration-200">
-                      <Link
-                        href="/profile"
-                        className="block border-b border-gray-100 px-5 py-3 text-sm font-medium text-gray-700 transition-all duration-150 hover:bg-gradient-to-r hover:from-gray-50 hover:to-white"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        {t('common.navigation.profile')}
-                      </Link>
-                      {isAdmin && (
-                        <Link
-                          href="/admin"
-                          className="block border-b border-gray-100 px-5 py-3 text-sm font-medium text-blue-600 transition-all duration-150 hover:bg-gradient-to-r hover:from-blue-50 hover:to-white"
-                          onClick={() => setShowUserMenu(false)}
-                        >
-                          <div className="flex items-center">
-                            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {t('common.navigation.adminPanel')}
-                          </div>
-                        </Link>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowUserMenu(false);
-                          logout();
-                        }}
-                        className="block w-full px-5 py-3 text-left text-sm font-medium text-red-600 transition-all duration-150 hover:bg-gradient-to-r hover:from-red-50 hover:to-white"
-                      >
-                        {t('common.navigation.logout')}
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <Link
-                  href="/login"
-                  className="flex flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
-                >
-                  <span className="relative h-5 w-5 shrink-0">
-                    <img
-                      src={HEADER_FIGMA_ASSETS.signIn}
-                      alt=""
-                      width={20}
-                      height={20}
-                      className="absolute inset-0 block size-5 max-w-none"
-                    />
-                  </span>
-                  <span className={utilityLabelClass}>{t('common.navigation.login')}</span>
-                </Link>
-              )}
-            </div>
-
-            <Link href="/cart" className="relative flex w-[33px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90">
-              <span className="relative h-5 w-5 shrink-0">
-                <img
-                  src={HEADER_FIGMA_ASSETS.cart}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="block size-5 max-w-none"
-                />
-                {cartCount > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-[#2db2ff] pb-px text-[9px] font-normal leading-[13px] text-white">
-                    {cartCount > 99 ? '99+' : cartCount}
-                  </span>
-                )}
-              </span>
-              <span className={utilityLabelClass}>{t('common.navigation.cart')}</span>
-            </Link>
-
-            <Link
-              href="/wishlist"
-              className="flex w-[53px] flex-col items-center text-[#4b5563] transition-colors hover:opacity-90"
-            >
-              <span className="relative h-5 w-5 shrink-0">
-                <img
-                  src={HEADER_FIGMA_ASSETS.favorite}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="absolute inset-0 block size-5 max-w-none"
-                />
-              </span>
-              <span className={utilityLabelClass}>{t('common.navigation.wishlist')}</span>
-            </Link>
-
-            <LanguageSwitcherPill />
+          <div className="flex min-w-0 shrink-0 items-center justify-end">
+            <HeaderPhoneLangCluster />
           </div>
         </div>
       </div>
