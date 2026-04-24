@@ -30,19 +30,19 @@ export function LanguageSwitcherPill() {
 
   return (
     <div
-      className="relative h-[41px] w-[148px] shrink-0 rounded-[22px] border-[1.2px] border-solid border-[#4b5563]"
+      className="relative h-[38.95px] w-[140.6px] shrink-0 rounded-[20.9px] border-[1.14px] border-solid border-[#4b5563]"
       role="group"
       aria-label="Language"
     >
       <div
-        className="pointer-events-none absolute left-[4px] top-[4px] bottom-[4px] w-[calc((100%-8px)/3)] rounded-[18px] bg-[#2db2ff] transition-transform duration-200 ease-out"
+        className="pointer-events-none absolute left-[3.8px] top-[3.8px] bottom-[3.8px] w-[calc((100%-7.6px)/3)] rounded-[17.1px] bg-[#2db2ff] transition-transform duration-200 ease-out"
         style={{ transform: slideTranslate }}
         aria-hidden
       />
-      <div className="relative z-10 grid h-full grid-cols-3 items-stretch px-[2px]">
+      <div className="relative z-10 grid h-full grid-cols-3 items-stretch px-[1.9px]">
         <button
           type="button"
-          className={`flex items-center justify-center rounded-[18px] text-[14px] font-bold leading-[15px] ${
+          className={`flex items-center justify-center rounded-[17.1px] text-[13.3px] font-bold leading-[14.25px] ${
             seg === 'hy' ? 'text-white' : 'text-[#4b5563]'
           }`}
           onClick={() => {
@@ -53,7 +53,7 @@ export function LanguageSwitcherPill() {
         </button>
         <button
           type="button"
-          className={`flex items-center justify-center rounded-[18px] text-[14px] font-bold leading-[15px] ${
+          className={`flex items-center justify-center rounded-[17.1px] text-[13.3px] font-bold leading-[14.25px] ${
             seg === 'en' ? 'text-white' : 'text-[#4b5563]'
           }`}
           onClick={() => {
@@ -64,7 +64,7 @@ export function LanguageSwitcherPill() {
         </button>
         <button
           type="button"
-          className={`flex items-center justify-center rounded-[18px] text-[14px] font-bold leading-[15px] ${
+          className={`flex items-center justify-center rounded-[17.1px] text-[13.3px] font-bold leading-[14.25px] ${
             seg === 'ru' ? 'text-white' : 'text-[#4b5563]'
           }`}
           onClick={() => {
