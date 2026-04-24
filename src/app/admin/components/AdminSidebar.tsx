@@ -52,11 +52,11 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
         <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
       </div>
       <aside className="hidden lg:block lg:w-64 flex-shrink-0 lg:sticky lg:top-0 lg:h-screen">
-        <nav className="h-full bg-white border border-gray-200 rounded-lg p-2 flex flex-col">
+        <nav className="h-full bg-white border border-gray-200 rounded-lg p-2 flex flex-col overflow-hidden">
           <div className="px-4 py-3 text-sm font-semibold text-gray-900 border-b border-gray-200">
             Admin page
           </div>
-          <div className="space-y-1">
+          <div className="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1">
             {primaryTabs.map((tab) => {
             if (tab.isSubCategory && !isProductsExpanded) {
               return null;
@@ -136,7 +136,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
             })}
           </div>
           {homeTab ? (
-            <div className="mt-auto pt-3 border-t border-gray-200 space-y-2">
+            <div className="mt-auto shrink-0 pt-3 border-t border-gray-200 space-y-2 bg-white">
               <button
                 onClick={() => {
                   router.push(homeTab.path);
