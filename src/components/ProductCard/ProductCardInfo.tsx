@@ -75,11 +75,19 @@ export function ProductCardInfo({
         <div className={`mt-2 flex items-center justify-between ${isCompact ? 'gap-2' : 'gap-4'}`}>
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className={`${isCompact ? 'text-lg' : 'text-2xl'} font-semibold text-gray-900`}>
+              <span
+                className={`${
+                  isCompact ? 'text-[1.06875rem]' : 'text-[1.425rem]'
+                } font-semibold text-gray-900`}
+              >
                 {formatPrice(price || 0, currency)}
               </span>
               {discountPercent && discountPercent > 0 ? (
-                <span className={`${isCompact ? 'text-xs' : 'text-sm'} font-semibold text-blue-600`}>
+                <span
+                  className={`${
+                    isCompact ? 'text-[0.7125rem]' : 'text-[0.83125rem]'
+                  } font-semibold text-blue-600`}
+                >
                   -{discountPercent}%
                 </span>
               ) : null}

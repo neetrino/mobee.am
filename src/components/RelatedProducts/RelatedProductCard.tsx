@@ -116,11 +116,11 @@ export function RelatedProductCard({
               {/* Price */}
               <div className="mt-auto flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="text-[1.06875rem] font-bold text-gray-900">
                     {formatPrice(product.price, currency)}
                   </span>
                   {product.discountPercent && product.discountPercent > 0 && (
-                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                    <span className="text-[0.7125rem] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
                       -{product.discountPercent}%
                     </span>
                   )}

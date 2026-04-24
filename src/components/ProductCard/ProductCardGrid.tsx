@@ -61,7 +61,9 @@ export function ProductCardGrid({
   onCompareToggle,
   onAddToCart,
 }: ProductCardGridProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
+  /** Russian “Добавить в корзину” needs a slightly tighter pill on desktop (lg). */
+  const ruDesktopAddToCart = lang === 'ru';
 
   return (
     <div className="relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[583px]">
@@ -121,11 +123,11 @@ export function ProductCardGrid({
               className={`font-bold tabular-nums text-gray-900 ${
                 smallerFooterPrice
                   ? isCompact
-                    ? 'text-[0.8680921875rem] leading-[1.350365625rem]'
-                    : 'text-[0.964546875rem] leading-[1.350365625rem]'
+                    ? 'text-[0.824687578125rem] leading-[1.28284734375rem]'
+                    : 'text-[0.91631953125rem] leading-[1.28284734375rem]'
                   : isCompact
-                    ? 'text-lg leading-7'
-                    : 'text-xl leading-7'
+                    ? 'text-[1.06875rem] leading-[1.6625rem]'
+                    : 'text-[1.1875rem] leading-[1.6625rem]'
               }`}
             >
               {formatPrice(product.price || 0, currency)}
@@ -135,11 +137,11 @@ export function ProductCardGrid({
                 className={`font-semibold text-blue-600 ${
                   smallerFooterPrice
                     ? isCompact
-                      ? 'text-[0.578728125rem]'
-                      : 'text-[0.6751828125rem]'
+                      ? 'text-[0.54979171875rem]'
+                      : 'text-[0.641423671875rem]'
                     : isCompact
-                      ? 'text-xs'
-                      : 'text-sm'
+                      ? 'text-[0.7125rem]'
+                      : 'text-[0.83125rem]'
                 }`}
               >
                 -{product.discountPercent}%
@@ -157,15 +159,29 @@ export function ProductCardGrid({
               : 'cursor-not-allowed opacity-50'
           } ${
             isCompact
-              ? 'h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide'
-              : 'h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]'
+              ? `h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide${
+                  ruDesktopAddToCart
+                    ? ' lg:h-[38px] lg:min-w-[104.5px] lg:gap-[7.6px] lg:rounded-[19px] lg:px-[11.4px] lg:text-[11.4px]'
+                    : ''
+                }`
+              : `h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]${
+                  ruDesktopAddToCart
+                    ? ' lg:h-[36.94px] lg:min-w-[101.57px] lg:gap-[5.99px] lg:rounded-[15.39px] lg:px-[12.31px] lg:text-[10.77px] lg:leading-[20.52px] lg:tracking-[0.154px]'
+                    : ''
+                }`
           }`}
           title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
           aria-label={product.inStock ? t('common.ariaLabels.addToCart') : t('common.ariaLabels.outOfStock')}
         >
           {isAddingToCart ? (
             <svg
-              className={`animate-spin ${isCompact ? 'h-4 w-4' : 'h-[16.2px] w-[16.2px]'}`}
+              className={`animate-spin ${isCompact ? 'h-4 w-4' : 'h-[16.2px] w-[16.2px]'}${
+                ruDesktopAddToCart
+                  ? isCompact
+                    ? ' lg:h-[15.2px] lg:w-[15.2px]'
+                    : ' lg:h-[15.39px] lg:w-[15.39px]'
+                  : ''
+              }`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -180,7 +196,17 @@ export function ProductCardGrid({
             </svg>
           ) : (
             <>
-              <CartIcon className="shrink-0" size={isCompact ? 18 : 16.2} />
+              {ruDesktopAddToCart ? (
+                <>
+                  <CartIcon className="shrink-0 lg:hidden" size={isCompact ? 18 : 16.2} />
+                  <CartIcon
+                    className="hidden shrink-0 lg:block"
+                    size={isCompact ? 17.1 : 15.39}
+                  />
+                </>
+              ) : (
+                <CartIcon className="shrink-0" size={isCompact ? 18 : 16.2} />
+              )}
               <span className="whitespace-nowrap">{t('common.buttons.addToCart')}</span>
             </>
           )}
