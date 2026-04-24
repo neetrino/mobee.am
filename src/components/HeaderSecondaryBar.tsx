@@ -175,7 +175,7 @@ export function HeaderSecondaryBar({
               {categoriesMenu}
             </div>
 
-            <div className="relative min-w-0 max-w-[480px] flex-1 xl:max-w-[600px]">
+            <div className="relative min-w-0 max-w-[299px] flex-1 xl:max-w-[374px]">
               <form onSubmit={onSearchSubmit} className="relative w-full">
                 <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">
                   <SecondarySearchGlyph className="text-gray-400" />
