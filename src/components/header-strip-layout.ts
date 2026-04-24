@@ -1,6 +1,5 @@
 /**
- * Shared layout for the two stacked top strips ({@link Header} + {@link MainHeaderBar})
- * so they use the same vertical padding and minimum height on large screens.
+ * Shared layout for the main header strip ({@link Header}) and matching storefront sections.
  */
 export const HEADER_STRIP_PADDING_Y =
   'py-[0.45rem] sm:py-[0.6rem] lg:py-[0.6rem]';
