@@ -74,12 +74,12 @@ export function OrdersTable({
   }
 
   return (
-    <Card className="p-6">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+    <Card className="p-3 sm:p-4 lg:p-5">
+      <div className="w-full">
+        <table className="w-full table-fixed divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3">
+              <th className="w-10 px-2 py-3 sm:px-3">
                 <input
                   type="checkbox"
                   aria-label={t('admin.orders.selectAllOrders')}
@@ -87,14 +87,14 @@ export function OrdersTable({
                   onChange={onToggleSelectAll}
                 />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[11%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.orderNumber')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[18%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.customer')}
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                className="w-[12%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"
                 onClick={() => onSort('total')}
               >
                 <div className="flex items-center gap-1">
@@ -117,20 +117,20 @@ export function OrdersTable({
                   </div>
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[7%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.items')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.status')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.payment')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.fulfillment')}
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                className="w-[10%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"
                 onClick={() => onSort('createdAt')}
               >
                 <div className="flex items-center gap-1">

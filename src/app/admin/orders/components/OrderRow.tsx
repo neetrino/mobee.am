@@ -55,7 +55,7 @@ export function OrderRow({
 
   return (
     <tr className="hover:bg-gray-50">
-      <td className="px-4 py-4">
+      <td className="px-2 py-3 align-top sm:px-3">
         <input
           type="checkbox"
           aria-label={t('admin.orders.selectOrder').replace('{number}', order.number)}
@@ -64,30 +64,30 @@ export function OrderRow({
         />
       </td>
       <td
-        className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-gray-50"
+        className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
         onClick={onViewDetails}
       >
         <div className="text-sm font-medium text-gray-900">{order.number}</div>
       </td>
       <td
-        className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-gray-50"
+        className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
         onClick={onViewDetails}
       >
         <div className="text-sm font-medium text-gray-900">
           {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
         </div>
         {order.customerPhone && (
-          <div className="text-sm text-gray-500">{order.customerPhone}</div>
+          <div className="text-xs text-gray-500 break-all">{order.customerPhone}</div>
         )}
         <div className="mt-1 text-xs text-admin-600">{t('admin.orders.viewOrderDetails')}</div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="px-2 py-3 align-top text-sm font-medium text-gray-900 break-words sm:px-3">
         {calculateTotalWithoutShipping()}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-2 py-3 align-top text-sm text-gray-500 sm:px-3">
         {order.itemsCount}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-2 py-3 align-top sm:px-3">
         <div className="flex items-center gap-2">
           {updatingStatus ? (
             <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function OrderRow({
             <select
               value={order.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getStatusColor(order.status)}`}
+              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getStatusColor(order.status)}`}
             >
               <option value="pending">{t('admin.orders.pending')}</option>
               <option value="processing">{t('admin.orders.processing')}</option>
@@ -108,7 +108,7 @@ export function OrderRow({
           )}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-2 py-3 align-top sm:px-3">
         <div className="flex items-center gap-2">
           {updatingPaymentStatus ? (
             <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export function OrderRow({
             <select
               value={order.paymentStatus}
               onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
+              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
             >
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>
@@ -128,7 +128,7 @@ export function OrderRow({
           )}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-2 py-3 align-top sm:px-3">
         <div className="flex items-center gap-2">
           {updatingFulfillmentStatus ? (
             <div className="flex items-center gap-2">
@@ -139,7 +139,7 @@ export function OrderRow({
             <select
               value={order.fulfillmentStatus}
               onChange={(e) => onFulfillmentStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getFulfillmentStatusColor(order.fulfillmentStatus)}`}
+              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getFulfillmentStatusColor(order.fulfillmentStatus)}`}
             >
               <option value="unfulfilled">{t('admin.orders.unfulfilled')}</option>
               <option value="fulfilled">{t('admin.orders.fulfilled')}</option>
@@ -149,7 +149,7 @@ export function OrderRow({
           )}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-2 py-3 align-top text-sm text-gray-500 break-words sm:px-3">
         {new Date(order.createdAt).toLocaleDateString()}
       </td>
     </tr>
