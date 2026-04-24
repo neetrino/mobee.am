@@ -29,8 +29,8 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
       <div className="lg:hidden mb-6">
         <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
       </div>
-      <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-        <nav className="bg-white border border-gray-200 rounded-lg p-2 space-y-1">
+      <aside className="hidden lg:block lg:w-64 flex-shrink-0 lg:sticky lg:top-0 lg:h-screen">
+        <nav className="h-full bg-white border border-gray-200 rounded-lg p-2 space-y-1">
           {adminTabs.map((tab) => {
             if (tab.isSubCategory && !isProductsExpanded) {
               return null;
