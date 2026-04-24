@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { getAdminMenuTABS } from '../admin-menu.config';
+import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../../../lib/language';
 
 interface AdminSidebarProps {
   currentPath: string;
@@ -12,6 +13,11 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
+  const languageTabs: Array<{ code: LanguageCode; label: string }> = [
+    { code: 'hy', label: 'hy' },
+    { code: 'en', label: 'eng' },
+    { code: 'ru', label: 'ru' },
+  ];
   const adminTabs = getAdminMenuTABS(t);
   const homeTab = adminTabs.find((tab) => tab.id === 'home');
   const primaryTabs = adminTabs.filter((tab) => tab.id !== 'home');
@@ -19,12 +25,26 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
   const productGroupPaths = ['/admin/products', '/admin/categories', '/admin/brands', '/admin/attributes'];
   const isProductGroupActive = productGroupPaths.some((path) => currentPath.startsWith(path));
   const [isProductsExpanded, setIsProductsExpanded] = useState(isProductGroupActive);
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en');
 
   useEffect(() => {
     if (isProductGroupActive) {
       setIsProductsExpanded(true);
     }
   }, [isProductGroupActive]);
+
+  useEffect(() => {
+    setCurrentLanguage(getStoredLanguage());
+
+    const handleLanguageUpdate = () => {
+      setCurrentLanguage(getStoredLanguage());
+    };
+
+    window.addEventListener('language-updated', handleLanguageUpdate);
+    return () => {
+      window.removeEventListener('language-updated', handleLanguageUpdate);
+    };
+  }, []);
 
   return (
     <>
@@ -116,21 +136,46 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
             })}
           </div>
           {homeTab ? (
-            <button
-              onClick={() => {
-                router.push(homeTab.path);
-              }}
-              className={`w-full mt-auto flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
-                currentPath === '/'
-                  ? 'bg-admin text-white'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              <span className={`flex-shrink-0 ${currentPath === '/' ? 'text-white' : 'text-gray-500'}`}>
-                {homeTab.icon}
-              </span>
-              <span className="text-left">{homeTab.label}</span>
-            </button>
+            <div className="mt-auto pt-3 border-t border-gray-200 space-y-2">
+              <button
+                onClick={() => {
+                  router.push(homeTab.path);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                  currentPath === '/'
+                    ? 'bg-admin text-white'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                <span className={`flex-shrink-0 ${currentPath === '/' ? 'text-white' : 'text-gray-500'}`}>
+                  {homeTab.icon}
+                </span>
+                <span className="text-left">{homeTab.label}</span>
+              </button>
+              <div className="grid grid-cols-3 gap-1">
+                {languageTabs.map((language) => {
+                  const isActive = currentLanguage === language.code;
+                  return (
+                    <button
+                      key={language.code}
+                      type="button"
+                      onClick={() => {
+                        if (!isActive) {
+                          setStoredLanguage(language.code);
+                        }
+                      }}
+                      className={`w-full px-2 py-1.5 rounded-md text-xs font-semibold text-center uppercase tracking-wide transition-all border ${
+                        isActive
+                          ? 'bg-admin text-white border-admin'
+                          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                    >
+                      {language.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           ) : null}
         </nav>
       </aside>
