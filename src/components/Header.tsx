@@ -22,6 +22,7 @@ import {
 } from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
+import { HeaderSecondaryBar } from './HeaderSecondaryBar';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -376,6 +377,9 @@ export function Header() {
   const productsMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+  const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
+  const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
 
   const {
     query: searchQuery,
@@ -593,6 +597,9 @@ export function Header() {
       if (productsMenuRef.current && !productsMenuRef.current.contains(event.target as Node)) {
         setShowProductsMenu(false);
       }
+      if (categoriesPillWrapRef.current && !categoriesPillWrapRef.current.contains(event.target as Node)) {
+        setShowCategoriesPillMenu(false);
+      }
       if (searchModalRef.current && !searchModalRef.current.contains(event.target as Node)) {
         setShowSearchModal(false);
       }
@@ -633,12 +640,19 @@ export function Header() {
     };
   }, []);
 
-  // Focus search input when modal opens; show dropdown if query present
+  // Focus search input when modal opens; sync dropdown with query. When modal is closed, do not
+  // force-close the dropdown so the desktop secondary search bar can keep showing results.
   useEffect(() => {
     if (showSearchModal && searchInputRef.current) {
       searchInputRef.current.focus();
       setSearchDropdownOpen(searchQuery.trim().length >= 1);
-    } else {
+      return;
+    }
+    if (showSearchModal) {
+      setSearchDropdownOpen(searchQuery.trim().length >= 1);
+      return;
+    }
+    if (searchQuery.trim().length < 1) {
       setSearchDropdownOpen(false);
     }
   }, [showSearchModal, searchQuery]);
@@ -654,6 +668,10 @@ export function Header() {
         setShowSearchModal(false);
       }
 
+      if (showCategoriesPillMenu) {
+        setShowCategoriesPillMenu(false);
+      }
+
       if (mobileMenuOpen) {
         setMobileMenuOpen(false);
       }
@@ -663,7 +681,7 @@ export function Header() {
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [showSearchModal, mobileMenuOpen]);
+  }, [showSearchModal, mobileMenuOpen, showCategoriesPillMenu]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -797,6 +815,7 @@ export function Header() {
                 className="relative flex items-center"
                 ref={productsMenuRef}
                 onMouseEnter={() => {
+                  setShowCategoriesPillMenu(false);
                   if (productsMenuTimeoutRef.current) {
                     clearTimeout(productsMenuTimeoutRef.current);
                     productsMenuTimeoutRef.current = null;
@@ -852,6 +871,83 @@ export function Header() {
           </div>
         </div>
       </div>
+
+      <HeaderSecondaryBar
+        montserratClassName={montserrat.className}
+        categoriesWrapRef={categoriesPillWrapRef}
+        categoriesLabel={t('common.navigation.categories')}
+        isCategoriesMenuOpen={showCategoriesPillMenu}
+        onCategoriesButtonClick={() => {
+          if (productsMenuTimeoutRef.current) {
+            clearTimeout(productsMenuTimeoutRef.current);
+            productsMenuTimeoutRef.current = null;
+          }
+          setShowProductsMenu(false);
+          setShowCategoriesPillMenu((open) => !open);
+        }}
+        categoriesMenu={
+          showCategoriesPillMenu ? (
+            <>
+              <div className="absolute left-0 top-full z-50 h-2 w-full" aria-hidden />
+              <div className="absolute left-0 top-full z-50 w-64 pt-2">
+                <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
+                  {loadingCategories ? (
+                    <div className="px-4 py-2 text-sm text-gray-500">{t('common.messages.loading')}</div>
+                  ) : (
+                    getRootCategories(categories).map((category) => (
+                      <CategoryMenuItem
+                        key={category.id}
+                        category={category}
+                        onClose={() => setShowCategoriesPillMenu(false)}
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+            </>
+          ) : null
+        }
+        searchQuery={searchQuery}
+        onSearchChange={(value) => {
+          setSearchQuery(value);
+          if (value.trim().length >= 1) {
+            setSearchDropdownOpen(true);
+          } else {
+            setSearchDropdownOpen(false);
+          }
+        }}
+        onSearchSubmit={handleSearch}
+        onSearchKeyDown={searchHandleKeyDown}
+        searchPlaceholder={t('common.mainHeader.searchPlaceholder')}
+        searchInputRef={desktopSearchInputRef}
+        onSearchFocus={() => {
+          if (searchQuery.trim().length >= 1) {
+            setSearchDropdownOpen(true);
+          }
+        }}
+        searchResults={searchResults}
+        searchLoading={searchLoading}
+        searchError={searchError}
+        searchDropdownOpen={searchDropdownOpen}
+        searchSelectedIndex={searchSelectedIndex}
+        onSearchResultClick={(result) => {
+          router.push(`/products/${result.slug}`);
+          clearSearch();
+          setSearchDropdownOpen(false);
+        }}
+        onSearchDropdownClose={() => setSearchDropdownOpen(false)}
+        suppressSearchDropdown={showSearchModal}
+        compareCount={compareCount}
+        wishlistCount={wishlistCount}
+        cartCount={cartCount}
+        isLoggedIn={isLoggedIn}
+        loginLabel={t('common.navigation.login')}
+        profileLabel={t('common.navigation.profile')}
+        compareAria={t('common.navigation.compare')}
+        wishlistAria={t('common.navigation.wishlist')}
+        cartAria={t('common.navigation.cart')}
+        profileAria={t('common.navigation.profile')}
+      />
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
