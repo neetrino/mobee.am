@@ -64,7 +64,9 @@ export function Footer() {
   const productsColumnPaddingClass = isArmenian ? 'xl:pr-[15%]' : '';
 
   return (
-    <footer className={`${montserrat.className} ${isArmenian ? 'bg-[#f3f4f6]' : 'border-t border-gray-200 bg-white'}`}>
+    <footer
+      className={`${montserrat.className} hidden lg:block ${isArmenian ? 'bg-[#f3f4f6]' : 'border-t border-gray-200 bg-white'}`}
+    >
       <div className={sectionWrapperClass}>
         <div className={sectionGridClass}>
           {/* Visit us */}
