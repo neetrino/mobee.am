@@ -13,7 +13,7 @@ import { LoadingState } from './loading-state';
 
 export default function CartPage() {
   const { isLoggedIn } = useAuth();
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState(getStoredCurrency());
@@ -96,7 +96,7 @@ export default function CartPage() {
   }
 
   if (!cart || cart.items.length === 0) {
-    return <EmptyCart t={t} lang={lang} />;
+    return <EmptyCart t={t} />;
   }
 
   return (
