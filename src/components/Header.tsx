@@ -927,6 +927,10 @@ export function Header() {
         wishlistAria={t('common.navigation.wishlist')}
         cartAria={t('common.navigation.cart')}
         profileAria={t('common.navigation.profile')}
+        isAdmin={isAdmin}
+        adminPanelLabel={t('common.navigation.adminPanel')}
+        logoutLabel={t('common.navigation.logout')}
+        onLogout={logout}
       />
 
       {/* Mobile Menu */}

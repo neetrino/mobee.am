@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { forwardRef } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
@@ -66,6 +66,121 @@ function UserOutlineIcon({ className }: { className?: string }) {
 const iconLinkClass =
   'flex h-8 w-8 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
 
+const PROFILE_MENU_ID = 'header-secondary-profile-menu';
+
+function ProfileAccountMenu({
+  profileLabel,
+  profileAria,
+  isAdmin,
+  adminPanelLabel,
+  logoutLabel,
+  onLogout,
+}: {
+  profileLabel: string;
+  profileAria: string;
+  isAdmin: boolean;
+  adminPanelLabel: string;
+  logoutLabel: string;
+  onLogout: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const onDocMouseDown = (event: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocMouseDown);
+    return () => document.removeEventListener('mousedown', onDocMouseDown);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  const itemClass =
+    'flex w-full items-center gap-2 px-3 py-2.5 text-left text-[13px] font-normal leading-normal text-gray-800 transition-colors hover:bg-gray-50';
+
+  return (
+    <div ref={wrapRef} className="relative shrink-0">
+      <button
+        type="button"
+        id={`${PROFILE_MENU_ID}-trigger`}
+        aria-expanded={open}
+        aria-haspopup="true"
+        aria-controls={PROFILE_MENU_ID}
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1.5 rounded-md text-[#4b5563] transition-colors hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
+        aria-label={profileAria}
+      >
+        <UserOutlineIcon className="shrink-0" />
+        <span className="whitespace-nowrap text-[13px] font-normal leading-normal">{profileLabel}</span>
+        <span className="flex h-4 w-4 shrink-0 items-center justify-center text-gray-500" aria-hidden>
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M3 4.5L6 7.5L9 4.5"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      </button>
+      {open ? (
+        <>
+          <div className="absolute right-0 top-full z-[60] h-2 w-full min-w-[160px]" aria-hidden />
+          <div
+            id={PROFILE_MENU_ID}
+            role="menu"
+            aria-labelledby={`${PROFILE_MENU_ID}-trigger`}
+            className="absolute right-0 top-full z-[60] min-w-[200px] pt-2"
+          >
+            <div className="overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-2xl">
+              <Link href="/profile" role="menuitem" className={itemClass} onClick={close}>
+                {profileLabel}
+              </Link>
+              {isAdmin ? (
+                <Link href="/admin" role="menuitem" className={`${itemClass} text-blue-700 hover:bg-blue-50`} onClick={close}>
+                  {adminPanelLabel}
+                </Link>
+              ) : null}
+              <div className="my-1 border-t border-gray-100" role="separator" aria-orientation="horizontal" />
+              <button
+                type="button"
+                role="menuitem"
+                className={`${itemClass} text-red-600 hover:bg-red-50`}
+                onClick={() => {
+                  close();
+                  onLogout();
+                }}
+              >
+                {logoutLabel}
+              </button>
+            </div>
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 export interface HeaderSecondaryBarProps {
   montserratClassName: string;
   categoriesWrapRef: RefObject<HTMLDivElement>;
@@ -98,6 +213,10 @@ export interface HeaderSecondaryBarProps {
   wishlistAria: string;
   cartAria: string;
   profileAria: string;
+  isAdmin: boolean;
+  adminPanelLabel: string;
+  logoutLabel: string;
+  onLogout: () => void;
   /** When the global search modal is open, hide this dropdown so only one listbox is active. */
   suppressSearchDropdown: boolean;
   /**
@@ -143,6 +262,10 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
       wishlistAria,
       cartAria,
       profileAria,
+      isAdmin,
+      adminPanelLabel,
+      logoutLabel,
+      onLogout,
       suppressSearchDropdown,
       dockToViewportTop = false,
     },
@@ -258,14 +381,14 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
             </div>
 
             {isLoggedIn ? (
-              <Link
-                href="/profile"
-                className="flex items-center gap-1.5 text-[#4b5563] transition-colors hover:text-gray-900"
-                aria-label={profileAria}
-              >
-                <UserOutlineIcon className="shrink-0" />
-                <span className="whitespace-nowrap text-[13px] font-normal leading-normal">{profileLabel}</span>
-              </Link>
+              <ProfileAccountMenu
+                profileLabel={profileLabel}
+                profileAria={profileAria}
+                isAdmin={isAdmin}
+                adminPanelLabel={adminPanelLabel}
+                logoutLabel={logoutLabel}
+                onLogout={onLogout}
+              />
             ) : (
               <Link
                 href="/login"
