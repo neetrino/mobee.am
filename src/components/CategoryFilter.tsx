@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
+import { useProductsFilters } from './ProductsFiltersProvider';
 
 interface CategoryFilterProps {
   currentCategory?: string;
@@ -33,26 +34,45 @@ export function CategoryFilter({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const filtersCtx = useProductsFilters();
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (filtersCtx !== null) {
+      setLoading(filtersCtx.loading);
+      if (!filtersCtx.loading) {
+        setCategories(filtersCtx.topCategories);
+      }
+      return;
+    }
+
+    let cancelled = false;
     async function fetchTopCategories() {
       try {
         const lang = getStoredLanguage();
         const response = await apiClient.get<CategoriesResponse>('/api/v1/categories/top', {
           params: { lang, limit: '6' },
         });
-        setCategories(response.data ?? []);
+        if (!cancelled) {
+          setCategories(response.data ?? []);
+        }
       } catch {
-        setCategories([]);
+        if (!cancelled) {
+          setCategories([]);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
-    fetchTopCategories();
-  }, [search, minPrice, maxPrice]);
+    void fetchTopCategories();
+    return () => {
+      cancelled = true;
+    };
+  }, [filtersCtx, filtersCtx?.loading, filtersCtx?.topCategories, search, minPrice, maxPrice]);
 
   const toggleCategory = (slug: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -62,7 +82,7 @@ export function CategoryFilter({
       params.set('category', slug);
     }
     params.delete('page');
-    router.push(`/products?${params.toString()}`);
+    router.push(`/shop?${params.toString()}`);
   };
 
   if (loading || categories.length === 0) {

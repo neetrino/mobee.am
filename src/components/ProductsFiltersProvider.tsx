@@ -45,11 +45,21 @@ export interface ProductsFiltersData {
   priceRange: PriceRangeOption;
 }
 
+/** Top categories for shop sidebar (shared fetch, avoids duplicate /categories/top). */
+export interface ShopTopCategoryOption {
+  id: string;
+  slug: string;
+  title: string;
+  productCount: number;
+}
+
 interface ProductsFiltersContextValue {
   data: ProductsFiltersData | null;
   loading: boolean;
   error: boolean;
   refetch: () => void;
+  /** Loaded in parallel with filters; empty array when none or on error. */
+  topCategories: ShopTopCategoryOption[];
 }
 
 const ProductsFiltersContext = createContext<ProductsFiltersContextValue | null>(null);
@@ -77,6 +87,7 @@ export function ProductsFiltersProvider({
   children,
 }: ProductsFiltersProviderProps) {
   const [data, setData] = useState<ProductsFiltersData | null>(null);
+  const [topCategories, setTopCategories] = useState<ShopTopCategoryOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -90,16 +101,25 @@ export function ProductsFiltersProvider({
       if (search) params.search = search;
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
-      const res = await apiClient.get<ProductsFiltersData>('/api/v1/products/filters', { params });
+
+      const [filtersRes, topRes] = await Promise.all([
+        apiClient.get<ProductsFiltersData>('/api/v1/products/filters', { params }),
+        apiClient.get<{ data: ShopTopCategoryOption[] }>('/api/v1/categories/top', {
+          params: { lang, limit: '6' },
+        }),
+      ]);
+
       setData({
-        colors: res.colors ?? [],
-        sizes: res.sizes ?? [],
-        brands: res.brands ?? [],
-        priceRange: res.priceRange ?? DEFAULT_FILTERS.priceRange,
+        colors: filtersRes.colors ?? [],
+        sizes: filtersRes.sizes ?? [],
+        brands: filtersRes.brands ?? [],
+        priceRange: filtersRes.priceRange ?? DEFAULT_FILTERS.priceRange,
       });
+      setTopCategories(topRes.data ?? []);
     } catch {
       setError(true);
       setData(DEFAULT_FILTERS);
+      setTopCategories([]);
     } finally {
       setLoading(false);
     }
@@ -110,8 +130,14 @@ export function ProductsFiltersProvider({
   }, [fetchFilters]);
 
   const value = useMemo<ProductsFiltersContextValue>(
-    () => ({ data, loading, error, refetch: fetchFilters }),
-    [data, loading, error, fetchFilters]
+    () => ({
+      data,
+      loading,
+      error,
+      refetch: fetchFilters,
+      topCategories,
+    }),
+    [data, loading, error, fetchFilters, topCategories]
   );
 
   return (

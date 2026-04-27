@@ -9,9 +9,11 @@ interface ProductsHeaderProps {
    * Ընդհանուր ապրանքների քանակը՝ բոլոր էջերում (from API meta.total)
    */
   total: number;
+  /** When true, total count is not yet loaded (client fetch). */
+  isCountPending?: boolean;
 }
 
-function ProductsHeaderContent({ total }: ProductsHeaderProps) {
+function ProductsHeaderContent({ total, isCountPending }: ProductsHeaderProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
@@ -66,7 +68,10 @@ function ProductsHeaderContent({ total }: ProductsHeaderProps) {
           )}
           
           <h1 className="text-xl font-bold text-gray-900">
-            {t('products.header.allProducts').replace('{total}', total.toString())}
+            {t('products.header.allProducts').replace(
+              '{total}',
+              isCountPending ? '…' : total.toString(),
+            )}
           </h1>
         </div>
       </div>
@@ -74,7 +79,10 @@ function ProductsHeaderContent({ total }: ProductsHeaderProps) {
       {/* Mobile */}
       <div className="sm:hidden">
         <h1 className="text-lg font-bold text-gray-900">
-          {t('products.header.allProducts').replace('{total}', total.toString())}
+          {t('products.header.allProducts').replace(
+            '{total}',
+            isCountPending ? '…' : total.toString(),
+          )}
         </h1>
       </div>
     </div>

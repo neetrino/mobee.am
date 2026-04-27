@@ -97,7 +97,7 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
     // Reset page to 1 when filters change
     params.delete('page');
 
-    router.push(`/products?${params.toString()}`);
+    router.push(`/shop?${params.toString()}`);
   };
 
   if (loading) {

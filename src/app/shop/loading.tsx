@@ -1,7 +1,24 @@
-export default function ProductsLoading() {
+/**
+ * Instant route feedback while the shop shell streams (same idea as other route loading UI).
+ */
+export default function ShopLoading() {
   return (
-    <div className="flex items-center justify-center py-24" aria-busy="true" aria-label="Loading products">
-      <div className="w-10 h-10 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
+    <div className="w-full max-w-full animate-pulse">
+      <div className="mx-auto max-w-[1917px] px-4 pt-6 sm:px-6 lg:px-[53px]">
+        <div className="h-8 w-56 rounded bg-gray-200" />
+      </div>
+      <div className="mx-auto mt-6 flex max-w-[1917px] flex-col gap-6 px-4 sm:px-6 lg:flex-row lg:px-[53px]">
+        <div className="hidden h-[480px] w-full max-w-[403px] rounded-lg bg-gray-200 lg:block" />
+        <div className="min-w-0 flex-1 space-y-4 py-4 lg:pl-[53px]">
+          <div className="h-5 w-40 rounded bg-gray-200" />
+          <div className="h-10 max-w-md rounded bg-gray-200" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-[3/4] rounded-lg bg-gray-200" />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

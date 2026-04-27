@@ -73,7 +73,7 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
       params.delete('brand');
     }
     params.delete('page');
-    router.push(`/products?${params.toString()}`);
+    router.push(`/shop?${params.toString()}`);
   };
 
   if (loading) {
