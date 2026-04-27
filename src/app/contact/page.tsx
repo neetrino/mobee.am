@@ -198,7 +198,7 @@ export default function ContactPage() {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full bg-gray-900 text-white hover:bg-gray-800 rounded-md py-3 font-semibold uppercase tracking-wide"
+                className="w-full !bg-[#2DB2FF] text-white hover:!bg-[#25A0E0] rounded-md py-3 font-semibold uppercase tracking-wide focus:!ring-[#2DB2FF]"
                 disabled={submitting}
               >
                 {submitting ? (t('contact.form.submitting') || 'Ուղարկվում է...') : t('contact.form.submit')}
