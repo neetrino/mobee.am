@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { apiClient } from '../lib/api-client';
+import { useMemo } from 'react';
+import { useCategoriesTree } from './CategoriesTreeContext';
 import {
   ACCESSORIES_SLUG_PARTS,
   COMPUTERS_SLUG_PARTS,
@@ -15,7 +15,6 @@ import {
   type CategoryTreeNode,
   WATCHES_SLUG_PARTS,
 } from '../lib/category-nav';
-import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
@@ -24,10 +23,6 @@ const montserrat = Montserrat({
   weight: ['700'],
   display: 'swap',
 });
-
-interface CategoriesResponse {
-  data: CategoryTreeNode[];
-}
 
 type SlotKey =
   | 'computers'
@@ -129,33 +124,7 @@ function categoryHref(resolved: CategoryTreeNode | null, fallbackSlug: string): 
 
 export function TopCategories() {
   const { t } = useTranslation();
-  const [categories, setCategories] = useState<CategoryTreeNode[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const loadCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      const lang = getStoredLanguage();
-      const response = await apiClient.get<CategoriesResponse>('/api/v1/categories/tree', {
-        params: { lang },
-      });
-      setCategories(response.data || []);
-    } catch {
-      setCategories([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadCategories();
-  }, [loadCategories]);
-
-  useEffect(() => {
-    const onLang = () => void loadCategories();
-    window.addEventListener('language-updated', onLang);
-    return () => window.removeEventListener('language-updated', onLang);
-  }, [loadCategories]);
+  const { categories, loadingCategories: loading } = useCategoriesTree();
 
   const resolvedBySlot = useMemo(() => {
     return {

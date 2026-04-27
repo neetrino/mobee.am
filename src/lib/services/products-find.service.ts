@@ -1,7 +1,10 @@
 import { ProductFilters } from "./products-find-query.service";
 import { productsFindQueryService } from "./products-find-query.service";
 import { productsFindFilterService } from "./products-find-filter.service";
-import { productsFindTransformService } from "./products-find-transform.service";
+import {
+  loadProductDiscountContext,
+  productsFindTransformService,
+} from "./products-find-transform.service";
 
 class ProductsFindService {
   /**
@@ -34,8 +37,14 @@ class ProductsFindService {
         ? filteredProducts
         : filteredProducts.slice(start, start + limit);
 
+    const discounts = await loadProductDiscountContext();
+
     // Step 4: Transform products to response format
-    const data = await productsFindTransformService.transformProducts(paginatedProducts, lang);
+    const data = await productsFindTransformService.transformProducts(
+      paginatedProducts,
+      lang,
+      discounts,
+    );
 
     return {
       data,

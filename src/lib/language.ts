@@ -10,6 +10,41 @@ export type LanguageCode = keyof typeof LANGUAGES;
 
 const LANGUAGE_STORAGE_KEY = 'shop_language';
 
+/** Cookie mirrored from localStorage so server components can read the UI language. */
+export const LANGUAGE_COOKIE_NAME = 'shop_language';
+
+const LANGUAGE_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 365;
+
+export function persistLanguageCookie(language: LanguageCode): void {
+  if (typeof document === 'undefined') return;
+  try {
+    document.cookie = `${LANGUAGE_COOKIE_NAME}=${encodeURIComponent(language)}; Path=/; Max-Age=${LANGUAGE_COOKIE_MAX_AGE_SEC}; SameSite=Lax`;
+  } catch {
+    // Ignore
+  }
+}
+
+/** Read locale from Next.js `cookies()` (server). */
+export function readLanguageFromCookies(
+  cookieStore: { get(name: string): { value: string } | undefined },
+): LanguageCode {
+  const raw = cookieStore.get(LANGUAGE_COOKIE_NAME)?.value;
+  if (!raw) return 'en';
+  try {
+    const decoded = decodeURIComponent(raw);
+    if (decoded in LANGUAGES) return decoded as LanguageCode;
+  } catch {
+    if (raw in LANGUAGES) return raw as LanguageCode;
+  }
+  return 'en';
+}
+
+/** Align cookie with localStorage (e.g. returning visitors who only had LS). */
+export function syncLanguageCookieFromStorage(): void {
+  if (typeof window === 'undefined') return;
+  persistLanguageCookie(getStoredLanguage());
+}
+
 export function getStoredLanguage(): LanguageCode {
   if (typeof window === 'undefined') return 'en';
   try {
@@ -27,6 +62,7 @@ export function setStoredLanguage(language: LanguageCode, options?: { skipReload
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    persistLanguageCookie(language);
     window.dispatchEvent(new Event('language-updated'));
     // Only reload if skipReload is not true
     if (!options?.skipReload) {

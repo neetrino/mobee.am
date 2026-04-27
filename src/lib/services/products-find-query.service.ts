@@ -28,12 +28,13 @@ class ProductsFindQueryService {
     }
 
     const needOverFetch =
-      Boolean(filters.category || filters.search) ||
-      filters.minPrice != null ||
-      filters.maxPrice != null ||
-      Boolean(filters.colors || filters.sizes || filters.brand) ||
-      filters.sort === "name-asc" ||
-      filters.sort === "name-desc";
+      !filters.ids?.length &&
+      (Boolean(filters.category || filters.search) ||
+        filters.minPrice != null ||
+        filters.maxPrice != null ||
+        Boolean(filters.colors || filters.sizes || filters.brand) ||
+        filters.sort === "name-asc" ||
+        filters.sort === "name-desc");
 
     if (!needOverFetch) {
       const [total, products] = await Promise.all([

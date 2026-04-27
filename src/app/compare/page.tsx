@@ -82,14 +82,16 @@ export default function ComparePage() {
         };
       }>('/api/v1/products', {
         params: {
-          limit: '1000',
+          ids: idsToLoad.join(','),
+          limit: String(Math.min(Math.max(idsToLoad.length, 1), 20)),
           lang: languagePreference,
         },
       });
 
-      const compareProducts = response.data.filter((product) =>
-        idsToLoad.includes(product.id)
-      );
+      const byId = new Map(response.data.map((p) => [p.id, p]));
+      const compareProducts = idsToLoad
+        .map((id) => byId.get(id))
+        .filter((p): p is Product => Boolean(p));
       setProducts(compareProducts);
     } catch (error) {
       console.error('[Compare] Error fetching compare products:', error);

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { getStoredLanguage } from '../../lib/language';
+import { cookies } from 'next/headers';
+import { readLanguageFromCookies } from '../../lib/language';
 import { t } from '../../lib/i18n';
 import { PriceFilter } from '../../components/PriceFilter';
 import { ColorFilter } from '../../components/ColorFilter';
@@ -12,7 +13,9 @@ import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
 import { ShopSortFilter } from '../../components/ShopSortFilter';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
-import { parseProductSortOption, type ProductSortOption } from '@/lib/products/sort';
+import { parseProductSortOption } from '@/lib/products/sort';
+import { productsService } from '@/lib/services/products.service';
+import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-product-filters';
 
 const PAGE_CONTAINER = 'mx-auto w-full max-w-[1917px] px-4 sm:px-6 lg:px-[53px]';
 // Container for filters section to align with Header logo (same Y-axis)
@@ -50,71 +53,6 @@ interface ProductsResponse {
 }
 
 /**
- * Fetch products (PRODUCTION SAFE)
- */
-async function getProducts(
-  page: number = 1,
-  search?: string,
-  category?: string,
-  minPrice?: string,
-  maxPrice?: string,
-  colors?: string,
-  sizes?: string,
-  brand?: string,
-  sort: ProductSortOption = "default",
-  limit: number = 12
-): Promise<ProductsResponse> {
-  try {
-    const language = getStoredLanguage();
-    const params: Record<string, string> = {
-      page: page.toString(),
-      limit: limit.toString(),
-      lang: language,
-    };
-
-    if (search?.trim()) params.search = search.trim();
-    if (category?.trim()) params.category = category.trim();
-    if (minPrice?.trim()) params.minPrice = minPrice.trim();
-    if (maxPrice?.trim()) params.maxPrice = maxPrice.trim();
-    if (colors?.trim()) params.colors = colors.trim();
-    if (sizes?.trim()) params.sizes = sizes.trim();
-    if (brand?.trim()) params.brand = brand.trim();
-    if (sort !== "default") params.sort = sort;
-
-    const queryString = new URLSearchParams(params).toString();
-
-    // Fallback chain: NEXT_PUBLIC_APP_URL -> VERCEL_URL -> localhost (for local dev)
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-
-    const targetUrl = `${baseUrl}/api/v1/products?${queryString}`;
-    const res = await fetch(targetUrl, {
-      cache: "no-store"
-    });
-
-    if (!res.ok) throw new Error(`API failed: ${res.status}`);
-
-    const response = await res.json();
-    if (!response.data || !Array.isArray(response.data)) {
-      return {
-        data: [],
-        meta: { total: 0, page: 1, limit: 12, totalPages: 0 }
-      };
-    }
-
-    return response;
-
-  } catch (e) {
-    console.error("❌ PRODUCT ERROR", e);
-    return {
-      data: [],
-      meta: { total: 0, page: 1, limit: 12, totalPages: 0 }
-    };
-  }
-}
-
-/**
  * PAGE
  */
 interface ProductsPageProps {
@@ -129,21 +67,25 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     ? parseInt(limitParam, 10)
     : null;
   const perPage = parsedLimit ? Math.min(parsedLimit, 200) : 12;
-
   const sort = parseProductSortOption(params?.sort);
+  const cookieStore = await cookies();
+  const language = readLanguageFromCookies(cookieStore);
 
-  const productsData = await getProducts(
-    page,
-    params?.search,
-    params?.category,
-    params?.minPrice,
-    params?.maxPrice,
-    params?.colors,
-    params?.sizes,
-    params?.brand,
-    sort,
-    perPage
-  );
+  let productsData: ProductsResponse;
+  try {
+    const lang = language;
+    const filters = buildShopProductFiltersFromSearchParams(
+      params as Record<string, string | undefined>,
+      lang,
+    );
+    productsData = await productsService.findAll(filters);
+  } catch (e) {
+    console.error("❌ PRODUCT ERROR", e);
+    productsData = {
+      data: [],
+      meta: { total: 0, page: 1, limit: perPage, totalPages: 0 },
+    };
+  }
 
   // ------------------------------------
   // 🔧 FIX: normalize products 
@@ -152,6 +94,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const normalizedProducts = productsData.data.map((p: Product & {
     defaultVariantId?: string | null;
     colors?: string[];
+    originalPrice?: number | null;
   }) => ({
     id: p.id,
     slug: p.slug,
@@ -200,9 +143,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     }
     return out;
   };
-
-  // Get language for translations
-  const language = getStoredLanguage();
 
   return (
     <div className="w-full max-w-full">

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { productsService } from "@/lib/services/products.service";
 import { cacheService } from "@/lib/services/cache.service";
-import { parseProductSortOption } from "@/lib/products/sort";
+import { buildProductListFiltersFromUrlSearchParams } from "@/lib/shop/build-shop-product-filters";
 
 const PRODUCTS_CACHE_TTL = 120; // 2 minutes
 const FEATURED_CACHE_TTL = 600; // 10 minutes for home featured tabs (new/bestseller/featured)
@@ -9,31 +9,7 @@ const FEATURED_CACHE_TTL = 600; // 10 minutes for home featured tabs (new/bestse
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const sort = parseProductSortOption(searchParams.get("sort"));
-
-    const filters = {
-      category: searchParams.get("category") || undefined,
-      search: searchParams.get("search") || undefined,
-      filter: searchParams.get("filter") || searchParams.get("filters") || undefined,
-      minPrice: searchParams.get("minPrice")
-        ? parseFloat(searchParams.get("minPrice")!)
-        : undefined,
-      maxPrice: searchParams.get("maxPrice")
-        ? parseFloat(searchParams.get("maxPrice")!)
-        : undefined,
-      colors: searchParams.get("colors") || undefined,
-      sizes: searchParams.get("sizes") || undefined,
-      brand: searchParams.get("brand") || undefined,
-      sort,
-      page: searchParams.get("page")
-        ? parseInt(searchParams.get("page")!)
-        : 1,
-      limit: Math.min(
-        searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : 12,
-        200
-      ),
-      lang: searchParams.get("lang") || "en",
-    };
+    const filters = buildProductListFiltersFromUrlSearchParams(searchParams);
 
     const cacheKey = `products:${searchParams.toString()}`;
     const cached = await cacheService.get(cacheKey);

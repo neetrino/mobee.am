@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { AuthProvider } from '../lib/auth/AuthContext';
+import { CategoriesTreeProvider } from './CategoriesTreeContext';
 import { ToastContainer } from './Toast';
 
 /**
@@ -11,7 +12,7 @@ import { ToastContainer } from './Toast';
 export function ClientProviders({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
-      {children}
+      <CategoriesTreeProvider>{children}</CategoriesTreeProvider>
       <ToastContainer />
     </AuthProvider>
   );

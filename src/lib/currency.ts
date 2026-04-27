@@ -34,7 +34,8 @@ async function getCurrencyRates(): Promise<Record<string, number>> {
 
   try {
     const response = await fetch('/api/v1/currency-rates', {
-      cache: 'no-store', // Always fetch fresh rates
+      // Allow HTTP caching; in-memory cache below still caps refresh frequency.
+      cache: 'default',
     });
     if (response.ok) {
       const rates = await response.json();

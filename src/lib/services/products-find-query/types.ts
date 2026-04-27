@@ -17,6 +17,8 @@ export interface ProductFilters {
   page?: number;
   limit?: number;
   lang?: string;
+  /** When set, return only these product ids (e.g. compare tray). Max 20 at API boundary. */
+  ids?: string[];
 }
 
 /**

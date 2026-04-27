@@ -203,14 +203,25 @@ export async function buildWhereClause(
   where: Prisma.ProductWhereInput | null;
   bestsellerProductIds: string[];
 }> {
+  const bestsellerProductIds: string[] = [];
+
+  if (filters.ids && filters.ids.length > 0) {
+    return {
+      where: {
+        published: true,
+        deletedAt: null,
+        id: { in: filters.ids },
+      },
+      bestsellerProductIds: [],
+    };
+  }
+
   const {
     category,
     search,
     filter,
     lang = "en",
   } = filters;
-
-  const bestsellerProductIds: string[] = [];
 
   // Build base where clause
   let where: Prisma.ProductWhereInput = {

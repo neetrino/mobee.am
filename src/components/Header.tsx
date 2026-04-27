@@ -23,6 +23,7 @@ import {
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
+import { useCategoriesTree } from './CategoriesTreeContext';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -44,10 +45,6 @@ interface Category {
   title: string;
   fullPath: string;
   children: Category[];
-}
-
-interface CategoriesResponse {
-  data: Category[];
 }
 
 // Icon Components
@@ -355,9 +352,8 @@ export function Header() {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { categories, loadingCategories } = useCategoriesTree();
   const [, setSelectedCategory] = useState<Category | null>(null);
-  const [loadingCategories, setLoadingCategories] = useState(false);
   const currentYear = new Date().getFullYear();
 
   const isNavActive = (href: string) => {
@@ -608,30 +604,6 @@ export function Header() {
   }, []);
 
   // Sync search input with URL params - handled by HeaderSearchSync component wrapped in Suspense
-
-  // Fetch categories (language is always 'en')
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      setLoadingCategories(true);
-      // Small delay to avoid simultaneous requests
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Language is always 'en'
-      const response = await apiClient.get<CategoriesResponse>('/api/v1/categories/tree', {
-        params: { lang: 'en' },
-      });
-      setCategories(response.data || []);
-    } catch (err: any) {
-      console.error('Error fetching categories:', err);
-      setCategories([]);
-    } finally {
-      setLoadingCategories(false);
-    }
-  };
 
   // Get only root categories (parent categories) for main dropdown
   // API already returns root categories in tree structure, so we just return them as-is
