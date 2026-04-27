@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
 import { Eye, EyeOff } from 'lucide-react';
+import { authFormClasses } from '../../lib/auth/authFormTailwind';
 
 export default function RegisterPage() {
   const { t } = useTranslation();
@@ -148,7 +149,7 @@ export default function RegisterPage() {
                 id="firstName"
                 type="text"
                 placeholder={t('register.placeholders.firstName')}
-                className="w-full"
+                className={`w-full ${authFormClasses.input}`}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 disabled={isSubmitting || isLoading}
@@ -162,7 +163,7 @@ export default function RegisterPage() {
                 id="lastName"
                 type="text"
                 placeholder={t('register.placeholders.lastName')}
-                className="w-full"
+                className={`w-full ${authFormClasses.input}`}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 disabled={isSubmitting || isLoading}
@@ -177,7 +178,7 @@ export default function RegisterPage() {
               id="email"
               type="email"
               placeholder={t('register.placeholders.email')}
-              className="w-full"
+              className={`w-full ${authFormClasses.input}`}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isSubmitting || isLoading}
@@ -191,7 +192,7 @@ export default function RegisterPage() {
               id="phone"
               type="tel"
               placeholder={t('register.placeholders.phone')}
-              className="w-full"
+              className={`w-full ${authFormClasses.input}`}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               disabled={isSubmitting || isLoading}
@@ -206,7 +207,7 @@ export default function RegisterPage() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder={t('register.placeholders.password')}
-                className="w-full pr-10"
+                className={`w-full pr-10 ${authFormClasses.input}`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting || isLoading}
@@ -215,7 +216,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                className={`absolute right-3 top-1/2 -translate-y-1/2 ${authFormClasses.passwordToggle}`}
                 disabled={isSubmitting || isLoading}
               >
                 {showPassword ? (
@@ -238,7 +239,7 @@ export default function RegisterPage() {
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder={t('register.placeholders.confirmPassword')}
-                className="w-full pr-10"
+                className={`w-full pr-10 ${authFormClasses.input}`}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={isSubmitting || isLoading}
@@ -247,7 +248,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                className={`absolute right-3 top-1/2 -translate-y-1/2 ${authFormClasses.passwordToggle}`}
                 disabled={isSubmitting || isLoading}
               >
                 {showConfirmPassword ? (
@@ -270,17 +271,17 @@ export default function RegisterPage() {
                   setError(null);
                 }
               }}
-              className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className={`mt-1 ${authFormClasses.checkbox}`}
               disabled={isSubmitting || isLoading}
               required
             />
             <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
               {t('register.form.acceptTerms')}{' '}
-              <Link href="/terms" className="text-blue-600 hover:underline">
+              <Link href="/terms" className={authFormClasses.linkInline}>
                 {t('register.form.termsOfService')}
               </Link>{' '}
               {t('register.form.and')}{' '}
-              <Link href="/privacy" className="text-blue-600 hover:underline">
+              <Link href="/privacy" className={authFormClasses.linkInline}>
                 {t('register.form.privacyPolicy')}
               </Link>
             </label>
@@ -288,9 +289,9 @@ export default function RegisterPage() {
           {!acceptTerms && error === t('register.errors.acceptTerms') && (
             <p className="text-xs text-red-600 -mt-2">{t('register.errors.mustAcceptTerms')}</p>
           )}
-          <Button 
-            variant="primary" 
-            className="w-full"
+          <Button
+            variant="primary"
+            className={authFormClasses.submitButton}
             type="submit"
             disabled={isSubmitting || isLoading}
           >
@@ -301,7 +302,7 @@ export default function RegisterPage() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             {t('register.form.alreadyHaveAccount')}{' '}
-            <Link href="/login" className="text-blue-600 hover:underline font-medium">
+            <Link href="/login" className={authFormClasses.link}>
               {t('register.form.signIn')}
             </Link>
           </p>

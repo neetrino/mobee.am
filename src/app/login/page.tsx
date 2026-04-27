@@ -8,6 +8,7 @@ import { useAuth } from '../../lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
 import { Eye, EyeOff } from 'lucide-react';
+import { authFormClasses } from '../../lib/auth/authFormTailwind';
 
 function LoginPageContent() {
   const { t } = useTranslation();
@@ -85,7 +86,7 @@ function LoginPageContent() {
               id="emailOrPhone"
               type="text"
               placeholder={t('login.form.emailOrPhonePlaceholder')}
-              className="w-full"
+              className={`w-full ${authFormClasses.input}`}
               value={emailOrPhone}
               onChange={(e) => setEmailOrPhone(e.target.value)}
               disabled={isSubmitting || isLoading}
@@ -101,7 +102,7 @@ function LoginPageContent() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder={t('login.form.passwordPlaceholder')}
-                className="w-full pr-10"
+                className={`w-full pr-10 ${authFormClasses.input}`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting || isLoading}
@@ -110,7 +111,7 @@ function LoginPageContent() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                className={`absolute right-3 top-1/2 -translate-y-1/2 ${authFormClasses.passwordToggle}`}
                 disabled={isSubmitting || isLoading}
               >
                 {showPassword ? (
@@ -127,21 +128,21 @@ function LoginPageContent() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className={authFormClasses.checkbox}
                 disabled={isSubmitting || isLoading}
               />
               <span className="ml-2 text-sm text-gray-600">{t('login.form.rememberMe')}</span>
             </label>
             <Link
               href="/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
+              className={authFormClasses.linkSm}
             >
               {t('login.form.forgotPassword')}
             </Link>
           </div>
-          <Button 
-            variant="primary" 
-            className="w-full"
+          <Button
+            variant="primary"
+            className={authFormClasses.submitButton}
             type="submit"
             disabled={isSubmitting || isLoading}
           >
@@ -152,7 +153,7 @@ function LoginPageContent() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             {t('login.form.noAccount')}{' '}
-            <Link href="/register" className="text-blue-600 hover:underline font-medium">
+            <Link href="/register" className={authFormClasses.link}>
               {t('login.form.signUp')}
             </Link>
           </p>
