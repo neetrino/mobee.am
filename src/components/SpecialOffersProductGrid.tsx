@@ -47,7 +47,11 @@ export function SpecialOffersProductGrid({
   }
   if (products.length > 0) {
     return (
-      <HomeBestChoiceStyleProductGrid products={products} productsPerPage={productsPerPage} />
+      <HomeBestChoiceStyleProductGrid
+        products={products}
+        productsPerPage={productsPerPage}
+        specialOffersHomeCard
+      />
     );
   }
   return (

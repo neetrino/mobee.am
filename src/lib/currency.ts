@@ -14,7 +14,8 @@ function formatAmdAmountWithTrailingDram(value: number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
-  return `${formatted} Դ`;
+  /** NBSP so the amount and dram sign stay on one line (e.g. product cards). */
+  return `${formatted}\u00A0Դ`;
 }
 
 // Cache for currency rates from API

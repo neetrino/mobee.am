@@ -12,11 +12,14 @@ export const HOME_BEST_CHOICE_CARD_WIDTH = 'w-full min-w-0';
 type HomeBestChoiceStyleProductGridProps = {
   products: FeaturedHomeProduct[];
   productsPerPage: number;
+  /** Home “Специальные предложения” row — RU desktop add-to-cart pill sizing. */
+  specialOffersHomeCard?: boolean;
 };
 
 export function HomeBestChoiceStyleProductGrid({
   products,
   productsPerPage,
+  specialOffersHomeCard = false,
 }: HomeBestChoiceStyleProductGridProps) {
   return (
     <div className={HOME_BEST_CHOICE_GRID_LAYOUT}>
@@ -27,6 +30,7 @@ export function HomeBestChoiceStyleProductGrid({
             viewMode="grid-2"
             shiftImageInFrame
             smallerFooterPrice
+            specialOffersHomeCard={specialOffersHomeCard}
           />
         </div>
       ))}

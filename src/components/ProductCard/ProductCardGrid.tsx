@@ -36,6 +36,8 @@ interface ProductCardGridProps {
   squareImageFrame?: boolean;
   /** Smaller footer price (home “best choice”; ~23% under default grid-2). */
   smallerFooterPrice?: boolean;
+  /** Home special-offers cards — RU `lg` add-to-cart pill 155.99×36.94px. */
+  specialOffersHomeCard?: boolean;
   onImageError: () => void;
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
@@ -56,6 +58,7 @@ export function ProductCardGrid({
   shiftImageInFrame = false,
   squareImageFrame = true,
   smallerFooterPrice = false,
+  specialOffersHomeCard = false,
   onImageError,
   onWishlistToggle,
   onCompareToggle,
@@ -64,6 +67,8 @@ export function ProductCardGrid({
   const { t, lang } = useTranslation();
   /** Russian “Добавить в корзину” needs a slightly tighter pill on desktop (lg). */
   const ruDesktopAddToCart = lang === 'ru';
+  const ruSpecialOffersDesktopCart =
+    ruDesktopAddToCart && specialOffersHomeCard && !isCompact;
 
   return (
     <div className="relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[583px]">
@@ -120,7 +125,7 @@ export function ProductCardGrid({
         <div className="min-w-0 flex flex-col">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`font-bold tabular-nums text-gray-900 ${
+              className={`whitespace-nowrap font-bold tabular-nums text-gray-900 ${
                 smallerFooterPrice
                   ? isCompact
                     ? 'text-[0.824687578125rem] leading-[1.28284734375rem]'
@@ -165,9 +170,11 @@ export function ProductCardGrid({
                     : ''
                 }`
               : `h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]${
-                  ruDesktopAddToCart
-                    ? ' lg:h-[36.94px] lg:min-w-[101.57px] lg:gap-[5.99px] lg:rounded-[15.39px] lg:px-[12.31px] lg:text-[10.77px] lg:leading-[20.52px] lg:tracking-[0.154px]'
-                    : ''
+                  ruSpecialOffersDesktopCart
+                    ? ' lg:h-[36.94px] lg:w-[155.99px] lg:min-w-[155.99px] lg:max-w-[155.99px] lg:gap-[9.19px] lg:rounded-[15.39px] lg:px-[18.91px] lg:text-[10.77px] lg:leading-[20.52px] lg:tracking-[0.154px]'
+                    : ruDesktopAddToCart
+                      ? ' lg:h-[36.94px] lg:min-w-[101.57px] lg:gap-[5.99px] lg:rounded-[15.39px] lg:px-[12.31px] lg:text-[10.77px] lg:leading-[20.52px] lg:tracking-[0.154px]'
+                      : ''
                 }`
           }`}
           title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}

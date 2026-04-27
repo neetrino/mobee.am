@@ -76,7 +76,7 @@ export function ProductCardInfo({
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <span
-                className={`${
+                className={`whitespace-nowrap ${
                   isCompact ? 'text-[1.06875rem]' : 'text-[1.425rem]'
                 } font-semibold text-gray-900`}
               >
