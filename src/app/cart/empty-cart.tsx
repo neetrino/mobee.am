@@ -44,7 +44,7 @@ export function EmptyCart({ t }: EmptyCartProps) {
               <Button
                 variant="primary"
                 size="lg"
-                className="h-14 w-full rounded-[50px] bg-[#2DB2FF] px-[10px] text-[14px] font-semibold leading-normal text-white hover:bg-[#2DB2FF] focus:ring-[#2DB2FF]"
+                className="h-14 w-full !rounded-full !bg-admin-500 px-[10px] text-[14px] font-semibold leading-normal !text-white hover:!bg-admin-500 focus:!ring-admin-500"
               >
                 {t('common.cart.exploreCategories')}
               </Button>
