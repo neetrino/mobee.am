@@ -48,7 +48,9 @@ function MobileHeroIphoneBanner() {
   const titleClass = lang === 'hy' ? notoArmenian.className : montserrat.className;
 
   return (
-    <div className={`pb-2 lg:hidden ${montserrat.className}`}>
+    <div
+      className={`pb-2 pt-[calc(theme(spacing.4)*1.05+4px)] lg:hidden ${montserrat.className}`}
+    >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <div className="relative isolate min-h-[168px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-2 pt-4">
           <div className="relative z-10 flex max-w-[55%] flex-col items-start gap-2">
