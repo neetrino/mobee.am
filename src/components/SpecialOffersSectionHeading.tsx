@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
+import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -45,8 +46,11 @@ export function SpecialOffersSectionHeading({ children }: SpecialOffersSectionHe
   const { t } = useTranslation();
 
   return (
-    <div className={`mt-[9rem] ${montserrat.className}`} aria-labelledby="special-offers-heading">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+    <div
+      className={`mt-6 lg:mt-[9rem] ${montserrat.className}`}
+      aria-label={t('home.special_offers_heading.title')}
+    >
+      <div className="hidden flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 lg:flex">
         <div className="flex min-w-0 flex-col gap-2">
           <h2
             id="special-offers-heading"
@@ -73,6 +77,10 @@ export function SpecialOffersSectionHeading({ children }: SpecialOffersSectionHe
           </span>
         </Link>
       </div>
+      <HomeMobileSectionTitle
+        sectionHeadingId="special-offers-heading-mobile"
+        title={t('home.mobile_home.specialOffersSectionTitle')}
+      />
       {children}
     </div>
   );

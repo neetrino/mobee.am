@@ -51,6 +51,18 @@
     "errorLoading": "Չհաջողվեց բեռնել ապրանքները",
     "tryAgain": "Փորձել կրկին",
     "noProducts": "Այս կատեգորիայում ապրանքներ չկան:"
+  },
+  "mobile_home": {
+    "featuredSectionTitle": "Առաջարկված",
+    "specialOffersSectionTitle": "Հատուկ առաջարկներ",
+    "discountLabel": "{{percent}}% զեղչ",
+    "categoryPill": {
+      "computers": "Mac",
+      "phones": "iPhone",
+      "tablets": "iPad",
+      "watches": "Watch",
+      "headphones": "AirPods"
+    }
   }
 }
 

@@ -371,6 +371,8 @@ export function Header() {
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
+  const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
   const primaryStripRef = useRef<HTMLElement | null>(null);
   const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
@@ -741,67 +743,77 @@ export function Header() {
       </Suspense>
 
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        {/* Mobile: logo row — Figma omits search/currency in bar; currency stays for small screens */}
-        <div
-          className={`flex items-center justify-between ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} lg:hidden`}
-        >
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-gray-200 bg-white text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 sm:h-10 sm:w-10"
-              aria-label={t('common.ariaLabels.openMenu')}
-              aria-expanded={mobileMenuOpen}
-            >
-              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
-              </svg>
-            </button>
-            <Link href="/" className="flex shrink-0 items-center gap-2">
-              <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
-                <span className="text-[18px] font-bold leading-6 text-white">M</span>
-              </div>
-              <span className="text-[18px] font-bold leading-6 tracking-[-0.5px] text-[#111827]">Mobee</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative" ref={mobileCurrencyRef}>
-              <button
-                type="button"
-                onClick={() => setShowMobileCurrency(!showMobileCurrency)}
-                className="flex h-9 cursor-pointer items-center justify-center gap-1 bg-transparent px-2 text-xs font-medium text-gray-800 transition-colors sm:h-10 sm:gap-2 sm:px-3 sm:text-sm"
-              >
-                <span className="text-sm font-semibold leading-none sm:text-base">{selectedCurrencyInfo.symbol}</span>
-                <span className="text-xs font-medium leading-none sm:text-sm">{selectedCurrency}</span>
-                <ChevronDownIcon />
-              </button>
-              {showMobileCurrency && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-40 animate-in overflow-hidden bg-white shadow-2xl fade-in slide-in-from-top-2 duration-200">
-                  {Object.values(CURRENCIES).map((currency) => (
-                    <button
-                      key={currency.code}
-                      type="button"
-                      onClick={() => {
-                        handleCurrencyChange(currency.code);
-                        setShowMobileCurrency(false);
-                      }}
-                      className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
-                        selectedCurrency === currency.code
-                          ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{currency.code}</span>
-                        <span className="text-gray-500">{currency.symbol}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+        {/* Mobile — Figma: pill search + menu (logo & currency live in drawer) */}
+        <div className="flex items-center gap-4 border-b border-gray-100 py-2.5 lg:hidden">
+          <form
+            ref={mobileHomeSearchFormRef}
+            onSubmit={handleSearch}
+            className="relative min-w-0 flex-1"
+          >
+            <div className="flex items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3 py-3.5">
+              <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <circle cx="11" cy="11" r="7" strokeWidth={2} />
+                  <path strokeLinecap="round" strokeWidth={2} d="M20 20l-4.3-4.3" />
+                </svg>
+              </span>
+              <input
+                ref={mobileHomeSearchInputRef}
+                type="search"
+                name="header-mobile-home-search"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (e.target.value.trim().length >= 1) {
+                    setSearchDropdownOpen(true);
+                  } else {
+                    setSearchDropdownOpen(false);
+                  }
+                }}
+                onFocus={() => {
+                  if (searchQuery.trim().length >= 1) {
+                    setSearchDropdownOpen(true);
+                  }
+                }}
+                onKeyDown={searchHandleKeyDown}
+                placeholder={t('common.mainHeader.searchPlaceholder')}
+                autoComplete="off"
+                className="min-w-0 flex-1 bg-transparent text-sm leading-normal text-gray-900 outline-none placeholder:text-[#6b7280]"
+                aria-controls="header-mobile-search-results"
+                aria-expanded={searchDropdownOpen && searchResults.length > 0}
+                aria-autocomplete="list"
+              />
             </div>
-            <HeaderPhoneLangCluster phoneNumberVisibility="smUp" />
-          </div>
+            {!showSearchModal ? (
+              <SearchDropdown
+                listboxId="header-mobile-search-results"
+                results={searchResults}
+                loading={searchLoading}
+                error={searchError}
+                isOpen={searchDropdownOpen}
+                selectedIndex={searchSelectedIndex}
+                query={searchQuery}
+                onResultClick={(result) => {
+                  router.push(`/products/${result.slug}`);
+                  clearSearch();
+                  setSearchDropdownOpen(false);
+                }}
+                onClose={() => setSearchDropdownOpen(false)}
+                className="mt-1"
+              />
+            ) : null}
+          </form>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f7f7f7] text-gray-800 transition-opacity active:opacity-90"
+            aria-label={t('common.ariaLabels.openMenu')}
+            aria-expanded={mobileMenuOpen}
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
         </div>
 
         {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
@@ -945,18 +957,71 @@ export function Header() {
             className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <p className="text-lg font-semibold text-gray-900">{t('common.navigation.categories')}</p>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-10 h-10 rounded-full border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
-                aria-label={t('common.ariaLabels.closeMenu')}
-              >
-                <svg className="w-5 h-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex min-w-0 items-center gap-2"
+                >
+                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-sm">
+                    <span className="text-[18px] font-bold leading-6 text-white">M</span>
+                  </div>
+                  <span className="truncate text-lg font-bold tracking-tight text-gray-900">Mobee</span>
+                </Link>
+                <div className="relative shrink-0" ref={mobileCurrencyRef}>
+                  <button
+                    type="button"
+                    onClick={() => setShowMobileCurrency(!showMobileCurrency)}
+                    className="flex h-9 cursor-pointer items-center justify-center gap-1 rounded-full border border-gray-200 bg-white px-2 text-xs font-medium text-gray-800 transition-colors"
+                  >
+                    <span className="text-sm font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
+                    <span className="text-xs font-medium leading-none">{selectedCurrency}</span>
+                    <ChevronDownIcon />
+                  </button>
+                  {showMobileCurrency ? (
+                    <div className="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-2xl">
+                      {Object.values(CURRENCIES).map((currency) => (
+                        <button
+                          key={currency.code}
+                          type="button"
+                          onClick={() => {
+                            handleCurrencyChange(currency.code);
+                            setShowMobileCurrency(false);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
+                            selectedCurrency === currency.code
+                              ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span>{currency.code}</span>
+                            <span className="text-gray-500">{currency.symbol}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-base font-semibold text-gray-900">{t('common.navigation.categories')}</p>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900"
+                  aria-label={t('common.ariaLabels.closeMenu')}
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="border-b border-gray-100 px-4 py-2">
+              <HeaderPhoneLangCluster phoneNumberVisibility="always" />
             </div>
 
             <div className="flex-1 overflow-hidden min-h-0">

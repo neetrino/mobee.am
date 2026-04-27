@@ -32,6 +32,14 @@ type SlotKey =
   | 'headphones'
   | 'accessories';
 
+const MOBILE_CATEGORY_PILL_KEYS: readonly Exclude<SlotKey, 'accessories'>[] = [
+  'computers',
+  'phones',
+  'tablets',
+  'watches',
+  'headphones',
+];
+
 interface CategorySlot {
   key: SlotKey;
   fallbackSlug: string;
@@ -140,8 +148,16 @@ export function TopCategories() {
   if (loading) {
     return (
       <section className={`bg-white ${montserrat.className}`} aria-hidden>
-        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-40 pt-12`}>
-          <div className="flex items-end gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
+        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-12`}>
+          <div className="flex gap-2 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:hidden">
+            {MOBILE_CATEGORY_PILL_KEYS.map((key) => (
+              <div
+                key={key}
+                className="h-9 w-20 shrink-0 animate-pulse rounded-full bg-[#eceff2]"
+              />
+            ))}
+          </div>
+          <div className="hidden items-end gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:flex">
             {CATEGORY_STRIP_SLOTS.map((slot) => (
               <div
                 key={slot.key}
@@ -158,8 +174,28 @@ export function TopCategories() {
 
   return (
     <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
-      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-40 pt-12`}>
-        <div className="flex items-end justify-start gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory sm:justify-center sm:overflow-visible sm:pb-0">
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-12`}>
+        <div className="flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide lg:hidden">
+          {MOBILE_CATEGORY_PILL_KEYS.map((key) => {
+            const slot = CATEGORY_STRIP_SLOTS.find((s) => s.key === key);
+            if (!slot) {
+              return null;
+            }
+            const resolved = resolvedBySlot[slot.key];
+            const href = categoryHref(resolved, slot.fallbackSlug);
+            const pillLabel = t(`home.mobile_home.categoryPill.${slot.key}` as const);
+            return (
+              <Link
+                key={slot.key}
+                href={href}
+                className="shrink-0 rounded-full bg-[#f7f7f7] px-4 py-2 text-sm font-medium leading-normal text-[#303030] transition-opacity active:opacity-90"
+              >
+                {pillLabel}
+              </Link>
+            );
+          })}
+        </div>
+        <div className="hidden items-end justify-start gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory sm:justify-center sm:overflow-visible sm:pb-0 lg:flex">
           {CATEGORY_STRIP_SLOTS.map((slot) => {
             const resolved = resolvedBySlot[slot.key];
             const href = categoryHref(resolved, slot.fallbackSlug);
@@ -221,3 +257,4 @@ export function TopCategories() {
     </section>
   );
 }
+

@@ -3,125 +3,99 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Home, UserRound, Store } from 'lucide-react';
-import { getCompareCount, getWishlistCount } from '../lib/storageCounts';
-import { CartIcon } from './icons/CartIcon';
+import { Heart, Home, ShoppingBag, UserRound } from 'lucide-react';
+import { getWishlistCount } from '../lib/storageCounts';
 import { useTranslation } from '../lib/i18n-client';
 
-interface MobileNavItem {
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  href?: string;
-  action?: () => void;
-  onClick?: () => void;
-  badge?: 'wishlist' | 'compare';
-  visible?: boolean;
+type NavKey = 'home' | 'cart' | 'wishlist' | 'profile';
+
+interface MobileNavDef {
+  key: NavKey;
+  labelKey: string;
+  href: string;
+  icon: typeof Home;
 }
 
 /**
- * Ստեղծում է հաստատուն mobile նավիգացիոն վահանակ՝ էջի ներքևում,
- * որպեսզի հիմնական գործողությունները միշտ լինեն ձեռքի տակ փոքր էկրաններում։
+ * Mobile bottom bar aligned with Figma mobee-new (home pill, bag, wishlist, profile).
  */
 export function MobileBottomNav() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const [wishlistCount, setWishlistCount] = useState(0);
-  const [compareCount, setCompareCount] = useState(0);
 
   useEffect(() => {
     const updateCounts = () => {
-      const wishlist = getWishlistCount();
-      const compare = getCompareCount();
-      console.debug('[MobileBottomNav] wishlist/compare counts refreshed', { wishlist, compare });
-      setWishlistCount(wishlist);
-      setCompareCount(compare);
+      setWishlistCount(getWishlistCount());
     };
 
     updateCounts();
     window.addEventListener('wishlist-updated', updateCounts);
-    window.addEventListener('compare-updated', updateCounts);
 
     return () => {
       window.removeEventListener('wishlist-updated', updateCounts);
-      window.removeEventListener('compare-updated', updateCounts);
     };
   }, []);
 
-  const navItems: MobileNavItem[] = useMemo(
+  const items: MobileNavDef[] = useMemo(
     () => [
-      { 
-        label: t('common.navigation.home'), 
-        href: '/', 
-        icon: Home, 
-        visible: true,
-      },
-      { 
-        label: t('common.navigation.products'), 
-        href: '/shop', 
-        icon: Store, 
-        visible: true,
-      },
-      { 
-        label: t('common.navigation.cart'), 
-        href: '/cart', 
-        icon: CartIcon, 
-        visible: true,
-      },
-      { label: t('common.navigation.profile'), href: '/profile', icon: UserRound, visible: true },
+      { key: 'home', labelKey: 'common.navigation.home', href: '/', icon: Home },
+      { key: 'cart', labelKey: 'common.navigation.cart', href: '/cart', icon: ShoppingBag },
+      { key: 'wishlist', labelKey: 'common.navigation.wishlist', href: '/wishlist', icon: Heart },
+      { key: 'profile', labelKey: 'common.navigation.profile', href: '/profile', icon: UserRound },
     ],
-    [t]
+    [],
   );
 
-  const resolveBadgeValue = (badge?: MobileNavItem['badge']) => {
-    if (badge === 'wishlist') return wishlistCount;
-    if (badge === 'compare') return compareCount;
-    return 0;
+  const pathIsActive = (item: MobileNavDef) => {
+    if (item.key === 'home') {
+      return pathname === '/';
+    }
+    return pathname === item.href || pathname.startsWith(`${item.href}/`);
   };
 
   return (
-    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(15,23,42,0.08)]">
-      <div className="mx-auto flex max-w-md items-stretch justify-between px-2 py-2">
-        {navItems.filter(item => item.visible).map(({ label, href, icon: Icon, badge, action, onClick }) => {
-          const isActive = href ? pathname === href : false;
-          const badgeValue = resolveBadgeValue(badge);
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t-0 bg-white shadow-[0_0_20px_rgba(0,0,0,0.15)] lg:hidden">
+      <div className="mx-auto flex max-w-md items-center justify-center gap-2 px-4 py-3 sm:gap-4 sm:px-6">
+        {items.map((item) => {
+          const active = pathIsActive(item);
+          const Icon = item.icon;
+          const label = t(item.labelKey);
 
-          const content = (
+          const inner = (
             <>
-              <div className="relative">
-                <Icon className={`h-5 w-5 ${isActive ? 'text-gray-900' : 'text-gray-500'}`} />
-                {badgeValue > 0 && (
-                  <span className="absolute -top-2 -right-2 rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
-                    {badgeValue > 99 ? '99+' : badgeValue}
+              <div className="relative flex items-center justify-center">
+                <Icon
+                  className={`h-5 w-5 shrink-0 ${active ? 'text-[#2db2ff]' : 'text-gray-500'}`}
+                  strokeWidth={active && item.key === 'home' ? 2.5 : 2}
+                  aria-hidden
+                />
+                {item.key === 'wishlist' && wishlistCount > 0 ? (
+                  <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+                    {wishlistCount > 99 ? '99+' : wishlistCount}
                   </span>
-                )}
+                ) : null}
               </div>
-              <span className="mt-1 text-[11px]">{label}</span>
+              {active && item.key === 'home' ? (
+                <span className="text-sm font-normal leading-none text-[#2db2ff]">{label}</span>
+              ) : null}
             </>
           );
 
-          if (action) {
-            return (
-              <button
-                key={label}
-                type="button"
-                onClick={action}
-                className="flex flex-1 flex-col items-center rounded-xl px-2 py-1 text-xs font-medium text-gray-500 transition"
-              >
-                {content}
-              </button>
-            );
-          }
+          const pillClass =
+            active && item.key === 'home'
+              ? 'flex items-center gap-2 rounded-[65px] bg-[rgba(25,158,235,0.1)] px-4 py-2'
+              : 'flex h-10 flex-1 items-center justify-center rounded-2xl py-1';
 
           return (
             <Link
-              key={label}
-              href={href || '#'}
-              onClick={onClick}
-              className={`flex flex-1 flex-col items-center rounded-xl px-2 py-1 text-xs font-medium transition ${
-                isActive ? 'text-gray-900' : 'text-gray-500'
-              }`}
+              key={item.key}
+              href={item.href}
+              className={`${pillClass} min-w-0 transition-opacity active:opacity-80`}
+              aria-label={item.key === 'home' && active ? label : label}
+              aria-current={active ? 'page' : undefined}
             >
-              {content}
+              {inner}
             </Link>
           );
         })}
@@ -129,4 +103,3 @@ export function MobileBottomNav() {
     </nav>
   );
 }
-

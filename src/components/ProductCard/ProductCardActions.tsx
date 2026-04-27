@@ -17,6 +17,8 @@ interface ProductCardActionsProps {
   onAddToCart: (e: MouseEvent) => void;
   /** Stack wishlist + compare at the top-right of the product image (always visible; not hover-only). */
   cornerOnImage?: boolean;
+  /** Home mobile Figma — white circular controls on the image. */
+  homeProductGridCard?: boolean;
 }
 
 /**
@@ -32,6 +34,7 @@ export function ProductCardActions({
   onCompareToggle,
   onAddToCart,
   cornerOnImage = false,
+  homeProductGridCard = false,
 }: ProductCardActionsProps) {
   const { t } = useTranslation();
   const iconSize = isCompact ? 18 : 24;
@@ -77,6 +80,14 @@ export function ProductCardActions({
     </>
   );
 
+  const cornerIdleWishlist = homeProductGridCard
+    ? 'max-lg:border max-lg:border-gray-100 max-lg:bg-white max-lg:text-gray-900 max-lg:shadow-sm max-lg:hover:bg-gray-50 bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5] lg:bg-[#e8f0f8]'
+    : 'bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]';
+
+  const cornerIdleCompare = homeProductGridCard
+    ? 'max-lg:border max-lg:border-gray-100 max-lg:bg-white max-lg:text-gray-900 max-lg:shadow-sm max-lg:hover:bg-gray-50 border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5] lg:border-transparent lg:bg-[#e8f0f8]'
+    : 'border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]';
+
   if (cornerOnImage) {
     return (
       <div
@@ -91,7 +102,7 @@ export function ProductCardActions({
           className={`${gridCornerSize} flex shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
             isInWishlist
               ? 'bg-red-600 text-white shadow-md'
-              : 'bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]'
+              : cornerIdleWishlist
           }`}
           title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
           aria-label={isInWishlist ? t('common.ariaLabels.removeFromWishlist') : t('common.ariaLabels.addToWishlist')}
@@ -104,7 +115,7 @@ export function ProductCardActions({
           className={`${gridCornerSize} flex shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
             isInCompare
               ? 'border-gray-900 bg-white text-gray-900 shadow-sm'
-              : 'border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]'
+              : cornerIdleCompare
           }`}
           title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
           aria-label={isInCompare ? t('common.ariaLabels.removeFromCompare') : t('common.ariaLabels.addToCompare')}

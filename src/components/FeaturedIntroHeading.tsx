@@ -38,7 +38,7 @@ export function FeaturedIntroHeading() {
 
   return (
     <section
-      className={`bg-white ${montserrat.className}`}
+      className={`hidden bg-white lg:block ${montserrat.className}`}
       aria-labelledby="featured-intro-heading"
     >
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-10 pt-6`}>

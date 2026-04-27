@@ -18,6 +18,10 @@ interface ProductCardInfoProps {
   isCompact?: boolean;
   /** Figma mobee-new: price lives in the bordered footer row with the add button */
   hidePrice?: boolean;
+  /** Home mobile grid — hide small caps brand row. */
+  omitBrandRow?: boolean;
+  /** Home mobile grid — title at 12px regular on small screens. */
+  titleSizeMobileFigma?: boolean;
 }
 
 /**
@@ -34,30 +38,44 @@ export function ProductCardInfo({
   colors,
   isCompact = false,
   hidePrice = false,
+  omitBrandRow = false,
+  titleSizeMobileFigma = false,
 }: ProductCardInfoProps) {
   const { t } = useTranslation();
 
   const paddingClass = (() => {
     if (hidePrice) {
+      if (omitBrandRow) {
+        return 'px-3 pb-2 pt-2 lg:px-5 lg:pb-4 lg:pt-0';
+      }
       return isCompact ? 'px-3 pt-2 pb-2' : 'px-5 pt-0 pb-4';
     }
     return isCompact ? 'p-2.5' : 'p-4';
   })();
 
+  const titleClass = (() => {
+    if (titleSizeMobileFigma) {
+      return `line-clamp-2 text-gray-900 max-lg:text-xs max-lg:font-normal max-lg:leading-normal lg:text-[18px] lg:font-bold lg:leading-7 ${
+        subtitle ? 'mb-0.5 lg:mb-1' : 'mb-1 lg:mb-2'
+      }`;
+    }
+    if (isCompact) {
+      return `text-base font-bold text-gray-900 line-clamp-2 ${subtitle ? 'mb-0.5' : 'mb-1'}`;
+    }
+    return `text-[18px] leading-7 font-bold text-gray-900 line-clamp-2 ${subtitle ? 'mb-1' : 'mb-2'}`;
+  })();
+
   return (
     <div className={paddingClass}>
       <Link href={`/products/${slug}`} className="block">
-        {/* Product line (Figma: small caps category) */}
-        <p
-          className={`${isCompact ? 'text-[9px]' : 'text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400 ${isCompact ? 'mb-0.5' : 'mb-1'}`}
-        >
-          {brandName || t('common.defaults.category')}
-        </p>
-        <h3
-          className={`${isCompact ? 'text-base' : 'text-[18px] leading-7'} font-bold text-gray-900 line-clamp-2 ${subtitle ? (isCompact ? 'mb-0.5' : 'mb-1') : isCompact ? 'mb-1' : 'mb-2'}`}
-        >
-          {title}
-        </h3>
+        {!omitBrandRow ? (
+          <p
+            className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
+          >
+            {brandName || t('common.defaults.category')}
+          </p>
+        ) : null}
+        <h3 className={titleClass}>{title}</h3>
         {subtitle ? (
           <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
             <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />

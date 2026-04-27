@@ -51,6 +51,18 @@
     "errorLoading": "Не удалось загрузить товары",
     "tryAgain": "Попробовать снова",
     "noProducts": "В этой категории нет товаров."
+  },
+  "mobile_home": {
+    "featuredSectionTitle": "Избранное",
+    "specialOffersSectionTitle": "Акции",
+    "discountLabel": "{{percent}}% скидка",
+    "categoryPill": {
+      "computers": "Mac",
+      "phones": "iPhone",
+      "tablets": "iPad",
+      "watches": "Watch",
+      "headphones": "AirPods"
+    }
   }
 }
 

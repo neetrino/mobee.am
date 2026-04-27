@@ -5,7 +5,7 @@ import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 
 /** Matches site content gutters rhythm — same as former inline best-choice grid. */
 export const HOME_BEST_CHOICE_GRID_LAYOUT =
-  'grid grid-cols-2 gap-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4';
+  'grid grid-cols-2 gap-2 sm:gap-4 md:gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-6';
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'w-full min-w-0';
 
@@ -31,6 +31,7 @@ export function HomeBestChoiceStyleProductGrid({
             shiftImageInFrame
             smallerFooterPrice
             specialOffersHomeCard={specialOffersHomeCard}
+            homeProductGridCard
           />
         </div>
       ))}

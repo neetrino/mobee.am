@@ -43,25 +43,52 @@ function CtaArrowIcon() {
   );
 }
 
+function MobileHeroIphoneBanner() {
+  const { t, lang } = useTranslation();
+  const titleClass = lang === 'hy' ? notoArmenian.className : montserrat.className;
+
+  return (
+    <div className={`pb-2 lg:hidden ${montserrat.className}`}>
+      <div className={SITE_CONTENT_GUTTERS_CLASS}>
+        <div className="relative isolate min-h-[168px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-2 pt-4">
+          <div className="relative z-10 flex max-w-[55%] flex-col items-start gap-2">
+            <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-normal leading-normal text-[#14ae5c]">
+              {t('home.hero_free_shipping')}
+            </span>
+            <p
+              className={`${titleClass} text-[clamp(1.5rem,7vw,2rem)] font-bold leading-tight tracking-tight text-black`}
+            >
+              {t('home.hero_iphone_title')}
+            </p>
+          </div>
+          <div className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[min(52%,140px)] w-[min(58%,220px)] min-h-[118px] min-w-[160px] max-w-[220px]">
+            <Image
+              src={IMG_IPHONE}
+              alt=""
+              fill
+              className="object-contain object-right-bottom"
+              sizes="220px"
+              priority
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function HeroCarousel() {
   const { t, lang } = useTranslation();
   const headlineClass = lang === 'hy' ? notoArmenian.className : montserrat.className;
 
   return (
-    <section
-      className={`bg-white ${montserrat.className}`}
-      aria-labelledby="hero-promo-heading"
-    >
-      <div
-        className={`${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-[calc(theme(spacing.8)*4)]`}
-      >
+    <section className={`bg-white ${montserrat.className}`}>
+      <MobileHeroIphoneBanner />
+
+      <div className={`hidden lg:block ${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-[calc(theme(spacing.8)*4)]`}>
         <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:gap-5">
-          {/* Main banner — Figma 1:226; headphones 1:229 (+20% vs base); ~10% of icon height past card top */}
           <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px]">
-            <div
-              className="absolute inset-0 z-0 rounded-[40px] bg-[#e9ecf0]"
-              aria-hidden
-            />
+            <div className="absolute inset-0 z-0 rounded-[40px] bg-[#e9ecf0]" aria-hidden />
             <div className="absolute right-4 top-4 z-30 sm:right-8 sm:top-8 md:right-10 md:top-10">
               <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[12px] font-normal leading-normal text-[#14ae5c]">
                 {t('home.hero_free_shipping')}
@@ -94,7 +121,6 @@ export function HeroCarousel() {
               </div>
             </div>
 
-            {/* Headphones: 280×369; sm: −47% self-width; sm vertical −20.5px (up 25px vs prior +4.5px). */}
             <div className="pointer-events-none relative z-10 mx-auto mt-2 h-[214px] w-full max-w-[287px] -translate-x-1/2 -translate-y-[40%] sm:absolute sm:bottom-0 sm:right-0 sm:mx-0 sm:mt-0 sm:h-[369px] sm:w-[280px] sm:max-w-none sm:-translate-x-[47%] sm:-translate-y-[20.5px]">
               <Image
                 src={IMG_AIRPODS}
@@ -107,11 +133,8 @@ export function HeroCarousel() {
             </div>
           </div>
 
-          {/* Right column — Figma nodes 1:234–1:246 */}
           <div className="flex w-full min-w-0 shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:justify-between lg:gap-0">
-            <div
-              className="flex min-w-0 flex-col gap-4 overflow-hidden rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8 lg:h-[178px] lg:w-full lg:shrink-0 lg:gap-2 lg:px-12 lg:py-6"
-            >
+            <div className="flex min-w-0 flex-col gap-4 overflow-hidden rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8 lg:h-[178px] lg:w-full lg:shrink-0 lg:gap-2 lg:px-12 lg:py-6">
               <p className="w-full min-w-0 max-w-full break-words text-[12px] font-normal leading-4 text-[#111]">
                 <span className="block">{t('home.hero_chat_line1')}</span>
                 <span>
@@ -126,17 +149,11 @@ export function HeroCarousel() {
                     : `${headlineClass} flex w-full min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-[clamp(2.5rem,10vw,3.875rem)] font-black leading-none [overflow-wrap:anywhere] lg:flex-nowrap lg:text-[clamp(2rem,4vw,3rem)]`
                 }
               >
-                <span
-                  className={
-                    lang === 'ru' ? 'shrink-0 text-black' : 'min-w-0 break-words text-black'
-                  }
-                >
+                <span className={lang === 'ru' ? 'shrink-0 text-black' : 'min-w-0 break-words text-black'}>
                   {t('home.hero_promo_headline')}
                 </span>
                 <span
-                  className={`min-w-0 shrink-0 text-[#ff490d] ${
-                    lang === 'ru' ? '-translate-y-[0.14em]' : ''
-                  }`}
+                  className={`min-w-0 shrink-0 text-[#ff490d] ${lang === 'ru' ? '-translate-y-[0.14em]' : ''}`}
                 >
                   {t('home.hero_discount_percent')}
                 </span>

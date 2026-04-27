@@ -5,6 +5,8 @@ import { FeaturedBestChoiceGrid } from './FeaturedBestChoiceGrid';
 import { SpecialOffersProductGrid } from './SpecialOffersProductGrid';
 import { SpecialOffersSectionHeading } from './SpecialOffersSectionHeading';
 import { WhyChooseUsSection } from './WhyChooseUsSection';
+import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
+import { HomeMobileSaleBanner } from './HomeMobileSaleBanner';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { t } from '../lib/i18n';
 import { FEATURED_HOME_FILTER_DEFAULT, useFeaturedHomeProducts } from './useFeaturedHomeProducts';
@@ -38,11 +40,16 @@ export function HomeProductSections() {
   }, [fetchSpecialOffersProducts]);
 
   return (
-    <section className="bg-gray-50 pb-16 pt-6" aria-labelledby="home-product-sections">
+    <section className="bg-white pb-16 pt-2 lg:bg-gray-50 lg:pt-6" aria-labelledby="home-product-sections">
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <h2 id="home-product-sections" className="sr-only">
           {t(language, 'home.featured_products.title')}
         </h2>
+
+        <HomeMobileSectionTitle
+          sectionHeadingId="home-featured-heading-mobile"
+          title={t(language, 'home.mobile_home.featuredSectionTitle')}
+        />
 
         <FeaturedBestChoiceGrid
           language={language}
@@ -54,7 +61,7 @@ export function HomeProductSections() {
         />
 
         <SpecialOffersSectionHeading>
-          <div className="mt-[7.5rem]">
+          <div className="mt-8 lg:mt-[7.5rem]">
             <SpecialOffersProductGrid
               language={specialOffersLanguage}
               loading={specialOffersLoading}
@@ -68,7 +75,11 @@ export function HomeProductSections() {
 
       </div>
 
-      <WhyChooseUsSection />
+      <div className="hidden lg:block">
+        <WhyChooseUsSection />
+      </div>
+
+      <HomeMobileSaleBanner />
     </section>
   );
 }

@@ -51,6 +51,18 @@
     "errorLoading": "Failed to load products",
     "tryAgain": "Try Again",
     "noProducts": "No products in this category."
+  },
+  "mobile_home": {
+    "featuredSectionTitle": "Featured",
+    "specialOffersSectionTitle": "Special offers",
+    "discountLabel": "{{percent}}% off",
+    "categoryPill": {
+      "computers": "Mac",
+      "phones": "iPhone",
+      "tablets": "iPad",
+      "watches": "Watch",
+      "headphones": "AirPods"
+    }
   }
 }
 

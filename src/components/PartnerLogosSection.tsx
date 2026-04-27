@@ -51,7 +51,7 @@ export function PartnerLogosSection() {
 
   return (
     <section
-      className="border-b border-solid border-[#eeeef0] bg-white"
+      className="hidden border-b border-solid border-[#eeeef0] bg-white lg:block"
       aria-labelledby="partner-logos-heading"
     >
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-[49px] pt-12`}>

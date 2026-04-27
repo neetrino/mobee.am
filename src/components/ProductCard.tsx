@@ -45,6 +45,8 @@ interface ProductCardProps {
   smallerFooterPrice?: boolean;
   /** Home special-offers grid — RU desktop footer CTA uses Figma 155.99×36.94px. */
   specialOffersHomeCard?: boolean;
+  /** Home featured / special-offer grids — mobile Figma card chrome. */
+  homeProductGridCard?: boolean;
 }
 
 /**
@@ -58,6 +60,7 @@ export function ProductCard({
   squareImageFrame = true,
   smallerFooterPrice = false,
   specialOffersHomeCard = false,
+  homeProductGridCard = false,
 }: ProductCardProps) {
   const isCompact = viewMode === 'grid-3';
   const router = useRouter();
@@ -133,6 +136,7 @@ export function ProductCard({
       squareImageFrame={squareImageFrame}
       smallerFooterPrice={smallerFooterPrice}
       specialOffersHomeCard={specialOffersHomeCard}
+      homeProductGridCard={homeProductGridCard}
       onImageError={() => setImageError(true)}
       onWishlistToggle={handleWishlistToggle}
       onCompareToggle={handleCompareToggle}
