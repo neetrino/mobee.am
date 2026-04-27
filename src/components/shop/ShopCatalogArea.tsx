@@ -81,7 +81,7 @@ export function ShopCatalogArea() {
   const totalPages = meta?.totalPages ?? 0;
 
   return (
-    <div className="min-w-0 w-full flex-1 py-4 lg:pl-[53px]">
+    <div className="min-w-0 w-full flex-1 py-4">
       <div className="w-full">
         <ProductsHeader total={total} isCountPending={loading} />
       </div>

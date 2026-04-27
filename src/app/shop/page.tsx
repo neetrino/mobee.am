@@ -10,6 +10,7 @@ import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { ShopCatalogArea } from '@/components/shop/ShopCatalogArea';
+import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
 
 interface ProductsPageProps {
   searchParams?: Promise<Record<string, string | undefined>> | Record<string, string | undefined>;
@@ -17,8 +18,8 @@ interface ProductsPageProps {
 
 function ShopCatalogFallback() {
   return (
-    <div className="min-w-0 w-full flex-1 py-4 lg:pl-[53px]">
-      <div className="mx-auto mb-6 h-8 w-48 max-w-[1917px] animate-pulse rounded bg-gray-200 px-0" />
+    <div className="min-w-0 w-full flex-1 py-4">
+      <div className="mb-6 h-8 w-48 animate-pulse rounded bg-gray-200" />
       <div className="mb-6 h-10 w-full max-w-md animate-pulse rounded bg-gray-200" />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
@@ -45,7 +46,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   return (
     <div className="w-full max-w-full">
-      <div className="mx-auto flex w-full max-w-[1917px] flex-col gap-6 px-4 sm:px-6 lg:flex-row lg:items-start lg:px-[53px]">
+      <div
+        className={`flex w-full flex-col gap-6 lg:flex-row lg:items-start ${SITE_CONTENT_GUTTERS_CLASS}`}
+      >
         <ProductsFiltersProvider
           category={params?.category}
           search={params?.search}
