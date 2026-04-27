@@ -1,116 +1,94 @@
 import { db } from "@white-shop/db";
 
-/**
- * Extract image from product media
- */
+const TOP_PRODUCTS_WINDOW_DAYS = 365;
+
 function extractImageFromMedia(media: unknown[] | undefined): string | null {
-  if (!Array.isArray(media) || media.length === 0) {
-    return null;
-  }
-
+  if (!Array.isArray(media) || media.length === 0) return null;
   const firstMedia = media[0];
-  
-  if (typeof firstMedia === "string") {
-    return firstMedia;
-  }
-  
+  if (typeof firstMedia === "string") return firstMedia;
   if (firstMedia && typeof firstMedia === "object" && "url" in firstMedia) {
-    const mediaObj = firstMedia as { url?: string };
-    return mediaObj.url || null;
+    return (firstMedia as { url?: string }).url || null;
   }
-
   return null;
 }
 
+function windowStartDate() {
+  const d = new Date();
+  d.setDate(d.getDate() - TOP_PRODUCTS_WINDOW_DAYS);
+  return d;
+}
+
+function mapTopRowsToProducts(
+  sorted: Array<{
+    variantId: string | null;
+    _sum: { quantity: number | null; total: number | null };
+    _count: { id: number };
+  }>,
+  variantById: Map<
+    string,
+    {
+      id: string;
+      productId: string;
+      sku: string | null;
+      product: {
+        media: unknown;
+        translations: Array<{ title: string }>;
+      } | null;
+    }
+  >
+) {
+  return sorted.map((row) => {
+    const v = variantById.get(row.variantId!);
+    const title = v?.product?.translations?.[0]?.title ?? "Unknown Product";
+    return {
+      variantId: row.variantId!,
+      productId: v?.productId ?? "",
+      title,
+      sku: v?.sku ?? "N/A",
+      totalQuantity: row._sum.quantity ?? 0,
+      totalRevenue: row._sum.total ?? 0,
+      orderCount: row._count.id,
+      image: extractImageFromMedia(v?.product?.media as unknown[] | undefined),
+    };
+  });
+}
+
 /**
- * Get top products for dashboard
+ * Get top products for admin dashboard (aggregated in DB, bounded time window)
  */
 export async function getTopProducts(limit: number = 5) {
-  // Get all order items with their variants
-  const orderItems = await db.orderItem.findMany({
-    include: {
-      variant: {
-        include: {
-          product: {
-            include: {
-              translations: {
-                where: { locale: "en" },
-                take: 1,
-              },
-            },
-          },
+  const grouped = await db.orderItem.groupBy({
+    by: ["variantId"],
+    where: {
+      variantId: { not: null },
+      order: { createdAt: { gte: windowStartDate() } },
+    },
+    _sum: { quantity: true, total: true },
+    _count: { id: true },
+  });
+
+  const sorted = grouped
+    .filter((row) => row.variantId)
+    .sort((a, b) => (b._sum.total ?? 0) - (a._sum.total ?? 0))
+    .slice(0, limit);
+
+  if (sorted.length === 0) return [];
+
+  const variants = await db.productVariant.findMany({
+    where: { id: { in: sorted.map((r) => r.variantId!) } },
+    select: {
+      id: true,
+      productId: true,
+      sku: true,
+      product: {
+        select: {
+          media: true,
+          translations: { where: { locale: "en" }, take: 1, select: { title: true } },
         },
       },
     },
   });
 
-  // Group by variant and calculate stats
-  const productStats = new Map<
-    string,
-    {
-      variantId: string;
-      productId: string;
-      title: string;
-      sku: string;
-      totalQuantity: number;
-      totalRevenue: number;
-      orderCount: number;
-      image?: string | null;
-    }
-  >();
-
-  orderItems.forEach((item: { 
-    variantId: string | null; 
-    quantity: number; 
-    total: number; 
-    variant?: { 
-      id: string; 
-      productId: string; 
-      sku: string | null; 
-      product?: { 
-        translations?: Array<{ title: string }>; 
-        media?: unknown[] 
-      } 
-    } | null
-  }) => {
-    if (!item.variant) return;
-
-    const variantId = item.variantId || item.variant.id;
-    const productId = item.variant.productId;
-    const product = item.variant.product;
-    const translations = product?.translations || [];
-    const translation = translations[0];
-    const title = translation?.title || "Unknown Product";
-    const sku = item.variant.sku || "N/A";
-    const image = extractImageFromMedia(product?.media);
-
-    if (!productStats.has(variantId)) {
-      productStats.set(variantId, {
-        variantId,
-        productId,
-        title,
-        sku,
-        totalQuantity: 0,
-        totalRevenue: 0,
-        orderCount: 0,
-        image,
-      });
-    }
-
-    const stats = productStats.get(variantId)!;
-    stats.totalQuantity += item.quantity;
-    stats.totalRevenue += item.total;
-    stats.orderCount += 1;
-  });
-
-  // Convert to array and sort by revenue
-  const topProducts = Array.from(productStats.values())
-    .sort((a, b) => b.totalRevenue - a.totalRevenue)
-    .slice(0, limit);
-
-  return topProducts;
+  const variantById = new Map(variants.map((v) => [v.id, v]));
+  return mapTopRowsToProducts(sorted, variantById);
 }
-
-
-
-

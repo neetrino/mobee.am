@@ -82,11 +82,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!parsedUser.roles || !Array.isArray(parsedUser.roles)) {
             console.log('⚠️ [AUTH] User data missing roles, fetching from API...');
             try {
-              const profileData = await apiClient.get<{ roles: string[] }>('/api/v1/users/profile');
-              if (profileData.roles) {
-                parsedUser.roles = profileData.roles;
+              const rolePayload = await apiClient.get<{ roles: string[] }>('/api/v1/users/roles');
+              if (rolePayload.roles) {
+                parsedUser.roles = rolePayload.roles;
                 localStorage.setItem(AUTH_USER_KEY, JSON.stringify(parsedUser));
-                console.log('✅ [AUTH] Roles updated from API:', profileData.roles);
+                console.log('✅ [AUTH] Roles updated from API:', rolePayload.roles);
               }
             } catch (fetchError) {
               console.error('❌ [AUTH] Failed to fetch user roles:', fetchError);
