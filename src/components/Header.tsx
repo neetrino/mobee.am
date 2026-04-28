@@ -21,6 +21,8 @@ import {
   MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
   MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
   MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX,
+  MOBILE_PRIMARY_MENU_BAR_CLASS,
+  MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
@@ -99,7 +101,7 @@ const SearchIcon = () => (
   </svg>
 );
 
-/** Mobile menu bars use h-0.5 (2px). Match globe stroke in 24×24 viewBox at 22px render: 2 * (24/22). */
+/** Globe stroke in 24×24 viewBox at 22px render: 2 * (24/22). */
 const MOBILE_GLOBE_STROKE_USER_UNITS = (2 * 24) / 22;
 
 /** Globe for mobile primary strip language control (inherits text color for strokes). */
@@ -884,10 +886,10 @@ export function Header() {
                 aria-expanded={mobileMenuOpen}
                 aria-label={t('common.ariaLabels.openMenu')}
               >
-                <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
-                  <span className="h-0.5 w-full rounded-full bg-gray-900" />
-                  <span className="h-0.5 w-full rounded-full bg-gray-900" />
-                  <span className="h-0.5 w-full rounded-full bg-gray-900" />
+                <span className={MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS} aria-hidden>
+                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
+                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
+                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
                 </span>
               </button>
             </div>

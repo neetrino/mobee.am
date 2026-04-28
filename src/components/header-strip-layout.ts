@@ -28,3 +28,12 @@ export const MOBILE_HEADER_CENTER_LOGO_SIZE_PX = 40;
  * Figma mobee-new node 180:1419 — corner radius on the center mark.
  */
 export const MOBILE_HEADER_CENTER_LOGO_RADIUS_PX = 12;
+
+/**
+ * Mobile primary strip menu (hamburger) glyph: 2px bars + 2px gap (wrap has no fixed height, so
+ * bars are not squished — reads a bit thinner than the 2.5–3px tuning pass).
+ */
+export const MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS =
+  'flex w-[18px] shrink-0 flex-col justify-center gap-[2px]';
+
+export const MOBILE_PRIMARY_MENU_BAR_CLASS = 'h-[2px] w-full rounded-full bg-black';
