@@ -41,30 +41,26 @@ export const COMPARE_EMPTY_STATE_IMAGE_SRC = '/images/compare-empty-state.png';
 /** `sizes` for empty-state `next/image` — matches icon box ~7.2rem width */
 export const COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR = '115px';
 
-/** Baseline viewport-height padding before footer (first pass). */
-const COMPARE_EMPTY_STATE_FOOTER_GAP_BASE_VH = 20;
-
-/** +20% vs baseline (20 × 1.2 → 24vh in `COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS`). */
-const COMPARE_EMPTY_STATE_FOOTER_GAP_INCREASE_RATIO = 1.2;
-
-const COMPARE_EMPTY_STATE_FOOTER_GAP_EFFECTIVE_VH = Math.round(
-  COMPARE_EMPTY_STATE_FOOTER_GAP_BASE_VH * COMPARE_EMPTY_STATE_FOOTER_GAP_INCREASE_RATIO,
-);
-
-if (COMPARE_EMPTY_STATE_FOOTER_GAP_EFFECTIVE_VH !== 24) {
-  throw new Error(
-    'compare-layout: update COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS literal to match EFFECTIVE_VH',
-  );
-}
-
-/** Padding below empty-state CTA before site footer (literal for Tailwind JIT). */
-export const COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS = 'pb-[24vh]';
-
 /**
- * Space below empty-state icon before title/description (30vh — shifts copy down from icon).
+ * Small padding below empty-state CTA before the site footer (site chrome already adds mobile nav inset).
  * Literal for Tailwind JIT.
  */
-export const COMPARE_EMPTY_STATE_TEXT_TOP_OFFSET_CLASS = 'mt-[30vh]';
+export const COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS = 'pb-6';
+
+/**
+ * Fills viewport under header + compare page title so copy and CTA sit at the lowest practical position.
+ * `10rem` ≈ header + title row + page vertical padding (tune if chrome heights change).
+ * Literal for Tailwind JIT.
+ */
+export const COMPARE_EMPTY_STATE_LOWER_PANEL_MIN_HEIGHT_CLASS =
+  'min-h-[calc(100svh-10rem)]';
+
+/**
+ * Flex column: anchor empty-state copy and button toward the bottom of the min-height panel.
+ * Literal for Tailwind JIT.
+ */
+export const COMPARE_EMPTY_STATE_LOWER_PANEL_FLEX_CLASS =
+  'flex flex-col justify-end items-center';
 
 /**
  * Tight gap between description and browse-products CTA (text sits right above button).
