@@ -18,6 +18,7 @@ import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_STRIP_PADDING_Y,
+  MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
@@ -378,7 +379,25 @@ export function Header() {
   const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
   const [secondaryDocked, setSecondaryDocked] = useState(false);
   const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
+  const [mobilePrimaryHeaderSpacerPx, setMobilePrimaryHeaderSpacerPx] = useState(
+    MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX,
+  );
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
+
+  const syncMobilePrimaryHeaderSpacer = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      setMobilePrimaryHeaderSpacerPx(0);
+      return;
+    }
+    const primaryEl = primaryStripRef.current;
+    if (!primaryEl) {
+      return;
+    }
+    setMobilePrimaryHeaderSpacerPx(Math.round(primaryEl.getBoundingClientRect().height));
+  }, []);
 
   const syncSecondaryDock = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -418,19 +437,42 @@ export function Header() {
     };
   }, [syncSecondaryDock]);
 
+  useLayoutEffect(() => {
+    syncMobilePrimaryHeaderSpacer();
+    const primaryEl = primaryStripRef.current;
+    if (typeof ResizeObserver === 'undefined' || !primaryEl) {
+      return;
+    }
+    const ro = new ResizeObserver(() => {
+      syncMobilePrimaryHeaderSpacer();
+    });
+    ro.observe(primaryEl);
+    return () => {
+      ro.disconnect();
+    };
+  }, [syncMobilePrimaryHeaderSpacer]);
+
   useEffect(() => {
     syncSecondaryDock();
+    syncMobilePrimaryHeaderSpacer();
     window.addEventListener('scroll', syncSecondaryDock, { passive: true });
-    window.addEventListener('resize', syncSecondaryDock);
+    const onResize = () => {
+      syncSecondaryDock();
+      syncMobilePrimaryHeaderSpacer();
+    };
+    window.addEventListener('resize', onResize);
     const mq = window.matchMedia('(min-width: 1024px)');
-    const onMq = () => syncSecondaryDock();
+    const onMq = () => {
+      syncSecondaryDock();
+      syncMobilePrimaryHeaderSpacer();
+    };
     mq.addEventListener('change', onMq);
     return () => {
       window.removeEventListener('scroll', syncSecondaryDock);
-      window.removeEventListener('resize', syncSecondaryDock);
+      window.removeEventListener('resize', onResize);
       mq.removeEventListener('change', onMq);
     };
-  }, [syncSecondaryDock]);
+  }, [syncSecondaryDock, syncMobilePrimaryHeaderSpacer]);
 
   const {
     query: searchQuery,
@@ -733,7 +775,10 @@ export function Header() {
 
   return (
     <div className={montserrat.className}>
-    <header ref={primaryStripRef} className="border-b border-gray-200 bg-white lg:border-b-0">
+    <header
+      ref={primaryStripRef}
+      className="border-b border-gray-200 bg-white max-lg:fixed max-lg:inset-x-0 max-lg:top-0 max-lg:z-40 lg:border-b-0"
+    >
       <Suspense fallback={null}>
         <HeaderSearchSync
           setSearchQuery={setSearchQuery}
@@ -858,6 +903,12 @@ export function Header() {
         </div>
       </div>
     </header>
+
+      <div
+        aria-hidden
+        className="shrink-0 lg:hidden"
+        style={{ height: mobilePrimaryHeaderSpacerPx }}
+      />
 
       {secondaryDocked ? (
         <div
