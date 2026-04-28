@@ -7,7 +7,7 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } f
 import type { FormEvent, ReactNode, CSSProperties } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
-import { getStoredLanguage } from '../lib/language';
+import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
 import { useInstantSearch } from './hooks/useInstantSearch';
 import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
@@ -98,6 +98,32 @@ const SearchIcon = () => (
     <path d="M15.5 15.5L19 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 );
+
+/** Globe for mobile primary strip language control (#2DB2FF frame, white strokes). */
+const GlobeLanguageIcon = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="shrink-0"
+    aria-hidden
+  >
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.75" />
+    <path d="M2 12h20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    <path
+      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+      stroke="currentColor"
+      strokeWidth="1.75"
+    />
+  </svg>
+);
+
+const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
+
+const mobilePrimaryLangButtonClassName =
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2DB2FF] text-white shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2DB2FF]';
 
 /**
  * Component that syncs search params with state
@@ -411,6 +437,7 @@ export function Header() {
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
+  const mobilePrimaryLangRef = useRef<HTMLDivElement>(null);
   const primaryStripRef = useRef<HTMLElement | null>(null);
   const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
   const [secondaryDocked, setSecondaryDocked] = useState(false);
@@ -419,6 +446,7 @@ export function Header() {
     MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX,
   );
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
+  const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
 
   const syncMobilePrimaryHeaderSpacer = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -699,6 +727,9 @@ export function Header() {
       if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(event.target as Node)) {
         setShowMobileCurrency(false);
       }
+      if (mobilePrimaryLangRef.current && !mobilePrimaryLangRef.current.contains(event.target as Node)) {
+        setShowMobilePrimaryLangMenu(false);
+      }
       const clickTarget = event.target as Node;
       const inDesktopCategories = categoriesPillWrapRef.current?.contains(clickTarget);
       if (!inDesktopCategories) {
@@ -767,6 +798,10 @@ export function Header() {
         setShowCategoriesPillMenu(false);
       }
 
+      if (showMobilePrimaryLangMenu) {
+        setShowMobilePrimaryLangMenu(false);
+      }
+
       if (mobileMenuOpen) {
         setMobileMenuOpen(false);
       }
@@ -776,7 +811,7 @@ export function Header() {
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [showSearchModal, mobileMenuOpen, showCategoriesPillMenu]);
+  }, [showSearchModal, mobileMenuOpen, showCategoriesPillMenu, showMobilePrimaryLangMenu]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -834,6 +869,7 @@ export function Header() {
                 type="button"
                 onClick={() => {
                   setShowCategoriesPillMenu(false);
+                  setShowMobilePrimaryLangMenu(false);
                   setMobileMenuOpen(true);
                 }}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2DB2FF] text-white shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
@@ -865,17 +901,49 @@ export function Header() {
               </div>
               <span className="text-[20px] font-bold leading-7 tracking-[-0.5px] text-[#111827]">Mobee</span>
             </Link>
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="relative z-20 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f7f7f7] text-gray-800 transition-opacity active:opacity-90"
-              aria-label={t('common.ariaLabels.openMenu')}
-              aria-expanded={mobileMenuOpen}
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
-              </svg>
-            </button>
+            <div className="relative z-20 shrink-0" ref={mobilePrimaryLangRef}>
+              <button
+                type="button"
+                onClick={() => setShowMobilePrimaryLangMenu((open) => !open)}
+                className={mobilePrimaryLangButtonClassName}
+                aria-label={t('common.ariaLabels.changeLanguage')}
+                aria-expanded={showMobilePrimaryLangMenu}
+                aria-haspopup="listbox"
+              >
+                <GlobeLanguageIcon />
+              </button>
+              {showMobilePrimaryLangMenu ? (
+                <div
+                  className="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-2xl"
+                  role="listbox"
+                  aria-label={t('common.ariaLabels.changeLanguage')}
+                >
+                  {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
+                    const active = getStoredLanguage() === code;
+                    const label = code === 'hy' ? 'ՀԱՅ' : code === 'ru' ? 'РУС' : 'EN';
+                    return (
+                      <button
+                        key={code}
+                        type="button"
+                        role="option"
+                        aria-selected={active}
+                        onClick={() => {
+                          setShowMobilePrimaryLangMenu(false);
+                          if (!active) setStoredLanguage(code);
+                        }}
+                        className={`w-full px-4 py-2.5 text-left text-sm font-semibold transition-colors duration-150 ${
+                          active
+                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
           </div>
           <div className="border-t border-gray-100 pb-2.5 pt-0">
             <form
