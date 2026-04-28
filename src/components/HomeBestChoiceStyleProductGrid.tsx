@@ -4,6 +4,10 @@ import { ProductCard } from './ProductCard';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import { HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW } from './home-best-choice.constants';
 import { chunkArray } from '../lib/chunk-array';
+import {
+  useHomeBestChoiceCarouselPageSync,
+  type MobileCarouselViewState,
+} from './useHomeBestChoiceCarouselPageSync';
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'w-full min-w-0';
 
@@ -26,6 +30,8 @@ type HomeBestChoiceStyleProductGridProps = {
   mobileCarouselAriaLabel: string;
   /** Home “Специальные предложения” row — RU desktop add-to-cart pill sizing. */
   specialOffersHomeCard?: boolean;
+  /** Reports visible snap page for {@link HomeMobileSectionTitle} indicators. */
+  onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 };
 
 function BestChoiceProductCell({
@@ -54,13 +60,20 @@ export function HomeBestChoiceStyleProductGrid({
   productsPerPage,
   mobileCarouselAriaLabel,
   specialOffersHomeCard = false,
+  onMobileCarouselViewChange,
 }: HomeBestChoiceStyleProductGridProps) {
   const visible = products.slice(0, productsPerPage);
   const mobilePages = chunkArray(visible, HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW);
+  const mobilePageCount = mobilePages.length;
+  const carouselScrollRef = useHomeBestChoiceCarouselPageSync(
+    mobilePageCount,
+    onMobileCarouselViewChange,
+  );
 
   return (
     <>
       <div
+        ref={carouselScrollRef}
         className={HOME_BEST_CHOICE_MOBILE_CAROUSEL}
         role="region"
         aria-roledescription="carousel"
@@ -111,16 +124,24 @@ function SkeletonCell() {
 export function HomeBestChoiceStyleProductGridSkeleton({
   productsPerPage,
   mobileCarouselAriaLabel,
+  onMobileCarouselViewChange,
 }: {
   productsPerPage: number;
   mobileCarouselAriaLabel: string;
+  onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 }) {
   const indices = [...Array(productsPerPage)].map((_, i) => i);
   const mobilePages = chunkArray(indices, HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW);
+  const mobilePageCount = mobilePages.length;
+  const carouselScrollRef = useHomeBestChoiceCarouselPageSync(
+    mobilePageCount,
+    onMobileCarouselViewChange,
+  );
 
   return (
     <>
       <div
+        ref={carouselScrollRef}
         className={HOME_BEST_CHOICE_MOBILE_CAROUSEL}
         role="region"
         aria-roledescription="carousel"

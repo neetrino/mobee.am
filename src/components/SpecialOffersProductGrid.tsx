@@ -4,6 +4,7 @@ import {
   HomeBestChoiceStyleProductGrid,
   HomeBestChoiceStyleProductGridSkeleton,
 } from './HomeBestChoiceStyleProductGrid';
+import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSync';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import type { LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
@@ -15,6 +16,7 @@ type SpecialOffersProductGridProps = {
   products: FeaturedHomeProduct[];
   productsPerPage: number;
   onRetry: () => void;
+  onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 };
 
 /**
@@ -27,12 +29,14 @@ export function SpecialOffersProductGrid({
   products,
   productsPerPage,
   onRetry,
+  onMobileCarouselViewChange,
 }: SpecialOffersProductGridProps) {
   if (loading) {
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
+        onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
     );
   }
@@ -57,6 +61,7 @@ export function SpecialOffersProductGrid({
         productsPerPage={productsPerPage}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
         specialOffersHomeCard
+        onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
     );
   }

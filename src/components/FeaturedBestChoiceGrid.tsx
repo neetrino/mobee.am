@@ -4,6 +4,7 @@ import {
   HomeBestChoiceStyleProductGrid,
   HomeBestChoiceStyleProductGridSkeleton,
 } from './HomeBestChoiceStyleProductGrid';
+import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSync';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import type { LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
@@ -15,6 +16,7 @@ type FeaturedBestChoiceGridProps = {
   products: FeaturedHomeProduct[];
   productsPerPage: number;
   onRetry: () => void;
+  onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 };
 
 export function FeaturedBestChoiceGrid({
@@ -24,12 +26,14 @@ export function FeaturedBestChoiceGrid({
   products,
   productsPerPage,
   onRetry,
+  onMobileCarouselViewChange,
 }: FeaturedBestChoiceGridProps) {
   if (loading) {
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
         mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
+        onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
     );
   }
@@ -53,6 +57,7 @@ export function FeaturedBestChoiceGrid({
         products={products}
         productsPerPage={productsPerPage}
         mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
+        onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
     );
   }

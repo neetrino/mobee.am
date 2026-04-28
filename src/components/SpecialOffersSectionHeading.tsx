@@ -37,12 +37,18 @@ function ArrowRightIcon({ className }: { className?: string }) {
 type SpecialOffersSectionHeadingProps = {
   /** Product grid — same card system as “best choice”, placed under the title row. */
   children?: ReactNode;
+  syncedCarouselPageIndex?: number;
+  syncedCarouselPageCount?: number;
 };
 
 /**
  * Row below the home “best choice” grid — same typography/rhythm as {@link FeaturedIntroHeading}.
  */
-export function SpecialOffersSectionHeading({ children }: SpecialOffersSectionHeadingProps) {
+export function SpecialOffersSectionHeading({
+  children,
+  syncedCarouselPageIndex,
+  syncedCarouselPageCount,
+}: SpecialOffersSectionHeadingProps) {
   const { t } = useTranslation();
 
   return (
@@ -80,6 +86,8 @@ export function SpecialOffersSectionHeading({ children }: SpecialOffersSectionHe
       <HomeMobileSectionTitle
         sectionHeadingId="special-offers-heading-mobile"
         title={t('home.mobile_home.specialOffersSectionTitle')}
+        syncedCarouselPageIndex={syncedCarouselPageIndex}
+        syncedCarouselPageCount={syncedCarouselPageCount}
       />
       {children}
     </div>
