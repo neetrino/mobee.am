@@ -310,6 +310,40 @@ function CategoryMenuItem({
   );
 }
 
+/** Root categories dropdown (desktop secondary bar + mobile header strip). */
+function CategoriesMenuFlyout({
+  loading,
+  roots,
+  onItemNavigate,
+  loadingLabel,
+}: {
+  loading: boolean;
+  roots: Category[];
+  onItemNavigate: () => void;
+  loadingLabel: string;
+}) {
+  return (
+    <>
+      <div className="absolute left-0 top-full z-[55] h-2 w-full" aria-hidden />
+      <div className="absolute left-0 top-full z-[55] w-64 max-w-[min(16rem,calc(100vw-2rem))] pt-2">
+        <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
+          {loading ? (
+            <div className="px-4 py-2 text-sm text-gray-500">{loadingLabel}</div>
+          ) : (
+            roots.map((category) => (
+              <CategoryMenuItem
+                key={category.id}
+                category={category}
+                onClose={onItemNavigate}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 /** Figma mobee-new node 178:535 — support phone + language pill */
 function HeaderPhoneLangCluster({ phoneNumberVisibility }: { phoneNumberVisibility?: 'always' | 'smUp' }) {
   const { t } = useTranslation();
@@ -375,6 +409,7 @@ export function Header() {
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
+  const mobileCategoriesPillWrapRef = useRef<HTMLDivElement>(null);
   const primaryStripRef = useRef<HTMLElement | null>(null);
   const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
   const [secondaryDocked, setSecondaryDocked] = useState(false);
@@ -663,7 +698,10 @@ export function Header() {
       if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(event.target as Node)) {
         setShowMobileCurrency(false);
       }
-      if (categoriesPillWrapRef.current && !categoriesPillWrapRef.current.contains(event.target as Node)) {
+      const clickTarget = event.target as Node;
+      const inDesktopCategories = categoriesPillWrapRef.current?.contains(clickTarget);
+      const inMobileCategories = mobileCategoriesPillWrapRef.current?.contains(clickTarget);
+      if (!inDesktopCategories && !inMobileCategories) {
         setShowCategoriesPillMenu(false);
       }
       if (searchModalRef.current && !searchModalRef.current.contains(event.target as Node)) {
@@ -788,13 +826,32 @@ export function Header() {
       </Suspense>
 
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        {/* Mobile — first strip (reserved; logo/actions can move here later) */}
-        <div
-          className={`flex min-h-12 items-center border-b border-gray-100 lg:hidden ${HEADER_STRIP_PADDING_Y}`}
-          aria-hidden
-        />
-        {/* Mobile — second strip: pill search + menu (logo & currency live in drawer) */}
-        <div className="flex items-center gap-4 py-2.5 lg:hidden">
+        {/* Mobile — single strip: categories (left) + search + menu; secondary bar is lg+ only */}
+        <div className="flex items-center gap-3 border-b border-gray-100 py-2.5 lg:hidden">
+          <div className="relative shrink-0" ref={mobileCategoriesPillWrapRef}>
+            <button
+              type="button"
+              onClick={() => setShowCategoriesPillMenu((open) => !open)}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2DB2FF] text-white shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
+              aria-expanded={showCategoriesPillMenu}
+              aria-haspopup="true"
+              aria-label={t('common.navigation.categories')}
+            >
+              <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
+                <span className="h-0.5 w-full rounded-full bg-white" />
+                <span className="h-0.5 w-full rounded-full bg-white" />
+                <span className="h-0.5 w-full rounded-full bg-white" />
+              </span>
+            </button>
+            {showCategoriesPillMenu ? (
+              <CategoriesMenuFlyout
+                loading={loadingCategories}
+                roots={getRootCategories(categories)}
+                onItemNavigate={() => setShowCategoriesPillMenu(false)}
+                loadingLabel={t('common.messages.loading')}
+              />
+            ) : null}
+          </div>
           <form
             ref={mobileHomeSearchFormRef}
             onSubmit={handleSearch}
@@ -935,24 +992,12 @@ export function Header() {
         }}
         categoriesMenu={
           showCategoriesPillMenu ? (
-            <>
-              <div className="absolute left-0 top-full z-50 h-2 w-full" aria-hidden />
-              <div className="absolute left-0 top-full z-50 w-64 pt-2">
-                <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
-                  {loadingCategories ? (
-                    <div className="px-4 py-2 text-sm text-gray-500">{t('common.messages.loading')}</div>
-                  ) : (
-                    getRootCategories(categories).map((category) => (
-                      <CategoryMenuItem
-                        key={category.id}
-                        category={category}
-                        onClose={() => setShowCategoriesPillMenu(false)}
-                      />
-                    ))
-                  )}
-                </div>
-              </div>
-            </>
+            <CategoriesMenuFlyout
+              loading={loadingCategories}
+              roots={getRootCategories(categories)}
+              onItemNavigate={() => setShowCategoriesPillMenu(false)}
+              loadingLabel={t('common.messages.loading')}
+            />
           ) : null
         }
         searchQuery={searchQuery}

@@ -15,6 +15,6 @@ export const SITE_CONTENT_GUTTERS_CLASS =
 
 /**
  * Initial flow spacer under the fixed mobile primary header (px) before ResizeObserver measures.
- * Includes first (placeholder) + second (search) strips on small screens.
+ * One mobile strip: categories + search + menu (ResizeObserver overrides when mounted).
  */
-export const MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX = 128;
+export const MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX = 88;
