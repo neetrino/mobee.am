@@ -35,6 +35,12 @@ const montserrat = Montserrat({
   display: 'swap',
 });
 
+/** Right padding on pill so input clears the submit control (half-width overlap). */
+const MOBILE_HOME_SEARCH_PILL_RIGHT_PAD_CLASS = 'pr-28';
+/** Same height as pill (h-11); right edge flush with pill (absolute in wrapper). */
+const MOBILE_HOME_SEARCH_SUBMIT_CLASS =
+  'absolute right-0 top-1/2 z-10 flex h-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#2DB2FF] px-4 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-95 active:opacity-90';
+
 // Navigation links will be translated dynamically using useTranslation hook
 const primaryNavLinks = [
   { href: '/', translationKey: 'common.navigation.home' },
@@ -989,39 +995,46 @@ export function Header() {
               onSubmit={handleSearch}
               className="relative min-w-0 w-full"
             >
-              <div className="flex h-11 items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3">
-                <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle cx="11" cy="11" r="7" strokeWidth={2} />
-                    <path strokeLinecap="round" strokeWidth={2} d="M20 20l-4.3-4.3" />
-                  </svg>
-                </span>
-                <input
-                  ref={mobileHomeSearchInputRef}
-                  type="search"
-                  name="header-mobile-home-search"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    if (e.target.value.trim().length >= 1) {
-                      setSearchDropdownOpen(true);
-                    } else {
-                      setSearchDropdownOpen(false);
-                    }
-                  }}
-                  onFocus={() => {
-                    if (searchQuery.trim().length >= 1) {
-                      setSearchDropdownOpen(true);
-                    }
-                  }}
-                  onKeyDown={searchHandleKeyDown}
-                  placeholder={t('common.mainHeader.searchPlaceholder')}
-                  autoComplete="off"
-                  className="min-w-0 flex-1 bg-transparent text-sm leading-normal text-gray-900 outline-none placeholder:text-[#6b7280]"
-                  aria-controls="header-mobile-search-results"
-                  aria-expanded={searchDropdownOpen && searchResults.length > 0}
-                  aria-autocomplete="list"
-                />
+              <div className="relative w-full min-w-0">
+                <div
+                  className={`flex h-11 min-w-0 items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3 ${MOBILE_HOME_SEARCH_PILL_RIGHT_PAD_CLASS}`}
+                >
+                  <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <circle cx="11" cy="11" r="7" strokeWidth={2} />
+                      <path strokeLinecap="round" strokeWidth={2} d="M20 20l-4.3-4.3" />
+                    </svg>
+                  </span>
+                  <input
+                    ref={mobileHomeSearchInputRef}
+                    type="search"
+                    name="header-mobile-home-search"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (e.target.value.trim().length >= 1) {
+                        setSearchDropdownOpen(true);
+                      } else {
+                        setSearchDropdownOpen(false);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchQuery.trim().length >= 1) {
+                        setSearchDropdownOpen(true);
+                      }
+                    }}
+                    onKeyDown={searchHandleKeyDown}
+                    placeholder={t('common.mainHeader.searchPlaceholder')}
+                    autoComplete="off"
+                    className="min-w-0 flex-1 bg-transparent text-sm leading-normal text-gray-900 outline-none placeholder:text-[#6b7280]"
+                    aria-controls="header-mobile-search-results"
+                    aria-expanded={searchDropdownOpen && searchResults.length > 0}
+                    aria-autocomplete="list"
+                  />
+                </div>
+                <button type="submit" className={MOBILE_HOME_SEARCH_SUBMIT_CLASS}>
+                  {t('common.buttons.search')}
+                </button>
               </div>
               {!showSearchModal ? (
                 <SearchDropdown
