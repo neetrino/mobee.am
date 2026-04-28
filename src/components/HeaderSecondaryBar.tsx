@@ -287,23 +287,23 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               <button
                 type="button"
                 onClick={onCategoriesButtonClick}
-                className="flex h-9 w-full min-w-[156px] max-w-[210px] items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-4 pr-3 text-left text-[#fcfcfc] shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
+                className="flex h-9 w-full min-w-[156px] max-w-[210px] items-center justify-between gap-1.5 rounded-[70px] border border-gray-200 bg-white pl-4 pr-3 text-left text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
                 aria-expanded={isCategoriesMenuOpen}
                 aria-haspopup="true"
               >
                 <span className="flex min-w-0 flex-1 items-center gap-2">
                   <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
-                    <span className="h-0.5 w-full rounded-full bg-white" />
-                    <span className="h-0.5 w-full rounded-full bg-white" />
-                    <span className="h-0.5 w-full rounded-full bg-white" />
+                    <span className="h-0.5 w-full rounded-full bg-gray-900" />
+                    <span className="h-0.5 w-full rounded-full bg-gray-900" />
+                    <span className="h-0.5 w-full rounded-full bg-gray-900" />
                   </span>
                   <span className="truncate text-[13px] font-bold leading-7">{categoriesLabel}</span>
                 </span>
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden>
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center text-gray-900" aria-hidden>
                   <svg width="8" height="8" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M3 4.5L6 7.5L9 4.5"
-                      stroke="white"
+                      stroke="currentColor"
                       strokeWidth={1.5}
                       strokeLinecap="round"
                       strokeLinejoin="round"

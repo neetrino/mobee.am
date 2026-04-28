@@ -99,7 +99,10 @@ const SearchIcon = () => (
   </svg>
 );
 
-/** Globe for mobile primary strip language control (#2DB2FF frame, white strokes). */
+/** Mobile menu bars use h-0.5 (2px). Match globe stroke in 24×24 viewBox at 22px render: 2 * (24/22). */
+const MOBILE_GLOBE_STROKE_USER_UNITS = (2 * 24) / 22;
+
+/** Globe for mobile primary strip language control (inherits text color for strokes). */
 const GlobeLanguageIcon = () => (
   <svg
     width="22"
@@ -107,15 +110,20 @@ const GlobeLanguageIcon = () => (
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className="shrink-0"
+    className="shrink-0 text-black"
     aria-hidden
   >
-    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.75" />
-    <path d="M2 12h20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS} />
+    <path
+      d="M2 12h20"
+      stroke="currentColor"
+      strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS}
+      strokeLinecap="round"
+    />
     <path
       d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
       stroke="currentColor"
-      strokeWidth="1.75"
+      strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS}
     />
   </svg>
 );
@@ -123,7 +131,7 @@ const GlobeLanguageIcon = () => (
 const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
 
 const mobilePrimaryLangButtonClassName =
-  'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2DB2FF] text-white shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2DB2FF]';
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
 
 /**
  * Component that syncs search params with state
@@ -861,7 +869,7 @@ export function Header() {
       </Suspense>
 
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        {/* Mobile — strip 1: categories + menu; strip 2: search (secondary row) */}
+        {/* Mobile — strip 1: menu + logo + language; strip 2: search (secondary row) */}
         <div className="flex flex-col border-b border-gray-100 lg:hidden">
           <div className="relative flex items-center justify-between gap-3 py-2.5">
             <div className="relative z-20 shrink-0">
@@ -872,14 +880,14 @@ export function Header() {
                   setShowMobilePrimaryLangMenu(false);
                   setMobileMenuOpen(true);
                 }}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2DB2FF] text-white shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
                 aria-expanded={mobileMenuOpen}
                 aria-label={t('common.ariaLabels.openMenu')}
               >
                 <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
-                  <span className="h-0.5 w-full rounded-full bg-white" />
-                  <span className="h-0.5 w-full rounded-full bg-white" />
-                  <span className="h-0.5 w-full rounded-full bg-white" />
+                  <span className="h-0.5 w-full rounded-full bg-gray-900" />
+                  <span className="h-0.5 w-full rounded-full bg-gray-900" />
+                  <span className="h-0.5 w-full rounded-full bg-gray-900" />
                 </span>
               </button>
             </div>
