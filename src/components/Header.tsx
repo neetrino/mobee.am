@@ -18,6 +18,8 @@ import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_STRIP_PADDING_Y,
+  MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
+  MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
   MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
@@ -828,8 +830,8 @@ export function Header() {
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         {/* Mobile — strip 1: categories + menu; strip 2: search (secondary row) */}
         <div className="flex flex-col border-b border-gray-100 lg:hidden">
-          <div className="flex items-center justify-between gap-3 py-2.5">
-            <div className="relative shrink-0" ref={mobileCategoriesPillWrapRef}>
+          <div className="relative flex items-center justify-between gap-3 py-2.5">
+            <div className="relative z-20 shrink-0" ref={mobileCategoriesPillWrapRef}>
               <button
                 type="button"
                 onClick={() => setShowCategoriesPillMenu((open) => !open)}
@@ -853,10 +855,23 @@ export function Header() {
                 />
               ) : null}
             </div>
+            {/* Figma mobee-new 180:1419 — center mark (40×40, shadow); fills sit like desktop wordmark */}
+            <Link
+              href="/"
+              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center justify-center overflow-hidden bg-[#2db2ff] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] transition-opacity active:opacity-90"
+              style={{
+                width: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
+                height: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
+                borderRadius: MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
+              }}
+              aria-label={t('common.navigation.home')}
+            >
+              <span className="text-[18px] font-bold leading-none">M</span>
+            </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f7f7f7] text-gray-800 transition-opacity active:opacity-90"
+              className="relative z-20 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f7f7f7] text-gray-800 transition-opacity active:opacity-90"
               aria-label={t('common.ariaLabels.openMenu')}
               aria-expanded={mobileMenuOpen}
             >

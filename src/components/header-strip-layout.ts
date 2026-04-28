@@ -18,3 +18,13 @@ export const SITE_CONTENT_GUTTERS_CLASS =
  * Mobile: categories row + search row (ResizeObserver overrides when mounted).
  */
 export const MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX = 148;
+
+/**
+ * Figma mobee-new node 180:1419 — mobile primary strip center logo frame (Overlay+Shadow group size).
+ */
+export const MOBILE_HEADER_CENTER_LOGO_SIZE_PX = 40;
+
+/**
+ * Figma mobee-new node 180:1419 — corner radius on the center mark.
+ */
+export const MOBILE_HEADER_CENTER_LOGO_RADIUS_PX = 12;
