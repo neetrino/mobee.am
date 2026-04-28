@@ -312,7 +312,7 @@ function CategoryMenuItem({
   );
 }
 
-/** Root categories dropdown (desktop secondary bar + mobile header strip). */
+/** Root categories dropdown (desktop secondary bar). */
 function CategoriesMenuFlyout({
   loading,
   roots,
@@ -411,7 +411,6 @@ export function Header() {
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
-  const mobileCategoriesPillWrapRef = useRef<HTMLDivElement>(null);
   const primaryStripRef = useRef<HTMLElement | null>(null);
   const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
   const [secondaryDocked, setSecondaryDocked] = useState(false);
@@ -702,8 +701,7 @@ export function Header() {
       }
       const clickTarget = event.target as Node;
       const inDesktopCategories = categoriesPillWrapRef.current?.contains(clickTarget);
-      const inMobileCategories = mobileCategoriesPillWrapRef.current?.contains(clickTarget);
-      if (!inDesktopCategories && !inMobileCategories) {
+      if (!inDesktopCategories) {
         setShowCategoriesPillMenu(false);
       }
       if (searchModalRef.current && !searchModalRef.current.contains(event.target as Node)) {
@@ -831,14 +829,16 @@ export function Header() {
         {/* Mobile — strip 1: categories + menu; strip 2: search (secondary row) */}
         <div className="flex flex-col border-b border-gray-100 lg:hidden">
           <div className="relative flex items-center justify-between gap-3 py-2.5">
-            <div className="relative z-20 shrink-0" ref={mobileCategoriesPillWrapRef}>
+            <div className="relative z-20 shrink-0">
               <button
                 type="button"
-                onClick={() => setShowCategoriesPillMenu((open) => !open)}
+                onClick={() => {
+                  setShowCategoriesPillMenu(false);
+                  setMobileMenuOpen(true);
+                }}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2DB2FF] text-white shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
-                aria-expanded={showCategoriesPillMenu}
-                aria-haspopup="true"
-                aria-label={t('common.navigation.categories')}
+                aria-expanded={mobileMenuOpen}
+                aria-label={t('common.ariaLabels.openMenu')}
               >
                 <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
                   <span className="h-0.5 w-full rounded-full bg-white" />
@@ -846,14 +846,6 @@ export function Header() {
                   <span className="h-0.5 w-full rounded-full bg-white" />
                 </span>
               </button>
-              {showCategoriesPillMenu ? (
-                <CategoriesMenuFlyout
-                  loading={loadingCategories}
-                  roots={getRootCategories(categories)}
-                  onItemNavigate={() => setShowCategoriesPillMenu(false)}
-                  loadingLabel={t('common.messages.loading')}
-                />
-              ) : null}
             </div>
             {/* Figma mobee-new 180:1419 — center mark (40×40, shadow); fills sit like desktop wordmark */}
             <Link
