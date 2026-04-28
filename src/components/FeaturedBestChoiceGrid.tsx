@@ -26,7 +26,12 @@ export function FeaturedBestChoiceGrid({
   onRetry,
 }: FeaturedBestChoiceGridProps) {
   if (loading) {
-    return <HomeBestChoiceStyleProductGridSkeleton productsPerPage={productsPerPage} />;
+    return (
+      <HomeBestChoiceStyleProductGridSkeleton
+        productsPerPage={productsPerPage}
+        mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
+      />
+    );
   }
   if (error) {
     return (
@@ -44,7 +49,11 @@ export function FeaturedBestChoiceGrid({
   }
   if (products.length > 0) {
     return (
-      <HomeBestChoiceStyleProductGrid products={products} productsPerPage={productsPerPage} />
+      <HomeBestChoiceStyleProductGrid
+        products={products}
+        productsPerPage={productsPerPage}
+        mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
+      />
     );
   }
   return (

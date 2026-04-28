@@ -29,7 +29,12 @@ export function SpecialOffersProductGrid({
   onRetry,
 }: SpecialOffersProductGridProps) {
   if (loading) {
-    return <HomeBestChoiceStyleProductGridSkeleton productsPerPage={productsPerPage} />;
+    return (
+      <HomeBestChoiceStyleProductGridSkeleton
+        productsPerPage={productsPerPage}
+        mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
+      />
+    );
   }
   if (error) {
     return (
@@ -50,6 +55,7 @@ export function SpecialOffersProductGrid({
       <HomeBestChoiceStyleProductGrid
         products={products}
         productsPerPage={productsPerPage}
+        mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
         specialOffersHomeCard
       />
     );
