@@ -20,7 +20,6 @@ import {
   HEADER_STRIP_PADDING_Y,
   MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
   MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
-  MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
@@ -446,32 +445,18 @@ export function Header() {
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileStrip1Ref = useRef<HTMLDivElement>(null);
+  const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
   const mobilePrimaryLangRef = useRef<HTMLDivElement>(null);
   const primaryStripRef = useRef<HTMLElement | null>(null);
   const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
   const [secondaryDocked, setSecondaryDocked] = useState(false);
   const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
-  const [mobilePrimaryHeaderSpacerPx, setMobilePrimaryHeaderSpacerPx] = useState(
-    MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX,
-  );
+  const [mobileSearchDocked, setMobileSearchDocked] = useState(false);
+  const [mobileSearchFlowSpacerPx, setMobileSearchFlowSpacerPx] = useState(0);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
-
-  const syncMobilePrimaryHeaderSpacer = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    if (window.matchMedia('(min-width: 1024px)').matches) {
-      setMobilePrimaryHeaderSpacerPx(0);
-      return;
-    }
-    const primaryEl = primaryStripRef.current;
-    if (!primaryEl) {
-      return;
-    }
-    setMobilePrimaryHeaderSpacerPx(Math.round(primaryEl.getBoundingClientRect().height));
-  }, []);
 
   const syncSecondaryDock = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -496,6 +481,29 @@ export function Header() {
     setSecondaryDocked(primaryEl.getBoundingClientRect().bottom <= 0);
   }, []);
 
+  const syncMobileSearchDock = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      setMobileSearchDocked(false);
+      setMobileSearchFlowSpacerPx(0);
+      return;
+    }
+    const strip1 = mobileStrip1Ref.current;
+    const searchWrap = mobileSearchWrapRef.current;
+    if (searchWrap) {
+      const h = Math.round(searchWrap.getBoundingClientRect().height);
+      if (h > 0) {
+        setMobileSearchFlowSpacerPx(h);
+      }
+    }
+    if (!strip1) {
+      return;
+    }
+    setMobileSearchDocked(strip1.getBoundingClientRect().bottom <= 0);
+  }, []);
+
   useLayoutEffect(() => {
     syncSecondaryDock();
     const secondaryEl = secondaryBarOuterRef.current;
@@ -512,41 +520,45 @@ export function Header() {
   }, [syncSecondaryDock]);
 
   useLayoutEffect(() => {
-    syncMobilePrimaryHeaderSpacer();
-    const primaryEl = primaryStripRef.current;
-    if (typeof ResizeObserver === 'undefined' || !primaryEl) {
+    syncMobileSearchDock();
+    const searchWrap = mobileSearchWrapRef.current;
+    if (typeof ResizeObserver === 'undefined' || !searchWrap) {
       return;
     }
     const ro = new ResizeObserver(() => {
-      syncMobilePrimaryHeaderSpacer();
+      syncMobileSearchDock();
     });
-    ro.observe(primaryEl);
+    ro.observe(searchWrap);
     return () => {
       ro.disconnect();
     };
-  }, [syncMobilePrimaryHeaderSpacer]);
+  }, [syncMobileSearchDock]);
 
   useEffect(() => {
-    syncSecondaryDock();
-    syncMobilePrimaryHeaderSpacer();
-    window.addEventListener('scroll', syncSecondaryDock, { passive: true });
+    const onScroll = () => {
+      syncSecondaryDock();
+      syncMobileSearchDock();
+    };
     const onResize = () => {
       syncSecondaryDock();
-      syncMobilePrimaryHeaderSpacer();
+      syncMobileSearchDock();
     };
+    syncSecondaryDock();
+    syncMobileSearchDock();
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
     const mq = window.matchMedia('(min-width: 1024px)');
     const onMq = () => {
       syncSecondaryDock();
-      syncMobilePrimaryHeaderSpacer();
+      syncMobileSearchDock();
     };
     mq.addEventListener('change', onMq);
     return () => {
-      window.removeEventListener('scroll', syncSecondaryDock);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       mq.removeEventListener('change', onMq);
     };
-  }, [syncSecondaryDock, syncMobilePrimaryHeaderSpacer]);
+  }, [syncSecondaryDock, syncMobileSearchDock]);
 
   const {
     query: searchQuery,
@@ -565,6 +577,10 @@ export function Header() {
     maxResults: 6,
     lang: getStoredLanguage(),
   });
+
+  useLayoutEffect(() => {
+    syncMobileSearchDock();
+  }, [searchDropdownOpen, syncMobileSearchDock]);
 
   const fetchCart = async () => {
     if (!isLoggedIn) {
@@ -860,7 +876,7 @@ export function Header() {
     <div className={montserrat.className}>
     <header
       ref={primaryStripRef}
-      className="border-b border-gray-200 bg-white max-lg:fixed max-lg:inset-x-0 max-lg:top-0 max-lg:z-40 lg:border-b-0"
+      className="overflow-visible border-b border-gray-200 bg-white lg:border-b-0"
     >
       <Suspense fallback={null}>
         <HeaderSearchSync
@@ -871,8 +887,8 @@ export function Header() {
       </Suspense>
 
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        {/* Mobile — strip 1: menu + logo + language; strip 2: search (secondary row) */}
-        <div className="flex flex-col border-b border-gray-100 lg:hidden">
+        {/* Mobile — strip 1 scrolls away; strip 2 pins to viewport top once strip 1 has left */}
+        <div ref={mobileStrip1Ref} className="border-b border-gray-100 lg:hidden">
           <div className="relative flex items-center justify-between gap-3 py-2.5">
             <div className="relative z-20 shrink-0">
               <button
@@ -955,7 +971,19 @@ export function Header() {
               ) : null}
             </div>
           </div>
-          <div className="border-t border-gray-100 py-2.5">
+        </div>
+
+        {mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? (
+          <div aria-hidden className="shrink-0 lg:hidden" style={{ height: mobileSearchFlowSpacerPx }} />
+        ) : null}
+
+        <div
+          ref={mobileSearchWrapRef}
+          className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
+            mobileSearchDocked ? 'fixed inset-x-0 top-0 z-40 border-b border-gray-200' : ''
+          }`}
+        >
+          <div className={mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
             <form
               ref={mobileHomeSearchFormRef}
               onSubmit={handleSearch}
@@ -1059,12 +1087,6 @@ export function Header() {
         </div>
       </div>
     </header>
-
-      <div
-        aria-hidden
-        className="shrink-0 lg:hidden"
-        style={{ height: mobilePrimaryHeaderSpacerPx }}
-      />
 
       {secondaryDocked ? (
         <div
