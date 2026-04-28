@@ -11,6 +11,10 @@ import { formatPrice, getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
+import {
+  COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS,
+  COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS,
+} from './compare-layout.constants';
 
 interface Product {
   id: string;
@@ -428,7 +432,9 @@ export default function ComparePage() {
           </div>
         </div>
       ) : (
-        <div className="text-center py-8">
+        <div
+          className={`text-center py-8 ${COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS}`}
+        >
           <div className="max-w-md mx-auto">
             <svg
               className="mx-auto h-16 w-16 text-gray-400 mb-3"
@@ -449,7 +455,10 @@ export default function ComparePage() {
             <p className="text-sm text-gray-600 mb-4">
               {t('common.compare.emptyDescription')}
             </p>
-            <Link href="/products">
+            <Link
+              href="/products"
+              className={`inline-block ${COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS}`}
+            >
               <Button
                 variant="primary"
                 size="md"
