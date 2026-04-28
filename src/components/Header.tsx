@@ -788,8 +788,13 @@ export function Header() {
       </Suspense>
 
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        {/* Mobile — Figma: pill search + menu (logo & currency live in drawer) */}
-        <div className="flex items-center gap-4 border-b border-gray-100 py-2.5 lg:hidden">
+        {/* Mobile — first strip (reserved; logo/actions can move here later) */}
+        <div
+          className={`flex min-h-12 items-center border-b border-gray-100 lg:hidden ${HEADER_STRIP_PADDING_Y}`}
+          aria-hidden
+        />
+        {/* Mobile — second strip: pill search + menu (logo & currency live in drawer) */}
+        <div className="flex items-center gap-4 py-2.5 lg:hidden">
           <form
             ref={mobileHomeSearchFormRef}
             onSubmit={handleSearch}
