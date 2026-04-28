@@ -826,101 +826,105 @@ export function Header() {
       </Suspense>
 
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        {/* Mobile — single strip: categories (left) + search + menu; secondary bar is lg+ only */}
-        <div className="flex items-center gap-3 border-b border-gray-100 py-2.5 lg:hidden">
-          <div className="relative shrink-0" ref={mobileCategoriesPillWrapRef}>
+        {/* Mobile — strip 1: categories + menu; strip 2: search (secondary row) */}
+        <div className="flex flex-col border-b border-gray-100 lg:hidden">
+          <div className="flex items-center justify-between gap-3 py-2.5">
+            <div className="relative shrink-0" ref={mobileCategoriesPillWrapRef}>
+              <button
+                type="button"
+                onClick={() => setShowCategoriesPillMenu((open) => !open)}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2DB2FF] text-white shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
+                aria-expanded={showCategoriesPillMenu}
+                aria-haspopup="true"
+                aria-label={t('common.navigation.categories')}
+              >
+                <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
+                  <span className="h-0.5 w-full rounded-full bg-white" />
+                  <span className="h-0.5 w-full rounded-full bg-white" />
+                  <span className="h-0.5 w-full rounded-full bg-white" />
+                </span>
+              </button>
+              {showCategoriesPillMenu ? (
+                <CategoriesMenuFlyout
+                  loading={loadingCategories}
+                  roots={getRootCategories(categories)}
+                  onItemNavigate={() => setShowCategoriesPillMenu(false)}
+                  loadingLabel={t('common.messages.loading')}
+                />
+              ) : null}
+            </div>
             <button
               type="button"
-              onClick={() => setShowCategoriesPillMenu((open) => !open)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2DB2FF] text-white shadow-sm transition-[filter] hover:brightness-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
-              aria-expanded={showCategoriesPillMenu}
-              aria-haspopup="true"
-              aria-label={t('common.navigation.categories')}
+              onClick={() => setMobileMenuOpen(true)}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f7f7f7] text-gray-800 transition-opacity active:opacity-90"
+              aria-label={t('common.ariaLabels.openMenu')}
+              aria-expanded={mobileMenuOpen}
             >
-              <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
-                <span className="h-0.5 w-full rounded-full bg-white" />
-                <span className="h-0.5 w-full rounded-full bg-white" />
-                <span className="h-0.5 w-full rounded-full bg-white" />
-              </span>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
             </button>
-            {showCategoriesPillMenu ? (
-              <CategoriesMenuFlyout
-                loading={loadingCategories}
-                roots={getRootCategories(categories)}
-                onItemNavigate={() => setShowCategoriesPillMenu(false)}
-                loadingLabel={t('common.messages.loading')}
-              />
-            ) : null}
           </div>
-          <form
-            ref={mobileHomeSearchFormRef}
-            onSubmit={handleSearch}
-            className="relative min-w-0 flex-1"
-          >
-            <div className="flex items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3 py-3.5">
-              <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <circle cx="11" cy="11" r="7" strokeWidth={2} />
-                  <path strokeLinecap="round" strokeWidth={2} d="M20 20l-4.3-4.3" />
-                </svg>
-              </span>
-              <input
-                ref={mobileHomeSearchInputRef}
-                type="search"
-                name="header-mobile-home-search"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  if (e.target.value.trim().length >= 1) {
-                    setSearchDropdownOpen(true);
-                  } else {
+          <div className="border-t border-gray-100 pb-2.5 pt-0">
+            <form
+              ref={mobileHomeSearchFormRef}
+              onSubmit={handleSearch}
+              className="relative min-w-0 w-full"
+            >
+              <div className="flex items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3 py-3">
+                <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="11" cy="11" r="7" strokeWidth={2} />
+                    <path strokeLinecap="round" strokeWidth={2} d="M20 20l-4.3-4.3" />
+                  </svg>
+                </span>
+                <input
+                  ref={mobileHomeSearchInputRef}
+                  type="search"
+                  name="header-mobile-home-search"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (e.target.value.trim().length >= 1) {
+                      setSearchDropdownOpen(true);
+                    } else {
+                      setSearchDropdownOpen(false);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (searchQuery.trim().length >= 1) {
+                      setSearchDropdownOpen(true);
+                    }
+                  }}
+                  onKeyDown={searchHandleKeyDown}
+                  placeholder={t('common.mainHeader.searchPlaceholder')}
+                  autoComplete="off"
+                  className="min-w-0 flex-1 bg-transparent text-sm leading-normal text-gray-900 outline-none placeholder:text-[#6b7280]"
+                  aria-controls="header-mobile-search-results"
+                  aria-expanded={searchDropdownOpen && searchResults.length > 0}
+                  aria-autocomplete="list"
+                />
+              </div>
+              {!showSearchModal ? (
+                <SearchDropdown
+                  listboxId="header-mobile-search-results"
+                  results={searchResults}
+                  loading={searchLoading}
+                  error={searchError}
+                  isOpen={searchDropdownOpen}
+                  selectedIndex={searchSelectedIndex}
+                  query={searchQuery}
+                  onResultClick={(result) => {
+                    router.push(`/products/${result.slug}`);
+                    clearSearch();
                     setSearchDropdownOpen(false);
-                  }
-                }}
-                onFocus={() => {
-                  if (searchQuery.trim().length >= 1) {
-                    setSearchDropdownOpen(true);
-                  }
-                }}
-                onKeyDown={searchHandleKeyDown}
-                placeholder={t('common.mainHeader.searchPlaceholder')}
-                autoComplete="off"
-                className="min-w-0 flex-1 bg-transparent text-sm leading-normal text-gray-900 outline-none placeholder:text-[#6b7280]"
-                aria-controls="header-mobile-search-results"
-                aria-expanded={searchDropdownOpen && searchResults.length > 0}
-                aria-autocomplete="list"
-              />
-            </div>
-            {!showSearchModal ? (
-              <SearchDropdown
-                listboxId="header-mobile-search-results"
-                results={searchResults}
-                loading={searchLoading}
-                error={searchError}
-                isOpen={searchDropdownOpen}
-                selectedIndex={searchSelectedIndex}
-                query={searchQuery}
-                onResultClick={(result) => {
-                  router.push(`/products/${result.slug}`);
-                  clearSearch();
-                  setSearchDropdownOpen(false);
-                }}
-                onClose={() => setSearchDropdownOpen(false)}
-                className="mt-1"
-              />
-            ) : null}
-          </form>
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(true)}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f7f7f7] text-gray-800 transition-opacity active:opacity-90"
-            aria-label={t('common.ariaLabels.openMenu')}
-            aria-expanded={mobileMenuOpen}
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-          </button>
+                  }}
+                  onClose={() => setSearchDropdownOpen(false)}
+                  className="mt-1"
+                />
+              ) : null}
+            </form>
+          </div>
         </div>
 
         {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
