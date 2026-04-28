@@ -80,6 +80,7 @@
     "title": "My Wishlist",
     "empty": "Your wishlist is empty",
     "emptyDescription": "Start adding products to your wishlist to save them for later.",
+    "emptyBrowseCta": "Browse Products",
     "totalCount": "Total items in wishlist",
     "tableHeaders": {
       "productName": "Product Name",

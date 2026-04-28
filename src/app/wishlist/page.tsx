@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
-import { getStoredLanguage, type LanguageCode } from '../../lib/language';
+import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { EmptyWishlist } from './empty-wishlist';
@@ -51,7 +51,6 @@ export default function WishlistPage() {
   const [loading, setLoading] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState<LanguageCode>(getStoredLanguage());
   const [addingToCart, setAddingToCart] = useState<Set<string>>(new Set());
   // Track if we updated locally to prevent unnecessary re-fetch
   const isLocalUpdateRef = useRef(false);
@@ -122,17 +121,11 @@ export default function WishlistPage() {
       setCurrency(getStoredCurrency());
     };
 
-    const handleLanguageUpdate = () => {
-      setLanguage(getStoredLanguage());
-    };
-
     window.addEventListener('wishlist-updated', handleWishlistUpdate);
     window.addEventListener('currency-updated', handleCurrencyUpdate);
-    window.addEventListener('language-updated', handleLanguageUpdate);
     return () => {
       window.removeEventListener('wishlist-updated', handleWishlistUpdate);
       window.removeEventListener('currency-updated', handleCurrencyUpdate);
-      window.removeEventListener('language-updated', handleLanguageUpdate);
     };
   }, [fetchWishlistProducts]);
 
@@ -357,7 +350,7 @@ export default function WishlistPage() {
         </div>
         </>
       ) : (
-        <EmptyWishlist t={t} lang={language} />
+        <EmptyWishlist t={t} />
       )}
     </div>
   );
