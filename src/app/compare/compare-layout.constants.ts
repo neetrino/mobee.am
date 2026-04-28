@@ -61,8 +61,14 @@ if (COMPARE_EMPTY_STATE_FOOTER_GAP_EFFECTIVE_VH !== 24) {
 export const COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS = 'pb-[24vh]';
 
 /**
- * Margin above browse-products CTA — 30% of viewport height (shifts button down).
+ * Space below empty-state icon before title/description (30vh — shifts copy down from icon).
  * Literal for Tailwind JIT.
  */
-export const COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS = 'mt-[30vh]';
+export const COMPARE_EMPTY_STATE_TEXT_TOP_OFFSET_CLASS = 'mt-[30vh]';
+
+/**
+ * Tight gap between description and browse-products CTA (text sits right above button).
+ * Literal for Tailwind JIT.
+ */
+export const COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS = 'mt-3';
 

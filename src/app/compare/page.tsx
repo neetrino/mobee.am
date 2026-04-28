@@ -14,6 +14,7 @@ import { useAuth } from '../../lib/auth/AuthContext';
 import {
   COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS,
   COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS,
+  COMPARE_EMPTY_STATE_TEXT_TOP_OFFSET_CLASS,
 } from './compare-layout.constants';
 
 interface Product {
@@ -437,7 +438,7 @@ export default function ComparePage() {
         >
           <div className="max-w-md mx-auto">
             <svg
-              className="mx-auto h-16 w-16 text-gray-400 mb-3"
+              className="mx-auto h-16 w-16 text-gray-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -449,12 +450,14 @@ export default function ComparePage() {
                 d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
               />
             </svg>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              {t('common.compare.empty')}
-            </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              {t('common.compare.emptyDescription')}
-            </p>
+            <div className={COMPARE_EMPTY_STATE_TEXT_TOP_OFFSET_CLASS}>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                {t('common.compare.empty')}
+              </h2>
+              <p className="text-sm text-gray-600">
+                {t('common.compare.emptyDescription')}
+              </p>
+            </div>
             <Link
               href="/products"
               className={`inline-block ${COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS}`}
