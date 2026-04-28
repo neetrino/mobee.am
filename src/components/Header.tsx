@@ -879,7 +879,7 @@ export function Header() {
   };
 
   return (
-    <div className={montserrat.className}>
+    <div className={`relative z-50 ${montserrat.className}`}>
     <header
       ref={primaryStripRef}
       className="overflow-visible border-b border-gray-200 bg-white lg:border-b-0"
