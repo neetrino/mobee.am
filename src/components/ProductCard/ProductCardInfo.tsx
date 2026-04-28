@@ -46,9 +46,11 @@ export function ProductCardInfo({
   const paddingClass = (() => {
     if (hidePrice) {
       if (omitBrandRow) {
-        return 'px-3 pb-2 pt-2 lg:px-5 lg:pb-4 lg:pt-0';
+        return 'px-3 pb-2 pt-2 max-lg:pt-4 lg:px-5 lg:pb-4 lg:pt-0';
       }
-      return isCompact ? 'px-3 pt-2 pb-2' : 'px-5 pt-0 pb-4';
+      return isCompact
+        ? 'px-3 pt-2 pb-2 max-lg:pt-4'
+        : 'px-5 pt-0 pb-4 max-lg:pt-3';
     }
     return isCompact ? 'p-2.5' : 'p-4';
   })();

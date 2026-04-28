@@ -32,9 +32,10 @@ export function ProductCardImage({
   squareImageFrame = true,
 }: ProductCardImageProps) {
   const showPlaceholder = imageError;
+  /** max-lg: frame 90% width vs desktop (171 / 212) so title clears the image on small screens. */
   const frameClass = isCompact
-    ? "w-[171px] max-w-[84%]"
-    : "w-[212px] max-w-[84%]";
+    ? "w-[171px] max-w-[84%] max-lg:w-[153.9px]"
+    : "w-[212px] max-w-[84%] max-lg:w-[190.8px]";
   const aspectClass = squareImageFrame ? "aspect-square" : "aspect-[3/4]";
 
   return (

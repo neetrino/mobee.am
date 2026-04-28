@@ -92,9 +92,12 @@ export function ProductCardGrid({
     ? 'relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:hover:shadow-none lg:min-h-[583px]'
     : 'relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[583px]';
 
+  /** Mobile: reserve in-flow height so absolutely positioned image/actions do not overlap the title. */
   const imageStackClass = homeProductGridCard
-    ? 'relative max-lg:h-[100px] lg:h-[380px]'
-    : 'relative lg:h-[380px]';
+    ? 'relative max-lg:min-h-[176px] max-lg:overflow-hidden lg:h-[380px]'
+    : isCompact
+      ? 'relative max-lg:min-h-[240px] lg:h-[380px]'
+      : 'relative max-lg:min-h-[277px] lg:h-[380px]';
 
   const imageFrameClass = homeProductGridCard
     ? 'absolute inset-x-2 top-2 max-lg:inset-x-2 max-lg:top-2 lg:inset-x-5 lg:top-5 lg:h-[320px]'
