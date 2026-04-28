@@ -847,18 +847,23 @@ export function Header() {
                 </span>
               </button>
             </div>
-            {/* Figma mobee-new 180:1419 — center mark (40×40, shadow); fills sit like desktop wordmark */}
+            {/* Figma 180:1419 mark + 178:529 wordmark — center cluster like desktop */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center justify-center overflow-hidden bg-[#2db2ff] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] transition-opacity active:opacity-90"
-              style={{
-                width: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
-                height: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
-                borderRadius: MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
-              }}
+              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center gap-2 transition-opacity active:opacity-90"
               aria-label={t('common.navigation.home')}
             >
-              <span className="text-[18px] font-bold leading-none">M</span>
+              <div
+                className="flex shrink-0 items-center justify-center overflow-hidden bg-[#2db2ff] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
+                style={{
+                  width: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
+                  height: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
+                  borderRadius: MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
+                }}
+              >
+                <span className="text-[18px] font-bold leading-none">M</span>
+              </div>
+              <span className="text-[20px] font-bold leading-7 tracking-[-0.5px] text-[#111827]">Mobee</span>
             </Link>
             <button
               type="button"
