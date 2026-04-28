@@ -955,13 +955,13 @@ export function Header() {
               ) : null}
             </div>
           </div>
-          <div className="border-t border-gray-100 pb-2.5 pt-0">
+          <div className="border-t border-gray-100 py-2.5">
             <form
               ref={mobileHomeSearchFormRef}
               onSubmit={handleSearch}
               className="relative min-w-0 w-full"
             >
-              <div className="flex items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3 py-3">
+              <div className="flex h-11 items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3">
                 <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <circle cx="11" cy="11" r="7" strokeWidth={2} />

@@ -15,9 +15,9 @@ export const SITE_CONTENT_GUTTERS_CLASS =
 
 /**
  * Initial flow spacer under the fixed mobile primary header (px) before ResizeObserver measures.
- * Mobile: categories row + search row (ResizeObserver overrides when mounted).
+ * Mobile: primary row + search row (same vertical rhythm: py-2.5 + h-11 each; ResizeObserver overrides).
  */
-export const MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX = 148;
+export const MOBILE_PRIMARY_HEADER_SPACER_FALLBACK_PX = 130;
 
 /**
  * Figma mobee-new node 180:1419 — mobile primary strip center logo frame (Overlay+Shadow group size).
