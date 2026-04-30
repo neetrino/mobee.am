@@ -1,10 +1,10 @@
 'use client';
 
 import { use } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
 import { getStoredCurrency } from '../../../lib/currency';
-import { t } from '../../../lib/i18n';
+import { t, getProductText } from '../../../lib/i18n';
+import { sanitizeHtml } from '../../../lib/utils/sanitize';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { RelatedProducts } from '../../../components/RelatedProducts';
 import { ProductReviews } from '../../../components/ProductReviews';
@@ -17,8 +17,11 @@ import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '@/lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
 
 export default function ProductPage({ params }: ProductPageProps) {
-  const router = useRouter();
   const { isLoggedIn } = useAuth();
+
+  const scrollToProductDetails = () => {
+    document.getElementById('product-long-description')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   
   const {
     product,
@@ -136,7 +139,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             isInWishlist={isInWishlist}
             isInCompare={isInCompare}
             showMessage={showMessage}
-            isLoggedIn={isLoggedIn}
             currentVariant={currentVariant}
             attributeGroups={attributeGroups}
             selectedColor={selectedColor}
@@ -149,6 +151,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             onAddToWishlist={handleAddToWishlist}
             onCompareToggle={handleCompareToggle}
             onScrollToReviews={scrollToReviews}
+            onScrollToDetails={scrollToProductDetails}
             onColorSelect={handleColorSelect}
             onSizeSelect={handleSizeSelect}
             onAttributeValueSelect={handleAttributeValueSelect}
@@ -156,6 +159,21 @@ export default function ProductPage({ params }: ProductPageProps) {
             getRequiredAttributesMessage={getRequiredAttributesMessage}
           />
       </div>
+
+      <section
+        id="product-long-description"
+        className="mt-16 max-w-3xl scroll-mt-24 border-t border-gray-200 pt-12"
+      >
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">{t(language, 'product.description_title')}</h2>
+        <div
+          className="prose prose-sm max-w-none text-gray-600"
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(
+              getProductText(language, product.id, 'longDescription') || product.description || ''
+            ),
+          }}
+        />
+      </section>
 
       <div id="product-reviews" className="mt-24 scroll-mt-24">
         <ProductReviews productSlug={slug} productId={product.id} />

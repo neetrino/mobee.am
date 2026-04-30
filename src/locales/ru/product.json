@@ -23,7 +23,12 @@
   "errorAddingToCart": "Ошибка при добавлении в корзину",
   "pcs": "шт",
   "outOfStockLabel": "Нет в наличии",
-  "noRelatedProducts": "Похожие товары не найдены"
+  "noRelatedProducts": "Похожие товары не найдены",
+  "pricePrefix": "Цена:",
+  "priceInfoAria": "Информация о цене",
+  "priceInfoTitle": "Цена указана с учётом НДС, если применимо. Итоговая цена может зависеть от выбранного варианта.",
+  "moreDetails": "Подробнее",
+  "availableInStores": "Доступно в магазинах"
 }
 
 

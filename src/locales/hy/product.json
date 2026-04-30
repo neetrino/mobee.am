@@ -23,7 +23,12 @@
   "errorAddingToCart": "Սխալ ավելացնելիս",
   "pcs": "հատ",
   "outOfStockLabel": "Արտադրված",
-  "noRelatedProducts": "Նմանատիպ ապրանքներ չգտնվեցին"
+  "noRelatedProducts": "Նմանատիպ ապրանքներ չգտնվեցին",
+  "pricePrefix": "Գին՝",
+  "priceInfoAria": "Գնի մասին տեղեկություն",
+  "priceInfoTitle": "Գինը կարող է ներառել ԱԱՀ։ Զամբյուղում վերջնական գինը կարող է փոխվել ընտրված տարբերակից կախված։",
+  "moreDetails": "Ավելի մանրամասն",
+  "availableInStores": "Առկա է խանութներում"
 }
 
 
