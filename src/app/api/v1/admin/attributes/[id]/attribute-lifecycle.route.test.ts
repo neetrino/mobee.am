@@ -53,8 +53,19 @@ describe("admin attribute lifecycle routes", () => {
   it("handles value and translation lifecycle", async () => {
     const attributeState = {
       id: "attr-1",
+      key: "color",
       name: "Color",
-      values: [{ id: "val-1", label: "Blue", colors: [] as string[] }],
+      type: "select",
+      filterable: true,
+      values: [
+        {
+          id: "val-1",
+          value: "blue",
+          label: "Blue",
+          colors: [] as string[],
+          imageUrl: null as string | null,
+        },
+      ],
     };
 
     vi.mocked(adminService.addAttributeValue).mockImplementation(async () => ({

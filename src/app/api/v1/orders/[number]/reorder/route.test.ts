@@ -35,8 +35,10 @@ describe("POST /api/v1/orders/[number]/reorder", () => {
   it("returns reorder summary for authorized users", async () => {
     vi.mocked(authenticateToken).mockResolvedValue({
       id: "user-1",
-      role: "customer",
+      email: null,
+      phone: null,
       locale: "en",
+      roles: ["customer"],
     });
     vi.mocked(ordersService.reorder).mockResolvedValue({
       orderNumber: "ORD-1",
