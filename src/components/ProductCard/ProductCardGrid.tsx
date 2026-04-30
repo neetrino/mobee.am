@@ -116,7 +116,7 @@ export function ProductCardGrid({
       : 'px-5 pb-5';
 
   return (
-    <div className={cardShellClass}>
+    <div className={cardShellClass} data-product-card-root>
       <div className={imageStackClass}>
         <div className={imageFrameClass}>
           <div className={imageMatClass}>

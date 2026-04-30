@@ -12,6 +12,8 @@ import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
 import { useProductPage } from './useProductPage';
 import type { ProductPageProps } from './types';
+import { dispatchCartFlyAnimation } from '@/lib/cart/dispatchCartFlyAnimation';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '@/lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
 
 export default function ProductPage({ params }: ProductPageProps) {
@@ -80,6 +82,11 @@ export default function ProductPage({ params }: ProductPageProps) {
       }
       setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
       window.dispatchEvent(new Event('cart-updated'));
+      const flyEl = document.querySelector<HTMLElement>('[data-pdp-cart-fly-source]');
+      const slideSrc = images[currentImageIndex];
+      const flyUrl =
+        typeof slideSrc === 'string' && slideSrc.length > 0 ? slideSrc : PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+      dispatchCartFlyAnimation(flyUrl, flyEl);
     } catch (err) { 
       setShowMessage(t(language, 'product.errorAddingToCart')); 
     } finally { 

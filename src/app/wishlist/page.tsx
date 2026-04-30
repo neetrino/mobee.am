@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
+import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
@@ -196,6 +198,11 @@ export default function WishlistPage() {
 
       // Trigger cart update event
       window.dispatchEvent(new Event('cart-updated'));
+      const flySource = document.querySelector<HTMLElement>(
+        `[data-wishlist-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
+      );
+      const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+      dispatchCartFlyAnimation(flyUrl, flySource);
     } catch (error: any) {
       console.error('Error adding to cart:', error);
       if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
@@ -265,12 +272,14 @@ export default function WishlistPage() {
               <div
                 key={product.id}
                 className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-6 hover:bg-gray-50 transition-colors"
+                data-wishlist-product-id={product.id}
               >
                 {/* Product Name */}
                 <div className="md:col-span-5 flex items-center gap-4">
                   <Link
                     href={`/products/${product.slug}`}
                     className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden"
+                    data-cart-fly-source
                   >
                     {product.image ? (
                       <Image

@@ -39,7 +39,7 @@ export function ProductCardImage({
   const aspectClass = squareImageFrame ? "aspect-square" : "aspect-[3/4]";
 
   return (
-    <div className={`relative ${aspectClass} shrink-0 ${frameClass}`}>
+    <div className={`relative ${aspectClass} shrink-0 ${frameClass}`} data-cart-fly-source>
       <Link
         href={`/products/${slug}`}
         className="absolute inset-0 block"

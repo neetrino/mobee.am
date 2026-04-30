@@ -367,7 +367,12 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   <span className="sr-only">{wishlistCount}</span>
                 ) : null}
               </Link>
-              <Link href="/cart" className={`${iconLinkClass} relative`} aria-label={cartAria}>
+              <Link
+                href="/cart"
+                className={`${iconLinkClass} relative`}
+                aria-label={cartAria}
+                data-cart-fly-target="desktop"
+              >
                 <CartIcon size={18} className="shrink-0" />
                 {cartCount > 0 ? (
                   <span

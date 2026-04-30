@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/auth/AuthContext';
 import { useWishlist } from './hooks/useWishlist';
 import { useCompare } from './hooks/useCompare';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../lib/productCardDisplayImage';
 import { useAddToCart } from './hooks/useAddToCart';
 import { useCurrency } from './hooks/useCurrency';
 import { ProductCardList } from './ProductCard/ProductCardList';
@@ -101,7 +102,9 @@ export function ProductCard({
   const handleAddToCart = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart();
+    const root = (e.currentTarget as HTMLElement).closest('[data-product-card-root]');
+    const flySourceEl = root?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
+    void addToCart({ imageUrl: PRODUCT_CARD_DISPLAY_IMAGE_SRC, flySourceEl });
   };
 
   // List view layout

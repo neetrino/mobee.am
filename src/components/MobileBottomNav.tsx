@@ -109,6 +109,7 @@ function MobileNavItem({ item, active, label, wishlistCount }: MobileNavItemProp
       className={linkClass}
       aria-label={label}
       aria-current={active ? 'page' : undefined}
+      {...(item.key === 'cart' ? { 'data-cart-fly-target': 'mobile' as const } : {})}
     >
       {active ? (
         <>

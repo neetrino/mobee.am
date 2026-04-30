@@ -7,6 +7,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
+import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
@@ -227,6 +229,11 @@ export default function ComparePage() {
 
       // Trigger cart update event
       window.dispatchEvent(new Event('cart-updated'));
+      const flySource = document.querySelector<HTMLElement>(
+        `[data-compare-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
+      );
+      const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+      dispatchCartFlyAnimation(flyUrl, flySource);
     } catch (error: any) {
       console.error('Error adding to cart:', error);
       if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
@@ -310,9 +317,16 @@ export default function ComparePage() {
                     {t('common.compare.image')}
                   </td>
                   {products.map((product) => (
-                    <td key={product.id} className="px-4 py-4 text-center">
+                    <td
+                      key={product.id}
+                      className="px-4 py-4 text-center"
+                      data-compare-product-id={product.id}
+                    >
                       <Link href={`/products/${product.slug}`} className="inline-block">
-                        <div className="w-32 h-32 mx-auto bg-gray-100 rounded-lg overflow-hidden relative">
+                        <div
+                          className="w-32 h-32 mx-auto bg-gray-100 rounded-lg overflow-hidden relative"
+                          data-cart-fly-source
+                        >
                           {product.image ? (
                             <Image
                               src={product.image}

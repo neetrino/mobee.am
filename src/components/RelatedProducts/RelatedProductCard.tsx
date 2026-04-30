@@ -67,7 +67,7 @@ export function RelatedProductCard({
       className="flex-shrink-0 px-3 h-full"
       style={{ width }}
     >
-      <div className="group relative h-full flex flex-col">
+      <div className="group relative h-full flex flex-col" data-related-product-card>
         <Link
           href={`/products/${product.slug}`}
           className="block cursor-pointer flex-1 flex flex-col"
@@ -83,7 +83,10 @@ export function RelatedProductCard({
         >
           <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
             {/* Product Image */}
-            <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden flex-shrink-0">
+            <div
+              className="relative aspect-square bg-white border border-gray-100 overflow-hidden flex-shrink-0"
+              data-cart-fly-source
+            >
               {hasImage ? (
                 <Image
                   src={PRODUCT_CARD_DISPLAY_IMAGE_SRC}

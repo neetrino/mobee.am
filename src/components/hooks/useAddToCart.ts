@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '../../lib/api-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
+import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
+import type { CartFlyContext } from '../../lib/cart/cart-fly-animation.types';
 import { readGuestCart, upsertGuestCartItem } from '../../lib/cart/guest-cart';
 
 interface ProductDetails {
@@ -40,7 +42,13 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
   const { t } = useTranslation();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  const addToCart = async () => {
+  const triggerFly = (fly: CartFlyContext | undefined) => {
+    if (fly?.imageUrl && fly.flySourceEl) {
+      dispatchCartFlyAnimation(fly.imageUrl, fly.flySourceEl);
+    }
+  };
+
+  const addToCart = async (fly?: CartFlyContext) => {
     if (!inStock) {
       return;
     }
@@ -89,6 +97,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           quantity: 1,
         });
         window.dispatchEvent(new Event('cart-updated'));
+        triggerFly(fly);
       } catch (error: unknown) {
         console.error('❌ [PRODUCT CARD] Error adding to guest cart:', error);
         const err = error as { message?: string; status?: number };
@@ -139,6 +148,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
       window.dispatchEvent(new CustomEvent('cart-updated', {
         detail: response.cartSummary || null,
       }));
+      triggerFly(fly);
     } catch (error: unknown) {
       console.error('❌ [PRODUCT CARD] Error adding to cart:', error);
 

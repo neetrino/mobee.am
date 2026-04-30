@@ -211,7 +211,10 @@ export function ProductImageGallery({
         
         {/* Right Column - Main Image */}
         <div className="flex-1">
-          <div className="relative aspect-square bg-white rounded-lg overflow-hidden group shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+          <div
+            className="relative aspect-square bg-white rounded-lg overflow-hidden group shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+            data-pdp-cart-fly-source
+          >
           {images.length > 0 && !mainImageFailed ? (
             <img 
               src={currentSrc} 
