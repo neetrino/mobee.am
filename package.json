@@ -32,7 +32,8 @@
     "db:seed:admin": "node shared/db/prisma/seed-admin.cjs",
     "db:seed:figma": "node shared/db/prisma/seed-figma-products.cjs",
     "db:migrate:deploy": "node src/scripts/run-migrations.js",
-    "db:migrate:health": "node src/scripts/check-migrations-health.js"
+    "db:migrate:health": "node src/scripts/check-migrations-health.js",
+    "upload:product-card-image-r2": "node scripts/upload-product-card-display-to-r2.cjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.995.0",
