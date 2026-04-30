@@ -217,7 +217,7 @@ export function ProductInfoAndActions({
           </div>
           <button 
             disabled={!canAddToCart || isAddingToCart} 
-            className="flex-1 h-12 bg-gray-900 text-white rounded-xl uppercase font-bold disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="flex-1 h-12 bg-admin text-white rounded-xl uppercase font-bold transition-colors hover:bg-admin-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
             onClick={onAddToCart}
           >
             {isAddingToCart ? t(language, 'product.adding') : (isOutOfStock ? t(language, 'product.outOfStock') : (isVariationRequired ? getRequiredAttributesMessage() : (hasUnavailableAttributes ? t(language, 'product.outOfStock') : t(language, 'product.addToCart'))))}
