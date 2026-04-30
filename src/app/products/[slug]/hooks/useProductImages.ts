@@ -5,6 +5,7 @@ import {
   normalizeUrlForComparison,
   cleanImageUrls,
 } from '../../../../lib/utils/image-utils';
+import { resolveProductCardImageSrc } from '../../../../lib/productCardDisplayImage';
 import type { Product } from '../types';
 
 /**
@@ -54,8 +55,15 @@ export function useProductImages(product: Product | null): string[] {
         seenNormalized.add(normalized);
       }
     });
-    
-    return allImages;
+
+    const cardHeroSrc = resolveProductCardImageSrc(product.image);
+    const primaryKey = normalizeUrlForComparison(cardHeroSrc);
+    const withoutPrimaryDuplicate = allImages.filter((img) => {
+      const processed = processImageUrl(img) || img;
+      return normalizeUrlForComparison(processed) !== primaryKey;
+    });
+
+    return [cardHeroSrc, ...withoutPrimaryDuplicate];
   }, [product]);
 }
 
