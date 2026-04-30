@@ -4,6 +4,7 @@ import { getRecentOrders } from "./admin-stats/recent-orders";
 import { getTopProducts } from "./admin-stats/top-products";
 import { getActivity } from "./admin-stats/activity";
 import { getAnalytics } from "./admin-stats/analytics";
+import type { AdminAnalyticsPeriod } from "@/lib/contracts/admin-analytics";
 
 /**
  * Service for admin statistics operations
@@ -47,7 +48,7 @@ class AdminStatsService {
   /**
    * Get analytics data
    */
-  async getAnalytics(period: string = 'week', startDate?: string, endDate?: string) {
+  async getAnalytics(period: AdminAnalyticsPeriod = "week", startDate?: string, endDate?: string) {
     return getAnalytics(period, startDate, endDate);
   }
 }

@@ -16,13 +16,12 @@ interface MobileFiltersDrawerProps {
  */
 export function MobileFiltersDrawer({
   title,
-  triggerLabel,
+  triggerLabel: _triggerLabel,
   children,
   openEventName,
 }: MobileFiltersDrawerProps) {
   const { t } = useTranslation();
   const defaultTitle = title || t('products.mobileFilters.title');
-  const defaultTriggerLabel = triggerLabel || t('products.mobileFilters.title');
   const [open, setOpen] = useState(false);
 
   useEffect(() => {

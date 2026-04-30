@@ -3,24 +3,68 @@
   "hero_subtitle": "Բացահայտեք զարմանալի ապրանքներ և բացառիկ առաջարկներ: Գնեք ամենավերջին միտումները և գտեք այն ամենը, ինչ ձեզ հարկավոր է մեկ տեղում:",
   "hero_button_products": "ԱՊՐԱՆՔՆԵՐ",
   "hero_button_view_more": "ԴԻՏԵԼ ԱՎԵԼԻՆ",
-  "features_title": "Մենք ապահովում ենք բարձրորակ ապրանքներ",
-  "features_subtitle": "Անբավարարված հաճախորդը, ով ունի պատճառ, խնդիր է, բայց անբավարարված հաճախորդը, ով չի կարող բացատրել, ավելի մեծ խնդիր է:",
-  "feature_fast_delivery_title": "Արագ առաքում",
-  "feature_fast_delivery_description": "Հավանական է, որ չի եղել համագործակցություն և ստուգման կետեր, չի եղել գործընթաց:",
-  "feature_best_quality_title": "Լավագույն որակ",
-  "feature_best_quality_description": "Սա բովանդակության ռազմավարություն է, որը սխալվել է հենց սկզբից:",
-  "feature_free_return_title": "Անվճար վերադարձ",
-  "feature_free_return_description": "Ճիշտ է, բայց դա ամենը չէ, ինչ անհրաժեշտ է բաները վերադարձնելու համար:",
+  "hero_promo_headline": "ԶԵՂՉ",
+  "hero_promo_body_line1": "Զգացեք խաղը փոխող A17 Pro չիպը և",
+  "hero_promo_body_line2": "պրոֆեսիոնալ տեսախցիկի համակարգը:",
+  "hero_free_shipping": "Անվճար առաքում",
+  "hero_cta_more": "Ավելին",
+  "hero_chat_line1": "Զրուցեք",
+  "hero_chat_bold": "Apple մասնագետի",
+  "hero_chat_line2": " հետ առցանց կամ խանութում:",
+  "hero_discount_percent": "50%",
+  "hero_iphone_title": "iPhone 17 Pro",
+  "featured_intro": {
+    "title": "Լավագույն ընտրություն",
+    "subtitle": "Պարզ ընտրություն լավագույններից",
+    "cta": "Ավելին"
+  },
+  "special_offers_heading": {
+    "title": "Հատուկ Առաջարկներ",
+    "subtitle": "Ընտրված տեխնիկա հատուկ պայմաններով",
+    "cta": "Ավելին",
+    "carouselAriaLabel": "Հատուկ առաջարկներ՝ սահմանեք կողքը՝ տեսնելու ևս"
+  },
+  "why_choose_us_heading": {
+    "title": "Ինչու Ընտրել Մեզ",
+    "subtitle": "Լուծումներ, որոնք հարմար են քո ամենօրյա օգտագործման համար",
+    "cta": "Ավելին"
+  },
+  "why_choose_us_benefits": {
+    "warranty_title": "Երաշխիք",
+    "warranty_description": "Բոլոր ապրանքները գալիս են պաշտոնական երաշխիքով։",
+    "delivery_title": "Արագ առաքում",
+    "delivery_description": "Առաքում նույն օրը կամ հնարավորինս արագ։",
+    "installment_title": "Տարաժամկետ վճարում",
+    "installment_description": "Հարմար վճարումներ՝ մաս-մաս տարբերակով։",
+    "original_title": "Օրիգինալ ապրանքներ",
+    "original_description": "Միայն բնօրինակ և ստուգված տեխնիկա։"
+  },
+  "partner_logos": {
+    "heading": "Բրենդներ",
+    "apple": "Apple",
+    "lg": "LG",
+    "samsung": "Samsung",
+    "xiaomi": "Xiaomi"
+  },
   "featured_products": {
     "title": "Առաջարկվող ապրանքներ",
-    "subtitle": "Երեք արագ ընտրություն. Նոր ժամանումներ, Լավագույն վաճառքներ և Առաջարկվող ընտրություններ",
-    "tab_new": "ՆՈՐ",
-    "tab_bestseller": "ԼԱՎԱԳՈՒՅՆ ՎԱՃԱՌՔ",
-    "tab_featured": "ԱՌԱՋԱՐԿՎՈՂ",
-    "ariaShowProducts": "Ցուցադրել {label} ապրանքներ",
+    "subtitle": "Ընտրված առաջարկներ մեր կատալոգից",
     "errorLoading": "Չհաջողվեց բեռնել ապրանքները",
     "tryAgain": "Փորձել կրկին",
-    "noProducts": "Այս կատեգորիայում ապրանքներ չկան:"
+    "noProducts": "Այս կատեգորիայում ապրանքներ չկան:",
+    "carouselAriaLabel": "Առաջարկված ապրանքներ՝ սահմանեք կողքը՝ տեսնելու ևս"
+  },
+  "mobile_home": {
+    "featuredSectionTitle": "Առաջարկված",
+    "specialOffersSectionTitle": "Հատուկ առաջարկներ",
+    "discountLabel": "{{percent}}% զեղչ",
+    "categoryPill": {
+      "computers": "Mac",
+      "phones": "iPhone",
+      "tablets": "iPad",
+      "watches": "Watch",
+      "headphones": "AirPods"
+    }
   }
 }
 

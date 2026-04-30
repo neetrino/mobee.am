@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import type { ProductSortOption } from "@/lib/products/sort";
 
 /**
  * Product filters interface
@@ -12,10 +13,12 @@ export interface ProductFilters {
   colors?: string;
   sizes?: string;
   brand?: string;
-  sort?: string;
+  sort?: ProductSortOption;
   page?: number;
   limit?: number;
   lang?: string;
+  /** When set, return only these product ids (e.g. compare tray). Max 20 at API boundary. */
+  ids?: string[];
 }
 
 /**

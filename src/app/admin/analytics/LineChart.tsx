@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useTranslation } from '../../../lib/i18n-client';
 
@@ -88,14 +88,14 @@ export function LineChart({ data }: LineChartProps) {
         <defs>
           {/* Modern gradient for area */}
           <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
+            <stop offset="0%" stopColor="#2DB2FF" stopOpacity="0.4" />
             <stop offset="50%" stopColor="#6366f1" stopOpacity="0.2" />
             <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
           </linearGradient>
           
           {/* Gradient for line */}
           <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="0%" stopColor="#2DB2FF" />
             <stop offset="50%" stopColor="#6366f1" />
             <stop offset="100%" stopColor="#8b5cf6" />
           </linearGradient>
@@ -206,7 +206,7 @@ export function LineChart({ data }: LineChartProps) {
               cy={point.y}
               r="8"
               fill="transparent"
-              className="hover:fill-blue-100 hover:fill-opacity-30 transition-all duration-200"
+              className="hover:fill-admin-100 hover:fill-opacity-30 transition-all duration-200"
             />
             
             {/* Outer glow circle */}
@@ -214,7 +214,7 @@ export function LineChart({ data }: LineChartProps) {
               cx={point.x}
               cy={point.y}
               r="5"
-              fill="#3b82f6"
+              fill="#2DB2FF"
               opacity="0.3"
               className="group-hover:opacity-0.6 group-hover:r-7 transition-all duration-200"
             />
@@ -225,7 +225,7 @@ export function LineChart({ data }: LineChartProps) {
               cy={point.y}
               r="4"
               fill="white"
-              stroke="#3b82f6"
+              stroke="#2DB2FF"
               strokeWidth="3"
               className="group-hover:r-5 group-hover:stroke-[#6366f1] transition-all duration-200"
               filter="url(#glow)"
@@ -236,7 +236,7 @@ export function LineChart({ data }: LineChartProps) {
               cx={point.x}
               cy={point.y}
               r="2"
-              fill="#3b82f6"
+              fill="#2DB2FF"
               className="group-hover:fill-[#6366f1] transition-all duration-200"
             />
             

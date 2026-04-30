@@ -8,6 +8,7 @@ import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import type { CurrencyCode } from '../../lib/currency';
 import type { LanguageCode } from '../../lib/language';
 import { t } from '../../lib/i18n';
+import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 
 interface RelatedProduct {
   id: string;
@@ -56,7 +57,8 @@ export function RelatedProductCard({
   imageError,
   width,
 }: RelatedProductCardProps) {
-  const hasImage = product.image && !imageError;
+  const hasImage = !imageError;
+  const imageSrc = resolveProductCardImageSrc(product.image);
   const categoryName = product.categories && product.categories.length > 0 
     ? product.categories.map(c => c.title).join(', ')
     : product.brand?.name || 'Product';
@@ -66,7 +68,7 @@ export function RelatedProductCard({
       className="flex-shrink-0 px-3 h-full"
       style={{ width }}
     >
-      <div className="group relative h-full flex flex-col">
+      <div className="group relative h-full flex flex-col" data-related-product-card>
         <Link
           href={`/products/${product.slug}`}
           className="block cursor-pointer flex-1 flex flex-col"
@@ -82,13 +84,16 @@ export function RelatedProductCard({
         >
           <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
             {/* Product Image */}
-            <div className="relative aspect-square bg-gray-100 overflow-hidden flex-shrink-0">
+            <div
+              className="relative aspect-square bg-white border border-gray-100 overflow-hidden flex-shrink-0"
+              data-cart-fly-source
+            >
               {hasImage ? (
                 <Image
-                  src={product.image!}
+                  src={imageSrc}
                   alt={product.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-contain group-hover:scale-105 transition-transform duration-300"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   unoptimized
                   onError={() => onImageError(product.id)}
@@ -113,28 +118,17 @@ export function RelatedProductCard({
               </p>
 
               {/* Price */}
-              <div className="flex flex-col gap-1 mt-auto">
+              <div className="mt-auto flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="whitespace-nowrap text-[1.06875rem] font-bold text-gray-900">
                     {formatPrice(product.price, currency)}
                   </span>
                   {product.discountPercent && product.discountPercent > 0 && (
-                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                    <span className="text-[0.7125rem] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
                       -{product.discountPercent}%
                     </span>
                   )}
                 </div>
-                {(product.originalPrice && product.originalPrice > product.price) || 
-                 (product.compareAtPrice && product.compareAtPrice > product.price) ? (
-                  <span className="text-sm text-gray-500 line-through decoration-gray-400">
-                    {formatPrice(
-                      (product.originalPrice && product.originalPrice > product.price) 
-                        ? product.originalPrice 
-                        : (product.compareAtPrice || 0),
-                      currency
-                    )}
-                  </span>
-                ) : null}
               </div>
             </div>
           </div>

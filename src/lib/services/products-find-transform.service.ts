@@ -3,6 +3,46 @@ import { processImageUrl } from "../utils/image-utils";
 import { translations } from "../translations";
 import { ProductWithRelations } from "./products-find-query.service";
 
+export type ProductDiscountContext = {
+  globalDiscount: number;
+  categoryDiscounts: Record<string, number>;
+  brandDiscounts: Record<string, number>;
+};
+
+/**
+ * Load discount-related settings once per product list request.
+ */
+export async function loadProductDiscountContext(): Promise<ProductDiscountContext> {
+  const discountSettings = await db.settings.findMany({
+    where: {
+      key: {
+        in: ["globalDiscount", "categoryDiscounts", "brandDiscounts"],
+      },
+    },
+  });
+
+  const globalDiscount =
+    Number(
+      discountSettings.find((s: { key: string; value: unknown }) => s.key === "globalDiscount")?.value,
+    ) || 0;
+
+  const categoryDiscountsSetting = discountSettings.find(
+    (s: { key: string; value: unknown }) => s.key === "categoryDiscounts",
+  );
+  const categoryDiscounts = categoryDiscountsSetting
+    ? ((categoryDiscountsSetting.value as Record<string, number>) || {})
+    : {};
+
+  const brandDiscountsSetting = discountSettings.find(
+    (s: { key: string; value: unknown }) => s.key === "brandDiscounts",
+  );
+  const brandDiscounts = brandDiscountsSetting
+    ? ((brandDiscountsSetting.value as Record<string, number>) || {})
+    : {};
+
+  return { globalDiscount, categoryDiscounts, brandDiscounts };
+};
+
 /**
  * Get "Out of Stock" translation for a given language
  */
@@ -18,27 +58,10 @@ class ProductsFindTransformService {
    */
   async transformProducts(
     products: ProductWithRelations[],
-    lang: string = "en"
+    lang: string = "en",
+    discounts: ProductDiscountContext,
   ): Promise<any[]> {
-    // Get discount settings
-    const discountSettings = await db.settings.findMany({
-      where: {
-        key: {
-          in: ["globalDiscount", "categoryDiscounts", "brandDiscounts"],
-        },
-      },
-    });
-
-    const globalDiscount =
-      Number(
-        discountSettings.find((s: { key: string; value: unknown }) => s.key === "globalDiscount")?.value
-      ) || 0;
-    
-    const categoryDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "categoryDiscounts");
-    const categoryDiscounts = categoryDiscountsSetting ? (categoryDiscountsSetting.value as Record<string, number>) || {} : {};
-    
-    const brandDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "brandDiscounts");
-    const brandDiscounts = brandDiscountsSetting ? (brandDiscountsSetting.value as Record<string, number>) || {} : {};
+    const { globalDiscount, categoryDiscounts, brandDiscounts } = discounts;
 
     // Format response
     const data = products.map((product: ProductWithRelations) => {
@@ -212,6 +235,7 @@ class ProductsFindTransformService {
         id: product.id,
         slug: translation?.slug || "",
         title: translation?.title || "",
+        subtitle: translation?.subtitle || "",
         defaultVariantId: variant?.id ?? null,
         brand: product.brand
           ? {

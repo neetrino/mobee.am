@@ -1,5 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { db } from "@white-shop/db";
+import {
+  PRODUCT_VARIANT_DB_SELECT,
+  PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
+} from "@/lib/database/productVariantDb.constants";
 import { ensureProductVariantAttributesColumn } from "../../../utils/db-ensure";
 import { logger } from "../../../utils/logger";
 
@@ -15,6 +19,7 @@ const getProductListInclude = () => ({
     where: { published: true },
     take: 1,
     orderBy: { price: "asc" as const },
+    select: PRODUCT_VARIANT_DB_SELECT,
   },
   labels: true,
 });
@@ -35,18 +40,7 @@ const getProductDetailInclude = () => ({
     },
   },
   variants: {
-    include: {
-      options: {
-        include: {
-          attributeValue: {
-            include: {
-              attribute: true,
-              translations: true,
-            },
-          },
-        },
-      },
-    },
+    select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
     orderBy: {
       position: "asc" as const,
     },

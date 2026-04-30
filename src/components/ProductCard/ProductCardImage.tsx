@@ -2,56 +2,71 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ProductLabels } from "../ProductLabels";
+import { resolveProductCardImageSrc } from "../../lib/productCardDisplayImage";
 import { ProductImagePlaceholder } from "../ProductImagePlaceholder";
-import type { ProductLabel } from "../ProductLabels";
 
 interface ProductCardImageProps {
   slug: string;
   image: string | null;
   title: string;
-  labels?: ProductLabel[];
   imageError: boolean;
   onImageError: () => void;
   isCompact?: boolean;
+  /** Shift focal point ~10% from center (home “best choice” cards). */
+  shiftImageInFrame?: boolean;
+  /** Square image frame; false uses portrait 3:4. */
+  squareImageFrame?: boolean;
 }
 
 /**
- * Component for displaying product image with labels.
- * Shows placeholder icon when no image or image failed to load.
+ * Centered product image for the grid card — object-contain in a square frame (or portrait 3:4 when squareImageFrame is false).
  */
 export function ProductCardImage({
   slug,
   image,
   title,
-  labels,
   imageError,
   onImageError,
   isCompact = false,
+  shiftImageInFrame = false,
+  squareImageFrame = true,
 }: ProductCardImageProps) {
-  const showPlaceholder = !image || imageError;
+  const showPlaceholder = imageError;
+  const imageSrc = resolveProductCardImageSrc(image);
+  /** max-lg: frame 90% width vs desktop (171 / 212) so title clears the image on small screens. */
+  const frameClass = isCompact
+    ? "w-[171px] max-w-[84%] max-lg:w-[153.9px]"
+    : "w-[212px] max-w-[84%] max-lg:w-[190.8px]";
+  const aspectClass = squareImageFrame ? "aspect-square" : "aspect-[3/4]";
 
   return (
-    <div className="aspect-square bg-gray-100 relative overflow-hidden">
-      <Link href={`/products/${slug}`} className="block w-full h-full">
+    <div className={`relative ${aspectClass} shrink-0 ${frameClass}`} data-cart-fly-source>
+      <Link
+        href={`/products/${slug}`}
+        className="absolute inset-0 block"
+        aria-label={title}
+      >
         {showPlaceholder ? (
           <ProductImagePlaceholder
-            className="w-full h-full"
+            className="h-full w-full"
             aria-label={title ? `No image for ${title}` : "No image"}
           />
         ) : (
           <Image
-            src={image}
+            src={imageSrc}
             alt={title}
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            className={
+              shiftImageInFrame
+                ? 'object-contain object-[60%_60%]'
+                : 'object-contain'
+            }
+            sizes="(max-width: 768px) 78vw, (max-width: 1200px) 35vw, 212px"
             unoptimized
             onError={onImageError}
           />
         )}
       </Link>
-      {labels && labels.length > 0 && <ProductLabels labels={labels} />}
     </div>
   );
 }

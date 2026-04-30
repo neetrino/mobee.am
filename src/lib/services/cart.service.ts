@@ -1,6 +1,11 @@
 import { db } from "@white-shop/db";
-import { logger } from "../utils/logger";
+import { Prisma } from "@prisma/client";
 import { extractMediaUrl } from "../utils/extractMediaUrl";
+import {
+  calculateReservationDelta,
+  releaseVariantStockReservation,
+  reserveVariantStock,
+} from "./inventory/stock-reservation";
 
 class CartService {
   /**
@@ -203,31 +208,12 @@ class CartService {
       };
     }
 
-    const [cart, variant] = await Promise.all([
-      db.cart.findFirst({
-        where: { userId },
-        include: { items: true },
-      }),
-      db.productVariant.findUnique({
-        where: { id: variantId },
-        select: { id: true, published: true, productId: true, stock: true, price: true },
-      }),
-    ]);
+    const variant = await db.productVariant.findUnique({
+      where: { id: variantId },
+      select: { id: true, published: true, productId: true, price: true },
+    });
 
-    let resolvedCart = cart;
-    if (!resolvedCart) {
-      resolvedCart = await db.cart.create({
-        data: {
-          userId,
-          locale,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          items: { create: [] },
-        },
-        include: { items: true },
-      });
-    }
-
-    if (!variant || !variant.published || variant.productId !== productId) {
+    if (!variant || variant.productId !== productId || !variant.published) {
       throw {
         status: 404,
         type: "https://api.shop.am/problems/not-found",
@@ -235,75 +221,66 @@ class CartService {
       };
     }
 
-    const existingItem = resolvedCart.items.find((item: { variantId: string }) => item.variantId === variantId);
-
-    // Calculate total quantity that will be in cart after adding
-    const totalQuantity = existingItem ? existingItem.quantity + quantity : quantity;
-
-    // Check if total quantity exceeds available stock
-    if (totalQuantity > variant.stock) {
-      logger.warn("Cart: stock limit exceeded", {
-        variantId,
-        currentInCart: existingItem?.quantity ?? 0,
-        requestedQuantity: quantity,
-        totalQuantity,
-        availableStock: variant.stock,
+    return db.$transaction(async (tx: Prisma.TransactionClient) => {
+      const existingCart = await tx.cart.findFirst({
+        where: { userId },
       });
-      throw {
-        status: 422,
-        type: "https://api.shop.am/problems/validation-error",
-        title: "Insufficient stock",
-        detail: `No more stock available. Maximum available: ${variant.stock}, already in cart: ${existingItem?.quantity || 0}, requested: ${quantity}`,
-      };
-    }
+      const resolvedCart = existingCart
+        ? existingCart
+        : await tx.cart.create({
+            data: {
+              userId,
+              locale,
+              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            },
+          });
 
-    let item;
-    if (existingItem) {
-      logger.debug("Cart: updating existing item", {
-        itemId: existingItem.id,
-        oldQuantity: existingItem.quantity,
-        newQuantity: totalQuantity,
-      });
-      item = await db.cartItem.update({
-        where: { id: existingItem.id },
-        data: {
-          quantity: totalQuantity,
-        },
-      });
-      // Summary from current state: other items + this updated item (no extra DB query)
-      const otherItems = resolvedCart.items.filter((i: { id: string }) => i.id !== existingItem.id);
-      const itemsForSum = [
-        ...otherItems.map((i: { quantity: number; priceSnapshot: unknown }) => ({ q: i.quantity, p: Number(i.priceSnapshot) })),
-        { q: totalQuantity, p: Number(item.priceSnapshot) },
-      ];
-      const itemsCount = itemsForSum.reduce((sum, i) => sum + i.q, 0);
-      const total = itemsForSum.reduce((sum, i) => sum + i.q * i.p, 0);
-      return {
-        item: { id: item.id, variantId, quantity: item.quantity, price: Number(item.priceSnapshot) },
-        cartSummary: { itemsCount, total },
-      };
-    } else {
-      logger.debug("Cart: creating new item", { variantId, quantity });
-      item = await db.cartItem.create({
-        data: {
+      const existingItem = await tx.cartItem.findFirst({
+        where: {
           cartId: resolvedCart.id,
           variantId,
-          productId,
-          quantity,
-          priceSnapshot: variant.price,
         },
       });
-      const itemsForSum = [
-        ...resolvedCart.items.map((i: { quantity: number; priceSnapshot: unknown }) => ({ q: i.quantity, p: Number(i.priceSnapshot) })),
-        { q: quantity, p: Number(variant.price) },
-      ];
-      const itemsCount = itemsForSum.reduce((sum, i) => sum + i.q, 0);
-      const total = itemsForSum.reduce((sum, i) => sum + i.q * i.p, 0);
+
+      const previousQuantity = existingItem?.quantity ?? 0;
+      const nextQuantity = previousQuantity + quantity;
+      const reservationDelta = calculateReservationDelta({
+        previousQuantity,
+        nextQuantity,
+      });
+      await reserveVariantStock(tx, variantId, reservationDelta);
+
+      const item = existingItem
+        ? await tx.cartItem.update({
+            where: { id: existingItem.id },
+            data: { quantity: nextQuantity },
+          })
+        : await tx.cartItem.create({
+            data: {
+              cartId: resolvedCart.id,
+              variantId,
+              productId,
+              quantity: nextQuantity,
+              priceSnapshot: variant.price,
+            },
+          });
+
+      const cartItems = await tx.cartItem.findMany({
+        where: { cartId: resolvedCart.id },
+        select: { quantity: true, priceSnapshot: true },
+      });
+
+      const itemsCount = cartItems.reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+      const total = cartItems.reduce(
+        (sum, cartItem) => sum + cartItem.quantity * Number(cartItem.priceSnapshot),
+        0
+      );
+
       return {
         item: { id: item.id, variantId, quantity: item.quantity, price: Number(item.priceSnapshot) },
         cartSummary: { itemsCount, total },
       };
-    }
+    });
   }
 
   /**
@@ -344,22 +321,21 @@ class CartService {
     }
 
     const item = cart.items[0];
-    const variant = await db.productVariant.findUnique({
-      where: { id: item.variantId },
+    const reservationDelta = calculateReservationDelta({
+      previousQuantity: item.quantity,
+      nextQuantity: quantity,
     });
+    const updatedItem = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+      if (reservationDelta > 0) {
+        await reserveVariantStock(tx, item.variantId, reservationDelta);
+      } else if (reservationDelta < 0) {
+        await releaseVariantStockReservation(tx, item.variantId, Math.abs(reservationDelta));
+      }
 
-    if (!variant || variant.stock < quantity) {
-      throw {
-        status: 422,
-        type: "https://api.shop.am/problems/validation-error",
-        title: "Insufficient stock",
-        detail: `Requested quantity (${quantity}) exceeds available stock (${variant?.stock || 0})`,
-      };
-    }
-
-    const updatedItem = await db.cartItem.update({
-      where: { id: itemId },
-      data: { quantity },
+      return tx.cartItem.update({
+        where: { id: itemId },
+        data: { quantity },
+      });
     });
 
     return {
@@ -393,8 +369,24 @@ class CartService {
       };
     }
 
-    await db.cartItem.delete({
+    const item = await db.cartItem.findUnique({
       where: { id: itemId },
+      select: { variantId: true, quantity: true },
+    });
+
+    if (!item) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "Cart item not found",
+      };
+    }
+
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
+      await releaseVariantStockReservation(tx, item.variantId, item.quantity);
+      await tx.cartItem.delete({
+        where: { id: itemId },
+      });
     });
 
     return null;

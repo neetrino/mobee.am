@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
@@ -7,10 +7,12 @@ import type { useOrders } from '../useOrders';
 interface OrdersFiltersProps {
   statusFilter: string;
   paymentStatusFilter: string;
+  fulfillmentStatusFilter: string;
   searchQuery: string;
   updateMessage: { type: 'success' | 'error'; text: string } | null;
   setStatusFilter: (value: string) => void;
   setPaymentStatusFilter: (value: string) => void;
+  setFulfillmentStatusFilter: (value: string) => void;
   setSearchQuery: (value: string) => void;
   setPage: (value: number | ((prev: number) => number)) => void;
   router: ReturnType<typeof useOrders>['router'];
@@ -20,10 +22,12 @@ interface OrdersFiltersProps {
 export function OrdersFilters({
   statusFilter,
   paymentStatusFilter,
+  fulfillmentStatusFilter,
   searchQuery,
   updateMessage,
   setStatusFilter,
   setPaymentStatusFilter,
+  setFulfillmentStatusFilter,
   setSearchQuery,
   setPage,
   router,
@@ -70,11 +74,24 @@ export function OrdersFilters({
     router.push(newUrl, { scroll: false });
   };
 
+  const handleFulfillmentStatusChange = (newFulfillmentStatus: string) => {
+    setFulfillmentStatusFilter(newFulfillmentStatus);
+    setPage(1);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (newFulfillmentStatus) {
+      params.set('fulfillmentStatus', newFulfillmentStatus);
+    } else {
+      params.delete('fulfillmentStatus');
+    }
+    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
+    router.push(newUrl, { scroll: false });
+  };
+
   return (
     <Card className="p-4 mb-6">
       <div className="flex gap-4 items-center flex-wrap">
         <select
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
           value={statusFilter}
           onChange={(e) => handleStatusChange(e.target.value)}
         >
@@ -85,7 +102,7 @@ export function OrdersFilters({
           <option value="cancelled">{t('admin.orders.cancelled')}</option>
         </select>
         <select
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
           value={paymentStatusFilter}
           onChange={(e) => handlePaymentStatusChange(e.target.value)}
         >
@@ -94,10 +111,21 @@ export function OrdersFilters({
           <option value="pending">{t('admin.orders.pendingPayment')}</option>
           <option value="failed">{t('admin.orders.failed')}</option>
         </select>
+        <select
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
+          value={fulfillmentStatusFilter}
+          onChange={(e) => handleFulfillmentStatusChange(e.target.value)}
+        >
+          <option value="">{t('admin.orders.allFulfillmentStatuses')}</option>
+          <option value="unfulfilled">{t('admin.orders.unfulfilled')}</option>
+          <option value="fulfilled">{t('admin.orders.fulfilled')}</option>
+          <option value="shipped">{t('admin.orders.shipped')}</option>
+          <option value="delivered">{t('admin.orders.delivered')}</option>
+        </select>
         <input
           type="text"
           placeholder={t('admin.orders.searchPlaceholder')}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-[200px]"
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin flex-1 min-w-[200px]"
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
         />

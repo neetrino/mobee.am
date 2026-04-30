@@ -501,6 +501,21 @@ model ProductReview {
 }
 
 // ============================================
+// PROMO CODE MODEL
+// ============================================
+model PromoCode {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  discountPercent Float
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("promo_codes")
+}
+
+// ============================================
 // SETTINGS MODEL
 // ============================================
 model Settings {

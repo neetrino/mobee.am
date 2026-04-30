@@ -1,7 +1,7 @@
 {
   "buttons": {
-    "addToCart": "Ավելացնել զամբյուղ",
-    "addToWishlist": "Ավելացնել ցանկությունների ցուցակ",
+    "addToCart": "Ավելացնել",
+    "addToWishlist": "Ավելացնել լավագույն",
     "viewProduct": "Դիտել ապրանքը",
     "viewDetails": "Դիտել մանրամասները",
     "browseProducts": "Դիտել ապրանքները",
@@ -18,13 +18,13 @@
   },
   "navigation": {
     "home": "Գլխավոր",
-    "products": "Ապրանքներ",
+    "products": "Խանութ",
     "categories": "Կատեգորիաներ",
     "cart": "Զամբյուղ",
-    "wishlist": "Ցանկությունների ցուցակ",
+    "wishlist": "Լավագույն",
     "compare": "Համեմատել",
     "checkout": "Վճարում",
-    "profile": "Պրոֆիլ",
+    "profile": "Մուտք",
     "orders": "Պատվերներ",
     "login": "Մուտք",
     "register": "Գրանցում",
@@ -43,6 +43,21 @@
     "delivery": "Առաքում",
     "stores": "Խանութներ"
   },
+  "mainHeader": {
+    "searchPlaceholder": "Գտիր լավագույնը",
+    "specialOffers": "Հատուկ առաջարկներ",
+    "phonesLink": "Հեռախոսներ",
+    "tabletsLink": "Պլանշետներ",
+    "computersLink": "Համակարգիչներ",
+    "watchesLink": "Ժամացույցեր",
+    "headphonesLink": "Ականջակալներ",
+    "accessoriesLink": "Աքսեսուարներ"
+  },
+  "header": {
+    "supportPhoneAria": "Զանգել աջակցությանը",
+    "supportPhoneNumber": "+374 10 000000",
+    "supportPhoneTel": "+37410000000"
+  },
   "stock": {
     "inStock": "Պահեստում",
     "outOfStock": "Արտադրված"
@@ -50,6 +65,8 @@
   "cart": {
     "title": "Գնումների զամբյուղ",
     "empty": "Ձեր զամբյուղը դատարկ է",
+    "emptyDescription": "Կարծես դեռ ոչինչ չեք ավելացրել զամբյուղում։ Գնացեք և ուսումնասիրեք հիմնական կատեգորիաները։",
+    "exploreCategories": "Ուսումնասիրել կատեգորիաները",
     "orderSummary": "Պատվերի ամփոփում",
     "subtotal": "Ենթագումար",
     "shipping": "Առաքում",
@@ -60,10 +77,11 @@
     "item": "ապրանք"
   },
   "wishlist": {
-    "title": "Իմ ցանկությունների ցուցակ",
-    "empty": "Ձեր ցանկությունների ցուցակը դատարկ է",
-    "emptyDescription": "Սկսեք ավելացնել ապրանքներ ձեր ցանկությունների ցուցակին՝ հետագա օգտագործման համար:",
-    "totalCount": "Ընդհանուր ապրանքներ ցանկությունների ցուցակում",
+    "title": "Իմ լավագույն",
+    "empty": "Դեռ ոչինչ չեք ավելացրել ցանկում",
+    "emptyDescription": "Դեռ ոչինչ չկա․ գտեք և ավելացրեք ձեր սիրելի ապրանքները",
+    "emptyBrowseCta": "Ավելին",
+    "totalCount": "Ընդհանուր ապրանքներ լավագույնում",
     "tableHeaders": {
       "productName": "Ապրանքի անվանում",
       "unitPrice": "Միավորի գին",
@@ -108,8 +126,8 @@
   "messages": {
     "addedToCart": "Ավելացվեց զամբյուղ",
     "removedFromCart": "Հեռացվեց զամբյուղից",
-    "addedToWishlist": "Ավելացվեց ցանկությունների ցուցակ",
-    "removedFromWishlist": "Հեռացվեց ցանկությունների ցուցակից",
+    "addedToWishlist": "Ավելացվեց լավագույն",
+    "removedFromWishlist": "Հեռացվեց լավագույնից",
     "addedToCompare": "Ավելացվեց համեմատման ցուցակ",
     "removedFromCompare": "Հեռացվեց համեմատման ցուցակից",
     "errorAddingToCart": "Սխալ ավելացնելիս",
@@ -148,10 +166,10 @@
     "failedToAddToCart": "Չհաջողվեց ավելացնել ապրանքը զամբյուղ: Խնդրում ենք կրկին փորձել:"
   },
   "ariaLabels": {
-    "addToCart": "Ավելացնել զամբյուղ",
+    "addToCart": "Ավելացնել",
     "removeFromCart": "Հեռացնել զամբյուղից",
-    "addToWishlist": "Ավելացնել ցանկությունների ցուցակ",
-    "removeFromWishlist": "Հեռացնել ցանկությունների ցուցակից",
+    "addToWishlist": "Ավելացնել լավագույն",
+    "removeFromWishlist": "Հեռացնել լավագույնից",
     "addToCompare": "Ավելացնել համեմատման ցուցակ",
     "removeFromCompare": "Հեռացնել համեմատման ցուցակից",
     "outOfStock": "Արտադրված",
@@ -159,6 +177,7 @@
     "searchPlaceholder": "Որոնել ապրանքներ",
     "openMenu": "Բացել նավիգացիայի մենյու",
     "closeMenu": "Փակել նավիգացիայի մենյու",
+    "changeLanguage": "Փոխել լեզուն",
     "instagram": "Instagram",
     "facebook": "Facebook",
     "linkedin": "LinkedIn",
@@ -183,18 +202,24 @@
     "category": "Մթերք"
   },
   "footer": {
+    "visitUs": "Այցելիր մեզ",
+    "productsHeading": "Ապրանք",
+    "sectionsHeading": "Բաժիններ",
+    "connectHeading": "Կապ",
+    "openInMaps": "Բացել հասցեն Google Քարտեզներում",
     "shop": "Խանութ",
-    "description": "Պրոֆեսիոնալ էլեկտրոնային առևտրի հարթակ ժամանակակից գնումների փորձի համար:",
-    "quickLinks": "Արագ հղումներ",
-    "legal": "Իրավական",
-    "contactInfo": "Կոնտակտային տեղեկատվություն",
-    "privacyPolicy": "Գաղտնիության քաղաքականություն",
-    "termsOfService": "Ծառայությունների պայմաններ",
-    "cookiePolicy": "Cookie քաղաքականություն",
-    "refundPolicy": "Փոխհատուցման քաղաքականություն",
-    "deliveryTerms": "Առաքման պայմաններ",
-    "copyright": "© {year} Խանութ: Բոլոր իրավունքները պաշտպանված են:",
-    "paymentMethods": "Վճարման եղանակներ:"
+    "copyright": "© {year} Mobee: Բոլոր իրավունքները պաշտպանված են:",
+    "legalBar": {
+      "brand": "MOBEE",
+      "copyrightLead": "Copyright © {year} | All Rights Reserved,",
+      "createdBy": "Created by",
+      "creditCompany": "Neetrino IT Company",
+      "privacyPolicy": "Գաղտնիության քաղաքականություն",
+      "shippingPolicy": "Առաքման քաղաքականություն",
+      "returnPolicy": "Վերադարձի քաղաքականություն",
+      "termsOfUse": "Օգտագործման պայմաններ",
+      "policiesNavLabel": "Իրավական և քաղաքականություն"
+    }
   },
   "product": {
     "product": "ապրանք",

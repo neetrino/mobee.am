@@ -6,6 +6,7 @@ import { OrdersFilters } from './components/OrdersFilters';
 import { BulkSelectionControls } from './components/BulkSelectionControls';
 import { OrdersTable } from './components/OrdersTable';
 import { OrderDetailsModal } from './components/OrderDetailsModal';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 export function OrdersPageContent() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export function OrdersPageContent() {
     currency,
     statusFilter,
     paymentStatusFilter,
+    fulfillmentStatusFilter,
     searchQuery,
     page,
     meta,
@@ -22,6 +24,7 @@ export function OrdersPageContent() {
     sortOrder,
     updatingStatuses,
     updatingPaymentStatuses,
+    updatingFulfillmentStatuses,
     updateMessage,
     selectedIds,
     bulkDeleting,
@@ -30,6 +33,7 @@ export function OrdersPageContent() {
     loadingOrderDetails,
     setStatusFilter,
     setPaymentStatusFilter,
+    setFulfillmentStatusFilter,
     setSearchQuery,
     setPage,
     formatCurrency,
@@ -41,13 +45,14 @@ export function OrdersPageContent() {
     handleBulkDelete,
     handleStatusChange,
     handlePaymentStatusChange,
+    handleFulfillmentStatusChange,
     router,
     searchParams,
   } = useOrders();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath="/admin/orders" router={router} t={t}>
+      <div className="max-w-7xl">
         <div className="mb-8">
           <button
             onClick={() => router.push('/admin')}
@@ -64,10 +69,12 @@ export function OrdersPageContent() {
         <OrdersFilters
           statusFilter={statusFilter}
           paymentStatusFilter={paymentStatusFilter}
+          fulfillmentStatusFilter={fulfillmentStatusFilter}
           searchQuery={searchQuery}
           updateMessage={updateMessage}
           setStatusFilter={setStatusFilter}
           setPaymentStatusFilter={setPaymentStatusFilter}
+          setFulfillmentStatusFilter={setFulfillmentStatusFilter}
           setSearchQuery={setSearchQuery}
           setPage={setPage}
           router={router}
@@ -86,6 +93,7 @@ export function OrdersPageContent() {
           selectedIds={selectedIds}
           updatingStatuses={updatingStatuses}
           updatingPaymentStatuses={updatingPaymentStatuses}
+          updatingFulfillmentStatuses={updatingFulfillmentStatuses}
           sortBy={sortBy}
           sortOrder={sortOrder}
           page={page}
@@ -96,6 +104,7 @@ export function OrdersPageContent() {
           onViewDetails={handleViewOrderDetails}
           onStatusChange={handleStatusChange}
           onPaymentStatusChange={handlePaymentStatusChange}
+          onFulfillmentStatusChange={handleFulfillmentStatusChange}
           onPageChange={(newPage) => setPage(newPage)}
           formatCurrency={formatCurrency}
         />
@@ -110,6 +119,6 @@ export function OrdersPageContent() {
           />
         )}
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

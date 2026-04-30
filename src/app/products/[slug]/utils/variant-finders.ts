@@ -1,4 +1,4 @@
-import type { Product, ProductVariant, VariantOption } from '../types';
+import type { Product, ProductVariant } from '../types';
 import { variantHasColor } from './variant-helpers';
 import { getOptionValue } from './variant-helpers';
 

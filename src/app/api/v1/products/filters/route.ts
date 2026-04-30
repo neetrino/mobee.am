@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { productsService } from "@/lib/services/products.service";
+import { getCachedProductFilters } from "@/lib/services/products-filters-cached";
 
 export async function GET(req: NextRequest) {
   try {
@@ -33,8 +33,10 @@ export async function GET(req: NextRequest) {
       lang: searchParams.get("lang") || "en",
     };
 
-    const result = await productsService.getFilters(filters);
-    return NextResponse.json(result);
+    const { result, cacheStatus } = await getCachedProductFilters(filters);
+    return NextResponse.json(result, {
+      headers: { "X-Cache": cacheStatus },
+    });
   } catch (error: any) {
     console.error("❌ [PRODUCTS FILTERS] Error:", error);
     console.error("❌ [PRODUCTS FILTERS] Error stack:", error.stack);

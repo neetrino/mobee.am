@@ -1,20 +1,15 @@
 'use client';
 
-import { Button } from '@shop/ui';
 import { formatDate, type Review } from './utils';
 
 interface ReviewItemProps {
   review: Review;
-  currentUserId?: string;
-  onEdit: (review: Review) => void;
 }
 
 /**
  * Single review item component
  */
-export function ReviewItem({ review, currentUserId, onEdit }: ReviewItemProps) {
-  const isOwnReview = currentUserId && review.userId === currentUserId;
-
+export function ReviewItem({ review }: ReviewItemProps) {
   return (
     <div className="border-b border-gray-200 pb-6 last:border-b-0">
       <div className="flex items-start justify-between mb-2">
@@ -44,17 +39,6 @@ export function ReviewItem({ review, currentUserId, onEdit }: ReviewItemProps) {
             </span>
           </div>
         </div>
-        {isOwnReview && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(review)}
-            className="ml-4"
-          >
-            Edit
-          </Button>
-        )}
       </div>
       <p className="text-gray-700 whitespace-pre-wrap">{review.comment}</p>
     </div>

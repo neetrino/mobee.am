@@ -1,5 +1,3 @@
-import type { RequestOptions } from "./types";
-
 /**
  * Build URL from endpoint and params
  */

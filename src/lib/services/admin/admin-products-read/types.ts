@@ -11,6 +11,7 @@ export interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
   sort?: string;
+  stockStatus?: "all" | "inStock" | "outOfStock";
 }
 
 

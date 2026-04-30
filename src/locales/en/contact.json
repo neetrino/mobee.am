@@ -3,7 +3,7 @@
   "email": "info@shop.am",
   "address": "Yerevan, Abovyan 10",
   "workingHours": "Mon-Fri 10:00-19:00",
-  "social": { "instagram": "", "facebook": "", "linkedin": "" },
+  "social": { "instagram": "", "facebook": "", "linkedin": "", "telegram": "", "whatsapp": "" },
   "callToUs": {"title":"Call Us:","description":"We are available 24/7, 7 days a week."},
   "writeToUs": {"title":"Write to Us:","description":"Fill out our form and we will contact you within 24 hours.","emailLabel":"Email:"},
   "headquarter": {"title":"Headquarters:","hours":{"weekdays":"Monday - Friday: 9:00-20:00","saturday":"Saturday: 11:00 - 15:00"}},

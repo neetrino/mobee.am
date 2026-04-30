@@ -16,6 +16,20 @@ const config: Config = {
         warning: '#F59E0B',
         error: '#EF4444',
         info: '#3B82F6',
+        /** Admin panel brand accent */
+        admin: {
+          DEFAULT: '#2DB2FF',
+          50: '#EEF9FF',
+          100: '#D9F2FF',
+          200: '#B3E5FF',
+          300: '#7AD1FF',
+          400: '#4DC2FF',
+          500: '#2DB2FF',
+          600: '#1A9FE6',
+          700: '#1488CC',
+          800: '#0E6BA3',
+          900: '#0A4F7A',
+        },
       },
       fontFamily: {
         sans: ['system-ui', '-apple-system', 'sans-serif'],

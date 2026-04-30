@@ -3,132 +3,176 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Home, UserRound, Store } from 'lucide-react';
-import { getCompareCount, getWishlistCount } from '../lib/storageCounts';
-import { CartIcon } from './icons/CartIcon';
+import { Montserrat } from 'next/font/google';
+import { Heart, Home, UserRound } from 'lucide-react';
+import { getWishlistCount } from '../lib/storageCounts';
+import { useTranslation } from '../lib/i18n-client';
+import { MobileNavBagIcon } from './icons/MobileNavBagIcon';
+import {
+  MOBILE_BOTTOM_NAV_INNER_PB_CLASS,
+  MOBILE_BOTTOM_NAV_INNER_PT_CLASS,
+  MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS,
+} from './mobile-bottom-nav.constants';
 
-interface MobileNavItem {
+const montserratNav = Montserrat({
+  subsets: ['latin'],
+  weight: ['400'],
+  display: 'swap',
+});
+
+type NavKey = 'home' | 'cart' | 'wishlist' | 'profile';
+
+type MobileNavDef =
+  | { key: 'cart'; labelKey: string; href: string }
+  | { key: Exclude<NavKey, 'cart'>; labelKey: string; href: string; icon: typeof Home };
+
+const INACTIVE_ICON_BOX: Record<NavKey, string> = {
+  home: 'h-5 w-5',
+  cart: 'h-5 w-5',
+  wishlist: 'h-6 w-6',
+  profile: 'h-[22px] w-[22px]',
+};
+
+const ACTIVE_ICON_BOX = 'h-5 w-5';
+
+const INACTIVE_ICON_COLOR = 'text-[#9e9e9e]';
+const ACTIVE_ICON_COLOR = 'text-[#2db2ff]';
+
+function pathIsActive(pathname: string, item: MobileNavDef): boolean {
+  if (item.key === 'home') {
+    return pathname === '/';
+  }
+  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+}
+
+interface NavIconProps {
+  item: MobileNavDef;
+  active: boolean;
+}
+
+function MobileBottomNavIcon({ item, active }: NavIconProps) {
+  const iconBox = active ? ACTIVE_ICON_BOX : INACTIVE_ICON_BOX[item.key];
+  const iconColor = active ? ACTIVE_ICON_COLOR : INACTIVE_ICON_COLOR;
+
+  if (item.key === 'cart') {
+    return (
+      <MobileNavBagIcon
+        size={20}
+        strokeWidth={1.5}
+        className={`shrink-0 ${iconBox} ${iconColor}`}
+      />
+    );
+  }
+
+  const Icon = item.icon;
+  const useFill =
+    active && (item.key === 'wishlist' || item.key === 'home' || item.key === 'profile');
+
+  return (
+    <Icon
+      className={`shrink-0 ${iconBox} ${iconColor}`}
+      strokeWidth={active ? 2.5 : 1.5}
+      fill={useFill ? 'currentColor' : 'none'}
+      aria-hidden
+    />
+  );
+}
+
+interface MobileNavItemProps {
+  item: MobileNavDef;
+  active: boolean;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  href?: string;
-  action?: () => void;
-  onClick?: () => void;
-  badge?: 'wishlist' | 'compare';
-  visible?: boolean;
+  wishlistCount: number;
+}
+
+function MobileNavItem({ item, active, label, wishlistCount }: MobileNavItemProps) {
+  const showWishlistBadge = item.key === 'wishlist' && wishlistCount > 0;
+
+  const iconWrap = (
+    <div className="relative flex items-center justify-center">
+      <MobileBottomNavIcon item={item} active={active} />
+      {showWishlistBadge ? (
+        <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+          {wishlistCount > 99 ? '99+' : wishlistCount}
+        </span>
+      ) : null}
+    </div>
+  );
+
+  const linkClass = active
+    ? `flex ${MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS} shrink-0 items-center gap-2 rounded-[65px] bg-[rgba(25,158,235,0.1)] px-4 py-2 transition-opacity active:opacity-80`
+    : `relative flex ${MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS} min-h-0 flex-1 items-center justify-center overflow-hidden py-1 transition-opacity active:opacity-80`;
+
+  return (
+    <Link
+      href={item.href}
+      className={linkClass}
+      aria-label={label}
+      aria-current={active ? 'page' : undefined}
+      {...(item.key === 'cart' ? { 'data-cart-fly-target': 'mobile' as const } : {})}
+    >
+      {active ? (
+        <>
+          {iconWrap}
+          <span
+            className={`${montserratNav.className} shrink-0 whitespace-nowrap text-sm font-normal leading-normal text-[#2db2ff]`}
+          >
+            {label}
+          </span>
+        </>
+      ) : (
+        iconWrap
+      )}
+    </Link>
+  );
 }
 
 /**
- * Ստեղծում է հաստատուն mobile նավիգացիոն վահանակ՝ էջի ներքևում,
- * որպեսզի հիմնական գործողությունները միշտ լինեն ձեռքի տակ փոքր էկրաններում։
+ * Mobile bottom bar — Figma mobee-new node 183:1956 (spacing, pill, Iconly Bold/Light weights).
  */
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const isProductsPage = pathname?.startsWith('/products');
+  const { t } = useTranslation();
   const [wishlistCount, setWishlistCount] = useState(0);
-  const [compareCount, setCompareCount] = useState(0);
 
   useEffect(() => {
     const updateCounts = () => {
-      const wishlist = getWishlistCount();
-      const compare = getCompareCount();
-      console.debug('[MobileBottomNav] wishlist/compare counts refreshed', { wishlist, compare });
-      setWishlistCount(wishlist);
-      setCompareCount(compare);
+      setWishlistCount(getWishlistCount());
     };
 
     updateCounts();
     window.addEventListener('wishlist-updated', updateCounts);
-    window.addEventListener('compare-updated', updateCounts);
 
     return () => {
       window.removeEventListener('wishlist-updated', updateCounts);
-      window.removeEventListener('compare-updated', updateCounts);
     };
   }, []);
 
-  const navItems: MobileNavItem[] = useMemo(
+  const items: MobileNavDef[] = useMemo(
     () => [
-      { 
-        label: 'Home', 
-        href: '/', 
-        icon: Home, 
-        visible: true,
-      },
-      // Shop with Store icon
-      { 
-        label: 'Shop', 
-        href: '/products', 
-        icon: Store, 
-        visible: true,
-        onClick: () => console.info('🛒 [MobileBottomNav] Shop tapped, navigating to /products'),
-      },
-      // On mobile we show Cart instead of Wishlist
-      { 
-        label: 'Cart', 
-        href: '/cart', 
-        icon: CartIcon, 
-        visible: true,
-      },
-      { label: 'My account', href: '/profile', icon: UserRound, visible: true },
+      { key: 'home', labelKey: 'common.navigation.home', href: '/', icon: Home },
+      { key: 'cart', labelKey: 'common.navigation.cart', href: '/cart' },
+      { key: 'wishlist', labelKey: 'common.navigation.wishlist', href: '/wishlist', icon: Heart },
+      { key: 'profile', labelKey: 'common.navigation.profile', href: '/profile', icon: UserRound },
     ],
-    [isProductsPage]
+    [],
   );
 
-  const resolveBadgeValue = (badge?: MobileNavItem['badge']) => {
-    if (badge === 'wishlist') return wishlistCount;
-    if (badge === 'compare') return compareCount;
-    return 0;
-  };
-
   return (
-    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(15,23,42,0.08)]">
-      <div className="mx-auto flex max-w-md items-stretch justify-between px-2 py-2">
-        {navItems.filter(item => item.visible).map(({ label, href, icon: Icon, badge, action, onClick }) => {
-          const isActive = href ? pathname === href : false;
-          const badgeValue = resolveBadgeValue(badge);
-
-          const content = (
-            <>
-              <div className="relative">
-                <Icon className={`h-5 w-5 ${isActive ? 'text-gray-900' : 'text-gray-500'}`} />
-                {badgeValue > 0 && (
-                  <span className="absolute -top-2 -right-2 rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
-                    {badgeValue > 99 ? '99+' : badgeValue}
-                  </span>
-                )}
-              </div>
-              <span className="mt-1 text-[11px]">{label}</span>
-            </>
-          );
-
-          if (action) {
-            return (
-              <button
-                key={label}
-                type="button"
-                onClick={action}
-                className="flex flex-1 flex-col items-center rounded-xl px-2 py-1 text-xs font-medium text-gray-500 transition"
-              >
-                {content}
-              </button>
-            );
-          }
-
-          return (
-            <Link
-              key={label}
-              href={href || '#'}
-              onClick={onClick}
-              className={`flex flex-1 flex-col items-center rounded-xl px-2 py-1 text-xs font-medium transition ${
-                isActive ? 'text-gray-900' : 'text-gray-500'
-              }`}
-            >
-              {content}
-            </Link>
-          );
-        })}
+    <nav className="fixed inset-x-0 bottom-0 z-40 bg-white drop-shadow-[0px_0px_20px_rgba(0,0,0,0.15)] lg:hidden">
+      <div
+        className={`flex w-full items-center justify-center gap-4 px-6 ${MOBILE_BOTTOM_NAV_INNER_PT_CLASS} ${MOBILE_BOTTOM_NAV_INNER_PB_CLASS}`}
+      >
+        {items.map((item) => (
+          <MobileNavItem
+            key={item.key}
+            item={item}
+            active={pathIsActive(pathname, item)}
+            label={t(item.labelKey)}
+            wishlistCount={wishlistCount}
+          />
+        ))}
       </div>
     </nav>
   );
 }
-

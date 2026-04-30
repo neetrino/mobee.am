@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
 import { adminService } from "@/lib/services/admin.service";
+import {
+  ADMIN_ANALYTICS_PERIODS,
+  type AdminAnalyticsPeriod,
+} from "@/lib/contracts/admin-analytics";
 
 /**
  * Force dynamic rendering for this route
  * Prevents Next.js from statically generating this route
  */
 export const dynamic = "force-dynamic";
+
+function parsePeriod(value: string | null): AdminAnalyticsPeriod {
+  if (value && ADMIN_ANALYTICS_PERIODS.includes(value as AdminAnalyticsPeriod)) {
+    return value as AdminAnalyticsPeriod;
+  }
+  return "week";
+}
 
 /**
  * GET /api/v1/admin/analytics
@@ -33,7 +44,7 @@ export async function GET(req: NextRequest) {
 
     // Get query parameters
     const { searchParams } = new URL(req.url);
-    const period = searchParams.get("period") || "week";
+    const period = parsePeriod(searchParams.get("period"));
     const startDate = searchParams.get("startDate") || undefined;
     const endDate = searchParams.get("endDate") || undefined;
 

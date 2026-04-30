@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/auth/AuthContext';
 import { useWishlist } from './hooks/useWishlist';
 import { useCompare } from './hooks/useCompare';
+import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
 import { useAddToCart } from './hooks/useAddToCart';
 import { useCurrency } from './hooks/useCurrency';
 import { ProductCardList } from './ProductCard/ProductCardList';
@@ -15,6 +16,7 @@ interface Product {
   id: string;
   slug: string;
   title: string;
+  subtitle?: string | null;
   price: number;
   image: string | null;
   inStock: boolean;
@@ -36,13 +38,31 @@ type ViewMode = 'list' | 'grid-2' | 'grid-3';
 interface ProductCardProps {
   product: Product;
   viewMode?: ViewMode;
+  /** Nudge product art in the frame (e.g. home “best choice” grid). */
+  shiftImageInFrame?: boolean;
+  /** Use a square image frame; set false for portrait 3:4. */
+  squareImageFrame?: boolean;
+  /** Smaller footer price (e.g. home “best choice” grid). */
+  smallerFooterPrice?: boolean;
+  /** Home special-offers grid — RU desktop footer CTA uses Figma 155.99×36.94px. */
+  specialOffersHomeCard?: boolean;
+  /** Home featured / special-offer grids — mobile Figma card chrome. */
+  homeProductGridCard?: boolean;
 }
 
 /**
  * Product card component with Compare, Wishlist and Cart icons
  * Displays product image, title, category, price and action buttons
  */
-export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) {
+export function ProductCard({
+  product,
+  viewMode = 'grid-3',
+  shiftImageInFrame = false,
+  squareImageFrame = true,
+  smallerFooterPrice = false,
+  specialOffersHomeCard = false,
+  homeProductGridCard = false,
+}: ProductCardProps) {
   const isCompact = viewMode === 'grid-3';
   const router = useRouter();
   const { isLoggedIn } = useAuth();
@@ -82,7 +102,12 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
   const handleAddToCart = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart();
+    const root = (e.currentTarget as HTMLElement).closest('[data-product-card-root]');
+    const flySourceEl = root?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
+    void addToCart({
+      imageUrl: resolveProductCardImageSrc(product.image),
+      flySourceEl,
+    });
   };
 
   // List view layout
@@ -113,6 +138,11 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
       isAddingToCart={isAddingToCart}
       imageError={imageError}
       isCompact={isCompact}
+      shiftImageInFrame={shiftImageInFrame}
+      squareImageFrame={squareImageFrame}
+      smallerFooterPrice={smallerFooterPrice}
+      specialOffersHomeCard={specialOffersHomeCard}
+      homeProductGridCard={homeProductGridCard}
       onImageError={() => setImageError(true)}
       onWishlistToggle={handleWishlistToggle}
       onCompareToggle={handleCompareToggle}

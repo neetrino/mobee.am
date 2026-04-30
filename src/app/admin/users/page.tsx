@@ -1,11 +1,12 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 interface User {
   id: string;
@@ -33,6 +34,7 @@ export default function UsersPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -79,7 +81,7 @@ export default function UsersPage() {
     if (isLoggedIn && isAdmin) {
       fetchUsers();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isLoggedIn, isAdmin, page, search, roleFilter]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -164,7 +166,7 @@ export default function UsersPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -186,8 +188,8 @@ export default function UsersPage() {
         );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath={pathname || '/admin/users'} router={router} t={t}>
+      <div className="max-w-7xl">
         <div className="mb-8">
           <button
             onClick={() => router.push('/admin')}
@@ -277,7 +279,7 @@ export default function UsersPage() {
         <Card className="p-6">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
               <p className="text-gray-600">{t('admin.users.loadingUsers')}</p>
             </div>
           ) : filteredUsers.length === 0 ? (
@@ -349,7 +351,7 @@ export default function UsersPage() {
                             {user.roles?.map((role) => (
                               <span
                                 key={role}
-                                className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                                className="px-2 py-1 text-xs font-medium bg-admin-100 text-admin-800 rounded-full"
                               >
                                 {role}
                               </span>
@@ -429,7 +431,7 @@ export default function UsersPage() {
           )}
         </Card>
       </div>
-    </div>
+    </AdminPageShell>
   );
 }
 

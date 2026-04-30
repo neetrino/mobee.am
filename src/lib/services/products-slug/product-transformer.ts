@@ -363,12 +363,28 @@ export async function transformProduct(
     };
   }) : [];
 
+  const listingCardImage: string | null = (() => {
+    if (!Array.isArray(product.media) || product.media.length === 0) {
+      return null;
+    }
+    const firstImage = processImageUrl(
+      product.media[0] as
+        | string
+        | null
+        | undefined
+        | { url?: string; src?: string; value?: string },
+    );
+    return firstImage || null;
+  })();
+
   return {
     id: product.id,
     slug: translation?.slug || "",
     title: translation?.title || "",
     subtitle: translation?.subtitle || null,
     description: translation?.descriptionHtml || null,
+    /** Same as product list/card: first gallery URL from raw `media[0]` (before variant separation). */
+    image: listingCardImage,
     brand: product.brand
       ? {
           id: product.brand.id,

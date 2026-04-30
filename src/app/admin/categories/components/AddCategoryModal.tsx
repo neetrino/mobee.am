@@ -1,8 +1,7 @@
-'use client';
+﻿'use client';
 
 import { Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { showToast } from '../../../../components/Toast';
 import type { Category, CategoryFormData } from '../types';
 
 interface AddCategoryModalProps {
@@ -52,7 +51,7 @@ export function AddCategoryModal({
             <select
               value={formData.parentId}
               onChange={(e) => onFormDataChange({ ...formData, parentId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
             >
               <option value="">{t('admin.categories.rootCategory')}</option>
               {categories
@@ -70,7 +69,7 @@ export function AddCategoryModal({
                 type="checkbox"
                 checked={formData.requiresSizes}
                 onChange={(e) => onFormDataChange({ ...formData, requiresSizes: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
               />
               <span className="text-sm text-gray-700">
                 {t('admin.categories.requiresSizes')}

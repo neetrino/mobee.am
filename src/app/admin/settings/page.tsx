@@ -1,12 +1,13 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 interface Settings {
   defaultCurrency?: string;
@@ -20,6 +21,7 @@ export default function SettingsPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<Settings>({
@@ -131,7 +133,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -143,8 +145,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath={pathname || '/admin/settings'} router={router} t={t}>
+      <div className="max-w-4xl">
         <div className="mb-8">
           <button
             onClick={() => router.push('/admin')}
@@ -168,7 +170,7 @@ export default function SettingsPage() {
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                 defaultValue={t('admin.settings.siteNamePlaceholder')}
               />
             </div>
@@ -177,7 +179,7 @@ export default function SettingsPage() {
                 {t('admin.settings.siteDescription')}
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                 rows={3}
                 defaultValue={t('admin.settings.siteDescriptionPlaceholder')}
               />
@@ -196,7 +198,7 @@ export default function SettingsPage() {
               <select 
                 value={settings.defaultCurrency || 'AMD'}
                 onChange={(e) => setSettings({ ...settings, defaultCurrency: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
               >
                 <option value="AMD">{t('admin.settings.amd')}</option>
                 <option value="USD">{t('admin.settings.usd')}</option>
@@ -237,7 +239,7 @@ export default function SettingsPage() {
                       USD: parseFloat(e.target.value) || 1,
                     },
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   disabled
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.baseCurrency')}</p>
@@ -284,7 +286,7 @@ export default function SettingsPage() {
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   placeholder="400"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.rateToUSD')}</p>
@@ -331,7 +333,7 @@ export default function SettingsPage() {
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   placeholder="0.92"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.rateToUSD')}</p>
@@ -378,7 +380,7 @@ export default function SettingsPage() {
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   placeholder="90"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.rateToUSD')}</p>
@@ -425,7 +427,7 @@ export default function SettingsPage() {
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
                   placeholder="2.7"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('admin.settings.rateToUSD')}</p>
@@ -452,7 +454,7 @@ export default function SettingsPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </AdminPageShell>
   );
 }
 

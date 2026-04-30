@@ -7,32 +7,18 @@ import { formatPrice } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import { CompareIcon } from '../icons/CompareIcon';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
+import { WishlistHeartIcon } from '../icons/WishlistHeartIcon';
 import { ProductColors } from './ProductColors';
 import type { CurrencyCode } from '../../lib/currency';
+import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import type { ProductLabel } from '../ProductLabels';
-
-interface WishlistIconProps {
-  filled?: boolean;
-}
-
-const WishlistIcon = ({ filled = false }: WishlistIconProps) => (
-  <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path 
-      d="M10 17L8.55 15.7C4.4 12.2 2 10.1 2 7.5C2 5.4 3.4 4 5.5 4C6.8 4 8.1 4.6 9 5.5C9.9 4.6 11.2 4 12.5 4C14.6 4 16 5.4 16 7.5C16 10.1 13.6 12.2 9.45 15.7L10 17Z" 
-      stroke="currentColor" 
-      strokeWidth="1.8" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      fill={filled ? "currentColor" : "none"} 
-    />
-  </svg>
-);
 
 interface ProductCardListProps {
   product: {
     id: string;
     slug: string;
     title: string;
+    subtitle?: string | null;
     price: number;
     image: string | null;
     inStock: boolean;
@@ -70,21 +56,23 @@ export function ProductCardList({
   onAddToCart,
 }: ProductCardListProps) {
   const { t } = useTranslation();
+  const imageSrc = resolveProductCardImageSrc(product.image);
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 px-4 sm:px-6 py-4">
         {/* Product Image */}
         <Link
           href={`/products/${product.slug}`}
-          className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden self-start sm:self-center"
+          className="w-20 h-20 bg-white border border-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden self-start sm:self-center"
+          data-cart-fly-source
         >
-          {product.image && !imageError ? (
+          {!imageError ? (
             <Image
-              src={product.image}
+              src={imageSrc}
               alt={product.title}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="80px"
               unoptimized
               onError={onImageError}
@@ -101,12 +89,18 @@ export function ProductCardList({
         {/* Product Info */}
         <div className="flex-1 min-w-0 w-full sm:w-auto">
           <Link href={`/products/${product.slug}`} className="block">
-            <h3 className="text-lg sm:text-xl font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2">
-              {product.title}
-            </h3>
-            <p className="text-base sm:text-lg text-gray-500 mt-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400">
               {product.brand?.name || t('common.defaults.category')}
             </p>
+            <h3 className="text-lg sm:text-xl font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 mt-0.5">
+              {product.title}
+            </h3>
+            {product.subtitle ? (
+              <p className="flex items-center gap-2 text-[11px] text-gray-500 mt-1">
+                <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
+                <span className="line-clamp-2">{product.subtitle}</span>
+              </p>
+            ) : null}
           </Link>
           {/* Available Colors */}
           {product.colors && product.colors.length > 0 && (
@@ -121,26 +115,15 @@ export function ProductCardList({
           {/* Price */}
           <div className="flex flex-col">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xl sm:text-2xl font-semibold text-blue-600">
+              <span className="whitespace-nowrap text-[1.1875rem] font-semibold text-blue-600 sm:text-[1.425rem]">
                 {formatPrice(product.price || 0, currency)}
               </span>
               {product.discountPercent && product.discountPercent > 0 ? (
-                <span className="text-xs sm:text-sm font-semibold text-blue-600">
+                <span className="text-[0.7125rem] font-semibold text-blue-600 sm:text-[0.83125rem]">
                   -{product.discountPercent}%
                 </span>
               ) : null}
             </div>
-            {(product.originalPrice && product.originalPrice > product.price) || 
-             (product.compareAtPrice && product.compareAtPrice > product.price) ? (
-              <span className="text-base sm:text-lg text-gray-500 line-through mt-0.5">
-                {formatPrice(
-                  (product.originalPrice && product.originalPrice > product.price) 
-                    ? product.originalPrice 
-                    : (product.compareAtPrice || 0), 
-                  currency
-                )}
-              </span>
-            ) : null}
           </div>
 
           {/* Action Buttons */}
@@ -170,7 +153,7 @@ export function ProductCardList({
               title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
               aria-label={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
             >
-              <WishlistIcon filled={isInWishlist} />
+              <WishlistHeartIcon filled={isInWishlist} />
             </button>
 
             {/* Cart Icon */}

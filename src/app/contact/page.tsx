@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Input } from '@shop/ui';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
 import { apiClient } from '../../lib/api-client';
@@ -90,7 +90,10 @@ export default function ContactPage() {
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.callToUs.title')}</h3>
               </div>
               <p className="text-gray-600 mb-2">{t('contact.callToUs.description')}</p>
-              <a href={`tel:${t('contact.phone')}`} className="text-orange-500 hover:text-orange-600 font-medium">
+              <a
+                href={`tel:${t('contact.phone')}`}
+                className="font-medium text-[#2DB2FF] hover:text-[#2DB2FF] hover:underline"
+              >
                 {t('contact.phone')}
               </a>
             </div>
@@ -104,7 +107,10 @@ export default function ContactPage() {
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.writeToUs.title')}</h3>
               </div>
               <p className="text-gray-600 mb-2">{t('contact.writeToUs.description')}</p>
-              <a href={`mailto:${t('contact.email')}`} className="text-orange-500 hover:text-orange-600 font-medium">
+              <a
+                href={`mailto:${t('contact.email')}`}
+                className="font-medium text-[#2DB2FF] hover:text-[#2DB2FF] hover:underline"
+              >
                 {t('contact.writeToUs.emailLabel')} {t('contact.email')}
               </a>
             </div>
@@ -121,7 +127,7 @@ export default function ContactPage() {
                 <p>{t('contact.headquarter.hours.weekdays')}</p>
                 <p>{t('contact.headquarter.hours.saturday')}</p>
               </div>
-              <p className="text-orange-500 hover:text-orange-600 font-medium">
+              <p className="font-medium text-[#2DB2FF]">
                 {t('contact.address')}
               </p>
             </div>
@@ -192,7 +198,7 @@ export default function ContactPage() {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full bg-gray-900 text-white hover:bg-gray-800 rounded-md py-3 font-semibold uppercase tracking-wide"
+                className="w-full !bg-[#2DB2FF] text-white hover:!bg-[#25A0E0] rounded-md py-3 font-semibold uppercase tracking-wide focus:!ring-[#2DB2FF]"
                 disabled={submitting}
               >
                 {submitting ? (t('contact.form.submitting') || 'Ուղարկվում է...') : t('contact.form.submit')}
@@ -200,20 +206,6 @@ export default function ContactPage() {
             </form>
           </div>
         </div>
-      </div>
-
-      {/* Bottom Section: Map */}
-      <div className="w-full h-[500px] bg-gray-100">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3048.1234567890123!2d44.5150!3d40.1812!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x406aa2dab8fc8b5b%3A0x3d1479ab4e9b8c5e!2sAbovyan%20St%2C%20Yerevan%2C%20Armenia!5e0!3m2!1sen!2sam!4v1234567890123!5m2!1sen!2sam"
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="w-full h-full"
-        />
       </div>
     </div>
   );

@@ -6,10 +6,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
+import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
+import { EmptyWishlist } from './empty-wishlist';
 
 interface Product {
   id: string;
@@ -195,6 +198,11 @@ export default function WishlistPage() {
 
       // Trigger cart update event
       window.dispatchEvent(new Event('cart-updated'));
+      const flySource = document.querySelector<HTMLElement>(
+        `[data-wishlist-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
+      );
+      const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+      dispatchCartFlyAnimation(flyUrl, flySource);
     } catch (error: any) {
       console.error('Error adding to cart:', error);
       if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
@@ -264,12 +272,14 @@ export default function WishlistPage() {
               <div
                 key={product.id}
                 className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-6 hover:bg-gray-50 transition-colors"
+                data-wishlist-product-id={product.id}
               >
                 {/* Product Name */}
                 <div className="md:col-span-5 flex items-center gap-4">
                   <Link
                     href={`/products/${product.slug}`}
                     className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden"
+                    data-cart-fly-source
                   >
                     {product.image ? (
                       <Image
@@ -304,16 +314,6 @@ export default function WishlistPage() {
                     <span className="text-base font-semibold text-blue-600">
                       {formatPrice(product.price, currency)}
                     </span>
-                    {(product.originalPrice && product.originalPrice > product.price) && (
-                      <span className="text-sm text-gray-500 line-through">
-                        {formatPrice(product.originalPrice, currency)}
-                      </span>
-                    )}
-                    {!product.originalPrice && product.compareAtPrice && product.compareAtPrice > product.price && (
-                      <span className="text-sm text-gray-500 line-through">
-                        {formatPrice(product.compareAtPrice, currency)}
-                      </span>
-                    )}
                   </div>
                 </div>
 
@@ -359,34 +359,7 @@ export default function WishlistPage() {
         </div>
         </>
       ) : (
-        <div className="text-center py-16">
-          <div className="max-w-md mx-auto">
-            <svg
-              className="mx-auto h-24 w-24 text-gray-400 mb-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {t('common.wishlist.empty')}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {t('common.wishlist.emptyDescription')}
-            </p>
-            <Link href="/products">
-              <Button variant="primary" size="lg">
-                {t('common.buttons.browseProducts')}
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <EmptyWishlist t={t} />
       )}
     </div>
   );

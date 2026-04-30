@@ -5,6 +5,9 @@
   "shippingAddress": "Адрес доставки",
   "paymentMethod": "Способ оплаты",
   "orderSummary": "Итоги заказа",
+  "promoCode": {
+    "title": "Промокод"
+  },
   "form": {
     "firstName": "Имя",
     "lastName": "Фамилия",
@@ -17,7 +20,8 @@
     "cardNumber": "Номер карты",
     "expiryDate": "Срок действия",
     "cvv": "CVV",
-    "cardHolderName": "Имя держателя карты"
+    "cardHolderName": "Имя держателя карты",
+    "promoCode": "Промокод"
   },
   "placeholders": {
     "phone": "+374XXXXXXXX",
@@ -27,7 +31,8 @@
     "cardNumber": "1234 5678 9012 3456",
     "expiryDate": "ММ/ГГ",
     "cvv": "123",
-    "cardHolderName": "Иван Иванов"
+    "cardHolderName": "Иван Иванов",
+    "promoCode": "Введите промокод"
   },
   "shipping": {
     "storePickup": "Самовывоз",
@@ -94,7 +99,9 @@
     "fillShippingAddress": "Пожалуйста, заполните все поля адреса доставки",
     "cartEmpty": "Корзина пуста",
     "failedToLoadCart": "Не удалось загрузить корзину",
-    "failedToCreateOrder": "Не удалось создать заказ. Пожалуйста, попробуйте снова."
+    "failedToCreateOrder": "Не удалось создать заказ. Пожалуйста, попробуйте снова.",
+    "invalidPromoCode": "Промокод может содержать только буквы, цифры, нижнее подчеркивание и дефис",
+    "promoCodeTooLong": "Промокод слишком длинный"
   }
 }
 

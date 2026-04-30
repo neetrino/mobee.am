@@ -3,7 +3,7 @@
  */
 
 import type { ChangeEvent } from 'react';
-import type { Brand, Category, Attribute, GeneratedVariant } from '../types';
+import type { Category, GeneratedVariant } from '../types';
 import { generateSlug } from '../utils/productUtils';
 
 interface UseProductFormCallbacksProps {
@@ -29,12 +29,12 @@ export function useProductFormCallbacks({
   categories,
   selectedAttributesForVariants,
   selectedAttributeValueIds,
-  generatedVariants,
+  generatedVariants: _generatedVariants,
   setFormData,
   setSelectedAttributesForVariants,
   setSelectedAttributeValueIds,
   setGeneratedVariants,
-  setSimpleProductData,
+  setSimpleProductData: _setSimpleProductData,
   checkIsClothingCategory,
 }: UseProductFormCallbacksProps) {
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {

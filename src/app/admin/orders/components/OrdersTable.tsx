@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
@@ -13,6 +13,7 @@ interface OrdersTableProps {
   selectedIds: Set<string>;
   updatingStatuses: Set<string>;
   updatingPaymentStatuses: Set<string>;
+  updatingFulfillmentStatuses: Set<string>;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
   page: number;
@@ -23,6 +24,7 @@ interface OrdersTableProps {
   onViewDetails: (orderId: string) => void;
   onStatusChange: (orderId: string, newStatus: string) => void;
   onPaymentStatusChange: (orderId: string, newPaymentStatus: string) => void;
+  onFulfillmentStatusChange: (orderId: string, newFulfillmentStatus: string) => void;
   onPageChange: (newPage: number) => void;
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
 }
@@ -33,6 +35,7 @@ export function OrdersTable({
   selectedIds,
   updatingStatuses,
   updatingPaymentStatuses,
+  updatingFulfillmentStatuses,
   sortBy,
   sortOrder,
   page,
@@ -43,6 +46,7 @@ export function OrdersTable({
   onViewDetails,
   onStatusChange,
   onPaymentStatusChange,
+  onFulfillmentStatusChange,
   onPageChange,
   formatCurrency,
 }: OrdersTableProps) {
@@ -52,7 +56,7 @@ export function OrdersTable({
     return (
       <Card className="p-6">
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.orders.loadingOrders')}</p>
         </div>
       </Card>
@@ -70,12 +74,12 @@ export function OrdersTable({
   }
 
   return (
-    <Card className="p-6">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+    <Card className="p-3 sm:p-4 lg:p-5">
+      <div className="w-full">
+        <table className="w-full table-fixed divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3">
+              <th className="w-10 px-2 py-3 sm:px-3">
                 <input
                   type="checkbox"
                   aria-label={t('admin.orders.selectAllOrders')}
@@ -83,28 +87,28 @@ export function OrdersTable({
                   onChange={onToggleSelectAll}
                 />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[11%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.orderNumber')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[18%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.customer')}
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                className="w-[12%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"
                 onClick={() => onSort('total')}
               >
                 <div className="flex items-center gap-1">
                   {t('admin.orders.total')}
                   <div className="flex flex-col">
                     <svg
-                      className={`w-3 h-3 ${sortBy === 'total' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-400'}`}
+                      className={`w-3 h-3 ${sortBy === 'total' && sortOrder === 'asc' ? 'text-admin-600' : 'text-gray-400'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
                       <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                     </svg>
                     <svg
-                      className={`w-3 h-3 -mt-1 ${sortBy === 'total' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-400'}`}
+                      className={`w-3 h-3 -mt-1 ${sortBy === 'total' && sortOrder === 'desc' ? 'text-admin-600' : 'text-gray-400'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -113,31 +117,34 @@ export function OrdersTable({
                   </div>
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[7%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.items')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.status')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.payment')}
               </th>
+              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
+                {t('admin.orders.fulfillment')}
+              </th>
               <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                className="w-[10%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"
                 onClick={() => onSort('createdAt')}
               >
                 <div className="flex items-center gap-1">
                   {t('admin.orders.date')}
                   <div className="flex flex-col">
                     <svg
-                      className={`w-3 h-3 ${sortBy === 'createdAt' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-400'}`}
+                      className={`w-3 h-3 ${sortBy === 'createdAt' && sortOrder === 'asc' ? 'text-admin-600' : 'text-gray-400'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
                       <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                     </svg>
                     <svg
-                      className={`w-3 h-3 -mt-1 ${sortBy === 'createdAt' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-400'}`}
+                      className={`w-3 h-3 -mt-1 ${sortBy === 'createdAt' && sortOrder === 'desc' ? 'text-admin-600' : 'text-gray-400'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -156,10 +163,14 @@ export function OrdersTable({
                 selected={selectedIds.has(order.id)}
                 updatingStatus={updatingStatuses.has(order.id)}
                 updatingPaymentStatus={updatingPaymentStatuses.has(order.id)}
+                updatingFulfillmentStatus={updatingFulfillmentStatuses.has(order.id)}
                 onToggleSelect={() => onToggleSelect(order.id)}
                 onViewDetails={() => onViewDetails(order.id)}
                 onStatusChange={(newStatus) => onStatusChange(order.id, newStatus)}
                 onPaymentStatusChange={(newPaymentStatus) => onPaymentStatusChange(order.id, newPaymentStatus)}
+                onFulfillmentStatusChange={(newFulfillmentStatus) =>
+                  onFulfillmentStatusChange(order.id, newFulfillmentStatus)
+                }
                 formatCurrency={formatCurrency}
               />
             ))}

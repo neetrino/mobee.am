@@ -1,165 +1,189 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Montserrat, Noto_Sans_Armenian } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
+import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
-const heroImages = [
-  'https://images.pexels.com/photos/67102/pexels-photo-67102.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  'https://images.pexels.com/photos/266688/pexels-photo-266688.jpeg',
-  'https://images.pexels.com/photos/3217852/pexels-photo-3217852.jpeg',
-];
+const montserrat = Montserrat({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+});
 
-export function HeroCarousel() {
-  const router = useRouter();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const { t } = useTranslation();
+const notoArmenian = Noto_Sans_Armenian({
+  subsets: ['armenian'],
+  weight: ['400', '700', '900'],
+  display: 'swap',
+});
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 5000); // Change image every 5 seconds
+const IMG_AIRPODS = '/images/hero/airpods-max.png';
+const IMG_IPHONE = '/images/hero/iphone.png';
 
-    return () => clearInterval(interval);
-  }, []); // Auto-advance every 5 seconds
+function CtaArrowIcon() {
+  return (
+    <svg
+      width={15}
+      height={15}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="text-[#1e1e1e]"
+      aria-hidden
+    >
+      <path
+        d="M5 12h14M13 6l6 6-6 6"
+        stroke="currentColor"
+        strokeWidth={2.2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? heroImages.length - 1 : prevIndex - 1
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const handleShopNow = () => {
-    router.push('/products');
-  };
-
-  const handleBrowseCategories = () => {
-    router.push('/products');
-  };
+function MobileHeroIphoneBanner() {
+  const { t, lang } = useTranslation();
+  const titleClass = lang === 'hy' ? notoArmenian.className : montserrat.className;
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent z-10" />
-      
-      {/* Images */}
-      <div className="relative w-full h-full">
-        {heroImages.map((image, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
+    <div
+      className={`pb-2 pt-[calc(theme(spacing.4)*1.05+4px)] lg:hidden ${montserrat.className}`}
+    >
+      <div className={SITE_CONTENT_GUTTERS_CLASS}>
+        <div className="relative isolate min-h-[168px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-2 pt-4">
+          <div className="relative z-10 flex max-w-[55%] flex-col items-start gap-2">
+            <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-normal leading-normal text-[#14ae5c]">
+              {t('home.hero_free_shipping')}
+            </span>
+            <p
+              className={`${titleClass} text-[clamp(1.5rem,7vw,2rem)] font-bold leading-tight tracking-tight text-black`}
+            >
+              {t('home.hero_iphone_title')}
+            </p>
+          </div>
+          <div className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[min(52%,140px)] w-[min(58%,220px)] min-h-[118px] min-w-[160px] max-w-[220px]">
             <Image
-              src={image}
-              alt={`Hero image ${index + 1}`}
+              src={IMG_IPHONE}
+              alt=""
               fill
-              className="object-cover"
-              priority={index === 0}
-              unoptimized
+              className="object-contain object-right-bottom"
+              sizes="220px"
+              priority
             />
           </div>
-        ))}
-      </div>
-
-      {/* Overlay Content - Text and Buttons */}
-      <div className="absolute inset-0 flex flex-col items-start justify-center z-20 px-4 sm:px-6 md:px-12 lg:px-20 xl:px-32 pointer-events-none">
-        <div className="text-left pointer-events-auto max-w-2xl">
-          {/* Background overlay for better text readability */}
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-8 md:p-10 lg:p-12 shadow-2xl border border-white/5">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              {t('home.hero_title')}
-            </h1>
-            <p className="text-lg md:text-xl lg:text-2xl text-gray-700 mb-8 leading-relaxed">
-              {t('home.hero_subtitle')}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                onClick={handleShopNow}
-                className="px-10 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                {t('home.hero_button_products')}
-              </button>
-              <button
-                onClick={handleBrowseCategories}
-                className="px-10 py-4 bg-white text-gray-900 border-2 border-gray-900 rounded-lg hover:bg-gray-50 transition-all font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                {t('home.hero_button_view_more')}
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
-
-      {/* Navigation Arrows */}
-      <button
-        onClick={goToPrevious}
-        className="absolute left-6 md:left-8 top-1/2 transform -translate-y-1/2 bg-white/50 hover:bg-white/70 text-gray-900 p-2 md:p-3 rounded-full shadow-lg transition-all z-30 cursor-pointer hover:scale-110"
-        aria-label="Previous image"
-      >
-        <svg
-          className="w-4 h-4 md:w-6 md:h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2.5}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </button>
-
-      <button
-        onClick={goToNext}
-        className="absolute right-6 md:right-8 top-1/2 transform -translate-y-1/2 bg-white/50 hover:bg-white/70 text-gray-900 p-2 md:p-3 rounded-full shadow-lg transition-all z-30 cursor-pointer hover:scale-110"
-        aria-label="Next image"
-      >
-        <svg
-          className="w-4 h-4 md:w-6 md:h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2.5}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </button>
-
-      {/* Dots Indicator */}
-      <div className="absolute bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-30">
-        {heroImages.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              index === currentIndex
-                ? 'bg-white w-10'
-                : 'bg-white/50 hover:bg-white/75 w-2'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
       </div>
     </div>
   );
 }
 
+export function HeroCarousel() {
+  const { t, lang } = useTranslation();
+  const headlineClass = lang === 'hy' ? notoArmenian.className : montserrat.className;
+
+  return (
+    <section className={`bg-white ${montserrat.className}`}>
+      <MobileHeroIphoneBanner />
+
+      <div className={`hidden lg:block ${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-[calc(theme(spacing.8)*4)]`}>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:gap-5">
+          <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px]">
+            <div className="absolute inset-0 z-0 rounded-[40px] bg-[#e9ecf0]" aria-hidden />
+            <div className="absolute right-4 top-4 z-30 sm:right-8 sm:top-8 md:right-10 md:top-10">
+              <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[12px] font-normal leading-normal text-[#14ae5c]">
+                {t('home.hero_free_shipping')}
+              </span>
+            </div>
+
+            <div className="relative z-20 flex h-full min-h-[inherit] flex-col px-6 pb-4 pt-12 sm:max-w-[min(52%,20rem)] sm:px-10 sm:pb-10 sm:pt-14 md:max-w-[55%] md:px-[54px] md:pb-8">
+              <h2
+                id="hero-promo-heading"
+                className={`${headlineClass} text-[clamp(2.75rem,8vw,5.125rem)] font-black leading-none tracking-tight text-black`}
+              >
+                {t('home.hero_promo_headline')}
+              </h2>
+              <p className="mt-6 max-w-[207px] text-[14px] font-normal leading-5 text-black sm:max-w-none">
+                <span className="block">{t('home.hero_promo_body_line1')}</span>
+                <span className="block">{t('home.hero_promo_body_line2')}</span>
+              </p>
+              <div className="mt-8 md:mt-10">
+                <Link
+                  href="/products"
+                  className="inline-flex h-12 min-w-[159px] items-center justify-between gap-2 rounded-full bg-[#1e1e1e] pl-5 pr-1.5 transition-opacity hover:opacity-90"
+                >
+                  <span className="flex-1 text-right text-[12px] font-medium leading-none text-[#2db2ff]">
+                    {t('home.hero_cta_more')}
+                  </span>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2db2ff]">
+                    <CtaArrowIcon />
+                  </span>
+                </Link>
+              </div>
+            </div>
+
+            <div className="pointer-events-none relative z-10 mx-auto mt-2 h-[214px] w-full max-w-[287px] -translate-x-1/2 -translate-y-[40%] sm:absolute sm:bottom-0 sm:right-0 sm:mx-0 sm:mt-0 sm:h-[369px] sm:w-[280px] sm:max-w-none sm:-translate-x-[47%] sm:-translate-y-[20.5px]">
+              <Image
+                src={IMG_AIRPODS}
+                alt=""
+                fill
+                className="object-contain object-center sm:object-right-bottom"
+                sizes="(max-width: 640px) 287px, 280px"
+                priority
+              />
+            </div>
+          </div>
+
+          <div className="flex w-full min-w-0 shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:justify-between lg:gap-0">
+            <div className="flex min-w-0 flex-col gap-4 overflow-hidden rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8 lg:h-[178px] lg:w-full lg:shrink-0 lg:gap-2 lg:px-12 lg:py-6">
+              <p className="w-full min-w-0 max-w-full break-words text-[12px] font-normal leading-4 text-[#111]">
+                <span className="block">{t('home.hero_chat_line1')}</span>
+                <span>
+                  <span className="font-extrabold">{t('home.hero_chat_bold')}</span>
+                  {t('home.hero_chat_line2')}
+                </span>
+              </p>
+              <div
+                className={
+                  lang === 'ru'
+                    ? `${headlineClass} flex w-full min-w-0 flex-nowrap items-baseline gap-x-1.5 whitespace-nowrap text-[clamp(1.875rem,6.25vw,3rem)] font-black leading-none lg:text-[clamp(1.75rem,4vw,2.75rem)]`
+                    : `${headlineClass} flex w-full min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-[clamp(2.5rem,10vw,3.875rem)] font-black leading-none [overflow-wrap:anywhere] lg:flex-nowrap lg:text-[clamp(2rem,4vw,3rem)]`
+                }
+              >
+                <span className={lang === 'ru' ? 'shrink-0 text-black' : 'min-w-0 break-words text-black'}>
+                  {t('home.hero_promo_headline')}
+                </span>
+                <span
+                  className={`min-w-0 shrink-0 text-[#ff490d] ${lang === 'ru' ? '-translate-y-[0.14em]' : ''}`}
+                >
+                  {t('home.hero_discount_percent')}
+                </span>
+              </div>
+            </div>
+
+            <div className="relative min-h-[160px] overflow-hidden rounded-[40px] bg-[#e9ecf0]">
+              <div className="relative z-10 flex h-full flex-col px-6 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-5">
+                <span className="inline-flex w-fit items-center rounded-full bg-white px-1.5 py-0.5 text-[12px] font-normal leading-normal text-[#14ae5c]">
+                  {t('home.hero_free_shipping')}
+                </span>
+                <p className="mt-3 max-w-[137px] text-[22px] font-bold leading-none text-black">
+                  {t('home.hero_iphone_title')}
+                </p>
+              </div>
+              <div className="absolute bottom-0 right-0 h-[132px] w-[215px] overflow-hidden rounded-bl-[14px] rounded-br-[38px] rounded-tl-[14px] rounded-tr-[14px] sm:h-[131px]">
+                <Image
+                  src={IMG_IPHONE}
+                  alt=""
+                  fill
+                  className="object-cover object-right-bottom"
+                  sizes="215px"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

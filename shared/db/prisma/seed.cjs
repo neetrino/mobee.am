@@ -144,9 +144,12 @@ async function seedProducts(categoryIds, brandIds) {
     "Scarf", "Mouse Pad", "Rug", "Foam Roller", "Essay Collection",
     "Socks Pack", "Monitor Stand", "Vase", "Pull-Up Bar", "Biography",
     "Gloves", "Cable Organizer", "Cushion", "Running Belt", "Art Book",
+    "Travel Adapter", "Laptop Sleeve", "Action Camera", "Tripod Stand", "Power Bank",
+    "Wireless Charger", "Gaming Mouse", "Mechanical Keyboard", "Desk Mat", "Noise Cancelling Headphones",
+    "Portable SSD", "Smart Home Plug", "Air Purifier Filter", "Fitness Tracker Band", "Photo Frame",
   ];
   const created = [];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 70; i++) {
     const title = titles[i] || `Product ${i + 1}`;
     const slug = `seed-${slugify(title)}-${i + 1}`;
     const catIndex = i % categoryIds.length;

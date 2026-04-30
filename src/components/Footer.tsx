@@ -2,208 +2,150 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
+import { FooterLegalBar } from './FooterLegalBar';
+import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { useFooterCategoryHrefs } from './useFooterCategoryHrefs';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  display: 'swap',
+});
+
+const linkMuted =
+  'block pb-[1.5px] pt-[5.5px] text-[16px] font-bold uppercase tracking-[0.55px] text-[#a1a1aa] transition-colors hover:text-gray-700';
+
+const headingClass =
+  'text-[16px] font-bold uppercase tracking-[0.55px] text-black leading-[16.5px]';
+
+function SocialLink({ href, label }: { href: string; label: string }) {
+  if (!href) {
+    return <span className={linkMuted}>{label}</span>;
+  }
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={linkMuted}
+    >
+      {label}
+    </a>
+  );
+}
 
 export function Footer() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
+  const categoryHrefs = useFooterCategoryHrefs();
+  const isArmenian = lang === 'hy';
+
+  const addressText = t('contact.address');
+  const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressText)}`;
+
+  const social = {
+    instagram: t('contact.social.instagram'),
+    facebook: t('contact.social.facebook'),
+    telegram: t('contact.social.telegram'),
+    whatsapp: t('contact.social.whatsapp'),
+  };
+
+  const sectionWrapperClass = isArmenian
+    ? `${SITE_CONTENT_GUTTERS_CLASS} py-10 md:py-14 xl:py-20`
+    : 'mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20';
+
+  const sectionGridClass = isArmenian
+    ? 'grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-12 xl:grid-cols-[minmax(320px,427px)_1fr_repeat(3,minmax(120px,160px))] xl:gap-x-8 xl:gap-y-0'
+    : 'grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-4 lg:gap-8';
+
+  const rightColumnShiftClass = isArmenian ? 'xl:-translate-x-[15%]' : '';
+  const rightColumnPaddingClass = isArmenian ? 'xl:pr-[5%]' : '';
+  const productsColumnPaddingClass = isArmenian ? 'xl:pr-[15%]' : '';
 
   return (
-    <footer className="bg-black border-t border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company */}
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">{t('common.footer.shop')}</h3>
-            <p className="text-sm text-gray-300">
-              {t('common.footer.description')}
-            </p>
+    <footer
+      className={`${montserrat.className} hidden lg:block ${isArmenian ? 'bg-[#f3f4f6]' : 'border-t border-gray-200 bg-white'}`}
+    >
+      <div className={sectionWrapperClass}>
+        <div className={sectionGridClass}>
+          {/* Visit us */}
+          <div className="flex flex-col gap-6 xl:col-start-1">
+            <h2 className={headingClass}>{t('common.footer.visitUs')}</h2>
+            <Link
+              href={mapsHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative block h-[120px] w-full overflow-hidden rounded-xl bg-[#e2e8f0]"
+              aria-label={t('common.footer.openInMaps')}
+            >
+              <Image
+                src="/images/footer/visit-map.png"
+                alt=""
+                fill
+                className={`object-cover object-center ${isArmenian ? 'grayscale opacity-50' : ''}`}
+                sizes="(max-width: 768px) 100vw, 25vw"
+              />
+              {isArmenian ? <div aria-hidden="true" className="absolute inset-0 bg-white mix-blend-saturation" /> : null}
+            </Link>
+            <div className="text-[16px] leading-6 text-[#64748b] whitespace-pre-line">{addressText}</div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-4">
-              {t('common.footer.quickLinks')}
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/products"
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('common.navigation.products')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about"
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('common.navigation.about')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('common.navigation.contact')}
-                </Link>
-              </li>
-            </ul>
+          {/* Products */}
+          <div className={`flex flex-col gap-6 xl:col-start-3 ${rightColumnShiftClass} ${productsColumnPaddingClass}`}>
+            <h2 className={headingClass}>{t('common.footer.productsHeading')}</h2>
+            <nav className="flex flex-col gap-4" aria-label={t('common.footer.productsHeading')}>
+              <Link href={categoryHrefs.phones} className={linkMuted}>
+                {t('common.mainHeader.phonesLink')}
+              </Link>
+              <Link href={categoryHrefs.computers} className={linkMuted}>
+                {t('common.mainHeader.computersLink')}
+              </Link>
+              <Link href={categoryHrefs.tablets} className={linkMuted}>
+                {t('common.mainHeader.tabletsLink')}
+              </Link>
+              <Link href={categoryHrefs.watches} className={linkMuted}>
+                {t('common.mainHeader.watchesLink')}
+              </Link>
+              <Link href={categoryHrefs.accessories} className={linkMuted}>
+                {t('common.mainHeader.accessoriesLink')}
+              </Link>
+            </nav>
           </div>
 
-          {/* Legal */}
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-4">{t('common.footer.legal')}</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('common.footer.privacyPolicy')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('common.footer.termsOfService')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/cookies"
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('common.footer.cookiePolicy')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/refund-policy"
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('common.footer.refundPolicy')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/delivery-terms"
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('common.footer.deliveryTerms')}
-                </Link>
-              </li>
-            </ul>
+          {/* Sections */}
+          <div className={`flex flex-col gap-6 xl:col-start-4 ${rightColumnShiftClass} ${rightColumnPaddingClass}`}>
+            <h2 className={headingClass}>{t('common.footer.sectionsHeading')}</h2>
+            <nav className="flex flex-col gap-4" aria-label={t('common.footer.sectionsHeading')}>
+              <Link href="/shop" className={linkMuted}>
+                {t('common.footer.shop')}
+              </Link>
+              <Link href="/about" className={linkMuted}>
+                {t('common.navigation.about')}
+              </Link>
+              <Link href="/contact" className={linkMuted}>
+                {t('common.navigation.contact')}
+              </Link>
+              <Link href="/faq" className={linkMuted}>
+                {t('common.navigation.faq')}
+              </Link>
+            </nav>
           </div>
 
-          {/* Contact Info */}
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-4">{t('common.footer.contactInfo')}</h4>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-2">
-                <svg
-                  className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                <span className="text-sm text-gray-300">{t('contact.address')}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-gray-400 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  />
-                </svg>
-                <a
-                  href={`tel:${t('contact.phone')}`}
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('contact.phone')}
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-gray-400 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                <a
-                  href={`mailto:${t('contact.email')}`}
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {t('contact.email')}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Bottom */}
-        <div className="mt-8 pt-8 border-t border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-300">
-              {t('common.footer.copyright').replace('{year}', new Date().getFullYear().toString())}
-            </p>
-            
-            {/* Payment Methods */}
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-400 mr-2">{t('common.footer.paymentMethods')}</span>
-              <div className="flex items-center gap-3">
-                <Image
-                  src="https://static.tert.am/storage/files/tert/2020/04/27/idram_main_visual-770x_.png"
-                  alt="Idram"
-                  width={80}
-                  height={30}
-                  className="h-6 w-auto opacity-80 hover:opacity-100 transition-opacity"
-                  unoptimized
-                />
-                <Image
-                  src="https://finport.am/mcgallery/20190415121452.jpg"
-                  alt="ArCa"
-                  width={80}
-                  height={30}
-                  className="h-6 w-auto opacity-80 hover:opacity-100 transition-opacity"
-                  unoptimized
-                />
-              </div>
+          {/* Connect / social */}
+          <div className={`flex flex-col gap-6 xl:col-start-5 ${rightColumnShiftClass}`}>
+            <h2 className={headingClass}>{t('common.footer.connectHeading')}</h2>
+            <div className="flex flex-col gap-4">
+              <SocialLink href={social.instagram} label="Instagram" />
+              <SocialLink href={social.facebook} label="Facebook" />
+              <SocialLink href={social.telegram} label="Telegram" />
+              <SocialLink href={social.whatsapp} label="WhatsApp" />
             </div>
           </div>
         </div>
       </div>
+
+      <FooterLegalBar />
     </footer>
   );
 }
-

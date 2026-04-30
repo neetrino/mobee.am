@@ -3,24 +3,68 @@
   "hero_subtitle": "Откройте для себя удивительные товары и эксклюзивные предложения. Покупайте последние тренды и найдите все необходимое в одном месте.",
   "hero_button_products": "ТОВАРЫ",
   "hero_button_view_more": "УЗНАТЬ БОЛЬШЕ",
-  "features_title": "Мы предоставляем товары высокого качества",
-  "features_subtitle": "Клиент, который недоволен по причине, это проблема, клиент, который недоволен, хотя он или она не может",
-  "feature_fast_delivery_title": "Быстрая доставка",
-  "feature_fast_delivery_description": "Скорее всего, не было сотрудничества и контрольных точек, не было процесса.",
-  "feature_best_quality_title": "Лучшее качество",
-  "feature_best_quality_description": "Это стратегия контента, которая пошла не так с самого начала. Отказ от использования Lorem Ipsum.",
-  "feature_free_return_title": "Бесплатный возврат",
-  "feature_free_return_description": "Это правда, но этого недостаточно, чтобы вернуть все в нужное русло для текста.",
+  "hero_promo_headline": "СКИДКИ",
+  "hero_promo_body_line1": "Оцените революционный чип A17 Pro и",
+  "hero_promo_body_line2": "профессиональную камеру.",
+  "hero_free_shipping": "Бесплатная доставка",
+  "hero_cta_more": "Подробнее",
+  "hero_chat_line1": "Чат с",
+  "hero_chat_bold": "специалистом Apple",
+  "hero_chat_line2": " онлайн или в магазине.",
+  "hero_discount_percent": "50%",
+  "hero_iphone_title": "iPhone 17 Pro",
+  "featured_intro": {
+    "title": "Лучший выбор",
+    "subtitle": "Простой выбор среди лучшего",
+    "cta": "Ещё"
+  },
+  "special_offers_heading": {
+    "title": "Специальные предложения",
+    "subtitle": "Подобранная техника на особых условиях",
+    "cta": "Ещё",
+    "carouselAriaLabel": "Специальные предложения — проведите в сторону, чтобы увидеть ещё"
+  },
+  "why_choose_us_heading": {
+    "title": "Почему выбирают нас",
+    "subtitle": "Решения, удобные для повседневного использования",
+    "cta": "Ещё"
+  },
+  "why_choose_us_benefits": {
+    "warranty_title": "Гарантия",
+    "warranty_description": "Все товары поставляются с официальной гарантией.",
+    "delivery_title": "Быстрая доставка",
+    "delivery_description": "Доставка в день заказа или максимально быстро.",
+    "installment_title": "Рассрочка",
+    "installment_description": "Удобная оплата частями.",
+    "original_title": "Оригинальная техника",
+    "original_description": "Только оригинальная и проверенная техника."
+  },
+  "partner_logos": {
+    "heading": "Бренды",
+    "apple": "Apple",
+    "lg": "LG",
+    "samsung": "Samsung",
+    "xiaomi": "Xiaomi"
+  },
   "featured_products": {
     "title": "Рекомендуемые товары",
-    "subtitle": "Три быстрых выбора: Новинки, Бестселлеры и Рекомендуемые товары",
-    "tab_new": "НОВИНКИ",
-    "tab_bestseller": "БЕСТСЕЛЛЕРЫ",
-    "tab_featured": "РЕКОМЕНДУЕМЫЕ",
-    "ariaShowProducts": "Показать товары {label}",
+    "subtitle": "Подборка из нашего каталога",
     "errorLoading": "Не удалось загрузить товары",
     "tryAgain": "Попробовать снова",
-    "noProducts": "В этой категории нет товаров."
+    "noProducts": "В этой категории нет товаров.",
+    "carouselAriaLabel": "Рекомендуемые товары — проведите в сторону, чтобы увидеть ещё"
+  },
+  "mobile_home": {
+    "featuredSectionTitle": "Избранное",
+    "specialOffersSectionTitle": "Акции",
+    "discountLabel": "{{percent}}% скидка",
+    "categoryPill": {
+      "computers": "Mac",
+      "phones": "iPhone",
+      "tablets": "iPad",
+      "watches": "Watch",
+      "headphones": "AirPods"
+    }
   }
 }
 

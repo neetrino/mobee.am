@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '../../lib/api-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
+import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
+import type { CartFlyContext } from '../../lib/cart/cart-fly-animation.types';
+import { readGuestCart, upsertGuestCartItem } from '../../lib/cart/guest-cart';
 
 interface ProductDetails {
   id: string;
@@ -39,7 +42,13 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
   const { t } = useTranslation();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  const addToCart = async () => {
+  const triggerFly = (fly: CartFlyContext | undefined) => {
+    if (fly?.imageUrl && fly.flySourceEl) {
+      dispatchCartFlyAnimation(fly.imageUrl, fly.flySourceEl);
+    }
+  };
+
+  const addToCart = async (fly?: CartFlyContext) => {
     if (!inStock) {
       return;
     }
@@ -55,10 +64,6 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
     if (!isLoggedIn) {
       setIsAddingToCart(true);
       try {
-        const CART_KEY = 'shop_cart_guest';
-        const stored = localStorage.getItem(CART_KEY);
-        const cart: Array<{ productId: string; productSlug: string; variantId?: string; quantity: number; price?: number }> = stored ? JSON.parse(stored) : [];
-
         let variantId: string;
         let variantStock: number | undefined;
         let variantPrice: number | undefined = propPrice || undefined;
@@ -77,32 +82,22 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           if (!variantPrice) variantPrice = productDetails.variants[0].price;
         }
 
-        const existingItem = cart.find(item => item.productId === productId && item.variantId === variantId);
-        const currentQuantityInCart = existingItem?.quantity || 0;
-        const totalQuantity = currentQuantityInCart + 1;
+        const existingGuestItem = readGuestCart().find((item) => item.variantId === variantId);
+        const nextQuantity = (existingGuestItem?.quantity ?? 0) + 1;
 
-        if (variantStock !== undefined && totalQuantity > variantStock) {
+        if (variantStock !== undefined && nextQuantity > variantStock) {
           alert(t('common.alerts.noMoreStockAvailable'));
           setIsAddingToCart(false);
           return;
         }
-
-        if (existingItem) {
-          existingItem.quantity = totalQuantity;
-          if (!existingItem.productSlug) existingItem.productSlug = productSlug;
-          if (variantPrice) existingItem.price = variantPrice;
-        } else {
-          cart.push({
-            productId,
-            productSlug,
-            variantId,
-            quantity: 1,
-            price: variantPrice || 0,
-          });
-        }
-
-        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        upsertGuestCartItem({
+          productId,
+          productSlug,
+          variantId,
+          quantity: 1,
+        });
         window.dispatchEvent(new Event('cart-updated'));
+        triggerFly(fly);
       } catch (error: unknown) {
         console.error('❌ [PRODUCT CARD] Error adding to guest cart:', error);
         const err = error as { message?: string; status?: number };
@@ -153,6 +148,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
       window.dispatchEvent(new CustomEvent('cart-updated', {
         detail: response.cartSummary || null,
       }));
+      triggerFly(fly);
     } catch (error: unknown) {
       console.error('❌ [PRODUCT CARD] Error adding to cart:', error);
 

@@ -17,6 +17,8 @@ export interface SearchDropdownProps {
   onClose: () => void;
   onSeeAllClick?: () => void;
   className?: string;
+  /** Defaults to `search-results` — use a unique id when multiple dropdowns exist on the page. */
+  listboxId?: string;
 }
 
 export function SearchDropdown({
@@ -30,6 +32,7 @@ export function SearchDropdown({
   onClose,
   onSeeAllClick,
   className = '',
+  listboxId = 'search-results',
 }: SearchDropdownProps) {
   const { t } = useTranslation();
   const currency = getStoredCurrency();
@@ -41,7 +44,7 @@ export function SearchDropdown({
   return (
     <div
       role="listbox"
-      id="search-results"
+      id={listboxId}
       aria-label={t('common.ariaLabels.searchPlaceholder')}
       className={`absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-[60] max-h-[min(70vh,400px)] overflow-hidden flex flex-col ${className}`}
     >

@@ -1,10 +1,8 @@
 'use client';
 
-import { use } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
-import { getStoredCurrency } from '../../../lib/currency';
-import { t } from '../../../lib/i18n';
+import { t, getProductText } from '../../../lib/i18n';
+import { sanitizeHtml } from '../../../lib/utils/sanitize';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { RelatedProducts } from '../../../components/RelatedProducts';
 import { ProductReviews } from '../../../components/ProductReviews';
@@ -12,10 +10,16 @@ import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
 import { useProductPage } from './useProductPage';
 import type { ProductPageProps } from './types';
+import { dispatchCartFlyAnimation } from '@/lib/cart/dispatchCartFlyAnimation';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '@/lib/productCardDisplayImage';
+import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
 
 export default function ProductPage({ params }: ProductPageProps) {
-  const router = useRouter();
   const { isLoggedIn } = useAuth();
+
+  const scrollToProductDetails = () => {
+    document.getElementById('product-long-description')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   
   const {
     product,
@@ -45,8 +49,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     sizeGroups,
     currentVariant,
     price,
-    originalPrice,
-    compareAtPrice,
     discountPercent,
     maxQuantity,
     isOutOfStock,
@@ -70,19 +72,22 @@ export default function ProductPage({ params }: ProductPageProps) {
     setIsAddingToCart(true);
     try {
       if (!isLoggedIn) {
-        const stored = localStorage.getItem('shop_cart_guest');
-        const cart = stored ? JSON.parse(stored) : [];
-        const existing = cart.find((i: unknown): i is { variantId: string; quantity: number; productId?: string; productSlug?: string } => 
-          typeof i === 'object' && i !== null && 'variantId' in i && i.variantId === currentVariant.id
-        );
-        if (existing) existing.quantity += quantity;
-        else cart.push({ productId: product.id, productSlug: product.slug, variantId: currentVariant.id, quantity });
-        localStorage.setItem('shop_cart_guest', JSON.stringify(cart));
+        upsertGuestCartItem({
+          productId: product.id,
+          productSlug: product.slug,
+          variantId: currentVariant.id,
+          quantity,
+        });
       } else {
         await apiClient.post('/api/v1/cart/items', { productId: product.id, variantId: currentVariant.id, quantity });
       }
       setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
       window.dispatchEvent(new Event('cart-updated'));
+      const flyEl = document.querySelector<HTMLElement>('[data-pdp-cart-fly-source]');
+      const slideSrc = images[currentImageIndex];
+      const flyUrl =
+        typeof slideSrc === 'string' && slideSrc.length > 0 ? slideSrc : PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+      dispatchCartFlyAnimation(flyUrl, flyEl);
     } catch (err) { 
       setShowMessage(t(language, 'product.errorAddingToCart')); 
     } finally { 
@@ -116,8 +121,6 @@ export default function ProductPage({ params }: ProductPageProps) {
           <ProductInfoAndActions
             product={product}
             price={price}
-            originalPrice={originalPrice}
-            compareAtPrice={compareAtPrice}
             discountPercent={discountPercent}
             currency={currency}
             language={language}
@@ -134,7 +137,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             isInWishlist={isInWishlist}
             isInCompare={isInCompare}
             showMessage={showMessage}
-            isLoggedIn={isLoggedIn}
             currentVariant={currentVariant}
             attributeGroups={attributeGroups}
             selectedColor={selectedColor}
@@ -147,6 +149,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             onAddToWishlist={handleAddToWishlist}
             onCompareToggle={handleCompareToggle}
             onScrollToReviews={scrollToReviews}
+            onScrollToDetails={scrollToProductDetails}
             onColorSelect={handleColorSelect}
             onSizeSelect={handleSizeSelect}
             onAttributeValueSelect={handleAttributeValueSelect}
@@ -155,11 +158,26 @@ export default function ProductPage({ params }: ProductPageProps) {
           />
       </div>
 
+      <section
+        id="product-long-description"
+        className="mt-16 max-w-3xl scroll-mt-24 border-t border-gray-200 pt-12"
+      >
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">{t(language, 'product.description_title')}</h2>
+        <div
+          className="prose prose-sm max-w-none text-gray-600"
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(
+              getProductText(language, product.id, 'longDescription') || product.description || ''
+            ),
+          }}
+        />
+      </section>
+
       <div id="product-reviews" className="mt-24 scroll-mt-24">
         <ProductReviews productSlug={slug} productId={product.id} />
       </div>
       <div className="mt-16">
-        <RelatedProducts categorySlug={product.categories?.[0]?.slug} currentProductId={product.id} />
+        <RelatedProducts currentProductSlug={product.slug} />
       </div>
     </div>
   );

@@ -1,26 +1,50 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef, Suspense } from 'react';
-import type { FormEvent, ReactNode, CSSProperties } from 'react';
-import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, formatPrice, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
+import { Montserrat } from 'next/font/google';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
+import type { FormEvent, CSSProperties } from 'react';
+import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
-import { getStoredLanguage } from '../lib/language';
+import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
 import { useInstantSearch } from './hooks/useInstantSearch';
 import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
 import { apiClient } from '../lib/api-client';
 import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCounts';
-import { LanguageSwitcherHeader } from './LanguageSwitcherHeader';
-import { Instagram, Facebook, Linkedin } from 'lucide-react';
+import { LanguageSwitcherPill } from './LanguageSwitcherPill';
+import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
+import {
+  HEADER_STRIP_MIN_HEIGHT_LG,
+  HEADER_STRIP_PADDING_Y,
+  MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
+  MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
+  MOBILE_PRIMARY_MENU_BAR_CLASS,
+  MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
+  SITE_CONTENT_GUTTERS_CLASS,
+} from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
+import { HeaderSecondaryBar } from './HeaderSecondaryBar';
+import { useCategoriesTree } from './CategoriesTreeContext';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['500', '600', '800', '900'],
+  display: 'swap',
+});
+
+/** Right padding on pill so input clears the submit control (half-width overlap). */
+const MOBILE_HOME_SEARCH_PILL_RIGHT_PAD_CLASS = 'pr-28';
+/** Same height as pill (h-11); right edge flush with pill (absolute in wrapper). */
+const MOBILE_HOME_SEARCH_SUBMIT_CLASS =
+  'absolute right-0 top-1/2 z-10 flex h-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#2DB2FF] px-4 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-95 active:opacity-90';
 
 // Navigation links will be translated dynamically using useTranslation hook
 const primaryNavLinks = [
   { href: '/', translationKey: 'common.navigation.home' },
-  { href: '/products', translationKey: 'common.navigation.products' },
+  { href: '/shop', translationKey: 'common.navigation.products' },
   { href: '/about', translationKey: 'common.navigation.about' },
   { href: '/contact', translationKey: 'common.navigation.contact' },
 ];
@@ -31,10 +55,6 @@ interface Category {
   title: string;
   fullPath: string;
   children: Category[];
-}
-
-interface CategoriesResponse {
-  data: Category[];
 }
 
 // Icon Components
@@ -48,16 +68,6 @@ const ChevronDownIcon = () => (
 const ArrowRightIcon = () => (
   <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-auto">
     <path d="M3 2L5 4L3 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-/**
- * Profile icon for logged out state (outline style)
- */
-const ProfileIconOutline = () => (
-  <svg width="19" height="19" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="7" r="3.2" stroke="currentColor" strokeWidth="1.8" fill="none" />
-    <path d="M5 17C5 14.5 7.5 12.5 10 12.5C12.5 12.5 15 14.5 15 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 );
 
@@ -96,35 +106,39 @@ const SearchIcon = () => (
   </svg>
 );
 
-interface BadgeIconProps {
-  icon: ReactNode;
-  badge?: number;
-  className?: string;
-  iconClassName?: string;
-}
+/** Globe stroke in 24×24 viewBox at 22px render: 2 * (24/22). */
+const MOBILE_GLOBE_STROKE_USER_UNITS = (2 * 24) / 22;
 
-const BadgeIcon = ({ icon, badge = 0, className = '', iconClassName = '' }: BadgeIconProps) => (
-  <div className={`relative ${className}`}>
-    <div className={iconClassName}>
-      {icon}
-    </div>
-    {badge > 0 && (
-      <span className="
-      absolute 
-      -top-5 
-      -right-5 
-      bg-gradient-to-br from-red-500 to-red-600 
-      text-white text-[10px] font-bold 
-      rounded-full min-w-[20px] h-5 px-1.5 
-      flex items-center justify-center 
-      leading-none shadow-lg border-2 border-white 
-      animate-pulse
-    ">
-        {badge > 99 ? '99+' : badge}
-      </span>
-    )}
-  </div>
+/** Globe for mobile primary strip language control (inherits text color for strokes). */
+const GlobeLanguageIcon = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="shrink-0 text-black"
+    aria-hidden
+  >
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS} />
+    <path
+      d="M2 12h20"
+      stroke="currentColor"
+      strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS}
+      strokeLinecap="round"
+    />
+    <path
+      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+      stroke="currentColor"
+      strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS}
+    />
+  </svg>
 );
+
+const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
+
+const mobilePrimaryLangButtonClassName =
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
 
 /**
  * Component that syncs search params with state
@@ -272,7 +286,7 @@ function CategoryMenuItem({
       onMouseLeave={handleMouseLeave}
     >
       <Link
-        href={`/products?category=${category.slug}`}
+        href={`/shop?category=${category.slug}`}
         className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-all duration-150"
         onClick={onClose}
       >
@@ -310,7 +324,7 @@ function CategoryMenuItem({
                 <div key={columnIndex} className="flex flex-col">
                   <div className="mb-4 pb-2 border-b border-gray-200">
                     <Link
-                      href={`/products?category=${category.slug}`}
+                      href={`/shop?category=${category.slug}`}
                       className="text-sm font-bold text-gray-900 hover:text-gray-700 uppercase tracking-wide"
                       onClick={onClose}
                     >
@@ -321,7 +335,7 @@ function CategoryMenuItem({
                     {column.map((subCategory) => (
                       <Link
                         key={subCategory.id}
-                        href={`/products?category=${subCategory.slug}`}
+                        href={`/shop?category=${subCategory.slug}`}
                         className="block text-sm text-gray-700 hover:text-gray-900 transition-colors duration-150 py-1"
                         onClick={onClose}
                       >
@@ -339,33 +353,218 @@ function CategoryMenuItem({
   );
 }
 
+/** Root categories dropdown (desktop secondary bar). */
+function CategoriesMenuFlyout({
+  loading,
+  roots,
+  onItemNavigate,
+  loadingLabel,
+}: {
+  loading: boolean;
+  roots: Category[];
+  onItemNavigate: () => void;
+  loadingLabel: string;
+}) {
+  return (
+    <>
+      <div className="absolute left-0 top-full z-[55] h-2 w-full" aria-hidden />
+      <div className="absolute left-0 top-full z-[55] w-64 max-w-[min(16rem,calc(100vw-2rem))] pt-2">
+        <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
+          {loading ? (
+            <div className="px-4 py-2 text-sm text-gray-500">{loadingLabel}</div>
+          ) : (
+            roots.map((category) => (
+              <CategoryMenuItem
+                key={category.id}
+                category={category}
+                onClose={onItemNavigate}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+/** Figma mobee-new node 178:535 — support phone + language pill */
+function HeaderPhoneLangCluster({ phoneNumberVisibility }: { phoneNumberVisibility?: 'always' | 'smUp' }) {
+  const { t } = useTranslation();
+  const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
+  const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
+
+  const numberClass =
+    phoneNumberVisibility === 'smUp'
+      ? 'hidden truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151] sm:inline'
+      : 'truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151]';
+
+  return (
+    <div className="flex min-w-0 shrink-0 items-center gap-6 sm:gap-[50px]">
+      <a href={telHref} className="flex min-w-0 items-center gap-2" aria-label={t('common.header.supportPhoneAria')}>
+        <span className="relative size-6 shrink-0">
+          <img
+            src={HEADER_FIGMA_ASSETS.phoneIcon}
+            alt=""
+            width={24}
+            height={24}
+            className="absolute inset-0 block size-6 max-w-none"
+          />
+        </span>
+        <span className={numberClass}>{t('common.header.supportPhoneNumber')}</span>
+      </a>
+      <LanguageSwitcherPill />
+    </div>
+  );
+}
+
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { isLoggedIn, logout, isAdmin } = useAuth();
   const { t } = useTranslation();
   const [compareCount, setCompareCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
-  const [cartTotal, setCartTotal] = useState(0);
-  const [showCurrency, setShowCurrency] = useState(false);
+  const [, setCartTotal] = useState(0);
   const [showMobileCurrency, setShowMobileCurrency] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showProductsMenu, setShowProductsMenu] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { categories, loadingCategories } = useCategoriesTree();
   const [, setSelectedCategory] = useState<Category | null>(null);
-  const [loadingCategories, setLoadingCategories] = useState(false);
   const currentYear = new Date().getFullYear();
 
-  const currencyRef = useRef<HTMLDivElement>(null);
+  const isNavActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href === '/shop') return pathname.startsWith('/shop') || pathname.startsWith('/products');
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const navTextClass = (href: string) =>
+    isNavActive(href)
+      ? 'whitespace-nowrap text-[13px] font-black leading-5 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
+      : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
+
   const mobileCurrencyRef = useRef<HTMLDivElement>(null);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-  const productsMenuRef = useRef<HTMLDivElement>(null);
-  const productsMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
+  const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileStrip1Ref = useRef<HTMLDivElement>(null);
+  const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
+  const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
+  const mobilePrimaryLangRef = useRef<HTMLDivElement>(null);
+  const primaryStripRef = useRef<HTMLElement | null>(null);
+  const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
+  const [secondaryDocked, setSecondaryDocked] = useState(false);
+  const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
+  const [mobileSearchDocked, setMobileSearchDocked] = useState(false);
+  const [mobileSearchFlowSpacerPx, setMobileSearchFlowSpacerPx] = useState(0);
+  const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
+  const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
+
+  const syncSecondaryDock = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const mq = window.matchMedia('(min-width: 1024px)');
+    if (!mq.matches) {
+      setSecondaryDocked(false);
+      return;
+    }
+    const secondaryEl = secondaryBarOuterRef.current;
+    if (secondaryEl) {
+      const h = secondaryEl.offsetHeight;
+      if (h > 0) {
+        setSecondaryBarHeightPx(h);
+      }
+    }
+    const primaryEl = primaryStripRef.current;
+    if (!primaryEl) {
+      return;
+    }
+    setSecondaryDocked(primaryEl.getBoundingClientRect().bottom <= 0);
+  }, []);
+
+  const syncMobileSearchDock = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      setMobileSearchDocked(false);
+      setMobileSearchFlowSpacerPx(0);
+      return;
+    }
+    const strip1 = mobileStrip1Ref.current;
+    const searchWrap = mobileSearchWrapRef.current;
+    if (searchWrap) {
+      const h = Math.round(searchWrap.getBoundingClientRect().height);
+      if (h > 0) {
+        setMobileSearchFlowSpacerPx(h);
+      }
+    }
+    if (!strip1) {
+      return;
+    }
+    setMobileSearchDocked(strip1.getBoundingClientRect().bottom <= 0);
+  }, []);
+
+  useLayoutEffect(() => {
+    syncSecondaryDock();
+    const secondaryEl = secondaryBarOuterRef.current;
+    if (typeof ResizeObserver === 'undefined' || !secondaryEl) {
+      return;
+    }
+    const ro = new ResizeObserver(() => {
+      syncSecondaryDock();
+    });
+    ro.observe(secondaryEl);
+    return () => {
+      ro.disconnect();
+    };
+  }, [syncSecondaryDock]);
+
+  useLayoutEffect(() => {
+    syncMobileSearchDock();
+    const searchWrap = mobileSearchWrapRef.current;
+    if (typeof ResizeObserver === 'undefined' || !searchWrap) {
+      return;
+    }
+    const ro = new ResizeObserver(() => {
+      syncMobileSearchDock();
+    });
+    ro.observe(searchWrap);
+    return () => {
+      ro.disconnect();
+    };
+  }, [syncMobileSearchDock]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      syncSecondaryDock();
+      syncMobileSearchDock();
+    };
+    const onResize = () => {
+      syncSecondaryDock();
+      syncMobileSearchDock();
+    };
+    syncSecondaryDock();
+    syncMobileSearchDock();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const onMq = () => {
+      syncSecondaryDock();
+      syncMobileSearchDock();
+    };
+    mq.addEventListener('change', onMq);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      mq.removeEventListener('change', onMq);
+    };
+  }, [syncSecondaryDock, syncMobileSearchDock]);
 
   const {
     query: searchQuery,
@@ -384,6 +583,10 @@ export function Header() {
     maxResults: 6,
     lang: getStoredLanguage(),
   });
+
+  useLayoutEffect(() => {
+    syncMobileSearchDock();
+  }, [searchDropdownOpen, syncMobileSearchDock]);
 
   const fetchCart = async () => {
     if (!isLoggedIn) {
@@ -542,30 +745,6 @@ export function Header() {
 
   // Sync search input with URL params - handled by HeaderSearchSync component wrapped in Suspense
 
-  // Fetch categories (language is always 'en')
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      setLoadingCategories(true);
-      // Small delay to avoid simultaneous requests
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Language is always 'en'
-      const response = await apiClient.get<CategoriesResponse>('/api/v1/categories/tree', {
-        params: { lang: 'en' },
-      });
-      setCategories(response.data || []);
-    } catch (err: any) {
-      console.error('Error fetching categories:', err);
-      setCategories([]);
-    } finally {
-      setLoadingCategories(false);
-    }
-  };
-
   // Get only root categories (parent categories) for main dropdown
   // API already returns root categories in tree structure, so we just return them as-is
   const getRootCategories = (cats: Category[]): Category[] => {
@@ -577,17 +756,16 @@ export function Header() {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (currencyRef.current && !currencyRef.current.contains(event.target as Node)) {
-        setShowCurrency(false);
-      }
       if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(event.target as Node)) {
         setShowMobileCurrency(false);
       }
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setShowUserMenu(false);
+      if (mobilePrimaryLangRef.current && !mobilePrimaryLangRef.current.contains(event.target as Node)) {
+        setShowMobilePrimaryLangMenu(false);
       }
-      if (productsMenuRef.current && !productsMenuRef.current.contains(event.target as Node)) {
-        setShowProductsMenu(false);
+      const clickTarget = event.target as Node;
+      const inDesktopCategories = categoriesPillWrapRef.current?.contains(clickTarget);
+      if (!inDesktopCategories) {
+        setShowCategoriesPillMenu(false);
       }
       if (searchModalRef.current && !searchModalRef.current.contains(event.target as Node)) {
         setShowSearchModal(false);
@@ -598,6 +776,12 @@ export function Header() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, []);
+
+  useEffect(() => {
+    const openSearch = () => setShowSearchModal(true);
+    window.addEventListener('mobee:open-search', openSearch);
+    return () => window.removeEventListener('mobee:open-search', openSearch);
   }, []);
 
   useEffect(() => {
@@ -614,21 +798,19 @@ export function Header() {
     }
   }, [mobileMenuOpen]);
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (productsMenuTimeoutRef.current) {
-        clearTimeout(productsMenuTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Focus search input when modal opens; show dropdown if query present
+  // Focus search input when modal opens; sync dropdown with query. When modal is closed, do not
+  // force-close the dropdown so the desktop secondary search bar can keep showing results.
   useEffect(() => {
     if (showSearchModal && searchInputRef.current) {
       searchInputRef.current.focus();
       setSearchDropdownOpen(searchQuery.trim().length >= 1);
-    } else {
+      return;
+    }
+    if (showSearchModal) {
+      setSearchDropdownOpen(searchQuery.trim().length >= 1);
+      return;
+    }
+    if (searchQuery.trim().length < 1) {
       setSearchDropdownOpen(false);
     }
   }, [showSearchModal, searchQuery]);
@@ -644,6 +826,14 @@ export function Header() {
         setShowSearchModal(false);
       }
 
+      if (showCategoriesPillMenu) {
+        setShowCategoriesPillMenu(false);
+      }
+
+      if (showMobilePrimaryLangMenu) {
+        setShowMobilePrimaryLangMenu(false);
+      }
+
       if (mobileMenuOpen) {
         setMobileMenuOpen(false);
       }
@@ -653,7 +843,7 @@ export function Header() {
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [showSearchModal, mobileMenuOpen]);
+  }, [showSearchModal, mobileMenuOpen, showCategoriesPillMenu, showMobilePrimaryLangMenu]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -671,7 +861,7 @@ export function Header() {
     }
     clearSearch();
     const queryString = params.toString();
-    router.push(queryString ? `/products?${queryString}` : '/products');
+    router.push(queryString ? `/shop?${queryString}` : '/shop');
   };
 
   /**
@@ -684,13 +874,16 @@ export function Header() {
     });
     setStoredCurrency(currency);
     setSelectedCurrency(currency);
-    setShowCurrency(false);
     // Trigger currency update event to refresh prices
     window.dispatchEvent(new Event('currency-updated'));
   };
 
   return (
-    <header className="bg-gradient-to-b from-gray-50 to-white sticky top-0 z-50 border-b border-gray-200/80 shadow-sm backdrop-blur-sm bg-white/95">
+    <div className={`relative z-50 ${montserrat.className}`}>
+    <header
+      ref={primaryStripRef}
+      className="overflow-visible border-b border-gray-200 bg-white lg:border-b-0"
+    >
       <Suspense fallback={null}>
         <HeaderSearchSync
           setSearchQuery={setSearchQuery}
@@ -698,312 +891,294 @@ export function Header() {
           categories={categories}
         />
       </Suspense>
-      {/* Top Bar */}
-      <div className="bg-white border-b border-gray-200 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-3 py-3 text-sm text-gray-700 sm:flex-row sm:items-center sm:justify-between">
-            {/* Phone + Social */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-              <div className="flex items-center gap-2 text-gray-700">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 3C2 2.44772 2.44772 2 3 2H5.15287C5.64171 2 6.0589 2.35341 6.13927 2.8356L6.87858 7.27147C6.95075 7.70451 6.73206 8.13397 6.3394 8.3303L4.79126 9.10437C5.90715 11.8783 8.12168 14.0929 10.8956 15.2088L11.6697 13.6606C11.866 13.2679 12.2955 13.0493 12.7285 13.1214L17.1644 13.8607C17.6466 13.9411 18 14.3583 18 14.8471V17C18 17.5523 17.5523 18 17 18H15C7.8203 18 2 12.1797 2 5V3Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span className="font-medium">{t('contact.phone')}</span>
-              </div>
-              <div className="flex items-center gap-3 text-gray-600">
-                <a
-                  href={t('contact.social.instagram') || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-pink-600 transition-colors"
-                  aria-label={t('common.ariaLabels.instagram')}
-                >
-                  <Instagram className="w-4 h-4" />
-                </a>
-                <a
-                  href={t('contact.social.facebook') || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-blue-600 transition-colors"
-                  aria-label={t('common.ariaLabels.facebook')}
-                >
-                  <Facebook className="w-4 h-4" />
-                </a>
-                <a
-                  href={t('contact.social.linkedin') || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-blue-700 transition-colors"
-                  aria-label={t('common.ariaLabels.linkedin')}
-                >
-                  <Linkedin className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
 
-            {/* Currency and Language Switcher */}
-            <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-              <LanguageSwitcherHeader />
-              <div className="relative" ref={currencyRef}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCurrency(!showCurrency);
-                  }}
-                  className="flex items-center gap-2 bg-white px-3 py-2 text-gray-800 transition-colors"
-                >
-                  <span className="text-base font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
-                  <span className="text-sm font-medium leading-none">{selectedCurrency}</span>
-                  <ChevronDownIcon />
-                </button>
-                {showCurrency && (
-                  <div className="absolute top-full right-0 mt-2 w-40 bg-white z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    {Object.values(CURRENCIES).map((currency) => (
-                      <button
-                        key={currency.code}
-                        onClick={() => handleCurrencyChange(currency.code)}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-all duration-150 ${selectedCurrency === currency.code
-                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900 font-semibold'
-                            : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span>{currency.code}</span>
-                          <span className="text-gray-500">{currency.symbol}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Header */}
-      <div className="max-w-7xl mx-auto pl-2 sm:pl-4 md:pl-6 lg:pl-8 pr-2 sm:pr-4 md:pr-6 lg:pr-8">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 py-4 md:py-3">
-          {/* Logo + Mobile Menu */}
-          <div className="flex w-full items-center justify-between md:w-auto md:justify-start">
-            <div className="flex items-center gap-2 sm:gap-3">
+      <div className={SITE_CONTENT_GUTTERS_CLASS}>
+        {/* Mobile — strip 1 scrolls away; strip 2 pins to viewport top once strip 1 has left */}
+        <div ref={mobileStrip1Ref} className="border-b border-gray-100 lg:hidden">
+          <div className="relative flex items-center justify-between gap-3 py-2.5">
+            <div className="relative z-20 shrink-0">
               <button
                 type="button"
-                onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
-                aria-label={t('common.ariaLabels.openMenu')}
+                onClick={() => {
+                  setShowCategoriesPillMenu(false);
+                  setShowMobilePrimaryLangMenu(false);
+                  setMobileMenuOpen(true);
+                }}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
                 aria-expanded={mobileMenuOpen}
+                aria-label={t('common.ariaLabels.openMenu')}
               >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
-                </svg>
-              </button>
-              <Link href="/" className="flex items-center flex-shrink-0 group">
-                <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent group-hover:from-gray-800 group-hover:to-gray-600 transition-all duration-300">
-                  White-Shop
+                <span className={MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS} aria-hidden>
+                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
+                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
+                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
                 </span>
-              </Link>
+              </button>
             </div>
-            {/* Mobile Currency and Language - on same line as logo */}
-            <div className="flex items-center gap-1 sm:gap-2 md:hidden">
-              {/* Currency Switcher */}
-              <div className="relative" ref={mobileCurrencyRef}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMobileCurrency(!showMobileCurrency);
-                  }}
-                  className="flex h-9 sm:h-10 items-center justify-center gap-1 sm:gap-2 bg-transparent md:bg-white px-2 sm:px-3 text-xs sm:text-sm font-medium text-gray-800 shadow-none md:shadow-sm transition-colors cursor-pointer"
+            {/* Figma 180:1419 mark + 178:529 wordmark — center cluster like desktop */}
+            <Link
+              href="/"
+              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center gap-2 transition-opacity active:opacity-90"
+              aria-label={t('common.navigation.home')}
+            >
+              <div
+                className="flex shrink-0 items-center justify-center overflow-hidden bg-[#2db2ff] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
+                style={{
+                  width: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
+                  height: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
+                  borderRadius: MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
+                }}
+              >
+                <span className="text-[18px] font-bold leading-none">M</span>
+              </div>
+              <span className="text-[20px] font-bold leading-7 tracking-[-0.5px] text-[#111827]">Mobee</span>
+            </Link>
+            <div className="relative z-20 shrink-0" ref={mobilePrimaryLangRef}>
+              <button
+                type="button"
+                onClick={() => setShowMobilePrimaryLangMenu((open) => !open)}
+                className={mobilePrimaryLangButtonClassName}
+                aria-label={t('common.ariaLabels.changeLanguage')}
+                aria-expanded={showMobilePrimaryLangMenu}
+                aria-haspopup="listbox"
+              >
+                <GlobeLanguageIcon />
+              </button>
+              {showMobilePrimaryLangMenu ? (
+                <div
+                  className="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-2xl"
+                  role="listbox"
+                  aria-label={t('common.ariaLabels.changeLanguage')}
                 >
-                  <span className="text-sm sm:text-base font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
-                  <span className="text-xs sm:text-sm font-medium leading-none">{selectedCurrency}</span>
-                  <ChevronDownIcon />
-                </button>
-                {showMobileCurrency && (
-                  <div className="absolute top-full right-0 mt-2 w-40 bg-white shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    {Object.values(CURRENCIES).map((currency) => (
+                  {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
+                    const active = getStoredLanguage() === code;
+                    const label = code === 'hy' ? 'ՀԱՅ' : code === 'ru' ? 'РУС' : 'EN';
+                    return (
                       <button
-                        key={currency.code}
+                        key={code}
+                        type="button"
+                        role="option"
+                        aria-selected={active}
                         onClick={() => {
-                          handleCurrencyChange(currency.code);
-                          setShowMobileCurrency(false);
+                          setShowMobilePrimaryLangMenu(false);
+                          if (!active) setStoredLanguage(code);
                         }}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-all duration-150 ${
-                          selectedCurrency === currency.code
-                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900 font-semibold'
+                        className={`w-full px-4 py-2.5 text-left text-sm font-semibold transition-colors duration-150 ${
+                          active
+                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900'
                             : 'text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <span>{currency.code}</span>
-                          <span className="text-gray-500">{currency.symbol}</span>
-                        </div>
+                        {label}
                       </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {/* Language Switcher */}
-              <div className="flex h-9 sm:h-10 items-center justify-center">
-                <LanguageSwitcherHeader />
-              </div>
+                    );
+                  })}
+                </div>
+              ) : null}
             </div>
           </div>
+        </div>
 
-          {/* Navigation Links - Centered */}
-          <nav className="order-3 hidden w-full items-center justify-center gap-1 md:order-none md:flex md:flex-1">
-            <Link href="/" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap">
-              {t('common.navigation.home')}
+        {mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? (
+          <div aria-hidden className="shrink-0 lg:hidden" style={{ height: mobileSearchFlowSpacerPx }} />
+        ) : null}
+
+        <div
+          ref={mobileSearchWrapRef}
+          className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
+            mobileSearchDocked ? 'fixed inset-x-0 top-0 z-40 border-b border-gray-200' : ''
+          }`}
+        >
+          <div className={mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
+            <form
+              ref={mobileHomeSearchFormRef}
+              onSubmit={handleSearch}
+              className="relative min-w-0 w-full"
+            >
+              <div className="relative w-full min-w-0">
+                <div
+                  className={`flex h-11 min-w-0 items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3 ${MOBILE_HOME_SEARCH_PILL_RIGHT_PAD_CLASS}`}
+                >
+                  <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <circle cx="11" cy="11" r="7" strokeWidth={2} />
+                      <path strokeLinecap="round" strokeWidth={2} d="M20 20l-4.3-4.3" />
+                    </svg>
+                  </span>
+                  <input
+                    ref={mobileHomeSearchInputRef}
+                    type="search"
+                    name="header-mobile-home-search"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (e.target.value.trim().length >= 1) {
+                        setSearchDropdownOpen(true);
+                      } else {
+                        setSearchDropdownOpen(false);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchQuery.trim().length >= 1) {
+                        setSearchDropdownOpen(true);
+                      }
+                    }}
+                    onKeyDown={searchHandleKeyDown}
+                    placeholder={t('common.mainHeader.searchPlaceholder')}
+                    autoComplete="off"
+                    className="min-w-0 flex-1 bg-transparent text-sm leading-normal text-gray-900 outline-none placeholder:text-[#6b7280]"
+                    aria-controls="header-mobile-search-results"
+                    aria-expanded={searchDropdownOpen && searchResults.length > 0}
+                    aria-autocomplete="list"
+                  />
+                </div>
+                <button type="submit" className={MOBILE_HOME_SEARCH_SUBMIT_CLASS}>
+                  {t('common.buttons.search')}
+                </button>
+              </div>
+              {!showSearchModal ? (
+                <SearchDropdown
+                  listboxId="header-mobile-search-results"
+                  results={searchResults}
+                  loading={searchLoading}
+                  error={searchError}
+                  isOpen={searchDropdownOpen}
+                  selectedIndex={searchSelectedIndex}
+                  query={searchQuery}
+                  onResultClick={(result) => {
+                    router.push(`/products/${result.slug}`);
+                    clearSearch();
+                    setSearchDropdownOpen(false);
+                  }}
+                  onClose={() => setSearchDropdownOpen(false)}
+                  className="mt-1"
+                />
+              ) : null}
+            </form>
+          </div>
+        </div>
+
+        {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
+        <div
+          className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`}
+        >
+          <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
+            <Link href="/" className="flex w-[104px] shrink-0 items-center gap-2">
+              <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                <span className="text-[18px] font-bold leading-6 text-white">M</span>
+              </div>
+              <span className="text-[18px] font-bold leading-6 tracking-[-0.5px] text-[#111827]">Mobee</span>
             </Link>
-            <div 
-              className="relative" 
-              ref={productsMenuRef}
-              onMouseEnter={() => {
-                if (productsMenuTimeoutRef.current) {
-                  clearTimeout(productsMenuTimeoutRef.current);
-                  productsMenuTimeoutRef.current = null;
-                }
-                setShowProductsMenu(true);
-              }}
-              onMouseLeave={() => {
-                productsMenuTimeoutRef.current = setTimeout(() => {
-                  setShowProductsMenu(false);
-                }, 150);
-              }}
+            <nav
+              className="flex min-w-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[60px]"
+              aria-label="Primary"
             >
               <Link
-                href="/products"
-                className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap flex items-center gap-1"
+                href="/"
+                className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/')}`}
+              >
+                {t('common.navigation.home')}
+              </Link>
+              <Link
+                href="/shop"
+                className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/shop')}`}
               >
                 {t('common.navigation.products')}
-                <ChevronDownIcon />
               </Link>
-              {showProductsMenu && (
-                <>
-                  <div className="absolute top-full left-0 w-full h-2" />
-                  <div className="absolute top-full left-0 pt-2 w-64 z-50">
-                    <div className="bg-white rounded-xl shadow-2xl border border-gray-200/80 overflow-visible">
-                      {loadingCategories ? (
-                        <div className="px-4 py-2 text-sm text-gray-500">{t('common.messages.loading')}</div>
-                      ) : (
-                        getRootCategories(categories).map((category) => (
-                          <CategoryMenuItem
-                            key={category.id}
-                            category={category}
-                            onClose={() => setShowProductsMenu(false)}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-            <Link href="/about" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap">
-              {t('common.navigation.about')}
-            </Link>
-            <Link href="/contact" className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap">
-              {t('common.navigation.contact')}
-            </Link>
-          </nav>
-
-
-          {/* Right Side Actions - Icons Only */}
-          <div className="ml-auto hidden items-center gap-2 md:flex">
-            {/* Search Icon Button */}
-            <button
-              onClick={() => {
-                setShowSearchModal(!showSearchModal);
-                setShowCurrency(false);
-              }}
-              className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150"
-              aria-label={t('common.ariaLabels.search')}
-            >
-              <SearchIcon />
-            </button>
-
-            {/* Icons */}
-              {/* Profile / User Menu */}
-              <div className="relative" ref={userMenuRef}>
-                {isLoggedIn ? (
-                  <>
-                    <button
-                      onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="w-11 h-11 flex items-center justify-center transition-all duration-200 group"
-                    >
-                      <ProfileIconFilled />
-                    </button>
-                    {showUserMenu && (
-                      <div className="absolute top-full right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl border border-gray-200/80 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <Link
-                          href="/profile"
-                          className="block px-5 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-white transition-all duration-150 font-medium border-b border-gray-100"
-                          onClick={() => setShowUserMenu(false)}
-                        >
-                          {t('common.navigation.profile')}
-                        </Link>
-                        {isAdmin && (
-                          <Link
-                            href="/admin"
-                            className="block px-5 py-3 text-sm text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-white transition-all duration-150 font-medium border-b border-gray-100"
-                            onClick={() => setShowUserMenu(false)}
-                          >
-                            <div className="flex items-center">
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              {t('common.navigation.adminPanel')}
-                            </div>
-                          </Link>
-                        )}
-                        <button
-                          onClick={() => {
-                            setShowUserMenu(false);
-                            logout();
-                          }}
-                          className="block w-full text-left px-5 py-3 text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-white transition-all duration-150 font-medium"
-                        >
-                          {t('common.navigation.logout')}
-                        </button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <Link href="/login" className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150 group">
-                    <ProfileIconOutline />
-                  </Link>
-                )}
-              </div>
-
-              {/* Compare */}
-              <Link href="/compare" className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150 relative group">
-                <BadgeIcon icon={<CompareIcon size={18} />} badge={compareCount} />
+              <Link href="/about" className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/about')}`}>
+                {t('common.navigation.about')}
               </Link>
-
-              {/* Wishlist */}
-              <Link href="/wishlist" className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150 relative group">
-                <BadgeIcon icon={<WishlistIcon />} badge={wishlistCount} />
+              <Link href="/contact" className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/contact')}`}>
+                {t('common.navigation.contact')}
               </Link>
-
-              {/* Shopping Cart */}
-              <Link href="/cart" className="flex items-center gap-[0.hpx] group">
-                <div className="w-11 h-11 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-150 relative">
-                  <BadgeIcon icon={<CartIcon size={19} />} badge={cartCount} />
-                </div>
-                <span className="text-gray-800 font-bold text-sm hidden sm:block min-w-[3.25rem] group-hover:text-gray-900 transition-colors">
-                  {formatPrice(cartTotal, selectedCurrency)}
-                </span>
-              </Link>
-            </div>
+            </nav>
           </div>
 
+          <div className="flex min-w-0 shrink-0 items-center justify-end">
+            <HeaderPhoneLangCluster />
+          </div>
+        </div>
       </div>
+    </header>
+
+      {secondaryDocked ? (
+        <div
+          aria-hidden
+          className="hidden w-full shrink-0 lg:block"
+          style={{ height: Math.max(secondaryBarHeightPx, 52) }}
+        />
+      ) : null}
+
+      <HeaderSecondaryBar
+        ref={secondaryBarOuterRef}
+        dockToViewportTop={secondaryDocked}
+        montserratClassName={montserrat.className}
+        categoriesWrapRef={categoriesPillWrapRef}
+        categoriesLabel={t('common.navigation.categories')}
+        isCategoriesMenuOpen={showCategoriesPillMenu}
+        onCategoriesButtonClick={() => {
+          setShowCategoriesPillMenu((open) => !open);
+        }}
+        categoriesMenu={
+          showCategoriesPillMenu ? (
+            <CategoriesMenuFlyout
+              loading={loadingCategories}
+              roots={getRootCategories(categories)}
+              onItemNavigate={() => setShowCategoriesPillMenu(false)}
+              loadingLabel={t('common.messages.loading')}
+            />
+          ) : null
+        }
+        searchQuery={searchQuery}
+        onSearchChange={(value) => {
+          setSearchQuery(value);
+          if (value.trim().length >= 1) {
+            setSearchDropdownOpen(true);
+          } else {
+            setSearchDropdownOpen(false);
+          }
+        }}
+        onSearchSubmit={handleSearch}
+        onSearchKeyDown={searchHandleKeyDown}
+        searchPlaceholder={t('common.mainHeader.searchPlaceholder')}
+        searchInputRef={desktopSearchInputRef}
+        onSearchFocus={() => {
+          if (searchQuery.trim().length >= 1) {
+            setSearchDropdownOpen(true);
+          }
+        }}
+        searchResults={searchResults}
+        searchLoading={searchLoading}
+        searchError={searchError}
+        searchDropdownOpen={searchDropdownOpen}
+        searchSelectedIndex={searchSelectedIndex}
+        onSearchResultClick={(result) => {
+          router.push(`/products/${result.slug}`);
+          clearSearch();
+          setSearchDropdownOpen(false);
+        }}
+        onSearchDropdownClose={() => setSearchDropdownOpen(false)}
+        suppressSearchDropdown={showSearchModal}
+        compareCount={compareCount}
+        wishlistCount={wishlistCount}
+        cartCount={cartCount}
+        isLoggedIn={isLoggedIn}
+        loginLabel={t('common.navigation.login')}
+        profileLabel={t('common.navigation.profile')}
+        compareAria={t('common.navigation.compare')}
+        wishlistAria={t('common.navigation.wishlist')}
+        cartAria={t('common.navigation.cart')}
+        profileAria={t('common.navigation.profile')}
+        isAdmin={isAdmin}
+        adminPanelLabel={t('common.navigation.adminPanel')}
+        logoutLabel={t('common.navigation.logout')}
+        onLogout={logout}
+      />
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 flex md:hidden bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm lg:hidden"
           role="dialog"
           aria-modal="true"
           onClick={() => setMobileMenuOpen(false)}
@@ -1012,18 +1187,71 @@ export function Header() {
             className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <p className="text-lg font-semibold text-gray-900">Navigation</p>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-10 h-10 rounded-full border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
-                aria-label={t('common.ariaLabels.closeMenu')}
-              >
-                <svg className="w-5 h-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex min-w-0 items-center gap-2"
+                >
+                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-sm">
+                    <span className="text-[18px] font-bold leading-6 text-white">M</span>
+                  </div>
+                  <span className="truncate text-lg font-bold tracking-tight text-gray-900">Mobee</span>
+                </Link>
+                <div className="relative shrink-0" ref={mobileCurrencyRef}>
+                  <button
+                    type="button"
+                    onClick={() => setShowMobileCurrency(!showMobileCurrency)}
+                    className="flex h-9 cursor-pointer items-center justify-center gap-1 rounded-full border border-gray-200 bg-white px-2 text-xs font-medium text-gray-800 transition-colors"
+                  >
+                    <span className="text-sm font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
+                    <span className="text-xs font-medium leading-none">{selectedCurrency}</span>
+                    <ChevronDownIcon />
+                  </button>
+                  {showMobileCurrency ? (
+                    <div className="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-2xl">
+                      {Object.values(CURRENCIES).map((currency) => (
+                        <button
+                          key={currency.code}
+                          type="button"
+                          onClick={() => {
+                            handleCurrencyChange(currency.code);
+                            setShowMobileCurrency(false);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
+                            selectedCurrency === currency.code
+                              ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span>{currency.code}</span>
+                            <span className="text-gray-500">{currency.symbol}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-base font-semibold text-gray-900">{t('common.navigation.categories')}</p>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900"
+                  aria-label={t('common.ariaLabels.closeMenu')}
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="border-b border-gray-100 px-4 py-2">
+              <HeaderPhoneLangCluster phoneNumberVisibility="always" />
             </div>
 
             <div className="flex-1 overflow-hidden min-h-0">
@@ -1042,6 +1270,23 @@ export function Header() {
                       </svg>
                     </Link>
                   ))}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setShowSearchModal(true);
+                    }}
+                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 normal-case font-medium text-gray-700"
+                  >
+                    <span className="flex items-center gap-2">
+                      <SearchIcon />
+                      {t('common.buttons.search')}
+                    </span>
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
 
                   <Link
                     href="/wishlist"
@@ -1066,7 +1311,7 @@ export function Header() {
                   >
                     <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
                       <CompareIcon size={18} />
-                      Compare
+                      {t('common.navigation.compare')}
                     </span>
                     {compareCount > 0 && (
                       <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
@@ -1082,7 +1327,7 @@ export function Header() {
                   >
                     <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
                       <CartIcon size={19} />
-                      Cart
+                      {t('common.navigation.cart')}
                     </span>
                     {cartCount > 0 && (
                       <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
@@ -1100,7 +1345,7 @@ export function Header() {
                       >
                         <span className="flex items-center gap-2">
                           <ProfileIconFilled />
-                          Profile
+                          {t('common.navigation.profile')}
                         </span>
                         <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1112,7 +1357,7 @@ export function Header() {
                           onClick={() => setMobileMenuOpen(false)}
                           className="flex items-center justify-between px-4 py-3 hover:bg-blue-50 normal-case text-blue-700"
                         >
-                          <span>Admin Panel</span>
+                          <span>{t('common.navigation.adminPanel')}</span>
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
@@ -1125,7 +1370,7 @@ export function Header() {
                         }}
                         className="flex w-full items-center justify-between px-4 py-3 text-left text-red-600 hover:bg-red-50 normal-case font-semibold"
                       >
-                        Logout
+                        {t('common.navigation.logout')}
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -1138,7 +1383,7 @@ export function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 normal-case text-gray-800"
                       >
-                        <span>Login</span>
+                        <span>{t('common.navigation.login')}</span>
                         <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -1148,7 +1393,7 @@ export function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex items-center justify-between px-4 py-3 hover:bg-gray-900 hover:text-white normal-case text-gray-900 font-semibold"
                       >
-                        <span>Create account</span>
+                        <span>{t('common.navigation.register')}</span>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -1158,7 +1403,7 @@ export function Header() {
                 </div>
 
                 <div className="border-t border-gray-200 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
-                  © {currentYear} White-Shop
+                  © {currentYear} Mobee
                 </div>
               </nav>
             </div>
@@ -1219,7 +1464,7 @@ export function Header() {
           </div>
         </div>
       )}
-    </header>
+    </div>
   );
 }
 

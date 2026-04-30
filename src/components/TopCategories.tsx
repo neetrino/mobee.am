@@ -1,62 +1,170 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
-import { apiClient } from '../lib/api-client';
-import { getStoredLanguage } from '../lib/language';
+import Link from 'next/link';
+import { Montserrat } from 'next/font/google';
+import { useMemo } from 'react';
+import { useCategoriesTree } from './CategoriesTreeContext';
+import {
+  ACCESSORIES_SLUG_PARTS,
+  COMPUTERS_SLUG_PARTS,
+  findCategoryBySlugParts,
+  HEADPHONES_SLUG_PARTS,
+  PHONES_SLUG_PARTS,
+  TABLETS_SLUG_PARTS,
+  type CategoryTreeNode,
+  WATCHES_SLUG_PARTS,
+} from '../lib/category-nav';
 import { useTranslation } from '../lib/i18n-client';
+import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
-interface TopCategoryItem {
-  id: string;
-  slug: string;
-  title: string;
-  productCount: number;
-  image: string | null;
+const montserrat = Montserrat({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['700'],
+  display: 'swap',
+});
+
+type SlotKey =
+  | 'computers'
+  | 'phones'
+  | 'tablets'
+  | 'watches'
+  | 'headphones'
+  | 'accessories';
+
+const MOBILE_CATEGORY_PILL_KEYS: readonly Exclude<SlotKey, 'accessories'>[] = [
+  'computers',
+  'phones',
+  'tablets',
+  'watches',
+  'headphones',
+];
+
+interface CategorySlot {
+  key: SlotKey;
+  fallbackSlug: string;
+  imageSrc: string;
+  imageWidth: number;
+  imageHeight: number;
+  labelKey: `common.mainHeader.${string}`;
+  tall: boolean;
+  imageWrapperClassName: string;
+  imageClassName: string;
 }
 
-interface TopCategoriesResponse {
-  data: TopCategoryItem[];
+const CATEGORY_STRIP_SLOTS: readonly CategorySlot[] = [
+  {
+    key: 'computers',
+    fallbackSlug: 'computers',
+    imageSrc: '/images/home/category-strip/computers.png',
+    imageWidth: 146,
+    imageHeight: 146,
+    labelKey: 'common.mainHeader.computersLink',
+    tall: false,
+    imageWrapperClassName:
+      'absolute left-[31px] top-[24px] flex size-[146px] items-center justify-center',
+    imageClassName: 'object-contain',
+  },
+  {
+    key: 'phones',
+    fallbackSlug: 'phones',
+    imageSrc: '/images/home/category-strip/phones.png',
+    imageWidth: 127,
+    imageHeight: 127,
+    labelKey: 'common.mainHeader.phonesLink',
+    tall: false,
+    imageWrapperClassName: 'absolute left-[31px] top-[24px] size-[127px]',
+    imageClassName: 'object-cover',
+  },
+  {
+    key: 'tablets',
+    fallbackSlug: 'tablets',
+    imageSrc: '/images/home/category-strip/tablets.png',
+    imageWidth: 128,
+    imageHeight: 128,
+    labelKey: 'common.mainHeader.tabletsLink',
+    tall: false,
+    imageWrapperClassName: 'absolute left-[34px] top-[23px] size-[128px]',
+    imageClassName: 'object-cover',
+  },
+  {
+    key: 'watches',
+    fallbackSlug: 'watches',
+    imageSrc: '/images/home/category-strip/watches.png',
+    imageWidth: 154,
+    imageHeight: 154,
+    labelKey: 'common.mainHeader.watchesLink',
+    tall: false,
+    imageWrapperClassName:
+      'absolute left-[20px] top-[9px] flex size-[154px] items-center justify-center',
+    imageClassName: 'object-cover',
+  },
+  {
+    key: 'headphones',
+    fallbackSlug: 'headphones',
+    imageSrc: '/images/home/category-strip/headphones.png',
+    imageWidth: 146,
+    imageHeight: 146,
+    labelKey: 'common.mainHeader.headphonesLink',
+    tall: false,
+    imageWrapperClassName: 'absolute left-[25px] top-[10px] size-[146px]',
+    imageClassName: 'object-cover',
+  },
+  {
+    key: 'accessories',
+    fallbackSlug: 'accessories',
+    imageSrc: '/images/home/category-strip/accessories.png',
+    imageWidth: 134,
+    imageHeight: 134,
+    labelKey: 'common.mainHeader.accessoriesLink',
+    tall: false,
+    imageWrapperClassName: 'absolute left-[31px] top-[21px] size-[134px]',
+    imageClassName: 'object-contain',
+  },
+];
+
+function categoryHref(resolved: CategoryTreeNode | null, fallbackSlug: string): string {
+  if (resolved) {
+    return `/products?category=${encodeURIComponent(resolved.slug)}`;
+  }
+  return `/products?category=${encodeURIComponent(fallbackSlug)}`;
 }
 
 export function TopCategories() {
   const { t } = useTranslation();
-  const router = useRouter();
-  const [topCategories, setTopCategories] = useState<TopCategoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { categories, loadingCategories: loading } = useCategoriesTree();
 
-  useEffect(() => {
-    fetchTopCategories();
-  }, []);
-
-  const fetchTopCategories = async () => {
-    try {
-      setLoading(true);
-      const language = getStoredLanguage();
-      const response = await apiClient.get<TopCategoriesResponse>('/api/v1/categories/top', {
-        params: { lang: language, limit: '5' },
-      });
-      setTopCategories(response.data || []);
-    } catch (err) {
-      console.error('[TopCategories] Error:', err);
-      setTopCategories([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const resolvedBySlot = useMemo(() => {
+    return {
+      computers: findCategoryBySlugParts(categories, COMPUTERS_SLUG_PARTS),
+      phones: findCategoryBySlugParts(categories, PHONES_SLUG_PARTS),
+      tablets: findCategoryBySlugParts(categories, TABLETS_SLUG_PARTS),
+      watches: findCategoryBySlugParts(categories, WATCHES_SLUG_PARTS),
+      headphones: findCategoryBySlugParts(categories, HEADPHONES_SLUG_PARTS),
+      accessories: findCategoryBySlugParts(categories, ACCESSORIES_SLUG_PARTS),
+    };
+  }, [categories]);
 
   if (loading) {
     return (
-      <section className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center gap-8 md:gap-12 lg:gap-16 flex-wrap">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex flex-col items-center gap-3 min-w-[120px]">
-                <div className="w-24 h-24 rounded-full bg-gray-200 animate-pulse shadow-sm"></div>
-                <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="w-16 h-3 bg-gray-200 rounded animate-pulse"></div>
-              </div>
+      <section className={`bg-white ${montserrat.className}`} aria-hidden>
+        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-12`}>
+          <div className="flex gap-2 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:hidden">
+            {MOBILE_CATEGORY_PILL_KEYS.map((key) => (
+              <div
+                key={key}
+                className="h-9 w-20 shrink-0 animate-pulse rounded-full bg-[#eceff2]"
+              />
+            ))}
+          </div>
+          <div className="hidden items-end gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:flex">
+            {CATEGORY_STRIP_SLOTS.map((slot) => (
+              <div
+                key={slot.key}
+                className={`shrink-0 rounded-[30px] bg-[#eceff2] ${
+                  slot.tall ? 'h-[227px] w-[197px]' : 'h-[201px] w-[197px]'
+                } animate-pulse`}
+              />
             ))}
           </div>
         </div>
@@ -64,54 +172,89 @@ export function TopCategories() {
     );
   }
 
-  if (topCategories.length === 0) {
-    return null;
-  }
-
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-center items-center gap-6 md:gap-8 lg:gap-12 xl:gap-16 flex-wrap">
-          {topCategories.map((item) => (
-            <Link
-              key={item.id}
-              href={`/products?category=${item.slug}`}
-              onClick={(e) => {
-                e.preventDefault();
-                router.push(`/products?category=${item.slug}`);
-              }}
-              className="flex flex-col items-center gap-3 group cursor-pointer transition-all duration-300 hover:scale-105 min-w-[120px] outline-none focus:outline-none hover:outline-none focus-visible:outline-none ring-0 focus:ring-0 hover:ring-0"
-            >
-              <div className="transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1 relative outline-none">
-                {item.image ? (
-                  <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 shadow-md transition-all duration-300 flex items-center justify-center outline-none ring-0">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-300 outline-none"
-                      unoptimized
-                    />
-                  </div>
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center shadow-md transition-all duration-300 outline-none ring-0">
-                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                    </svg>
-                  </div>
-                )}
-              </div>
-              <span className="text-sm font-semibold text-gray-900 text-center max-w-[140px] group-hover:text-gray-700 transition-colors">
-                {item.title}
-              </span>
-              <span className="text-xs text-gray-500 font-medium">
-                {item.productCount} {item.productCount === 1 ? t('common.product.product') : t('common.product.products')}
-              </span>
-            </Link>
-          ))}
+    <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-12`}>
+        <div className="flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide lg:hidden">
+          {MOBILE_CATEGORY_PILL_KEYS.map((key) => {
+            const slot = CATEGORY_STRIP_SLOTS.find((s) => s.key === key);
+            if (!slot) {
+              return null;
+            }
+            const resolved = resolvedBySlot[slot.key];
+            const href = categoryHref(resolved, slot.fallbackSlug);
+            const pillLabel = t(`home.mobile_home.categoryPill.${slot.key}` as const);
+            return (
+              <Link
+                key={slot.key}
+                href={href}
+                className="shrink-0 rounded-full bg-[#f7f7f7] px-4 py-2 text-sm font-medium leading-normal text-[#303030] transition-opacity active:opacity-90"
+              >
+                {pillLabel}
+              </Link>
+            );
+          })}
+        </div>
+        <div className="hidden items-end justify-start gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory sm:justify-center sm:overflow-visible sm:pb-0 lg:flex">
+          {CATEGORY_STRIP_SLOTS.map((slot) => {
+            const resolved = resolvedBySlot[slot.key];
+            const href = categoryHref(resolved, slot.fallbackSlug);
+            const cardHeight = slot.tall ? 'min-h-[227px]' : 'min-h-[201px]';
+
+            return (
+              <Link
+                key={slot.key}
+                href={href}
+                className={`group relative flex w-[197px] shrink-0 snap-start flex-col ${cardHeight} overflow-hidden rounded-[30px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99]`}
+              >
+                <div
+                  className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-2 pb-[22px] pt-2 text-center ${
+                    slot.tall ? 'pb-[25px]' : ''
+                  }`}
+                >
+                  <span className="text-[16px] font-bold leading-5 text-[#1c1c1c]">
+                    {t(slot.labelKey)}
+                  </span>
+                </div>
+                <div className={`pointer-events-none z-[2] ${slot.imageWrapperClassName}`}>
+                  {slot.key === 'watches' ? (
+                    <div className="flex size-full items-center justify-center">
+                      <div className="flex-none -rotate-[5.85deg]">
+                        <div className="relative size-[140px]">
+                          <Image
+                            src={slot.imageSrc}
+                            alt=""
+                            width={slot.imageWidth}
+                            height={slot.imageHeight}
+                            className={`size-full max-w-none ${slot.imageClassName}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className={
+                        slot.key === 'computers'
+                          ? 'relative size-full -scale-x-100'
+                          : 'relative size-full'
+                      }
+                    >
+                      <Image
+                        src={slot.imageSrc}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 42vw, 197px"
+                        className={slot.imageClassName}
+                      />
+                    </div>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
+

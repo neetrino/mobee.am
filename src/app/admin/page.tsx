@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
-import { AdminSidebar } from './components/AdminSidebar';
+import { AdminPageShell } from './components/AdminPageShell';
 import { StatsGrid } from './components/StatsGrid';
 import { RecentOrdersCard } from './components/RecentOrdersCard';
 import { TopProductsCard } from './components/TopProductsCard';
@@ -14,7 +14,7 @@ import { useAdminDashboard } from './hooks/useAdminDashboard';
 
 export default function AdminPanel() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading, user } = useAuth();
+  const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -48,19 +48,11 @@ export default function AdminPanel() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin');
-
-  useEffect(() => {
-    if (pathname) {
-      setCurrentPath(pathname);
-    }
-  }, [pathname]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -72,35 +64,18 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.dashboard.title')}</h1>
-          <p className="text-gray-600 mt-2">
-            {t('admin.dashboard.welcome').replace('{name}', user?.firstName || t('admin.dashboard.title'))}
-          </p>
-        </div>
+    <AdminPageShell currentPath={pathname || '/admin'} router={router} t={t} mainClassName="max-w-7xl">
+      <StatsGrid stats={stats} statsLoading={statsLoading} />
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <AdminSidebar currentPath={currentPath} router={router} t={t} />
-
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
-            <StatsGrid stats={stats} statsLoading={statsLoading} />
-
-            {/* Dashboard Sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <RecentOrdersCard recentOrders={recentOrders} recentOrdersLoading={recentOrdersLoading} />
-              <TopProductsCard topProducts={topProducts} topProductsLoading={topProductsLoading} />
-            </div>
-
-            <UserActivityCard userActivity={userActivity} userActivityLoading={userActivityLoading} />
-
-            <QuickActionsCard />
-          </div>
-        </div>
+      {/* Dashboard Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <RecentOrdersCard recentOrders={recentOrders} recentOrdersLoading={recentOrdersLoading} />
+        <TopProductsCard topProducts={topProducts} topProductsLoading={topProductsLoading} />
       </div>
-    </div>
+
+      <UserActivityCard userActivity={userActivity} userActivityLoading={userActivityLoading} />
+
+      <QuickActionsCard />
+    </AdminPageShell>
   );
 }

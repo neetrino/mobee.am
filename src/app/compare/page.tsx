@@ -7,10 +7,18 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
+import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
+import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
+import {
+  COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS,
+  COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS,
+  COMPARE_EMPTY_STATE_LOWER_PANEL_FLEX_CLASS,
+  COMPARE_EMPTY_STATE_LOWER_PANEL_MIN_HEIGHT_CLASS,
+} from './compare-layout.constants';
 
 interface Product {
   id: string;
@@ -82,14 +90,16 @@ export default function ComparePage() {
         };
       }>('/api/v1/products', {
         params: {
-          limit: '1000',
+          ids: idsToLoad.join(','),
+          limit: String(Math.min(Math.max(idsToLoad.length, 1), 20)),
           lang: languagePreference,
         },
       });
 
-      const compareProducts = response.data.filter((product) =>
-        idsToLoad.includes(product.id)
-      );
+      const byId = new Map(response.data.map((p) => [p.id, p]));
+      const compareProducts = idsToLoad
+        .map((id) => byId.get(id))
+        .filter((p): p is Product => Boolean(p));
       setProducts(compareProducts);
     } catch (error) {
       console.error('[Compare] Error fetching compare products:', error);
@@ -219,6 +229,11 @@ export default function ComparePage() {
 
       // Trigger cart update event
       window.dispatchEvent(new Event('cart-updated'));
+      const flySource = document.querySelector<HTMLElement>(
+        `[data-compare-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
+      );
+      const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+      dispatchCartFlyAnimation(flyUrl, flySource);
     } catch (error: any) {
       console.error('Error adding to cart:', error);
       if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
@@ -302,9 +317,16 @@ export default function ComparePage() {
                     {t('common.compare.image')}
                   </td>
                   {products.map((product) => (
-                    <td key={product.id} className="px-4 py-4 text-center">
+                    <td
+                      key={product.id}
+                      className="px-4 py-4 text-center"
+                      data-compare-product-id={product.id}
+                    >
                       <Link href={`/products/${product.slug}`} className="inline-block">
-                        <div className="w-32 h-32 mx-auto bg-gray-100 rounded-lg overflow-hidden relative">
+                        <div
+                          className="w-32 h-32 mx-auto bg-gray-100 rounded-lg overflow-hidden relative"
+                          data-cart-fly-source
+                        >
                           {product.image ? (
                             <Image
                               src={product.image}
@@ -365,16 +387,6 @@ export default function ComparePage() {
                         <p className="text-lg font-bold text-gray-900 select-none">
                           {formatPrice(product.price, currency)}
                         </p>
-                        {(product.originalPrice && product.originalPrice > product.price) && (
-                          <p className="text-sm text-gray-500 line-through select-none">
-                            {formatPrice(product.originalPrice, currency)}
-                          </p>
-                        )}
-                        {!product.originalPrice && product.compareAtPrice && product.compareAtPrice > product.price && (
-                          <p className="text-sm text-gray-500 line-through select-none">
-                            {formatPrice(product.compareAtPrice, currency)}
-                          </p>
-                        )}
                       </div>
                     </td>
                   ))}
@@ -436,29 +448,25 @@ export default function ComparePage() {
           </div>
         </div>
       ) : (
-        <div className="text-center py-8">
-          <div className="max-w-md mx-auto">
-            <svg
-              className="mx-auto h-16 w-16 text-gray-400 mb-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
-              />
-            </svg>
+        <div
+          className={`${COMPARE_EMPTY_STATE_LOWER_PANEL_FLEX_CLASS} text-center ${COMPARE_EMPTY_STATE_LOWER_PANEL_MIN_HEIGHT_CLASS} ${COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS}`}
+        >
+          <div className="max-w-md mx-auto w-full">
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               {t('common.compare.empty')}
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600">
               {t('common.compare.emptyDescription')}
             </p>
-            <Link href="/products">
-              <Button variant="primary" size="md">
+            <Link
+              href="/products"
+              className={`inline-block ${COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS}`}
+            >
+              <Button
+                variant="primary"
+                size="md"
+                className="bg-[#2DB2FF] hover:bg-[#1CA8F9]"
+              >
                 {t('common.compare.browseProducts')}
               </Button>
             </Link>

@@ -1,6 +1,42 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
 
+/**
+ * Allow next/image when the product card display asset is served from R2 or another absolute URL.
+ * @param {string | undefined} urlString
+ * @returns {{ protocol: string; hostname: string; pathname: string } | null}
+ */
+function remotePatternFromAbsoluteUrl(urlString) {
+  if (!urlString || typeof urlString !== 'string') {
+    return null;
+  }
+  const trimmed = urlString.trim();
+  if (!trimmed) {
+    return null;
+  }
+  try {
+    const u = new URL(trimmed);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') {
+      return null;
+    }
+    return {
+      protocol: u.protocol.replace(':', ''),
+      hostname: u.hostname,
+      pathname: '/**',
+    };
+  } catch {
+    return null;
+  }
+}
+
+const productCardDisplayRemotePattern = remotePatternFromAbsoluteUrl(
+  process.env.NEXT_PUBLIC_PRODUCT_CARD_DISPLAY_IMAGE_URL
+);
+
+const r2PublicRemotePattern = remotePatternFromAbsoluteUrl(
+  process.env.R2_PUBLIC_URL
+);
+
 const nextConfig = {
   reactStrictMode: true,
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
@@ -82,6 +118,8 @@ const nextConfig = {
         hostname: 'cdn-icons-png.flaticon.com',
         pathname: '/**',
       },
+      ...(productCardDisplayRemotePattern ? [productCardDisplayRemotePattern] : []),
+      ...(r2PublicRemotePattern ? [r2PublicRemotePattern] : []),
     ],
     // Allow unoptimized images for development (images will use unoptimized prop)
     // Ensure image optimization is enabled for production

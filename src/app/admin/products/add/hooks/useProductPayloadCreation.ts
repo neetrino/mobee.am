@@ -1,7 +1,5 @@
 import { apiClient } from '@/lib/api-client';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import type { Attribute } from '../types';
-
 interface CreateAndSubmitPayloadProps {
   formData: {
     title: string;
@@ -112,7 +110,8 @@ export async function createAndSubmitPayload({
           errorMessage = err.message;
         }
       }
-      
+
+      console.error(errorMessage);
       throw err;
     } finally {
       setLoading(false);

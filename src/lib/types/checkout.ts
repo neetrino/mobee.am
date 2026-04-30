@@ -26,6 +26,8 @@ export interface CheckoutData {
   /** Ignored at checkout — server computes from shippingMethod + shippingAddress.city */
   shippingAmount?: number;
   paymentMethod?: string;
+  promoCode?: string;
+  locale?: "en" | "hy" | "ru";
   billingAddress?: {
     firstName?: string;
     lastName?: string;

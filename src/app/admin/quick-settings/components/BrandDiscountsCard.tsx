@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -55,7 +55,7 @@ export function BrandDiscountsCard({
 
       {brandsLoading ? (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.quickSettings.loadingBrands')}</p>
         </div>
       ) : brands.length === 0 ? (

@@ -7,6 +7,9 @@ import { getStoredCurrency } from '../lib/currency';
 import { getStoredLanguage, type LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
 import { useAuth } from '../lib/auth/AuthContext';
+import { dispatchCartFlyAnimation } from '../lib/cart/dispatchCartFlyAnimation';
+import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
+import { upsertGuestCartItem } from '../lib/cart/guest-cart';
 import { useRelatedProducts } from './hooks/useRelatedProducts';
 import { useCarousel } from './hooks/useCarousel';
 import { useVisibleCards } from './hooks/useVisibleCards';
@@ -15,15 +18,14 @@ import { CarouselNavigation } from './RelatedProducts/CarouselNavigation';
 import { CarouselDots } from './RelatedProducts/CarouselDots';
 
 interface RelatedProductsProps {
-  categorySlug?: string;
-  currentProductId: string;
+  currentProductSlug: string;
 }
 
 /**
  * RelatedProducts component - displays products from the same category in a carousel
  * Shown at the bottom of the single product page
  */
-export function RelatedProducts({ categorySlug, currentProductId }: RelatedProductsProps) {
+export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const [language, setLanguage] = useState<LanguageCode>('en');
@@ -31,7 +33,7 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   
   const visibleCards = useVisibleCards();
-  const { products, loading } = useRelatedProducts({ categorySlug, currentProductId, language });
+  const { products, loading } = useRelatedProducts({ currentProductSlug, language });
   
   const {
     currentIndex,
@@ -75,11 +77,6 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
       return;
     }
 
-    if (!isLoggedIn) {
-      router.push(`/login?redirect=/products/${product.slug}`);
-      return;
-    }
-
     setAddingToCart(prev => new Set(prev).add(product.id));
 
     try {
@@ -106,17 +103,32 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
 
       const variantId = productDetails.variants[0].id;
       
-      await apiClient.post(
-        '/api/v1/cart/items',
-        {
+      if (!isLoggedIn) {
+        upsertGuestCartItem({
           productId: product.id,
-          variantId: variantId,
+          productSlug: product.slug,
+          variantId,
           quantity: 1,
-        }
-      );
+        });
+      } else {
+        await apiClient.post(
+          '/api/v1/cart/items',
+          {
+            productId: product.id,
+            variantId: variantId,
+            quantity: 1,
+          }
+        );
+      }
 
       // Trigger cart update event
       window.dispatchEvent(new Event('cart-updated'));
+      const cardRoot = (e.currentTarget as HTMLElement).closest('[data-related-product-card]');
+      const flySource = cardRoot?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
+      dispatchCartFlyAnimation(
+        resolveProductCardImageSrc(product.image),
+        flySource,
+      );
     } catch (error: unknown) {
       console.error('[RelatedProducts] Error adding to cart:', error);
       const err = error as { message?: string };

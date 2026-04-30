@@ -18,7 +18,7 @@
   },
   "navigation": {
     "home": "Home",
-    "products": "Products",
+    "products": "Shop",
     "categories": "Categories",
     "cart": "Cart",
     "wishlist": "Wishlist",
@@ -43,6 +43,21 @@
     "delivery": "Delivery",
     "stores": "Stores"
   },
+  "mainHeader": {
+    "searchPlaceholder": "Find the best",
+    "specialOffers": "Special offers",
+    "phonesLink": "Phones",
+    "tabletsLink": "Tablets",
+    "computersLink": "Computers",
+    "watchesLink": "Watches",
+    "headphonesLink": "Headphones",
+    "accessoriesLink": "Accessories"
+  },
+  "header": {
+    "supportPhoneAria": "Call customer support",
+    "supportPhoneNumber": "+374 10 000000",
+    "supportPhoneTel": "+37410000000"
+  },
   "stock": {
     "inStock": "In Stock",
     "outOfStock": "Out of Stock"
@@ -50,6 +65,8 @@
   "cart": {
     "title": "Shopping Cart",
     "empty": "Your cart is empty",
+    "emptyDescription": "Looks like you have not added anything in your cart. Go ahead and explore top categories.",
+    "exploreCategories": "Explore Categories",
     "orderSummary": "Order Summary",
     "subtotal": "Subtotal",
     "shipping": "Shipping",
@@ -63,6 +80,7 @@
     "title": "My Wishlist",
     "empty": "Your wishlist is empty",
     "emptyDescription": "Start adding products to your wishlist to save them for later.",
+    "emptyBrowseCta": "Browse Products",
     "totalCount": "Total items in wishlist",
     "tableHeaders": {
       "productName": "Product Name",
@@ -161,6 +179,7 @@
     "searchPlaceholder": "Search products",
     "openMenu": "Open navigation menu",
     "closeMenu": "Close navigation menu",
+    "changeLanguage": "Change language",
     "instagram": "Instagram",
     "facebook": "Facebook",
     "linkedin": "LinkedIn",
@@ -185,18 +204,24 @@
     "category": "Grocery"
   },
   "footer": {
+    "visitUs": "Visit us",
+    "productsHeading": "Products",
+    "sectionsHeading": "Sections",
+    "connectHeading": "Connect",
+    "openInMaps": "Open address in Google Maps",
     "shop": "Shop",
-    "description": "Professional e-commerce platform for modern shopping experience.",
-    "quickLinks": "Quick Links",
-    "legal": "Legal",
-    "contactInfo": "Contact Information",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "cookiePolicy": "Cookie Policy",
-    "refundPolicy": "Refund Policy",
-    "deliveryTerms": "Delivery Terms",
-    "copyright": "© {year} Shop. All rights reserved.",
-    "paymentMethods": "Payment Methods:"
+    "copyright": "© {year} Mobee. All rights reserved.",
+    "legalBar": {
+      "brand": "MOBEE",
+      "copyrightLead": "Copyright © {year} | All Rights Reserved,",
+      "createdBy": "Created by",
+      "creditCompany": "Neetrino IT Company",
+      "privacyPolicy": "Privacy policy",
+      "shippingPolicy": "Shipping policy",
+      "returnPolicy": "Return policy",
+      "termsOfUse": "Terms of use",
+      "policiesNavLabel": "Legal and policies"
+    }
   },
   "product": {
     "product": "product",

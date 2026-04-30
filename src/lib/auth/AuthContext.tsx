@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient, ApiError } from '../api-client';
+import { mergeGuestCartIntoUserCart } from '../cart/guest-cart';
 
 /**
  * User interface
@@ -81,11 +82,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!parsedUser.roles || !Array.isArray(parsedUser.roles)) {
             console.log('⚠️ [AUTH] User data missing roles, fetching from API...');
             try {
-              const profileData = await apiClient.get<{ roles: string[] }>('/api/v1/users/profile');
-              if (profileData.roles) {
-                parsedUser.roles = profileData.roles;
+              const rolePayload = await apiClient.get<{ roles: string[] }>('/api/v1/users/roles');
+              if (rolePayload.roles) {
+                parsedUser.roles = rolePayload.roles;
                 localStorage.setItem(AUTH_USER_KEY, JSON.stringify(parsedUser));
-                console.log('✅ [AUTH] Roles updated from API:', profileData.roles);
+                console.log('✅ [AUTH] Roles updated from API:', rolePayload.roles);
               }
             } catch (fetchError) {
               console.error('❌ [AUTH] Failed to fetch user roles:', fetchError);
@@ -109,6 +110,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     loadAuthState();
   }, []);
+
+  const persistAuthResponse = (response: AuthResponse) => {
+    if (!response?.token || !response.user?.id) {
+      throw new Error('Invalid response from server');
+    }
+    localStorage.setItem(AUTH_TOKEN_KEY, response.token);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
+    setToken(response.token);
+    setUser(response.user);
+    window.dispatchEvent(new Event('auth-updated'));
+  };
+
+  const mergeGuestCartAfterAuth = async () => {
+    const result = await mergeGuestCartIntoUserCart();
+    if (result.failed.length > 0) {
+      console.warn('⚠️ [AUTH] Guest cart merge partially failed', {
+        merged: result.merged.length,
+        failed: result.failed.length,
+      });
+      return;
+    }
+
+    if (result.merged.length > 0) {
+      console.log('✅ [AUTH] Guest cart merged into user cart', {
+        merged: result.merged.length,
+      });
+    }
+  };
 
   /**
    * Login user
@@ -136,15 +165,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin: response.user.roles?.includes('admin')
       });
 
-      // Store auth data
-      localStorage.setItem(AUTH_TOKEN_KEY, response.token);
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
-
-      setToken(response.token);
-      setUser(response.user);
-
-      // Trigger auth update event
-      window.dispatchEvent(new Event('auth-updated'));
+      persistAuthResponse(response);
+      await mergeGuestCartAfterAuth();
 
       // Don't redirect here - let the login page handle redirect based on query params
     } catch (error: any) {
@@ -202,32 +224,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log('✅ [AUTH] Registration response received:', response);
 
-      if (!response || !response.user || !response.token) {
-        console.error('❌ [AUTH] Invalid response structure:', response);
-        throw new Error('Invalid response from server');
-      }
-
+      persistAuthResponse(response);
+      await mergeGuestCartAfterAuth();
       console.log('✅ [AUTH] Registration successful:', { userId: response.user.id });
 
-      // Store auth data
-      try {
-        localStorage.setItem(AUTH_TOKEN_KEY, response.token);
-        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
-        console.log('💾 [AUTH] Auth data stored in localStorage');
-      } catch (storageError) {
-        console.error('❌ [AUTH] Failed to store auth data:', storageError);
-        throw new Error('Failed to save authentication data');
-      }
-
-      setToken(response.token);
-      setUser(response.user);
-
-      // Trigger auth update event
-      window.dispatchEvent(new Event('auth-updated'));
-
       console.log('🔄 [AUTH] Redirecting to home page...');
-      // Redirect to home page
-      router.push('/');
+      router.refresh();
+      router.replace('/');
     } catch (error: any) {
       console.error('❌ [AUTH] Registration error:', error);
       console.error('❌ [AUTH] Error details:', {

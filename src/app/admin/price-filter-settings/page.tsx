@@ -1,13 +1,12 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
-import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
-import { getAdminMenuTABS } from '../admin-menu.config';
 import { useTranslation } from '../../../lib/i18n-client';
+import { AdminPageShell } from '../components/AdminPageShell';
 
 export default function PriceFilterSettingsPage() {
   const { t } = useTranslation();
@@ -236,20 +235,11 @@ export default function PriceFilterSettingsPage() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  // Get current path to highlight active tab
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin');
-  
-  useEffect(() => {
-    if (pathname) {
-      setCurrentPath(pathname);
-    }
-  }, [pathname]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -260,11 +250,9 @@ export default function PriceFilterSettingsPage() {
     return null; // Will redirect
   }
 
-  const adminTabs = getAdminMenuTABS(t);
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AdminPageShell currentPath={pathname || '/admin/price-filter-settings'} router={router} t={t}>
+      <div className="max-w-7xl">
         {/* Header */}
         <div className="mb-8">
           <button
@@ -284,43 +272,7 @@ export default function PriceFilterSettingsPage() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:hidden mb-6">
-            <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
-          </div>
-          {/* Sidebar Navigation */}
-          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-            <nav className="bg-white border border-gray-200 rounded-lg p-2 space-y-1">
-              {adminTabs.map((tab) => {
-                const isActive = currentPath === tab.path || 
-                  (tab.path === '/admin' && currentPath === '/admin') ||
-                  (tab.path !== '/admin' && currentPath.startsWith(tab.path));
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      router.push(tab.path);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
-                      tab.isSubCategory ? 'pl-12' : ''
-                    } ${
-                      isActive
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
-                  >
-                    <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>
-                      {tab.icon}
-                    </span>
-                    <span className="text-left">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
-
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
+        <div>
             <Card className="p-6">
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('admin.priceFilter.priceFilterDefaultRange')}</h2>
@@ -331,7 +283,7 @@ export default function PriceFilterSettingsPage() {
 
               {loading ? (
                 <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
                   <p className="text-gray-600">{t('admin.priceFilter.loadingSettings')}</p>
                 </div>
               ) : (
@@ -395,14 +347,14 @@ export default function PriceFilterSettingsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="bg-admin-50 border border-admin-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-admin-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <div className="text-sm text-blue-800">
+                      <div className="text-sm text-admin-800">
                         <p className="font-medium mb-1">{t('admin.priceFilter.howItWorks')}</p>
-                        <ul className="list-disc list-inside space-y-1 text-blue-700">
+                        <ul className="list-disc list-inside space-y-1 text-admin-700">
                           <li>{t('admin.priceFilter.stepSizeControls')}</li>
                           <li>{t('admin.priceFilter.differentStepSizes')}</li>
                           <li>{t('admin.priceFilter.defaultRange')}</li>
@@ -447,10 +399,9 @@ export default function PriceFilterSettingsPage() {
                 </div>
               )}
             </Card>
-          </div>
         </div>
       </div>
-    </div>
+    </AdminPageShell>
   );
 }
 

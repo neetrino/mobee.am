@@ -43,6 +43,21 @@
     "delivery": "Доставка",
     "stores": "Магазины"
   },
+  "mainHeader": {
+    "searchPlaceholder": "Найди лучшее",
+    "specialOffers": "Специальные предложения",
+    "phonesLink": "Телефоны",
+    "tabletsLink": "Планшеты",
+    "computersLink": "Компьютеры",
+    "watchesLink": "Часы",
+    "headphonesLink": "Наушники",
+    "accessoriesLink": "Аксессуары"
+  },
+  "header": {
+    "supportPhoneAria": "Позвонить в поддержку",
+    "supportPhoneNumber": "+374 10 000000",
+    "supportPhoneTel": "+37410000000"
+  },
   "stock": {
     "inStock": "В наличии",
     "outOfStock": "Нет в наличии"
@@ -50,6 +65,8 @@
   "cart": {
     "title": "Корзина покупок",
     "empty": "Ваша корзина пуста",
+    "emptyDescription": "Похоже, вы еще ничего не добавили в корзину. Перейдите к популярным категориям.",
+    "exploreCategories": "Изучить категории",
     "orderSummary": "Итоги заказа",
     "subtotal": "Промежуточный итог",
     "shipping": "Доставка",
@@ -63,6 +80,7 @@
     "title": "Мое избранное",
     "empty": "Ваше избранное пусто",
     "emptyDescription": "Начните добавлять товары в избранное, чтобы сохранить их на потом.",
+    "emptyBrowseCta": "Просмотреть товары",
     "totalCount": "Всего товаров в избранном",
     "tableHeaders": {
       "productName": "Название товара",
@@ -161,6 +179,7 @@
     "searchPlaceholder": "Поиск товаров",
     "openMenu": "Открыть меню навигации",
     "closeMenu": "Закрыть меню навигации",
+    "changeLanguage": "Сменить язык",
     "instagram": "Instagram",
     "facebook": "Facebook",
     "linkedin": "LinkedIn",
@@ -182,18 +201,24 @@
     "category": "Бакалея"
   },
   "footer": {
+    "visitUs": "Посетите нас",
+    "productsHeading": "Товары",
+    "sectionsHeading": "Разделы",
+    "connectHeading": "Связь",
+    "openInMaps": "Открыть адрес в Google Картах",
     "shop": "Магазин",
-    "description": "Профессиональная платформа электронной коммерции для современного опыта покупок.",
-    "quickLinks": "Быстрые ссылки",
-    "legal": "Юридическая информация",
-    "contactInfo": "Контактная информация",
-    "privacyPolicy": "Политика конфиденциальности",
-    "termsOfService": "Условия использования",
-    "cookiePolicy": "Политика использования файлов cookie",
-    "refundPolicy": "Политика возврата",
-    "deliveryTerms": "Условия доставки",
-    "copyright": "© {year} Shop. Все права защищены.",
-    "paymentMethods": "Способы оплаты:"
+    "copyright": "© {year} Mobee. Все права защищены.",
+    "legalBar": {
+      "brand": "MOBEE",
+      "copyrightLead": "Авторское право © {year} | Все права защищены,",
+      "createdBy": "Создано",
+      "creditCompany": "Neetrino IT Company",
+      "privacyPolicy": "Политика конфиденциальности",
+      "shippingPolicy": "Политика доставки",
+      "returnPolicy": "Политика возврата",
+      "termsOfUse": "Условия использования",
+      "policiesNavLabel": "Правовая информация"
+    }
   },
   "product": {
     "product": "товар",

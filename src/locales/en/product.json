@@ -23,7 +23,12 @@
   "errorAddingToCart": "Error adding to cart",
   "pcs": "pcs",
   "outOfStockLabel": "Out of Stock",
-  "noRelatedProducts": "Related products not found"
+  "noRelatedProducts": "Related products not found",
+  "pricePrefix": "Price:",
+  "priceInfoAria": "Price information",
+  "priceInfoTitle": "Price includes VAT where applicable. Final price may depend on the selected variant.",
+  "moreDetails": "More details",
+  "availableInStores": "Available in stores"
 }
 
 

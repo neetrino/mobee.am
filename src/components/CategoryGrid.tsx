@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
+import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
 
 interface Category {
   id: string;
@@ -303,7 +304,7 @@ export function CategoryGrid() {
           {categories.map((category) => {
             const productCount = productCounts[category.slug] ?? 0;
             const product = categoryProducts[category.slug];
-            
+
             return (
               <Link
                 key={category.id}
@@ -316,10 +317,10 @@ export function CategoryGrid() {
               >
                 {/* Product Image or Icon */}
                 <div className="transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1 relative">
-                  {product?.image ? (
+                  {product ? (
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-white shadow-md border-2 border-gray-200 group-hover:border-gray-400 transition-all duration-300">
                       <Image
-                        src={product.image}
+                        src={resolveProductCardImageSrc(product.image)}
                         alt={category.title}
                         width={80}
                         height={80}

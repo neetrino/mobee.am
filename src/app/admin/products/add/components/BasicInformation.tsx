@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { ChangeEvent } from 'react';
 import { Input } from '@shop/ui';
@@ -47,7 +47,7 @@ export function BasicInformation({
                 value="simple"
                 checked={productType === 'simple'}
                 onChange={(e) => setProductType(e.target.value as 'simple' | 'variable')}
-                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                className="w-4 h-4 text-admin-600 border-gray-300 focus:ring-admin"
               />
               <span className="text-sm text-gray-700">{t('admin.products.add.productTypeSimple')}</span>
             </label>
@@ -58,7 +58,7 @@ export function BasicInformation({
                 value="variable"
                 checked={productType === 'variable'}
                 onChange={(e) => setProductType(e.target.value as 'simple' | 'variable')}
-                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                className="w-4 h-4 text-admin-600 border-gray-300 focus:ring-admin"
               />
               <span className="text-sm text-gray-700">{t('admin.products.add.productTypeVariable')}</span>
             </label>
@@ -96,7 +96,7 @@ export function BasicInformation({
             {t('admin.products.add.description')}
           </label>
           <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
             rows={6}
             value={descriptionHtml}
             onChange={onDescriptionChange}

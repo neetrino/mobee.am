@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -366,20 +366,11 @@ export default function QuickSettingsPage() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  // Get current path to highlight active tab
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin/quick-settings');
-  
-  useEffect(() => {
-    if (pathname) {
-      setCurrentPath(pathname);
-    }
-  }, [pathname]);
-
   if (isLoading) {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
@@ -391,8 +382,8 @@ export default function QuickSettingsPage() {
   }
 
   return (
-    <QuickSettingsContent
-      currentPath={currentPath}
+      <QuickSettingsContent
+      currentPath={pathname || '/admin/quick-settings'}
       router={router}
       t={t}
       globalDiscount={globalDiscount}

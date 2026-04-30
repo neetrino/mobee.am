@@ -1,7 +1,7 @@
 import { db } from "@white-shop/db";
 import { logger } from "../../../utils/logger";
 import { ensureColorsColumnsExist } from "./migration";
-import { formatAttribute, parseColors } from "./utils";
+import { formatAttribute } from "./utils";
 
 /**
  * Add attribute value

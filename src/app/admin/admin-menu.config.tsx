@@ -14,6 +14,21 @@ import type { AdminMenuItem } from '../../components/AdminMenuDrawer';
 export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   return [
   {
+    id: 'home',
+    label: t('admin.menu.home'),
+    path: '/',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1h-5.5a.5.5 0 01-.5-.5V14h-4v7.5a.5.5 0 01-.5.5H4a1 1 0 01-1-1V9.75z"
+        />
+      </svg>
+    ),
+  },
+  {
     id: 'dashboard',
     label: t('admin.menu.dashboard'),
     path: '/admin',
@@ -122,6 +137,21 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     ),
   },
   {
+    id: 'promocodes',
+    label: t('admin.menu.promocodes'),
+    path: '/admin/promocodes',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 14l6-6m-5.5.5h.01m4.99 4.99h.01M5 7l4-4 10 10-4 4L5 7zm0 0l-2 2a2.828 2.828 0 000 4l4 4a2.828 2.828 0 004 0l2-2"
+        />
+      </svg>
+    ),
+  },
+  {
     id: 'users',
     label: t('admin.menu.users'),
     path: '/admin/users',
@@ -162,6 +192,21 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
           strokeLinejoin="round"
           strokeWidth={2}
           d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'inventory',
+    label: t('admin.menu.inventory'),
+    path: '/admin/inventory',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"
         />
       </svg>
     ),

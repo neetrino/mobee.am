@@ -105,6 +105,7 @@ export function useOrders() {
   const [currency, setCurrency] = useState<CurrencyCode>(getStoredCurrency());
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
+  const [fulfillmentStatusFilter, setFulfillmentStatusFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<OrdersResponse['meta'] | null>(null);
@@ -112,6 +113,7 @@ export function useOrders() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [updatingStatuses, setUpdatingStatuses] = useState<Set<string>>(new Set());
   const [updatingPaymentStatuses, setUpdatingPaymentStatuses] = useState<Set<string>>(new Set());
+  const [updatingFulfillmentStatuses, setUpdatingFulfillmentStatuses] = useState<Set<string>>(new Set());
   const [updateMessage, setUpdateMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
@@ -124,9 +126,11 @@ export function useOrders() {
     if (searchParams) {
       const status = searchParams.get('status') || '';
       const paymentStatus = searchParams.get('paymentStatus') || '';
+      const fulfillmentStatus = searchParams.get('fulfillmentStatus') || '';
       const search = searchParams.get('search') || '';
       setStatusFilter(status);
       setPaymentStatusFilter(paymentStatus);
+      setFulfillmentStatusFilter(fulfillmentStatus);
       setSearchQuery(search);
     }
   }, [searchParams]);
@@ -134,7 +138,15 @@ export function useOrders() {
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('📦 [ADMIN] Fetching orders...', { page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder });
+      console.log('📦 [ADMIN] Fetching orders...', {
+        page,
+        statusFilter,
+        paymentStatusFilter,
+        fulfillmentStatusFilter,
+        searchQuery,
+        sortBy,
+        sortOrder,
+      });
       
       const response = await apiClient.get<OrdersResponse>('/api/v1/admin/orders', {
         params: {
@@ -142,6 +154,7 @@ export function useOrders() {
           limit: '20',
           status: statusFilter || '',
           paymentStatus: paymentStatusFilter || '',
+          fulfillmentStatus: fulfillmentStatusFilter || '',
           search: searchQuery || '',
           sortBy: sortBy || '',
           sortOrder: sortOrder || '',
@@ -156,7 +169,7 @@ export function useOrders() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder]);
+  }, [page, statusFilter, paymentStatusFilter, fulfillmentStatusFilter, searchQuery, sortBy, sortOrder]);
 
   // Initialize currency rates and listen for currency changes
   useEffect(() => {
@@ -191,10 +204,14 @@ export function useOrders() {
 
   useEffect(() => {
     fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder]);
+     
+  }, [page, statusFilter, paymentStatusFilter, fulfillmentStatusFilter, searchQuery, sortBy, sortOrder]);
 
-  const formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string = (amount: number, orderCurrency: string = 'AMD', fromCurrency: CurrencyCode = 'USD') => {
+  const formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string = (
+    amount: number,
+    _orderCurrency: string = 'AMD',
+    fromCurrency: CurrencyCode = 'USD',
+  ) => {
     // Use the selected display currency instead of order currency
     const displayCurrency = currency;
     
@@ -412,6 +429,51 @@ export function useOrders() {
     }
   };
 
+  const handleFulfillmentStatusChange = async (
+    orderId: string,
+    newFulfillmentStatus: string
+  ) => {
+    try {
+      console.log('📝 [ADMIN] Changing order fulfillment status:', {
+        orderId,
+        newFulfillmentStatus,
+      });
+      setUpdatingFulfillmentStatuses((prev) => new Set(prev).add(orderId));
+      setUpdateMessage(null);
+
+      await apiClient.put(`/api/v1/admin/orders/${orderId}`, {
+        fulfillmentStatus: newFulfillmentStatus,
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId
+            ? { ...order, fulfillmentStatus: newFulfillmentStatus }
+            : order
+        )
+      );
+
+      setUpdateMessage({
+        type: 'success',
+        text: t('admin.orders.fulfillmentStatusUpdated'),
+      });
+      setTimeout(() => setUpdateMessage(null), 3000);
+    } catch (err) {
+      console.error('❌ [ADMIN] Error updating order fulfillment status:', err);
+      setUpdateMessage({
+        type: 'error',
+        text: t('admin.orders.failedToUpdateFulfillmentStatus'),
+      });
+      setTimeout(() => setUpdateMessage(null), 5000);
+    } finally {
+      setUpdatingFulfillmentStatuses((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(orderId);
+        return newSet;
+      });
+    }
+  };
+
   return {
     // State
     orders,
@@ -419,6 +481,7 @@ export function useOrders() {
     currency,
     statusFilter,
     paymentStatusFilter,
+    fulfillmentStatusFilter,
     searchQuery,
     page,
     meta,
@@ -426,6 +489,7 @@ export function useOrders() {
     sortOrder,
     updatingStatuses,
     updatingPaymentStatuses,
+    updatingFulfillmentStatuses,
     updateMessage,
     selectedIds,
     bulkDeleting,
@@ -435,6 +499,7 @@ export function useOrders() {
     // Actions
     setStatusFilter,
     setPaymentStatusFilter,
+    setFulfillmentStatusFilter,
     setSearchQuery,
     setPage,
     fetchOrders,
@@ -447,6 +512,7 @@ export function useOrders() {
     handleBulkDelete,
     handleStatusChange,
     handlePaymentStatusChange,
+    handleFulfillmentStatusChange,
     router,
     searchParams,
   };

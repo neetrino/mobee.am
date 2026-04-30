@@ -5,6 +5,13 @@ import type { CheckoutData } from "../types/checkout";
 import { logger } from "../utils/logger";
 import { adminDeliveryService } from "./admin/admin-delivery.service";
 import { extractMediaUrl } from "../utils/extractMediaUrl";
+import {
+  calculateDiscountAmount,
+  calculateTotals,
+  normalizeCheckoutLocale,
+  normalizePercent,
+} from "./orders/checkout-calculations";
+import { createPaymentUrl } from "./orders/checkout-payment";
 
 const orderNumberId = customAlphabet("0123456789ABCDEFGHJKLMNPQRSTUVWXYZ", 10);
 
@@ -31,17 +38,6 @@ type CartItemWithRelations = Prisma.CartItemGetPayload<{
   };
 }>;
 
-type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
-  include: {
-    product: {
-      include: {
-        translations: true;
-      };
-    };
-    options: true;
-  };
-}>;
-
 type OrderItemWithVariant = Prisma.OrderItemGetPayload<{
   include: {
     variant: {
@@ -61,11 +57,47 @@ type OrderItemWithVariant = Prisma.OrderItemGetPayload<{
   };
 }>;
 
+interface ReorderSkippedItem {
+  variantId: string;
+  productTitle: string;
+  quantity: number;
+  reason: "variant_not_found" | "variant_unpublished" | "insufficient_stock";
+  availableStock?: number;
+}
+
+interface ReorderAddedItem {
+  variantId: string;
+  productId: string;
+  quantity: number;
+}
+
 class OrdersService {
+  private async resolvePromoDiscountPercent(code?: string): Promise<number> {
+    if (!code) return 0;
+    const normalizedCode = code.trim().toUpperCase();
+    if (!normalizedCode) return 0;
+
+    const promoCode = await db.promoCode.findUnique({
+      where: { code: normalizedCode },
+      select: { discountPercent: true, isActive: true },
+    });
+
+    if (!promoCode || !promoCode.isActive) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/validation-error",
+        title: "Invalid promo code",
+        detail: `Promo code "${normalizedCode}" is invalid or inactive`,
+      };
+    }
+
+    return normalizePercent(promoCode.discountPercent, 0);
+  }
+
   /**
    * Create order (checkout)
    */
-  async checkout(data: CheckoutData, userId?: string) {
+  async checkout(data: CheckoutData, userId?: string, baseUrl?: string) {
     try {
       const {
         cartId,
@@ -75,6 +107,8 @@ class OrdersService {
         shippingMethod = 'pickup',
         shippingAddress,
         paymentMethod = 'idram',
+        promoCode,
+        locale,
       } = data;
       // shippingAmount is ignored — computed server-side from shippingMethod and address
 
@@ -99,8 +133,9 @@ class OrdersService {
         sku: string;
         imageUrl?: string;
       }> = [];
+      const isUserCartCheckout = Boolean(userId && cartId && cartId !== "guest-cart");
 
-      if (userId && cartId && cartId !== 'guest-cart') {
+      if (isUserCartCheckout) {
         // Get items from user's cart
         const cart = await db.cart.findFirst({
           where: { id: cartId, userId },
@@ -177,7 +212,7 @@ class OrdersService {
             // Get image URL
             const imageUrl = extractMediaUrl(product.media) ?? undefined;
 
-            // Check stock availability
+            // Check stock availability for reserved cart item quantity
             if (variant.stock < item.quantity) {
               throw {
                 status: 422,
@@ -292,7 +327,8 @@ class OrdersService {
 
       // Calculate totals
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const discountAmount = 0; // TODO: Implement discount/coupon logic
+      const discountPercent = await this.resolvePromoDiscountPercent(promoCode);
+      const discountAmount = calculateDiscountAmount(subtotal, discountPercent);
       // Shipping: computed server-side only (never trust client-provided amount)
       let shippingAmount = 0;
       if (shippingMethod === 'delivery' && shippingAddress?.city?.trim()) {
@@ -303,8 +339,18 @@ class OrdersService {
         );
         if (shippingAmount < 0) shippingAmount = 0;
       }
-      const taxAmount = 0; // TODO: Calculate tax if needed
-      const total = subtotal - discountAmount + shippingAmount + taxAmount;
+      const taxPercent = normalizePercent(process.env.CHECKOUT_TAX_PERCENT, 0);
+      const applyTaxOnShipping = process.env.CHECKOUT_TAX_APPLY_ON_SHIPPING === "true";
+      const totals = calculateTotals({
+        subtotal,
+        discountAmount,
+        shippingAmount,
+        taxConfig: {
+          percent: taxPercent,
+          applyOnShipping: applyTaxOnShipping,
+        },
+      });
+      const customerLocale = normalizeCheckoutLocale(locale);
 
       // Generate order number
       const orderNumber = generateOrderNumber();
@@ -320,15 +366,15 @@ class OrdersService {
             status: 'pending',
             paymentStatus: 'pending',
             fulfillmentStatus: 'unfulfilled',
-            subtotal,
-            discountAmount,
-            shippingAmount,
-            taxAmount,
-            total,
+            subtotal: totals.subtotal,
+            discountAmount: totals.discountAmount,
+            shippingAmount: totals.shippingAmount,
+            taxAmount: totals.taxAmount,
+            total: totals.total,
             currency: 'AMD',
             customerEmail: email,
             customerPhone: phone,
-            customerLocale: 'en', // TODO: Get from request
+            customerLocale,
             shippingMethod,
             shippingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
             billingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
@@ -351,6 +397,9 @@ class OrdersService {
                   source: userId ? 'user' : 'guest',
                   paymentMethod,
                   shippingMethod,
+                  promoCode: promoCode ?? null,
+                  discountPercent,
+                  taxPercent,
                 },
               },
             },
@@ -377,9 +426,20 @@ class OrdersService {
 
             const quantity = Number(item.quantity);
             const variantId = item.variantId;
-            const updated = await tx.$executeRaw(
-              Prisma.sql`UPDATE product_variants SET stock = stock - ${quantity} WHERE id = ${variantId} AND stock >= ${quantity}`
-            );
+            const updated = isUserCartCheckout
+              ? await tx.$executeRaw(
+                  Prisma.sql`UPDATE product_variants
+                             SET stock = stock - ${quantity},
+                                 stock_reserved = stock_reserved - ${quantity}
+                             WHERE id = ${variantId}
+                               AND stock >= ${quantity}
+                               AND stock_reserved >= ${quantity}`
+                )
+              : await tx.$executeRaw(
+                  Prisma.sql`UPDATE product_variants
+                             SET stock = stock - ${quantity}
+                             WHERE id = ${variantId} AND stock >= ${quantity}`
+                );
             if (updated === 0) {
               const variant = await tx.productVariant.findUnique({
                 where: { id: variantId },
@@ -414,7 +474,7 @@ class OrdersService {
             orderId: newOrder.id,
             provider: paymentMethod,
             method: paymentMethod,
-            amount: total,
+            amount: totals.total,
             currency: 'AMD',
             status: 'pending',
           },
@@ -433,6 +493,14 @@ class OrdersService {
       );
 
       // Return order and payment info
+      const paymentUrl = createPaymentUrl({
+        paymentId: order.payment.id,
+        orderNumber: order.order.number,
+        amount: Number(order.order.total),
+        provider: paymentMethod as "idram" | "arca" | "cash_on_delivery",
+        baseUrl: baseUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+      });
+
       return {
         order: {
           id: order.order.id,
@@ -444,10 +512,10 @@ class OrdersService {
         },
         payment: {
           provider: order.payment.provider,
-          paymentUrl: null, // TODO: Generate payment URL for Idram/ArCa
+          paymentUrl,
           expiresAt: null, // TODO: Set expiration if needed
         },
-        nextAction: paymentMethod === 'idram' || paymentMethod === 'arca' 
+        nextAction: (paymentMethod === 'idram' || paymentMethod === 'arca') && Boolean(paymentUrl)
           ? 'redirect_to_payment' 
           : 'view_order',
       };
@@ -699,6 +767,193 @@ class OrdersService {
       trackingNumber: order.trackingNumber || undefined,
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
+    };
+  }
+
+  /**
+   * Reorder items from a previous order into the user's cart.
+   * Adds all valid items in one transaction and reports skipped items.
+   */
+  async reorder(orderNumber: string, userId: string) {
+    const order = await db.order.findFirst({
+      where: {
+        number: orderNumber,
+        userId,
+      },
+      include: {
+        items: {
+          select: {
+            variantId: true,
+            productTitle: true,
+            quantity: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "Order not found",
+        detail: `Order with number '${orderNumber}' not found`,
+      };
+    }
+
+    if (order.items.length === 0) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/validation-error",
+        title: "Order has no items",
+        detail: "Cannot reorder an order without items",
+      };
+    }
+
+    const requestedByVariant = new Map<
+      string,
+      { variantId: string; productTitle: string; quantity: number }
+    >();
+
+    for (const item of order.items) {
+      if (item.variantId == null) continue;
+
+      const existing = requestedByVariant.get(item.variantId);
+      if (!existing) {
+        requestedByVariant.set(item.variantId, {
+          variantId: item.variantId,
+          productTitle: item.productTitle,
+          quantity: item.quantity,
+        });
+        continue;
+      }
+
+      existing.quantity += item.quantity;
+    }
+
+    const variantIds = Array.from(requestedByVariant.keys());
+    const variants = await db.productVariant.findMany({
+      where: { id: { in: variantIds } },
+      select: {
+        id: true,
+        productId: true,
+        stock: true,
+        published: true,
+        price: true,
+      },
+    });
+    const variantsById = new Map(variants.map((variant) => [variant.id, variant]));
+
+    const skipped: ReorderSkippedItem[] = [];
+    const toAdd: ReorderAddedItem[] = [];
+
+    for (const requested of requestedByVariant.values()) {
+      const variant = variantsById.get(requested.variantId);
+
+      if (!variant) {
+        skipped.push({
+          variantId: requested.variantId,
+          productTitle: requested.productTitle,
+          quantity: requested.quantity,
+          reason: "variant_not_found",
+        });
+        continue;
+      }
+
+      if (!variant.published) {
+        skipped.push({
+          variantId: requested.variantId,
+          productTitle: requested.productTitle,
+          quantity: requested.quantity,
+          reason: "variant_unpublished",
+          availableStock: variant.stock,
+        });
+        continue;
+      }
+
+      if (variant.stock < requested.quantity) {
+        skipped.push({
+          variantId: requested.variantId,
+          productTitle: requested.productTitle,
+          quantity: requested.quantity,
+          reason: "insufficient_stock",
+          availableStock: variant.stock,
+        });
+        continue;
+      }
+
+      toAdd.push({
+        variantId: requested.variantId,
+        productId: variant.productId,
+        quantity: requested.quantity,
+      });
+    }
+
+    if (toAdd.length > 0) {
+      await db.$transaction(async (tx: Prisma.TransactionClient) => {
+        let cart = await tx.cart.findFirst({
+          where: { userId },
+        });
+        if (!cart) {
+          cart = await tx.cart.create({
+            data: {
+              userId,
+              locale: "en",
+              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            },
+          });
+        } else {
+          await tx.cart.update({
+            where: { id: cart.id },
+            data: { updatedAt: new Date() },
+          });
+        }
+
+        for (const item of toAdd) {
+          const variantRow = variantsById.get(item.variantId);
+          const priceSnapshot = variantRow?.price ?? 0;
+
+          const existingCartItem = await tx.cartItem.findFirst({
+            where: {
+              cartId: cart.id,
+              variantId: item.variantId,
+            },
+            select: {
+              id: true,
+              quantity: true,
+            },
+          });
+
+          if (!existingCartItem) {
+            await tx.cartItem.create({
+              data: {
+                cartId: cart.id,
+                productId: item.productId,
+                variantId: item.variantId,
+                quantity: item.quantity,
+                priceSnapshot,
+              },
+            });
+            continue;
+          }
+
+          await tx.cartItem.update({
+            where: { id: existingCartItem.id },
+            data: {
+              quantity: existingCartItem.quantity + item.quantity,
+            },
+          });
+        }
+      });
+    }
+
+    return {
+      orderNumber,
+      added: toAdd.length,
+      skipped: skipped.length,
+      totalRequested: requestedByVariant.size,
+      addedItems: toAdd,
+      skippedItems: skipped,
+      hasPartialFailure: skipped.length > 0,
     };
   }
 }

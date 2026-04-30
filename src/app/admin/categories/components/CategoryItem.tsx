@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Button } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -23,7 +23,7 @@ export function CategoryItem({ category, parentCategory, onEdit, onDelete }: Cat
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium text-gray-900">{category.title}</div>
           {category.requiresSizes && (
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+            <span className="text-xs bg-admin-100 text-admin-800 px-2 py-0.5 rounded">
               Sizes
             </span>
           )}
@@ -42,7 +42,7 @@ export function CategoryItem({ category, parentCategory, onEdit, onDelete }: Cat
           variant="ghost"
           size="sm"
           onClick={() => onEdit(category)}
-          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+          className="text-admin-600 hover:text-admin-800 hover:bg-admin-50"
         >
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

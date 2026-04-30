@@ -1,228 +1,216 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { apiClient } from '../lib/api-client';
-import { getStoredLanguage, type LanguageCode } from '../lib/language';
-import { ProductCard } from './ProductCard';
+import { useCallback } from 'react';
+import { FeaturedBestChoiceGrid } from './FeaturedBestChoiceGrid';
+import { SpecialOffersProductGrid } from './SpecialOffersProductGrid';
+import { SpecialOffersSectionHeading } from './SpecialOffersSectionHeading';
+import { WhyChooseUsSection } from './WhyChooseUsSection';
+import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
+import { HomeMobileSaleBanner } from './HomeMobileSaleBanner';
+import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { t } from '../lib/i18n';
-import type { ProductLabel } from './ProductLabels';
+import { FEATURED_HOME_FILTER_DEFAULT, useFeaturedHomeProducts } from './useFeaturedHomeProducts';
+import {
+  SPECIAL_OFFERS_HOME_FILTER_DEFAULT,
+  useSpecialOffersHomeProducts,
+} from './useSpecialOffersHomeProducts';
+import { useHomeProductSectionsCarousels } from './useHomeProductSectionsCarousels';
+import type { LanguageCode } from '../lib/language';
+import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
+import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSync';
 
-interface Product {
-  id: string;
-  slug: string;
-  title: string;
-  price: number;
-  compareAtPrice?: number | null;
-  image: string | null;
-  inStock: boolean;
-  brand: {
-    id: string;
-    name: string;
-  } | null;
-  colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>; // Available colors from variants with imageUrl and colors hex
-  sizes?: Array<{ value: string; imageUrl?: string | null }>; // Available sizes from variants
-  attributes?: Record<string, Array<{ valueId?: string; value: string; label: string; imageUrl?: string | null; colors?: string[] | null }>>; // Other attributes (not color or size)
-  originalPrice?: number | null;
-  discountPercent?: number | null;
-  labels?: ProductLabel[];
+type HomeFeaturedCarouselSectionProps = {
+  language: LanguageCode;
+  featuredCarousel: MobileCarouselViewState;
+  loading: boolean;
+  error: string | null;
+  products: FeaturedHomeProduct[];
+  productsPerPage: number;
+  onRetry: () => void;
+  onFeaturedCarouselViewChange: (state: MobileCarouselViewState) => void;
+};
+
+function HomeFeaturedCarouselSection({
+  language,
+  featuredCarousel,
+  loading,
+  error,
+  products,
+  productsPerPage,
+  onRetry,
+  onFeaturedCarouselViewChange,
+}: HomeFeaturedCarouselSectionProps) {
+  return (
+    <>
+      <HomeMobileSectionTitle
+        sectionHeadingId="home-featured-heading-mobile"
+        title={t(language, 'home.mobile_home.featuredSectionTitle')}
+        syncedCarouselPageIndex={featuredCarousel.pageIndex}
+        syncedCarouselPageCount={featuredCarousel.pageCount}
+      />
+      <FeaturedBestChoiceGrid
+        language={language}
+        loading={loading}
+        error={error}
+        products={products}
+        productsPerPage={productsPerPage}
+        onRetry={onRetry}
+        onMobileCarouselViewChange={onFeaturedCarouselViewChange}
+      />
+    </>
+  );
 }
 
-interface ProductsResponse {
-  data: Product[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
+type HomeSpecialOffersCarouselSectionProps = {
+  specialOffersLanguage: LanguageCode;
+  specialOffersCarousel: MobileCarouselViewState;
+  specialOffersLoading: boolean;
+  specialOffersError: string | null;
+  specialOffersProducts: FeaturedHomeProduct[];
+  specialOffersProductsPerPage: number;
+  onRetrySpecialOffers: () => void;
+  onSpecialOffersCarouselViewChange: (state: MobileCarouselViewState) => void;
+};
+
+function HomeSpecialOffersCarouselSection({
+  specialOffersLanguage,
+  specialOffersCarousel,
+  specialOffersLoading,
+  specialOffersError,
+  specialOffersProducts,
+  specialOffersProductsPerPage,
+  onRetrySpecialOffers,
+  onSpecialOffersCarouselViewChange,
+}: HomeSpecialOffersCarouselSectionProps) {
+  return (
+    <SpecialOffersSectionHeading
+      syncedCarouselPageIndex={specialOffersCarousel.pageIndex}
+      syncedCarouselPageCount={specialOffersCarousel.pageCount}
+    >
+      <div className="mt-8 lg:mt-[7.5rem]">
+        <SpecialOffersProductGrid
+          language={specialOffersLanguage}
+          loading={specialOffersLoading}
+          error={specialOffersError}
+          products={specialOffersProducts}
+          productsPerPage={specialOffersProductsPerPage}
+          onRetry={onRetrySpecialOffers}
+          onMobileCarouselViewChange={onSpecialOffersCarouselViewChange}
+        />
+      </div>
+    </SpecialOffersSectionHeading>
+  );
 }
 
-type FilterType = 'new' | 'featured' | 'bestseller';
+type HomeProductSectionsBodyProps = {
+  language: LanguageCode;
+  products: FeaturedHomeProduct[];
+  loading: boolean;
+  error: string | null;
+  productsPerPage: number;
+  onRetry: () => void;
+  specialOffersLanguage: LanguageCode;
+  specialOffersProducts: FeaturedHomeProduct[];
+  specialOffersLoading: boolean;
+  specialOffersError: string | null;
+  specialOffersProductsPerPage: number;
+  onRetrySpecialOffers: () => void;
+  featuredCarousel: MobileCarouselViewState;
+  specialOffersCarousel: MobileCarouselViewState;
+  onFeaturedCarouselViewChange: (state: MobileCarouselViewState) => void;
+  onSpecialOffersCarouselViewChange: (state: MobileCarouselViewState) => void;
+};
 
-interface Tab {
-  id: FilterType;
-  label: string;
-  filter: string | null;
+function HomeProductSectionsBody(props: HomeProductSectionsBodyProps) {
+  const { language, ...rest } = props;
+  return (
+    <div className={SITE_CONTENT_GUTTERS_CLASS}>
+      <h2 id="home-product-sections" className="sr-only">
+        {t(language, 'home.featured_products.title')}
+      </h2>
+      <HomeFeaturedCarouselSection
+        language={language}
+        featuredCarousel={rest.featuredCarousel}
+        loading={rest.loading}
+        error={rest.error}
+        products={rest.products}
+        productsPerPage={rest.productsPerPage}
+        onRetry={rest.onRetry}
+        onFeaturedCarouselViewChange={rest.onFeaturedCarouselViewChange}
+      />
+      <HomeSpecialOffersCarouselSection
+        specialOffersLanguage={rest.specialOffersLanguage}
+        specialOffersCarousel={rest.specialOffersCarousel}
+        specialOffersLoading={rest.specialOffersLoading}
+        specialOffersError={rest.specialOffersError}
+        specialOffersProducts={rest.specialOffersProducts}
+        specialOffersProductsPerPage={rest.specialOffersProductsPerPage}
+        onRetrySpecialOffers={rest.onRetrySpecialOffers}
+        onSpecialOffersCarouselViewChange={rest.onSpecialOffersCarouselViewChange}
+      />
+    </div>
+  );
 }
-
-// Tabs will be generated dynamically with translations
-
-const PRODUCTS_PER_PAGE = 10;
-const MOBILE_GRID_LAYOUT =
-  'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
 
 /**
- * FeaturedProductsTabs Component
- * Displays products with tabs for filtering (NEW OFFERS, NEW, FEATURED, TOP SELLERS)
- * Similar to the reference design with underlined active tab
+ * Product sections for the home page (stacked curated lists).
  */
-export function FeaturedProductsTabs() {
-  // Use state for language to prevent hydration mismatch
-  // Start with 'en' on server, update on client mount
-  const [language, setLanguage] = useState<LanguageCode>('en');
-  const [activeTab, setActiveTab] = useState<FilterType>('new');
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function HomeProductSections() {
+  const { language, products, loading, error, fetchProducts, productsPerPage } =
+    useFeaturedHomeProducts();
 
-  // Update language on mount and when language changes
-  useEffect(() => {
-    const updateLanguage = () => {
-      const storedLang = getStoredLanguage();
-      setLanguage(storedLang);
-    };
+  const {
+    language: specialOffersLanguage,
+    products: specialOffersProducts,
+    loading: specialOffersLoading,
+    error: specialOffersError,
+    fetchProducts: fetchSpecialOffersProducts,
+    productsPerPage: specialOffersProductsPerPage,
+  } = useSpecialOffersHomeProducts();
 
-    // Update immediately on mount
-    updateLanguage();
-
-    // Listen to language-updated events
-    const handleLanguageUpdate = () => {
-      updateLanguage();
-    };
-
-    window.addEventListener('language-updated', handleLanguageUpdate);
-    return () => {
-      window.removeEventListener('language-updated', handleLanguageUpdate);
-    };
-  }, []);
-
-  // Generate tabs with translations (memoized based on language)
-  const tabs: Tab[] = [
-    { id: 'new', label: t(language, 'home.featured_products.tab_new'), filter: 'new' },
-    { id: 'bestseller', label: t(language, 'home.featured_products.tab_bestseller'), filter: 'bestseller' },
-    { id: 'featured', label: t(language, 'home.featured_products.tab_featured'), filter: 'featured' },
-  ];
-
-  /**
-   * Fetch products based on active filter
-   */
-  const fetchProducts = useCallback(async (filter: string | null) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const currentLang = language;
-      const params: Record<string, string> = {
-        page: '1',
-        limit: PRODUCTS_PER_PAGE.toString(),
-        lang: currentLang,
-      };
-
-      // Add filter if provided
-      if (filter) {
-        params.filter = filter;
-      }
-
-      const response = await apiClient.get<ProductsResponse>('/api/v1/products', {
-        params,
-      });
-
-      setProducts((response.data || []).slice(0, PRODUCTS_PER_PAGE));
-    } catch (err) {
-      console.error('[FeaturedProductsTabs] Error:', err);
-      setError(t(language, 'home.featured_products.errorLoading'));
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [language]);
-
-  /**
-   * Handle tab change
-   */
-  const handleTabChange = (tabId: FilterType) => {
-    setActiveTab(tabId);
-    const tab = tabs.find((t) => t.id === tabId);
-    fetchProducts(tab?.filter || null);
-  };
-
-  // Load products on mount (default "NEW")
-  useEffect(() => {
-    fetchProducts('new');
+  const onRetry = useCallback(() => {
+    fetchProducts(FEATURED_HOME_FILTER_DEFAULT);
   }, [fetchProducts]);
 
+  const onRetrySpecialOffers = useCallback(() => {
+    fetchSpecialOffersProducts(SPECIAL_OFFERS_HOME_FILTER_DEFAULT);
+  }, [fetchSpecialOffersProducts]);
+
+  const {
+    featuredCarousel,
+    specialOffersCarousel,
+    onFeaturedCarouselViewChange,
+    onSpecialOffersCarouselViewChange,
+  } = useHomeProductSectionsCarousels(productsPerPage, specialOffersProductsPerPage);
+
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
-        <h2 className="text-3xl font-bold text-gray-900 text-center">
-          {t(language, 'home.featured_products.title')}
-        </h2>
-        <p className="mt-3 mb-8 text-base text-gray-600 text-center">
-          {t(language, 'home.featured_products.subtitle')}
-        </p>
+    <section className="bg-white pb-16 pt-2 lg:bg-gray-50 lg:pt-6" aria-labelledby="home-product-sections">
+      <HomeProductSectionsBody
+        language={language}
+        products={products}
+        loading={loading}
+        error={error}
+        productsPerPage={productsPerPage}
+        onRetry={onRetry}
+        specialOffersLanguage={specialOffersLanguage}
+        specialOffersProducts={specialOffersProducts}
+        specialOffersLoading={specialOffersLoading}
+        specialOffersError={specialOffersError}
+        specialOffersProductsPerPage={specialOffersProductsPerPage}
+        onRetrySpecialOffers={onRetrySpecialOffers}
+        featuredCarousel={featuredCarousel}
+        specialOffersCarousel={specialOffersCarousel}
+        onFeaturedCarouselViewChange={onFeaturedCarouselViewChange}
+        onSpecialOffersCarouselViewChange={onSpecialOffersCarouselViewChange}
+      />
 
-        {/* Tabs Navigation */}
-        <div className="flex justify-center items-center gap-6 md:gap-8 mb-8 flex-wrap">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`
-                  relative px-4 py-2 text-sm font-medium transition-colors duration-200
-                  ${isActive 
-                    ? 'text-blue-600' 
-                    : 'text-gray-600 hover:text-gray-900'
-                  }
-                `}
-                aria-label={t(language, 'home.featured_products.ariaShowProducts').replace('{label}', tab.label)}
-                aria-pressed={isActive}
-              >
-                {tab.label}
-                {/* Active indicator - underline */}
-                {isActive && (
-                  <span 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
-                    aria-hidden="true"
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Products Grid */}
-        {loading ? (
-          <div className={MOBILE_GRID_LAYOUT}>
-            {[...Array(PRODUCTS_PER_PAGE)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg overflow-hidden animate-pulse">
-                <div className="aspect-square bg-gray-200"></div>
-                <div className="p-4 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-5 bg-gray-200 rounded w-1/3"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-red-600 mb-4">{error}</p>
-            <button
-              onClick={() => {
-                const tab = tabs.find((t) => t.id === activeTab);
-                fetchProducts(tab?.filter || null);
-              }}
-              className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors"
-            >
-              {t(language, 'home.featured_products.tryAgain')}
-            </button>
-          </div>
-        ) : products.length > 0 ? (
-          <div className={MOBILE_GRID_LAYOUT}>
-            {products.slice(0, PRODUCTS_PER_PAGE).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500">{t(language, 'home.featured_products.noProducts')}</p>
-          </div>
-        )}
+      <div className="hidden lg:block">
+        <WhyChooseUsSection />
       </div>
+
+      <HomeMobileSaleBanner />
     </section>
   );
 }
 
+export const FeaturedProductsTabs = HomeProductSections;

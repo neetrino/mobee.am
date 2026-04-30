@@ -1,0 +1,785 @@
+# TASKS AUDIT
+
+## 1. Define data model and migrations
+Status: Mostly implemented
+Completion: 95%
+Progress state: Partially completed
+Summary:
+- Prisma data model is broad and production-oriented; migration SQL files are present and ordered, but runtime migration state cannot be confirmed from repository code alone.
+Implemented parts:
+- Core domain models exist in Prisma: users, addresses, categories, brands, attributes/values/translations, products/translations/variants/options/labels, carts/items, orders/items/payments/events, reviews, promo codes, settings, contact messages.
+- Migration chain exists with 10 SQL migrations including init, product attributes, variant attributes, stock constraints, FK/index improvements, and promo codes.
+- Migration runner and migration notes exist for operational use.
+Files:
+- `shared/db/prisma/schema.prisma`
+- `shared/db/prisma/migrations/20251204093152_init/migration.sql`
+- `shared/db/prisma/migrations/20251222195036_add_product_attributes/migration.sql`
+- `shared/db/prisma/migrations/20260115040503_add_attributes_to_product_variant/migration.sql`
+- `shared/db/prisma/migrations/20260223100000_add_stock_non_negative_check/migration.sql`
+- `shared/db/prisma/migrations/20260423120000_add_promo_codes/migration.sql`
+- `src/scripts/run-migrations.js`
+Missing:
+- Applied migration state per environment is Not verified from current codebase.
+- Connected database appears to be pre-existing and not baselined for Prisma migration history (`P3005`), so migration health cannot pass until baseline strategy is applied.
+Next implementation scope:
+- Baseline existing database(s) for Prisma migration history and then run deploy + health checks.
+- Record per-environment rollout status after successful baseline/deploy.
+Implementation summary:
+- Added a dedicated migration health script (`prisma migrate status`) that fails when migration state is unhealthy or `DATABASE_URL` is missing.
+- Wired CI to start PostgreSQL service, apply migrations, and run migration health verification.
+- Replaced migration README with rollout/verification documentation covering local and CI checks.
+- Verified command behavior locally: health check correctly reports unapplied migrations for the current connected DB.
+- Removed unused `stockReserved` from Prisma schema and added a forward migration to drop the column.
+- Validated schema and ran test suite after migration update.
+Files changed:
+- `.github/workflows/ci.yml`
+- `package.json`
+- `src/scripts/check-migrations-health.js`
+- `shared/db/prisma/migrations/README_MIGRATION.md`
+- `shared/db/prisma/migrations/20260423143000_remove_stock_reserved/migration.sql`
+- `shared/db/prisma/schema.prisma`
+- `TASKS.mdc`
+Remaining:
+- Baseline existing database(s) before migration deploy (current deploy fails with `P3005`).
+- Record per-environment (staging/production) rollout results after successful baseline plus `pnpm run db:migrate:deploy` and `pnpm run db:migrate:health`.
+Execution order: 1
+
+## 2. Global layout: Header/Footer and navigation
+Status: Completed
+Completion: 100%
+Summary:
+- A shared global storefront shell with header, secondary nav, breadcrumb, footer, and mobile bottom nav is implemented and wired in root layout.
+Implemented parts:
+- Root layout wraps pages with `SiteChrome`.
+- `SiteChrome` conditionally skips chrome for `/admin` routes.
+- Header includes search entry and nav structure; footer and mobile nav are present.
+- `/products` route redirects to `/shop`, preserving query params.
+Files:
+- `src/app/layout.tsx`
+- `src/components/SiteChrome.tsx`
+- `src/components/Header.tsx`
+- `src/components/MainHeaderBar.tsx`
+- `src/components/Breadcrumb.tsx`
+- `src/components/Footer.tsx`
+- `src/components/MobileBottomNav.tsx`
+- `src/app/products/page.tsx`
+Implementation summary:
+- Updated shell/navigation entrypoints to use canonical `/shop` for catalog navigation links and query-based category routing.
+- Converted mobile nav and mobile menu labels to locale resources (`common.navigation.*`) for i18n parity.
+- Kept product detail pages on `/products/[slug]` while preserving `/products` redirect behavior to `/shop`.
+- Ran automated tests to verify no regressions in the existing test suite.
+Verification:
+- `pnpm test` (passed, 2 files / 16 tests)
+Execution order: 2
+
+## 3. Home page sections
+Status: Completed
+Completion: 100%
+Summary:
+- Home page sections are assembled and rendered end-to-end in the storefront with modular section components and locale-backed content.
+Implemented parts:
+- Hero, top categories, featured intro, featured/special sections, and partner logos are rendered.
+- Home data hooks exist for featured and special offers content selection.
+Files:
+- `src/app/page.tsx`
+- `src/components/HeroCarousel.tsx`
+- `src/components/TopCategories.tsx`
+- `src/components/FeaturedIntroHeading.tsx`
+- `src/components/FeaturedProductsTabs.tsx`
+- `src/components/PartnerLogosSection.tsx`
+- `src/components/useFeaturedHomeProducts.ts`
+- `src/components/useSpecialOffersHomeProducts.ts`
+- `src/locales/en/home.json`
+Implementation summary:
+- Added explicit home-section ownership mapping (`adminApi` vs `localeStatic`) with source contracts per section.
+- Aligned homepage semantics from tab-oriented naming to stacked section naming via `HomeProductSections` export.
+- Kept backwards compatibility by preserving `FeaturedProductsTabs` as an alias export to avoid integration breakage.
+Files changed:
+- `src/components/homeSections.ts`
+- `src/components/homeSections.test.ts`
+- `src/components/FeaturedProductsTabs.tsx`
+- `src/components/useFeaturedHomeProducts.ts`
+- `src/app/page.tsx`
+Verification:
+- `pnpm test` (passed, 3 files / 19 tests)
+Execution order: 3
+
+## 4. Sorting options
+Status: Completed
+Completion: 100%
+Summary:
+- Sorting is now validated at API boundary and consistently wired from storefront query params to backend sorting logic.
+Implemented parts:
+- Sort dropdown supports default/price/name asc-desc and writes `sort` to query params.
+- Shop page forwards validated `sort` to `/api/v1/products`.
+- Products API validates incoming sort option against allowed values.
+- Products query service propagates sort through query execution and in-memory fallback sorting.
+- Products header now uses canonical `/shop` routes for sort/filter/limit interactions.
+Files:
+- `src/components/ProductsHeader.tsx`
+- `src/components/ProductsGrid.tsx`
+- `src/app/shop/page.tsx`
+- `src/app/products/page.tsx`
+ - `src/app/api/v1/products/route.ts`
+ - `src/lib/products/sort.ts`
+ - `src/lib/services/products-find-query.service.ts`
+ - `src/lib/services/products-find-query/query-executor.ts`
+ - `src/lib/services/products-find-filter.service.ts`
+Verification:
+- `pnpm test src/lib/products/sort.test.ts src/lib/services/products-find-filter.service.test.ts` (passed, 2 files / 6 tests)
+- `pnpm test` (passed, 5 files / 25 tests)
+Execution order: 4
+
+## 5. Gallery and Zoom
+Status: Completed
+Completion: 100%
+Summary:
+- Product detail gallery with thumbnails and fullscreen modal zoom is implemented.
+Implemented parts:
+- Vertical thumbnail strip with scrolling and selected-image synchronization.
+- Main image area with hover scale and fullscreen modal open/close flow.
+- Placeholder/error handling for failed images.
+Files:
+- `src/app/products/[slug]/ProductImageGallery.tsx`
+- `src/components/ProductImagePlaceholder.tsx`
+Missing:
+- None.
+Implementation summary:
+- Upgraded fullscreen viewer with in-modal previous/next image navigation controls and keyboard support (Arrow Left/Right, Escape).
+- Added progressive zoom controls (wheel + buttons with bounded scale) and swipe gesture support for touch navigation.
+- Extracted gallery interaction logic into dedicated utility helpers to keep behavior deterministic and testable.
+Files changed:
+- `src/app/products/[slug]/ProductImageGallery.tsx`
+- `src/app/products/[slug]/product-image-gallery.utils.ts`
+- `src/app/products/[slug]/product-image-gallery.utils.test.ts`
+Verification:
+- `pnpm test src/app/products/[slug]/product-image-gallery.utils.test.ts` (passed, 1 file / 5 tests)
+- `pnpm test` (passed, 6 files / 30 tests)
+Execution order: 5
+
+## 6. Product info and variants
+Status: Completed
+Completion: 100%
+Summary:
+- Product detail, variant selection, and variant availability endpoints are implemented across frontend and backend.
+Implemented parts:
+- Product slug API and service query/transform layers exist.
+- Variant detail endpoint provides stock/availability snapshot.
+- PDP variant and attribute selectors are wired in frontend.
+Files:
+- `src/app/api/v1/products/[slug]/route.ts`
+- `src/lib/services/products.service.ts`
+- `src/lib/services/products-slug.service.ts`
+- `src/lib/services/products-slug/product-query-builder.ts`
+- `src/lib/services/products-slug/product-transformer.ts`
+- `src/app/api/v1/products/variants/[id]/route.ts`
+- `src/app/products/[slug]/ProductInfoAndActions.tsx`
+- `src/app/products/[slug]/ProductAttributesSelector.tsx`
+- `src/app/products/[slug]/useVariantSelection.ts`
+Missing:
+- None.
+Implementation summary:
+- Added dedicated invariant unit coverage for variant resolution behavior in PDP utilities.
+- Verified exact matching and fallback behavior for color/size combinations including out-of-stock fallback.
+- Verified multi-color option matching and attribute-level valueId matching in all-attributes variant resolution.
+Files changed:
+- `src/app/products/[slug]/utils/variant-finders.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/app/products/[slug]/utils/variant-finders.test.ts` (passed, 1 file / 5 tests)
+- `pnpm test` (passed, 7 files / 35 tests)
+Execution order: 6
+
+## 7. Related products and Reviews (v1 read-only)
+Status: Completed
+Completion: 100%
+Summary:
+- Related products now use a dedicated backend contract based on the current product slug, and reviews are strictly read-only in both API and UI layers.
+Implemented parts:
+- Related products API exists at `GET /api/v1/products/[slug]/related`.
+- Related products hook fetches dedicated related data from slug-based backend contract.
+- Related products add-to-cart now matches PDP guest behavior via shared guest cart helper.
+- Reviews GET by product slug exists.
+- Reviews UI renders read-only summary/list without write/edit actions.
+Files:
+- `src/app/api/v1/products/[slug]/related/route.ts`
+- `src/components/hooks/useRelatedProducts.ts`
+- `src/components/RelatedProducts.tsx`
+- `src/app/api/v1/products/[slug]/reviews/route.ts`
+- `src/lib/services/reviews.service.ts`
+- `src/components/ProductReviews.tsx`
+- `src/components/ProductReviews/ReviewList.tsx`
+- `src/components/ProductReviews/ReviewItem.tsx`
+- `src/components/ProductReviews/hooks/useReviews.ts`
+- `src/app/api/v1/reviews/[reviewId]/route.ts`
+Implementation summary:
+- Added `GET /api/v1/products/[slug]/related` route to derive related products server-side from the current product and its primary category.
+- Switched storefront related-products hook from generic `/api/v1/products` queries to the dedicated slug-based related-products endpoint.
+- Enforced v1 read-only reviews by returning `405 Method Not Allowed` for review create/update/delete endpoints.
+- Removed write/edit review controls from storefront UI, leaving reviews list and summary read-only.
+- Unified guest add-to-cart behavior between PDP and related products via shared `guest-cart` helper.
+Files changed:
+- `src/app/api/v1/products/[slug]/related/route.ts`
+- `src/components/hooks/useRelatedProducts.ts`
+- `src/components/RelatedProducts.tsx`
+- `src/app/products/[slug]/page.tsx`
+- `src/lib/cart/guest-cart.ts`
+- `src/lib/cart/guest-cart.test.ts`
+- `src/app/api/v1/products/[slug]/reviews/route.ts`
+- `src/app/api/v1/reviews/[reviewId]/route.ts`
+- `src/components/ProductReviews.tsx`
+- `src/components/ProductReviews/ReviewList.tsx`
+- `src/components/ProductReviews/ReviewItem.tsx`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/cart/guest-cart.test.ts` (passed, 1 file / 2 tests)
+- `pnpm test` (passed, 8 files / 37 tests)
+Execution order: 7
+
+## 8. Cart actions and persistence
+Status: Completed
+Completion: 100%
+Summary:
+- Cart actions exist for authenticated users via API and for guests via localStorage; checkout also supports guest items.
+Implemented parts:
+- Authenticated cart APIs: get/add/update/delete item.
+- Guest cart persistence in localStorage with hydration from product API.
+- Cart page handlers support optimistic updates.
+- Checkout can submit guest items array.
+Files:
+- `src/app/api/v1/cart/route.ts`
+- `src/app/api/v1/cart/items/route.ts`
+- `src/app/api/v1/cart/items/[id]/route.ts`
+- `src/lib/services/cart.service.ts`
+- `src/app/cart/cart-fetcher.ts`
+- `src/app/cart/cart-handlers.ts`
+- `src/app/cart/constants.ts`
+- `src/app/checkout/hooks/useCart.ts`
+- `src/lib/services/orders.service.ts`
+Missing:
+- None.
+Next implementation scope:
+- None.
+Implementation summary:
+- Standardized on a single **localStorage-only** guest cart persistence strategy and moved guest cart read/write/hydration helpers into `src/lib/cart/guest-cart.ts`.
+- Removed duplicated guest-cart hydration logic by reusing shared guest-cart utilities from both cart and checkout flows.
+- Added deterministic guest-to-user merge on auth success (sorted item merge order, keep failed items in guest cart, clear successfully merged items only).
+- Refactored guest cart add/update/remove flows to use shared guest-cart helpers, reducing divergence between storefront paths.
+Files changed:
+- `src/lib/cart/guest-cart.ts`
+- `src/lib/cart/guest-cart.test.ts`
+- `src/lib/auth/AuthContext.tsx`
+- `src/components/hooks/useAddToCart.ts`
+- `src/app/cart/cart-fetcher.ts`
+- `src/app/cart/cart-handlers.ts`
+- `src/app/checkout/checkoutUtils.ts`
+Verification:
+- `pnpm test src/lib/cart/guest-cart.test.ts` (passed, 1 file / 6 tests)
+- `pnpm test` (passed, 8 files / 41 tests)
+Execution order: 8
+
+## 9. Checkout form implementation
+Status: Completed
+Completion: 100%
+Summary:
+- Checkout UI, form state, validation, delivery price integration, and order submission wiring are implemented.
+Implemented parts:
+- Checkout form sections and payment/shipping controls exist.
+- Form uses `react-hook-form` with Zod schema via resolver.
+- Delivery pricing hook and order submission hooks are integrated.
+- Route for checkout submission exists and calls order service.
+- Checkout API route now enforces strict shared DTO schema validation at the API boundary.
+Files:
+- `src/app/checkout/page.tsx`
+- `src/app/checkout/CheckoutForm.tsx`
+- `src/app/checkout/useCheckout.ts`
+- `src/app/checkout/utils/validation-schema.ts`
+- `src/app/checkout/hooks/useOrderSubmission.ts`
+- `src/app/checkout/hooks/useDeliveryPrice.ts`
+- `src/app/api/v1/orders/checkout/route.ts`
+ - `src/lib/schemas/checkout.schema.ts`
+ - `src/lib/schemas/checkout.schema.test.ts`
+Missing:
+- Not verified from current codebase: external payment provider redirect lifecycle.
+Implementation summary:
+- Added `checkout.schema` with strict request contracts (cart/items, email/phone, shipping/payment enums, delivery-city requirement).
+- Wired `POST /api/v1/orders/checkout` to parse request via shared schema before service execution.
+- Added explicit validation-error responses for schema failures with field-level issue details.
+- Added unit tests for valid cart/guest payloads and invalid boundary cases.
+Verification:
+- `pnpm test src/lib/schemas/checkout.schema.test.ts` (passed, 1 file / 4 tests)
+- `pnpm test` (passed, 9 files / 45 tests)
+Execution order: 9
+
+## 10. Order summary and validations
+Status: Completed
+Completion: 100%
+Summary:
+- Order summary UI and substantial backend order validation/stock checks exist, but discount/tax/payment URL logic is still placeholder-level.
+Implemented parts:
+- Checkout order summary component and summary calculation hook exist.
+- Service validates cart/guest items, checks stock, computes server-side shipping, creates order/payment in transaction, decrements stock atomically.
+- Order list/detail APIs for customers are implemented.
+Files:
+- `src/app/checkout/OrderSummary.tsx`
+- `src/app/checkout/hooks/useOrderSummary.ts`
+- `src/app/checkout/utils/validation-schema.ts`
+- `src/app/api/v1/orders/checkout/route.ts`
+- `src/lib/services/orders.service.ts`
+- `src/app/api/v1/orders/route.ts`
+- `src/app/api/v1/orders/[number]/route.ts`
+Missing:
+- None.
+Implementation summary:
+- Added checkout pricing utilities for promo discount, tax-percent normalization, money rounding, and locale normalization.
+- Implemented promo-code discount application in checkout flow using active promo records from `promo_codes`.
+- Implemented server-side tax calculation path using env-driven tax settings (`CHECKOUT_TAX_PERCENT`, `CHECKOUT_TAX_APPLY_ON_SHIPPING`).
+- Added signed online payment session URL generation for Idram/ArCa and secure callback signature verification.
+- Added callback route `GET /api/v1/payments/callback` with signature + timestamp validation and transactional payment/order status updates.
+- Propagated actual checkout locale from request/user context and persisted it in `order.customerLocale`.
+- Extended checkout request schema and submission payload to support `promoCode` and `locale`.
+Files changed:
+- `src/lib/services/orders.service.ts`
+- `src/lib/services/orders/checkout-calculations.ts`
+- `src/lib/services/orders/checkout-payment.ts`
+- `src/app/api/v1/payments/callback/route.ts`
+- `src/app/api/v1/orders/checkout/route.ts`
+- `src/lib/schemas/checkout.schema.ts`
+- `src/lib/types/checkout.ts`
+- `src/app/checkout/hooks/useOrderSubmission.ts`
+- `src/app/checkout/types.ts`
+- `src/lib/services/orders/checkout-calculations.test.ts`
+- `src/lib/services/orders/checkout-payment.test.ts`
+- `src/lib/schemas/checkout.schema.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/services/orders/checkout-calculations.test.ts src/lib/services/orders/checkout-payment.test.ts src/lib/schemas/checkout.schema.test.ts` (passed, 3 files / 12 tests)
+- `pnpm test` (passed, 11 files / 53 tests)
+Execution order: 10
+
+## 11. Profile and address management
+Status: Completed
+Completion: 100%
+Summary:
+- Profile and address CRUD endpoints plus profile page hooks/components are implemented, but payload validation and typing are weak on the service layer.
+Implemented parts:
+- Profile GET/PUT routes and service methods exist.
+- Address list/create/update/delete/default routes and service methods exist.
+- Profile page tabs and hooks consume these APIs.
+Files:
+- `src/app/api/v1/users/profile/route.ts`
+- `src/app/api/v1/users/addresses/route.ts`
+- `src/app/api/v1/users/addresses/[addressId]/route.ts`
+- `src/app/api/v1/users/addresses/[addressId]/default/route.ts`
+- `src/lib/services/users.service.ts`
+- `src/app/profile/page.tsx`
+- `src/app/profile/hooks/useAddresses.ts`
+- `src/app/profile/hooks/useProfile.ts`
+Missing:
+- None.
+Implementation summary:
+- Added strict profile/address request schemas with Zod (`safeParseProfileUpdate`, `safeParseAddressCreate`, `safeParseAddressUpdate`) including strict payload shape checks.
+- Wired profile and addresses API routes to validate bodies and return consistent `400 validation-error` responses when payloads are invalid.
+- Replaced `any` payloads in `users.service` with explicit typed contracts and removed unsafe DB update spread usage by mapping allowed fields explicitly.
+- Hardened default-address mutation by verifying ownership (`userId` + `addressId`) before changing defaults.
+- Standardized users address route error handling to `toApiError` + logger.
+Files changed:
+- `src/lib/schemas/users.schema.ts`
+- `src/lib/schemas/users.schema.test.ts`
+- `src/lib/services/users.service.ts`
+- `src/app/api/v1/users/profile/route.ts`
+- `src/app/api/v1/users/addresses/route.ts`
+- `src/app/api/v1/users/addresses/[addressId]/route.ts`
+- `src/app/api/v1/users/addresses/[addressId]/default/route.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/schemas/users.schema.test.ts` (passed, 1 file / 5 tests)
+- `pnpm test` (passed, 12 files / 58 tests)
+Execution order: 11
+
+## 12. Order history and reorder
+Status: Completed
+Completion: 100%
+Summary:
+- Customer order history and reorder flow are implemented with a dedicated backend reorder endpoint and structured partial-failure reporting.
+Implemented parts:
+- Orders listing and order-by-number detail APIs exist.
+- Profile orders hook fetches orders/details and supports reorder flow.
+- Reorder uses dedicated server endpoint with stock/publish validation and batch cart updates.
+Files:
+- `src/app/api/v1/orders/route.ts`
+- `src/app/api/v1/orders/[number]/route.ts`
+- `src/app/profile/hooks/useOrders.ts`
+- `src/app/profile/OrderDetailsModal.tsx`
+- `src/app/api/v1/products/variants/[id]/route.ts`
+- `src/app/api/v1/cart/items/route.ts`
+Missing:
+- None.
+Implementation summary:
+- Added `POST /api/v1/orders/[number]/reorder` route secured by auth and wired to `ordersService.reorder`.
+- Implemented backend reorder service flow that aggregates order items by variant, validates variant existence/published state/stock, and adds valid items to user cart in one transaction.
+- Added structured reorder response payload (`added`, `skipped`, `addedItems`, `skippedItems`, `hasPartialFailure`) for reliable UI messaging.
+- Refactored profile reorder action to call the new backend endpoint instead of client-side per-item variant/cart API loops.
+- Added API route tests covering unauthorized and successful reorder response paths.
+Files changed:
+- `src/lib/services/orders.service.ts`
+- `src/app/api/v1/orders/[number]/reorder/route.ts`
+- `src/app/api/v1/orders/[number]/reorder/route.test.ts`
+- `src/app/profile/hooks/useOrders.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/app/api/v1/orders/[number]/reorder/route.test.ts` (passed, 1 file / 2 tests)
+- `pnpm test` (passed, 13 files / 60 tests)
+Execution order: 12
+
+## 13. Products CRUD and media management
+Status: Completed
+Completion: 100%
+Summary:
+- Admin product management is feature-rich with list/create/update/delete and media upload, wired to backend services.
+Implemented parts:
+- Admin products API supports filtered list and create.
+- Product by id API supports read/update/delete.
+- Upload images route exists (R2 storage).
+- Admin product UI includes create/edit and variant/media helpers.
+Files:
+- `src/app/api/v1/admin/products/route.ts`
+- `src/app/api/v1/admin/products/[id]/route.ts`
+- `src/app/api/v1/admin/products/upload-images/route.ts`
+- `src/app/admin/products/page.tsx`
+- `src/app/admin/products/add/page.tsx`
+- `src/app/admin/products/add/components/ProductImages.tsx`
+- `src/app/admin/products/add/components/VariantBuilder.tsx`
+- `src/lib/services/admin.service.ts`
+- `src/lib/services/admin/admin-products-create.service.ts`
+- `src/lib/services/admin/admin-products-update.service.ts`
+Missing:
+- None.
+Implementation summary:
+- Added backend stock filter contract (`stock=inStock|outOfStock`) for admin products list API and wired it into query builder logic so pagination/count metadata stays consistent with filtered result sets.
+- Removed client-side stock filtering in admin products page and forwarded stock filter to backend query params.
+- Added explicit media storage health endpoint (`GET /api/v1/admin/products/upload-images`) exposing readiness/missing R2 variables.
+- Added upload fallback behavior: when R2 is not configured, upload route returns inline image URLs with explicit fallback metadata instead of failing hard.
+Files changed:
+- `src/app/api/v1/admin/products/route.ts`
+- `src/lib/services/admin/admin-products-read/types.ts`
+- `src/lib/services/admin/admin-products-read/query-builder.ts`
+- `src/lib/services/admin/admin-products-read/query-builder.test.ts`
+- `src/app/admin/products/page.tsx`
+- `src/app/api/v1/admin/products/upload-images/route.ts`
+- `src/app/api/v1/admin/products/upload-images/route.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/services/admin/admin-products-read/query-builder.test.ts src/app/api/v1/admin/products/upload-images/route.test.ts` (passed, 2 files / 5 tests)
+- `pnpm test` (passed, 15 files / 65 tests)
+Execution order: 13
+
+## 14. Categories/types and attributes management
+Status: Completed
+Completion: 100%
+Summary:
+- Categories and attributes management are implemented in admin and API layers; standalone product-type entity management is not present.
+Implemented parts:
+- Admin categories CRUD API and admin categories page/hook.
+- Admin attributes CRUD (including values/translations routes) and admin attributes page.
+- Supporting services in admin domain.
+Files:
+- `src/app/api/v1/admin/categories/route.ts`
+- `src/app/api/v1/admin/categories/[id]/route.ts`
+- `src/app/api/v1/admin/attributes/route.ts`
+- `src/app/api/v1/admin/attributes/[id]/route.ts`
+- `src/app/api/v1/admin/attributes/[id]/values/route.ts`
+- `src/app/api/v1/admin/attributes/values/[valueId]/route.ts`
+- `src/app/api/v1/admin/attributes/[id]/translations/route.ts`
+- `src/app/admin/categories/page.tsx`
+- `src/app/admin/attributes/page.tsx`
+- `src/lib/services/admin/admin-categories.service.ts`
+- `src/lib/services/admin/admin-attributes.service.ts`
+Missing:
+- None.
+Implementation summary:
+- Added lifecycle API route tests for admin attributes covering value create/update/delete and translation updates end-to-end at route boundary level.
+- Added guarded delete behavior test to verify service validation errors are propagated correctly when an attribute value is still in use.
+- Confirmed current product type modeling strategy remains category/attribute-driven, so no separate first-class product-types CRUD entity is required in this scope.
+Files changed:
+- `src/app/api/v1/admin/attributes/[id]/attribute-lifecycle.route.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/app/api/v1/admin/attributes/[id]/attribute-lifecycle.route.test.ts` (passed, 1 file / 3 tests)
+- `pnpm test` (passed, 16 files / 68 tests)
+Execution order: 14
+
+## 15. Orders list and status management
+Status: Completed
+Completion: 100%
+Summary:
+- Admin order listing now supports status, payment, and fulfillment workflows end-to-end in both backend filtering and admin UI controls.
+Implemented parts:
+- Admin orders list API with pagination and filters.
+- Admin order id API with GET/PUT/DELETE.
+- Mutation layer validates status/paymentStatus/fulfillmentStatus values.
+- Admin orders table UI supports status/payment/fulfillment updates.
+Files:
+- `src/app/api/v1/admin/orders/route.ts`
+- `src/app/api/v1/admin/orders/[id]/route.ts`
+- `src/lib/services/admin/admin-orders.service.ts`
+- `src/lib/services/admin/admin-orders/order-mutations.ts`
+- `src/lib/services/admin/admin-orders/query-builder.ts`
+- `src/lib/services/admin/admin-orders/types.ts`
+- `src/lib/services/admin/admin-orders/query-builder.test.ts`
+- `src/app/admin/orders/useOrders.ts`
+- `src/app/admin/orders/OrdersPageContent.tsx`
+- `src/app/admin/orders/components/OrdersFilters.tsx`
+- `src/app/admin/orders/components/OrdersTable.tsx`
+- `src/app/admin/orders/components/OrderRow.tsx`
+- `src/app/admin/orders/components/OrderDetailsModal.tsx`
+ - `src/app/admin/orders/utils/orderUtils.ts`
+ - `src/locales/en/admin.json`
+ - `src/locales/hy/admin.json`
+ - `src/locales/ru/admin.json`
+Missing:
+- Not verified from current codebase: business policy correctness for hard delete of orders.
+Implementation summary:
+- Added `fulfillmentStatus` as a first-class admin orders filter from URL params through API route parsing to Prisma where-clause generation.
+- Added fulfillment status filter dropdown in admin orders filters UI and persisted it in URL query params.
+- Added fulfillment status inline update control per order row, with loading state and success/error feedback.
+- Added fulfillment status color mapping for table badges/selects and aligned table columns with a dedicated fulfillment column.
+- Added locale keys for fulfillment labels/messages in English, Armenian, and Russian.
+- Added unit test coverage for admin orders query builder fulfillment filtering behavior.
+Verification:
+- `pnpm test src/lib/services/admin/admin-orders/query-builder.test.ts` (passed, 1 file / 2 tests)
+- `pnpm test` (passed, 17 files / 70 tests)
+Execution order: 15
+
+## 16. Inventory and stock management
+Status: Completed
+Completion: 100%
+Summary:
+- Stock exists at variant level and is enforced in cart/checkout, but there is no dedicated inventory module with reservation/reconciliation workflows.
+Implemented parts:
+- Variant stock field in schema and non-negative DB check migration.
+- Cart add/update validates against available stock.
+- Checkout decrements stock atomically in transaction.
+- Admin product forms expose stock editing for simple/variant products.
+Files:
+- `shared/db/prisma/schema.prisma`
+- `shared/db/prisma/migrations/20260223100000_add_stock_non_negative_check/migration.sql`
+- `src/lib/services/cart.service.ts`
+- `src/lib/services/orders.service.ts`
+- `src/app/admin/products/add/components/VariantBuilder.tsx`
+- `src/app/admin/products/add/components/SimpleProductFields.tsx`
+- `src/lib/services/admin/admin-stats/stats-calculator.ts`
+Missing:
+- None.
+Next implementation scope:
+- None.
+Implementation summary:
+- Added explicit inventory reservation lifecycle via `stockReserved` with reserve/release/commit semantics.
+- Cart add/update/remove flows now adjust reservations transactionally (`reserve` on quantity increase, `release` on decrease/remove).
+- Checkout commit now handles reserved stock for authenticated carts (`stock - qty` and `stockReserved - qty` atomically), while guest checkout keeps direct stock decrement path.
+- Added Prisma schema + migration for `product_variants.stock_reserved` with non-negative and not-exceed-stock DB constraints.
+- Added unit coverage for reservation delta behavior.
+- Added admin inventory list and reconciliation APIs (`GET /api/v1/admin/inventory`, `GET /api/v1/admin/inventory?report=reconciliation`) with available/reserved stock visibility.
+- Added admin stock adjustment API (`POST /api/v1/admin/inventory/adjustments`) with strict payload validation and stock safety guards.
+- Added admin inventory page (`/admin/inventory`) and sidebar navigation entry for stock adjustments and reconciliation summary.
+- Added route-level tests for inventory list/reconciliation and stock adjustments.
+Files changed:
+- `shared/db/prisma/schema.prisma`
+- `shared/db/prisma/migrations/20260423170000_add_stock_reserved_lifecycle/migration.sql`
+- `src/lib/services/inventory/stock-reservation.ts`
+- `src/lib/services/inventory/stock-reservation.test.ts`
+- `src/lib/services/cart.service.ts`
+- `src/lib/services/orders.service.ts`
+- `src/lib/services/admin/admin-inventory.service.ts`
+- `src/app/api/v1/admin/inventory/route.ts`
+- `src/app/api/v1/admin/inventory/route.test.ts`
+- `src/app/api/v1/admin/inventory/adjustments/route.ts`
+- `src/app/api/v1/admin/inventory/adjustments/route.test.ts`
+- `src/app/admin/inventory/page.tsx`
+- `src/app/admin/admin-menu.config.tsx`
+- `src/locales/en/admin.json`
+- `src/locales/hy/admin.json`
+- `src/locales/ru/admin.json`
+Verification:
+- `pnpm test src/lib/services/inventory/stock-reservation.test.ts src/lib/services/admin/admin-orders/order-mutations.test.ts` (passed, 2 files / 5 tests)
+- `pnpm test src/app/api/v1/admin/inventory/route.test.ts src/app/api/v1/admin/inventory/adjustments/route.test.ts` (passed, 2 files / 6 tests)
+- `pnpm test` (passed, 21 files / 81 tests)
+Execution order: 16
+
+## 17. Analytics Dashboard
+Status: Completed
+Completion: 100%
+Summary:
+- Admin analytics APIs and UI now share a typed contract with dashboard stats, with validated period handling and normalized currency across analytics metrics.
+Implemented parts:
+- Analytics endpoint with period/date filters.
+- Stats endpoint and dashboard widget endpoints are available.
+- Analytics page and hook consume analytics/stats APIs.
+- Core aggregation logic implemented in admin stats analytics service.
+Files:
+- `src/app/api/v1/admin/analytics/route.ts`
+- `src/app/api/v1/admin/stats/route.ts`
+- `src/app/api/v1/admin/dashboard/recent-orders/route.ts`
+- `src/app/api/v1/admin/dashboard/top-products/route.ts`
+- `src/app/api/v1/admin/user-activity/route.ts`
+- `src/lib/services/admin/admin-stats.service.ts`
+- `src/lib/services/admin/admin-stats/analytics.ts`
+- `src/app/admin/analytics/page.tsx`
+- `src/app/admin/analytics/hooks/useAnalytics.ts`
+- `src/app/admin/page.tsx`
+- `src/app/admin/hooks/useAdminDashboard.ts`
+Missing:
+- None.
+Implementation summary:
+- Added a shared admin analytics contract (`AdminStatsSummary`, `AdminAnalyticsData`, typed periods) and reused it across `/admin` and `/admin/analytics` data hooks.
+- Added currency normalization (`normalizeCurrencyCode`) to enforce stable ISO-like currency values with safe `AMD` fallback.
+- Added period parsing/validation for `GET /api/v1/admin/analytics` and typed period propagation into analytics service.
+- Extended analytics response orders summary with normalized `currency`, then wired charts/cards/product/category revenue displays to use this currency instead of implicit defaults.
+- Added unit coverage for analytics period boundary behavior and currency normalization fallback/normalization scenarios.
+Files changed:
+- `src/lib/contracts/admin-analytics.ts`
+- `src/lib/services/admin/admin-stats/analytics.ts`
+- `src/lib/services/admin/admin-stats/analytics.test.ts`
+- `src/lib/services/admin/admin-stats.service.ts`
+- `src/app/api/v1/admin/analytics/route.ts`
+- `src/app/admin/analytics/types.ts`
+- `src/app/admin/hooks/useAdminDashboard.ts`
+- `src/app/admin/analytics/components/StatsCards.tsx`
+- `src/app/admin/analytics/components/TopProducts.tsx`
+- `src/app/admin/analytics/components/TopCategories.tsx`
+- `src/app/admin/analytics/components/OrdersByDayChart.tsx`
+- `src/app/admin/analytics/page.tsx`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/services/admin/admin-stats/analytics.test.ts` (passed, 1 file / 5 tests)
+- `pnpm test` (passed, 22 files / 86 tests)
+Execution order: 17
+
+## 18. Global search
+Status: Completed
+Completion: 100%
+Summary:
+- Global search is now versioned and unified: storefront instant search uses canonical v1 API routes and admin has a dedicated cross-entity global search endpoint for products and orders.
+Implemented parts:
+- Instant search hook with debounce, cancellation, keyboard handling.
+- Public search API queries published products by title/subtitle/SKU.
+- Header and search dropdown integrate instant results.
+- Admin products and admin orders have their own contextual `search` filters.
+Files:
+- `src/components/hooks/useInstantSearch.ts`
+- `src/components/SearchDropdown.tsx`
+- `src/components/Header.tsx`
+- `src/app/api/search/instant/route.ts`
+- `src/app/api/v1/admin/products/route.ts`
+- `src/app/api/v1/admin/orders/route.ts`
+Missing:
+- Not verified from current codebase: relevance quality, typo tolerance, and scalability behavior under large catalogs.
+Implementation summary:
+- Added canonical storefront instant search endpoint `GET /api/v1/search/instant` and switched the storefront search hook to use it.
+- Preserved backward compatibility for existing clients by keeping `/api/search/instant` as a compatibility re-export to the v1 handler.
+- Added admin cross-entity global search endpoint `GET /api/v1/admin/search?q=...` that aggregates matching products and orders in one response.
+- Added unit coverage for admin global-search parameter normalization and result mapping.
+Files changed:
+- `src/app/api/v1/search/instant/route.ts`
+- `src/app/api/search/instant/route.ts`
+- `src/components/hooks/useInstantSearch.ts`
+- `src/app/api/v1/admin/search/route.ts`
+- `src/lib/search/admin-global-search.ts`
+- `src/lib/search/admin-global-search.test.ts`
+- `TASKS.mdc`
+Verification:
+- `pnpm test src/lib/search/admin-global-search.test.ts` (passed, 1 file / 4 tests)
+- `pnpm test` (passed, 23 files / 90 tests)
+Execution order: 18
+
+# IMPLEMENTATION QUEUE
+
+1. Define data model and migrations
+   - Current status: Mostly implemented (95%)
+   - Why it is or is not ready: Schema/migrations are in place and unused reservation field was removed, but migration history is not baselined in the connected DB.
+   - Recommended next step: Baseline target databases, then run deploy + health checks and record rollout status.
+
+2. Global layout: Header/Footer and navigation
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Navigation links now consistently target canonical `/shop`, and mobile navigation labels are locale-driven.
+   - Recommended next step: None.
+
+3. Home page sections
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Data ownership is explicit per section and section naming now matches stacked UX behavior.
+   - Recommended next step: None.
+
+4. Sorting options
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Sort parameters are validated end-to-end and storefront routing now uses canonical `/shop` paths.
+   - Recommended next step: None.
+
+5. Gallery and Zoom
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Fullscreen gallery now supports keyboard and swipe navigation plus bounded progressive zoom controls.
+   - Recommended next step: None.
+
+6. Product info and variants
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Variant resolution now has invariant test coverage for exact match, fallback selection, multi-color options, and valueId-based attribute matching.
+   - Recommended next step: None.
+
+7. Related products and Reviews (v1 read-only)
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Dedicated related-products backend contract is in place and review write flows are disabled across API/UI for strict v1 read-only scope.
+   - Recommended next step: None.
+
+8. Cart actions and persistence
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Guest cart persistence is now unified under shared localStorage helpers, and deterministic merge-to-user flow is implemented and tested.
+   - Recommended next step: None.
+
+9. Checkout form implementation
+   - Current status: Completed (100%)
+   - Why it is or is not ready: UI/form wiring and strict route-level request schema validation are now implemented and verified by tests.
+   - Recommended next step: None.
+
+10. Order summary and validations
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Promo discount, tax calculation, payment session URL generation with signed callback verification, and checkout locale propagation are now implemented and tested.
+   - Recommended next step: None.
+
+11. Profile and address management
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Profile/address APIs now enforce strict request schemas and service contracts are typed without `any` or unsafe payload spreading.
+   - Recommended next step: None.
+
+12. Order history and reorder
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Reorder now runs through a dedicated backend endpoint with server-side validation, transactional cart writes, and structured partial-failure reporting.
+   - Recommended next step: None.
+
+13. Products CRUD and media management
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Stock filtering now runs server-side for reliable pagination/count metadata, and media upload exposes storage health plus inline fallback when R2 is not configured.
+   - Recommended next step: None.
+
+14. Categories/types and attributes management
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Category/attribute admin APIs are implemented and route-level lifecycle coverage now validates value/translation flows; product type modeling is intentionally category/attribute-driven for current scope.
+   - Recommended next step: None.
+
+15. Orders list and status management
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Fulfillment status filters and update controls are now wired end-to-end across API and admin UI, with test coverage for query filtering behavior.
+   - Recommended next step: None.
+
+16. Inventory and stock management
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Reservation lifecycle, admin inventory adjustment APIs/UI, and reconciliation reporting are implemented and covered by tests.
+   - Recommended next step: None.
+
+17. Analytics Dashboard
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Both admin dashboard surfaces now reuse a shared analytics contract, analytics period boundaries and currency normalization are covered by tests, and UI/API currency handling is explicit.
+   - Recommended next step: None.
+
+18. Global search
+   - Current status: Completed (100%)
+   - Why it is or is not ready: Storefront instant search now uses canonical `/api/v1/search/instant` with a compatibility alias, and admin cross-entity search is implemented via `/api/v1/admin/search`.
+   - Recommended next step: Optional future improvements for relevance ranking, typo tolerance, and large-catalog indexing.

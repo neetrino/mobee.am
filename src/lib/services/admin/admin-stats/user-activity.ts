@@ -1,8 +1,5 @@
 import { db } from "@white-shop/db";
 
-/**
- * Format user for activity response
- */
 function formatUser(user: {
   id: string;
   email: string | null;
@@ -17,52 +14,36 @@ function formatUser(user: {
     phone: user.phone || undefined,
     name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email || user.phone || "Unknown",
     registeredAt: user.createdAt.toISOString(),
-    lastLoginAt: undefined, // We don't track last login yet
+    lastLoginAt: undefined,
   };
 }
 
-/**
- * Format active user for activity response
- */
-function formatActiveUser(user: {
-  id: string;
-  email: string | null;
-  phone: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  createdAt: Date;
-  orders: Array<{
+function formatActiveUserFromAgg(
+  user: {
     id: string;
-    total: number;
+    email: string | null;
+    phone: string | null;
+    firstName: string | null;
+    lastName: string | null;
     createdAt: Date;
-  }>;
-}) {
-  const orders = Array.isArray(user.orders) ? user.orders : [];
-  const orderCount = orders.length;
-  const totalSpent = orders.reduce((sum: number, order: { total: number }) => sum + order.total, 0);
-  const lastOrder = orders[0] || null;
-
+  },
+  metrics: { orderCount: number; totalSpent: number; lastOrderDate: Date }
+) {
   return {
     id: user.id,
     email: user.email || undefined,
     phone: user.phone || undefined,
     name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email || user.phone || "Unknown",
-    orderCount,
-    totalSpent,
-    lastOrderDate: lastOrder ? lastOrder.createdAt.toISOString() : user.createdAt.toISOString(),
-    lastLoginAt: undefined, // We don't track last login yet
+    orderCount: metrics.orderCount,
+    totalSpent: metrics.totalSpent,
+    lastOrderDate: metrics.lastOrderDate.toISOString(),
+    lastLoginAt: undefined,
   };
 }
 
-/**
- * Get user activity (recent registrations and active users)
- */
-export async function getUserActivity(limit: number = 10) {
-  // Get recent registrations
+async function loadRecentRegistrations(limit: number) {
   const recentUsers = await db.user.findMany({
-    where: {
-      deletedAt: null,
-    },
+    where: { deletedAt: null },
     take: limit,
     orderBy: { createdAt: "desc" },
     select: {
@@ -74,17 +55,25 @@ export async function getUserActivity(limit: number = 10) {
       createdAt: true,
     },
   });
+  return recentUsers.map(formatUser);
+}
 
-  const recentRegistrations = recentUsers.map(formatUser);
+async function loadActiveUsersBySpend(limit: number) {
+  const orderMetrics = await db.order.groupBy({
+    by: ["userId"],
+    where: { userId: { not: null } },
+    _count: { id: true },
+    _sum: { total: true },
+    _max: { createdAt: true },
+    orderBy: { _sum: { total: "desc" } },
+    take: limit,
+  });
 
-  // Get active users (users with orders)
-  const usersWithOrders = await db.user.findMany({
-    where: {
-      deletedAt: null,
-      orders: {
-        some: {},
-      },
-    },
+  const userIds = orderMetrics.map((row) => row.userId).filter((id): id is string => id !== null);
+  if (userIds.length === 0) return [];
+
+  const users = await db.user.findMany({
+    where: { id: { in: userIds }, deletedAt: null },
     select: {
       id: true,
       email: true,
@@ -92,26 +81,31 @@ export async function getUserActivity(limit: number = 10) {
       firstName: true,
       lastName: true,
       createdAt: true,
-      orders: {
-        select: {
-          id: true,
-          total: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: "desc" },
-      },
     },
-    take: limit,
   });
+  const userById = new Map(users.map((u) => [u.id, u]));
 
-  const activeUsers = usersWithOrders.map(formatActiveUser);
-
-  return {
-    recentRegistrations,
-    activeUsers,
-  };
+  return orderMetrics
+    .map((row) => {
+      const uid = row.userId;
+      if (!uid) return null;
+      const u = userById.get(uid);
+      if (!u) return null;
+      const lastOrder = row._max.createdAt ?? u.createdAt;
+      return formatActiveUserFromAgg(u, {
+        orderCount: row._count.id,
+        totalSpent: row._sum.total ?? 0,
+        lastOrderDate: lastOrder,
+      });
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
 }
 
-
-
-
+/**
+ * Get user activity (recent registrations and active users)
+ */
+export async function getUserActivity(limit: number = 10) {
+  const recentRegistrations = await loadRecentRegistrations(limit);
+  const activeUsers = await loadActiveUsersBySpend(limit);
+  return { recentRegistrations, activeUsers };
+}

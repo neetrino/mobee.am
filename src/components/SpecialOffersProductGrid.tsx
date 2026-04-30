@@ -1,0 +1,73 @@
+'use client';
+
+import {
+  HomeBestChoiceStyleProductGrid,
+  HomeBestChoiceStyleProductGridSkeleton,
+} from './HomeBestChoiceStyleProductGrid';
+import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSync';
+import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
+import type { LanguageCode } from '../lib/language';
+import { t } from '../lib/i18n';
+
+type SpecialOffersProductGridProps = {
+  language: LanguageCode;
+  loading: boolean;
+  error: string | null;
+  products: FeaturedHomeProduct[];
+  productsPerPage: number;
+  onRetry: () => void;
+  onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
+};
+
+/**
+ * Same card treatment as {@link FeaturedBestChoiceGrid} — grid-2, shifted art, compact price, first hero tile.
+ */
+export function SpecialOffersProductGrid({
+  language,
+  loading,
+  error,
+  products,
+  productsPerPage,
+  onRetry,
+  onMobileCarouselViewChange,
+}: SpecialOffersProductGridProps) {
+  if (loading) {
+    return (
+      <HomeBestChoiceStyleProductGridSkeleton
+        productsPerPage={productsPerPage}
+        mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
+        onMobileCarouselViewChange={onMobileCarouselViewChange}
+      />
+    );
+  }
+  if (error) {
+    return (
+      <div className="py-12 text-center">
+        <p className="mb-4 text-red-600">{error}</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="rounded bg-gray-900 px-4 py-2 text-white transition-colors hover:bg-gray-800"
+        >
+          {t(language, 'home.featured_products.tryAgain')}
+        </button>
+      </div>
+    );
+  }
+  if (products.length > 0) {
+    return (
+      <HomeBestChoiceStyleProductGrid
+        products={products}
+        productsPerPage={productsPerPage}
+        mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
+        specialOffersHomeCard
+        onMobileCarouselViewChange={onMobileCarouselViewChange}
+      />
+    );
+  }
+  return (
+    <div className="py-12 text-center">
+      <p className="text-gray-500">{t(language, 'home.featured_products.noProducts')}</p>
+    </div>
+  );
+}

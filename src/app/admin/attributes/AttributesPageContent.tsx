@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useTranslation } from '../../../lib/i18n-client';
-import { useAttributes, type Attribute, type AttributeValue } from './useAttributes';
+import { useAttributes } from './useAttributes';
 import { ValueEditForm } from './ValueEditForm';
 
 export function AttributesPageContent() {
@@ -19,7 +19,7 @@ export function AttributesPageContent() {
     newValue,
     addingValueTo,
     deletingValue,
-    editingValue,
+    editingValue: _editingValue,
     valueError,
     expandedValueId,
     editingLabel,
@@ -35,7 +35,7 @@ export function AttributesPageContent() {
     setEditingAttributeName,
     setEditingLabel,
     setEditingColors,
-    setEditingImageUrl,
+    setEditingImageUrl: _setEditingImageUrl,
     setValueError,
     handleCreateAttribute,
     handleDeleteAttribute,
@@ -55,7 +55,7 @@ export function AttributesPageContent() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
             <p className="text-sm text-gray-600">{t('admin.attributes.loadingAttributes')}</p>
           </div>
         </div>
@@ -74,7 +74,7 @@ export function AttributesPageContent() {
           </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -97,7 +97,7 @@ export function AttributesPageContent() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder={t('admin.attributes.namePlaceholder')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin focus:border-transparent"
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -108,7 +108,7 @@ export function AttributesPageContent() {
               <div className="flex gap-3 pt-2">
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors"
                 >
                   {t('admin.attributes.createAttribute')}
                 </button>
@@ -137,7 +137,7 @@ export function AttributesPageContent() {
             <p className="text-gray-600 mb-4">{t('admin.attributes.getStarted')}</p>
             <button
               onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+              className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors"
             >
               {t('admin.attributes.createAttribute')}
             </button>
@@ -179,13 +179,13 @@ export function AttributesPageContent() {
                                   handleUpdateAttributeName(attribute.id);
                                 }
                               }}
-                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-lg font-semibold"
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin focus:border-transparent text-lg font-semibold"
                               autoFocus
                             />
                             <button
                               onClick={() => handleUpdateAttributeName(attribute.id)}
                               disabled={!editingAttributeName.trim() || savingAttribute}
-                              className="px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                              className="px-3 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
                               {savingAttribute ? (
                                 <>
@@ -217,7 +217,7 @@ export function AttributesPageContent() {
                                 {attribute.key}
                               </span>
                               {attribute.filterable && (
-                                <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                                <span className="text-xs px-2 py-1 bg-admin-100 text-admin-700 rounded">
                                   {t('admin.attributes.filterable')}
                                 </span>
                               )}
@@ -283,7 +283,7 @@ export function AttributesPageContent() {
                                 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition-colors
                                 ${valueError 
                                   ? 'border-red-300 bg-red-50 focus:ring-red-500' 
-                                  : 'border-gray-300 focus:ring-gray-900'
+                                  : 'border-gray-300 focus:ring-admin'
                                 }
                               `}
                             />
@@ -299,7 +299,7 @@ export function AttributesPageContent() {
                           <button
                             onClick={() => handleAddValue(attribute.id)}
                             disabled={!newValue.trim() || addingValueTo === attribute.id}
-                            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                           >
                             {addingValueTo === attribute.id ? (
                               <>

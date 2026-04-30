@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, Input } from '@shop/ui';
-import { UseFormRegister, UseFormSetValue, FieldErrors, UseFormWatch } from 'react-hook-form';
+import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
 
@@ -79,6 +79,19 @@ export function CheckoutForm({
             />
           </div>
         </div>
+      </Card>
+
+      {/* Promo Code */}
+      <Card className="p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.promoCode.title')}</h2>
+        <Input
+          label={t('checkout.form.promoCode')}
+          type="text"
+          placeholder={t('checkout.placeholders.promoCode')}
+          {...register('promoCode')}
+          error={errors.promoCode?.message}
+          disabled={isSubmitting}
+        />
       </Card>
 
       {/* Shipping Method */}

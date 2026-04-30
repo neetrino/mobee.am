@@ -1,4 +1,3 @@
-import { db } from "@white-shop/db";
 import { logger } from "../../../utils/logger";
 import type { ProductFilters } from "./types";
 import { buildProductWhereClause, buildProductOrderByClause } from "./query-builder";

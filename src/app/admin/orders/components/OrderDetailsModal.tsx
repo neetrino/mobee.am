@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { CurrencyCode } from '../../../../lib/currency';
@@ -58,7 +58,7 @@ export function OrderDetailsModal({
         <div className="p-6">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
               <p className="text-gray-600">{t('admin.orders.orderDetails.loadingOrderDetails')}</p>
             </div>
           ) : (

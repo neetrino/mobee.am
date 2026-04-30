@@ -2,8 +2,7 @@
 
 import type { ChangeEvent } from 'react';
 import { processImageFile } from '../../../../../lib/utils/image-utils';
-import type { Variant, ColorData } from '../types';
-import type { GeneratedVariant } from '../types';
+import type { Variant, GeneratedVariant } from '../types';
 
 interface UseImageHandlingProps {
   imageUrls: string[];
@@ -36,8 +35,8 @@ interface UseImageHandlingReturn {
 export function useImageHandling({
   imageUrls,
   featuredImageIndex,
-  variants,
-  generatedVariants,
+  variants: _variants,
+  generatedVariants: _generatedVariants,
   colorImageTarget,
   setImageUrls,
   setFeaturedImageIndex,
@@ -188,7 +187,6 @@ export function useImageHandling({
 
       setImageUrls((prev) => {
         const newImageUrls = [...prev, ...uploadedImages];
-        const newFeaturedIdx = prev.length === 0 ? 0 : featuredImageIndex;
         if (prev.length === 0 && newImageUrls.length > 0) {
           setFeaturedImageIndex(0);
           setMainProductImage(newImageUrls[0]);

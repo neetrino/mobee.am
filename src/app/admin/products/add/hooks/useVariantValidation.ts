@@ -16,7 +16,7 @@ export function useVariantValidation({
   productType,
   variants,
   simpleProductData,
-  isClothingCategory,
+  isClothingCategory: _isClothingCategory,
   setLoading,
 }: UseVariantValidationProps) {
   const validateVariants = (): boolean => {
@@ -41,8 +41,7 @@ export function useVariantValidation({
           return false;
         }
         skuSet.add(variantSku);
-        
-        const categoryRequiresSizes = isClothingCategory();
+
         const colorData = variant.colors && variant.colors.length > 0 ? variant.colors : [];
         
         if (colorData.length > 0) {
