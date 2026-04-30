@@ -22,8 +22,8 @@ interface ValueEditFormProps {
 }
 
 export function ValueEditForm({
-  attributeId,
-  value,
+  attributeId: _attributeId,
+  value: _value,
   editingLabel,
   editingColors,
   editingImageUrl,

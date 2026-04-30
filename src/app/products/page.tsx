@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 type SearchValue = string | string[] | undefined;
 
 interface ProductsRedirectPageProps {
-  searchParams?: Promise<Record<string, SearchValue>> | Record<string, SearchValue>;
+  searchParams?: Promise<Record<string, SearchValue>>;
 }
 
 export default async function ProductsRedirectPage({ searchParams }: ProductsRedirectPageProps) {

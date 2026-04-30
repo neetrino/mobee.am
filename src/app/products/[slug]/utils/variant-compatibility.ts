@@ -1,4 +1,4 @@
-import type { ProductVariant, VariantOption } from '../types';
+import type { ProductVariant } from '../types';
 
 /**
  * Check if a variant is compatible with currently selected attributes

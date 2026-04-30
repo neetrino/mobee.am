@@ -13,7 +13,6 @@ import { useVariantSelection } from './hooks/useVariantSelection';
 import { useProductActions } from './hooks/useProductActions';
 import { useProductQuantity } from './hooks/useProductQuantity';
 import { useProductCalculations } from './hooks/useProductCalculations';
-import type { Product } from './types';
 
 export function useProductPage(params: Promise<{ slug?: string }>) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -83,7 +82,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     selectedSize,
   });
 
-  const { quantity, setQuantity, maxQuantity, adjustQuantity } = useProductQuantity({
+  const { quantity, setQuantity: _setQuantity, maxQuantity, adjustQuantity } = useProductQuantity({
     currentVariant,
     isOutOfStock,
     isVariationRequired,

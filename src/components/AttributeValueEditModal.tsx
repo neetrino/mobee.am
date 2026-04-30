@@ -25,7 +25,7 @@ export function AttributeValueEditModal({
   isOpen,
   onClose,
   value,
-  attributeId,
+  attributeId: _attributeId,
   onSave,
 }: AttributeValueEditModalProps) {
   const { t } = useTranslation();

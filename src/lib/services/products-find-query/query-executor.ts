@@ -277,9 +277,19 @@ async function executeWithoutAttributeValue(
 function getOrderBy(sort: ProductSortOption): Prisma.ProductOrderByWithRelationInput[] {
   switch (sort) {
     case "price-asc":
-      return [{ variants: { _min: { price: "asc" } } }, { createdAt: "desc" }];
+      return [
+        {
+          variants: { _min: { price: "asc" } },
+        } as unknown as Prisma.ProductOrderByWithRelationInput,
+        { createdAt: "desc" },
+      ];
     case "price-desc":
-      return [{ variants: { _max: { price: "desc" } } }, { createdAt: "desc" }];
+      return [
+        {
+          variants: { _max: { price: "desc" } },
+        } as unknown as Prisma.ProductOrderByWithRelationInput,
+        { createdAt: "desc" },
+      ];
     default:
       return [{ createdAt: "desc" }];
   }

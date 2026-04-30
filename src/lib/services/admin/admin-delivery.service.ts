@@ -1,5 +1,4 @@
 import { db } from "@white-shop/db";
-import { logger } from "@/lib/utils/logger";
 
 class AdminDeliveryService {
   /**
@@ -99,7 +98,7 @@ class AdminDeliveryService {
       id: location.id || `location-${Date.now()}-${index}`,
     }));
 
-    const setting = await db.settings.upsert({
+    await db.settings.upsert({
       where: { key: 'delivery-locations' },
       update: {
         value: { locations: locationsWithIds },

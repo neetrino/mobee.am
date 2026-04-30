@@ -60,7 +60,7 @@ function handleNetworkError(error: unknown, baseUrl: string, url: string): never
 async function handleErrorResponse(
   response: Response,
   url: string,
-  baseUrl: string
+  _baseUrl: string
 ): Promise<never> {
   const isUnauthorized = response.status === 401;
   const isNotFound = response.status === 404;

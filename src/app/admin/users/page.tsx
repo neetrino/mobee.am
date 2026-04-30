@@ -81,7 +81,7 @@ export default function UsersPage() {
     if (isLoggedIn && isAdmin) {
       fetchUsers();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isLoggedIn, isAdmin, page, search, roleFilter]);
 
   const handleSearch = (e: React.FormEvent) => {

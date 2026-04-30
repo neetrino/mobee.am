@@ -37,7 +37,7 @@ interface OrderSummaryProps {
 }
 
 export function OrderSummary({
-  cart,
+  cart: _cart,
   orderSummary,
   currency,
   shippingMethod,

@@ -1,6 +1,5 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@prisma/client";
-import { logger } from "../utils/logger";
 import { extractMediaUrl } from "../utils/extractMediaUrl";
 import {
   calculateReservationDelta,

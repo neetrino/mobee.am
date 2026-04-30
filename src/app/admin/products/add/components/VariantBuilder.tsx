@@ -32,7 +32,7 @@ export function VariantBuilder({
   attributes,
   selectedAttributesForVariants,
   isEditMode,
-  hasVariantsToLoad,
+  hasVariantsToLoad: _hasVariantsToLoad,
   defaultCurrency,
   imageUploadLoading,
   slug,

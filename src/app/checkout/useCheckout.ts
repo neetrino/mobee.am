@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStoredCurrency } from '../../lib/currency';
@@ -16,12 +15,11 @@ import { useOrderSummary } from './hooks/useOrderSummary';
 import type { CheckoutFormData } from './types';
 
 export function useCheckout() {
-  const router = useRouter();
   const { isLoggedIn, isLoading } = useAuth();
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState(getStoredLanguage());
+  const [_language, setLanguage] = useState(getStoredLanguage());
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);

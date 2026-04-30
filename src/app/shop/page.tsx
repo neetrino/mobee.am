@@ -13,7 +13,7 @@ import { ShopCatalogArea } from '@/components/shop/ShopCatalogArea';
 import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
 
 interface ProductsPageProps {
-  searchParams?: Promise<Record<string, string | undefined>> | Record<string, string | undefined>;
+  searchParams?: Promise<Record<string, string | undefined>>;
 }
 
 function ShopCatalogFallback() {

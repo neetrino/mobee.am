@@ -11,7 +11,7 @@ export function buildCategoryTree(categories: Category[]): CategoryWithLevel[] {
 
   // First pass: create map
   categories.forEach(cat => {
-    const { children, ...catWithoutChildren } = cat;
+    const { children: _children, ...catWithoutChildren } = cat;
     categoryMap.set(cat.id, { ...catWithoutChildren, level: 0 });
   });
 

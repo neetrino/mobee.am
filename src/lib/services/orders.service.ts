@@ -38,17 +38,6 @@ type CartItemWithRelations = Prisma.CartItemGetPayload<{
   };
 }>;
 
-type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
-  include: {
-    product: {
-      include: {
-        translations: true;
-      };
-    };
-    options: true;
-  };
-}>;
-
 type OrderItemWithVariant = Prisma.OrderItemGetPayload<{
   include: {
     variant: {
@@ -826,6 +815,8 @@ class OrdersService {
     >();
 
     for (const item of order.items) {
+      if (item.variantId == null) continue;
+
       const existing = requestedByVariant.get(item.variantId);
       if (!existing) {
         requestedByVariant.set(item.variantId, {
@@ -847,6 +838,7 @@ class OrdersService {
         productId: true,
         stock: true,
         published: true,
+        price: true,
       },
     });
     const variantsById = new Map(variants.map((variant) => [variant.id, variant]));
@@ -898,17 +890,28 @@ class OrdersService {
 
     if (toAdd.length > 0) {
       await db.$transaction(async (tx: Prisma.TransactionClient) => {
-        const cart = await tx.cart.upsert({
+        let cart = await tx.cart.findFirst({
           where: { userId },
-          update: {
-            updatedAt: new Date(),
-          },
-          create: {
-            userId,
-          },
         });
+        if (!cart) {
+          cart = await tx.cart.create({
+            data: {
+              userId,
+              locale: "en",
+              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            },
+          });
+        } else {
+          await tx.cart.update({
+            where: { id: cart.id },
+            data: { updatedAt: new Date() },
+          });
+        }
 
         for (const item of toAdd) {
+          const variantRow = variantsById.get(item.variantId);
+          const priceSnapshot = variantRow?.price ?? 0;
+
           const existingCartItem = await tx.cartItem.findFirst({
             where: {
               cartId: cart.id,
@@ -927,6 +930,7 @@ class OrdersService {
                 productId: item.productId,
                 variantId: item.variantId,
                 quantity: item.quantity,
+                priceSnapshot,
               },
             });
             continue;

@@ -2,7 +2,6 @@
 
 import { Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { showToast } from '../../../../components/Toast';
 import type { Category, CategoryFormData } from '../types';
 
 interface AddCategoryModalProps {

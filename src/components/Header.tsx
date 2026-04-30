@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { FormEvent, ReactNode, CSSProperties } from 'react';
+import type { FormEvent, CSSProperties } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
@@ -425,7 +425,7 @@ export function Header() {
   const [compareCount, setCompareCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
-  const [cartTotal, setCartTotal] = useState(0);
+  const [, setCartTotal] = useState(0);
   const [showMobileCurrency, setShowMobileCurrency] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

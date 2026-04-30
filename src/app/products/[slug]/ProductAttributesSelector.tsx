@@ -26,7 +26,6 @@ export interface ProductAttributesSelectorProps {
   onSizeSelect: (size: string) => void;
   onAttributeValueSelect: (attrKey: string, value: string) => void;
   getOptionValue: (options: VariantOption[] | undefined, key: string) => string | null;
-  getRequiredAttributesMessage: () => string;
 }
 
 const getColorValue = (colorName: string): string => {
@@ -164,7 +163,7 @@ export function ProductAttributesSelector({
                         style={hasImage ? undefined : { backgroundColor: colorHex }}
                       >
                         {hasImage && processedImageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element -- remote variant swatch URLs
+                           
                           <img src={processedImageUrl} alt={g.label} className="h-full w-full object-cover" />
                         ) : null}
                       </button>
@@ -194,7 +193,7 @@ export function ProductAttributesSelector({
                         }`}
                       >
                         {hasImage && processedImageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
+                           
                           <img
                             src={processedImageUrl}
                             alt=""
@@ -232,7 +231,7 @@ export function ProductAttributesSelector({
                       style={!hasImage && colorHex ? { backgroundColor: colorHex } : undefined}
                     >
                       {hasImage && processedImageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
+                         
                         <img
                           src={processedImageUrl}
                           alt=""

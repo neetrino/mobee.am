@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
 import { useTranslation } from '../../../../lib/i18n-client';
-import type { Product, ProductsResponse } from '../types';
+import type { Product } from '../types';
 
 interface UseProductHandlersProps {
   products: Product[];
@@ -18,7 +16,7 @@ interface UseProductHandlersProps {
 
 export function useProductHandlers({
   products,
-  setProducts,
+  setProducts: _setProducts,
   fetchProducts,
   selectedIds,
   setSelectedIds,
@@ -27,7 +25,6 @@ export function useProductHandlers({
   setTogglingAllFeatured,
 }: UseProductHandlersProps) {
   const { t } = useTranslation();
-  const router = useRouter();
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -123,7 +120,7 @@ export function useProductHandlers({
     }
   };
 
-  const handleToggleFeatured = async (productId: string, currentStatus: boolean, productTitle: string) => {
+  const handleToggleFeatured = async (productId: string, currentStatus: boolean, _productTitle: string) => {
     try {
       const newStatus = !currentStatus;
       

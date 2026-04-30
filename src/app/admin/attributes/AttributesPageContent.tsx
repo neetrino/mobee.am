@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useTranslation } from '../../../lib/i18n-client';
-import { useAttributes, type Attribute, type AttributeValue } from './useAttributes';
+import { useAttributes } from './useAttributes';
 import { ValueEditForm } from './ValueEditForm';
 
 export function AttributesPageContent() {
@@ -19,7 +19,7 @@ export function AttributesPageContent() {
     newValue,
     addingValueTo,
     deletingValue,
-    editingValue,
+    editingValue: _editingValue,
     valueError,
     expandedValueId,
     editingLabel,
@@ -35,7 +35,7 @@ export function AttributesPageContent() {
     setEditingAttributeName,
     setEditingLabel,
     setEditingColors,
-    setEditingImageUrl,
+    setEditingImageUrl: _setEditingImageUrl,
     setValueError,
     handleCreateAttribute,
     handleDeleteAttribute,

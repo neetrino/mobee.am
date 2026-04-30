@@ -204,10 +204,14 @@ export function useOrders() {
 
   useEffect(() => {
     fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [page, statusFilter, paymentStatusFilter, fulfillmentStatusFilter, searchQuery, sortBy, sortOrder]);
 
-  const formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string = (amount: number, orderCurrency: string = 'AMD', fromCurrency: CurrencyCode = 'USD') => {
+  const formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string = (
+    amount: number,
+    _orderCurrency: string = 'AMD',
+    fromCurrency: CurrencyCode = 'USD',
+  ) => {
     // Use the selected display currency instead of order currency
     const displayCurrency = currency;
     

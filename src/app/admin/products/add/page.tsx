@@ -110,7 +110,7 @@ function AddProductPageContent() {
   });
 
   const {
-    addImageUrl,
+    addImageUrl: _addImageUrl,
     removeImageUrl,
     setFeaturedImage,
     handleUploadImages,

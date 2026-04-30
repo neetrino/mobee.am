@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Button, Input } from '@shop/ui';
+import { Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
 
 interface GlobalDiscountCardProps {

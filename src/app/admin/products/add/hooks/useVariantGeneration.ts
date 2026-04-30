@@ -20,7 +20,7 @@ export function useVariantGeneration({
   selectedAttributesForVariants,
   selectedAttributeValueIds,
   attributes,
-  generatedVariants,
+  generatedVariants: _generatedVariants,
   formDataSlug,
   formDataTitle,
   isEditMode,
@@ -119,7 +119,7 @@ export function useVariantGeneration({
         setGeneratedVariants(() => []);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [selectedAttributesForVariants, selectedAttributeValueIds, attributes, formDataSlug, formDataTitle, isEditMode, productId]);
 
   return {

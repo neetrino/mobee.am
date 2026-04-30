@@ -1,6 +1,19 @@
 import { Prisma } from "@prisma/client";
 import type { ProductFilters } from "./types";
 
+function appendAndClause(
+  where: Prisma.ProductWhereInput,
+  clause: Prisma.ProductWhereInput,
+): void {
+  const prev = where.AND;
+  const list: Prisma.ProductWhereInput[] = Array.isArray(prev)
+    ? [...prev]
+    : prev
+      ? [prev]
+      : [];
+  where.AND = [...list, clause];
+}
+
 /**
  * Build where clause for product queries
  */
@@ -78,11 +91,11 @@ export function buildProductWhereClause(filters: ProductFilters): Prisma.Product
   }
 
   if (filters.stockStatus === "inStock") {
-    where.AND = [...(where.AND ?? []), { variants: { some: { stock: { gt: 0 } } } }];
+    appendAndClause(where, { variants: { some: { stock: { gt: 0 } } } });
   }
 
   if (filters.stockStatus === "outOfStock") {
-    where.AND = [...(where.AND ?? []), { variants: { none: { stock: { gt: 0 } } } }];
+    appendAndClause(where, { variants: { none: { stock: { gt: 0 } } } });
   }
 
   return where;

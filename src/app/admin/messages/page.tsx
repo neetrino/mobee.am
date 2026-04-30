@@ -74,7 +74,7 @@ export default function MessagesPage() {
     if (isLoggedIn && isAdmin) {
       fetchMessages();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isLoggedIn, isAdmin, page]);
 
   const toggleSelect = (id: string) => {

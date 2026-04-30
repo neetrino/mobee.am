@@ -244,7 +244,10 @@ export async function updateOrder(orderId: string, data: UpdateOrderData) {
             quantity: true,
           },
         });
-        const adjustments = buildStockAdjustmentsForCancel(orderItems);
+        const restockItems = orderItems.filter(
+          (row): row is { variantId: string; quantity: number } => row.variantId != null,
+        );
+        const adjustments = buildStockAdjustmentsForCancel(restockItems);
 
         for (const adjustment of adjustments) {
           await tx.productVariant.updateMany({

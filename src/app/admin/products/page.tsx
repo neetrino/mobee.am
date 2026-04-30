@@ -33,7 +33,7 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState<string>('createdAt-desc');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
-  const [togglingAllFeatured, setTogglingAllFeatured] = useState(false);
+  const [_togglingAllFeatured, setTogglingAllFeatured] = useState(false);
   const [currency, setCurrency] = useState<CurrencyCode>('USD');
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function ProductsPage() {
     if (isLoggedIn && isAdmin) {
       fetchProducts();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isLoggedIn, isAdmin, page, search, selectedCategories, skuSearch, stockFilter, sortBy, minPrice, maxPrice]);
 
   const fetchProducts = async () => {

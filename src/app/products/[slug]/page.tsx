@@ -1,8 +1,6 @@
 'use client';
 
-import { use } from 'react';
 import { apiClient } from '../../../lib/api-client';
-import { getStoredCurrency } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
 import { useAuth } from '../../../lib/auth/AuthContext';

@@ -11,7 +11,7 @@ interface UseProductAttributeHandlersProps {
 }
 
 export function useProductAttributeHandlers({
-  attributes,
+  attributes: _attributes,
   setAttributes,
   getColorAttribute,
   getSizeAttribute,

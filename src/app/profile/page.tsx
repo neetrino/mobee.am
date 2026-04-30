@@ -11,7 +11,7 @@ import { ProfileAddresses } from './ProfileAddresses';
 import { ProfileOrders } from './ProfileOrders';
 import { ProfilePassword } from './ProfilePassword';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import type { ProfileTab, ProfileTabConfig } from './types';
+import type { ProfileTabConfig } from './types';
 
 function ProfilePageContent() {
   const { isLoggedIn, isLoading: authLoading } = useAuth();
@@ -21,8 +21,8 @@ function ProfilePageContent() {
     loading,
     error,
     success,
-    setError,
-    setSuccess,
+    setError: _setError,
+    setSuccess: _setSuccess,
     profile,
     activeTab,
     handleTabChange,

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { useTranslation } from '../../../lib/i18n-client';
-import type { CheckoutFormData } from '../types';
 
 export function useCheckoutSchema() {
   const { t } = useTranslation();

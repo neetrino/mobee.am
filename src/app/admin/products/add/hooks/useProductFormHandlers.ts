@@ -160,8 +160,7 @@ export function useProductFormHandlers({
         
         if (useGeneratedVariants) {
           console.log('📦 [ADMIN] Using generatedVariants format:', generatedVariants.length, 'variants');
-          const sizeAttribute = getSizeAttribute();
-          
+
           generatedVariants.forEach((genVariant, variantIndex) => {
             const variantPriceUSD = convertPrice(parseFloat(genVariant.price || '0'), defaultCurrency, 'USD');
             const variantCompareAtPriceUSD = genVariant.compareAtPrice 
