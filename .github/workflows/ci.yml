@@ -9,6 +9,10 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      # Prisma schema requires DIRECT_URL (Neon-style); plain Postgres CI uses the same URL.
+      DATABASE_URL: postgresql://test:test@localhost:5432/test
+      DIRECT_URL: postgresql://test:test@localhost:5432/test
     services:
       postgres:
         image: postgres:15
@@ -43,13 +47,9 @@ jobs:
 
       - name: Apply migrations (test DB)
         run: pnpm run db:migrate:deploy
-        env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/test
 
       - name: Migration health check
         run: pnpm run db:migrate:health
-        env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/test
 
       - name: Lint
         run: pnpm run lint
