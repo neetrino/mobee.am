@@ -10,7 +10,7 @@ import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { WishlistHeartIcon } from '../icons/WishlistHeartIcon';
 import { ProductColors } from './ProductColors';
 import type { CurrencyCode } from '../../lib/currency';
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
+import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import type { ProductLabel } from '../ProductLabels';
 
 interface ProductCardListProps {
@@ -56,6 +56,7 @@ export function ProductCardList({
   onAddToCart,
 }: ProductCardListProps) {
   const { t } = useTranslation();
+  const imageSrc = resolveProductCardImageSrc(product.image);
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
@@ -68,7 +69,7 @@ export function ProductCardList({
         >
           {!imageError ? (
             <Image
-              src={PRODUCT_CARD_DISPLAY_IMAGE_SRC}
+              src={imageSrc}
               alt={product.title}
               fill
               className="object-contain"

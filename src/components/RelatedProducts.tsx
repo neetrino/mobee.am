@@ -8,7 +8,7 @@ import { getStoredLanguage, type LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
 import { useAuth } from '../lib/auth/AuthContext';
 import { dispatchCartFlyAnimation } from '../lib/cart/dispatchCartFlyAnimation';
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../lib/productCardDisplayImage';
+import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '../lib/cart/guest-cart';
 import { useRelatedProducts } from './hooks/useRelatedProducts';
 import { useCarousel } from './hooks/useCarousel';
@@ -125,7 +125,10 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
       window.dispatchEvent(new Event('cart-updated'));
       const cardRoot = (e.currentTarget as HTMLElement).closest('[data-related-product-card]');
       const flySource = cardRoot?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
-      dispatchCartFlyAnimation(PRODUCT_CARD_DISPLAY_IMAGE_SRC, flySource);
+      dispatchCartFlyAnimation(
+        resolveProductCardImageSrc(product.image),
+        flySource,
+      );
     } catch (error: unknown) {
       console.error('[RelatedProducts] Error adding to cart:', error);
       const err = error as { message?: string };

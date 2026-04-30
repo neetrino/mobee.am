@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from "../../lib/productCardDisplayImage";
+import { resolveProductCardImageSrc } from "../../lib/productCardDisplayImage";
 import { ProductImagePlaceholder } from "../ProductImagePlaceholder";
 
 interface ProductCardImageProps {
@@ -23,7 +23,7 @@ interface ProductCardImageProps {
  */
 export function ProductCardImage({
   slug,
-  image: _productImage,
+  image,
   title,
   imageError,
   onImageError,
@@ -32,6 +32,7 @@ export function ProductCardImage({
   squareImageFrame = true,
 }: ProductCardImageProps) {
   const showPlaceholder = imageError;
+  const imageSrc = resolveProductCardImageSrc(image);
   /** max-lg: frame 90% width vs desktop (171 / 212) so title clears the image on small screens. */
   const frameClass = isCompact
     ? "w-[171px] max-w-[84%] max-lg:w-[153.9px]"
@@ -52,7 +53,7 @@ export function ProductCardImage({
           />
         ) : (
           <Image
-            src={PRODUCT_CARD_DISPLAY_IMAGE_SRC}
+            src={imageSrc}
             alt={title}
             fill
             className={

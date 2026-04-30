@@ -33,6 +33,10 @@ const productCardDisplayRemotePattern = remotePatternFromAbsoluteUrl(
   process.env.NEXT_PUBLIC_PRODUCT_CARD_DISPLAY_IMAGE_URL
 );
 
+const r2PublicRemotePattern = remotePatternFromAbsoluteUrl(
+  process.env.R2_PUBLIC_URL
+);
+
 const nextConfig = {
   reactStrictMode: true,
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
@@ -115,6 +119,7 @@ const nextConfig = {
         pathname: '/**',
       },
       ...(productCardDisplayRemotePattern ? [productCardDisplayRemotePattern] : []),
+      ...(r2PublicRemotePattern ? [r2PublicRemotePattern] : []),
     ],
     // Allow unoptimized images for development (images will use unoptimized prop)
     // Ensure image optimization is enabled for production
