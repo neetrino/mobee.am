@@ -11,7 +11,7 @@ const path = require('path');
 
 const rootDir = path.resolve(__dirname, '..');
 const dbRoot = path.join(rootDir, 'shared', 'db');
-
+ 
 function loadEnvFromRoot () {
   const envPath = path.join(rootDir, '.env');
   if (!fs.existsSync(envPath)) {
