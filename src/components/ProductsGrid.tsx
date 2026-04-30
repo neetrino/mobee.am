@@ -4,6 +4,12 @@ import { useEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { useTranslation } from '../lib/i18n-client';
 import type { ProductSortOption } from '@/lib/products/sort';
+import {
+  PRODUCTS_VIEW_MODE_CHANGED_EVENT,
+  PRODUCTS_VIEW_MODE_STORAGE_KEY,
+  parseProductListingViewMode,
+  type ProductListingViewMode,
+} from '@/lib/products/view-mode';
 
 interface Product {
   id: string;
@@ -20,8 +26,6 @@ interface Product {
   defaultVariantId?: string | null;
 }
 
-type ViewMode = 'list' | 'grid-2' | 'grid-3';
-
 interface ProductsGridProps {
   products: Product[];
   sortBy?: ProductSortOption;
@@ -29,30 +33,30 @@ interface ProductsGridProps {
 
 export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<ViewMode>('grid-2');
+  const [viewMode, setViewMode] = useState<ProductListingViewMode>('grid-2');
   const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
 
   // Load view mode from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem('products-view-mode');
-    if (stored && ['list', 'grid-2', 'grid-3'].includes(stored)) {
-      setViewMode(stored as ViewMode);
-    } else {
-      // Default to grid-2 if nothing stored
-      setViewMode('grid-2');
-      localStorage.setItem('products-view-mode', 'grid-2');
+    const stored = localStorage.getItem(PRODUCTS_VIEW_MODE_STORAGE_KEY);
+    const mode = parseProductListingViewMode(stored);
+    setViewMode(mode);
+    if (stored !== mode) {
+      localStorage.setItem(PRODUCTS_VIEW_MODE_STORAGE_KEY, mode);
     }
   }, []);
 
-  // Listen for view mode changes
+  // Listen for view mode changes (e.g. shop toolbar toggle)
   useEffect(() => {
-    const handleViewModeChange = (_event: CustomEvent) => {
-      setViewMode((_event as CustomEvent).detail);
+    const handleViewModeChange = (event: Event) => {
+      const detail = (event as CustomEvent<ProductListingViewMode>).detail;
+      const mode = parseProductListingViewMode(detail ?? null);
+      setViewMode(mode);
     };
 
-    window.addEventListener('view-mode-changed', handleViewModeChange as (_event: Event) => void);
+    window.addEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, handleViewModeChange);
     return () => {
-      window.removeEventListener('view-mode-changed', handleViewModeChange as (_event: Event) => void);
+      window.removeEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, handleViewModeChange);
     };
   }, []);
 

@@ -4,6 +4,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '../lib/i18n-client';
 import type { ProductSortOption } from '@/lib/products/sort';
+import {
+  PRODUCTS_VIEW_MODE_CHANGED_EVENT,
+  PRODUCTS_VIEW_MODE_STORAGE_KEY,
+  parseProductListingViewMode,
+  persistProductListingViewMode,
+  type ProductListingViewMode,
+} from '@/lib/products/view-mode';
 
 const SORT_OPTIONS: ProductSortOption[] = ['default', 'price-asc', 'price-desc', 'name-asc', 'name-desc'];
 
@@ -27,7 +34,11 @@ export function ShopSortFilter() {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [listingMode, setListingMode] = useState<ProductListingViewMode>('grid-2');
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const isListActive = listingMode === 'list';
+  const isGridActive = listingMode === 'grid-2' || listingMode === 'grid-3';
 
   const activeSort = useMemo<ProductSortOption>(() => {
     const sort = searchParams.get('sort');
@@ -45,6 +56,16 @@ export function ShopSortFilter() {
     return () => document.removeEventListener('mousedown', closeOnOutsideClick);
   }, []);
 
+  useEffect(() => {
+    setListingMode(parseProductListingViewMode(localStorage.getItem(PRODUCTS_VIEW_MODE_STORAGE_KEY)));
+    const onListingChanged = (event: Event) => {
+      const detail = (event as CustomEvent<ProductListingViewMode>).detail;
+      setListingMode(parseProductListingViewMode(detail ?? null));
+    };
+    window.addEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, onListingChanged);
+    return () => window.removeEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, onListingChanged);
+  }, []);
+
   const applySort = (sort: ProductSortOption) => {
     const params = new URLSearchParams(searchParams.toString());
     if (sort === 'default') {
@@ -56,6 +77,10 @@ export function ShopSortFilter() {
     setOpen(false);
     const query = params.toString();
     router.push(query ? `/shop?${query}` : '/shop');
+  };
+
+  const applyListingMode = (mode: ProductListingViewMode) => {
+    persistProductListingViewMode(mode);
   };
 
   return (
@@ -107,41 +132,72 @@ export function ShopSortFilter() {
         )}
       </div>
 
-      <button
-        type="button"
-        className="flex h-12 w-[110px] items-center justify-center gap-[13px] rounded-[90px] border border-[#4B5563] px-5 py-3"
-        aria-label={t('products.header.sortProducts')}
+      <div
+        className="flex h-12 w-[110px] shrink-0 items-stretch gap-0.5 rounded-[90px] border border-[#4B5563] p-1"
+        role="group"
+        aria-label={`${t('products.header.viewModes.list')} / ${t('products.header.viewModes.grid2')}`}
       >
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" className="shrink-0">
-          <circle cx="8" cy="8" r="1.5" fill="#4B5563" />
-          <circle cx="8" cy="16" r="1.5" fill="#4B5563" />
-          <circle cx="8" cy="24" r="1.5" fill="#4B5563" />
-          <path d="M12.5 8H24" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M12.5 16H24" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M12.5 24H24" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-
-        <span className="flex h-[39px] w-[43px] items-center justify-center rounded-[90px] bg-[#2DB2FF]">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
-            <circle cx="4.5" cy="4.5" r="1.4" fill="white" />
-            <circle cx="10.5" cy="4.5" r="1.4" fill="white" />
-            <circle cx="16.5" cy="4.5" r="1.4" fill="white" />
-            <circle cx="22.5" cy="4.5" r="1.4" fill="white" />
-            <circle cx="4.5" cy="10.5" r="1.4" fill="white" />
-            <circle cx="10.5" cy="10.5" r="1.4" fill="white" />
-            <circle cx="16.5" cy="10.5" r="1.4" fill="white" />
-            <circle cx="22.5" cy="10.5" r="1.4" fill="white" />
-            <circle cx="4.5" cy="16.5" r="1.4" fill="white" />
-            <circle cx="10.5" cy="16.5" r="1.4" fill="white" />
-            <circle cx="16.5" cy="16.5" r="1.4" fill="white" />
-            <circle cx="22.5" cy="16.5" r="1.4" fill="white" />
-            <circle cx="4.5" cy="22.5" r="1.4" fill="white" />
-            <circle cx="10.5" cy="22.5" r="1.4" fill="white" />
-            <circle cx="16.5" cy="22.5" r="1.4" fill="white" />
-            <circle cx="22.5" cy="22.5" r="1.4" fill="white" />
+        <button
+          type="button"
+          onClick={() => applyListingMode('list')}
+          aria-pressed={isListActive}
+          aria-label={t('products.header.viewModes.list')}
+          className={`flex flex-1 items-center justify-center rounded-[80px] transition-colors ${
+            isListActive ? 'bg-[#2DB2FF]' : 'bg-transparent'
+          }`}
+        >
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 32 32"
+            fill="none"
+            aria-hidden="true"
+            className={`shrink-0 ${isListActive ? 'text-white' : 'text-[#4B5563]'}`}
+          >
+            <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+            <circle cx="8" cy="16" r="1.5" fill="currentColor" />
+            <circle cx="8" cy="24" r="1.5" fill="currentColor" />
+            <path d="M12.5 8H24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M12.5 16H24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M12.5 24H24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
-        </span>
-      </button>
+        </button>
+        <button
+          type="button"
+          onClick={() => applyListingMode('grid-2')}
+          aria-pressed={isGridActive}
+          aria-label={t('products.header.viewModes.grid2')}
+          className={`flex flex-1 items-center justify-center rounded-[80px] transition-colors ${
+            isGridActive ? 'bg-[#2DB2FF]' : 'bg-transparent'
+          }`}
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            className={`shrink-0 ${isGridActive ? 'text-white' : 'text-[#4B5563]'}`}
+          >
+            <circle cx="4.5" cy="4.5" r="1.4" fill="currentColor" />
+            <circle cx="10.5" cy="4.5" r="1.4" fill="currentColor" />
+            <circle cx="16.5" cy="4.5" r="1.4" fill="currentColor" />
+            <circle cx="22.5" cy="4.5" r="1.4" fill="currentColor" />
+            <circle cx="4.5" cy="10.5" r="1.4" fill="currentColor" />
+            <circle cx="10.5" cy="10.5" r="1.4" fill="currentColor" />
+            <circle cx="16.5" cy="10.5" r="1.4" fill="currentColor" />
+            <circle cx="22.5" cy="10.5" r="1.4" fill="currentColor" />
+            <circle cx="4.5" cy="16.5" r="1.4" fill="currentColor" />
+            <circle cx="10.5" cy="16.5" r="1.4" fill="currentColor" />
+            <circle cx="16.5" cy="16.5" r="1.4" fill="currentColor" />
+            <circle cx="22.5" cy="16.5" r="1.4" fill="currentColor" />
+            <circle cx="4.5" cy="22.5" r="1.4" fill="currentColor" />
+            <circle cx="10.5" cy="22.5" r="1.4" fill="currentColor" />
+            <circle cx="16.5" cy="22.5" r="1.4" fill="currentColor" />
+            <circle cx="22.5" cy="22.5" r="1.4" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
