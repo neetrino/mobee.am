@@ -1,5 +1,9 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@prisma/client";
+import {
+  PRODUCT_VARIANT_DB_SELECT,
+  PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
+} from "@/lib/database/productVariantDb.constants";
 import { adminService } from "./admin.service";
 import { ProductWithRelations } from "./products-find-query.service";
 
@@ -142,18 +146,7 @@ class ProductsFiltersService {
               where: {
                 published: true,
               },
-              include: {
-                options: {
-                  include: {
-                    attributeValue: {
-                      include: {
-                        attribute: true,
-                        translations: true,
-                      },
-                    },
-                  },
-                },
-              },
+              select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
             },
             productAttributes: {
               include: {
@@ -450,6 +443,7 @@ class ProductsFiltersService {
           where: {
             published: true,
           },
+          select: PRODUCT_VARIANT_DB_SELECT,
         },
       },
     });

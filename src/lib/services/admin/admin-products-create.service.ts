@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE } from "@/lib/database/productVariantDb.constants";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { findOrCreateAttributeValue } from "../../utils/variant-generator";
 import { ensureProductAttributesTable } from "../../utils/db-ensure";
@@ -393,9 +394,7 @@ class AdminProductsCreateService {
           include: {
             translations: true,
             variants: {
-              include: {
-                options: true,
-              },
+              select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
             },
             labels: true,
           },

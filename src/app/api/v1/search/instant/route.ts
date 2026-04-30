@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { db } from '@white-shop/db';
+import { PRODUCT_VARIANT_DB_SELECT } from '@/lib/database/productVariantDb.constants';
 import { extractMediaUrl } from '@/lib/utils/extractMediaUrl';
 import { processImageUrl } from '@/lib/utils/image-utils';
 
@@ -64,7 +65,12 @@ export async function GET(req: NextRequest) {
       take: limit,
       include: {
         translations: true,
-        variants: { where: { published: true }, take: 1, orderBy: { price: 'asc' } },
+        variants: {
+          where: { published: true },
+          take: 1,
+          orderBy: { price: 'asc' },
+          select: PRODUCT_VARIANT_DB_SELECT,
+        },
         categories: { include: { translations: true } },
       },
     });

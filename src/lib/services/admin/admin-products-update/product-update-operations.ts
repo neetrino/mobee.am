@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@prisma/client";
+import { PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE } from "@/lib/database/productVariantDb.constants";
 import { logger } from "../../../utils/logger";
 import type { UpdateProductData } from "./types";
 import { collectVariantImages, buildProductUpdateData, updateProductTranslation, updateProductLabels, updateProductAttributes } from "./product-updater";
@@ -107,9 +108,7 @@ export async function updateProduct(
         include: {
           translations: true,
           variants: {
-            include: {
-              options: true,
-            },
+            select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
           },
           labels: true,
         },

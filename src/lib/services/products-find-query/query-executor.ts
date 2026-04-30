@@ -1,5 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { db } from "@white-shop/db";
+import {
+  PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
+  PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
+} from "@/lib/database/productVariantDb.constants";
 import { ensureProductVariantAttributesColumn } from "../../utils/db-ensure";
 import { logger } from "../../utils/logger";
 import type { ProductWithRelations } from "./types";
@@ -19,18 +23,7 @@ const getBaseInclude = () => ({
     where: {
       published: true,
     },
-    include: {
-      options: {
-        include: {
-          attributeValue: {
-            include: {
-              attribute: true,
-              translations: true,
-            },
-          },
-        },
-      },
-    },
+    select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
   },
   labels: true,
   categories: {
@@ -49,9 +42,7 @@ const getBaseIncludeWithoutAttributeValue = () => ({
     where: {
       published: true,
     },
-    include: {
-      options: true, // Include options without attributeValue relation
-    },
+    select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
   },
 });
 
