@@ -85,17 +85,17 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
     setSortedProducts(sorted);
   }, [products, sortBy]);
 
-  // Get grid classes based on view mode
+  // Get grid classes based on view mode (max 3 columns — shop matches home card row density on xl+)
   const getGridClasses = () => {
     switch (viewMode) {
       case 'list':
         return 'grid grid-cols-1 gap-4';
       case 'grid-2':
-        return 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6 2xl:grid-cols-4';
+        return 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6';
       case 'grid-3':
-        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-6 2xl:grid-cols-4';
+        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
       default:
-        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-6 2xl:grid-cols-4';
+        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
     }
   };
 
@@ -110,13 +110,13 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
   return (
     <div className={getGridClasses()}>
       {sortedProducts.map((product) => (
-        <ProductCard 
-          key={product.id} 
+        <ProductCard
+          key={product.id}
           product={{
             ...product,
-            compareAtPrice: product.compareAtPrice ?? undefined
-          }} 
-          viewMode={viewMode} 
+            compareAtPrice: product.compareAtPrice ?? undefined,
+          }}
+          viewMode={viewMode === 'list' ? 'list' : 'grid-2'}
         />
       ))}
     </div>
