@@ -7,6 +7,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { apiClient } from '../../../lib/api-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
 
 interface PromoCode {
   id: string;
@@ -213,7 +214,12 @@ export default function PromoCodesPage() {
                 />
               </div>
 
-              <Button type="submit" disabled={submitting} variant="primary" className="w-full md:w-auto">
+              <Button
+                type="submit"
+                disabled={submitting}
+                variant="primary"
+                className={`w-full md:w-auto ${ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}`}
+              >
                 {submitting ? t('admin.promocodes.creating') : t('admin.promocodes.create')}
               </Button>
             </form>

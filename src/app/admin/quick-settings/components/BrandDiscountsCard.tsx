@@ -2,7 +2,7 @@
 
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
+import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../../constants/adminDiscountSaveButton.constants';
 
 interface AdminBrand {
   id: string;
