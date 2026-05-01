@@ -28,6 +28,10 @@ export function LanguageSwitcherPill() {
   const slideTranslate =
     seg === 'hy' ? 'translateX(0%)' : seg === 'en' ? 'translateX(100%)' : 'translateX(200%)';
 
+  /** Matches first-bar phone label and secondary-bar profile label (`font-semibold`). */
+  const segmentLabelClass =
+    'flex items-center justify-center rounded-[17.1px] text-[13.3px] font-semibold leading-[14.25px]';
+
   return (
     <div
       className="relative h-[38.95px] w-[140.6px] shrink-0 rounded-[20.9px] border-[1.14px] border-solid border-[#4b5563]"
@@ -42,9 +46,7 @@ export function LanguageSwitcherPill() {
       <div className="relative z-10 grid h-full grid-cols-3 items-stretch px-[1.9px]">
         <button
           type="button"
-          className={`flex items-center justify-center rounded-[17.1px] text-[13.3px] font-bold leading-[14.25px] ${
-            seg === 'hy' ? 'text-white' : 'text-[#4b5563]'
-          }`}
+          className={`${segmentLabelClass} ${seg === 'hy' ? 'text-white' : 'text-[#4b5563]'}`}
           onClick={() => {
             if (lang !== 'hy') setStoredLanguage('hy');
           }}
@@ -53,9 +55,7 @@ export function LanguageSwitcherPill() {
         </button>
         <button
           type="button"
-          className={`flex items-center justify-center rounded-[17.1px] text-[13.3px] font-bold leading-[14.25px] ${
-            seg === 'en' ? 'text-white' : 'text-[#4b5563]'
-          }`}
+          className={`${segmentLabelClass} ${seg === 'en' ? 'text-white' : 'text-[#4b5563]'}`}
           onClick={() => {
             if (lang !== 'en') setStoredLanguage('en');
           }}
@@ -64,9 +64,7 @@ export function LanguageSwitcherPill() {
         </button>
         <button
           type="button"
-          className={`flex items-center justify-center rounded-[17.1px] text-[13.3px] font-bold leading-[14.25px] ${
-            seg === 'ru' ? 'text-white' : 'text-[#4b5563]'
-          }`}
+          className={`${segmentLabelClass} ${seg === 'ru' ? 'text-white' : 'text-[#4b5563]'}`}
           onClick={() => {
             if (lang !== 'ru') setStoredLanguage('ru');
           }}
