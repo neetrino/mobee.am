@@ -7,6 +7,7 @@ import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
 
 export default function PriceFilterSettingsPage() {
   const { t } = useTranslation();
@@ -370,7 +371,7 @@ export default function PriceFilterSettingsPage() {
                       variant="primary"
                       onClick={handleSave}
                       disabled={saving}
-                      className="px-6"
+                      className={`px-6 ${ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}`}
                     >
                       {saving ? (
                         <div className="flex items-center gap-2">
