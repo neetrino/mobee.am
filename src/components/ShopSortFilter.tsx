@@ -14,6 +14,9 @@ import {
 
 const SORT_OPTIONS: ProductSortOption[] = ['default', 'price-asc', 'price-desc', 'name-asc', 'name-desc'];
 
+/** Grid listing icon: 24px viewBox artwork, +5% display size vs default 24px toolbar icons. */
+const SHOP_GRID_LISTING_ICON_DISPLAY_PX = 24 * 1.05;
+
 function getSortLabel(sort: ProductSortOption, t: (key: string) => string): string {
   switch (sort) {
     case 'price-asc':
@@ -172,29 +175,22 @@ export function ShopSortFilter() {
           }`}
         >
           <svg
-            width="24"
-            height="24"
+            width={SHOP_GRID_LISTING_ICON_DISPLAY_PX}
+            height={SHOP_GRID_LISTING_ICON_DISPLAY_PX}
             viewBox="0 0 24 24"
             fill="none"
             aria-hidden="true"
             className={`shrink-0 ${isGridActive ? 'text-white' : 'text-[#4B5563]'}`}
           >
-            <circle cx="4.5" cy="4.5" r="1.4" fill="currentColor" />
-            <circle cx="10.5" cy="4.5" r="1.4" fill="currentColor" />
-            <circle cx="16.5" cy="4.5" r="1.4" fill="currentColor" />
-            <circle cx="22.5" cy="4.5" r="1.4" fill="currentColor" />
-            <circle cx="4.5" cy="10.5" r="1.4" fill="currentColor" />
-            <circle cx="10.5" cy="10.5" r="1.4" fill="currentColor" />
-            <circle cx="16.5" cy="10.5" r="1.4" fill="currentColor" />
-            <circle cx="22.5" cy="10.5" r="1.4" fill="currentColor" />
-            <circle cx="4.5" cy="16.5" r="1.4" fill="currentColor" />
-            <circle cx="10.5" cy="16.5" r="1.4" fill="currentColor" />
-            <circle cx="16.5" cy="16.5" r="1.4" fill="currentColor" />
-            <circle cx="22.5" cy="16.5" r="1.4" fill="currentColor" />
-            <circle cx="4.5" cy="22.5" r="1.4" fill="currentColor" />
-            <circle cx="10.5" cy="22.5" r="1.4" fill="currentColor" />
-            <circle cx="16.5" cy="22.5" r="1.4" fill="currentColor" />
-            <circle cx="22.5" cy="22.5" r="1.4" fill="currentColor" />
+            <circle cx="6" cy="6" r="1.4" fill="currentColor" />
+            <circle cx="12" cy="6" r="1.4" fill="currentColor" />
+            <circle cx="18" cy="6" r="1.4" fill="currentColor" />
+            <circle cx="6" cy="12" r="1.4" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.4" fill="currentColor" />
+            <circle cx="18" cy="12" r="1.4" fill="currentColor" />
+            <circle cx="6" cy="18" r="1.4" fill="currentColor" />
+            <circle cx="12" cy="18" r="1.4" fill="currentColor" />
+            <circle cx="18" cy="18" r="1.4" fill="currentColor" />
           </svg>
         </button>
       </div>
