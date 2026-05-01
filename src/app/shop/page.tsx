@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, type CSSProperties } from 'react';
 import { cookies } from 'next/headers';
 import { readLanguageFromCookies } from '../../lib/language';
 import { t } from '../../lib/i18n';
@@ -11,6 +11,7 @@ import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvide
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { ShopCatalogArea } from '@/components/shop/ShopCatalogArea';
 import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
+import { SHOP_FILTER_SIDEBAR_WIDTH_CSS } from './shop-layout.constants';
 
 interface ProductsPageProps {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -55,7 +56,14 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           minPrice={params?.minPrice}
           maxPrice={params?.maxPrice}
         >
-          <aside className="hidden lg:block lg:w-[403px] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-6 lg:border-r lg:border-[#e7e7e7] lg:pr-0">
+          <aside
+            className="hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-6 lg:border-r lg:border-[#e7e7e7] lg:pr-0"
+            style={
+              {
+                ['--shop-filter-aside-width']: SHOP_FILTER_SIDEBAR_WIDTH_CSS,
+              } as CSSProperties
+            }
+          >
             <div className="bg-white px-6 pt-6">
               <div className="mb-6">
                 <h2 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#0F172B]">
