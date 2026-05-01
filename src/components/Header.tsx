@@ -387,8 +387,14 @@ function CategoriesMenuFlyout({
   );
 }
 
-/** Figma mobee-new node 178:535 — support phone + language pill */
-function HeaderPhoneLangCluster({ phoneNumberVisibility }: { phoneNumberVisibility?: 'always' | 'smUp' }) {
+/** Figma mobee-new node 178:535 — support phone + optional language pill */
+function HeaderPhoneLangCluster({
+  phoneNumberVisibility,
+  showLanguageSwitcher = true,
+}: {
+  phoneNumberVisibility?: 'always' | 'smUp';
+  showLanguageSwitcher?: boolean;
+}) {
   const { t } = useTranslation();
   const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
   const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
@@ -412,7 +418,7 @@ function HeaderPhoneLangCluster({ phoneNumberVisibility }: { phoneNumberVisibili
         </span>
         <span className={numberClass}>{t('common.header.supportPhoneNumber')}</span>
       </a>
-      <LanguageSwitcherPill />
+      {showLanguageSwitcher ? <LanguageSwitcherPill /> : null}
     </div>
   );
 }
@@ -1251,7 +1257,7 @@ export function Header() {
             </div>
 
             <div className="border-b border-gray-100 px-4 py-2">
-              <HeaderPhoneLangCluster phoneNumberVisibility="always" />
+              <HeaderPhoneLangCluster phoneNumberVisibility="always" showLanguageSwitcher={false} />
             </div>
 
             <div className="flex-1 overflow-hidden min-h-0">
