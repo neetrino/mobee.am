@@ -28,6 +28,11 @@ import { CartIcon } from './icons/CartIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
 import { useCategoriesTree } from './CategoriesTreeContext';
 
+/** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
+const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
+/** Any scroll-down past this delta hides the peeking primary strip again. */
+const PRIMARY_STRIP_SCROLL_DOWN_HIDE_THRESHOLD_PX = 2;
+
 const montserrat = Montserrat({
   subsets: ['latin'],
   weight: ['500', '600', '800', '900'],
@@ -456,7 +461,10 @@ export function Header() {
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileStrip1WrapRef = useRef<HTMLDivElement>(null);
   const mobileStrip1Ref = useRef<HTMLDivElement>(null);
+  const desktopPrimaryWrapRef = useRef<HTMLDivElement>(null);
+  const desktopPrimaryRowRef = useRef<HTMLDivElement>(null);
   const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
   const mobilePrimaryLangRef = useRef<HTMLDivElement>(null);
@@ -466,6 +474,10 @@ export function Header() {
   const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
   const [mobileSearchDocked, setMobileSearchDocked] = useState(false);
   const [mobileSearchFlowSpacerPx, setMobileSearchFlowSpacerPx] = useState(0);
+  const [primaryBarPeekFromScrollUp, setPrimaryBarPeekFromScrollUp] = useState(false);
+  const [mobileStrip1HeightPx, setMobileStrip1HeightPx] = useState(0);
+  const [desktopPrimaryBarHeightPx, setDesktopPrimaryBarHeightPx] = useState(0);
+  const lastScrollYRef = useRef(0);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
 
@@ -501,7 +513,7 @@ export function Header() {
       setMobileSearchFlowSpacerPx(0);
       return;
     }
-    const strip1 = mobileStrip1Ref.current;
+    const strip1Wrap = mobileStrip1WrapRef.current;
     const searchWrap = mobileSearchWrapRef.current;
     if (searchWrap) {
       const h = Math.round(searchWrap.getBoundingClientRect().height);
@@ -509,10 +521,43 @@ export function Header() {
         setMobileSearchFlowSpacerPx(h);
       }
     }
-    if (!strip1) {
+    if (!strip1Wrap) {
       return;
     }
-    setMobileSearchDocked(strip1.getBoundingClientRect().bottom <= 0);
+    setMobileSearchDocked(strip1Wrap.getBoundingClientRect().bottom <= 0);
+  }, []);
+
+  useLayoutEffect(() => {
+    const stripInner = mobileStrip1Ref.current;
+    const desktopInner = desktopPrimaryRowRef.current;
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const measure = () => {
+      if (stripInner) {
+        const h = Math.round(stripInner.getBoundingClientRect().height);
+        if (h > 0) {
+          setMobileStrip1HeightPx(h);
+        }
+      }
+      if (desktopInner) {
+        const h = Math.round(desktopInner.getBoundingClientRect().height);
+        if (h > 0) {
+          setDesktopPrimaryBarHeightPx(h);
+        }
+      }
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (stripInner) {
+      ro.observe(stripInner);
+    }
+    if (desktopInner) {
+      ro.observe(desktopInner);
+    }
+    return () => {
+      ro.disconnect();
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -546,9 +591,23 @@ export function Header() {
   }, [syncMobileSearchDock]);
 
   useEffect(() => {
+    lastScrollYRef.current = window.scrollY;
     const onScroll = () => {
+      const y = window.scrollY;
+      const prev = lastScrollYRef.current;
+      const delta = y - prev;
+      lastScrollYRef.current = y;
+      if (delta < -PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX) {
+        setPrimaryBarPeekFromScrollUp(true);
+      } else if (delta > PRIMARY_STRIP_SCROLL_DOWN_HIDE_THRESHOLD_PX) {
+        setPrimaryBarPeekFromScrollUp(false);
+      }
       syncSecondaryDock();
       syncMobileSearchDock();
+      const primaryEl = primaryStripRef.current;
+      if (primaryEl && primaryEl.getBoundingClientRect().bottom > 0) {
+        setPrimaryBarPeekFromScrollUp(false);
+      }
     };
     const onResize = () => {
       syncSecondaryDock();
@@ -570,6 +629,11 @@ export function Header() {
       mq.removeEventListener('change', onMq);
     };
   }, [syncSecondaryDock, syncMobileSearchDock]);
+
+  useEffect(() => {
+    setPrimaryBarPeekFromScrollUp(false);
+    lastScrollYRef.current = typeof window !== 'undefined' ? window.scrollY : 0;
+  }, [pathname]);
 
   const {
     query: searchQuery,
@@ -883,6 +947,14 @@ export function Header() {
     window.dispatchEvent(new Event('currency-updated'));
   };
 
+  const mobileStripPeekActive = mobileSearchDocked && primaryBarPeekFromScrollUp;
+  const desktopPrimaryPeekActive = secondaryDocked && primaryBarPeekFromScrollUp;
+  const mobileDockedHeaderSpacerPx =
+    mobileSearchDocked && mobileSearchFlowSpacerPx > 0
+      ? mobileSearchFlowSpacerPx +
+        (mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0)
+      : 0;
+
   return (
     <div className={`relative z-50 ${montserrat.className}`}>
     <header
@@ -899,7 +971,23 @@ export function Header() {
 
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         {/* Mobile — strip 1 scrolls away; strip 2 pins to viewport top once strip 1 has left */}
-        <div ref={mobileStrip1Ref} className="border-b border-gray-100 lg:hidden">
+        <div
+          ref={mobileStrip1WrapRef}
+          className="lg:hidden"
+          style={
+            mobileStripPeekActive && mobileStrip1HeightPx > 0
+              ? { height: mobileStrip1HeightPx }
+              : undefined
+          }
+        >
+          <div
+            ref={mobileStrip1Ref}
+            className={`border-b border-gray-100 ${
+              mobileStripPeekActive
+                ? `fixed left-0 right-0 top-0 z-[45] border-b border-gray-200 bg-white shadow-sm ${SITE_CONTENT_GUTTERS_CLASS}`
+                : ''
+            }`}
+          >
           <div className="relative flex items-center justify-between gap-3 py-2.5">
             <div className="relative z-20 shrink-0">
               <button
@@ -978,17 +1066,26 @@ export function Header() {
               ) : null}
             </div>
           </div>
+          </div>
         </div>
 
-        {mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? (
-          <div aria-hidden className="shrink-0 lg:hidden" style={{ height: mobileSearchFlowSpacerPx }} />
+        {mobileDockedHeaderSpacerPx > 0 ? (
+          <div aria-hidden className="shrink-0 lg:hidden" style={{ height: mobileDockedHeaderSpacerPx }} />
         ) : null}
 
         <div
           ref={mobileSearchWrapRef}
           className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
-            mobileSearchDocked ? 'fixed inset-x-0 top-0 z-40 border-b border-gray-200' : ''
+            mobileSearchDocked ? 'fixed inset-x-0 z-40 border-b border-gray-200' : ''
           }`}
+          style={
+            mobileSearchDocked
+              ? {
+                  top:
+                    mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0,
+                }
+              : undefined
+          }
         >
           <div className={mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
             <form
@@ -1061,7 +1158,21 @@ export function Header() {
 
         {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
         <div
-          className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`}
+          ref={desktopPrimaryWrapRef}
+          className="hidden lg:block"
+          style={
+            desktopPrimaryPeekActive && desktopPrimaryBarHeightPx > 0
+              ? { height: desktopPrimaryBarHeightPx }
+              : undefined
+          }
+        >
+        <div
+          ref={desktopPrimaryRowRef}
+          className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
+            desktopPrimaryPeekActive
+              ? `fixed left-0 right-0 top-0 z-[55] border-b border-gray-200 bg-white ${SITE_CONTENT_GUTTERS_CLASS}`
+              : ''
+          }`}
         >
           <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
             <Link
@@ -1106,6 +1217,7 @@ export function Header() {
             <HeaderPhoneLangCluster />
           </div>
         </div>
+        </div>
       </div>
     </header>
 
@@ -1120,6 +1232,9 @@ export function Header() {
       <HeaderSecondaryBar
         ref={secondaryBarOuterRef}
         dockToViewportTop={secondaryDocked}
+        dockedViewportTopOffsetPx={
+          desktopPrimaryPeekActive && desktopPrimaryBarHeightPx > 0 ? desktopPrimaryBarHeightPx : 0
+        }
         montserratClassName={montserrat.className}
         categoriesWrapRef={categoriesPillWrapRef}
         categoriesLabel={t('common.navigation.categories')}

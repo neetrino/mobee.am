@@ -252,6 +252,10 @@ export interface HeaderSecondaryBarProps {
    * inside flex layouts). Parent renders a same-height flow spacer while this is true.
    */
   dockToViewportTop?: boolean;
+  /**
+   * When docked, shifts the fixed bar below another fixed strip (primary row revealed on scroll-up).
+   */
+  dockedViewportTopOffsetPx?: number;
 }
 
 const SECONDARY_SEARCH_LISTBOX_ID = 'header-secondary-search-results';
@@ -296,17 +300,25 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
       onLogout,
       suppressSearchDropdown,
       dockToViewportTop = false,
+      dockedViewportTopOffsetPx = 0,
     },
     ref,
   ) {
-    const positionClass = dockToViewportTop
-      ? 'fixed top-0 left-0 right-0 z-50'
-      : 'relative z-50';
+    const topOffset = Math.max(0, Math.round(dockedViewportTopOffsetPx));
+    const positionClass =
+      dockToViewportTop && topOffset > 0
+        ? 'fixed left-0 right-0 z-50'
+        : dockToViewportTop
+          ? 'fixed top-0 left-0 right-0 z-50'
+          : 'relative z-50';
+    const positionStyle: { top?: number } | undefined =
+      dockToViewportTop && topOffset > 0 ? { top: topOffset } : undefined;
 
     return (
     <div
       ref={ref}
       className={`hidden w-full border-t border-b border-gray-200 bg-white lg:block ${positionClass} ${montserratClassName}`}
+      style={positionStyle}
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <div className="flex items-center justify-between gap-3 py-2 lg:min-h-[52px]">
