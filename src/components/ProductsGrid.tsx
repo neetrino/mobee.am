@@ -110,14 +110,15 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
   return (
     <div className={getGridClasses()}>
       {sortedProducts.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={{
-            ...product,
-            compareAtPrice: product.compareAtPrice ?? undefined,
-          }}
-          viewMode={viewMode === 'list' ? 'list' : 'grid-2'}
-        />
+        <div key={product.id} className="h-full min-h-0">
+          <ProductCard
+            product={{
+              ...product,
+              compareAtPrice: product.compareAtPrice ?? undefined,
+            }}
+            viewMode={viewMode === 'list' ? 'list' : 'grid-2'}
+          />
+        </div>
       ))}
     </div>
   );

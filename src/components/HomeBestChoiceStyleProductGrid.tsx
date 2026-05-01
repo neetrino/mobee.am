@@ -9,7 +9,7 @@ import {
   type MobileCarouselViewState,
 } from './useHomeBestChoiceCarouselPageSync';
 
-export const HOME_BEST_CHOICE_CARD_WIDTH = 'w-full min-w-0';
+export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
 /** Desktop layout for home best-choice rows (hidden below `lg`). */
 const HOME_BEST_CHOICE_DESKTOP_GRID =

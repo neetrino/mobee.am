@@ -89,15 +89,15 @@ export function ProductCardGrid({
       : null;
 
   const cardShellClass = homeProductGridCard
-    ? 'relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:hover:shadow-none lg:min-h-[583px]'
-    : 'relative overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[583px]';
+    ? 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:hover:shadow-none lg:min-h-[583px]'
+    : 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[583px]';
 
   /** Mobile: reserve in-flow height so absolutely positioned image/actions do not overlap the title. */
   const imageStackClass = homeProductGridCard
-    ? 'relative max-lg:min-h-[176px] max-lg:overflow-hidden lg:h-[380px]'
+    ? 'relative shrink-0 max-lg:min-h-[176px] max-lg:overflow-hidden lg:h-[380px]'
     : isCompact
-      ? 'relative max-lg:min-h-[240px] lg:h-[380px]'
-      : 'relative max-lg:min-h-[277px] lg:h-[380px]';
+      ? 'relative shrink-0 max-lg:min-h-[240px] lg:h-[380px]'
+      : 'relative shrink-0 max-lg:min-h-[277px] lg:h-[380px]';
 
   const imageFrameClass = homeProductGridCard
     ? 'absolute inset-x-2 top-2 max-lg:inset-x-2 max-lg:top-2 lg:inset-x-5 lg:top-5 lg:h-[320px]'
@@ -151,23 +151,26 @@ export function ProductCardGrid({
         />
       </div>
 
-      <ProductCardInfo
-        slug={product.slug}
-        title={product.title}
-        subtitle={product.subtitle}
-        brandName={product.brand?.name}
-        price={product.price}
-        discountPercent={product.discountPercent}
-        currency={currency}
-        colors={product.colors}
-        isCompact={isCompact}
-        hidePrice
-        omitBrandRow={homeProductGridCard}
-        titleSizeMobileFigma={homeProductGridCard}
-      />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <ProductCardInfo
+          slug={product.slug}
+          title={product.title}
+          subtitle={product.subtitle}
+          brandName={product.brand?.name}
+          price={product.price}
+          discountPercent={product.discountPercent}
+          currency={currency}
+          colors={product.colors}
+          isCompact={isCompact}
+          hidePrice
+          omitBrandRow={homeProductGridCard}
+          titleSizeMobileFigma={homeProductGridCard}
+        />
+        <div className="min-h-0 flex-1" aria-hidden />
+      </div>
 
       <div
-        className={`flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-3 ${footerPad} ${
+        className={`shrink-0 flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-3 ${footerPad} ${
           homeProductGridCard ? 'max-lg:gap-2' : ''
         }`}
       >
@@ -205,10 +208,16 @@ export function ProductCardGrid({
                 </span>
               ) : null}
             </div>
-            {showStrike ? (
-              <span className="hidden text-[10px] font-normal italic leading-tight text-[#8e8e93] line-through max-lg:block">
-                {formatPrice(listPrice, currency)}
-              </span>
+            {homeProductGridCard ? (
+              <div className="hidden min-h-[14px] max-lg:block" aria-hidden={!showStrike}>
+                {showStrike && listPrice != null ? (
+                  <span className="text-[10px] font-normal italic leading-tight text-[#8e8e93] line-through">
+                    {formatPrice(listPrice, currency)}
+                  </span>
+                ) : (
+                  <span className="invisible block text-[10px] leading-tight">&nbsp;</span>
+                )}
+              </div>
             ) : null}
           </div>
           <button
@@ -284,11 +293,13 @@ export function ProductCardGrid({
             )}
           </button>
         </div>
-        {mobileDiscountLabel ? (
-          <div className="hidden max-lg:block">
-            <span className="inline-flex h-[22px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold leading-none text-[#ff383c]">
-              {mobileDiscountLabel}
-            </span>
+        {homeProductGridCard ? (
+          <div className="hidden min-h-[22px] max-lg:flex max-lg:items-center">
+            {mobileDiscountLabel ? (
+              <span className="inline-flex h-[22px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold leading-none text-[#ff383c]">
+                {mobileDiscountLabel}
+              </span>
+            ) : null}
           </div>
         ) : null}
       </div>
