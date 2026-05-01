@@ -1,4 +1,9 @@
 {
+  "sidebar": {
+    "logoLinkAria": "MOBEE — անցնել ադմին վահանակ",
+    "drawerTitle": "Ադմին նավիգացիա",
+    "drawerMenuButton": "Մենյու"
+  },
   "menu": {
     "home": "Գլխավոր",
     "dashboard": "Վահանակ",

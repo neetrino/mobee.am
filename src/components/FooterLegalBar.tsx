@@ -5,6 +5,7 @@ import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { FooterCurrency } from './FooterCurrency';
+import { SiteBrandLogo } from './SiteBrandLogo';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -30,8 +31,12 @@ export function FooterLegalBar() {
   return (
     <div className={`${montserrat.className} border-t border-[#eeeef0]`}>
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex w-full flex-col gap-5 pb-8 pt-[33px] lg:flex-row lg:flex-nowrap lg:items-center lg:gap-4`}>
-        <div className="shrink-0 text-[16px] font-black leading-[25px] text-black">
-          {t('common.footer.legalBar.brand')}
+        <div className="shrink-0">
+          <SiteBrandLogo
+            alt={t('common.ariaLabels.siteLogo')}
+            sizeClass="h-9 w-9"
+            className="rounded-lg ring-1 ring-black/5"
+          />
         </div>
 
         <div className="min-w-0 max-w-[283px] shrink-0 text-[14px] leading-[18px] text-[#a1a1aa]">

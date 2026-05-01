@@ -1,4 +1,9 @@
 {
+  "sidebar": {
+    "logoLinkAria": "MOBEE — go to admin dashboard",
+    "drawerTitle": "Admin navigation",
+    "drawerMenuButton": "Menu"
+  },
   "menu": {
     "home": "Home",
     "dashboard": "Dashboard",

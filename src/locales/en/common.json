@@ -192,7 +192,8 @@
     "increaseQuantity": "Increase quantity",
     "previousThumbnail": "Previous thumbnail",
     "nextThumbnail": "Next thumbnail",
-    "fullscreenImage": "Fullscreen image"
+    "fullscreenImage": "Fullscreen image",
+    "siteLogo": "MOBEE logo"
   },
   "placeholders": {
     "search": "Search products"

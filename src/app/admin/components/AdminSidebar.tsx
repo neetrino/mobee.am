@@ -1,8 +1,10 @@
 ﻿'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
+import { SiteBrandLogo } from '../../../components/SiteBrandLogo';
 import { getAdminMenuTABS } from '../admin-menu.config';
 import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../../../lib/language';
 
@@ -49,12 +51,32 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
   return (
     <>
       <div className="lg:hidden mb-6">
-        <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
+        <AdminMenuDrawer
+          tabs={adminTabs}
+          currentPath={currentPath}
+          logoLinkAria={t('admin.sidebar.logoLinkAria')}
+          siteLogoAlt={t('common.ariaLabels.siteLogo')}
+          drawerTitle={t('admin.sidebar.drawerTitle')}
+          drawerMenuButton={t('admin.sidebar.drawerMenuButton')}
+          closeMenuAria={t('common.ariaLabels.closeMenu')}
+        />
       </div>
       <aside className="hidden lg:block lg:w-64 flex-shrink-0 lg:sticky lg:top-0 lg:h-screen">
         <nav className="h-full bg-white border border-gray-200 rounded-lg p-2 flex flex-col overflow-hidden">
-          <div className="px-4 py-3 text-sm font-semibold text-gray-900 border-b border-gray-200">
-            Admin page
+          <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
+            <Link
+              href="/supersudo"
+              aria-label={t('admin.sidebar.logoLinkAria')}
+              className="shrink-0 rounded-lg ring-1 ring-gray-200/80 transition-opacity hover:opacity-90"
+            >
+              <SiteBrandLogo
+                decorative
+                alt={t('common.ariaLabels.siteLogo')}
+                sizeClass="h-9 w-9"
+                className="rounded-lg"
+              />
+            </Link>
+            <div className="min-w-0 flex-1 text-sm font-semibold text-gray-900">{t('admin.dashboard.title')}</div>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1">
             {primaryTabs.map((tab) => {

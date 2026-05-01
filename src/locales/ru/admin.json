@@ -1,4 +1,9 @@
 {
+  "sidebar": {
+    "logoLinkAria": "MOBEE — перейти в панель администратора",
+    "drawerTitle": "Навигация админки",
+    "drawerMenuButton": "Меню"
+  },
   "menu": {
     "home": "Главная",
     "dashboard": "Панель управления",

@@ -18,12 +18,11 @@ import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_STRIP_PADDING_Y,
-  MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
-  MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
+import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
@@ -924,20 +923,16 @@ export function Header() {
             {/* Figma 180:1419 mark + 178:529 wordmark — center cluster like desktop */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center gap-2 transition-opacity active:opacity-90"
+              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center transition-opacity active:opacity-90"
               aria-label={t('common.navigation.home')}
             >
-              <div
-                className="flex shrink-0 items-center justify-center overflow-hidden bg-[#2db2ff] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
-                style={{
-                  width: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
-                  height: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
-                  borderRadius: MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
-                }}
-              >
-                <span className="text-[18px] font-bold leading-none">M</span>
-              </div>
-              <span className="text-[20px] font-bold leading-7 tracking-[-0.5px] text-[#111827]">Mobee</span>
+              <SiteBrandLogo
+                decorative
+                alt={t('common.ariaLabels.siteLogo')}
+                sizeClass="h-10 w-10"
+                className="rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
+                priority
+              />
             </Link>
             <div className="relative z-20 shrink-0" ref={mobilePrimaryLangRef}>
               <button
@@ -1069,11 +1064,18 @@ export function Header() {
           className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`}
         >
           <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
-            <Link href="/" className="flex w-[104px] shrink-0 items-center gap-2">
-              <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
-                <span className="text-[18px] font-bold leading-6 text-white">M</span>
-              </div>
-              <span className="text-[18px] font-bold leading-6 tracking-[-0.5px] text-[#111827]">Mobee</span>
+            <Link
+              href="/"
+              aria-label={t('common.navigation.home')}
+              className="flex shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
+            >
+              <SiteBrandLogo
+                decorative
+                alt={t('common.ariaLabels.siteLogo')}
+                sizeClass="h-9 w-9"
+                className="rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
+                priority
+              />
             </Link>
             <nav
               className="flex min-w-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[60px]"
@@ -1198,12 +1200,15 @@ export function Header() {
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex min-w-0 items-center gap-2"
+                  aria-label={t('common.navigation.home')}
+                  className="flex min-w-0 shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
                 >
-                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-sm">
-                    <span className="text-[18px] font-bold leading-6 text-white">M</span>
-                  </div>
-                  <span className="truncate text-lg font-bold tracking-tight text-gray-900">Mobee</span>
+                  <SiteBrandLogo
+                    decorative
+                    alt={t('common.ariaLabels.siteLogo')}
+                    sizeClass="h-9 w-9"
+                    className="rounded-lg shadow-sm"
+                  />
                 </Link>
                 <div className="relative shrink-0" ref={mobileCurrencyRef}>
                   <button
@@ -1409,7 +1414,7 @@ export function Header() {
                 </div>
 
                 <div className="border-t border-gray-200 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
-                  © {currentYear} Mobee
+                  {t('common.footer.copyright').replace('{year}', String(currentYear))}
                 </div>
               </nav>
             </div>
