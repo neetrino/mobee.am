@@ -10,9 +10,12 @@ import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
 
+/** Trailing bar strokes — matches `CartIcon` (weight 2). */
+const SECONDARY_BAR_ICON_STROKE_WIDTH = 2;
+
 /** Menu lines for categories pill; single SVG so stroke weight matches on every line. */
 function CategoriesMenuLinesIcon({ className }: { className?: string }) {
-  const strokeWidth = 2;
+  const strokeWidth = SECONDARY_BAR_ICON_STROKE_WIDTH;
   return (
     <svg
       className={className}
@@ -45,10 +48,15 @@ function SecondarySearchGlyph({ className }: { className?: string }) {
       <path
         d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z"
         stroke="currentColor"
-        strokeWidth={2}
+        strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
         fill="none"
       />
-      <path d="M16 16L21 21" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+      <path
+        d="M16 16L21 21"
+        stroke="currentColor"
+        strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -68,14 +76,14 @@ function UserOutlineIcon({ className }: { className?: string }) {
       <path
         d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z"
         stroke="currentColor"
-        strokeWidth={1.5}
+        strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M4 20C4 16.6863 6.68629 14 10 14H14C17.3137 14 20 16.6863 20 20"
         stroke="currentColor"
-        strokeWidth={1.5}
+        strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -85,9 +93,6 @@ function UserOutlineIcon({ className }: { className?: string }) {
 
 const iconLinkClass =
   'flex h-8 w-8 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
-
-/** Trailing action icons: same stroke as `CartIcon` (strokeWidth 2 in 20×20 viewBox). */
-const SECONDARY_BAR_ICON_STROKE_WIDTH = 2;
 
 const PROFILE_MENU_ID = 'header-secondary-profile-menu';
 
@@ -153,7 +158,7 @@ function ProfileAccountMenu({
         aria-label={profileAria}
       >
         <UserOutlineIcon className="shrink-0" />
-        <span className="whitespace-nowrap text-[13px] font-normal leading-normal">{profileLabel}</span>
+        <span className="whitespace-nowrap text-[13px] font-semibold leading-normal">{profileLabel}</span>
         <span className="flex h-4 w-4 shrink-0 items-center justify-center text-gray-500" aria-hidden>
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
