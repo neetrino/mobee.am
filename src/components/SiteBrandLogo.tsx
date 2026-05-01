@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { SITE_LOGO_PATH, SITE_LOGO_SIZE_PX } from '../lib/brand.constants';
+import { SITE_LOGO_PATH, SITE_LOGO_SIZE_PX, SITE_LOGO_VISUAL_SCALE } from '../lib/brand.constants';
 
 export interface SiteBrandLogoProps {
   /**
@@ -41,7 +41,8 @@ export function SiteBrandLogo({
       width={SITE_LOGO_SIZE_PX}
       height={SITE_LOGO_SIZE_PX}
       priority={priority}
-      className={`object-contain ${sizeClass} ${className}`.trim()}
+      className={`origin-center object-contain ${sizeClass} ${className}`.trim()}
+      style={{ transform: `scale(${SITE_LOGO_VISUAL_SCALE})` }}
     />
   );
 }
