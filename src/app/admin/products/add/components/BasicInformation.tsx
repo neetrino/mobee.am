@@ -31,7 +31,7 @@ export function BasicInformation({
 
   const typeButtonClass = (active: boolean) =>
     `flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-      active ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+      active ? 'bg-admin-500 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
     }`;
 
   return (
