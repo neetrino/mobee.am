@@ -10,6 +10,26 @@ import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
 
+/** Menu lines for categories pill; single SVG so stroke weight matches on every line. */
+function CategoriesMenuLinesIcon({ className }: { className?: string }) {
+  const strokeWidth = 2;
+  return (
+    <svg
+      className={className}
+      width={18}
+      height={12}
+      viewBox="0 0 18 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <line x1={0} y1={2} x2={18} y2={2} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+      <line x1={0} y1={6} x2={18} y2={6} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+      <line x1={0} y1={10} x2={18} y2={10} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** Search icon in pill (20px, secondary bar). */
 function SecondarySearchGlyph({ className }: { className?: string }) {
   return (
@@ -292,11 +312,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                 aria-haspopup="true"
               >
                 <span className="flex min-w-0 flex-1 items-center gap-2">
-                  <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
-                    <span className="h-0.5 w-full rounded-full bg-white" />
-                    <span className="h-0.5 w-full rounded-full bg-white" />
-                    <span className="h-0.5 w-full rounded-full bg-white" />
-                  </span>
+                  <CategoriesMenuLinesIcon className="shrink-0 text-white" />
                   <span className="truncate text-[13px] font-bold leading-7">{categoriesLabel}</span>
                 </span>
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center text-white" aria-hidden>
