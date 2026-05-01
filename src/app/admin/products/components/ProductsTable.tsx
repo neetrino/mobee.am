@@ -325,7 +325,7 @@ export function ProductsTable({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => router.push(`/admin/products/add?id=${product.id}`)}
+                          onClick={() => router.push(`/supersudo/products/add?id=${product.id}`)}
                           className="text-admin-600 hover:text-admin-800 hover:bg-admin-50"
                         >
                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

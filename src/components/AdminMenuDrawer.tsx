@@ -97,8 +97,8 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
               {tabs.map((tab) => {
                 const isActive =
                   currentPath === tab.path ||
-                  (tab.path === '/admin' && currentPath === '/admin') ||
-                  (tab.path !== '/admin' && currentPath.startsWith(tab.path));
+                  (tab.path === '/supersudo' && currentPath === '/supersudo') ||
+                  (tab.path !== '/supersudo' && currentPath.startsWith(tab.path));
 
                 return (
                   <button

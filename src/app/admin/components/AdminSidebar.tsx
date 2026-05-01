@@ -22,7 +22,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
   const homeTab = adminTabs.find((tab) => tab.id === 'home');
   const primaryTabs = adminTabs.filter((tab) => tab.id !== 'home');
   const productSubmenuIds = new Set(['categories', 'brands', 'attributes']);
-  const productGroupPaths = ['/admin/products', '/admin/categories', '/admin/brands', '/admin/attributes'];
+  const productGroupPaths = ['/supersudo/products', '/supersudo/categories', '/supersudo/brands', '/supersudo/attributes'];
   const isProductGroupActive = productGroupPaths.some((path) => currentPath.startsWith(path));
   const [isProductsExpanded, setIsProductsExpanded] = useState(isProductGroupActive);
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en');
@@ -66,8 +66,8 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
             const isActive = isRootTab
               ? currentPath === '/'
               : currentPath === tab.path ||
-                (tab.path === '/admin' && currentPath === '/admin') ||
-                (tab.path !== '/admin' && currentPath.startsWith(tab.path)) ||
+                (tab.path === '/supersudo' && currentPath === '/supersudo') ||
+                (tab.path !== '/supersudo' && currentPath.startsWith(tab.path)) ||
                 (tab.id === 'products' && isProductGroupActive);
 
             if (tab.id === 'products') {

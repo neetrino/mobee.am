@@ -14,7 +14,7 @@ export default function OrdersPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }

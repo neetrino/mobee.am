@@ -33,7 +33,7 @@ export function FormActions({ loading, isEditMode }: FormActionsProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push('/admin/products')}
+          onClick={() => router.push('/supersudo/products')}
           className="w-full sm:w-auto order-1 sm:order-2"
         >
           {t('admin.common.cancel')}

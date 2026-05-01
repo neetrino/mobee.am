@@ -14,7 +14,7 @@ export function QuickActionsCard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Button
           variant="outline"
-          onClick={() => router.push('/admin/products/add')}
+          onClick={() => router.push('/supersudo/products/add')}
           className="justify-start h-auto py-4"
         >
           <div className="flex items-center gap-3">
@@ -31,7 +31,7 @@ export function QuickActionsCard() {
         </Button>
         <Button
           variant="outline"
-          onClick={() => router.push('/admin/orders')}
+          onClick={() => router.push('/supersudo/orders')}
           className="justify-start h-auto py-4"
         >
           <div className="flex items-center gap-3">
@@ -48,7 +48,7 @@ export function QuickActionsCard() {
         </Button>
         <Button
           variant="outline"
-          onClick={() => router.push('/admin/users')}
+          onClick={() => router.push('/supersudo/users')}
           className="justify-start h-auto py-4"
         >
           <div className="flex items-center gap-3">
@@ -65,7 +65,7 @@ export function QuickActionsCard() {
         </Button>
         <Button
           variant="outline"
-          onClick={() => router.push('/admin/settings')}
+          onClick={() => router.push('/supersudo/settings')}
           className="justify-start h-auto py-4"
         >
           <div className="flex items-center gap-3">

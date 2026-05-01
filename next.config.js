@@ -39,6 +39,13 @@ const r2PublicRemotePattern = remotePatternFromAbsoluteUrl(
 
 const nextConfig = {
   reactStrictMode: true,
+  /** /supersudo is served from src/app/admin (no redirect from /admin). */
+  async rewrites() {
+    return [
+      { source: '/supersudo', destination: '/admin' },
+      { source: '/supersudo/:path*', destination: '/admin/:path*' },
+    ];
+  },
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
   devIndicators: false,
   transpilePackages: ['@shop/ui', '@shop/design-tokens'],

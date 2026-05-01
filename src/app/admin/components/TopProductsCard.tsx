@@ -32,7 +32,7 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push('/admin/products')}
+          onClick={() => router.push('/supersudo/products')}
         >
           {t('admin.dashboard.viewAll')}
         </Button>
@@ -55,7 +55,7 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
             <div
               key={product.variantId}
               className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-              onClick={() => router.push(`/admin/products/${product.productId}`)}
+              onClick={() => router.push(`/supersudo/products/${product.productId}`)}
             >
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-xs font-bold text-gray-500">

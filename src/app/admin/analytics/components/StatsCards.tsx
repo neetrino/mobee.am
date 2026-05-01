@@ -19,7 +19,7 @@ export function StatsCards({ analytics, totalUsers }: StatsCardsProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       <Card 
         className="p-6 bg-gradient-to-br from-admin-50 to-admin-100 border-admin-200 hover:shadow-lg hover:scale-105 hover:border-admin-400 transition-all duration-200 group cursor-pointer relative"
-        onClick={() => router.push('/admin/orders')}
+        onClick={() => router.push('/supersudo/orders')}
         title={t('admin.analytics.clickToViewAllOrders')}
       >
         <div className="flex items-center justify-between mb-3">
@@ -40,7 +40,7 @@ export function StatsCards({ analytics, totalUsers }: StatsCardsProps) {
 
       <Card 
         className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg hover:scale-105 hover:border-green-400 transition-all duration-200 group cursor-pointer relative"
-        onClick={() => router.push('/admin/orders?paymentStatus=paid')}
+        onClick={() => router.push('/supersudo/orders?paymentStatus=paid')}
         title={t('admin.analytics.clickToViewPaidOrders')}
       >
         <div className="flex items-center justify-between mb-3">

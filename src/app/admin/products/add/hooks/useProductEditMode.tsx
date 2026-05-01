@@ -275,7 +275,7 @@ export function useProductEditMode({
           console.log('✅ [ADMIN] Product loaded for edit');
         } catch (err: unknown) {
           console.error('❌ [ADMIN] Error loading product:', err);
-          router.push('/admin/products');
+          router.push('/supersudo/products');
         } finally {
           setLoadingProduct(false);
         }

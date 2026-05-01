@@ -44,7 +44,7 @@ export function OrdersFilters({
     } else {
       params.delete('status');
     }
-    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
+    const newUrl = params.toString() ? `/supersudo/orders?${params.toString()}` : '/supersudo/orders';
     router.push(newUrl, { scroll: false });
   };
 
@@ -57,7 +57,7 @@ export function OrdersFilters({
     } else {
       params.delete('paymentStatus');
     }
-    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
+    const newUrl = params.toString() ? `/supersudo/orders?${params.toString()}` : '/supersudo/orders';
     router.push(newUrl, { scroll: false });
   };
 
@@ -70,7 +70,7 @@ export function OrdersFilters({
     } else {
       params.delete('search');
     }
-    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
+    const newUrl = params.toString() ? `/supersudo/orders?${params.toString()}` : '/supersudo/orders';
     router.push(newUrl, { scroll: false });
   };
 
@@ -83,7 +83,7 @@ export function OrdersFilters({
     } else {
       params.delete('fulfillmentStatus');
     }
-    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
+    const newUrl = params.toString() ? `/supersudo/orders?${params.toString()}` : '/supersudo/orders';
     router.push(newUrl, { scroll: false });
   };
 

@@ -9,7 +9,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin') ?? false;
+  const isAdmin = pathname?.startsWith('/supersudo') ?? false;
 
   if (isAdmin) {
     return <>{children}</>;

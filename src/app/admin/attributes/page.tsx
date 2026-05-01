@@ -15,7 +15,7 @@ export default function AttributesPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
       }
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
@@ -36,7 +36,7 @@ export default function AttributesPage() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/attributes'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/attributes'} router={router} t={t}>
       <div className="max-w-7xl">
         <AttributesPageContent />
       </div>

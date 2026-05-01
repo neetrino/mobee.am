@@ -157,7 +157,7 @@ function ProfileAccountMenu({
                 {profileLabel}
               </Link>
               {isAdmin ? (
-                <Link href="/admin" role="menuitem" className={`${itemClass} text-blue-700 hover:bg-blue-50`} onClick={close}>
+                <Link href="/supersudo" role="menuitem" className={`${itemClass} text-blue-700 hover:bg-blue-50`} onClick={close}>
                   {adminPanelLabel}
                 </Link>
               ) : null}

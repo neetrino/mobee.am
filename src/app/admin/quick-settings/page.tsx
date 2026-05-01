@@ -383,7 +383,7 @@ export default function QuickSettingsPage() {
 
   return (
       <QuickSettingsContent
-      currentPath={pathname || '/admin/quick-settings'}
+      currentPath={pathname || '/supersudo/quick-settings'}
       router={router}
       t={t}
       globalDiscount={globalDiscount}
