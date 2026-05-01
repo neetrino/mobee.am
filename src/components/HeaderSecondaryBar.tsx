@@ -86,6 +86,9 @@ function UserOutlineIcon({ className }: { className?: string }) {
 const iconLinkClass =
   'flex h-8 w-8 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
 
+/** Trailing action icons: same stroke as `CartIcon` (strokeWidth 2 in 20×20 viewBox). */
+const SECONDARY_BAR_ICON_STROKE_WIDTH = 2;
+
 const PROFILE_MENU_ID = 'header-secondary-profile-menu';
 
 function ProfileAccountMenu({
@@ -372,13 +375,17 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
           <div className="flex shrink-0 items-center gap-5 pl-1.5 xl:gap-7">
             <div className="flex items-center gap-0.5 sm:gap-1.5">
               <Link href="/compare" className={iconLinkClass} aria-label={compareAria}>
-                <CompareIcon size={20} className="shrink-0" />
+                <CompareIcon
+                  size={20}
+                  strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
+                  className="shrink-0"
+                />
                 {compareCount > 0 ? (
                   <span className="sr-only">{compareCount}</span>
                 ) : null}
               </Link>
               <Link href="/wishlist" className={iconLinkClass} aria-label={wishlistAria}>
-                <WishlistHeartIcon size={20} />
+                <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
                 {wishlistCount > 0 ? (
                   <span className="sr-only">{wishlistCount}</span>
                 ) : null}
