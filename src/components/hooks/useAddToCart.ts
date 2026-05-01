@@ -8,6 +8,7 @@ import { useTranslation } from '../../lib/i18n-client';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import type { CartFlyContext } from '../../lib/cart/cart-fly-animation.types';
 import { readGuestCart, upsertGuestCartItem } from '../../lib/cart/guest-cart';
+import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 
 interface ProductDetails {
   id: string;
@@ -60,6 +61,8 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
       return;
     }
 
+    const encodedSlug = encodeURIComponent(productSlug.trim());
+
     // If user is not logged in, use localStorage for cart
     if (!isLoggedIn) {
       setIsAddingToCart(true);
@@ -70,8 +73,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
         if (defaultVariantId) {
           variantId = defaultVariantId;
         } else {
-          const encodedSlug = encodeURIComponent(productSlug.trim());
-          const productDetails = await apiClient.get<ProductDetails>(`/api/v1/products/${encodedSlug}`);
+          const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
           if (!productDetails.variants || productDetails.variants.length === 0) {
             alert(t('common.alerts.noVariantsAvailable'));
             setIsAddingToCart(false);
@@ -120,18 +122,19 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
     }));
 
     try {
-      let variantId: string;
-      if (defaultVariantId) {
-        variantId = defaultVariantId;
-      } else {
-        const encodedSlug = encodeURIComponent(productSlug.trim());
-        const productDetails = await apiClient.get<ProductDetails>(`/api/v1/products/${encodedSlug}`);
-        if (!productDetails.variants || productDetails.variants.length === 0) {
-          alert(t('common.alerts.noVariantsAvailable'));
-          return;
-        }
-        variantId = productDetails.variants[0].id;
+      const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
+      if (!productDetails.variants || productDetails.variants.length === 0) {
+        alert(t('common.alerts.noVariantsAvailable'));
+        return;
       }
+
+      const variants = productDetails.variants;
+      const variantId =
+        defaultVariantId && variants.some((v) => v.id === defaultVariantId)
+          ? defaultVariantId
+          : variants[0].id;
+
+      const canonicalProductId = productDetails.id;
 
       const response = await apiClient.post<{
         item: { id: string; quantity: number; price: number };
@@ -139,8 +142,8 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
       }>(
         '/api/v1/cart/items',
         {
-          productId: productId,
-          variantId: variantId,
+          productId: canonicalProductId,
+          variantId,
           quantity: 1,
         }
       );

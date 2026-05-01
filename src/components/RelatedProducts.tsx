@@ -10,6 +10,7 @@ import { useAuth } from '../lib/auth/AuthContext';
 import { dispatchCartFlyAnimation } from '../lib/cart/dispatchCartFlyAnimation';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '../lib/cart/guest-cart';
+import { fetchProductBySlugWithLang } from '../lib/shop/fetchProductBySlugWithLang';
 import { useRelatedProducts } from './hooks/useRelatedProducts';
 import { useCarousel } from './hooks/useCarousel';
 import { useVisibleCards } from './hooks/useVisibleCards';
@@ -94,7 +95,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
       }
 
       const encodedSlug = encodeURIComponent(product.slug.trim());
-      const productDetails = await apiClient.get<ProductDetails>(`/api/v1/products/${encodedSlug}`);
+      const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
       if (!productDetails.variants || productDetails.variants.length === 0) {
         alert('No variants available');
@@ -102,10 +103,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
       }
 
       const variantId = productDetails.variants[0].id;
-      
+      const canonicalProductId = productDetails.id;
+
       if (!isLoggedIn) {
         upsertGuestCartItem({
-          productId: product.id,
+          productId: canonicalProductId,
           productSlug: product.slug,
           variantId,
           quantity: 1,
@@ -114,7 +116,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         await apiClient.post(
           '/api/v1/cart/items',
           {
-            productId: product.id,
+            productId: canonicalProductId,
             variantId: variantId,
             quantity: 1,
           }

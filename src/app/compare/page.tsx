@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
+import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
@@ -209,7 +210,8 @@ export default function ComparePage() {
         }>;
       }
 
-      const productDetails = await apiClient.get<ProductDetails>(`/api/v1/products/${product.slug}`);
+      const encodedSlug = encodeURIComponent(product.slug.trim());
+      const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
       if (!productDetails.variants || productDetails.variants.length === 0) {
         alert(t('common.alerts.noVariantsAvailable'));
@@ -217,12 +219,12 @@ export default function ComparePage() {
       }
 
       const variantId = productDetails.variants[0].id;
-      
+
       await apiClient.post(
         '/api/v1/cart/items',
         {
-          productId: product.id,
-          variantId: variantId,
+          productId: productDetails.id,
+          variantId,
           quantity: 1,
         }
       );
