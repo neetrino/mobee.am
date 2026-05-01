@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from 'react';
 import { Card } from '@shop/ui';
+import { useTranslation } from '../../../../../lib/i18n-client';
 import type {
   Brand,
   Category,
@@ -94,7 +95,7 @@ interface AddProductFormContentProps {
   onOpenValueModal: (modal: { variantId: string; attributeId: string } | null) => void;
   onAddLabel: () => void;
   onRemoveLabel: (index: number) => void;
-  onUpdateLabel: (index: number, field: keyof ProductLabel, value: any) => void;
+  onUpdateLabel: (index: number, field: keyof ProductLabel, value: ProductLabel[keyof ProductLabel]) => void;
   onFeaturedChange: (featured: boolean) => void;
   onVariantsUpdate: (updater: (prev: Variant[]) => Variant[]) => void;
   onApplyToAllVariants: (field: 'price' | 'compareAtPrice' | 'stock' | 'sku', value: string) => void;
@@ -167,15 +168,18 @@ export function AddProductFormContent({
   generateSlug,
   handleSubmit,
 }: AddProductFormContentProps) {
+  const { t } = useTranslation();
+
   return (
     <Card className="p-6 pb-24 sm:pb-24">
-      <form onSubmit={handleSubmit} className="space-y-14">
+      <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10">
         <BasicInformation
           productType={productType}
           setProductType={onProductTypeChange}
           title={formData.title}
           slug={formData.slug}
           descriptionHtml={formData.descriptionHtml}
+          isEditMode={isEditMode}
           onTitleChange={onTitleChange}
           onSlugChange={onSlugChange}
           onDescriptionChange={onDescriptionChange}
@@ -267,14 +271,22 @@ export function AddProductFormContent({
             />
           )}
 
-        <ProductLabels
-          labels={formData.labels}
-          onAddLabel={onAddLabel}
-          onRemoveLabel={onRemoveLabel}
-          onUpdateLabel={onUpdateLabel}
-        />
-
-        <Publishing featured={formData.featured} onFeaturedChange={onFeaturedChange} />
+        <details className="rounded-lg border border-dashed border-gray-300 bg-gray-50/50 px-4 py-3">
+          <summary className="cursor-pointer select-none text-sm font-semibold text-gray-800">
+            {t('admin.products.add.moreOptionsOptional')}
+          </summary>
+          <p className="mt-2 text-xs text-gray-500">{t('admin.products.add.moreOptionsOptionalHint')}</p>
+          <div className="mt-4 space-y-8 border-t border-gray-200 pt-6">
+            <ProductLabels
+              labels={formData.labels}
+              embedded
+              onAddLabel={onAddLabel}
+              onRemoveLabel={onRemoveLabel}
+              onUpdateLabel={onUpdateLabel}
+            />
+            <Publishing featured={formData.featured} onFeaturedChange={onFeaturedChange} />
+          </div>
+        </details>
 
         <FormActions loading={loading} isEditMode={isEditMode} />
       </form>
