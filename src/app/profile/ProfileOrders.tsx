@@ -52,7 +52,7 @@ export function ProfileOrders({
         <div className="text-center py-12">
           <p className="text-gray-600 mb-4">{t('profile.orders.noOrders')}</p>
           <Link href="/products">
-            <Button variant="primary">{t('profile.dashboard.startShopping')}</Button>
+            <Button variant="brand">{t('profile.dashboard.startShopping')}</Button>
           </Link>
         </div>
       </Card>
