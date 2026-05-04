@@ -14,7 +14,7 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: ProfileHeaderProps) {
   return (
     <>
-      <div className="lg:w-64 flex-shrink-0">
+      <div className="lg:w-64 flex-shrink-0 lg:sticky lg:top-8 lg:self-start">
         {/* Profile Header Section */}
         <Card className="mb-4 p-4">
           <div className="flex flex-row items-center gap-4">
