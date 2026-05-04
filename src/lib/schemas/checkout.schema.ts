@@ -33,7 +33,10 @@ const checkoutSchema = z
     shippingAddress: shippingAddressSchema.optional(),
     shippingAmount: z.number().min(0).optional(),
     paymentMethod: z.enum(["idram", "arca", "cash_on_delivery"]).default("idram"),
-    promoCode: z.string().trim().min(1).max(64).optional(),
+    promoCode: z.preprocess(
+      (val) => (val === "" || val === null || val === undefined ? undefined : val),
+      z.string().trim().min(1).max(64).optional()
+    ),
     locale: z.enum(["en", "hy", "ru"]).optional(),
     billingAddress: shippingAddressSchema.optional(),
   })
