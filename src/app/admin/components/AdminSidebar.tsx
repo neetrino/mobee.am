@@ -1,9 +1,12 @@
 ﻿'use client';
 
 import Link from 'next/link';
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { SiteBrandLogo } from '../../../components/SiteBrandLogo';
+import { getAdminMenuTABS } from '../admin-menu.config';
+import { AdminSidebarHomeLanguageBlock, useAdminSidebarLanguage } from './AdminSidebarHomeLanguage';
 import { AdminSidebarNavBody } from './AdminSidebarNavBody';
 
 interface AdminSidebarProps {
@@ -14,25 +17,40 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
   const headerTitle = t('admin.dashboard.title');
+  const homeTab = useMemo(() => getAdminMenuTABS(t).find((tab) => tab.id === 'home'), [t]);
+  const mobileLanguage = useAdminSidebarLanguage();
 
   return (
     <>
-      <div className="mb-6 lg:hidden">
-        <AdminMenuDrawer
-          renderNav={(onAfterNavigate) => (
-            <AdminSidebarNavBody
+      <div className="mb-6 flex flex-col gap-3 lg:hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <AdminMenuDrawer
+            renderNav={(onAfterNavigate) => (
+              <AdminSidebarNavBody
+                currentPath={currentPath}
+                router={router}
+                t={t}
+                onAfterNavigate={onAfterNavigate}
+              />
+            )}
+            logoLinkAria={t('admin.sidebar.logoLinkAria')}
+            siteLogoAlt={t('common.ariaLabels.siteLogo')}
+            headerTitle={headerTitle}
+            drawerMenuButton={t('admin.sidebar.drawerMenuButton')}
+            closeMenuAria={t('common.ariaLabels.closeMenu')}
+          />
+          {homeTab ? (
+            <AdminSidebarHomeLanguageBlock
+              layout="toolbar"
+              homeTab={homeTab}
               currentPath={currentPath}
-              router={router}
-              t={t}
-              onAfterNavigate={onAfterNavigate}
+              currentLanguage={mobileLanguage}
+              onGoHome={() => {
+                router.push(homeTab.path);
+              }}
             />
-          )}
-          logoLinkAria={t('admin.sidebar.logoLinkAria')}
-          siteLogoAlt={t('common.ariaLabels.siteLogo')}
-          headerTitle={headerTitle}
-          drawerMenuButton={t('admin.sidebar.drawerMenuButton')}
-          closeMenuAria={t('common.ariaLabels.closeMenu')}
-        />
+          ) : null}
+        </div>
       </div>
       <aside className="hidden h-screen w-64 flex-shrink-0 lg:sticky lg:top-0 lg:block">
         <nav className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-2">

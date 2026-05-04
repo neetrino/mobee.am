@@ -4,7 +4,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import type { AdminMenuItem } from '../../../components/AdminMenuDrawer';
 import { getAdminMenuTABS } from '../admin-menu.config';
-import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../../../lib/language';
+import { AdminSidebarHomeLanguageBlock, useAdminSidebarLanguage } from './AdminSidebarHomeLanguage';
 
 const PRODUCT_SUBMENU_IDS = new Set(['categories', 'brands', 'attributes']);
 const PRODUCT_GROUP_PATHS = [
@@ -13,12 +13,6 @@ const PRODUCT_GROUP_PATHS = [
   '/supersudo/brands',
   '/supersudo/attributes',
 ] as const;
-
-const LANGUAGE_TABS: Array<{ code: LanguageCode; label: string }> = [
-  { code: 'hy', label: 'hy' },
-  { code: 'en', label: 'eng' },
-  { code: 'ru', label: 'ru' },
-];
 
 function isProductGroupPathActive(currentPath: string): boolean {
   return PRODUCT_GROUP_PATHS.some((path) => currentPath.startsWith(path));
@@ -111,70 +105,6 @@ function NavItemButton({ tab, isActive, onNavigate }: NavItemButtonProps) {
   );
 }
 
-interface HomeAndLanguageFooterProps {
-  homeTab: AdminMenuItem;
-  currentPath: string;
-  currentLanguage: LanguageCode;
-  onGoHome: () => void;
-}
-
-function HomeAndLanguageFooter({ homeTab, currentPath, currentLanguage, onGoHome }: HomeAndLanguageFooterProps) {
-  return (
-    <div className="mt-auto shrink-0 space-y-2 border-t border-gray-200 bg-white pt-3">
-      <button
-        type="button"
-        onClick={onGoHome}
-        className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium transition-all ${
-          currentPath === '/' ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-        }`}
-      >
-        <span className={`flex-shrink-0 ${currentPath === '/' ? 'text-white' : 'text-gray-500'}`}>{homeTab.icon}</span>
-        <span>{homeTab.label}</span>
-      </button>
-      <div className="grid grid-cols-3 gap-1">
-        {LANGUAGE_TABS.map((language) => {
-          const isLangActive = currentLanguage === language.code;
-          return (
-            <button
-              key={language.code}
-              type="button"
-              onClick={() => {
-                if (!isLangActive) {
-                  setStoredLanguage(language.code);
-                }
-              }}
-              className={`w-full rounded-md border px-2 py-1.5 text-center text-xs font-semibold uppercase tracking-wide transition-all ${
-                isLangActive
-                  ? 'border-admin bg-admin text-white'
-                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              {language.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function useSidebarNavLanguage(): LanguageCode {
-  const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en');
-
-  useEffect(() => {
-    setCurrentLanguage(getStoredLanguage());
-    const handleLanguageUpdate = () => {
-      setCurrentLanguage(getStoredLanguage());
-    };
-    window.addEventListener('language-updated', handleLanguageUpdate);
-    return () => {
-      window.removeEventListener('language-updated', handleLanguageUpdate);
-    };
-  }, []);
-
-  return currentLanguage;
-}
-
 interface PrimaryNavListProps {
   primaryTabs: AdminMenuItem[];
   currentPath: string;
@@ -258,7 +188,7 @@ export function AdminSidebarNavBody({
   const primaryTabs = adminTabs.filter((tab) => tab.id !== 'home');
   const productGroupActive = isProductGroupPathActive(currentPath);
   const [isProductsExpanded, setIsProductsExpanded] = useState(productGroupActive);
-  const currentLanguage = useSidebarNavLanguage();
+  const currentLanguage = useAdminSidebarLanguage();
 
   useEffect(() => {
     if (productGroupActive) {
@@ -272,7 +202,7 @@ export function AdminSidebarNavBody({
   };
 
   return (
-    <>
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
         <PrimaryNavList
           primaryTabs={primaryTabs}
@@ -285,7 +215,8 @@ export function AdminSidebarNavBody({
         />
       </div>
       {homeTab ? (
-        <HomeAndLanguageFooter
+        <AdminSidebarHomeLanguageBlock
+          layout="stack"
           homeTab={homeTab}
           currentPath={currentPath}
           currentLanguage={currentLanguage}
@@ -294,6 +225,6 @@ export function AdminSidebarNavBody({
           }}
         />
       ) : null}
-    </>
+    </div>
   );
 }

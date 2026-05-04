@@ -108,7 +108,7 @@ export function AdminMenuDrawer({
               </button>
             </div>
 
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-2">
+            <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-2">
               {renderNav(() => {
                 setOpen(false);
               })}
