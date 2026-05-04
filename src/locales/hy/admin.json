@@ -2,7 +2,9 @@
   "sidebar": {
     "logoLinkAria": "MOBEE — անցնել ադմին վահանակ",
     "drawerTitle": "Ադմին նավիգացիա",
-    "drawerMenuButton": "Մենյու"
+    "drawerMenuButton": "Մենյու",
+    "expandProductsMenu": "Բացել ապրանքների ենթամենյու",
+    "collapseProductsMenu": "Փակել ապրանքների ենթամենյու"
   },
   "menu": {
     "home": "Գլխավոր",

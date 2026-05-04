@@ -2,7 +2,9 @@
   "sidebar": {
     "logoLinkAria": "MOBEE — перейти в панель администратора",
     "drawerTitle": "Навигация админки",
-    "drawerMenuButton": "Меню"
+    "drawerMenuButton": "Меню",
+    "expandProductsMenu": "Развернуть подменю товаров",
+    "collapseProductsMenu": "Свернуть подменю товаров"
   },
   "menu": {
     "home": "Главная",

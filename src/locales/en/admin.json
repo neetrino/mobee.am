@@ -2,7 +2,9 @@
   "sidebar": {
     "logoLinkAria": "MOBEE — go to admin dashboard",
     "drawerTitle": "Admin navigation",
-    "drawerMenuButton": "Menu"
+    "drawerMenuButton": "Menu",
+    "expandProductsMenu": "Expand products submenu",
+    "collapseProductsMenu": "Collapse products submenu"
   },
   "menu": {
     "home": "Home",
