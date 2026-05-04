@@ -221,7 +221,8 @@
       "shippingPolicy": "Shipping policy",
       "returnPolicy": "Return policy",
       "termsOfUse": "Terms of use",
-      "policiesNavLabel": "Legal and policies"
+      "policiesNavLabel": "Legal and policies",
+      "paymentMethodsLabel": "Accepted payment methods"
     }
   },
   "product": {

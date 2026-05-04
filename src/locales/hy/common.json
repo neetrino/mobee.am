@@ -219,7 +219,8 @@
       "shippingPolicy": "Առաքման քաղաքականություն",
       "returnPolicy": "Վերադարձի քաղաքականություն",
       "termsOfUse": "Օգտագործման պայմաններ",
-      "policiesNavLabel": "Իրավական և քաղաքականություն"
+      "policiesNavLabel": "Իրավական և քաղաքականություն",
+      "paymentMethodsLabel": "Ընդունված վճարման եղանակներ"
     }
   },
   "product": {

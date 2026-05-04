@@ -218,7 +218,8 @@
       "shippingPolicy": "Политика доставки",
       "returnPolicy": "Политика возврата",
       "termsOfUse": "Условия использования",
-      "policiesNavLabel": "Правовая информация"
+      "policiesNavLabel": "Правовая информация",
+      "paymentMethodsLabel": "Способы оплаты"
     }
   },
   "product": {
