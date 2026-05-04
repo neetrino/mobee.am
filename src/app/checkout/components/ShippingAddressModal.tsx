@@ -223,7 +223,7 @@ export function ShippingAddressModal({
           </Button>
           <Button
             type="button"
-            variant="primary"
+            variant="brand"
             className="flex-1"
             onClick={handleSubmit(
               (data) => {

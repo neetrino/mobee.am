@@ -3,7 +3,7 @@
 import React, { ButtonHTMLAttributes, forwardRef, ReactElement } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'brand';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
@@ -20,6 +20,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500',
       outline: 'bg-transparent text-gray-900 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500',
       ghost: 'bg-transparent text-gray-900 hover:bg-gray-100 focus:ring-gray-500',
+      /** Checkout / brand CTA — theme `admin` DEFAULT #2DB2FF */
+      brand:
+        '!rounded-2xl bg-admin-500 text-white shadow-sm hover:bg-admin-600 focus:ring-admin-500',
     };
     
     const sizeStyles = {

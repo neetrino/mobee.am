@@ -93,7 +93,7 @@ export function OrderSummary({
 
         <Button
           type="submit"
-          variant="primary"
+          variant="brand"
           className="w-full"
           size="lg"
           disabled={isSubmitting}
