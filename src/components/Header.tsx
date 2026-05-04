@@ -27,7 +27,6 @@ import {
 } from './header-strip-layout';
 import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
-import { CartIcon } from './icons/CartIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
 import { useCategoriesTree } from './CategoriesTreeContext';
 
@@ -98,12 +97,6 @@ const ProfileIconFilled = () => (
       <path d="M5 17C5 14.5 7.5 12.5 10 12.5C12.5 12.5 15 14.5 15 17" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   </div>
-);
-
-const WishlistIcon = () => (
-  <svg width="19" height="19" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 17L8.55 15.7C4.4 12.2 2 10.1 2 7.5C2 5.4 3.4 4 5.5 4C6.8 4 8.1 4.6 9 5.5C9.9 4.6 11.2 4 12.5 4C14.6 4 16 5.4 16 7.5C16 10.1 13.6 12.2 9.45 15.7L10 17Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-  </svg>
 );
 
 const SearchIcon = () => (
@@ -1453,39 +1446,6 @@ export function Header() {
                     </Link>
                   ))}
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setShowSearchModal(true);
-                    }}
-                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 normal-case font-medium text-gray-700"
-                  >
-                    <span className="flex items-center gap-2">
-                      <SearchIcon />
-                      {t('common.buttons.search')}
-                    </span>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-
-                  <Link
-                    href="/wishlist"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
-                  >
-                    <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
-                      <WishlistIcon />
-                      {t('common.navigation.wishlist')}
-                    </span>
-                    {wishlistCount > 0 && (
-                      <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
-                        {wishlistCount > 99 ? '99+' : wishlistCount}
-                      </span>
-                    )}
-                  </Link>
-
                   <Link
                     href="/compare"
                     onClick={() => setMobileMenuOpen(false)}
@@ -1498,22 +1458,6 @@ export function Header() {
                     {compareCount > 0 && (
                       <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
                         {compareCount > 99 ? '99+' : compareCount}
-                      </span>
-                    )}
-                  </Link>
-
-                  <Link
-                    href="/cart"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
-                  >
-                    <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
-                      <CartIcon size={19} />
-                      {t('common.navigation.cart')}
-                    </span>
-                    {cartCount > 0 && (
-                      <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
-                        {cartCount > 99 ? '99+' : cartCount}
                       </span>
                     )}
                   </Link>
