@@ -9,7 +9,7 @@ import { CategoryFilter } from '../../components/CategoryFilter';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
-import { ShopCatalogArea } from '@/components/shop/ShopCatalogArea';
+import { ShopCatalogSection } from '@/components/shop/ShopCatalogSection';
 import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
 import { SHOP_FILTER_SIDEBAR_WIDTH_CSS } from './shop-layout.constants';
 
@@ -31,10 +31,7 @@ function ShopCatalogFallback() {
   );
 }
 
-/**
- * Shop shell renders immediately; product list loads client-side (GET /api/v1/products),
- * matching the home page pattern so first paint is not blocked on DB.
- */
+/** Shop shell + filters render while the catalog section streams server-fetched list data (shared cache with the products API). */
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = searchParams ? await searchParams : {};
   const cookieStore = await cookies();
@@ -105,7 +102,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </aside>
 
           <Suspense fallback={<ShopCatalogFallback />}>
-            <ShopCatalogArea />
+            <ShopCatalogSection searchParams={params} />
           </Suspense>
 
           <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
