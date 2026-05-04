@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 /**
  * Shared layout for the main header strip ({@link Header}) and matching storefront sections.
  */
@@ -52,6 +54,17 @@ export const HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE = {
   transitionDuration: HEADER_PRIMARY_PEEK_DURATION,
   transitionTimingFunction: HEADER_PRIMARY_PEEK_EASING,
 } as const;
+
+/**
+ * Animate `top` only while a docked bar sits below a peeking primary strip.
+ * When `top` returns to 0, skip transition so the viewport does not briefly show page content above the bar.
+ */
+export function getDockedBarTopMotionStyle(peekOffsetPx: number): CSSProperties {
+  if (peekOffsetPx > 0) {
+    return { ...HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE };
+  }
+  return { transitionProperty: 'none' };
+}
 
 /** Inline styles for flow spacer `height` when peek toggles. */
 export const HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE = {

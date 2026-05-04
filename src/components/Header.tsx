@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { FormEvent, CSSProperties } from 'react';
+import type { CSSProperties, FormEvent } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
@@ -18,7 +18,7 @@ import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
   HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
   HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE,
-  HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE,
+  getDockedBarTopMotionStyle,
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_STRIP_PADDING_Y,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
@@ -990,6 +990,12 @@ export function Header() {
         (mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0)
       : 0;
 
+  const mobileSearchPeekTopPx =
+    mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0;
+  const mobileDockedSearchTopStyle: CSSProperties | undefined = mobileSearchDocked
+    ? { top: mobileSearchPeekTopPx, ...getDockedBarTopMotionStyle(mobileSearchPeekTopPx) }
+    : undefined;
+
   return (
     <div className={`relative z-50 ${montserrat.className}`}>
     <header
@@ -1123,15 +1129,7 @@ export function Header() {
           className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
             mobileSearchDocked ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none' : ''
           }`}
-          style={
-            mobileSearchDocked
-              ? {
-                  top:
-                    mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0,
-                  ...HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE,
-                }
-              : undefined
-          }
+          style={mobileDockedSearchTopStyle}
         >
           <div className={mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
             <form

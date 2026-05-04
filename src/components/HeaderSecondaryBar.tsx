@@ -5,10 +5,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
-import {
-  HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE,
-  SITE_CONTENT_GUTTERS_CLASS,
-} from './header-strip-layout';
+import { getDockedBarTopMotionStyle, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
@@ -310,7 +307,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
     const topOffset = Math.max(0, Math.round(dockedViewportTopOffsetPx));
     const positionClass = dockToViewportTop ? 'fixed left-0 right-0 z-50' : 'relative z-50';
     const positionStyle: CSSProperties | undefined = dockToViewportTop
-      ? { top: topOffset, ...HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE }
+      ? { top: topOffset, ...getDockedBarTopMotionStyle(topOffset) }
       : undefined;
 
     return (

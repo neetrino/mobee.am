@@ -87,8 +87,8 @@ export function ShopSortFilter() {
   };
 
   return (
-    <div className="relative z-50 flex w-full items-center gap-[10px]">
-      <div ref={containerRef} className="relative z-50 w-full max-w-[226px]">
+    <div className="relative z-10 flex w-full items-center gap-[10px]">
+      <div ref={containerRef} className="relative z-10 w-full max-w-[226px]">
         <button
           type="button"
           onClick={() => setOpen((currentOpen) => !currentOpen)}
@@ -118,7 +118,7 @@ export function ShopSortFilter() {
         </button>
 
         {open && (
-          <div className="absolute left-0 top-[calc(100%+8px)] z-[60] w-full rounded-2xl border border-[#E2E8F0] bg-white p-2 shadow-[0_12px_30px_rgba(15,23,43,0.12)]">
+          <div className="absolute left-0 top-[calc(100%+8px)] z-30 w-full rounded-2xl border border-[#E2E8F0] bg-white p-2 shadow-[0_12px_30px_rgba(15,23,43,0.12)]">
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option}
