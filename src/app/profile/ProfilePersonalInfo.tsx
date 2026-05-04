@@ -57,7 +57,7 @@ export function ProfilePersonalInfo({
           placeholder={t('profile.personal.phonePlaceholder')}
         />
         <div className="flex items-center gap-2 pt-4">
-          <Button type="submit" variant="primary" disabled={savingPersonal}>
+          <Button type="submit" variant="brand" disabled={savingPersonal}>
             {savingPersonal ? t('profile.personal.saving') : t('profile.personal.save')}
           </Button>
           <Button

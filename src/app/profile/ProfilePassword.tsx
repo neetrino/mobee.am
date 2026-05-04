@@ -49,7 +49,7 @@ export function ProfilePassword({
           required
         />
         <div className="pt-4">
-          <Button type="submit" variant="primary" disabled={savingPassword}>
+          <Button type="submit" variant="brand" disabled={savingPassword}>
             {savingPassword ? t('profile.password.changing') : t('profile.password.change')}
           </Button>
         </div>

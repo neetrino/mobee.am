@@ -39,7 +39,7 @@ export function ProfileAddresses({
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-gray-900">{t('profile.addresses.title')}</h2>
           <Button
-            variant="primary"
+            variant={showAddressForm ? 'outline' : 'brand'}
             onClick={() => {
               onResetForm();
               setShowAddressForm(!showAddressForm);
@@ -79,7 +79,7 @@ export function ProfileAddresses({
               <span className="ml-2 text-sm text-gray-700">{t('profile.addresses.form.isDefault')}</span>
             </label>
             <div className="flex gap-2">
-              <Button type="submit" variant="primary" disabled={savingAddress}>
+              <Button type="submit" variant="brand" disabled={savingAddress}>
                 {savingAddress ? t('profile.addresses.form.saving') : editingAddress ? t('profile.addresses.form.update') : t('profile.addresses.form.add')}
               </Button>
               <Button
