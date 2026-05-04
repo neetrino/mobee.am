@@ -11,14 +11,27 @@ export async function POST(req: NextRequest) {
   try {
     logger.info("Checkout request received");
     const user = await authenticateToken(req);
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          status: 401,
+          type: "https://api.shop.am/problems/unauthorized",
+          title: "Unauthorized",
+          detail: "Authentication required to place an order",
+        },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const data = parseCheckoutBody(body);
     const acceptLanguage = req.headers.get("accept-language");
-    const requestLocale = normalizeCheckoutLocale(data.locale || user?.locale || acceptLanguage);
+    const requestLocale = normalizeCheckoutLocale(data.locale || user.locale || acceptLanguage);
     const checkoutData = { ...data, locale: requestLocale };
     
     logger.debug("Checkout data", {
-      userId: user?.id,
+      userId: user.id,
       cartId: data.cartId,
       itemsCount: data.items?.length || 0,
       email: data.email,
@@ -28,7 +41,7 @@ export async function POST(req: NextRequest) {
       locale: requestLocale,
     });
     
-    const result = await ordersService.checkout(checkoutData, user?.id, req.nextUrl.origin);
+    const result = await ordersService.checkout(checkoutData, user.id, req.nextUrl.origin);
     
     logger.info("Checkout successful", {
       orderNumber: result.order?.number,

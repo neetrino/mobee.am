@@ -24,6 +24,8 @@ export default function CheckoutPage() {
     setShowShippingModal,
     showCardModal,
     setShowCardModal,
+    showLoginRequiredModal,
+    setShowLoginRequiredModal,
     deliveryPrice,
     loadingDeliveryPrice,
     register,
@@ -119,6 +121,8 @@ export default function CheckoutPage() {
         setShowShippingModal={setShowShippingModal}
         showCardModal={showCardModal}
         setShowCardModal={setShowCardModal}
+        showLoginRequiredModal={showLoginRequiredModal}
+        setShowLoginRequiredModal={setShowLoginRequiredModal}
         register={register}
         setValue={setValue}
         handleSubmit={handleSubmit}
