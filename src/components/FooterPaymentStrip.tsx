@@ -62,7 +62,7 @@ export function FooterPaymentStrip() {
   const year = new Date().getFullYear();
 
   return (
-    <div className={`${montserrat.className} border-t border-[#eeeef0]`}>
+    <div className={montserrat.className}>
       <div
         className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-6 pb-8 pt-[33px] lg:flex-row lg:items-center lg:justify-between lg:gap-8`}
       >
