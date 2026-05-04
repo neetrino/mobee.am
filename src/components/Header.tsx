@@ -387,7 +387,7 @@ function CategoriesMenuFlyout({
   );
 }
 
-/** Figma mobee-new node 178:535 — support phone + optional language pill */
+/** Figma mobee-new — support phone (icon node 178:537) + optional language pill */
 function HeaderPhoneLangCluster({
   phoneNumberVisibility,
   showLanguageSwitcher = true,
