@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, type MouseEvent } from 'react';
+import { useState, useEffect, useRef, type MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredCurrency } from '../lib/currency';
@@ -30,7 +30,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const [language, setLanguage] = useState<LanguageCode>('en');
-  const [addingToCart, setAddingToCart] = useState<Set<string>>(new Set());
+  const addToCartInFlightRef = useRef<Set<string>>(new Set());
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   
   const visibleCards = useVisibleCards();
@@ -70,82 +70,106 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   /**
    * Handle adding product to cart
    */
-  const handleAddToCart = async (e: MouseEvent, product: typeof products[0]) => {
+  const handleAddToCart = (e: MouseEvent, product: (typeof products)[0]) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (!product.inStock) {
+
+    if (!product.inStock || addToCartInFlightRef.current.has(product.id)) {
       return;
     }
 
-    setAddingToCart(prev => new Set(prev).add(product.id));
+    const cardRoot = (e.currentTarget as HTMLElement).closest('[data-related-product-card]');
+    const flySource = cardRoot?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
+    const runFly = () => {
+      dispatchCartFlyAnimation(resolveProductCardImageSrc(product.image), flySource);
+    };
 
-    try {
-      // Get product details to get variant ID
-      interface ProductDetails {
-        id: string;
-        slug: string;
-        variants?: Array<{
-          id: string;
-          sku: string;
-          price: number;
-          stock: number;
-          available: boolean;
-        }>;
-      }
-
-      const encodedSlug = encodeURIComponent(product.slug.trim());
-      const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
-
-      if (!productDetails.variants || productDetails.variants.length === 0) {
-        alert('No variants available');
-        return;
-      }
-
-      const variantId = productDetails.variants[0].id;
-      const canonicalProductId = productDetails.id;
-
-      if (!isLoggedIn) {
-        upsertGuestCartItem({
-          productId: canonicalProductId,
-          productSlug: product.slug,
-          variantId,
-          quantity: 1,
-        });
-      } else {
-        await apiClient.post(
-          '/api/v1/cart/items',
-          {
-            productId: canonicalProductId,
-            variantId: variantId,
-            quantity: 1,
-          }
-        );
-      }
-
-      // Trigger cart update event
-      window.dispatchEvent(new Event('cart-updated'));
-      const cardRoot = (e.currentTarget as HTMLElement).closest('[data-related-product-card]');
-      const flySource = cardRoot?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
-      dispatchCartFlyAnimation(
-        resolveProductCardImageSrc(product.image),
-        flySource,
+    if (isLoggedIn) {
+      window.dispatchEvent(
+        new CustomEvent('cart-updated', {
+          detail: { optimisticAdd: { quantity: 1, price: product.price } },
+        }),
       );
-    } catch (error: unknown) {
-      console.error('[RelatedProducts] Error adding to cart:', error);
-      const err = error as { message?: string };
-      if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-        router.push(`/login?redirect=/products/${product.slug}`);
-      } else {
-        alert('Failed to add product to cart. Please try again.');
-      }
-    } finally {
-      setAddingToCart(prev => {
-        const next = new Set(prev);
-        next.delete(product.id);
-        return next;
-      });
+      runFly();
     }
+
+    addToCartInFlightRef.current.add(product.id);
+
+    void (async () => {
+      try {
+        interface ProductDetails {
+          id: string;
+          slug: string;
+          variants?: Array<{
+            id: string;
+            sku: string;
+            price: number;
+            stock: number;
+            available: boolean;
+          }>;
+        }
+
+        let variantId: string;
+        let bodyProductId = product.id;
+
+        const presetVariantId = product.defaultVariantId ?? null;
+        if (presetVariantId) {
+          variantId = presetVariantId;
+        } else {
+          const encodedSlug = encodeURIComponent(product.slug.trim());
+          const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
+
+          if (!productDetails.variants || productDetails.variants.length === 0) {
+            alert('No variants available');
+            if (isLoggedIn) {
+              window.dispatchEvent(new Event('cart-updated'));
+            }
+            return;
+          }
+
+          variantId = productDetails.variants[0].id;
+          bodyProductId = productDetails.id;
+        }
+
+        if (!isLoggedIn) {
+          upsertGuestCartItem({
+            productId: bodyProductId,
+            productSlug: product.slug,
+            variantId,
+            quantity: 1,
+          });
+          window.dispatchEvent(new Event('cart-updated'));
+          runFly();
+        } else {
+          const response = await apiClient.post<{ cartSummary?: { itemsCount: number; total: number } }>(
+            '/api/v1/cart/items',
+            {
+              productId: bodyProductId,
+              variantId,
+              quantity: 1,
+            },
+          );
+          window.dispatchEvent(
+            new CustomEvent('cart-updated', {
+              detail: response.cartSummary ?? null,
+            }),
+          );
+        }
+      } catch (error: unknown) {
+        console.error('[RelatedProducts] Error adding to cart:', error);
+        if (isLoggedIn) {
+          window.dispatchEvent(new Event('cart-updated'));
+        }
+        const err = error as { message?: string };
+        if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+          router.push(`/login?redirect=/products/${product.slug}`);
+        } else {
+          alert('Failed to add product to cart. Please try again.');
+        }
+      } finally {
+        addToCartInFlightRef.current.delete(product.id);
+      }
+    })();
   };
 
   const currency = getStoredCurrency();
@@ -204,7 +228,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
                     product={product}
                     currency={currency}
                     language={language}
-                    isAddingToCart={addingToCart.has(product.id)}
+                    isAddingToCart={false}
                     hasMoved={hasMoved}
                     onAddToCart={handleAddToCart}
                     onImageError={handleImageError}

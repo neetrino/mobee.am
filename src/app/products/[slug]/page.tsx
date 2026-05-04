@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import { apiClient } from '../../../lib/api-client';
 import { t, getProductText } from '../../../lib/i18n';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
@@ -16,6 +17,7 @@ import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
 
 export default function ProductPage({ params }: ProductPageProps) {
   const { isLoggedIn } = useAuth();
+  const addToCartInFlightRef = useRef(false);
 
   const scrollToProductDetails = () => {
     document.getElementById('product-long-description')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -34,8 +36,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     selectedColor,
     selectedSize,
     selectedAttributeValues,
-    isAddingToCart,
-    setIsAddingToCart,
     showMessage,
     setShowMessage,
     isInWishlist,
@@ -67,33 +67,62 @@ export default function ProductPage({ params }: ProductPageProps) {
     getRequiredAttributesMessage,
   } = useProductPage(params);
 
-  const handleAddToCart = async () => {
-    if (!canAddToCart || !product || !currentVariant) return;
-    setIsAddingToCart(true);
-    try {
-      if (!isLoggedIn) {
-        upsertGuestCartItem({
+  const handleAddToCart = () => {
+    if (!canAddToCart || !product || !currentVariant || addToCartInFlightRef.current) {
+      return;
+    }
+
+    const flyEl = document.querySelector<HTMLElement>('[data-pdp-cart-fly-source]');
+    const slideSrc = images[currentImageIndex];
+    const flyUrl =
+      typeof slideSrc === 'string' && slideSrc.length > 0 ? slideSrc : PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+
+    if (!isLoggedIn) {
+      upsertGuestCartItem({
+        productId: product.id,
+        productSlug: product.slug,
+        variantId: currentVariant.id,
+        quantity,
+      });
+      setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
+      window.dispatchEvent(new Event('cart-updated'));
+      dispatchCartFlyAnimation(flyUrl, flyEl);
+      setTimeout(() => setShowMessage(null), 2000);
+      return;
+    }
+
+    addToCartInFlightRef.current = true;
+    window.dispatchEvent(
+      new CustomEvent('cart-updated', {
+        detail: { optimisticAdd: { quantity, price } },
+      }),
+    );
+    setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
+    dispatchCartFlyAnimation(flyUrl, flyEl);
+    setTimeout(() => setShowMessage(null), 2000);
+
+    void (async () => {
+      try {
+        const response = await apiClient.post<{
+          cartSummary?: { itemsCount: number; total: number };
+        }>('/api/v1/cart/items', {
           productId: product.id,
-          productSlug: product.slug,
           variantId: currentVariant.id,
           quantity,
         });
-      } else {
-        await apiClient.post('/api/v1/cart/items', { productId: product.id, variantId: currentVariant.id, quantity });
+        window.dispatchEvent(
+          new CustomEvent('cart-updated', {
+            detail: response.cartSummary ?? null,
+          }),
+        );
+      } catch {
+        window.dispatchEvent(new Event('cart-updated'));
+        setShowMessage(t(language, 'product.errorAddingToCart'));
+        setTimeout(() => setShowMessage(null), 2000);
+      } finally {
+        addToCartInFlightRef.current = false;
       }
-      setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
-      window.dispatchEvent(new Event('cart-updated'));
-      const flyEl = document.querySelector<HTMLElement>('[data-pdp-cart-fly-source]');
-      const slideSrc = images[currentImageIndex];
-      const flyUrl =
-        typeof slideSrc === 'string' && slideSrc.length > 0 ? slideSrc : PRODUCT_CARD_DISPLAY_IMAGE_SRC;
-      dispatchCartFlyAnimation(flyUrl, flyEl);
-    } catch (err) { 
-      setShowMessage(t(language, 'product.errorAddingToCart')); 
-    } finally { 
-      setIsAddingToCart(false); 
-      setTimeout(() => setShowMessage(null), 2000); 
-    }
+    })();
   };
 
   if (loading || !product) {
@@ -133,7 +162,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             hasUnavailableAttributes={hasUnavailableAttributes}
             unavailableAttributes={unavailableAttributes}
             canAddToCart={canAddToCart}
-            isAddingToCart={isAddingToCart}
             isInWishlist={isInWishlist}
             isInCompare={isInCompare}
             showMessage={showMessage}

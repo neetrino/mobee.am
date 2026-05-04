@@ -9,6 +9,8 @@ interface RelatedProduct {
   slug: string;
   title: string;
   price: number;
+  /** From list API — avoids GET /products/:slug before POST /cart/items when logged in. */
+  defaultVariantId?: string | null;
   originalPrice?: number | null;
   compareAtPrice: number | null;
   discountPercent?: number | null;
