@@ -16,6 +16,9 @@ import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCount
 import { LanguageSwitcherPill } from './LanguageSwitcherPill';
 import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
+  HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
+  HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE,
+  HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE,
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_STRIP_PADDING_Y,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
@@ -478,6 +481,8 @@ export function Header() {
   const [mobileStrip1HeightPx, setMobileStrip1HeightPx] = useState(0);
   const [desktopPrimaryBarHeightPx, setDesktopPrimaryBarHeightPx] = useState(0);
   const lastScrollYRef = useRef(0);
+  const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
+  const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
 
@@ -634,6 +639,45 @@ export function Header() {
     setPrimaryBarPeekFromScrollUp(false);
     lastScrollYRef.current = typeof window !== 'undefined' ? window.scrollY : 0;
   }, [pathname]);
+
+  const mobileStripPeekActive = mobileSearchDocked && primaryBarPeekFromScrollUp;
+  const desktopPrimaryPeekActive = secondaryDocked && primaryBarPeekFromScrollUp;
+
+  useEffect(() => {
+    if (!mobileStripPeekActive) {
+      setMobileStripPeekSlideIn(false);
+      return;
+    }
+    setMobileStripPeekSlideIn(false);
+    let innerId = 0;
+    const outerId = requestAnimationFrame(() => {
+      innerId = requestAnimationFrame(() => {
+        setMobileStripPeekSlideIn(true);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(outerId);
+      cancelAnimationFrame(innerId);
+    };
+  }, [mobileStripPeekActive]);
+
+  useEffect(() => {
+    if (!desktopPrimaryPeekActive) {
+      setDesktopPrimaryPeekSlideIn(false);
+      return;
+    }
+    setDesktopPrimaryPeekSlideIn(false);
+    let innerId = 0;
+    const outerId = requestAnimationFrame(() => {
+      innerId = requestAnimationFrame(() => {
+        setDesktopPrimaryPeekSlideIn(true);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(outerId);
+      cancelAnimationFrame(innerId);
+    };
+  }, [desktopPrimaryPeekActive]);
 
   const {
     query: searchQuery,
@@ -947,8 +991,6 @@ export function Header() {
     window.dispatchEvent(new Event('currency-updated'));
   };
 
-  const mobileStripPeekActive = mobileSearchDocked && primaryBarPeekFromScrollUp;
-  const desktopPrimaryPeekActive = secondaryDocked && primaryBarPeekFromScrollUp;
   const mobileDockedHeaderSpacerPx =
     mobileSearchDocked && mobileSearchFlowSpacerPx > 0
       ? mobileSearchFlowSpacerPx +
@@ -984,9 +1026,12 @@ export function Header() {
             ref={mobileStrip1Ref}
             className={`border-b border-gray-100 ${
               mobileStripPeekActive
-                ? `fixed left-0 right-0 top-0 z-[45] border-b border-gray-200 bg-white shadow-sm ${SITE_CONTENT_GUTTERS_CLASS}`
+                ? `fixed left-0 right-0 top-0 z-[45] border-b border-gray-200 bg-white shadow-sm will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
+                    mobileStripPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
+                  }`
                 : ''
             }`}
+            style={mobileStripPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
           >
           <div className="relative flex items-center justify-between gap-3 py-2.5">
             <div className="relative z-20 shrink-0">
@@ -1070,19 +1115,27 @@ export function Header() {
         </div>
 
         {mobileDockedHeaderSpacerPx > 0 ? (
-          <div aria-hidden className="shrink-0 lg:hidden" style={{ height: mobileDockedHeaderSpacerPx }} />
+          <div
+            aria-hidden
+            className="shrink-0 motion-reduce:transition-none lg:hidden"
+            style={{
+              height: mobileDockedHeaderSpacerPx,
+              ...HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
+            }}
+          />
         ) : null}
 
         <div
           ref={mobileSearchWrapRef}
           className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
-            mobileSearchDocked ? 'fixed inset-x-0 z-40 border-b border-gray-200' : ''
+            mobileSearchDocked ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none' : ''
           }`}
           style={
             mobileSearchDocked
               ? {
                   top:
                     mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0,
+                  ...HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE,
                 }
               : undefined
           }
@@ -1159,10 +1212,10 @@ export function Header() {
         {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
         <div
           ref={desktopPrimaryWrapRef}
-          className="hidden lg:block"
+          className="hidden motion-reduce:transition-none lg:block"
           style={
             desktopPrimaryPeekActive && desktopPrimaryBarHeightPx > 0
-              ? { height: desktopPrimaryBarHeightPx }
+              ? { height: desktopPrimaryBarHeightPx, ...HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE }
               : undefined
           }
         >
@@ -1170,9 +1223,12 @@ export function Header() {
           ref={desktopPrimaryRowRef}
           className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
             desktopPrimaryPeekActive
-              ? `fixed left-0 right-0 top-0 z-[55] border-b border-gray-200 bg-white ${SITE_CONTENT_GUTTERS_CLASS}`
+              ? `fixed left-0 right-0 top-0 z-[55] border-b border-gray-200 bg-white will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
+                  desktopPrimaryPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
+                }`
               : ''
           }`}
+          style={desktopPrimaryPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
         >
           <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
             <Link

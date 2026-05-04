@@ -2,10 +2,13 @@
 
 import Link from 'next/link';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import type { FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
+import type { CSSProperties, FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
-import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import {
+  HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE,
+  SITE_CONTENT_GUTTERS_CLASS,
+} from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
@@ -305,19 +308,15 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
     ref,
   ) {
     const topOffset = Math.max(0, Math.round(dockedViewportTopOffsetPx));
-    const positionClass =
-      dockToViewportTop && topOffset > 0
-        ? 'fixed left-0 right-0 z-50'
-        : dockToViewportTop
-          ? 'fixed top-0 left-0 right-0 z-50'
-          : 'relative z-50';
-    const positionStyle: { top?: number } | undefined =
-      dockToViewportTop && topOffset > 0 ? { top: topOffset } : undefined;
+    const positionClass = dockToViewportTop ? 'fixed left-0 right-0 z-50' : 'relative z-50';
+    const positionStyle: CSSProperties | undefined = dockToViewportTop
+      ? { top: topOffset, ...HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE }
+      : undefined;
 
     return (
     <div
       ref={ref}
-      className={`hidden w-full border-t border-b border-gray-200 bg-white lg:block ${positionClass} ${montserratClassName}`}
+      className={`hidden w-full border-t border-b border-gray-200 bg-white lg:block ${positionClass} motion-reduce:transition-none ${montserratClassName}`}
       style={positionStyle}
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>

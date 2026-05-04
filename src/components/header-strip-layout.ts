@@ -31,3 +31,31 @@ export const MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS =
   'flex w-[18px] shrink-0 flex-col justify-center gap-[2px]';
 
 export const MOBILE_PRIMARY_MENU_BAR_CLASS = 'h-[2px] w-full rounded-full bg-black';
+
+/** Primary strip peek (scroll-up) and docked bar offset — duration (ms). */
+export const HEADER_PRIMARY_PEEK_TRANSITION_MS = 280;
+
+export const HEADER_PRIMARY_PEEK_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+const HEADER_PRIMARY_PEEK_DURATION = `${HEADER_PRIMARY_PEEK_TRANSITION_MS}ms`;
+
+/** Inline styles for `transform` slide on peeking strips. */
+export const HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE = {
+  transitionProperty: 'transform',
+  transitionDuration: HEADER_PRIMARY_PEEK_DURATION,
+  transitionTimingFunction: HEADER_PRIMARY_PEEK_EASING,
+} as const;
+
+/** Inline styles for fixed search / secondary `top` offset. */
+export const HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE = {
+  transitionProperty: 'top',
+  transitionDuration: HEADER_PRIMARY_PEEK_DURATION,
+  transitionTimingFunction: HEADER_PRIMARY_PEEK_EASING,
+} as const;
+
+/** Inline styles for flow spacer `height` when peek toggles. */
+export const HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE = {
+  transitionProperty: 'height',
+  transitionDuration: HEADER_PRIMARY_PEEK_DURATION,
+  transitionTimingFunction: HEADER_PRIMARY_PEEK_EASING,
+} as const;
