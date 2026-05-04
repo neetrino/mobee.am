@@ -65,7 +65,7 @@ export default function CheckoutPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('checkout.title')}</h1>
         <Card className="p-6 text-center">
           <p className="text-gray-600 mb-4">{t('checkout.errors.cartEmpty')}</p>
-          <Button variant="primary" onClick={() => router.push('/products')}>
+          <Button variant="brand" onClick={() => router.push('/products')}>
             {t('checkout.buttons.continueShopping')}
           </Button>
         </Card>
