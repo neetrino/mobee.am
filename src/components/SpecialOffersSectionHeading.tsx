@@ -70,9 +70,9 @@ export function SpecialOffersSectionHeading({
         </div>
         <Link
           href="/products"
-          className="flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between rounded-full bg-[#2db2ff] pl-5 pr-0.5 transition-opacity hover:opacity-95 active:scale-[0.99] sm:w-[159px]"
+          className="group flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between rounded-full border-2 border-[#2db2ff] bg-[#2db2ff] pl-5 pr-0.5 transition-colors duration-200 hover:bg-[#1e1e1e] active:scale-[0.99] sm:w-[159px]"
         >
-          <span className="text-right text-[12px] font-medium leading-none text-[#1e1e1e]">
+          <span className="text-right text-[12px] font-medium leading-none text-[#1e1e1e] transition-colors duration-200 group-hover:text-white">
             {t('home.special_offers_heading.cta')}
           </span>
           <span
