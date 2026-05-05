@@ -29,7 +29,7 @@ export default function AdminError({
           >
             Try again
           </button>
-          <Link href="/admin" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
+          <Link href="/supersudo" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
             Admin
           </Link>
         </div>

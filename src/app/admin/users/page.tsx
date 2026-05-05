@@ -7,6 +7,7 @@ import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
 
 interface User {
   id: string;
@@ -47,7 +48,7 @@ export default function UsersPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -188,11 +189,11 @@ export default function UsersPage() {
         );
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/users'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/users'} router={router} t={t}>
       <div className="max-w-7xl">
         <div className="mb-8">
           <button
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push('/supersudo')}
             className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,7 +215,7 @@ export default function UsersPage() {
                 placeholder={t('admin.users.searchPlaceholder')}
                 className="flex-1"
               />
-              <Button type="submit" variant="primary">
+              <Button type="submit" variant="primary" className={ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}>
                 {t('admin.users.search')}
               </Button>
             </div>

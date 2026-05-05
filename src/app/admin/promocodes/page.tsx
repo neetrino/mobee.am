@@ -7,6 +7,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { apiClient } from '../../../lib/api-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
 
 interface PromoCode {
   id: string;
@@ -51,7 +52,7 @@ export default function PromoCodesPage() {
 
   useEffect(() => {
     if (!isLoading && (!isLoggedIn || !isAdmin)) {
-      router.push('/admin');
+      router.push('/supersudo');
     }
   }, [isAdmin, isLoading, isLoggedIn, router]);
 
@@ -163,11 +164,11 @@ export default function PromoCodesPage() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/promocodes'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/promocodes'} router={router} t={t}>
       <div className="max-w-7xl">
         <div className="mb-8">
           <button
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push('/supersudo')}
             className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,7 +214,12 @@ export default function PromoCodesPage() {
                 />
               </div>
 
-              <Button type="submit" disabled={submitting} variant="primary" className="w-full md:w-auto">
+              <Button
+                type="submit"
+                disabled={submitting}
+                variant="primary"
+                className={`w-full md:w-auto ${ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}`}
+              >
                 {submitting ? t('admin.promocodes.creating') : t('admin.promocodes.create')}
               </Button>
             </form>

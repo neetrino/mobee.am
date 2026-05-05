@@ -64,7 +64,7 @@ export default function AdminPanel() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin'} router={router} t={t} mainClassName="max-w-7xl">
+    <AdminPageShell currentPath={pathname || '/supersudo'} router={router} t={t} mainClassName="max-w-7xl">
       <StatsGrid stats={stats} statsLoading={statsLoading} />
 
       {/* Dashboard Sections */}

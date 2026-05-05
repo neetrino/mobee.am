@@ -1,7 +1,11 @@
 import { db } from "@white-shop/db";
 import { processImageUrl } from "../utils/image-utils";
 import { translations } from "../translations";
+import { cacheService } from "./cache.service";
 import { ProductWithRelations } from "./products-find-query.service";
+
+const DISCOUNT_CONTEXT_CACHE_KEY = "product-list:discount-context";
+const DISCOUNT_CONTEXT_TTL_SEC = 120;
 
 export type ProductDiscountContext = {
   globalDiscount: number;
@@ -10,9 +14,19 @@ export type ProductDiscountContext = {
 };
 
 /**
- * Load discount-related settings once per product list request.
+ * Load discount-related settings once per product list request (cached briefly to cut DB round-trips).
  */
 export async function loadProductDiscountContext(): Promise<ProductDiscountContext> {
+  try {
+    const cached = await cacheService.get(DISCOUNT_CONTEXT_CACHE_KEY);
+    if (cached !== null && cached !== undefined) {
+      const raw = typeof cached === "string" ? cached : JSON.stringify(cached);
+      return JSON.parse(raw) as ProductDiscountContext;
+    }
+  } catch {
+    // continue to DB
+  }
+
   const discountSettings = await db.settings.findMany({
     where: {
       key: {
@@ -40,7 +54,15 @@ export async function loadProductDiscountContext(): Promise<ProductDiscountConte
     ? ((brandDiscountsSetting.value as Record<string, number>) || {})
     : {};
 
-  return { globalDiscount, categoryDiscounts, brandDiscounts };
+  const ctx: ProductDiscountContext = { globalDiscount, categoryDiscounts, brandDiscounts };
+
+  try {
+    await cacheService.setex(DISCOUNT_CONTEXT_CACHE_KEY, DISCOUNT_CONTEXT_TTL_SEC, JSON.stringify(ctx));
+  } catch {
+    // ignore cache write failures
+  }
+
+  return ctx;
 };
 
 /**

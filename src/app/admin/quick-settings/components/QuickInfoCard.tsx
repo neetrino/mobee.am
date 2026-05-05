@@ -45,7 +45,7 @@ export function QuickInfoCard() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push('/admin/settings')}
+          onClick={() => router.push('/supersudo/settings')}
           className="w-full"
         >
           {t('admin.quickSettings.moreSettings')}

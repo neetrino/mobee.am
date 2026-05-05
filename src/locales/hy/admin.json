@@ -1,4 +1,11 @@
 {
+  "sidebar": {
+    "logoLinkAria": "MOBEE — անցնել ադմին վահանակ",
+    "drawerTitle": "Ադմին նավիգացիա",
+    "drawerMenuButton": "Մենյու",
+    "expandProductsMenu": "Բացել ապրանքների ենթամենյու",
+    "collapseProductsMenu": "Փակել ապրանքների ենթամենյու"
+  },
   "menu": {
     "home": "Գլխավոր",
     "dashboard": "Վահանակ",
@@ -351,6 +358,20 @@
       "editProduct": "Խմբագրել ապրանք",
       "addNewProduct": "Ավելացնել նոր ապրանք",
       "basicInformation": "Հիմնական տեղեկություն",
+      "productType": "Ապրանքի տիպ",
+      "productTypeDescription": "Մեկ գին/պաշար, թե տարբերակներով (չափ, գույն և այլն)",
+      "productTypeHintShort": "Մեկ գին և պաշար, կամ մի քանի տարբերակ (չափ, գույն…).",
+      "productTypeSimple": "Պարզ",
+      "productTypeVariable": "Տարբերակներով",
+      "urlSlugSection": "URL slug (վերնագրից — բացեք խմբագրելու համար)",
+      "descriptionOptionalSection": "Նկարագրություն (ընտրովի)",
+      "moreOptionsOptional": "Լրացուցիչ (ընտրովի)",
+      "moreOptionsOptionalHint": "Պիտակներ քարտի վրա, գլխավոր էջում առաջարկվող:",
+      "createNewCategoryLink": "Ստեղծել նոր կատեգորիա",
+      "chooseExistingCategoriesLink": "Ընտրել ցանկից",
+      "createNewBrandLink": "Ստեղծել նոր բրենդ",
+      "chooseExistingBrandsLink": "Ընտրել ցանկից",
+      "priceAndStock": "Գին և պաշար",
       "title": "Վերնագիր",
       "slug": "Slug",
       "description": "Նկարագրություն",

@@ -34,7 +34,7 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -56,7 +56,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/analytics'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/analytics'} router={router} t={t}>
       <div className="max-w-7xl">
         <AnalyticsHeader />
 

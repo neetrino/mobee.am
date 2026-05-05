@@ -71,7 +71,10 @@
     "completeOrder": "Complete Your Order",
     "confirmOrder": "Confirm Order",
     "cardDetails": "{method} Card Details",
-    "closeModal": "Close Window"
+    "closeModal": "Close Window",
+    "loginRequiredTitle": "Sign in required",
+    "loginRequiredMessage": "Please log in or register to place your order.",
+    "goToLogin": "Log in or register"
   },
   "messages": {
     "cashOnDeliveryInfo": "Cash on Delivery: You will pay cash when you receive your order. Card details are not required.",

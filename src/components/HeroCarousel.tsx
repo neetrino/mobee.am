@@ -60,7 +60,14 @@ function MobileHeroIphoneBanner() {
             <p
               className={`${titleClass} text-[clamp(1.5rem,7vw,2rem)] font-bold leading-tight tracking-tight text-black`}
             >
-              {t('home.hero_iphone_title')}
+              {lang === 'hy' ? (
+                <>
+                  <span className="block">{t('home.hero_iphone_title_mobile_line1')}</span>
+                  <span className="block">{t('home.hero_iphone_title_mobile_line2')}</span>
+                </>
+              ) : (
+                t('home.hero_iphone_title')
+              )}
             </p>
           </div>
           <div className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[min(52%,140px)] w-[min(58%,220px)] min-h-[118px] min-w-[160px] max-w-[220px]">

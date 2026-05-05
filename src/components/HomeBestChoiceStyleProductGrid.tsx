@@ -9,15 +9,15 @@ import {
   type MobileCarouselViewState,
 } from './useHomeBestChoiceCarouselPageSync';
 
-export const HOME_BEST_CHOICE_CARD_WIDTH = 'w-full min-w-0';
+export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
 /** Desktop layout for home best-choice rows (hidden below `lg`). */
 const HOME_BEST_CHOICE_DESKTOP_GRID =
   'hidden grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid lg:grid-cols-4 lg:gap-6';
 
-/** Horizontal snap carousel below the `lg` breakpoint. */
+/** Horizontal snap carousel below the `lg` breakpoint. Allow pan-y so the page can scroll vertically while touching the strip (touch-pan-x alone blocks vertical scroll on many browsers). */
 const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
-  'flex touch-pan-x overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
+  'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
 
 const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
 

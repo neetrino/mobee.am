@@ -23,6 +23,7 @@ export function useCheckout() {
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
+  const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
 
   const paymentMethods = usePaymentMethods();
   const checkoutSchema = useCheckoutSchema();
@@ -106,7 +107,11 @@ export function useCheckout() {
 
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (isLoading) {
+      return;
+    }
+
     if (shippingMethod === 'delivery') {
       const formData = watch();
       const hasShippingAddress = formData.shippingAddress && formData.shippingAddress.trim().length > 0;
@@ -122,16 +127,16 @@ export function useCheckout() {
       }
     }
     
+    if (!isLoggedIn) {
+      setShowLoginRequiredModal(true);
+      return;
+    }
+
     if (paymentMethod === 'arca' || paymentMethod === 'idram') {
       setShowCardModal(true);
       return;
     }
-    
-    if (!isLoggedIn) {
-      setShowShippingModal(true);
-      return;
-    }
-    
+
     handleSubmit(submitOrder)(e);
   };
 
@@ -152,6 +157,8 @@ export function useCheckout() {
     setShowShippingModal,
     showCardModal,
     setShowCardModal,
+    showLoginRequiredModal,
+    setShowLoginRequiredModal,
     deliveryPrice,
     loadingDeliveryPrice,
     // Form

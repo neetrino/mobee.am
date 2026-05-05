@@ -7,6 +7,7 @@ import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
 
 export default function PriceFilterSettingsPage() {
   const { t } = useTranslation();
@@ -251,12 +252,12 @@ export default function PriceFilterSettingsPage() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/price-filter-settings'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/price-filter-settings'} router={router} t={t}>
       <div className="max-w-7xl">
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push('/supersudo')}
             className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,7 +371,7 @@ export default function PriceFilterSettingsPage() {
                       variant="primary"
                       onClick={handleSave}
                       disabled={saving}
-                      className="px-6"
+                      className={`px-6 ${ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}`}
                     >
                       {saving ? (
                         <div className="flex items-center gap-2">

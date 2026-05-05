@@ -135,37 +135,6 @@ export function CategoriesBrands({
             {t('admin.products.add.categories')} <span className="text-gray-500 font-normal">{t('admin.products.add.selectMultiple')}</span>
           </label>
           <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <input
-                type="radio"
-                id="select-category"
-                name="category-mode"
-                checked={!useNewCategory}
-                onChange={() => {
-                  onUseNewCategoryChange(false);
-                  onNewCategoryNameChange('');
-                }}
-                className="w-4 h-4 text-admin-600 border-gray-300 focus:ring-admin"
-              />
-              <label htmlFor="select-category" className="text-sm text-gray-700">
-                {t('admin.products.add.selectExistingCategories')}
-              </label>
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <input
-                type="radio"
-                id="new-category"
-                name="category-mode"
-                checked={useNewCategory}
-                onChange={() => {
-                  onUseNewCategoryChange(true);
-                }}
-                className="w-4 h-4 text-admin-600 border-gray-300 focus:ring-admin"
-              />
-              <label htmlFor="new-category" className="text-sm text-gray-700">
-                {t('admin.products.add.addNewCategory')}
-              </label>
-            </div>
             {!useNewCategory ? (
               <div className="relative" data-category-dropdown>
                 <button
@@ -223,7 +192,7 @@ export function CategoriesBrands({
                 )}
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Input
                   type="text"
                   value={newCategoryName}
@@ -232,6 +201,26 @@ export function CategoriesBrands({
                   className="w-full"
                 />
               </div>
+            )}
+            {!useNewCategory ? (
+              <button
+                type="button"
+                onClick={() => onUseNewCategoryChange(true)}
+                className="text-sm font-medium text-admin-600 hover:text-admin-700"
+              >
+                {t('admin.products.add.createNewCategoryLink')}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  onUseNewCategoryChange(false);
+                  onNewCategoryNameChange('');
+                }}
+                className="text-sm font-medium text-admin-600 hover:text-admin-700"
+              >
+                {t('admin.products.add.chooseExistingCategoriesLink')}
+              </button>
             )}
           </div>
         </div>
@@ -242,37 +231,6 @@ export function CategoriesBrands({
             {t('admin.products.add.brands')} <span className="text-gray-500 font-normal">{t('admin.products.add.selectMultiple')}</span>
           </label>
           <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <input
-                type="radio"
-                id="select-brand"
-                name="brand-mode"
-                checked={!useNewBrand}
-                onChange={() => {
-                  onUseNewBrandChange(false);
-                  onNewBrandNameChange('');
-                }}
-                className="w-4 h-4 text-admin-600 border-gray-300 focus:ring-admin"
-              />
-              <label htmlFor="select-brand" className="text-sm text-gray-700">
-                {t('admin.products.add.selectExistingBrands')}
-              </label>
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <input
-                type="radio"
-                id="new-brand"
-                name="brand-mode"
-                checked={useNewBrand}
-                onChange={() => {
-                  onUseNewBrandChange(true);
-                }}
-                className="w-4 h-4 text-admin-600 border-gray-300 focus:ring-admin"
-              />
-              <label htmlFor="new-brand" className="text-sm text-gray-700">
-                {t('admin.products.add.addNewBrand')}
-              </label>
-            </div>
             {!useNewBrand ? (
               <div className="relative" data-brand-dropdown>
                 <button
@@ -334,6 +292,26 @@ export function CategoriesBrands({
                 placeholder={t('admin.products.add.enterNewBrandName')}
                 className="w-full"
               />
+            )}
+            {!useNewBrand ? (
+              <button
+                type="button"
+                onClick={() => onUseNewBrandChange(true)}
+                className="text-sm font-medium text-admin-600 hover:text-admin-700"
+              >
+                {t('admin.products.add.createNewBrandLink')}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  onUseNewBrandChange(false);
+                  onNewBrandNameChange('');
+                }}
+                className="text-sm font-medium text-admin-600 hover:text-admin-700"
+              >
+                {t('admin.products.add.chooseExistingBrandsLink')}
+              </button>
             )}
           </div>
         </div>

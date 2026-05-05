@@ -13,12 +13,14 @@ import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { EmptyWishlist } from './empty-wishlist';
+import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 
 interface Product {
   id: string;
   slug: string;
   title: string;
   price: number;
+  defaultVariantId?: string | null;
   originalPrice: number | null;
   compareAtPrice: number | null;
   discountPercent: number | null;
@@ -53,7 +55,7 @@ export default function WishlistPage() {
   const [loading, setLoading] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [addingToCart, setAddingToCart] = useState<Set<string>>(new Set());
+  const addToCartInFlightRef = useRef<Set<string>>(new Set());
   // Track if we updated locally to prevent unnecessary re-fetch
   const isLocalUpdateRef = useRef(false);
 
@@ -153,8 +155,8 @@ export default function WishlistPage() {
     window.dispatchEvent(new Event('wishlist-updated'));
   };
 
-  const handleAddToCart = async (product: Product) => {
-    if (!product.inStock) {
+  const handleAddToCart = (product: Product) => {
+    if (!product.inStock || addToCartInFlightRef.current.has(product.id)) {
       return;
     }
 
@@ -163,58 +165,76 @@ export default function WishlistPage() {
       return;
     }
 
-    setAddingToCart(prev => new Set(prev).add(product.id));
+    window.dispatchEvent(
+      new CustomEvent('cart-updated', {
+        detail: { optimisticAdd: { quantity: 1, price: product.price } },
+      }),
+    );
+    const flySource = document.querySelector<HTMLElement>(
+      `[data-wishlist-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
+    );
+    const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+    dispatchCartFlyAnimation(flyUrl, flySource);
 
-    try {
-      // Get product details to get variant ID
-      interface ProductDetails {
-        id: string;
-        variants?: Array<{
+    addToCartInFlightRef.current.add(product.id);
+
+    void (async () => {
+      try {
+        interface ProductDetails {
           id: string;
-          sku: string;
-          price: number;
-          stock: number;
-          available: boolean;
-        }>;
-      }
-
-      const productDetails = await apiClient.get<ProductDetails>(`/api/v1/products/${product.slug}`);
-
-      if (!productDetails.variants || productDetails.variants.length === 0) {
-        alert(t('common.alerts.noVariantsAvailable'));
-        return;
-      }
-
-      const variantId = productDetails.variants[0].id;
-      
-      await apiClient.post(
-        '/api/v1/cart/items',
-        {
-          productId: product.id,
-          variantId: variantId,
-          quantity: 1,
+          variants?: Array<{
+            id: string;
+            sku: string;
+            price: number;
+            stock: number;
+            available: boolean;
+          }>;
         }
-      );
 
-      // Trigger cart update event
-      window.dispatchEvent(new Event('cart-updated'));
-      const flySource = document.querySelector<HTMLElement>(
-        `[data-wishlist-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
-      );
-      const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
-      dispatchCartFlyAnimation(flyUrl, flySource);
-    } catch (error: any) {
-      console.error('Error adding to cart:', error);
-      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-        router.push(`/login?redirect=/wishlist`);
+        let variantId: string;
+        let bodyProductId = product.id;
+
+        if (product.defaultVariantId) {
+          variantId = product.defaultVariantId;
+        } else {
+          const encodedSlug = encodeURIComponent(product.slug.trim());
+          const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
+
+          if (!productDetails.variants || productDetails.variants.length === 0) {
+            alert(t('common.alerts.noVariantsAvailable'));
+            window.dispatchEvent(new Event('cart-updated'));
+            return;
+          }
+
+          variantId = productDetails.variants[0].id;
+          bodyProductId = productDetails.id;
+        }
+
+        const response = await apiClient.post<{ cartSummary?: { itemsCount: number; total: number } }>(
+          '/api/v1/cart/items',
+          {
+            productId: bodyProductId,
+            variantId,
+            quantity: 1,
+          },
+        );
+
+        window.dispatchEvent(
+          new CustomEvent('cart-updated', {
+            detail: response.cartSummary ?? null,
+          }),
+        );
+      } catch (error: unknown) {
+        console.error('Error adding to cart:', error);
+        window.dispatchEvent(new Event('cart-updated'));
+        const err = error as { message?: string };
+        if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+          router.push(`/login?redirect=/wishlist`);
+        }
+      } finally {
+        addToCartInFlightRef.current.delete(product.id);
       }
-    } finally {
-      setAddingToCart(prev => {
-        const next = new Set(prev);
-        next.delete(product.id);
-        return next;
-      });
-    }
+    })();
   };
 
   if (loading) {
@@ -338,10 +358,10 @@ export default function WishlistPage() {
                   <Button
                     variant="primary"
                     onClick={() => handleAddToCart(product)}
-                    disabled={!product.inStock || addingToCart.has(product.id)}
+                    disabled={!product.inStock}
                     className="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2 font-semibold uppercase text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {addingToCart.has(product.id) ? t('common.messages.adding') : t('common.buttons.addToCart')}
+                    {t('common.buttons.addToCart')}
                   </Button>
                   <button
                     onClick={() => handleRemove(product.id)}

@@ -189,7 +189,7 @@ function AddProductPageContent() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/products/add'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/products/add'} router={router} t={t}>
       <div className="max-w-7xl">
         <PageHeader isEditMode={isEditMode} />
 

@@ -32,7 +32,7 @@ interface CardDetailsModalProps {
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   isLoggedIn: boolean;
-  onShowShippingModal: () => void;
+  onRequireLogin: () => void;
   onSubmit: (data: CheckoutFormData) => void;
 }
 
@@ -55,7 +55,7 @@ export function CardDetailsModal({
   logoErrors,
   setLogoErrors,
   isLoggedIn,
-  onShowShippingModal,
+  onRequireLogin,
   onSubmit,
 }: CardDetailsModalProps) {
   const { t } = useTranslation();
@@ -172,7 +172,7 @@ export function CardDetailsModal({
               (data) => {
                 onClose();
                 if (!isLoggedIn) {
-                  onShowShippingModal();
+                  onRequireLogin();
                 } else {
                   onSubmit(data);
                 }

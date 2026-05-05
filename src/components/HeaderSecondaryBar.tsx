@@ -2,13 +2,36 @@
 
 import Link from 'next/link';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import type { FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
+import type { CSSProperties, FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
-import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { getDockedBarTopMotionStyle, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
+
+/** Trailing bar strokes — matches `CartIcon` (weight 2). */
+const SECONDARY_BAR_ICON_STROKE_WIDTH = 2;
+
+/** Menu lines for categories pill; single SVG so stroke weight matches on every line. */
+function CategoriesMenuLinesIcon({ className }: { className?: string }) {
+  const strokeWidth = SECONDARY_BAR_ICON_STROKE_WIDTH;
+  return (
+    <svg
+      className={className}
+      width={18}
+      height={12}
+      viewBox="0 0 18 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <line x1={0} y1={2} x2={18} y2={2} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+      <line x1={0} y1={6} x2={18} y2={6} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+      <line x1={0} y1={10} x2={18} y2={10} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+    </svg>
+  );
+}
 
 /** Search icon in pill (20px, secondary bar). */
 function SecondarySearchGlyph({ className }: { className?: string }) {
@@ -25,10 +48,15 @@ function SecondarySearchGlyph({ className }: { className?: string }) {
       <path
         d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z"
         stroke="currentColor"
-        strokeWidth={2}
+        strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
         fill="none"
       />
-      <path d="M16 16L21 21" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+      <path
+        d="M16 16L21 21"
+        stroke="currentColor"
+        strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -48,14 +76,14 @@ function UserOutlineIcon({ className }: { className?: string }) {
       <path
         d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z"
         stroke="currentColor"
-        strokeWidth={1.5}
+        strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M4 20C4 16.6863 6.68629 14 10 14H14C17.3137 14 20 16.6863 20 20"
         stroke="currentColor"
-        strokeWidth={1.5}
+        strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -130,7 +158,7 @@ function ProfileAccountMenu({
         aria-label={profileAria}
       >
         <UserOutlineIcon className="shrink-0" />
-        <span className="whitespace-nowrap text-[13px] font-normal leading-normal">{profileLabel}</span>
+        <span className="whitespace-nowrap text-[13px] font-semibold leading-normal">{profileLabel}</span>
         <span className="flex h-4 w-4 shrink-0 items-center justify-center text-gray-500" aria-hidden>
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -157,7 +185,7 @@ function ProfileAccountMenu({
                 {profileLabel}
               </Link>
               {isAdmin ? (
-                <Link href="/admin" role="menuitem" className={`${itemClass} text-blue-700 hover:bg-blue-50`} onClick={close}>
+                <Link href="/supersudo" role="menuitem" className={`${itemClass} text-blue-700 hover:bg-blue-50`} onClick={close}>
                   {adminPanelLabel}
                 </Link>
               ) : null}
@@ -224,6 +252,10 @@ export interface HeaderSecondaryBarProps {
    * inside flex layouts). Parent renders a same-height flow spacer while this is true.
    */
   dockToViewportTop?: boolean;
+  /**
+   * When docked, shifts the fixed bar below another fixed strip (primary row revealed on scroll-up).
+   */
+  dockedViewportTopOffsetPx?: number;
 }
 
 const SECONDARY_SEARCH_LISTBOX_ID = 'header-secondary-search-results';
@@ -268,17 +300,21 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
       onLogout,
       suppressSearchDropdown,
       dockToViewportTop = false,
+      dockedViewportTopOffsetPx = 0,
     },
     ref,
   ) {
-    const positionClass = dockToViewportTop
-      ? 'fixed top-0 left-0 right-0 z-50'
-      : 'relative z-50';
+    const topOffset = Math.max(0, Math.round(dockedViewportTopOffsetPx));
+    const positionClass = dockToViewportTop ? 'fixed left-0 right-0 z-50' : 'relative z-50';
+    const positionStyle: CSSProperties | undefined = dockToViewportTop
+      ? { top: topOffset, ...getDockedBarTopMotionStyle(topOffset) }
+      : undefined;
 
     return (
     <div
       ref={ref}
-      className={`hidden w-full border-t border-b border-gray-200 bg-white lg:block ${positionClass} ${montserratClassName}`}
+      className={`hidden w-full border-t border-b border-gray-200 bg-white lg:block ${positionClass} motion-reduce:transition-none ${montserratClassName}`}
+      style={positionStyle}
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <div className="flex items-center justify-between gap-3 py-2 lg:min-h-[52px]">
@@ -287,19 +323,15 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               <button
                 type="button"
                 onClick={onCategoriesButtonClick}
-                className="flex h-9 w-full min-w-[156px] max-w-[210px] items-center justify-between gap-1.5 rounded-[70px] border border-gray-200 bg-white pl-4 pr-3 text-left text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+                className="flex h-9 w-full min-w-[156px] max-w-[210px] items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-4 pr-3 text-left text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/90 active:opacity-90"
                 aria-expanded={isCategoriesMenuOpen}
                 aria-haspopup="true"
               >
                 <span className="flex min-w-0 flex-1 items-center gap-2">
-                  <span className="flex h-3 w-[18px] shrink-0 flex-col justify-center gap-1" aria-hidden>
-                    <span className="h-0.5 w-full rounded-full bg-gray-900" />
-                    <span className="h-0.5 w-full rounded-full bg-gray-900" />
-                    <span className="h-0.5 w-full rounded-full bg-gray-900" />
-                  </span>
+                  <CategoriesMenuLinesIcon className="shrink-0 text-white" />
                   <span className="truncate text-[13px] font-bold leading-7">{categoriesLabel}</span>
                 </span>
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center text-gray-900" aria-hidden>
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center text-white" aria-hidden>
                   <svg width="8" height="8" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M3 4.5L6 7.5L9 4.5"
@@ -356,13 +388,17 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
           <div className="flex shrink-0 items-center gap-5 pl-1.5 xl:gap-7">
             <div className="flex items-center gap-0.5 sm:gap-1.5">
               <Link href="/compare" className={iconLinkClass} aria-label={compareAria}>
-                <CompareIcon size={20} className="shrink-0" />
+                <CompareIcon
+                  size={20}
+                  strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
+                  className="shrink-0"
+                />
                 {compareCount > 0 ? (
                   <span className="sr-only">{compareCount}</span>
                 ) : null}
               </Link>
               <Link href="/wishlist" className={iconLinkClass} aria-label={wishlistAria}>
-                <WishlistHeartIcon size={20} />
+                <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
                 {wishlistCount > 0 ? (
                   <span className="sr-only">{wishlistCount}</span>
                 ) : null}

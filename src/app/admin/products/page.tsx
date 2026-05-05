@@ -39,7 +39,7 @@ export default function ProductsPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -295,14 +295,14 @@ export default function ProductsPage() {
     return null;
   }
 
-  const currentPath = pathname || '/admin/products';
+  const currentPath = pathname || '/supersudo/products';
 
   return (
     <AdminPageShell currentPath={currentPath} router={router} t={t}>
       <div className="max-w-7xl">
         <div className="mb-6">
           <button
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push('/supersudo')}
             className="text-gray-600 hover:text-gray-900 mb-2 flex items-center text-sm"
           >
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +351,7 @@ export default function ProductsPage() {
         {/* Add New Product Button */}
         <div className="mb-6">
           <button
-            onClick={() => router.push('/admin/products/add')}
+            onClick={() => router.push('/supersudo/products/add')}
             className="w-full px-4 py-3 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors flex items-center justify-center gap-2 font-medium text-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

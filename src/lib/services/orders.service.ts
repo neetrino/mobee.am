@@ -428,17 +428,17 @@ class OrdersService {
             const variantId = item.variantId;
             const updated = isUserCartCheckout
               ? await tx.$executeRaw(
-                  Prisma.sql`UPDATE product_variants
-                             SET stock = stock - ${quantity},
-                                 stock_reserved = stock_reserved - ${quantity}
-                             WHERE id = ${variantId}
-                               AND stock >= ${quantity}
-                               AND stock_reserved >= ${quantity}`
+                  Prisma.sql`UPDATE "product_variants"
+                             SET "stock" = "stock" - ${quantity},
+                                 "stockReserved" = "stockReserved" - ${quantity}
+                             WHERE "id" = ${variantId}
+                               AND "stock" >= ${quantity}
+                               AND "stockReserved" >= ${quantity}`
                 )
               : await tx.$executeRaw(
-                  Prisma.sql`UPDATE product_variants
-                             SET stock = stock - ${quantity}
-                             WHERE id = ${variantId} AND stock >= ${quantity}`
+                  Prisma.sql`UPDATE "product_variants"
+                             SET "stock" = "stock" - ${quantity}
+                             WHERE "id" = ${variantId} AND "stock" >= ${quantity}`
                 );
             if (updated === 0) {
               const variant = await tx.productVariant.findUnique({

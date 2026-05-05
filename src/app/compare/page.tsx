@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
+import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
@@ -25,6 +26,7 @@ interface Product {
   slug: string;
   title: string;
   price: number;
+  defaultVariantId?: string | null;
   originalPrice: number | null;
   compareAtPrice: number | null;
   discountPercent: number | null;
@@ -61,7 +63,7 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(true);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [addingToCart, setAddingToCart] = useState<Set<string>>(new Set());
+  const addToCartInFlightRef = useRef<Set<string>>(new Set());
   // Track if we updated locally to prevent unnecessary re-fetch
   const isLocalUpdateRef = useRef(false);
 
@@ -181,11 +183,11 @@ export default function ComparePage() {
     window.dispatchEvent(new Event('compare-updated'));
   };
 
-  const handleAddToCart = async (e: MouseEvent, product: Product) => {
+  const handleAddToCart = (e: MouseEvent, product: Product) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (!product.inStock) {
+
+    if (!product.inStock || addToCartInFlightRef.current.has(product.id)) {
       return;
     }
 
@@ -194,58 +196,76 @@ export default function ComparePage() {
       return;
     }
 
-    setAddingToCart(prev => new Set(prev).add(product.id));
+    window.dispatchEvent(
+      new CustomEvent('cart-updated', {
+        detail: { optimisticAdd: { quantity: 1, price: product.price } },
+      }),
+    );
+    const flySource = document.querySelector<HTMLElement>(
+      `[data-compare-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
+    );
+    const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+    dispatchCartFlyAnimation(flyUrl, flySource);
 
-    try {
-      // Get product details to get variant ID
-      interface ProductDetails {
-        id: string;
-        variants?: Array<{
+    addToCartInFlightRef.current.add(product.id);
+
+    void (async () => {
+      try {
+        interface ProductDetails {
           id: string;
-          sku: string;
-          price: number;
-          stock: number;
-          available: boolean;
-        }>;
-      }
-
-      const productDetails = await apiClient.get<ProductDetails>(`/api/v1/products/${product.slug}`);
-
-      if (!productDetails.variants || productDetails.variants.length === 0) {
-        alert(t('common.alerts.noVariantsAvailable'));
-        return;
-      }
-
-      const variantId = productDetails.variants[0].id;
-      
-      await apiClient.post(
-        '/api/v1/cart/items',
-        {
-          productId: product.id,
-          variantId: variantId,
-          quantity: 1,
+          variants?: Array<{
+            id: string;
+            sku: string;
+            price: number;
+            stock: number;
+            available: boolean;
+          }>;
         }
-      );
 
-      // Trigger cart update event
-      window.dispatchEvent(new Event('cart-updated'));
-      const flySource = document.querySelector<HTMLElement>(
-        `[data-compare-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
-      );
-      const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
-      dispatchCartFlyAnimation(flyUrl, flySource);
-    } catch (error: any) {
-      console.error('Error adding to cart:', error);
-      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-        router.push(`/login?redirect=/compare`);
+        let variantId: string;
+        let bodyProductId = product.id;
+
+        if (product.defaultVariantId) {
+          variantId = product.defaultVariantId;
+        } else {
+          const encodedSlug = encodeURIComponent(product.slug.trim());
+          const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
+
+          if (!productDetails.variants || productDetails.variants.length === 0) {
+            alert(t('common.alerts.noVariantsAvailable'));
+            window.dispatchEvent(new Event('cart-updated'));
+            return;
+          }
+
+          variantId = productDetails.variants[0].id;
+          bodyProductId = productDetails.id;
+        }
+
+        const response = await apiClient.post<{ cartSummary?: { itemsCount: number; total: number } }>(
+          '/api/v1/cart/items',
+          {
+            productId: bodyProductId,
+            variantId,
+            quantity: 1,
+          },
+        );
+
+        window.dispatchEvent(
+          new CustomEvent('cart-updated', {
+            detail: response.cartSummary ?? null,
+          }),
+        );
+      } catch (error: unknown) {
+        console.error('Error adding to cart:', error);
+        window.dispatchEvent(new Event('cart-updated'));
+        const err = error as { message?: string };
+        if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+          router.push(`/login?redirect=/compare`);
+        }
+      } finally {
+        addToCartInFlightRef.current.delete(product.id);
       }
-    } finally {
-      setAddingToCart(prev => {
-        const next = new Set(prev);
-        next.delete(product.id);
-        return next;
-      });
-    }
+    })();
   };
 
   if (loading) {
@@ -430,13 +450,11 @@ export default function ComparePage() {
                         </Link>
                         {product.inStock && (
                           <button
+                            type="button"
                             onClick={(e) => handleAddToCart(e, product)}
-                            disabled={addingToCart.has(product.id)}
-                            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                           >
-                            {addingToCart.has(product.id)
-                              ? t('common.messages.adding')
-                              : t('common.buttons.addToCart')}
+                            {t('common.buttons.addToCart')}
                           </button>
                         )}
                       </div>

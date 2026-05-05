@@ -4,12 +4,17 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
 import { SiteChrome } from '../components/SiteChrome';
+import { SITE_APP_ICON_PATH } from '../lib/brand.constants';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Shop - Professional E-commerce',
   description: 'Modern e-commerce platform',
+  icons: {
+    icon: SITE_APP_ICON_PATH,
+    apple: SITE_APP_ICON_PATH,
+  },
 };
 
 export default function RootLayout({

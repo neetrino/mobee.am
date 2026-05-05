@@ -1,4 +1,5 @@
 import { apiClient } from "../api-client";
+import { fetchProductBySlugWithLang } from "../shop/fetchProductBySlugWithLang";
 import { logger } from "../utils/logger";
 
 export interface GuestCartItem {
@@ -190,7 +191,8 @@ async function fetchGuestCartItemDetails(
       return { item: null, shouldRemove: true };
     }
 
-    const productData = await apiClient.get<ProductData>(`/api/v1/products/${item.productSlug}`);
+    const encodedSlug = encodeURIComponent(item.productSlug.trim());
+    const productData = await fetchProductBySlugWithLang<ProductData>(encodedSlug);
     const variant =
       productData.variants?.find((entry) => (entry._id?.toString() || entry.id) === item.variantId) ||
       productData.variants?.[0];

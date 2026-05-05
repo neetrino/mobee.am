@@ -14,7 +14,7 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: ProfileHeaderProps) {
   return (
     <>
-      <div className="lg:w-64 flex-shrink-0">
+      <div className="lg:w-64 flex-shrink-0 lg:sticky lg:top-8 lg:self-start">
         {/* Profile Header Section */}
         <Card className="mb-4 p-4">
           <div className="flex flex-row items-center gap-4">
@@ -56,7 +56,7 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
                 onClick={() => onTabChange(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
                   activeTab === tab.id
-                    ? 'bg-gray-900 text-white'
+                    ? 'bg-admin text-white'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >

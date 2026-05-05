@@ -96,7 +96,7 @@ export function OrderSummary({
 
       <div className="space-y-3">
         <Link href="/products">
-          <Button variant="primary" className="w-full">
+          <Button variant="brand" className="w-full">
             {t('orders.buttons.continueShopping')}
           </Button>
         </Link>

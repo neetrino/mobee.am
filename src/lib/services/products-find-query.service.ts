@@ -27,6 +27,8 @@ class ProductsFindQueryService {
       };
     }
 
+    const listingMode = !filters.ids?.length;
+
     const needOverFetch =
       !filters.ids?.length &&
       (Boolean(filters.category || filters.search) ||
@@ -39,7 +41,7 @@ class ProductsFindQueryService {
     if (!needOverFetch) {
       const [total, products] = await Promise.all([
         db.product.count({ where }),
-        executeProductQuery(where, limit, (page - 1) * limit, filters.sort),
+        executeProductQuery(where, limit, (page - 1) * limit, filters.sort, listingMode),
       ]);
       return {
         products,
@@ -49,7 +51,7 @@ class ProductsFindQueryService {
     }
 
     const fetchLimit = Math.min(limit * 10, 200);
-    const products = await executeProductQuery(where, fetchLimit, 0, filters.sort);
+    const products = await executeProductQuery(where, fetchLimit, 0, filters.sort, listingMode);
 
     return {
       products,

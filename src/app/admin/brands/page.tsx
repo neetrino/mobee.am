@@ -274,7 +274,7 @@ export default function BrandsPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -296,11 +296,11 @@ export default function BrandsPage() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/brands'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/brands'} router={router} t={t}>
       <div className="max-w-7xl">
         <div className="mb-8">
           <button
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push('/supersudo')}
             className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

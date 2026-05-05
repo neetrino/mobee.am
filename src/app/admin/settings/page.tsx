@@ -8,6 +8,7 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
 
 interface Settings {
   defaultCurrency?: string;
@@ -38,7 +39,7 @@ export default function SettingsPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -145,11 +146,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/settings'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/settings'} router={router} t={t}>
       <div className="max-w-4xl">
         <div className="mb-8">
           <button
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push('/supersudo')}
             className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -442,12 +443,13 @@ export default function SettingsPage() {
             variant="primary"
             onClick={handleSave}
             disabled={saving}
+            className={ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}
           >
             {saving ? t('admin.settings.saving') : t('admin.settings.saveSettings')}
           </Button>
           <Button
             variant="ghost"
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push('/supersudo')}
             disabled={saving}
           >
             {t('admin.settings.cancel')}

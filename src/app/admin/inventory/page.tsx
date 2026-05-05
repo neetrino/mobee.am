@@ -39,7 +39,7 @@ export default function AdminInventoryPage() {
 
   useEffect(() => {
     if (!isLoading && (!isLoggedIn || !isAdmin)) {
-      router.push('/admin');
+      router.push('/supersudo');
     }
   }, [isLoading, isLoggedIn, isAdmin, router]);
 
@@ -99,7 +99,7 @@ export default function AdminInventoryPage() {
   }
 
   return (
-    <AdminPageShell currentPath={pathname || '/admin/inventory'} router={router} t={t}>
+    <AdminPageShell currentPath={pathname || '/supersudo/inventory'} router={router} t={t}>
       <div className="max-w-7xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.inventory.title')}</h1>

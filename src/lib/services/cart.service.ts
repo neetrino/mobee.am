@@ -213,13 +213,16 @@ class CartService {
       select: { id: true, published: true, productId: true, price: true },
     });
 
-    if (!variant || variant.productId !== productId || !variant.published) {
+    if (!variant || !variant.published) {
       throw {
         status: 404,
         type: "https://api.shop.am/problems/not-found",
         title: "Variant not found",
       };
     }
+
+    /** Trust DB relation — client `productId` can be stale (wishlist/cache); cart row must match variant. */
+    const resolvedProductId = variant.productId;
 
     return db.$transaction(async (tx: Prisma.TransactionClient) => {
       const existingCart = await tx.cart.findFirst({
@@ -259,7 +262,7 @@ class CartService {
             data: {
               cartId: resolvedCart.id,
               variantId,
-              productId,
+              productId: resolvedProductId,
               quantity: nextQuantity,
               priceSnapshot: variant.price,
             },

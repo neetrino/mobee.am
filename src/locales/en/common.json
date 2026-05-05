@@ -192,7 +192,8 @@
     "increaseQuantity": "Increase quantity",
     "previousThumbnail": "Previous thumbnail",
     "nextThumbnail": "Next thumbnail",
-    "fullscreenImage": "Fullscreen image"
+    "fullscreenImage": "Fullscreen image",
+    "siteLogo": "MOBEE logo"
   },
   "placeholders": {
     "search": "Search products"
@@ -220,7 +221,8 @@
       "shippingPolicy": "Shipping policy",
       "returnPolicy": "Return policy",
       "termsOfUse": "Terms of use",
-      "policiesNavLabel": "Legal and policies"
+      "policiesNavLabel": "Legal and policies",
+      "paymentMethodsLabel": "Accepted payment methods"
     }
   },
   "product": {

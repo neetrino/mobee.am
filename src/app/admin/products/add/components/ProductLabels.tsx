@@ -6,18 +6,27 @@ import type { ProductLabel } from '../types';
 
 interface ProductLabelsProps {
   labels: ProductLabel[];
+  embedded?: boolean;
   onAddLabel: () => void;
   onRemoveLabel: (index: number) => void;
-  onUpdateLabel: (index: number, field: keyof ProductLabel, value: any) => void;
+  onUpdateLabel: (index: number, field: keyof ProductLabel, value: ProductLabel[keyof ProductLabel]) => void;
 }
 
-export function ProductLabels({ labels, onAddLabel, onRemoveLabel, onUpdateLabel }: ProductLabelsProps) {
+export function ProductLabels({
+  labels,
+  embedded = false,
+  onAddLabel,
+  onRemoveLabel,
+  onUpdateLabel,
+}: ProductLabelsProps) {
   const { t } = useTranslation();
+  const titleClass = embedded ? 'text-lg font-semibold text-gray-900' : 'text-xl font-semibold text-gray-900';
+  const TitleTag = embedded ? 'h3' : 'h2';
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">{t('admin.products.add.productLabels')}</h2>
+        <TitleTag className={titleClass}>{t('admin.products.add.productLabels')}</TitleTag>
         <Button type="button" variant="outline" onClick={onAddLabel}>
           {t('admin.products.add.addLabel')}
         </Button>

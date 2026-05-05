@@ -43,7 +43,7 @@ export function useProductFormState() {
   const [colorMessage, setColorMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [sizeMessage, setSizeMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [defaultCurrency, setDefaultCurrency] = useState<CurrencyCode>('AMD');
-  const [productType, setProductType] = useState<'simple' | 'variable'>('variable');
+  const [productType, setProductType] = useState<'simple' | 'variable'>('simple');
   const [simpleProductData, setSimpleProductData] = useState({
     price: '',
     compareAtPrice: '',

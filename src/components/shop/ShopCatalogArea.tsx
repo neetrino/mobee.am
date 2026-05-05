@@ -6,9 +6,17 @@ import { useSearchParams } from 'next/navigation';
 import { ProductsHeader } from '@/components/ProductsHeader';
 import { ProductsGrid } from '@/components/ProductsGrid';
 import { ShopSortFilter } from '@/components/ShopSortFilter';
+import type { LanguageCode } from '@/lib/language';
+import type { ProductListPayload } from '@/lib/services/products-list-cached';
 import { useTranslation } from '@/lib/i18n-client';
 import { parseProductSortOption } from '@/lib/products/sort';
 import { useShopCatalog, type ShopCatalogProduct } from './useShopCatalog';
+
+export type ShopCatalogAreaProps = {
+  initialPayload?: ProductListPayload;
+  initialFiltersKey?: string;
+  serverLanguage?: LanguageCode;
+};
 
 function ShopGridSkeleton() {
   return (
@@ -24,9 +32,17 @@ function ShopGridSkeleton() {
   );
 }
 
-export function ShopCatalogArea() {
+export function ShopCatalogArea({
+  initialPayload,
+  initialFiltersKey,
+  serverLanguage,
+}: ShopCatalogAreaProps = {}) {
   const searchParams = useSearchParams();
-  const { productsData, loading, error } = useShopCatalog();
+  const { productsData, loading, error } = useShopCatalog({
+    initialPayload,
+    initialFiltersKey,
+    serverLanguage,
+  });
   const { t } = useTranslation();
 
   const page = parseInt(searchParams.get('page') || '1', 10);

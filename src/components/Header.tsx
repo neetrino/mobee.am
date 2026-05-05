@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { FormEvent, CSSProperties } from 'react';
+import type { CSSProperties, FormEvent } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
@@ -16,18 +16,25 @@ import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCount
 import { LanguageSwitcherPill } from './LanguageSwitcherPill';
 import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
+  HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
+  HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE,
+  getDockedBarTopMotionStyle,
   HEADER_STRIP_MIN_HEIGHT_LG,
+  HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS,
   HEADER_STRIP_PADDING_Y,
-  MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
-  MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
+import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
-import { CartIcon } from './icons/CartIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
 import { useCategoriesTree } from './CategoriesTreeContext';
+
+/** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
+const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
+/** Any scroll-down past this delta hides the peeking primary strip again. */
+const PRIMARY_STRIP_SCROLL_DOWN_HIDE_THRESHOLD_PX = 2;
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -91,12 +98,6 @@ const ProfileIconFilled = () => (
       <path d="M5 17C5 14.5 7.5 12.5 10 12.5C12.5 12.5 15 14.5 15 17" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   </div>
-);
-
-const WishlistIcon = () => (
-  <svg width="19" height="19" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 17L8.55 15.7C4.4 12.2 2 10.1 2 7.5C2 5.4 3.4 4 5.5 4C6.8 4 8.1 4.6 9 5.5C9.9 4.6 11.2 4 12.5 4C14.6 4 16 5.4 16 7.5C16 10.1 13.6 12.2 9.45 15.7L10 17Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-  </svg>
 );
 
 const SearchIcon = () => (
@@ -387,8 +388,14 @@ function CategoriesMenuFlyout({
   );
 }
 
-/** Figma mobee-new node 178:535 — support phone + language pill */
-function HeaderPhoneLangCluster({ phoneNumberVisibility }: { phoneNumberVisibility?: 'always' | 'smUp' }) {
+/** Figma mobee-new — support phone (icon node 178:537) + optional language pill */
+function HeaderPhoneLangCluster({
+  phoneNumberVisibility,
+  showLanguageSwitcher = true,
+}: {
+  phoneNumberVisibility?: 'always' | 'smUp';
+  showLanguageSwitcher?: boolean;
+}) {
   const { t } = useTranslation();
   const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
   const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
@@ -412,7 +419,7 @@ function HeaderPhoneLangCluster({ phoneNumberVisibility }: { phoneNumberVisibili
         </span>
         <span className={numberClass}>{t('common.header.supportPhoneNumber')}</span>
       </a>
-      <LanguageSwitcherPill />
+      {showLanguageSwitcher ? <LanguageSwitcherPill /> : null}
     </div>
   );
 }
@@ -451,7 +458,10 @@ export function Header() {
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileStrip1WrapRef = useRef<HTMLDivElement>(null);
   const mobileStrip1Ref = useRef<HTMLDivElement>(null);
+  const desktopPrimaryWrapRef = useRef<HTMLDivElement>(null);
+  const desktopPrimaryRowRef = useRef<HTMLDivElement>(null);
   const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
   const mobilePrimaryLangRef = useRef<HTMLDivElement>(null);
@@ -461,6 +471,12 @@ export function Header() {
   const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
   const [mobileSearchDocked, setMobileSearchDocked] = useState(false);
   const [mobileSearchFlowSpacerPx, setMobileSearchFlowSpacerPx] = useState(0);
+  const [primaryBarPeekFromScrollUp, setPrimaryBarPeekFromScrollUp] = useState(false);
+  const [mobileStrip1HeightPx, setMobileStrip1HeightPx] = useState(0);
+  const [desktopPrimaryBarHeightPx, setDesktopPrimaryBarHeightPx] = useState(0);
+  const lastScrollYRef = useRef(0);
+  const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
+  const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
 
@@ -496,7 +512,7 @@ export function Header() {
       setMobileSearchFlowSpacerPx(0);
       return;
     }
-    const strip1 = mobileStrip1Ref.current;
+    const strip1Wrap = mobileStrip1WrapRef.current;
     const searchWrap = mobileSearchWrapRef.current;
     if (searchWrap) {
       const h = Math.round(searchWrap.getBoundingClientRect().height);
@@ -504,10 +520,43 @@ export function Header() {
         setMobileSearchFlowSpacerPx(h);
       }
     }
-    if (!strip1) {
+    if (!strip1Wrap) {
       return;
     }
-    setMobileSearchDocked(strip1.getBoundingClientRect().bottom <= 0);
+    setMobileSearchDocked(strip1Wrap.getBoundingClientRect().bottom <= 0);
+  }, []);
+
+  useLayoutEffect(() => {
+    const stripInner = mobileStrip1Ref.current;
+    const desktopInner = desktopPrimaryRowRef.current;
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const measure = () => {
+      if (stripInner) {
+        const h = Math.round(stripInner.getBoundingClientRect().height);
+        if (h > 0) {
+          setMobileStrip1HeightPx(h);
+        }
+      }
+      if (desktopInner) {
+        const h = Math.round(desktopInner.getBoundingClientRect().height);
+        if (h > 0) {
+          setDesktopPrimaryBarHeightPx(h);
+        }
+      }
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (stripInner) {
+      ro.observe(stripInner);
+    }
+    if (desktopInner) {
+      ro.observe(desktopInner);
+    }
+    return () => {
+      ro.disconnect();
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -541,9 +590,23 @@ export function Header() {
   }, [syncMobileSearchDock]);
 
   useEffect(() => {
+    lastScrollYRef.current = window.scrollY;
     const onScroll = () => {
+      const y = window.scrollY;
+      const prev = lastScrollYRef.current;
+      const delta = y - prev;
+      lastScrollYRef.current = y;
+      if (delta < -PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX) {
+        setPrimaryBarPeekFromScrollUp(true);
+      } else if (delta > PRIMARY_STRIP_SCROLL_DOWN_HIDE_THRESHOLD_PX) {
+        setPrimaryBarPeekFromScrollUp(false);
+      }
       syncSecondaryDock();
       syncMobileSearchDock();
+      const primaryEl = primaryStripRef.current;
+      if (primaryEl && primaryEl.getBoundingClientRect().bottom > 0) {
+        setPrimaryBarPeekFromScrollUp(false);
+      }
     };
     const onResize = () => {
       syncSecondaryDock();
@@ -565,6 +628,50 @@ export function Header() {
       mq.removeEventListener('change', onMq);
     };
   }, [syncSecondaryDock, syncMobileSearchDock]);
+
+  useEffect(() => {
+    setPrimaryBarPeekFromScrollUp(false);
+    lastScrollYRef.current = typeof window !== 'undefined' ? window.scrollY : 0;
+  }, [pathname]);
+
+  const mobileStripPeekActive = mobileSearchDocked && primaryBarPeekFromScrollUp;
+  const desktopPrimaryPeekActive = secondaryDocked && primaryBarPeekFromScrollUp;
+
+  useEffect(() => {
+    if (!mobileStripPeekActive) {
+      setMobileStripPeekSlideIn(false);
+      return;
+    }
+    setMobileStripPeekSlideIn(false);
+    let innerId = 0;
+    const outerId = requestAnimationFrame(() => {
+      innerId = requestAnimationFrame(() => {
+        setMobileStripPeekSlideIn(true);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(outerId);
+      cancelAnimationFrame(innerId);
+    };
+  }, [mobileStripPeekActive]);
+
+  useEffect(() => {
+    if (!desktopPrimaryPeekActive) {
+      setDesktopPrimaryPeekSlideIn(false);
+      return;
+    }
+    setDesktopPrimaryPeekSlideIn(false);
+    let innerId = 0;
+    const outerId = requestAnimationFrame(() => {
+      innerId = requestAnimationFrame(() => {
+        setDesktopPrimaryPeekSlideIn(true);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(outerId);
+      cancelAnimationFrame(innerId);
+    };
+  }, [desktopPrimaryPeekActive]);
 
   const {
     query: searchQuery,
@@ -878,6 +985,18 @@ export function Header() {
     window.dispatchEvent(new Event('currency-updated'));
   };
 
+  const mobileDockedHeaderSpacerPx =
+    mobileSearchDocked && mobileSearchFlowSpacerPx > 0
+      ? mobileSearchFlowSpacerPx +
+        (mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0)
+      : 0;
+
+  const mobileSearchPeekTopPx =
+    mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0;
+  const mobileDockedSearchTopStyle: CSSProperties | undefined = mobileSearchDocked
+    ? { top: mobileSearchPeekTopPx, ...getDockedBarTopMotionStyle(mobileSearchPeekTopPx) }
+    : undefined;
+
   return (
     <div className={`relative z-50 ${montserrat.className}`}>
     <header
@@ -894,7 +1013,26 @@ export function Header() {
 
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
         {/* Mobile — strip 1 scrolls away; strip 2 pins to viewport top once strip 1 has left */}
-        <div ref={mobileStrip1Ref} className="border-b border-gray-100 lg:hidden">
+        <div
+          ref={mobileStrip1WrapRef}
+          className="lg:hidden"
+          style={
+            mobileStripPeekActive && mobileStrip1HeightPx > 0
+              ? { height: mobileStrip1HeightPx }
+              : undefined
+          }
+        >
+          <div
+            ref={mobileStrip1Ref}
+            className={`border-b border-gray-100 ${
+              mobileStripPeekActive
+                ? `fixed left-0 right-0 top-0 z-[45] border-b border-gray-200 bg-white shadow-sm will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
+                    mobileStripPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
+                  }`
+                : ''
+            }`}
+            style={mobileStripPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
+          >
           <div className="relative flex items-center justify-between gap-3 py-2.5">
             <div className="relative z-20 shrink-0">
               <button
@@ -918,20 +1056,15 @@ export function Header() {
             {/* Figma 180:1419 mark + 178:529 wordmark — center cluster like desktop */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center gap-2 transition-opacity active:opacity-90"
+              className="absolute left-1/2 top-1/2 z-10 flex max-w-[min(220px,48vw)] -translate-x-1/2 -translate-y-1/2 shrink-0 items-center justify-center transition-opacity active:opacity-90"
               aria-label={t('common.navigation.home')}
             >
-              <div
-                className="flex shrink-0 items-center justify-center overflow-hidden bg-[#2db2ff] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
-                style={{
-                  width: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
-                  height: MOBILE_HEADER_CENTER_LOGO_SIZE_PX,
-                  borderRadius: MOBILE_HEADER_CENTER_LOGO_RADIUS_PX,
-                }}
-              >
-                <span className="text-[18px] font-bold leading-none">M</span>
-              </div>
-              <span className="text-[20px] font-bold leading-7 tracking-[-0.5px] text-[#111827]">Mobee</span>
+              <SiteBrandLogo
+                decorative
+                alt={t('common.ariaLabels.siteLogo')}
+                heightClass="h-8"
+                priority
+              />
             </Link>
             <div className="relative z-20 shrink-0" ref={mobilePrimaryLangRef}>
               <button
@@ -977,17 +1110,26 @@ export function Header() {
               ) : null}
             </div>
           </div>
+          </div>
         </div>
 
-        {mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? (
-          <div aria-hidden className="shrink-0 lg:hidden" style={{ height: mobileSearchFlowSpacerPx }} />
+        {mobileDockedHeaderSpacerPx > 0 ? (
+          <div
+            aria-hidden
+            className="shrink-0 motion-reduce:transition-none lg:hidden"
+            style={{
+              height: mobileDockedHeaderSpacerPx,
+              ...HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
+            }}
+          />
         ) : null}
 
         <div
           ref={mobileSearchWrapRef}
           className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
-            mobileSearchDocked ? 'fixed inset-x-0 top-0 z-40 border-b border-gray-200' : ''
+            mobileSearchDocked ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none' : ''
           }`}
+          style={mobileDockedSearchTopStyle}
         >
           <div className={mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
             <form
@@ -1060,14 +1202,37 @@ export function Header() {
 
         {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
         <div
-          className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`}
+          ref={desktopPrimaryWrapRef}
+          className="hidden motion-reduce:transition-none lg:block"
+          style={
+            desktopPrimaryPeekActive && desktopPrimaryBarHeightPx > 0
+              ? { height: desktopPrimaryBarHeightPx, ...HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE }
+              : undefined
+          }
+        >
+        <div
+          ref={desktopPrimaryRowRef}
+          className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
+            desktopPrimaryPeekActive
+              ? `fixed left-0 right-0 top-0 z-[55] border-b border-gray-200 bg-white will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
+                  desktopPrimaryPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
+                }`
+              : ''
+          }`}
+          style={desktopPrimaryPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
         >
           <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
-            <Link href="/" className="flex w-[104px] shrink-0 items-center gap-2">
-              <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
-                <span className="text-[18px] font-bold leading-6 text-white">M</span>
-              </div>
-              <span className="text-[18px] font-bold leading-6 tracking-[-0.5px] text-[#111827]">Mobee</span>
+            <Link
+              href="/"
+              aria-label={t('common.navigation.home')}
+              className="flex max-w-[min(280px,32vw)] shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
+            >
+              <SiteBrandLogo
+                decorative
+                alt={t('common.ariaLabels.siteLogo')}
+                heightClass={HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS}
+                priority
+              />
             </Link>
             <nav
               className="flex min-w-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[60px]"
@@ -1098,6 +1263,7 @@ export function Header() {
             <HeaderPhoneLangCluster />
           </div>
         </div>
+        </div>
       </div>
     </header>
 
@@ -1112,6 +1278,9 @@ export function Header() {
       <HeaderSecondaryBar
         ref={secondaryBarOuterRef}
         dockToViewportTop={secondaryDocked}
+        dockedViewportTopOffsetPx={
+          desktopPrimaryPeekActive && desktopPrimaryBarHeightPx > 0 ? desktopPrimaryBarHeightPx : 0
+        }
         montserratClassName={montserrat.className}
         categoriesWrapRef={categoriesPillWrapRef}
         categoriesLabel={t('common.navigation.categories')}
@@ -1192,12 +1361,10 @@ export function Header() {
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex min-w-0 items-center gap-2"
+                  aria-label={t('common.navigation.home')}
+                  className="flex min-w-0 max-w-[min(200px,55%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
                 >
-                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#2db2ff] shadow-sm">
-                    <span className="text-[18px] font-bold leading-6 text-white">M</span>
-                  </div>
-                  <span className="truncate text-lg font-bold tracking-tight text-gray-900">Mobee</span>
+                  <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
                 </Link>
                 <div className="relative shrink-0" ref={mobileCurrencyRef}>
                   <button
@@ -1251,7 +1418,7 @@ export function Header() {
             </div>
 
             <div className="border-b border-gray-100 px-4 py-2">
-              <HeaderPhoneLangCluster phoneNumberVisibility="always" />
+              <HeaderPhoneLangCluster phoneNumberVisibility="always" showLanguageSwitcher={false} />
             </div>
 
             <div className="flex-1 overflow-hidden min-h-0">
@@ -1271,39 +1438,6 @@ export function Header() {
                     </Link>
                   ))}
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setShowSearchModal(true);
-                    }}
-                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 normal-case font-medium text-gray-700"
-                  >
-                    <span className="flex items-center gap-2">
-                      <SearchIcon />
-                      {t('common.buttons.search')}
-                    </span>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-
-                  <Link
-                    href="/wishlist"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
-                  >
-                    <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
-                      <WishlistIcon />
-                      {t('common.navigation.wishlist')}
-                    </span>
-                    {wishlistCount > 0 && (
-                      <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
-                        {wishlistCount > 99 ? '99+' : wishlistCount}
-                      </span>
-                    )}
-                  </Link>
-
                   <Link
                     href="/compare"
                     onClick={() => setMobileMenuOpen(false)}
@@ -1316,22 +1450,6 @@ export function Header() {
                     {compareCount > 0 && (
                       <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
                         {compareCount > 99 ? '99+' : compareCount}
-                      </span>
-                    )}
-                  </Link>
-
-                  <Link
-                    href="/cart"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
-                  >
-                    <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
-                      <CartIcon size={19} />
-                      {t('common.navigation.cart')}
-                    </span>
-                    {cartCount > 0 && (
-                      <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
-                        {cartCount > 99 ? '99+' : cartCount}
                       </span>
                     )}
                   </Link>
@@ -1353,7 +1471,7 @@ export function Header() {
                       </Link>
                       {isAdmin && (
                         <Link
-                          href="/admin"
+                          href="/supersudo"
                           onClick={() => setMobileMenuOpen(false)}
                           className="flex items-center justify-between px-4 py-3 hover:bg-blue-50 normal-case text-blue-700"
                         >
@@ -1403,7 +1521,7 @@ export function Header() {
                 </div>
 
                 <div className="border-t border-gray-200 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
-                  © {currentYear} Mobee
+                  {t('common.footer.copyright').replace('{year}', String(currentYear))}
                 </div>
               </nav>
             </div>

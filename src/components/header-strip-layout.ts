@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 /**
  * Shared layout for the main header strip ({@link Header}) and matching storefront sections.
  */
@@ -24,6 +26,11 @@ export const MOBILE_HEADER_CENTER_LOGO_SIZE_PX = 40;
 export const MOBILE_HEADER_CENTER_LOGO_RADIUS_PX = 12;
 
 /**
+ * Desktop primary strip wordmark — 50% of Tailwind `h-9` (2.25rem × 0.5 = 1.125rem).
+ */
+export const HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS = 'h-[1.125rem]' as const;
+
+/**
  * Mobile primary strip menu (hamburger) glyph: 2px bars + 2px gap (wrap has no fixed height, so
  * bars are not squished — reads a bit thinner than the 2.5–3px tuning pass).
  */
@@ -31,3 +38,42 @@ export const MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS =
   'flex w-[18px] shrink-0 flex-col justify-center gap-[2px]';
 
 export const MOBILE_PRIMARY_MENU_BAR_CLASS = 'h-[2px] w-full rounded-full bg-black';
+
+/** Primary strip peek (scroll-up) and docked bar offset — duration (ms). */
+export const HEADER_PRIMARY_PEEK_TRANSITION_MS = 280;
+
+export const HEADER_PRIMARY_PEEK_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+const HEADER_PRIMARY_PEEK_DURATION = `${HEADER_PRIMARY_PEEK_TRANSITION_MS}ms`;
+
+/** Inline styles for `transform` slide on peeking strips. */
+export const HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE = {
+  transitionProperty: 'transform',
+  transitionDuration: HEADER_PRIMARY_PEEK_DURATION,
+  transitionTimingFunction: HEADER_PRIMARY_PEEK_EASING,
+} as const;
+
+/** Inline styles for fixed search / secondary `top` offset. */
+export const HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE = {
+  transitionProperty: 'top',
+  transitionDuration: HEADER_PRIMARY_PEEK_DURATION,
+  transitionTimingFunction: HEADER_PRIMARY_PEEK_EASING,
+} as const;
+
+/**
+ * Animate `top` only while a docked bar sits below a peeking primary strip.
+ * When `top` returns to 0, skip transition so the viewport does not briefly show page content above the bar.
+ */
+export function getDockedBarTopMotionStyle(peekOffsetPx: number): CSSProperties {
+  if (peekOffsetPx > 0) {
+    return { ...HEADER_PRIMARY_PEEK_TOP_MOTION_STYLE };
+  }
+  return { transitionProperty: 'none' };
+}
+
+/** Inline styles for flow spacer `height` when peek toggles. */
+export const HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE = {
+  transitionProperty: 'height',
+  transitionDuration: HEADER_PRIMARY_PEEK_DURATION,
+  transitionTimingFunction: HEADER_PRIMARY_PEEK_EASING,
+} as const;

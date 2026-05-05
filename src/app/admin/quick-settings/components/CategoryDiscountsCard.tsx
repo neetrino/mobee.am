@@ -2,6 +2,7 @@
 
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../../constants/adminDiscountSaveButton.constants';
 
 interface AdminCategory {
   id: string;
@@ -41,6 +42,7 @@ export function CategoryDiscountsCard({
           variant="primary"
           onClick={handleCategoryDiscountSave}
           disabled={categorySaving || categories.length === 0}
+          className={ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}
         >
           {categorySaving ? (
             <div className="flex items-center gap-2">

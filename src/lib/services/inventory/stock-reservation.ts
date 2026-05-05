@@ -19,10 +19,10 @@ export async function reserveVariantStock(
   }
 
   const updatedCount = await tx.$executeRaw(
-    Prisma.sql`UPDATE product_variants
-               SET stock_reserved = stock_reserved + ${quantityDelta}
-               WHERE id = ${variantId}
-                 AND stock - stock_reserved >= ${quantityDelta}`
+    Prisma.sql`UPDATE "product_variants"
+               SET "stockReserved" = "stockReserved" + ${quantityDelta}
+               WHERE "id" = ${variantId}
+                 AND "stock" - "stockReserved" >= ${quantityDelta}`
   );
 
   if (updatedCount === 0) {
@@ -45,8 +45,8 @@ export async function releaseVariantStockReservation(
   }
 
   await tx.$executeRaw(
-    Prisma.sql`UPDATE product_variants
-               SET stock_reserved = GREATEST(stock_reserved - ${quantityDelta}, 0)
-               WHERE id = ${variantId}`
+    Prisma.sql`UPDATE "product_variants"
+               SET "stockReserved" = GREATEST("stockReserved" - ${quantityDelta}, 0)
+               WHERE "id" = ${variantId}`
   );
 }

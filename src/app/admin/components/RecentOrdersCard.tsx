@@ -34,7 +34,7 @@ export function RecentOrdersCard({ recentOrders, recentOrdersLoading }: RecentOr
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push('/admin/orders')}
+          onClick={() => router.push('/supersudo/orders')}
         >
           {t('admin.dashboard.viewAll')}
         </Button>
@@ -57,7 +57,7 @@ export function RecentOrdersCard({ recentOrders, recentOrdersLoading }: RecentOr
             <div
               key={order.id}
               className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-              onClick={() => router.push(`/admin/orders?search=${order.number}`)}
+              onClick={() => router.push(`/supersudo/orders?search=${order.number}`)}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">

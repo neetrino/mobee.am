@@ -93,7 +93,7 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
                   key={tab.id}
                   onClick={() => handleSelect(tab.id)}
                   className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium ${
-                    activeTab === tab.id ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50'
+                    activeTab === tab.id ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <span className="flex items-center gap-3">

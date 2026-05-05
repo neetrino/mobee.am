@@ -1,8 +1,32 @@
 'use client';
 
+/** viewBox width/height (24×24). */
+const VIEWBOX = 24;
+
+/** Side shape: equal width and height so rects read as squares at any `size`. */
+const SIDE_SQUARE = 4.5;
+
+/** Soft corners on side squares (keeps shape square, not circular). */
+const SIDE_SQUARE_RX = 1;
+
+/** Symmetry axis in the 24×24 viewBox. */
+const ICON_CENTER = 12;
+
+/** Horizontal gap from center line to inner vertical edge of each square. */
+const GAP_CENTER_TO_SQUARE_INNER = 3.5;
+
+const LEFT_RECT_X = ICON_CENTER - GAP_CENTER_TO_SQUARE_INNER - SIDE_SQUARE;
+const RIGHT_RECT_X = ICON_CENTER + GAP_CENTER_TO_SQUARE_INNER;
+
+const SIDE_SQUARE_Y = ICON_CENTER - SIDE_SQUARE / 2;
+
+/** Center divider line — extends past the squares for the compare glyph. */
+const CENTER_LINE_Y1 = 6;
+const CENTER_LINE_Y2 = 18;
+
 interface CompareIconProps {
   /**
-   * Optional custom size in pixels; defaults to 20.
+   * Optional custom size in pixels; defaults to 18.
    */
   size?: number;
   /**
@@ -20,8 +44,8 @@ interface CompareIconProps {
 }
 
 /**
- * Compare glyph from Figma mobee-new Top Bar (node 1:408) — two vertical capsules
- * with a taller center stroke; matches header PNG, not Lucide Shuffle.
+ * Compare glyph — two rounded squares with a taller center stroke (Figma mobee-new Top Bar);
+ * not Lucide Shuffle.
  */
 export function CompareIcon({
   size = 18,
@@ -32,40 +56,37 @@ export function CompareIcon({
     <svg
       width={size}
       height={size}
-      viewBox="0 0 24 24"
+      viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className || undefined}
       aria-hidden
     >
-      {/* Left vertical pill */}
       <rect
-        x="5"
-        y="8"
-        width="3.5"
-        height="9"
-        rx="1.75"
+        x={LEFT_RECT_X}
+        y={SIDE_SQUARE_Y}
+        width={SIDE_SQUARE}
+        height={SIDE_SQUARE}
+        rx={SIDE_SQUARE_RX}
         stroke="currentColor"
         strokeWidth={strokeWidth}
         fill="none"
       />
-      {/* Center line — slightly taller than the pills */}
       <line
-        x1="12"
-        y1="6"
-        x2="12"
-        y2="18"
+        x1={ICON_CENTER}
+        y1={CENTER_LINE_Y1}
+        x2={ICON_CENTER}
+        y2={CENTER_LINE_Y2}
         stroke="currentColor"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
       />
-      {/* Right vertical pill */}
       <rect
-        x="15.5"
-        y="8"
-        width="3.5"
-        height="9"
-        rx="1.75"
+        x={RIGHT_RECT_X}
+        y={SIDE_SQUARE_Y}
+        width={SIDE_SQUARE}
+        height={SIDE_SQUARE}
+        rx={SIDE_SQUARE_RX}
         stroke="currentColor"
         strokeWidth={strokeWidth}
         fill="none"

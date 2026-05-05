@@ -37,7 +37,7 @@ export default function CategoriesPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -59,7 +59,7 @@ export default function CategoriesPage() {
   }
 
   return (
-    <AdminPageShell currentPath="/admin/categories" router={router} t={t}>
+    <AdminPageShell currentPath="/supersudo/categories" router={router} t={t}>
       <div className="max-w-7xl">
         <CategoriesHeader />
         <Card className="p-6">

@@ -26,7 +26,6 @@ interface ProductInfoAndActionsProps {
   hasUnavailableAttributes: boolean;
   unavailableAttributes: Map<string, boolean>;
   canAddToCart: boolean;
-  isAddingToCart: boolean;
   isInWishlist: boolean;
   isInCompare: boolean;
   showMessage: string | null;
@@ -38,7 +37,7 @@ interface ProductInfoAndActionsProps {
   colorGroups: Array<{ color: string; stock: number; variants: ProductVariant[] }>;
   sizeGroups: Array<{ size: string; stock: number; variants: ProductVariant[] }>;
   onQuantityAdjust: (delta: number) => void;
-  onAddToCart: () => Promise<void>;
+  onAddToCart: () => void;
   onAddToWishlist: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
   onScrollToReviews: () => void;
@@ -83,7 +82,6 @@ export function ProductInfoAndActions({
   hasUnavailableAttributes,
   unavailableAttributes,
   canAddToCart,
-  isAddingToCart,
   isInWishlist,
   isInCompare,
   showMessage,
@@ -243,19 +241,17 @@ export function ProductInfoAndActions({
       <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">
         <button
           type="button"
-          disabled={!canAddToCart || isAddingToCart}
+          disabled={!canAddToCart}
           className="h-12 min-w-[12rem] flex-1 rounded-xl bg-admin px-4 font-bold uppercase tracking-wide text-white transition-colors hover:bg-admin-600 disabled:cursor-not-allowed disabled:bg-gray-300"
           onClick={onAddToCart}
         >
-          {isAddingToCart
-            ? t(language, 'product.adding')
-            : isOutOfStock
-              ? t(language, 'product.outOfStock')
-              : isVariationRequired
-                ? getRequiredAttributesMessage()
-                : hasUnavailableAttributes
-                  ? t(language, 'product.outOfStock')
-                  : t(language, 'product.addToCart')}
+          {isOutOfStock
+            ? t(language, 'product.outOfStock')
+            : isVariationRequired
+              ? getRequiredAttributesMessage()
+              : hasUnavailableAttributes
+                ? t(language, 'product.outOfStock')
+                : t(language, 'product.addToCart')}
         </button>
         <button
           type="button"

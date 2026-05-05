@@ -36,7 +36,7 @@ export function CategoriesTreeProvider({ children }: { children: ReactNode }) {
 
   const refetchCategories = useCallback(async () => {
     if (typeof window === 'undefined') return;
-    if (pathname?.startsWith('/admin')) {
+    if (pathname?.startsWith('/supersudo')) {
       setCategories([]);
       setLoadingCategories(false);
       return;
