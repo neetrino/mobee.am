@@ -70,13 +70,17 @@ export function SpecialOffersSectionHeading({
         </div>
         <Link
           href="/products"
-          className="group flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between rounded-full border-2 border-[#2db2ff] bg-[#2db2ff] pl-5 pr-0.5 transition-colors duration-200 hover:bg-[#1e1e1e] active:scale-[0.99] sm:w-[159px]"
+          className="group relative flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between overflow-hidden rounded-full border-2 border-[#2db2ff] bg-[#2db2ff] pl-5 pr-0.5 active:scale-[0.99] sm:w-[159px]"
         >
-          <span className="text-right text-[12px] font-medium leading-none text-[#1e1e1e] transition-colors duration-200 group-hover:text-white">
+          <span
+            className="pointer-events-none absolute inset-0 origin-[calc(100%-24px)_50%] scale-x-0 bg-[#1e1e1e] transition-transform duration-500 ease-in-out group-hover:scale-x-100"
+            aria-hidden
+          />
+          <span className="relative z-10 text-right text-[12px] font-medium leading-none text-[#1e1e1e] transition-colors duration-500 ease-in-out group-hover:text-white">
             {t('home.special_offers_heading.cta')}
           </span>
           <span
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#1e1e1e] text-white"
+            className="relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full bg-[#1e1e1e] text-white"
             aria-hidden
           >
             <ArrowRightIcon className="size-2" />
