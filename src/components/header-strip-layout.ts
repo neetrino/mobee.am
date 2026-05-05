@@ -26,6 +26,11 @@ export const MOBILE_HEADER_CENTER_LOGO_SIZE_PX = 40;
 export const MOBILE_HEADER_CENTER_LOGO_RADIUS_PX = 12;
 
 /**
+ * Desktop primary strip wordmark — 50% of Tailwind `h-9` (2.25rem × 0.5 = 1.125rem).
+ */
+export const HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS = 'h-[1.125rem]' as const;
+
+/**
  * Mobile primary strip menu (hamburger) glyph: 2px bars + 2px gap (wrap has no fixed height, so
  * bars are not squished — reads a bit thinner than the 2.5–3px tuning pass).
  */

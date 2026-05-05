@@ -20,6 +20,7 @@ import {
   HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE,
   getDockedBarTopMotionStyle,
   HEADER_STRIP_MIN_HEIGHT_LG,
+  HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS,
   HEADER_STRIP_PADDING_Y,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
@@ -1229,7 +1230,7 @@ export function Header() {
               <SiteBrandLogo
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
-                heightClass="h-9"
+                heightClass={HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS}
                 priority
               />
             </Link>

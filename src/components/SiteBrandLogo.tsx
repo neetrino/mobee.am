@@ -11,6 +11,7 @@ export type SiteBrandLogoHeightClass =
   | 'h-7'
   | 'h-8'
   | 'h-9'
+  | 'h-[1.125rem]'
   | 'h-10'
   | 'h-11'
   | 'h-12'
