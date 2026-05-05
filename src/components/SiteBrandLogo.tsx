@@ -1,7 +1,20 @@
 'use client';
 
 import Image from 'next/image';
-import { SITE_LOGO_PATH, SITE_LOGO_SIZE_PX, SITE_LOGO_VISUAL_SCALE } from '../lib/brand.constants';
+import {
+  SITE_LOGO_INTRINSIC_HEIGHT,
+  SITE_LOGO_INTRINSIC_WIDTH,
+  SITE_LOGO_PATH,
+} from '../lib/brand.constants';
+
+export type SiteBrandLogoHeightClass =
+  | 'h-8'
+  | 'h-9'
+  | 'h-10'
+  | 'h-11'
+  | 'h-12'
+  | 'h-14'
+  | 'h-16';
 
 export interface SiteBrandLogoProps {
   /**
@@ -11,26 +24,20 @@ export interface SiteBrandLogoProps {
   alt: string;
   /** When true, `alt` is forced to empty (parent must expose the name, e.g. `aria-label` on a link). */
   decorative?: boolean;
-  /** Tailwind classes controlling rendered box (square asset). */
-  sizeClass:
-    | 'h-8 w-8'
-    | 'h-9 w-9'
-    | 'h-10 w-10'
-    | 'h-11 w-11'
-    | 'h-12 w-12'
-    | 'h-14 w-14'
-    | 'h-16 w-16';
+  /** Tailwind height for the wordmark; width follows intrinsic aspect ratio (capped via `className` when needed). */
+  heightClass: SiteBrandLogoHeightClass;
   className?: string;
   priority?: boolean;
 }
 
 /**
- * Official MOBEE logo for header, footer, auth, and admin chrome — same asset for every locale.
+ * MOBEE wordmark for header, auth, admin chrome, and error pages — same SVG for every locale.
+ * Footer legal strip keeps text-only brand (see `FooterPaymentStrip`).
  */
 export function SiteBrandLogo({
   alt,
   decorative = false,
-  sizeClass,
+  heightClass,
   className = '',
   priority = false,
 }: SiteBrandLogoProps) {
@@ -38,11 +45,11 @@ export function SiteBrandLogo({
     <Image
       src={SITE_LOGO_PATH}
       alt={decorative ? '' : alt}
-      width={SITE_LOGO_SIZE_PX}
-      height={SITE_LOGO_SIZE_PX}
+      width={SITE_LOGO_INTRINSIC_WIDTH}
+      height={SITE_LOGO_INTRINSIC_HEIGHT}
       priority={priority}
-      className={`origin-center object-contain ${sizeClass} ${className}`.trim()}
-      style={{ transform: `scale(${SITE_LOGO_VISUAL_SCALE})` }}
+      unoptimized
+      className={`${heightClass} w-auto object-contain object-center ${className}`.trim()}
     />
   );
 }
