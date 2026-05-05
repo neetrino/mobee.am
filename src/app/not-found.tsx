@@ -19,12 +19,12 @@ export default function NotFound() {
         <Link
           href="/"
           aria-label={t('common.navigation.home')}
-          className="mb-6 inline-flex rounded-xl shadow-md ring-1 ring-gray-200/80 transition-opacity hover:opacity-95"
+          className="mb-6 inline-flex max-w-[min(380px,calc(100vw-2rem))] justify-center rounded-xl shadow-md ring-1 ring-gray-200/80 transition-opacity hover:opacity-95"
         >
           <SiteBrandLogo
             decorative
             alt={t('common.ariaLabels.siteLogo')}
-            sizeClass="h-16 w-16"
+            heightClass="h-14"
             className="rounded-xl"
           />
         </Link>

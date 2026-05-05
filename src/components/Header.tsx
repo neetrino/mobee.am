@@ -1055,13 +1055,13 @@ export function Header() {
             {/* Figma 180:1419 mark + 178:529 wordmark — center cluster like desktop */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center transition-opacity active:opacity-90"
+              className="absolute left-1/2 top-1/2 z-10 flex max-w-[min(220px,48vw)] -translate-x-1/2 -translate-y-1/2 shrink-0 items-center justify-center transition-opacity active:opacity-90"
               aria-label={t('common.navigation.home')}
             >
               <SiteBrandLogo
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
-                sizeClass="h-10 w-10"
+                heightClass="h-8"
                 className="rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
                 priority
               />
@@ -1225,12 +1225,12 @@ export function Header() {
             <Link
               href="/"
               aria-label={t('common.navigation.home')}
-              className="flex shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
+              className="flex max-w-[min(280px,32vw)] shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
             >
               <SiteBrandLogo
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
-                sizeClass="h-9 w-9"
+                heightClass="h-9"
                 className="rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
                 priority
               />
@@ -1363,12 +1363,12 @@ export function Header() {
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label={t('common.navigation.home')}
-                  className="flex min-w-0 shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
+                  className="flex min-w-0 max-w-[min(200px,55%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
                 >
                   <SiteBrandLogo
                     decorative
                     alt={t('common.ariaLabels.siteLogo')}
-                    sizeClass="h-9 w-9"
+                    heightClass="h-8"
                     className="rounded-lg shadow-sm"
                   />
                 </Link>

@@ -88,9 +88,9 @@ export function AdminMenuDrawer({
                   onClick={() => {
                     setOpen(false);
                   }}
-                  className="shrink-0 rounded-lg ring-1 ring-gray-200/80 transition-opacity hover:opacity-90"
+                  className="flex min-w-0 max-w-[min(140px,42%)] shrink-0 rounded-lg ring-1 ring-gray-200/80 transition-opacity hover:opacity-90"
                 >
-                  <SiteBrandLogo decorative alt={siteLogoAlt} sizeClass="h-9 w-9" className="rounded-lg" />
+                  <SiteBrandLogo decorative alt={siteLogoAlt} heightClass="h-8" className="rounded-lg" />
                 </Link>
                 <p className="truncate text-lg font-semibold text-gray-900">{headerTitle}</p>
               </div>

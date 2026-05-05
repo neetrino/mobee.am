@@ -1,7 +1,21 @@
 'use client';
 
 import Image from 'next/image';
-import { SITE_LOGO_PATH, SITE_LOGO_SIZE_PX, SITE_LOGO_VISUAL_SCALE } from '../lib/brand.constants';
+import {
+  SITE_WORDMARK_HEIGHT_PX,
+  SITE_WORDMARK_PATH,
+  SITE_WORDMARK_WIDTH_PX,
+} from '../lib/brand.constants';
+
+export type SiteBrandLogoHeightClass =
+  | 'h-7'
+  | 'h-8'
+  | 'h-9'
+  | 'h-10'
+  | 'h-11'
+  | 'h-12'
+  | 'h-14'
+  | 'h-16';
 
 export interface SiteBrandLogoProps {
   /**
@@ -11,38 +25,30 @@ export interface SiteBrandLogoProps {
   alt: string;
   /** When true, `alt` is forced to empty (parent must expose the name, e.g. `aria-label` on a link). */
   decorative?: boolean;
-  /** Tailwind classes controlling rendered box (square asset). */
-  sizeClass:
-    | 'h-8 w-8'
-    | 'h-9 w-9'
-    | 'h-10 w-10'
-    | 'h-11 w-11'
-    | 'h-12 w-12'
-    | 'h-14 w-14'
-    | 'h-16 w-16';
+  /** Tailwind height class; width follows intrinsic aspect ratio, capped by `max-w-full` on the parent. */
+  heightClass: SiteBrandLogoHeightClass;
   className?: string;
   priority?: boolean;
 }
 
 /**
- * Official MOBEE logo for header, footer, auth, and admin chrome — same asset for every locale.
+ * MOBEE wordmark for header, auth, and admin chrome (storefront footer uses text, not this asset).
  */
 export function SiteBrandLogo({
   alt,
   decorative = false,
-  sizeClass,
+  heightClass,
   className = '',
   priority = false,
 }: SiteBrandLogoProps) {
   return (
     <Image
-      src={SITE_LOGO_PATH}
+      src={SITE_WORDMARK_PATH}
       alt={decorative ? '' : alt}
-      width={SITE_LOGO_SIZE_PX}
-      height={SITE_LOGO_SIZE_PX}
+      width={SITE_WORDMARK_WIDTH_PX}
+      height={SITE_WORDMARK_HEIGHT_PX}
       priority={priority}
-      className={`origin-center object-contain ${sizeClass} ${className}`.trim()}
-      style={{ transform: `scale(${SITE_LOGO_VISUAL_SCALE})` }}
+      className={`max-h-full w-auto max-w-full object-contain ${heightClass} ${className}`.trim()}
     />
   );
 }

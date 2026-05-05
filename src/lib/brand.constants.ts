@@ -1,8 +1,12 @@
-/** Public path to the official MOBEE logo (square PNG, full mark on brand blue). */
-export const SITE_LOGO_PATH = '/images/brand/mobee-logo.png';
+/** Wide MOBEE wordmark PNG (cyan on black) — header, auth, admin chrome, 404. Not used in the storefront footer. */
+export const SITE_WORDMARK_PATH = '/images/brand/mobee-wordmark.png';
 
-/** Intrinsic pixel size of the PNG asset (must match the file under `public/`). */
-export const SITE_LOGO_SIZE_PX = 1024;
+/** Intrinsic pixel size of `mobee-wordmark.png` under `public/`. */
+export const SITE_WORDMARK_WIDTH_PX = 1024;
 
-/** Renders the logo this much larger than its layout box (+5% → 1.05). */
-export const SITE_LOGO_VISUAL_SCALE = 1.05;
+export const SITE_WORDMARK_HEIGHT_PX = 103;
+
+/**
+ * Square mark for favicon / Apple touch icon only — tab icons need a compact asset, not the wide wordmark.
+ */
+export const SITE_APP_ICON_PATH = '/images/brand/mobee-logo.png';

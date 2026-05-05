@@ -58,12 +58,12 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
             <Link
               href="/supersudo"
               aria-label={t('admin.sidebar.logoLinkAria')}
-              className="shrink-0 rounded-lg ring-1 ring-gray-200/80 transition-opacity hover:opacity-90"
+              className="flex min-w-0 max-w-[160px] shrink-0 rounded-lg ring-1 ring-gray-200/80 transition-opacity hover:opacity-90"
             >
               <SiteBrandLogo
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
-                sizeClass="h-9 w-9"
+                heightClass="h-8"
                 className="rounded-lg"
               />
             </Link>
