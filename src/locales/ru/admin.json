@@ -4,7 +4,9 @@
     "drawerTitle": "Навигация админки",
     "drawerMenuButton": "Меню",
     "expandProductsMenu": "Развернуть подменю товаров",
-    "collapseProductsMenu": "Свернуть подменю товаров"
+    "collapseProductsMenu": "Свернуть подменю товаров",
+    "collapseSidebarAria": "Свернуть боковую панель админки",
+    "expandSidebarAria": "Развернуть боковую панель админки"
   },
   "menu": {
     "home": "Главная",
