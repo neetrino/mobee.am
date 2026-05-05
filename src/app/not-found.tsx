@@ -19,14 +19,9 @@ export default function NotFound() {
         <Link
           href="/"
           aria-label={t('common.navigation.home')}
-          className="mb-6 inline-flex max-w-[min(380px,calc(100vw-2rem))] justify-center rounded-xl shadow-md ring-1 ring-gray-200/80 transition-opacity hover:opacity-95"
+          className="mb-6 inline-flex max-w-[min(380px,calc(100vw-2rem))] justify-center transition-opacity hover:opacity-95"
         >
-          <SiteBrandLogo
-            decorative
-            alt={t('common.ariaLabels.siteLogo')}
-            heightClass="h-14"
-            className="rounded-xl"
-          />
+          <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-14" />
         </Link>
         <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">{t('common.notFound.title')}</h2>

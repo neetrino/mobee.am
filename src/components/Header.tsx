@@ -1062,7 +1062,6 @@ export function Header() {
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
                 heightClass="h-8"
-                className="rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
                 priority
               />
             </Link>
@@ -1231,7 +1230,6 @@ export function Header() {
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
                 heightClass="h-9"
-                className="rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
                 priority
               />
             </Link>
@@ -1365,12 +1363,7 @@ export function Header() {
                   aria-label={t('common.navigation.home')}
                   className="flex min-w-0 max-w-[min(200px,55%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
                 >
-                  <SiteBrandLogo
-                    decorative
-                    alt={t('common.ariaLabels.siteLogo')}
-                    heightClass="h-8"
-                    className="rounded-lg shadow-sm"
-                  />
+                  <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
                 </Link>
                 <div className="relative shrink-0" ref={mobileCurrencyRef}>
                   <button

@@ -15,14 +15,9 @@ export function AuthPageBrandMark({ homeAriaLabel, siteLogoAlt }: AuthPageBrandM
       <Link
         href="/"
         aria-label={homeAriaLabel}
-        className="inline-flex max-w-[min(340px,calc(100vw-2rem))] justify-center rounded-xl shadow-md ring-1 ring-black/5 transition-opacity hover:opacity-95 active:opacity-90"
+        className="inline-flex max-w-[min(340px,calc(100vw-2rem))] justify-center transition-opacity hover:opacity-95 active:opacity-90"
       >
-        <SiteBrandLogo
-          decorative
-          alt={siteLogoAlt}
-          heightClass="h-11"
-          className="rounded-xl"
-        />
+        <SiteBrandLogo decorative alt={siteLogoAlt} heightClass="h-11" />
       </Link>
     </div>
   );
