@@ -9,8 +9,6 @@
  * Requires: run from project root, .env with DATABASE_URL and DIRECT_URL.
  * Prisma client: pnpm run db:generate first if needed.
  */
- /* eslint-disable */
-/* eslint-disable @typescript-eslint/no-require-imports */
 const path = require("path");
 const fs = require("fs");
 

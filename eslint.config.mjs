@@ -61,7 +61,7 @@ const config = [
     },
   },
   {
-    files: ["src/scripts/**/*.js"],
+    files: ["src/scripts/**/*.js", "scripts/**/*.js"],
     rules: {
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-unused-vars": "off",
