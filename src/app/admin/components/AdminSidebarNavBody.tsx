@@ -203,7 +203,7 @@ export function AdminSidebarNavBody({
 
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col">
-      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
+      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1 lg:pr-0 lg:scrollbar-hide">
         <PrimaryNavList
           primaryTabs={primaryTabs}
           currentPath={currentPath}
