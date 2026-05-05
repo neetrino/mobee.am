@@ -58,6 +58,54 @@
     animation: fade-in 0.3s ease-out;
   }
 
+  /* Special offers CTA (“more”): double nudge on hover in, mirrored nudge on hover out */
+  @keyframes cta-arrow-nudge-in {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(3px);
+    }
+    50% {
+      transform: translateX(0);
+    }
+    75% {
+      transform: translateX(3px);
+    }
+  }
+
+  @keyframes cta-arrow-nudge-out {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-3px);
+    }
+    50% {
+      transform: translateX(0);
+    }
+    75% {
+      transform: translateX(-3px);
+    }
+  }
+
+  .animate-cta-arrow-nudge-in {
+    animation: cta-arrow-nudge-in 0.55s ease-in-out;
+  }
+
+  .animate-cta-arrow-nudge-out {
+    animation: cta-arrow-nudge-out 0.55s ease-in-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-cta-arrow-nudge-in,
+    .animate-cta-arrow-nudge-out {
+      animation: none;
+    }
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
