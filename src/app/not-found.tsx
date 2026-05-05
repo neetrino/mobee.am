@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { SiteBrandLogo } from '../components/SiteBrandLogo';
-import { SITE_LOGO_CLASS_NOT_FOUND } from '../lib/brand.constants';
 import { useTranslation } from '../lib/i18n-client';
 
 /**
@@ -20,13 +19,13 @@ export default function NotFound() {
         <Link
           href="/"
           aria-label={t('common.navigation.home')}
-          className="mb-6 inline-flex justify-center transition-opacity hover:opacity-95"
+          className="mb-6 inline-flex rounded-xl shadow-md ring-1 ring-gray-200/80 transition-opacity hover:opacity-95"
         >
           <SiteBrandLogo
             decorative
             alt={t('common.ariaLabels.siteLogo')}
-            heightClass="h-14"
-            className={SITE_LOGO_CLASS_NOT_FOUND}
+            sizeClass="h-16 w-16"
+            className="rounded-xl"
           />
         </Link>
         <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>

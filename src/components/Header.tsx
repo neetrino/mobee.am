@@ -25,11 +25,6 @@ import {
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
-import {
-  SITE_LOGO_CLASS_HEADER_DESKTOP,
-  SITE_LOGO_CLASS_HEADER_MOBILE,
-  SITE_LOGO_CLASS_MOBILE_DRAWER,
-} from '../lib/brand.constants';
 import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
@@ -1060,14 +1055,14 @@ export function Header() {
             {/* Figma 180:1419 mark + 178:529 wordmark — center cluster like desktop */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 z-10 flex min-w-0 -translate-x-1/2 -translate-y-1/2 shrink-0 items-center justify-center transition-opacity active:opacity-90"
+              className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 shrink-0 items-center transition-opacity active:opacity-90"
               aria-label={t('common.navigation.home')}
             >
               <SiteBrandLogo
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
-                heightClass="h-8"
-                className={SITE_LOGO_CLASS_HEADER_MOBILE}
+                sizeClass="h-10 w-10"
+                className="rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
                 priority
               />
             </Link>
@@ -1230,13 +1225,13 @@ export function Header() {
             <Link
               href="/"
               aria-label={t('common.navigation.home')}
-              className="flex min-w-0 shrink-0 items-center justify-center transition-opacity hover:opacity-95 active:opacity-90"
+              className="flex shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
             >
               <SiteBrandLogo
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
-                heightClass="h-9"
-                className={SITE_LOGO_CLASS_HEADER_DESKTOP}
+                sizeClass="h-9 w-9"
+                className="rounded-xl shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
                 priority
               />
             </Link>
@@ -1368,13 +1363,13 @@ export function Header() {
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label={t('common.navigation.home')}
-                  className="flex min-w-0 shrink-0 items-center transition-opacity active:opacity-90"
+                  className="flex min-w-0 shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
                 >
                   <SiteBrandLogo
                     decorative
                     alt={t('common.ariaLabels.siteLogo')}
-                    heightClass="h-8"
-                    className={SITE_LOGO_CLASS_MOBILE_DRAWER}
+                    sizeClass="h-9 w-9"
+                    className="rounded-lg shadow-sm"
                   />
                 </Link>
                 <div className="relative shrink-0" ref={mobileCurrencyRef}>

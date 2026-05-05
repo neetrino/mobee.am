@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, type ChangeEvent } from 'react';
+import type { ChangeEvent } from 'react';
 import { Input } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
 
@@ -28,7 +28,6 @@ export function BasicInformation({
   onDescriptionChange,
 }: BasicInformationProps) {
   const { t } = useTranslation();
-  const [slugSectionOpen, setSlugSectionOpen] = useState(isEditMode);
 
   const typeButtonClass = (active: boolean) =>
     `flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
@@ -73,13 +72,7 @@ export function BasicInformation({
           </div>
         </div>
 
-        <details
-          className="rounded-lg border border-gray-200 bg-gray-50/80 px-3 py-2"
-          open={slugSectionOpen}
-          onToggle={(event) => {
-            setSlugSectionOpen(event.currentTarget.open);
-          }}
-        >
+        <details className="rounded-lg border border-gray-200 bg-gray-50/80 px-3 py-2" defaultOpen={isEditMode}>
           <summary className="cursor-pointer select-none text-sm font-medium text-gray-800">
             {t('admin.products.add.urlSlugSection')}
           </summary>

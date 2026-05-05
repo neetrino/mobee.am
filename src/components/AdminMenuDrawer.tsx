@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { SITE_LOGO_CLASS_MOBILE_DRAWER } from '../lib/brand.constants';
 import { SiteBrandLogo } from './SiteBrandLogo';
 
 export interface AdminMenuItem {
@@ -89,14 +88,9 @@ export function AdminMenuDrawer({
                   onClick={() => {
                     setOpen(false);
                   }}
-                  className="flex min-w-0 shrink-0 items-center transition-opacity hover:opacity-90"
+                  className="shrink-0 rounded-lg ring-1 ring-gray-200/80 transition-opacity hover:opacity-90"
                 >
-                  <SiteBrandLogo
-                    decorative
-                    alt={siteLogoAlt}
-                    heightClass="h-8"
-                    className={SITE_LOGO_CLASS_MOBILE_DRAWER}
-                  />
+                  <SiteBrandLogo decorative alt={siteLogoAlt} sizeClass="h-9 w-9" className="rounded-lg" />
                 </Link>
                 <p className="truncate text-lg font-semibold text-gray-900">{headerTitle}</p>
               </div>

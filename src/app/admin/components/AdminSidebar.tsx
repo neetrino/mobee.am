@@ -5,7 +5,6 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { SiteBrandLogo } from '../../../components/SiteBrandLogo';
-import { SITE_LOGO_CLASS_ADMIN } from '../../../lib/brand.constants';
 import { getAdminMenuTABS } from '../admin-menu.config';
 import { AdminSidebarHomeLanguageBlock, useAdminSidebarLanguage } from './AdminSidebarHomeLanguage';
 import { AdminSidebarNavBody } from './AdminSidebarNavBody';
@@ -59,13 +58,13 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
             <Link
               href="/supersudo"
               aria-label={t('admin.sidebar.logoLinkAria')}
-              className="flex min-w-0 shrink-0 items-center transition-opacity hover:opacity-90"
+              className="shrink-0 rounded-lg ring-1 ring-gray-200/80 transition-opacity hover:opacity-90"
             >
               <SiteBrandLogo
                 decorative
                 alt={t('common.ariaLabels.siteLogo')}
-                heightClass="h-8"
-                className={SITE_LOGO_CLASS_ADMIN}
+                sizeClass="h-9 w-9"
+                className="rounded-lg"
               />
             </Link>
             <div className="min-w-0 flex-1 text-sm font-semibold text-gray-900">{headerTitle}</div>
