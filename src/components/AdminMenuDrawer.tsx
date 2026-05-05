@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { SiteBrandLogo } from './SiteBrandLogo';
@@ -18,7 +19,8 @@ interface AdminMenuDrawerProps {
   renderNav: (onAfterNavigate: () => void) => ReactNode;
   logoLinkAria: string;
   siteLogoAlt: string;
-  headerTitle: string;
+  /** Accessible name for the open drawer surface. */
+  drawerTitle: string;
   drawerMenuButton: string;
   closeMenuAria: string;
 }
@@ -30,7 +32,7 @@ export function AdminMenuDrawer({
   renderNav,
   logoLinkAria,
   siteLogoAlt,
-  headerTitle,
+  drawerTitle,
   drawerMenuButton,
   closeMenuAria,
 }: AdminMenuDrawerProps) {
@@ -75,36 +77,31 @@ export function AdminMenuDrawer({
             className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
             role="dialog"
             aria-modal="true"
-            aria-label={headerTitle}
+            aria-label={drawerTitle}
             onClick={(event) => {
               event.stopPropagation();
             }}
           >
             <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-5 py-4">
-              <div className="flex min-w-0 flex-1 items-center gap-3">
-                <Link
-                  href="/supersudo"
-                  aria-label={logoLinkAria}
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                  className="flex min-w-0 max-w-[min(140px,42%)] shrink-0 transition-opacity hover:opacity-90"
-                >
-                  <SiteBrandLogo decorative alt={siteLogoAlt} heightClass="h-8" />
-                </Link>
-                <p className="truncate text-lg font-semibold text-gray-900">{headerTitle}</p>
-              </div>
+              <Link
+                href="/supersudo"
+                aria-label={logoLinkAria}
+                onClick={() => {
+                  setOpen(false);
+                }}
+                className="flex min-w-0 max-w-[min(140px,42%)] shrink-0 transition-opacity hover:opacity-90"
+              >
+                <SiteBrandLogo decorative alt={siteLogoAlt} heightClass="h-8" />
+              </Link>
               <button
                 type="button"
                 onClick={() => {
                   setOpen(false);
                 }}
-                className="h-10 w-10 shrink-0 rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
                 aria-label={closeMenuAria}
               >
-                <svg className="mx-auto h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <ChevronLeft className="h-5 w-5" aria-hidden strokeWidth={2} />
               </button>
             </div>
 
