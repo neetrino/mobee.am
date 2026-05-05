@@ -66,6 +66,18 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Admin desktop sidebar nav: scroll without visible scrollbar (Tailwind `lg` = 1024px). */
+  @media (min-width: 1024px) {
+    .admin-sidebar-nav-scroll-desktop {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .admin-sidebar-nav-scroll-desktop::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 
 /* Policy pages typography & spacing */
