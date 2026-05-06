@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Montserrat } from 'next/font/google';
+import type { ReactNode } from 'react';
+import { Facebook, Instagram, MessageCircle, PhoneCall, Send } from 'lucide-react';
 import { useTranslation } from '../lib/i18n-client';
 import { FooterLegalBar } from './FooterLegalBar';
+import { FooterPaymentMethodsRow } from './FooterPaymentMethodsRow';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
-import { useFooterCategoryHrefs } from './useFooterCategoryHrefs';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -14,61 +16,78 @@ const montserrat = Montserrat({
   display: 'swap',
 });
 
-const linkMuted =
-  'block pb-[1.5px] pt-[5.5px] text-[16px] font-bold uppercase tracking-[0.55px] text-[#a1a1aa] transition-colors hover:text-gray-700';
+const footerNavLinkClass = 'block text-[14px] leading-5 text-[#6b7280] transition-colors hover:text-[#111827]';
 
 const headingClass =
   'text-[16px] font-bold uppercase tracking-[0.55px] text-black leading-[16.5px]';
 
-function SocialLink({ href, label }: { href: string; label: string }) {
-  if (!href) {
-    return <span className={linkMuted}>{label}</span>;
+type SocialIconLinkProps = {
+  readonly href: string;
+  readonly label: string;
+  readonly icon: ReactNode;
+};
+
+function SocialIconLink({ href, label, icon }: SocialIconLinkProps) {
+  if (!href || href.startsWith('contact.')) {
+    return (
+      <span
+        className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2db2ff] text-white/65"
+        aria-label={label}
+      >
+        {icon}
+      </span>
+    );
   }
+
+  const isExternal = href.startsWith('http');
   return (
-    <a
+    <Link
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={linkMuted}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
+      className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2db2ff] text-white transition-colors hover:bg-[#1a9ef0]"
+      aria-label={label}
     >
-      {label}
-    </a>
+      {icon}
+    </Link>
   );
 }
 
 export function Footer() {
   const { t, lang } = useTranslation();
-  const categoryHrefs = useFooterCategoryHrefs();
-  const isArmenian = lang === 'hy';
 
   const addressText = t('contact.address');
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressText)}`;
+  const phoneText = t('contact.phone');
+  const telHref = `tel:${phoneText.replace(/\s+/g, '')}`;
 
   const social = {
     instagram: t('contact.social.instagram'),
     facebook: t('contact.social.facebook'),
     telegram: t('contact.social.telegram'),
     whatsapp: t('contact.social.whatsapp'),
+    phone: telHref,
   };
 
-  const sectionWrapperClass = isArmenian
-    ? `${SITE_CONTENT_GUTTERS_CLASS} py-10 md:py-14 xl:py-20`
-    : 'mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20';
+  const sectionLinks = [
+    { href: '/about', label: t('common.navigation.about') },
+    { href: '/shop', label: t('common.footer.shop') },
+    { href: '/contact', label: t('common.navigation.contact') },
+  ];
 
-  const sectionGridClass = isArmenian
-    ? 'grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-12 xl:grid-cols-[minmax(320px,427px)_1fr_repeat(3,minmax(120px,160px))] xl:gap-x-8 xl:gap-y-0'
-    : 'grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-4 lg:gap-8';
-
-  const rightColumnShiftClass = isArmenian ? 'xl:-translate-x-[15%]' : '';
-  const rightColumnPaddingClass = isArmenian ? 'xl:pr-[5%]' : '';
-  const productsColumnPaddingClass = isArmenian ? 'xl:pr-[15%]' : '';
+  const policyLinks = [
+    { href: '/privacy', label: t('common.footer.legalBar.privacyPolicy') },
+    { href: '/delivery-terms', label: t('common.footer.legalBar.shippingPolicy') },
+    { href: '/returns', label: t('common.footer.legalBar.returnPolicy') },
+    { href: '/terms', label: t('common.footer.legalBar.termsOfUse') },
+  ];
 
   return (
     <footer
-      className={`${montserrat.className} hidden lg:block ${isArmenian ? 'bg-[#f3f4f6]' : 'border-t border-gray-200 bg-white'}`}
+      className={`${montserrat.className} hidden border-t border-[#eee] bg-[#f3f4f6] lg:block`}
     >
-      <div className={sectionWrapperClass}>
-        <div className={sectionGridClass}>
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-10 md:py-14 xl:py-8`}>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-10 md:gap-y-12 xl:grid-cols-[minmax(320px,427px)_minmax(160px,280px)_minmax(220px,283px)] xl:items-start xl:justify-between xl:gap-x-14">
           {/* Visit us */}
           <div className="flex flex-col gap-6 xl:col-start-1">
             <h2 className={headingClass}>{t('common.footer.visitUs')}</h2>
@@ -83,63 +102,41 @@ export function Footer() {
                 src="/images/footer/visit-map.png"
                 alt=""
                 fill
-                className={`object-cover object-center ${isArmenian ? 'grayscale opacity-50' : ''}`}
+                className="object-cover object-center grayscale opacity-50"
                 sizes="(max-width: 768px) 100vw, 25vw"
               />
-              {isArmenian ? <div aria-hidden="true" className="absolute inset-0 bg-white mix-blend-saturation" /> : null}
+              <div aria-hidden="true" className="absolute inset-0 bg-white mix-blend-saturation" />
             </Link>
             <div className="text-[16px] leading-6 text-[#64748b] whitespace-pre-line">{addressText}</div>
+            <FooterPaymentMethodsRow />
           </div>
 
-          {/* Products */}
-          <div className={`flex flex-col gap-6 xl:col-start-3 ${rightColumnShiftClass} ${productsColumnPaddingClass}`}>
-            <h2 className={headingClass}>{t('common.footer.productsHeading')}</h2>
-            <nav className="flex flex-col gap-4" aria-label={t('common.footer.productsHeading')}>
-              <Link href={categoryHrefs.phones} className={linkMuted}>
-                {t('common.mainHeader.phonesLink')}
-              </Link>
-              <Link href={categoryHrefs.computers} className={linkMuted}>
-                {t('common.mainHeader.computersLink')}
-              </Link>
-              <Link href={categoryHrefs.tablets} className={linkMuted}>
-                {t('common.mainHeader.tabletsLink')}
-              </Link>
-              <Link href={categoryHrefs.watches} className={linkMuted}>
-                {t('common.mainHeader.watchesLink')}
-              </Link>
-              <Link href={categoryHrefs.accessories} className={linkMuted}>
-                {t('common.mainHeader.accessoriesLink')}
-              </Link>
-            </nav>
-          </div>
-
-          {/* Sections */}
-          <div className={`flex flex-col gap-6 xl:col-start-4 ${rightColumnShiftClass} ${rightColumnPaddingClass}`}>
+          <div className="flex flex-col gap-6 xl:col-start-2">
             <h2 className={headingClass}>{t('common.footer.sectionsHeading')}</h2>
-            <nav className="flex flex-col gap-4" aria-label={t('common.footer.sectionsHeading')}>
-              <Link href="/shop" className={linkMuted}>
-                {t('common.footer.shop')}
-              </Link>
-              <Link href="/about" className={linkMuted}>
-                {t('common.navigation.about')}
-              </Link>
-              <Link href="/contact" className={linkMuted}>
-                {t('common.navigation.contact')}
-              </Link>
-              <Link href="/faq" className={linkMuted}>
-                {t('common.navigation.faq')}
-              </Link>
+            <nav className="flex flex-col gap-3" aria-label={t('common.footer.sectionsHeading')}>
+              {sectionLinks.map((link) => (
+                <Link key={link.href} href={link.href} className={footerNavLinkClass}>
+                  {link.label}
+                </Link>
+              ))}
             </nav>
           </div>
 
-          {/* Connect / social */}
-          <div className={`flex flex-col gap-6 xl:col-start-5 ${rightColumnShiftClass}`}>
-            <h2 className={headingClass}>{t('common.footer.connectHeading')}</h2>
-            <div className="flex flex-col gap-4">
-              <SocialLink href={social.instagram} label="Instagram" />
-              <SocialLink href={social.facebook} label="Facebook" />
-              <SocialLink href={social.telegram} label="Telegram" />
-              <SocialLink href={social.whatsapp} label="WhatsApp" />
+          <div className="flex flex-col gap-6 xl:col-start-3">
+            <h2 className={headingClass}>{t('common.footer.termsHeading')}</h2>
+            <nav className="flex flex-col gap-3" aria-label={t('common.footer.legalBar.policiesNavLabel')}>
+              {policyLinks.map((link) => (
+                <Link key={link.href} href={link.href} className={footerNavLinkClass}>
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center gap-4 pt-1">
+              <SocialIconLink href={social.instagram} label="Instagram" icon={<Instagram size={18} strokeWidth={2} />} />
+              <SocialIconLink href={social.facebook} label="Facebook" icon={<Facebook size={18} strokeWidth={2} />} />
+              <SocialIconLink href={social.telegram} label="Telegram" icon={<Send size={18} strokeWidth={2} />} />
+              <SocialIconLink href={social.whatsapp} label="WhatsApp" icon={<MessageCircle size={18} strokeWidth={2} />} />
+              <SocialIconLink href={social.phone} label={phoneText} icon={<PhoneCall size={18} strokeWidth={2} />} />
             </div>
           </div>
         </div>
