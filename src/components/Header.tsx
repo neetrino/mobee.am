@@ -1243,7 +1243,7 @@ export function Header() {
               />
             </Link>
             <nav
-              className="flex min-w-0 items-center gap-2 lg:gap-2 xl:gap-5 2xl:gap-[60px]"
+              className="ml-[calc(1.5rem-10px)] flex min-w-0 items-center gap-2 lg:ml-[calc(1.75rem-10px)] lg:gap-2 xl:ml-[calc(2.75rem-24.5px)] xl:gap-5 2xl:gap-[60px]"
               aria-label="Primary"
             >
               <Link
@@ -1455,11 +1455,22 @@ export function Header() {
                       <CompareIcon size={18} />
                       {t('common.navigation.compare')}
                     </span>
-                    {compareCount > 0 && (
-                      <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
-                        {compareCount > 99 ? '99+' : compareCount}
-                      </span>
-                    )}
+                    <span className="flex shrink-0 items-center gap-2">
+                      {compareCount > 0 ? (
+                        <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
+                          {compareCount > 99 ? '99+' : compareCount}
+                        </span>
+                      ) : null}
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
                   </Link>
 
                   {isLoggedIn ? (

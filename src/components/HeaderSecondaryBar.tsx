@@ -159,7 +159,12 @@ function ProfileAccountMenu({
       >
         <UserOutlineIcon className="shrink-0" />
         <span className="whitespace-nowrap text-[13px] font-semibold leading-normal">{profileLabel}</span>
-        <span className="flex h-4 w-4 shrink-0 items-center justify-center text-gray-500" aria-hidden>
+        <span
+          className={`flex h-4 w-4 shrink-0 items-center justify-center text-gray-500 transition-transform duration-200 ease-out motion-reduce:transition-none ${
+            open ? 'rotate-180' : 'rotate-0'
+          }`}
+          aria-hidden
+        >
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M3 4.5L6 7.5L9 4.5"
@@ -331,8 +336,13 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   <CategoriesMenuLinesIcon className="shrink-0 text-white" />
                   <span className="truncate text-[13px] font-bold leading-7">{categoriesLabel}</span>
                 </span>
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center text-white" aria-hidden>
-                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <span
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center text-white transition-transform duration-200 ease-out motion-reduce:transition-none ${
+                    isCategoriesMenuOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                  aria-hidden
+                >
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M3 4.5L6 7.5L9 4.5"
                       stroke="currentColor"
@@ -346,7 +356,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               {categoriesMenu}
             </div>
 
-            <div className="relative min-w-0 max-w-[220px] flex-1 lg:max-w-[260px] xl:max-w-[299px] 2xl:max-w-[374px]">
+            <div className="relative min-w-0 max-w-[203px] flex-1 lg:max-w-[273px] xl:max-w-[312px] 2xl:max-w-[387px]">
               <form onSubmit={onSearchSubmit} className="relative w-full">
                 <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">
                   <SecondarySearchGlyph className="text-gray-400" />
