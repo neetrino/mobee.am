@@ -8,6 +8,7 @@ import {
   useHomeBestChoiceCarouselPageSync,
   type MobileCarouselViewState,
 } from './useHomeBestChoiceCarouselPageSync';
+import { useIpadProHomeDesktopGrid } from './useIpadProHomeDesktopGrid';
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
@@ -15,7 +16,11 @@ export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 const HOME_BEST_CHOICE_DESKTOP_GRID =
   'hidden grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid lg:grid-cols-4 lg:gap-6';
 
-/** Horizontal snap carousel below the `lg` breakpoint. Allow pan-y so the page can scroll vertically while touching the strip (touch-pan-x alone blocks vertical scroll on many browsers). */
+/** iPad Pro only: three columns on the desktop grid (see {@link useIpadProHomeDesktopGrid}). */
+const HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO =
+  'hidden grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid lg:grid-cols-3 lg:gap-6';
+
+/** Horizontal snap carousel below `lg`. */
 const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
   'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
 
@@ -44,20 +49,23 @@ function BestChoiceProductCell({
   product,
   specialOffersHomeCard,
   viewMode,
+  homeStyle,
 }: {
   product: FeaturedHomeProduct;
   specialOffersHomeCard: boolean;
   viewMode: 'grid-2' | 'grid-3';
+  /** Mobile / iPad carousel styling; desktop uses default product card chrome. */
+  homeStyle: boolean;
 }) {
   return (
     <div className={HOME_BEST_CHOICE_CARD_WIDTH}>
       <ProductCard
         product={product}
         viewMode={viewMode}
-        shiftImageInFrame
-        smallerFooterPrice
+        shiftImageInFrame={homeStyle}
+        smallerFooterPrice={homeStyle}
         specialOffersHomeCard={specialOffersHomeCard}
-        homeProductGridCard
+        homeProductGridCard={homeStyle}
       />
     </div>
   );
@@ -71,6 +79,7 @@ export function HomeBestChoiceStyleProductGrid({
   specialOffersHomeCard = false,
   onMobileCarouselViewChange,
 }: HomeBestChoiceStyleProductGridProps) {
+  const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
   const visible = products.slice(0, productsPerPage);
   const mobilePages = chunkArray(visible, mobileCardsPerView);
   const mobilePageCount = mobilePages.length;
@@ -81,6 +90,9 @@ export function HomeBestChoiceStyleProductGrid({
     mobilePageCount,
     onMobileCarouselViewChange,
   );
+  const desktopGridClass = isIpadProDesktopGrid
+    ? HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO
+    : HOME_BEST_CHOICE_DESKTOP_GRID;
 
   return (
     <>
@@ -100,19 +112,21 @@ export function HomeBestChoiceStyleProductGrid({
                   product={product}
                   specialOffersHomeCard={specialOffersHomeCard}
                   viewMode={cardViewMode}
+                  homeStyle
                 />
               ))}
             </div>
           </div>
         ))}
       </div>
-      <div className={HOME_BEST_CHOICE_DESKTOP_GRID}>
+      <div className={desktopGridClass}>
         {visible.map((product) => (
           <BestChoiceProductCell
             key={product.id}
             product={product}
             specialOffersHomeCard={specialOffersHomeCard}
             viewMode="grid-2"
+            homeStyle={false}
           />
         ))}
       </div>
@@ -146,6 +160,7 @@ export function HomeBestChoiceStyleProductGridSkeleton({
   mobileCarouselAriaLabel: string;
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 }) {
+  const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
   const indices = [...Array(productsPerPage)].map((_, i) => i);
   const mobilePages = chunkArray(indices, mobileCardsPerView);
   const mobilePageCount = mobilePages.length;
@@ -154,6 +169,9 @@ export function HomeBestChoiceStyleProductGridSkeleton({
     mobilePageCount,
     onMobileCarouselViewChange,
   );
+  const desktopGridClass = isIpadProDesktopGrid
+    ? HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO
+    : HOME_BEST_CHOICE_DESKTOP_GRID;
 
   return (
     <>
@@ -175,7 +193,7 @@ export function HomeBestChoiceStyleProductGridSkeleton({
           </div>
         ))}
       </div>
-      <div className={HOME_BEST_CHOICE_DESKTOP_GRID} aria-hidden="true">
+      <div className={desktopGridClass} aria-hidden="true">
         {indices.map((i) => (
           <SkeletonCell key={`sk-d-${i}`} />
         ))}

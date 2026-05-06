@@ -5,9 +5,8 @@ import { ProductCard } from './ProductCard';
 import { useTranslation } from '../lib/i18n-client';
 import type { ProductSortOption } from '@/lib/products/sort';
 import {
-  LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY,
+  SHOP_COMPACT_THREE_COLUMN_MEDIA_QUERY,
   SHOP_LEGACY_DESKTOP_MEDIA_QUERY,
-  SHOP_TABLET_THREE_COL_MEDIA_QUERY,
 } from '@/lib/layout-breakpoints.constants';
 import {
   PRODUCTS_VIEW_MODE_CHANGED_EVENT,
@@ -38,7 +37,7 @@ interface ProductsGridProps {
 }
 
 /**
- * Mobile / tablet / iPad (below Tailwind `xl`): 2 cols phone, 3 cols iPad Mini band, 2 cols storefront `lg`–`xl`.
+ * Below `xl`: 2 cols phone; `md`–`lg` exclusive three cols (e.g. iPad mini); from `lg` (iPad Pro) two cols until legacy desktop.
  */
 const SHOP_COMPACT_GRID_CLASS =
   'grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-6';
@@ -53,28 +52,23 @@ function desktopShopGridClass(viewMode: ProductListingViewMode): string {
 export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
   const { t } = useTranslation();
   const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
-  const [isDesktopShell, setIsDesktopShell] = useState(false);
-  const [isShopTabletThreeCol, setIsShopTabletThreeCol] = useState(false);
+  const [isCompactThreeColumn, setIsCompactThreeColumn] = useState(false);
   const [isLegacyDesktopShop, setIsLegacyDesktopShop] = useState(false);
   const [listingViewMode, setListingViewMode] =
     useState<ProductListingViewMode>('grid-2');
 
   useLayoutEffect(() => {
-    const mqDesktop = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
-    const mqTabletThree = window.matchMedia(SHOP_TABLET_THREE_COL_MEDIA_QUERY);
+    const mqCompactThree = window.matchMedia(SHOP_COMPACT_THREE_COLUMN_MEDIA_QUERY);
     const mqLegacyDesktop = window.matchMedia(SHOP_LEGACY_DESKTOP_MEDIA_QUERY);
     const apply = () => {
-      setIsDesktopShell(mqDesktop.matches);
-      setIsShopTabletThreeCol(mqTabletThree.matches);
+      setIsCompactThreeColumn(mqCompactThree.matches);
       setIsLegacyDesktopShop(mqLegacyDesktop.matches);
     };
     apply();
-    mqDesktop.addEventListener('change', apply);
-    mqTabletThree.addEventListener('change', apply);
+    mqCompactThree.addEventListener('change', apply);
     mqLegacyDesktop.addEventListener('change', apply);
     return () => {
-      mqDesktop.removeEventListener('change', apply);
-      mqTabletThree.removeEventListener('change', apply);
+      mqCompactThree.removeEventListener('change', apply);
       mqLegacyDesktop.removeEventListener('change', apply);
     };
   }, []);
@@ -134,11 +128,12 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
 
   const cardViewMode: ProductListingViewMode = isLegacyDesktopShop
     ? listingViewMode
-    : isShopTabletThreeCol
+    : isCompactThreeColumn
       ? 'grid-3'
       : 'grid-2';
 
-  const useHomeCardChrome = !isLegacyDesktopShop && !isDesktopShell;
+  /** Home / mobile card chrome for the whole compact shop (incl. iPad Pro). */
+  const useHomeCardChrome = !isLegacyDesktopShop;
 
   return (
     <div className={gridClass}>
