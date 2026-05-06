@@ -64,12 +64,11 @@ export function setStoredLanguage(language: LanguageCode, options?: { skipReload
     localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
     persistLanguageCookie(language);
     window.dispatchEvent(new Event('language-updated'));
-    // Only reload if skipReload is not true
-    if (!options?.skipReload) {
-      // Use a small delay to ensure state updates are visible before reload
-      setTimeout(() => {
-        window.location.reload();
-      }, 50);
+    // Default behavior is now reactive update without full reload.
+    // Reload can still be explicitly requested with `skipReload: false`.
+    const shouldReload = options?.skipReload === false;
+    if (shouldReload) {
+      window.location.reload();
     }
   } catch (error) {
     console.error('Failed to save language:', error);
