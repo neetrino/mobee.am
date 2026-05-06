@@ -17,8 +17,11 @@ import { useAuth } from '../../lib/auth/AuthContext';
 import {
   COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS,
   COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS,
+  COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR,
+  COMPARE_EMPTY_STATE_IMAGE_SRC,
   COMPARE_EMPTY_STATE_LOWER_PANEL_FLEX_CLASS,
   COMPARE_EMPTY_STATE_LOWER_PANEL_MIN_HEIGHT_CLASS,
+  COMPARE_EMPTY_STATE_MAX_WIDTH_CLASS,
 } from './compare-layout.constants';
 
 interface Product {
@@ -469,7 +472,16 @@ export default function ComparePage() {
         <div
           className={`${COMPARE_EMPTY_STATE_LOWER_PANEL_FLEX_CLASS} text-center ${COMPARE_EMPTY_STATE_LOWER_PANEL_MIN_HEIGHT_CLASS} ${COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS}`}
         >
-          <div className="max-w-md mx-auto w-full">
+          <div className={`${COMPARE_EMPTY_STATE_MAX_WIDTH_CLASS} mx-auto w-full`}>
+            <Image
+              src={COMPARE_EMPTY_STATE_IMAGE_SRC}
+              alt={t('common.compare.empty')}
+              width={330}
+              height={267}
+              sizes={COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR}
+              className="mx-auto -mt-20 h-auto w-[330px] max-w-full"
+              unoptimized
+            />
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               {t('common.compare.empty')}
             </h2>

@@ -35,11 +35,12 @@ export const COMPARE_EMPTY_STATE_MAX_WIDTH_CLASS = 'max-w-[50.4rem]';
 /** `h-24 w-24` (6rem) × one +20% step — empty compare icon */
 export const COMPARE_EMPTY_STATE_ICON_CLASS = 'h-[7.2rem] w-[7.2rem]';
 
-/** Static empty-state illustration (Figma node 265:770, mobee-new) */
-export const COMPARE_EMPTY_STATE_IMAGE_SRC = '/images/compare-empty-state.png';
+/** Empty-state illustration exported from Figma (node 442:721, mobee-new) */
+export const COMPARE_EMPTY_STATE_IMAGE_SRC =
+  '/images/compare/compare-empty-state.png';
 
-/** `sizes` for empty-state `next/image` — matches icon box ~7.2rem width */
-export const COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR = '115px';
+/** Responsive `sizes` for empty-state image to avoid blurry rendering */
+export const COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR = '(max-width: 640px) 70vw, 330px';
 
 /**
  * Small padding below empty-state CTA before the site footer (site chrome already adds mobile nav inset).

@@ -3,6 +3,17 @@ import { categoriesService } from "@/lib/services/categories.service";
 import { cacheService } from "@/lib/services/cache.service";
 
 const CACHE_TTL = 300;
+const EMPTY_TREE_RESPONSE = { data: [] as Array<unknown> };
+
+function isDatabaseConfigurationError(error: unknown): boolean {
+  const detail = error instanceof Error ? error.message : String(error);
+  return (
+    detail.includes("Error validating datasource `db`") ||
+    detail.includes("env(\"DATABASE_URL\")") ||
+    detail.includes("P1001") ||
+    detail.includes("Can't reach database server")
+  );
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -22,17 +33,35 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(result, {
       headers: { "X-Cache": "MISS" },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (isDatabaseConfigurationError(error)) {
+      console.warn("⚠️ [CATEGORIES] Database is not configured, returning empty category tree");
+      return NextResponse.json(EMPTY_TREE_RESPONSE, {
+        headers: { "X-Cache": "BYPASS", "X-Data-Source": "fallback" },
+      });
+    }
+
+    const errorPayload =
+      error && typeof error === "object"
+        ? (error as {
+            type?: string;
+            title?: string;
+            status?: number;
+            detail?: string;
+            message?: string;
+          })
+        : undefined;
+
     console.error("❌ [CATEGORIES] Error:", error);
     return NextResponse.json(
       {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
+        type: errorPayload?.type || "https://api.shop.am/problems/internal-error",
+        title: errorPayload?.title || "Internal Server Error",
+        status: errorPayload?.status || 500,
+        detail: errorPayload?.detail || errorPayload?.message || "An error occurred",
         instance: req.url,
       },
-      { status: error.status || 500 }
+      { status: errorPayload?.status || 500 }
     );
   }
 }
