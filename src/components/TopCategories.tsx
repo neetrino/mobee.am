@@ -213,7 +213,7 @@ export function TopCategories() {
               <Link
                 key={slot.key}
                 href={href}
-                className={`@container group relative flex min-w-0 w-full flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(slot)}`}
+                className={`category-strip-card-cq group relative flex min-w-0 w-full flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(slot)}`}
               >
                 <div className="relative h-full w-full min-h-0 overflow-hidden">
                   <div
@@ -255,11 +255,11 @@ export function TopCategories() {
                   </div>
                 </div>
                 <div
-                  className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-1.5 pb-2 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
+                  className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-1.5 pb-2.5 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
                     slot.tall ? 'xl:pb-3' : ''
                   }`}
                 >
-                  <span className="line-clamp-2 max-w-full break-words text-[14px] font-bold leading-snug text-[#1c1c1c] [overflow-wrap:anywhere] xl:text-[16px] xl:leading-5">
+                  <span className="line-clamp-2 max-w-full break-words text-[13px] font-bold leading-snug text-[#1c1c1c] [overflow-wrap:anywhere] xl:text-[16px] xl:leading-5">
                     {t(slot.labelKey)}
                   </span>
                 </div>

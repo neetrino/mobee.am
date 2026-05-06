@@ -127,9 +127,23 @@
     }
   }
 
-  /* TopCategories desktop tiles: `cqi` scale; extra shrink lg–xl (iPad), full from xl (see tailwind screens). */
+  /* TopCategories: query container so `cqi` works on wide screens (child `.category-strip-tile-art`). */
+  .category-strip-card-cq {
+    container-type: inline-size;
+  }
+
   .category-strip-tile-art {
-    transform: translateX(-50%) scale(min(1, calc(0.76 * 100cqi / 197px)));
+    transform: translateX(-50%) scale(min(1, calc(100cqi / 197px)));
+  }
+
+  /*
+   * iPad / sub-xl: WebKit often ignores container units inside `transform` — use a plain scale so it always applies.
+   * Tune scale (iPad band).
+   */
+  @media (min-width: 834px) and (max-width: 1279.98px) {
+    .category-strip-tile-art {
+      transform: translateX(-50%) scale(0.8);
+    }
   }
 
   @media (min-width: 1280px) {
