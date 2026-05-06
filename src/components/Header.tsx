@@ -73,28 +73,6 @@ const ArrowRightIcon = () => (
   </svg>
 );
 
-/**
- * Profile icon for logged in state (filled style with background)
- */
-const ProfileIconFilled = () => (
-  <div className="relative w-[19px] h-[19px] flex items-center justify-center">
-    {/* Background circle */}
-    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full opacity-90 group-hover:opacity-100 transition-opacity duration-200 shadow-md"></div>
-    {/* Filled icon */}
-    <svg 
-      width="19" 
-      height="19" 
-      viewBox="0 0 20 20" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      className="relative z-10"
-    >
-      <circle cx="10" cy="7" r="3.2" fill="white" />
-      <path d="M5 17C5 14.5 7.5 12.5 10 12.5C12.5 12.5 15 14.5 15 17" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  </div>
-);
-
 const SearchIcon = () => (
   <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
@@ -135,6 +113,106 @@ const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
 
 const mobilePrimaryLangButtonClassName =
   'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
+
+/** Mobile drawer primary links — bordered pill buttons (aligned with strip icon radius). */
+const MOBILE_DRAWER_NAV_BUTTON_CLASS =
+  'flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100';
+
+interface MobileNavProfileUser {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+}
+
+function getMobileNavProfileInitials(user: MobileNavProfileUser): string {
+  const first = user.firstName?.trim();
+  const last = user.lastName?.trim();
+  if (first && last) {
+    return `${first[0]!}${last[0]!}`.toUpperCase();
+  }
+  if (first) {
+    return first.length >= 2 ? first.slice(0, 2).toUpperCase() : first[0]!.toUpperCase();
+  }
+  const email = user.email?.trim();
+  if (email) {
+    const local = email.split('@')[0] ?? '';
+    if (local.length >= 2) {
+      return local.slice(0, 2).toUpperCase();
+    }
+    return local.length === 1 ? local[0]!.toUpperCase() : '?';
+  }
+  const digits = user.phone?.replace(/\D/g, '') ?? '';
+  if (digits.length >= 2) {
+    return digits.slice(0, 2);
+  }
+  return '?';
+}
+
+function getMobileNavProfileCardLines(user: MobileNavProfileUser): {
+  title: string;
+  subtitle?: string;
+} {
+  const parts = [user.firstName?.trim(), user.lastName?.trim()].filter(Boolean);
+  const fullName = parts.join(' ');
+  const email = user.email?.trim() ?? '';
+  const phone = user.phone?.trim() ?? '';
+  if (fullName) {
+    return { title: fullName, subtitle: email || undefined };
+  }
+  if (email) {
+    return { title: email, subtitle: undefined };
+  }
+  if (phone) {
+    return { title: phone, subtitle: undefined };
+  }
+  return { title: '', subtitle: undefined };
+}
+
+function MobileDrawerProfileCard({
+  user,
+  profileFallbackLabel,
+  onNavigate,
+}: {
+  user: MobileNavProfileUser;
+  profileFallbackLabel: string;
+  onNavigate: () => void;
+}) {
+  const { title, subtitle } = getMobileNavProfileCardLines(user);
+  const heading = title || profileFallbackLabel;
+  return (
+    <Link
+      href="/profile"
+      onClick={onNavigate}
+      className="flex w-fit max-w-full min-w-0 items-center gap-3 self-start rounded-[1.75rem] border border-gray-200 bg-white px-3 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100"
+      aria-label={profileFallbackLabel}
+    >
+      <span
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-900"
+        aria-hidden
+      >
+        {getMobileNavProfileInitials(user)}
+      </span>
+      <span className="flex min-w-0 max-w-full flex-col gap-0.5 text-left">
+        <span className="max-w-full break-words text-sm font-bold leading-tight text-gray-900">{heading}</span>
+        {subtitle ? (
+          <span className="max-w-full break-words text-xs font-normal leading-snug text-gray-500 [overflow-wrap:anywhere]">
+            {subtitle}
+          </span>
+        ) : null}
+      </span>
+      <svg
+        className="h-5 w-5 shrink-0 text-gray-300"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </Link>
+  );
+}
 
 /**
  * Component that syncs search params with state
@@ -417,10 +495,43 @@ function HeaderPhoneLangCluster({
   );
 }
 
+/** Support call-to-action for mobile drawer — same chrome as `MOBILE_DRAWER_NAV_BUTTON_CLASS`. */
+function MobileDrawerSupportPhoneButton() {
+  const { t } = useTranslation();
+  const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
+  const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
+
+  return (
+    <a
+      href={telHref}
+      className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
+      aria-label={t('common.header.supportPhoneAria')}
+    >
+      <span className="flex min-w-0 flex-1 items-center gap-2">
+        <span className="relative size-6 shrink-0">
+          <img
+            src={HEADER_FIGMA_ASSETS.phoneIcon}
+            alt=""
+            width={24}
+            height={24}
+            className="absolute inset-0 block size-6 max-w-none"
+          />
+        </span>
+        <span className="min-w-0 truncate text-sm font-semibold text-[#374151]">
+          {t('common.header.supportPhoneNumber')}
+        </span>
+      </span>
+      <svg className="h-4 w-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </a>
+  );
+}
+
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isLoggedIn, logout, isAdmin } = useAuth();
+  const { isLoggedIn, logout, isAdmin, user } = useAuth();
   const { t } = useTranslation();
   const [compareCount, setCompareCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -1386,7 +1497,7 @@ export function Header() {
           onClick={() => setMobileMenuOpen(false)}
         >
           <div
-            className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
+            className="flex h-full min-h-screen w-[min(83vw,24rem)] min-w-[17rem] max-w-full flex-col bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
@@ -1401,7 +1512,7 @@ export function Header() {
                 </Link>
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-base font-semibold text-gray-900">{t('common.navigation.categories')}</p>
+                <p className="text-base font-semibold text-gray-900">{t('common.navigation.menuTitle')}</p>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
@@ -1415,22 +1526,25 @@ export function Header() {
               </div>
             </div>
 
-            <div className="border-b border-gray-100 px-4 py-2">
-              <HeaderPhoneLangCluster phoneNumberVisibility="always" showLanguageSwitcher={false} />
-            </div>
-
             <div className="flex-1 overflow-hidden min-h-0">
-              <nav className="flex h-full flex-col border-y border-gray-200 text-sm font-semibold uppercase tracking-wide text-gray-800 bg-white">
-                <div className="flex-1 overflow-y-auto divide-y divide-gray-200">
+              <nav className="flex h-full flex-col bg-white">
+                <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
+                  {isLoggedIn && user ? (
+                    <MobileDrawerProfileCard
+                      user={user}
+                      profileFallbackLabel={t('common.navigation.profile')}
+                      onNavigate={() => setMobileMenuOpen(false)}
+                    />
+                  ) : null}
                   {primaryNavLinks.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                      className={MOBILE_DRAWER_NAV_BUTTON_CLASS}
                     >
                       {t(link.translationKey)}
-                      <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
@@ -1439,7 +1553,7 @@ export function Header() {
                   <Link
                     href="/compare"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700`}
                   >
                     <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
                       <CompareIcon size={18} />
@@ -1465,24 +1579,11 @@ export function Header() {
 
                   {isLoggedIn ? (
                     <>
-                      <Link
-                        href="/profile"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 normal-case text-gray-800"
-                      >
-                        <span className="flex items-center gap-2">
-                          <ProfileIconFilled />
-                          {t('common.navigation.profile')}
-                        </span>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </Link>
                       {isAdmin && (
                         <Link
                           href="/supersudo"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center justify-between px-4 py-3 hover:bg-blue-50 normal-case text-blue-700"
+                          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} border-blue-200 normal-case text-blue-700 hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100/80`}
                         >
                           <span>{t('common.navigation.adminPanel')}</span>
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1490,12 +1591,14 @@ export function Header() {
                           </svg>
                         </Link>
                       )}
+                      <MobileDrawerSupportPhoneButton />
                       <button
+                        type="button"
                         onClick={() => {
                           setMobileMenuOpen(false);
                           logout();
                         }}
-                        className="flex w-full items-center justify-between px-4 py-3 text-left text-red-600 hover:bg-red-50 normal-case font-semibold"
+                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} w-full border-red-200 text-left normal-case font-semibold text-red-600 hover:border-red-300 hover:bg-red-50 active:bg-red-100/80`}
                       >
                         {t('common.navigation.logout')}
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1505,10 +1608,11 @@ export function Header() {
                     </>
                   ) : (
                     <>
+                      <MobileDrawerSupportPhoneButton />
                       <Link
                         href="/login"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 normal-case text-gray-800"
+                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
                       >
                         <span>{t('common.navigation.login')}</span>
                         <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1518,7 +1622,7 @@ export function Header() {
                       <Link
                         href="/register"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-900 hover:text-white normal-case text-gray-900 font-semibold"
+                        className="flex items-center justify-between rounded-2xl border border-gray-900 bg-gray-900 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-gray-800 hover:bg-gray-800 active:opacity-95"
                       >
                         <span>{t('common.navigation.register')}</span>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1529,7 +1633,7 @@ export function Header() {
                   )}
                 </div>
 
-                <div className="border-t border-gray-200 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
+                <div className="border-t border-gray-100 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
                   {t('common.footer.copyright').replace('{year}', String(currentYear))}
                 </div>
               </nav>

@@ -17,6 +17,7 @@
     "close": "Закрыть"
   },
   "navigation": {
+    "menuTitle": "Навигация",
     "home": "Главная",
     "products": "Товары",
     "categories": "Категории",
