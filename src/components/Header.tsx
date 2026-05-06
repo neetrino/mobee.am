@@ -477,6 +477,7 @@ export function Header() {
   const lastScrollYRef = useRef(0);
   const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
   const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
+  const [headerLayoutReady, setHeaderLayoutReady] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
 
@@ -578,12 +579,14 @@ export function Header() {
     syncMobileSearchDock();
     const searchWrap = mobileSearchWrapRef.current;
     if (typeof ResizeObserver === 'undefined' || !searchWrap) {
+      setHeaderLayoutReady(true);
       return;
     }
     const ro = new ResizeObserver(() => {
       syncMobileSearchDock();
     });
     ro.observe(searchWrap);
+    setHeaderLayoutReady(true);
     return () => {
       ro.disconnect();
     };
@@ -1031,7 +1034,11 @@ export function Header() {
                   }`
                 : ''
             }`}
-            style={mobileStripPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
+            style={
+              mobileStripPeekActive && headerLayoutReady
+                ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE }
+                : undefined
+            }
           >
           <div className="relative flex items-center justify-between gap-3 py-2.5">
             <div className="relative z-20 shrink-0">
@@ -1113,7 +1120,7 @@ export function Header() {
           </div>
         </div>
 
-        {mobileDockedHeaderSpacerPx > 0 ? (
+        {headerLayoutReady && mobileDockedHeaderSpacerPx > 0 ? (
           <div
             aria-hidden
             className="shrink-0 motion-reduce:transition-none lg:hidden"
@@ -1127,11 +1134,13 @@ export function Header() {
         <div
           ref={mobileSearchWrapRef}
           className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
-            mobileSearchDocked ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none' : ''
+            headerLayoutReady && mobileSearchDocked
+              ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none'
+              : ''
           }`}
-          style={mobileDockedSearchTopStyle}
+          style={headerLayoutReady ? mobileDockedSearchTopStyle : undefined}
         >
-          <div className={mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
+          <div className={headerLayoutReady && mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
             <form
               ref={mobileHomeSearchFormRef}
               onSubmit={handleSearch}

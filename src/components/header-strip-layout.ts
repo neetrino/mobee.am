@@ -16,6 +16,13 @@ export const SITE_CONTENT_GUTTERS_CLASS =
   'mx-auto w-full max-w-[1440px] px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20';
 
 /**
+ * Mobile hero strip (`lg:hidden`): slightly tighter padding than {@link SITE_CONTENT_GUTTERS_CLASS}
+ * so the promo card reads a bit wider.
+ */
+export const HERO_MOBILE_CONTENT_GUTTERS_CLASS =
+  'mx-auto w-full max-w-[1440px] px-3 sm:px-5 md:px-8';
+
+/**
  * Figma mobee-new node 180:1419 — mobile primary strip center logo frame (Overlay+Shadow group size).
  */
 export const MOBILE_HEADER_CENTER_LOGO_SIZE_PX = 40;

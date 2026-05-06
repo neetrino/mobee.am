@@ -44,35 +44,44 @@ async function fetchSpecialOffersHomePage(
   language: LanguageCode,
   filter: string | null,
 ): Promise<FeaturedHomeProduct[]> {
-  const searchParams = new URLSearchParams({
-    page: '1',
-    limit: PRODUCTS_PER_PAGE.toString(),
-    lang: language,
-  });
-
-  if (filter) {
-    searchParams.set('filter', filter);
-  }
-
-  try {
-    const response = await fetch(`/api/v1/products?${searchParams.toString()}`, {
-      method: 'GET',
-      cache: 'no-store',
+  const fetchByLanguage = async (requestedLanguage: LanguageCode): Promise<FeaturedHomeProduct[]> => {
+    const searchParams = new URLSearchParams({
+      page: '1',
+      limit: PRODUCTS_PER_PAGE.toString(),
+      lang: requestedLanguage,
     });
 
-    if (!response.ok) {
-      return [];
+    if (filter) {
+      searchParams.set('filter', filter);
     }
 
-    const rawData: unknown = await response.json();
-    if (!isProductsResponse(rawData)) {
+    try {
+      const response = await fetch(`/api/v1/products?${searchParams.toString()}`, {
+        method: 'GET',
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        return [];
+      }
+
+      const rawData: unknown = await response.json();
+      if (!isProductsResponse(rawData)) {
+        return [];
+      }
+
+      return rawData.data.slice(0, PRODUCTS_PER_PAGE);
+    } catch {
       return [];
     }
+  };
 
-    return rawData.data.slice(0, PRODUCTS_PER_PAGE);
-  } catch {
-    return [];
+  const localizedProducts = await fetchByLanguage(language);
+  if (localizedProducts.length > 0 || language === 'en') {
+    return localizedProducts;
   }
+
+  return fetchByLanguage('en');
 }
 
 export function useSpecialOffersHomeProducts() {

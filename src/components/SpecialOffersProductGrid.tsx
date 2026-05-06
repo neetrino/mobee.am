@@ -15,6 +15,7 @@ type SpecialOffersProductGridProps = {
   error: string | null;
   products: FeaturedHomeProduct[];
   productsPerPage: number;
+  mobileCardsPerView: number;
   onRetry: () => void;
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 };
@@ -28,6 +29,7 @@ export function SpecialOffersProductGrid({
   error,
   products,
   productsPerPage,
+  mobileCardsPerView,
   onRetry,
   onMobileCarouselViewChange,
 }: SpecialOffersProductGridProps) {
@@ -35,6 +37,7 @@ export function SpecialOffersProductGrid({
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
+        mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
@@ -59,6 +62,7 @@ export function SpecialOffersProductGrid({
       <HomeBestChoiceStyleProductGrid
         products={products}
         productsPerPage={productsPerPage}
+        mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
         specialOffersHomeCard
         onMobileCarouselViewChange={onMobileCarouselViewChange}

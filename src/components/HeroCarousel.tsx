@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Montserrat, Noto_Sans_Armenian } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
-import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { HERO_MOBILE_CONTENT_GUTTERS_CLASS, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -51,8 +51,8 @@ function MobileHeroIphoneBanner() {
     <div
       className={`pb-2 pt-[calc(theme(spacing.4)*1.05+4px)] lg:hidden ${montserrat.className}`}
     >
-      <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        <div className="relative isolate min-h-[168px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-2 pt-4">
+      <div className={HERO_MOBILE_CONTENT_GUTTERS_CLASS}>
+        <div className="relative isolate min-h-[208px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-3 pt-5 sm:min-h-[220px]">
           <div className="relative z-10 flex max-w-[55%] flex-col items-start gap-2">
             <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-normal leading-normal text-[#14ae5c]">
               {t('home.hero_free_shipping')}
@@ -70,7 +70,7 @@ function MobileHeroIphoneBanner() {
               )}
             </p>
           </div>
-          <div className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[min(52%,140px)] w-[min(58%,220px)] min-h-[118px] min-w-[160px] max-w-[220px]">
+          <div className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[min(56%,168px)] w-[min(58%,220px)] min-h-[140px] min-w-[160px] max-w-[220px]">
             <Image
               src={IMG_IPHONE}
               alt=""

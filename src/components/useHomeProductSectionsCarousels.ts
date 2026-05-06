@@ -1,26 +1,36 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW } from './home-best-choice.constants';
+import { useCallback, useEffect, useState } from 'react';
 import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSync';
 
-function initialMobileCarouselState(productsPerPage: number): MobileCarouselViewState {
+function initialMobileCarouselState(
+  productsPerPage: number,
+  mobileCardsPerView: number,
+): MobileCarouselViewState {
   return {
     pageIndex: 0,
-    pageCount: Math.max(1, Math.ceil(productsPerPage / HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW)),
+    pageCount: Math.max(1, Math.ceil(productsPerPage / mobileCardsPerView)),
   };
 }
 
 export function useHomeProductSectionsCarousels(
   featuredProductsPerPage: number,
   specialOffersProductsPerPage: number,
+  mobileCardsPerView: number,
 ) {
   const [featuredCarousel, setFeaturedCarousel] = useState(() =>
-    initialMobileCarouselState(featuredProductsPerPage),
+    initialMobileCarouselState(featuredProductsPerPage, mobileCardsPerView),
   );
   const [specialOffersCarousel, setSpecialOffersCarousel] = useState(() =>
-    initialMobileCarouselState(specialOffersProductsPerPage),
+    initialMobileCarouselState(specialOffersProductsPerPage, mobileCardsPerView),
   );
+
+  useEffect(() => {
+    setFeaturedCarousel(initialMobileCarouselState(featuredProductsPerPage, mobileCardsPerView));
+    setSpecialOffersCarousel(
+      initialMobileCarouselState(specialOffersProductsPerPage, mobileCardsPerView),
+    );
+  }, [featuredProductsPerPage, specialOffersProductsPerPage, mobileCardsPerView]);
 
   const onFeaturedCarouselViewChange = useCallback((state: MobileCarouselViewState) => {
     setFeaturedCarousel((prev) =>
