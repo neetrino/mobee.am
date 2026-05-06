@@ -39,12 +39,21 @@ const r2PublicRemotePattern = remotePatternFromAbsoluteUrl(
 
 const nextConfig = {
   reactStrictMode: true,
-  /** /supersudo is served from src/app/admin (no redirect from /admin). */
+  /**
+   * Admin UI files live under `src/app/admin` but are only exposed at `/supersudo`.
+   * `beforeFiles` runs before filesystem matching, so `/admin` never resolves to that tree.
+   */
   async rewrites() {
-    return [
-      { source: '/supersudo', destination: '/admin' },
-      { source: '/supersudo/:path*', destination: '/admin/:path*' },
-    ];
+    return {
+      beforeFiles: [
+        { source: '/admin', destination: '/__admin_path_disabled' },
+        { source: '/admin/:path*', destination: '/__admin_path_disabled' },
+      ],
+      afterFiles: [
+        { source: '/supersudo', destination: '/admin' },
+        { source: '/supersudo/:path*', destination: '/admin/:path*' },
+      ],
+    };
   },
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
   devIndicators: false,
