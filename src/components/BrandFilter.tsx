@@ -28,6 +28,11 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
   const { t } = useTranslation();
   const [brands, setBrands] = useState<BrandOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<string[]>(selectedBrands);
+
+  useEffect(() => {
+    setSelected(selectedBrands);
+  }, [selectedBrands]);
 
   useEffect(() => {
     if (filtersContext?.data?.brands) {
@@ -62,11 +67,14 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
   };
 
   const handleBrandSelect = (brandId: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const currentBrands = selectedBrands || [];
+    const currentBrands = selected;
     const newBrands = currentBrands.includes(brandId)
       ? currentBrands.filter((id) => id !== brandId)
       : [...currentBrands, brandId];
+
+    setSelected(newBrands);
+
+    const params = new URLSearchParams(searchParams.toString());
     if (newBrands.length > 0) {
       params.set('brand', newBrands.join(','));
     } else {
@@ -76,7 +84,7 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
     router.push(`/shop?${params.toString()}`);
   };
 
-  if (loading) {
+  if (loading && brands.length === 0) {
     return (
       <section className="border-b border-[#E2E8F0] pb-6">
         <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#1D293D]">
@@ -100,7 +108,7 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
       {brands.length > 0 ? (
         <div className="mt-4 space-y-3">
           {brands.map((brand) => {
-            const isSelected = selectedBrands.includes(brand.id);
+            const isSelected = selected.includes(brand.id);
 
             return (
               <button

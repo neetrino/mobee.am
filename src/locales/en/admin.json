@@ -4,7 +4,9 @@
     "drawerTitle": "Admin navigation",
     "drawerMenuButton": "Menu",
     "expandProductsMenu": "Expand products submenu",
-    "collapseProductsMenu": "Collapse products submenu"
+    "collapseProductsMenu": "Collapse products submenu",
+    "collapseSidebarAria": "Collapse admin sidebar",
+    "expandSidebarAria": "Expand admin sidebar"
   },
   "menu": {
     "home": "Home",

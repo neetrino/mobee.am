@@ -165,6 +165,21 @@
   "common": {
     "loading": "Loading profile...",
     "loadingProfile": "Loading profile..."
+  },
+  "deleteAccount": {
+    "button": "Delete account",
+    "confirmTitle": "Delete your account?",
+    "confirmBody": "Your account will be closed and you will be signed out. This action cannot be undone from the app.",
+    "continueToConfirm": "I understand, continue",
+    "finalTitle": "Final confirmation",
+    "finalBody": "This permanently closes your account from your side. To proceed, type the word below exactly as shown.",
+    "typeLabel": "Type DELETE (all caps) to confirm",
+    "back": "Back",
+    "phraseMismatch": "Text does not match. Type DELETE in capital letters.",
+    "cancel": "Cancel",
+    "confirm": "Delete account",
+    "deleting": "Deleting...",
+    "failed": "Could not delete account. Please try again."
   }
 }
 

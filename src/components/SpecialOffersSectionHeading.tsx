@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
@@ -34,6 +34,18 @@ function ArrowRightIcon({ className }: { className?: string }) {
   );
 }
 
+type CtaArrowMotion = 'idle' | 'hoverIn' | 'hoverOut';
+
+function getCtaArrowMotionClass(motion: CtaArrowMotion): string {
+  if (motion === 'hoverIn') {
+    return 'animate-cta-arrow-nudge-in';
+  }
+  if (motion === 'hoverOut') {
+    return 'animate-cta-arrow-nudge-out';
+  }
+  return '';
+}
+
 type SpecialOffersSectionHeadingProps = {
   /** Product grid — same card system as “best choice”, placed under the title row. */
   children?: ReactNode;
@@ -50,6 +62,18 @@ export function SpecialOffersSectionHeading({
   syncedCarouselPageCount,
 }: SpecialOffersSectionHeadingProps) {
   const { t } = useTranslation();
+  const [ctaArrowMotion, setCtaArrowMotion] = useState<CtaArrowMotion>('idle');
+  const [ctaArrowMotionKey, setCtaArrowMotionKey] = useState(0);
+
+  function handleCtaPointerEnter() {
+    setCtaArrowMotion('hoverIn');
+    setCtaArrowMotionKey((key) => key + 1);
+  }
+
+  function handleCtaPointerLeave() {
+    setCtaArrowMotion('hoverOut');
+    setCtaArrowMotionKey((key) => key + 1);
+  }
 
   return (
     <div
@@ -70,16 +94,27 @@ export function SpecialOffersSectionHeading({
         </div>
         <Link
           href="/products"
-          className="flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between rounded-full bg-[#2db2ff] pl-5 pr-0.5 transition-opacity hover:opacity-95 active:scale-[0.99] sm:w-[159px]"
+          onPointerEnter={handleCtaPointerEnter}
+          onPointerLeave={handleCtaPointerLeave}
+          className="group relative flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between overflow-hidden rounded-full border-2 border-[#2db2ff] bg-[#2db2ff] pl-5 pr-0.5 active:scale-[0.99] sm:w-[159px]"
         >
-          <span className="text-right text-[12px] font-medium leading-none text-[#1e1e1e]">
+          <span
+            className="pointer-events-none absolute inset-0 origin-[calc(100%-24px)_50%] scale-x-0 bg-[#1e1e1e] transition-transform duration-500 ease-in-out group-hover:scale-x-100"
+            aria-hidden
+          />
+          <span className="relative z-10 text-right text-[12px] font-medium leading-none text-[#1e1e1e] transition-colors duration-500 ease-in-out group-hover:text-white">
             {t('home.special_offers_heading.cta')}
           </span>
           <span
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#1e1e1e] text-white"
+            className="relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full bg-[#1e1e1e] text-white"
             aria-hidden
           >
-            <ArrowRightIcon className="size-2" />
+            <span
+              key={ctaArrowMotionKey}
+              className={`inline-flex items-center justify-center ${getCtaArrowMotionClass(ctaArrowMotion)}`}
+            >
+              <ArrowRightIcon className="size-2" />
+            </span>
           </span>
         </Link>
       </div>

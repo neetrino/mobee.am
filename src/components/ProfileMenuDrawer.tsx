@@ -13,12 +13,13 @@ interface ProfileMenuDrawerProps {
   tabs: ProfileMenuItem[];
   activeTab: string;
   onSelect: (_tabId: string) => void;
+  footer?: ReactNode;
 }
 
 /**
  * Mobile drawer for navigating profile dashboard tabs.
  */
-export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDrawerProps) {
+export function ProfileMenuDrawer({ tabs, activeTab, onSelect, footer }: ProfileMenuDrawerProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -110,6 +111,7 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
                   </svg>
                 </button>
               ))}
+              {footer ? <div className="border-t border-gray-100">{footer}</div> : null}
             </div>
           </div>
         </div>

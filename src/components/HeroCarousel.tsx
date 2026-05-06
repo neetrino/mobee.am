@@ -118,12 +118,16 @@ export function HeroCarousel() {
               <div className="mt-8 md:mt-10">
                 <Link
                   href="/products"
-                  className="inline-flex h-12 min-w-[159px] items-center justify-between gap-2 rounded-full bg-[#1e1e1e] pl-5 pr-1.5 transition-opacity hover:opacity-90"
+                  className="group relative inline-flex h-12 min-w-[159px] items-center justify-between gap-2 overflow-hidden rounded-full border-2 border-[#1e1e1e] bg-[#1e1e1e] pl-5 pr-1.5"
                 >
-                  <span className="flex-1 text-right text-[12px] font-medium leading-none text-[#2db2ff]">
+                  <span
+                    className="pointer-events-none absolute inset-0 origin-[calc(100%-28px)_50%] scale-x-0 bg-[#2db2ff] transition-transform duration-500 ease-in-out group-hover:scale-x-100"
+                    aria-hidden
+                  />
+                  <span className="relative z-10 flex-1 text-right text-[12px] font-medium leading-none text-[#2db2ff] transition-colors duration-500 ease-in-out group-hover:text-[#1e1e1e]">
                     {t('home.hero_cta_more')}
                   </span>
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2db2ff]">
+                  <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2db2ff]">
                     <CtaArrowIcon />
                   </span>
                 </Link>

@@ -46,6 +46,40 @@ class UsersService {
   }
 
   /**
+   * Soft-delete the authenticated user's account (same semantics as admin delete).
+   */
+  async deleteAccount(userId: string) {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { id: true, deletedAt: true },
+    });
+
+    if (!user) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "User not found",
+        detail: "User does not exist",
+      };
+    }
+
+    if (user.deletedAt) {
+      return { success: true };
+    }
+
+    await db.user.update({
+      where: { id: userId },
+      data: {
+        deletedAt: new Date(),
+        blocked: true,
+      },
+      select: { id: true },
+    });
+
+    return { success: true };
+  }
+
+  /**
    * Update user profile
    */
   async updateProfile(userId: string, data: ProfileUpdateInput) {

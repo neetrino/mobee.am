@@ -4,7 +4,9 @@
     "drawerTitle": "Ադմին նավիգացիա",
     "drawerMenuButton": "Մենյու",
     "expandProductsMenu": "Բացել ապրանքների ենթամենյու",
-    "collapseProductsMenu": "Փակել ապրանքների ենթամենյու"
+    "collapseProductsMenu": "Փակել ապրանքների ենթամենյու",
+    "collapseSidebarAria": "Ծալել ադմինի կողային վահանակը",
+    "expandSidebarAria": "Բացել ադմինի կողային վահանակը"
   },
   "menu": {
     "home": "Գլխավոր",

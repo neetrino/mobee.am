@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Maximize2, Minus, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minus, Plus, X } from "lucide-react";
 import { ProductLabels } from "../../../components/ProductLabels";
 import { ProductImagePlaceholder } from "../../../components/ProductImagePlaceholder";
 import { t } from "../../../lib/i18n";
@@ -346,7 +346,7 @@ export function ProductImageGallery({
             </div>
           </div>
           <button 
-            className="absolute top-4 right-4 text-white text-2xl"
+            className="absolute top-4 right-4 text-white"
             aria-label={t(language, 'common.buttons.close')}
             onClick={(e) => {
               e.stopPropagation();
@@ -354,7 +354,7 @@ export function ProductImageGallery({
               setShowZoom(false);
             }}
           >
-            {t(language, 'common.buttons.close')}
+            <X className="w-8 h-8" />
           </button>
         </div>
       )}
