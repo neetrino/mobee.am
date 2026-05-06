@@ -286,21 +286,88 @@ async function executeWithoutAttributeValue(
 function getOrderBy(sort: ProductSortOption): Prisma.ProductOrderByWithRelationInput[] {
   switch (sort) {
     case "price-asc":
-      return [
-        {
-          variants: { _min: { price: "asc" } },
-        } as unknown as Prisma.ProductOrderByWithRelationInput,
-        { createdAt: "desc" },
-      ];
     case "price-desc":
-      return [
-        {
-          variants: { _max: { price: "desc" } },
-        } as unknown as Prisma.ProductOrderByWithRelationInput,
-        { createdAt: "desc" },
-      ];
+      // Prisma does not support ordering Product by variant aggregate (_min/_max) in this schema;
+      // price ordering for unpaginated/overfetch paths is applied in products-find-filter.service.
+      return [{ createdAt: "desc" }];
     default:
       return [{ createdAt: "desc" }];
   }
+}
+
+/**
+ * Listing "from" price: minimum published variant price (matches grid / filter sort).
+ */
+function listPriceFromLightVariants(
+  variants: ReadonlyArray<{ price: number }>
+): number {
+  if (variants.length === 0) return 0;
+  return Math.min(...variants.map((v) => v.price));
+}
+
+/**
+ * Paginated catalog sort by list price: load lightweight rows, sort in memory, then full rows for the page.
+ * Avoids PrismaClientValidationError from unsupported relation aggregate orderBy.
+ */
+export async function fetchProductsPageForPriceSort(
+  where: Prisma.ProductWhereInput,
+  limit: number,
+  skip: number,
+  sort: "price-asc" | "price-desc",
+  listingMode: boolean
+): Promise<ProductWithRelations[]> {
+  const lightRows = await db.product.findMany({
+    where,
+    select: {
+      id: true,
+      createdAt: true,
+      variants: {
+        where: { published: true },
+        select: { price: true },
+      },
+    },
+  });
+
+  const sortedIds = lightRows
+    .map((row) => ({
+      id: row.id,
+      listPrice: listPriceFromLightVariants(row.variants),
+      createdAt: row.createdAt,
+    }))
+    .sort((a, b) => {
+      if (a.listPrice !== b.listPrice) {
+        return sort === "price-asc"
+          ? a.listPrice - b.listPrice
+          : b.listPrice - a.listPrice;
+      }
+      return (
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    })
+    .map((row) => row.id);
+
+  const pageIds = sortedIds.slice(skip, skip + limit);
+  if (pageIds.length === 0) {
+    return [];
+  }
+
+  const narrowedWhere: Prisma.ProductWhereInput = {
+    AND: [where, { id: { in: pageIds } }],
+  };
+
+  const products = await executeProductQuery(
+    narrowedWhere,
+    pageIds.length,
+    0,
+    "default",
+    listingMode
+  );
+
+  const orderMap = new Map(pageIds.map((id, index) => [id, index]));
+  products.sort(
+    (a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0)
+  );
+
+  return products;
 }
 

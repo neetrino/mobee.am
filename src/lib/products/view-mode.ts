@@ -8,19 +8,13 @@ const VALID_MODES: readonly ProductListingViewMode[] = ['list', 'grid-2', 'grid-
 
 const DEFAULT_LISTING_MODE: ProductListingViewMode = 'grid-2';
 
-/**
- * Parses stored listing mode from localStorage (or null when unset).
- */
 export function parseProductListingViewMode(stored: string | null): ProductListingViewMode {
-  if (stored && (VALID_MODES as readonly string[]).includes(stored)) {
+  if (stored && VALID_MODES.includes(stored as ProductListingViewMode)) {
     return stored as ProductListingViewMode;
   }
   return DEFAULT_LISTING_MODE;
 }
 
-/**
- * Persists listing mode and dispatches a window event so the product grid updates.
- */
 export function persistProductListingViewMode(mode: ProductListingViewMode): void {
   window.localStorage.setItem(PRODUCTS_VIEW_MODE_STORAGE_KEY, mode);
   window.dispatchEvent(

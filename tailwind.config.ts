@@ -1,5 +1,8 @@
 import type { Config } from 'tailwindcss';
-import { LAYOUT_DESKTOP_MIN_WIDTH_PX } from './src/lib/layout-breakpoints.constants';
+import {
+  LAYOUT_DESKTOP_MIN_WIDTH_PX,
+  SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX,
+} from './src/lib/layout-breakpoints.constants';
 
 const config: Config = {
   content: [
@@ -13,7 +16,7 @@ const config: Config = {
       sm: '640px',
       md: '768px',
       lg: `${LAYOUT_DESKTOP_MIN_WIDTH_PX}px`,
-      xl: '1280px',
+      xl: `${SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX}px`,
       '2xl': '1536px',
     },
     extend: {
