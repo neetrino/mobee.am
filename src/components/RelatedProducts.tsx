@@ -31,6 +31,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   const { isLoggedIn } = useAuth();
   const [language, setLanguage] = useState<LanguageCode>('en');
   const addToCartInFlightRef = useRef<Set<string>>(new Set());
+  const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   
   const visibleCards = useVisibleCards();
@@ -97,6 +98,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
     }
 
     addToCartInFlightRef.current.add(product.id);
+    setAddingProductId(product.id);
 
     void (async () => {
       try {
@@ -171,6 +173,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         }
       } finally {
         addToCartInFlightRef.current.delete(product.id);
+        setAddingProductId((current) => (current === product.id ? null : current));
       }
     })();
   };
@@ -230,7 +233,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
                     product={product}
                     currency={currency}
                     language={language}
-                    isAddingToCart={false}
+                    isAddingToCart={addingProductId === product.id}
                     hasMoved={hasMoved}
                     onAddToCart={handleAddToCart}
                     onImageError={handleImageError}
