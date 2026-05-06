@@ -1,6 +1,9 @@
+'use client';
+
 import { Card } from '@shop/ui';
 import { UserAvatar } from '../../components/UserAvatar';
 import { ProfileMenuDrawer } from '../../components/ProfileMenuDrawer';
+import { ProfileDeleteAccount } from './ProfileDeleteAccount';
 import type { UserProfile, ProfileTab, ProfileTabConfig } from './types';
 
 interface ProfileHeaderProps {
@@ -66,6 +69,7 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
                 <span className="text-left">{tab.label}</span>
               </button>
             ))}
+            <ProfileDeleteAccount t={t} />
           </nav>
         </aside>
       </div>
@@ -76,6 +80,7 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
           tabs={tabs}
           activeTab={activeTab}
           onSelect={(tabId) => onTabChange(tabId as ProfileTab)}
+          footer={<ProfileDeleteAccount t={t} variant="drawer" />}
         />
       </div>
     </>
