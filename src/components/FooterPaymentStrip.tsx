@@ -20,15 +20,12 @@ export function FooterPaymentStrip() {
   return (
     <div className={montserrat.className}>
       <div
-        className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-6 pb-8 pt-[33px] lg:flex-row lg:items-center lg:justify-between lg:gap-8`}
+        className={`${SITE_CONTENT_GUTTERS_CLASS} flex max-w-full flex-row flex-nowrap items-baseline gap-6 overflow-x-auto pb-8 pt-[33px]`}
       >
-        <div className="flex items-center">
-          <p className="text-[18px] font-black leading-[28px] text-black whitespace-nowrap">
-            {t('common.footer.legalBar.brand')}
-          </p>
-        </div>
-
-        <p className="max-w-[min(100%,420px)] text-[16px] leading-5 text-[#a1a1aa] lg:max-w-[360px] lg:text-right">
+        <p className="shrink-0 text-[18px] font-black leading-[28px] text-black">
+          {t('common.footer.legalBar.brand')}
+        </p>
+        <p className="whitespace-nowrap text-[16px] leading-5 text-[#a1a1aa]">
           <span>{t('common.footer.legalBar.copyrightLead').replace('{year}', String(year))} </span>
           <span>{t('common.footer.legalBar.createdBy')} </span>
           <span className="font-semibold text-[#a1a1aa]">{t('common.footer.legalBar.creditCompany')}</span>
