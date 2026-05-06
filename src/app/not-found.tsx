@@ -31,7 +31,7 @@ export default function NotFound() {
         <div className="flex gap-4 justify-center">
           <Link
             href="/"
-            className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+            className="px-6 py-3 bg-admin-500 text-white rounded-lg hover:bg-admin-600 transition-colors font-medium"
           >
             {t('common.notFound.goHome')}
           </Link>
