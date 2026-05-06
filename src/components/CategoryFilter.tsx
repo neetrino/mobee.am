@@ -36,7 +36,7 @@ export function CategoryFilter({
   const { t } = useTranslation();
   const filtersCtx = useProductsFilters();
   const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(currentCategory);
 
   useEffect(() => {

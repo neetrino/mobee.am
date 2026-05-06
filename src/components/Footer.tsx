@@ -54,7 +54,7 @@ function SocialIconLink({ href, label, icon }: SocialIconLinkProps) {
 }
 
 export function Footer() {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
 
   const addressText = t('contact.address');
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressText)}`;
