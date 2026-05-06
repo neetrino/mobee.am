@@ -74,3 +74,27 @@ export async function PUT(req: NextRequest) {
   }
 }
 
+export async function DELETE(req: NextRequest) {
+  try {
+    const user = await authenticateToken(req);
+    if (!user) {
+      return NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/unauthorized",
+          title: "Unauthorized",
+          status: 401,
+          detail: "Authentication token required",
+          instance: req.url,
+        },
+        { status: 401 }
+      );
+    }
+
+    const result = await usersService.deleteAccount(user.id);
+    return NextResponse.json(result);
+  } catch (error: unknown) {
+    logger.error("Users profile delete error", { error });
+    const apiError = toApiError(error, req.url);
+    return NextResponse.json(apiError, { status: apiError.status || 500 });
+  }
+}
