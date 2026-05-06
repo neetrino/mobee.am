@@ -100,7 +100,7 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
     router.push(`/shop?${params.toString()}`);
   };
 
-  if (loading) {
+  if (loading && colors.length === 0) {
     return (
       <section className="border-b border-[#E2E8F0] pb-6">
         <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#1D293D]">

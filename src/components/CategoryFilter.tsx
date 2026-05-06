@@ -37,6 +37,11 @@ export function CategoryFilter({
   const filtersCtx = useProductsFilters();
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(currentCategory);
+
+  useEffect(() => {
+    setSelectedCategory(currentCategory);
+  }, [currentCategory]);
 
   useEffect(() => {
     if (filtersCtx !== null) {
@@ -75,17 +80,20 @@ export function CategoryFilter({
   }, [filtersCtx, filtersCtx?.loading, filtersCtx?.topCategories, search, minPrice, maxPrice]);
 
   const toggleCategory = (slug: string) => {
+    const nextCategory = selectedCategory === slug ? undefined : slug;
+    setSelectedCategory(nextCategory);
+
     const params = new URLSearchParams(searchParams.toString());
-    if (currentCategory === slug) {
+    if (nextCategory === undefined) {
       params.delete('category');
     } else {
-      params.set('category', slug);
+      params.set('category', nextCategory);
     }
     params.delete('page');
     router.push(`/shop?${params.toString()}`);
   };
 
-  if (loading || categories.length === 0) {
+  if (categories.length === 0) {
     return null;
   }
 
@@ -97,7 +105,7 @@ export function CategoryFilter({
 
       <div className="mt-4 space-y-3">
         {categories.map((category) => {
-          const selected = currentCategory === category.slug;
+          const selected = selectedCategory === category.slug;
           return (
             <button
               key={category.id}

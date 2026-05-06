@@ -70,34 +70,32 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   {t(language, 'products.filters.sidebar.subtitle')}
                 </p>
               </div>
-              <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
-                <PriceFilter
-                  currentMinPrice={params?.minPrice}
-                  currentMaxPrice={params?.maxPrice}
-                  category={params?.category}
-                  search={params?.search}
-                />
-                <CategoryFilter
-                  currentCategory={params?.category}
-                  search={params?.search}
-                  minPrice={params?.minPrice}
-                  maxPrice={params?.maxPrice}
-                />
-                <BrandFilter
-                  category={params?.category}
-                  search={params?.search}
-                  minPrice={params?.minPrice}
-                  maxPrice={params?.maxPrice}
-                  selectedBrands={selectedBrands}
-                />
-                <ColorFilter
-                  category={params?.category}
-                  search={params?.search}
-                  minPrice={params?.minPrice}
-                  maxPrice={params?.maxPrice}
-                  selectedColors={selectedColors}
-                />
-              </Suspense>
+              <PriceFilter
+                currentMinPrice={params?.minPrice}
+                currentMaxPrice={params?.maxPrice}
+                category={params?.category}
+                search={params?.search}
+              />
+              <CategoryFilter
+                currentCategory={params?.category}
+                search={params?.search}
+                minPrice={params?.minPrice}
+                maxPrice={params?.maxPrice}
+              />
+              <BrandFilter
+                category={params?.category}
+                search={params?.search}
+                minPrice={params?.minPrice}
+                maxPrice={params?.maxPrice}
+                selectedBrands={selectedBrands}
+              />
+              <ColorFilter
+                category={params?.category}
+                search={params?.search}
+                minPrice={params?.minPrice}
+                maxPrice={params?.maxPrice}
+                selectedColors={selectedColors}
+              />
             </div>
           </aside>
 
@@ -107,34 +105,32 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
           <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
             <div className="space-y-6 p-4">
-              <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
-                <PriceFilter
-                  currentMinPrice={params?.minPrice}
-                  currentMaxPrice={params?.maxPrice}
-                  category={params?.category}
-                  search={params?.search}
-                />
-                <CategoryFilter
-                  currentCategory={params?.category}
-                  search={params?.search}
-                  minPrice={params?.minPrice}
-                  maxPrice={params?.maxPrice}
-                />
-                <BrandFilter
-                  category={params?.category}
-                  search={params?.search}
-                  minPrice={params?.minPrice}
-                  maxPrice={params?.maxPrice}
-                  selectedBrands={selectedBrands}
-                />
-                <ColorFilter
-                  category={params?.category}
-                  search={params?.search}
-                  minPrice={params?.minPrice}
-                  maxPrice={params?.maxPrice}
-                  selectedColors={selectedColors}
-                />
-              </Suspense>
+              <PriceFilter
+                currentMinPrice={params?.minPrice}
+                currentMaxPrice={params?.maxPrice}
+                category={params?.category}
+                search={params?.search}
+              />
+              <CategoryFilter
+                currentCategory={params?.category}
+                search={params?.search}
+                minPrice={params?.minPrice}
+                maxPrice={params?.maxPrice}
+              />
+              <BrandFilter
+                category={params?.category}
+                search={params?.search}
+                minPrice={params?.minPrice}
+                maxPrice={params?.maxPrice}
+                selectedBrands={selectedBrands}
+              />
+              <ColorFilter
+                category={params?.category}
+                search={params?.search}
+                minPrice={params?.minPrice}
+                maxPrice={params?.maxPrice}
+                selectedColors={selectedColors}
+              />
             </div>
           </MobileFiltersDrawer>
         </ProductsFiltersProvider>
