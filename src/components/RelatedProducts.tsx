@@ -50,8 +50,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
-    handleWheel,
-  } = useCarousel({ itemCount: products.length, visibleItems: visibleCards });
+  } = useCarousel({
+    itemCount: products.length,
+    visibleItems: visibleCards,
+    autoRotateInterval: 0,
+  });
 
   // Initialize language from localStorage after mount to prevent hydration mismatch
   useEffect(() => {
@@ -205,7 +208,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
             {/* Carousel Container */}
             <div 
               ref={carouselRef}
-              className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none"
+              className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none touch-pan-y"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -213,7 +216,6 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              onWheel={handleWheel}
             >
               <div
                 className="flex items-stretch"

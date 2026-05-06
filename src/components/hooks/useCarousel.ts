@@ -2,9 +2,13 @@
 
 import { useState, useEffect, useRef, type MouseEvent, type TouchEvent } from 'react';
 
+/** Minimum horizontal movement before treating pointer interaction as a carousel drag. */
+const CAROUSEL_DRAG_MIN_PX = 5;
+
 interface UseCarouselProps {
   itemCount: number;
   visibleItems: number;
+  /** Set to 0 to disable auto-advance (recommended when wheel/touch conflicts with page scroll). */
   autoRotateInterval?: number;
 }
 
@@ -15,6 +19,7 @@ export function useCarousel({ itemCount, visibleItems, autoRotateInterval = 5000
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -23,8 +28,8 @@ export function useCarousel({ itemCount, visibleItems, autoRotateInterval = 5000
 
   // Auto-rotate carousel
   useEffect(() => {
-    if (itemCount <= visibleItems || isDragging) return;
-    
+    if (autoRotateInterval <= 0 || itemCount <= visibleItems || isDragging) return;
+
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
         return prevIndex >= maxIndex ? 0 : prevIndex + 1;
@@ -62,6 +67,7 @@ export function useCarousel({ itemCount, visibleItems, autoRotateInterval = 5000
     setHasMoved(false);
     setIsDragging(true);
     setStartX(e.pageX - carouselRef.current.offsetLeft);
+    setStartY(e.pageY);
     setScrollLeft(currentIndex);
   };
 
@@ -69,9 +75,10 @@ export function useCarousel({ itemCount, visibleItems, autoRotateInterval = 5000
     if (!isDragging || !carouselRef.current) return;
     const x = e.pageX - carouselRef.current.offsetLeft;
     const deltaX = Math.abs(x - startX);
-    
-    // Only consider it dragging if mouse moved more than 5px
-    if (deltaX > 5) {
+    const deltaYMove = Math.abs(e.pageY - startY);
+
+    // Require dominant horizontal motion so vertical page intent does not move the strip
+    if (deltaX > CAROUSEL_DRAG_MIN_PX && deltaX > deltaYMove) {
       setHasMoved(true);
       e.preventDefault();
       const walk = (x - startX) * 2; // Scroll speed multiplier
@@ -99,6 +106,7 @@ export function useCarousel({ itemCount, visibleItems, autoRotateInterval = 5000
     setHasMoved(false);
     setIsDragging(true);
     setStartX(e.touches[0].pageX - carouselRef.current.offsetLeft);
+    setStartY(e.touches[0].pageY);
     setScrollLeft(currentIndex);
   };
 
@@ -106,9 +114,9 @@ export function useCarousel({ itemCount, visibleItems, autoRotateInterval = 5000
     if (!isDragging || !carouselRef.current) return;
     const x = e.touches[0].pageX - carouselRef.current.offsetLeft;
     const deltaX = Math.abs(x - startX);
-    
-    // Only consider it dragging if touch moved more than 5px
-    if (deltaX > 5) {
+    const deltaYMove = Math.abs(e.touches[0].pageY - startY);
+
+    if (deltaX > CAROUSEL_DRAG_MIN_PX && deltaX > deltaYMove) {
       setHasMoved(true);
       const walk = (x - startX) * 2;
       const cardWidth = 100 / visibleItems;
@@ -129,16 +137,6 @@ export function useCarousel({ itemCount, visibleItems, autoRotateInterval = 5000
     }
   };
 
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (e.deltaY === 0) return;
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 1 : -1;
-    setCurrentIndex((prevIndex) => {
-      const newIndex = prevIndex + delta;
-      return Math.max(0, Math.min(maxIndex, newIndex));
-    });
-  };
-
   return {
     currentIndex,
     isDragging,
@@ -153,7 +151,6 @@ export function useCarousel({ itemCount, visibleItems, autoRotateInterval = 5000
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
-    handleWheel,
   };
 }
 
