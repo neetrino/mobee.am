@@ -45,7 +45,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   return (
     <div className="w-full max-w-full">
       <div
-        className={`flex w-full flex-col gap-6 lg:flex-row lg:items-start ${SITE_CONTENT_GUTTERS_CLASS}`}
+        className={`flex w-full flex-col gap-6 pt-4 lg:flex-row lg:items-start ${SITE_CONTENT_GUTTERS_CLASS}`}
       >
         <ProductsFiltersProvider
           category={params?.category}
@@ -54,7 +54,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           maxPrice={params?.maxPrice}
         >
           <aside
-            className="hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-6 lg:border-r lg:border-[#e7e7e7] lg:pr-0"
+            className="hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-[4.25rem] lg:border-r lg:border-[#e7e7e7] lg:pr-0"
             style={
               {
                 ['--shop-filter-aside-width']: SHOP_FILTER_SIDEBAR_WIDTH_CSS,
