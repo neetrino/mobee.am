@@ -317,13 +317,13 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
       style={positionStyle}
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        <div className="flex items-center justify-between gap-3 py-2 lg:min-h-[52px]">
-          <div className="flex min-w-0 flex-1 items-center gap-4 xl:gap-6">
+        <div className="flex items-center justify-between gap-2 py-2 lg:min-h-[52px] xl:gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3 xl:gap-6">
             <div className="relative shrink-0" ref={categoriesWrapRef}>
               <button
                 type="button"
                 onClick={onCategoriesButtonClick}
-                className="flex h-9 w-full min-w-[156px] max-w-[210px] items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-4 pr-3 text-left text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/90 active:opacity-90"
+                className="flex h-9 w-full min-w-[132px] max-w-[180px] items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-3 pr-2.5 text-left text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/90 active:opacity-90 xl:min-w-[156px] xl:max-w-[210px] xl:pl-4 xl:pr-3"
                 aria-expanded={isCategoriesMenuOpen}
                 aria-haspopup="true"
               >
@@ -346,7 +346,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               {categoriesMenu}
             </div>
 
-            <div className="relative min-w-0 max-w-[299px] flex-1 xl:max-w-[374px]">
+            <div className="relative min-w-0 max-w-[220px] flex-1 lg:max-w-[260px] xl:max-w-[299px] 2xl:max-w-[374px]">
               <form onSubmit={onSearchSubmit} className="relative w-full">
                 <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">
                   <SecondarySearchGlyph className="text-gray-400" />
@@ -385,7 +385,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-5 pl-1.5 xl:gap-7">
+          <div className="flex shrink-0 items-center gap-3 pl-1 lg:gap-4 xl:gap-7">
             <div className="flex items-center gap-0.5 sm:gap-1.5">
               <Link href="/compare" className={iconLinkClass} aria-label={compareAria}>
                 <CompareIcon

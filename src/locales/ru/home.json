@@ -63,7 +63,8 @@
       "phones": "iPhone",
       "tablets": "iPad",
       "watches": "Watch",
-      "headphones": "AirPods"
+      "headphones": "AirPods",
+      "accessories": "Аксессуары"
     }
   }
 }

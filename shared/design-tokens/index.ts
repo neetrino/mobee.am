@@ -117,11 +117,11 @@ export const shadows = {
   lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
 } as const;
 
-// Breakpoints (for reference)
+// Breakpoints (for reference — Tailwind `theme.screens` in tailwind.config.ts)
 export const breakpoints = {
   sm: '640px',
   md: '768px',
-  lg: '1024px',
+  lg: '834px',
   xl: '1280px',
   '2xl': '1536px',
 } as const;

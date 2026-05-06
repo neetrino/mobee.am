@@ -30,6 +30,7 @@ import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
 import { useCategoriesTree } from './CategoriesTreeContext';
+import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 
 /** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
 const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
@@ -314,9 +315,7 @@ function CategoryMenuItem({
             }, 150);
           }}
         >
-          <div 
-            className="bg-white rounded-xl shadow-2xl border border-gray-200/80 p-6 min-w-[500px]"
-          >
+          <div className="w-max max-w-[min(500px,calc(100vw-2rem))] rounded-xl border border-gray-200/80 bg-white p-6 shadow-2xl">
             <div 
               className="grid gap-6"
               style={{ gridTemplateColumns: `repeat(${subcategoryColumns.length}, minmax(150px, 1fr))` }}
@@ -406,7 +405,7 @@ function HeaderPhoneLangCluster({
       : 'truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151]';
 
   return (
-    <div className="flex min-w-0 shrink-0 items-center gap-6 sm:gap-[50px]">
+    <div className="flex min-w-0 shrink-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[50px]">
       <a href={telHref} className="flex min-w-0 items-center gap-2" aria-label={t('common.header.supportPhoneAria')}>
         <span className="relative size-6 shrink-0">
           <img
@@ -485,7 +484,7 @@ export function Header() {
     if (typeof window === 'undefined') {
       return;
     }
-    const mq = window.matchMedia('(min-width: 1024px)');
+    const mq = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
     if (!mq.matches) {
       setSecondaryDocked(false);
       return;
@@ -508,7 +507,7 @@ export function Header() {
     if (typeof window === 'undefined') {
       return;
     }
-    if (window.matchMedia('(min-width: 1024px)').matches) {
+    if (window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY).matches) {
       setMobileSearchDocked(false);
       setMobileSearchFlowSpacerPx(0);
       return;
@@ -619,7 +618,7 @@ export function Header() {
     syncMobileSearchDock();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
-    const mq = window.matchMedia('(min-width: 1024px)');
+    const mq = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
     const onMq = () => {
       syncSecondaryDock();
       syncMobileSearchDock();
@@ -1221,7 +1220,7 @@ export function Header() {
         >
         <div
           ref={desktopPrimaryRowRef}
-          className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
+          className={`hidden min-w-0 w-full items-center justify-between gap-2 lg:gap-2 xl:gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
             desktopPrimaryPeekActive
               ? `fixed left-0 right-0 top-0 z-[55] border-b border-gray-200 bg-white will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
                   desktopPrimaryPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
@@ -1230,11 +1229,11 @@ export function Header() {
           }`}
           style={desktopPrimaryPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
         >
-          <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
+          <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-3 xl:gap-6 2xl:gap-[76px]">
             <Link
               href="/"
               aria-label={t('common.navigation.home')}
-              className="flex max-w-[min(280px,32vw)] shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
+              className="flex max-w-[min(280px,28vw)] shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
             >
               <SiteBrandLogo
                 decorative
@@ -1244,7 +1243,7 @@ export function Header() {
               />
             </Link>
             <nav
-              className="flex min-w-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[60px]"
+              className="flex min-w-0 items-center gap-2 lg:gap-2 xl:gap-5 2xl:gap-[60px]"
               aria-label="Primary"
             >
               <Link

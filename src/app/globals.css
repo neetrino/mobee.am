@@ -115,8 +115,8 @@
     display: none;
   }
 
-  /* Admin desktop sidebar nav: scroll without visible scrollbar (Tailwind `lg` = 1024px). */
-  @media (min-width: 1024px) {
+  /* Admin desktop sidebar nav: scroll without visible scrollbar (Tailwind `lg` — see layout-breakpoints.constants). */
+  @media (min-width: 834px) {
     .admin-sidebar-nav-scroll-desktop {
       -ms-overflow-style: none;
       scrollbar-width: none;
@@ -124,6 +124,17 @@
 
     .admin-sidebar-nav-scroll-desktop::-webkit-scrollbar {
       display: none;
+    }
+  }
+
+  /* TopCategories desktop tiles: `cqi` scale; extra shrink lg–xl (iPad), full from xl (see tailwind screens). */
+  .category-strip-tile-art {
+    transform: translateX(-50%) scale(min(1, calc(0.76 * 100cqi / 197px)));
+  }
+
+  @media (min-width: 1280px) {
+    .category-strip-tile-art {
+      transform: translateX(-50%) scale(min(1, calc(100cqi / 197px)));
     }
   }
 }
@@ -144,7 +155,7 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 834px) {
   .policy-page {
     padding-left: 2rem; /* lg:px-8 */
     padding-right: 2rem;
