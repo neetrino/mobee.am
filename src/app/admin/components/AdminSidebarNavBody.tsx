@@ -68,7 +68,7 @@ function ProductsNavRow({
         aria-label={isExpanded ? collapseAria : expandAria}
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-all ${
           isActive
-            ? 'bg-admin text-white hover:opacity-90'
+            ? 'text-admin hover:text-admin-700'
             : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
         }`}
       >
