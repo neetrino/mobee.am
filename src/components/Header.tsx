@@ -7,7 +7,7 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } f
 import type { CSSProperties, FormEvent } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
-import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
+import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
 import { useInstantSearch } from './hooks/useInstantSearch';
 import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
@@ -66,12 +66,6 @@ interface Category {
 }
 
 // Icon Components
-const ChevronDownIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
 // Arrow icon for categories with subcategories (▶)
 const ArrowRightIcon = () => (
   <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-auto">
@@ -432,7 +426,6 @@ export function Header() {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
   const [, setCartTotal] = useState(0);
-  const [showMobileCurrency, setShowMobileCurrency] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
@@ -451,7 +444,6 @@ export function Header() {
       ? 'whitespace-nowrap text-[13px] font-black leading-5 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
       : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
 
-  const mobileCurrencyRef = useRef<HTMLDivElement>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
@@ -860,14 +852,9 @@ export function Header() {
     return cats; // API already returns only root categories
   };
 
-  const selectedCurrencyInfo = CURRENCIES[selectedCurrency];
-
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(event.target as Node)) {
-        setShowMobileCurrency(false);
-      }
       if (mobilePrimaryLangRef.current && !mobilePrimaryLangRef.current.contains(event.target as Node)) {
         setShowMobilePrimaryLangMenu(false);
       }
@@ -1077,41 +1064,79 @@ export function Header() {
                 type="button"
                 onClick={() => setShowMobilePrimaryLangMenu((open) => !open)}
                 className={mobilePrimaryLangButtonClassName}
-                aria-label={t('common.ariaLabels.changeLanguage')}
+                aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
                 aria-expanded={showMobilePrimaryLangMenu}
-                aria-haspopup="listbox"
+                aria-haspopup="dialog"
+                aria-controls="header-mobile-locale-menu"
               >
                 <GlobeLanguageIcon />
               </button>
               {showMobilePrimaryLangMenu ? (
                 <div
-                  className="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-2xl"
-                  role="listbox"
-                  aria-label={t('common.ariaLabels.changeLanguage')}
+                  id="header-mobile-locale-menu"
+                  className="absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),14rem)] overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-2xl"
+                  role="dialog"
+                  aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
                 >
-                  {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
-                    const active = getStoredLanguage() === code;
-                    const label = code === 'hy' ? 'ՀԱՅ' : code === 'ru' ? 'РУС' : 'EN';
-                    return (
-                      <button
-                        key={code}
-                        type="button"
-                        role="option"
-                        aria-selected={active}
-                        onClick={() => {
-                          setShowMobilePrimaryLangMenu(false);
-                          if (!active) setStoredLanguage(code);
-                        }}
-                        className={`w-full px-4 py-2.5 text-left text-sm font-semibold transition-colors duration-150 ${
-                          active
-                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900'
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
+                  <div
+                    className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400"
+                    id="header-mobile-locale-lang-heading"
+                  >
+                    {t('common.localeMenu.languageSection')}
+                  </div>
+                  <div role="group" aria-labelledby="header-mobile-locale-lang-heading">
+                    {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
+                      const active = getStoredLanguage() === code;
+                      const label = LANGUAGES[code].nativeName;
+                      return (
+                        <button
+                          key={code}
+                          type="button"
+                          onClick={() => {
+                            setShowMobilePrimaryLangMenu(false);
+                            if (!active) setStoredLanguage(code);
+                          }}
+                          className={`w-full px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
+                            active
+                              ? 'bg-gray-100 font-bold text-gray-900'
+                              : 'font-normal text-gray-800 hover:bg-gray-50'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="my-1 border-t border-gray-100" role="separator" />
+                  <div
+                    className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400"
+                    id="header-mobile-locale-currency-heading"
+                  >
+                    {t('common.localeMenu.currencySection')}
+                  </div>
+                  <div role="group" aria-labelledby="header-mobile-locale-currency-heading">
+                    {Object.values(CURRENCIES).map((currency) => {
+                      const active = selectedCurrency === currency.code;
+                      return (
+                        <button
+                          key={currency.code}
+                          type="button"
+                          onClick={() => {
+                            setShowMobilePrimaryLangMenu(false);
+                            if (!active) handleCurrencyChange(currency.code);
+                          }}
+                          className={`flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
+                            active
+                              ? 'bg-gray-100 font-bold text-gray-900'
+                              : 'font-normal text-gray-800 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span>{currency.code}</span>
+                          <span className={active ? 'text-gray-900' : 'text-gray-500'}>{currency.symbol}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : null}
             </div>
@@ -1365,7 +1390,7 @@ export function Header() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
@@ -1374,41 +1399,6 @@ export function Header() {
                 >
                   <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
                 </Link>
-                <div className="relative shrink-0" ref={mobileCurrencyRef}>
-                  <button
-                    type="button"
-                    onClick={() => setShowMobileCurrency(!showMobileCurrency)}
-                    className="flex h-9 cursor-pointer items-center justify-center gap-1 rounded-full border border-gray-200 bg-white px-2 text-xs font-medium text-gray-800 transition-colors"
-                  >
-                    <span className="text-sm font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
-                    <span className="text-xs font-medium leading-none">{selectedCurrency}</span>
-                    <ChevronDownIcon />
-                  </button>
-                  {showMobileCurrency ? (
-                    <div className="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-2xl">
-                      {Object.values(CURRENCIES).map((currency) => (
-                        <button
-                          key={currency.code}
-                          type="button"
-                          onClick={() => {
-                            handleCurrencyChange(currency.code);
-                            setShowMobileCurrency(false);
-                          }}
-                          className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
-                            selectedCurrency === currency.code
-                              ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span>{currency.code}</span>
-                            <span className="text-gray-500">{currency.symbol}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-base font-semibold text-gray-900">{t('common.navigation.categories')}</p>

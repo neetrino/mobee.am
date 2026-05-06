@@ -167,6 +167,10 @@
     "productNotFound": "Product not found. Please refresh the page and try again.",
     "failedToAddToCart": "Failed to add product to cart. Please try again."
   },
+  "localeMenu": {
+    "languageSection": "Language",
+    "currencySection": "Currency"
+  },
   "ariaLabels": {
     "addToCart": "Add to cart",
     "removeFromCart": "Remove from cart",
@@ -180,6 +184,7 @@
     "openMenu": "Open navigation menu",
     "closeMenu": "Close navigation menu",
     "changeLanguage": "Change language",
+    "changeLanguageAndCurrency": "Language and currency",
     "instagram": "Instagram",
     "facebook": "Facebook",
     "linkedin": "LinkedIn",
