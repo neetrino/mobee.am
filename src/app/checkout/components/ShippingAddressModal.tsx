@@ -83,8 +83,9 @@ export function ShippingAddressModal({
               : t('checkout.modals.confirmOrder')}
           </h2>
           <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="rounded-full p-1 text-gray-400 transition-colors hover:text-gray-600"
             aria-label={t('checkout.modals.closeModal')}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -215,7 +216,7 @@ export function ShippingAddressModal({
           <Button
             type="button"
             variant="outline"
-            className="flex-1"
+            className="flex-1 !rounded-full"
             onClick={onClose}
             disabled={isSubmitting}
           >
@@ -224,7 +225,7 @@ export function ShippingAddressModal({
           <Button
             type="button"
             variant="brand"
-            className="flex-1"
+            className="flex-1 !rounded-full"
             onClick={handleSubmit(
               (data) => {
                 onClose();

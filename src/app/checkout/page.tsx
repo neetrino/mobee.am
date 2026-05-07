@@ -7,6 +7,7 @@ import { CheckoutForm } from './CheckoutForm';
 import { CheckoutModals } from './CheckoutModals';
 import { OrderSummary } from './OrderSummary';
 import { useCheckout } from './useCheckout';
+import { CHECKOUT_PAGE_SHELL_CLASS } from './constants';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -45,14 +46,14 @@ export default function CheckoutPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className={CHECKOUT_PAGE_SHELL_CLASS}>
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="h-96 bg-gray-200 rounded"></div>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="space-y-4 lg:col-span-2">
+              <div className="h-96 rounded bg-gray-200" />
             </div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-64 rounded bg-gray-200" />
           </div>
         </div>
       </div>
@@ -61,11 +62,11 @@ export default function CheckoutPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className={CHECKOUT_PAGE_SHELL_CLASS}>
         <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('checkout.title')}</h1>
         <Card className="p-6 text-center">
           <p className="text-gray-600 mb-4">{t('checkout.errors.cartEmpty')}</p>
-          <Button variant="brand" onClick={() => router.push('/products')}>
+          <Button variant="brand" className="!rounded-full" onClick={() => router.push('/products')}>
             {t('checkout.buttons.continueShopping')}
           </Button>
         </Card>
@@ -74,12 +75,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className={CHECKOUT_PAGE_SHELL_CLASS}>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('checkout.title')}</h1>
 
       <form onSubmit={handlePlaceOrder}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Checkout Form */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <CheckoutForm
             register={register}
             setValue={setValue}
@@ -94,7 +94,6 @@ export default function CheckoutPage() {
             setError={setError}
           />
 
-          {/* Order Summary */}
           <OrderSummary
             cart={cart}
             orderSummary={orderSummary}

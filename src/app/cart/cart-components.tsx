@@ -14,6 +14,7 @@ import {
   ORDER_SUMMARY_PANEL_RADIUS_CLASS,
 } from './constants';
 import { CART_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
+import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
 
 /**
  * Cart item row component
@@ -223,7 +224,7 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
   return (
     <div className="lg:col-span-1">
       <div
-        className={`${ORDER_SUMMARY_PANEL_RADIUS_CLASS} border border-gray-200 bg-white p-6 lg:sticky lg:top-24`}
+        className={`${ORDER_SUMMARY_PANEL_RADIUS_CLASS} border border-gray-200 bg-white p-6 ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}
       >
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           {t('common.cart.orderSummary')}

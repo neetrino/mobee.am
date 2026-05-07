@@ -3,6 +3,7 @@
 import { Card, Button } from '@shop/ui';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../lib/currency';
+import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
 
 interface Cart {
   id: string;
@@ -52,7 +53,7 @@ export function OrderSummary({
 
   return (
     <div>
-      <Card className="p-6 sticky top-4">
+      <Card className={`p-6 ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.orderSummary')}</h2>
         <div className="space-y-4 mb-6">
           <div className="flex justify-between text-gray-600">
@@ -94,7 +95,7 @@ export function OrderSummary({
         <Button
           type="submit"
           variant="brand"
-          className="w-full"
+          className="w-full !rounded-full"
           size="lg"
           disabled={isSubmitting}
           onClick={onPlaceOrder}

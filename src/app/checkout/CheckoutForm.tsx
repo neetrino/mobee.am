@@ -40,44 +40,40 @@ export function CheckoutForm({
   const { t } = useTranslation();
 
   return (
-    <div className="lg:col-span-2 space-y-6">
+    <div className="space-y-6 lg:col-span-2">
       {/* Contact Information */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.contactInformation')}</h2>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label={t('checkout.form.firstName')}
-              type="text"
-              {...register('firstName')}
-              error={errors.firstName?.message}
-              disabled={isSubmitting}
-            />
-            <Input
-              label={t('checkout.form.lastName')}
-              type="text"
-              {...register('lastName')}
-              error={errors.lastName?.message}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label={t('checkout.form.email')}
-              type="email"
-              {...register('email')}
-              error={errors.email?.message}
-              disabled={isSubmitting}
-            />
-            <Input
-              label={t('checkout.form.phone')}
-              type="tel"
-              placeholder={t('checkout.placeholders.phone')}
-              {...register('phone')}
-              error={errors.phone?.message}
-              disabled={isSubmitting}
-            />
-          </div>
+        <div className="flex flex-col gap-4">
+          <Input
+            label={t('checkout.form.firstName')}
+            type="text"
+            {...register('firstName')}
+            error={errors.firstName?.message}
+            disabled={isSubmitting}
+          />
+          <Input
+            label={t('checkout.form.lastName')}
+            type="text"
+            {...register('lastName')}
+            error={errors.lastName?.message}
+            disabled={isSubmitting}
+          />
+          <Input
+            label={t('checkout.form.email')}
+            type="email"
+            {...register('email')}
+            error={errors.email?.message}
+            disabled={isSubmitting}
+          />
+          <Input
+            label={t('checkout.form.phone')}
+            type="tel"
+            placeholder={t('checkout.placeholders.phone')}
+            {...register('phone')}
+            error={errors.phone?.message}
+            disabled={isSubmitting}
+          />
         </div>
       </Card>
 
