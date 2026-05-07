@@ -22,7 +22,7 @@ export default function ShopLoading() {
         <div className="min-w-0 flex-1 space-y-4 py-4 lg:pl-[53px]">
           <div className="h-5 w-40 rounded bg-gray-200" />
           <div className="h-10 max-w-md rounded bg-gray-200" />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-5 xl:grid-cols-3 xl:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="aspect-[3/4] rounded-lg bg-gray-200" />
             ))}

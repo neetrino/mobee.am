@@ -1,9 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { useTranslation } from '../lib/i18n-client';
 import type { ProductSortOption } from '@/lib/products/sort';
+import {
+  SHOP_COMPACT_THREE_COLUMN_MEDIA_QUERY,
+  SHOP_LEGACY_DESKTOP_MEDIA_QUERY,
+} from '@/lib/layout-breakpoints.constants';
 import {
   PRODUCTS_VIEW_MODE_CHANGED_EVENT,
   PRODUCTS_VIEW_MODE_STORAGE_KEY,
@@ -17,6 +21,7 @@ interface Product {
   title: string;
   price: number;
   compareAtPrice: number | null;
+  discountPercent?: number | null;
   image: string | null;
   inStock: boolean;
   brand: {
@@ -31,36 +36,61 @@ interface ProductsGridProps {
   sortBy?: ProductSortOption;
 }
 
+/**
+ * Below `xl`: 2 cols phone; `md`–`lg` exclusive three cols (e.g. iPad mini); from `lg` (iPad Pro) two cols until legacy desktop.
+ */
+const SHOP_COMPACT_GRID_CLASS =
+  'grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-6';
+
+function desktopShopGridClass(viewMode: ProductListingViewMode): string {
+  if (viewMode === 'list') {
+    return 'grid grid-cols-2 gap-2 lg:grid-cols-1 lg:gap-4';
+  }
+  return 'grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
+}
+
 export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<ProductListingViewMode>('grid-2');
   const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
+  const [isCompactThreeColumn, setIsCompactThreeColumn] = useState(false);
+  const [isLegacyDesktopShop, setIsLegacyDesktopShop] = useState(false);
+  const [listingViewMode, setListingViewMode] =
+    useState<ProductListingViewMode>('grid-2');
 
-  // Load view mode from localStorage
+  useLayoutEffect(() => {
+    const mqCompactThree = window.matchMedia(SHOP_COMPACT_THREE_COLUMN_MEDIA_QUERY);
+    const mqLegacyDesktop = window.matchMedia(SHOP_LEGACY_DESKTOP_MEDIA_QUERY);
+    const apply = () => {
+      setIsCompactThreeColumn(mqCompactThree.matches);
+      setIsLegacyDesktopShop(mqLegacyDesktop.matches);
+    };
+    apply();
+    mqCompactThree.addEventListener('change', apply);
+    mqLegacyDesktop.addEventListener('change', apply);
+    return () => {
+      mqCompactThree.removeEventListener('change', apply);
+      mqLegacyDesktop.removeEventListener('change', apply);
+    };
+  }, []);
+
   useEffect(() => {
     const stored = localStorage.getItem(PRODUCTS_VIEW_MODE_STORAGE_KEY);
     const mode = parseProductListingViewMode(stored);
-    setViewMode(mode);
+    setListingViewMode(mode);
     if (stored !== mode) {
       localStorage.setItem(PRODUCTS_VIEW_MODE_STORAGE_KEY, mode);
     }
   }, []);
 
-  // Listen for view mode changes (e.g. shop toolbar toggle)
   useEffect(() => {
-    const handleViewModeChange = (event: Event) => {
+    const onChange = (event: Event) => {
       const detail = (event as CustomEvent<ProductListingViewMode>).detail;
-      const mode = parseProductListingViewMode(detail ?? null);
-      setViewMode(mode);
+      setListingViewMode(parseProductListingViewMode(detail ?? null));
     };
-
-    window.addEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, handleViewModeChange);
-    return () => {
-      window.removeEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, handleViewModeChange);
-    };
+    window.addEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, onChange);
   }, []);
 
-  // Sort products
   useEffect(() => {
     const sorted = [...products];
 
@@ -78,26 +108,11 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
         sorted.sort((a, b) => b.title.localeCompare(a.title));
         break;
       default:
-        // Keep original order
         break;
     }
 
     setSortedProducts(sorted);
   }, [products, sortBy]);
-
-  // Get grid classes based on view mode (max 3 columns — shop matches home card row density on xl+)
-  const getGridClasses = () => {
-    switch (viewMode) {
-      case 'list':
-        return 'grid grid-cols-1 gap-4';
-      case 'grid-2':
-        return 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6';
-      case 'grid-3':
-        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
-      default:
-        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
-    }
-  };
 
   if (sortedProducts.length === 0) {
     return (
@@ -107,20 +122,36 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
     );
   }
 
+  const gridClass = isLegacyDesktopShop
+    ? desktopShopGridClass(listingViewMode)
+    : SHOP_COMPACT_GRID_CLASS;
+
+  const cardViewMode: ProductListingViewMode = isLegacyDesktopShop
+    ? listingViewMode
+    : isCompactThreeColumn
+      ? 'grid-3'
+      : 'grid-2';
+
+  /** Home / mobile card chrome for the whole compact shop (incl. iPad Pro). */
+  const useHomeCardChrome = !isLegacyDesktopShop;
+
   return (
-    <div className={getGridClasses()}>
+    <div className={gridClass}>
       {sortedProducts.map((product) => (
         <div key={product.id} className="h-full min-h-0">
           <ProductCard
             product={{
               ...product,
               compareAtPrice: product.compareAtPrice ?? undefined,
+              discountPercent: product.discountPercent ?? undefined,
             }}
-            viewMode={viewMode === 'list' ? 'list' : 'grid-2'}
+            viewMode={cardViewMode}
+            homeProductGridCard={useHomeCardChrome}
+            shiftImageInFrame={useHomeCardChrome}
+            smallerFooterPrice={useHomeCardChrome}
           />
         </div>
       ))}
     </div>
   );
 }
-

@@ -45,7 +45,7 @@ export function HomeMobileSectionTitle({
     <div className="flex items-center justify-between px-4 pt-4 lg:hidden">
       <h2
         id={sectionHeadingId}
-        className="text-base font-bold leading-normal text-[#303030]"
+        className="text-lg font-bold leading-snug text-[#303030]"
       >
         {title}
       </h2>

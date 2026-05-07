@@ -2,12 +2,13 @@
 
 import { ProductCard } from './ProductCard';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
-import { HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW } from './home-best-choice.constants';
+import { HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET } from './home-best-choice.constants';
 import { chunkArray } from '../lib/chunk-array';
 import {
   useHomeBestChoiceCarouselPageSync,
   type MobileCarouselViewState,
 } from './useHomeBestChoiceCarouselPageSync';
+import { useIpadProHomeDesktopGrid } from './useIpadProHomeDesktopGrid';
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
@@ -15,17 +16,27 @@ export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 const HOME_BEST_CHOICE_DESKTOP_GRID =
   'hidden grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid lg:grid-cols-4 lg:gap-6';
 
-/** Horizontal snap carousel below the `lg` breakpoint. Allow pan-y so the page can scroll vertically while touching the strip (touch-pan-x alone blocks vertical scroll on many browsers). */
+/** iPad Pro only: three columns on the desktop grid (see {@link useIpadProHomeDesktopGrid}). */
+const HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO =
+  'hidden grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid lg:grid-cols-3 lg:gap-6';
+
+/** Horizontal snap carousel below `lg`. */
 const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
   'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
 
 const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
 
-const HOME_BEST_CHOICE_MOBILE_INNER_GRID = 'grid grid-cols-2 gap-2';
+function homeBestChoiceMobileInnerGridClass(cardsPerView: number): string {
+  return cardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET
+    ? 'grid grid-cols-3 gap-2'
+    : 'grid grid-cols-2 gap-2';
+}
 
 type HomeBestChoiceStyleProductGridProps = {
   products: FeaturedHomeProduct[];
   productsPerPage: number;
+  /** Cards per horizontal snap page below `lg` (4 = 2×2 phone, 6 = 3×2 tablet). */
+  mobileCardsPerView: number;
   /** Accessible name for the horizontal product strip on small screens. */
   mobileCarouselAriaLabel: string;
   /** Home “Специальные предложения” row — RU desktop add-to-cart pill sizing. */
@@ -37,19 +48,24 @@ type HomeBestChoiceStyleProductGridProps = {
 function BestChoiceProductCell({
   product,
   specialOffersHomeCard,
+  viewMode,
+  homeStyle,
 }: {
   product: FeaturedHomeProduct;
   specialOffersHomeCard: boolean;
+  viewMode: 'grid-2' | 'grid-3';
+  /** Mobile / iPad carousel styling; desktop uses default product card chrome. */
+  homeStyle: boolean;
 }) {
   return (
     <div className={HOME_BEST_CHOICE_CARD_WIDTH}>
       <ProductCard
         product={product}
-        viewMode="grid-2"
-        shiftImageInFrame
-        smallerFooterPrice
+        viewMode={viewMode}
+        shiftImageInFrame={homeStyle}
+        smallerFooterPrice={homeStyle}
         specialOffersHomeCard={specialOffersHomeCard}
-        homeProductGridCard
+        homeProductGridCard={homeStyle}
       />
     </div>
   );
@@ -58,17 +74,25 @@ function BestChoiceProductCell({
 export function HomeBestChoiceStyleProductGrid({
   products,
   productsPerPage,
+  mobileCardsPerView,
   mobileCarouselAriaLabel,
   specialOffersHomeCard = false,
   onMobileCarouselViewChange,
 }: HomeBestChoiceStyleProductGridProps) {
+  const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
   const visible = products.slice(0, productsPerPage);
-  const mobilePages = chunkArray(visible, HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW);
+  const mobilePages = chunkArray(visible, mobileCardsPerView);
   const mobilePageCount = mobilePages.length;
+  const cardViewMode: 'grid-2' | 'grid-3' =
+    mobileCardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET ? 'grid-3' : 'grid-2';
+  const mobileInnerGridClass = homeBestChoiceMobileInnerGridClass(mobileCardsPerView);
   const carouselScrollRef = useHomeBestChoiceCarouselPageSync(
     mobilePageCount,
     onMobileCarouselViewChange,
   );
+  const desktopGridClass = isIpadProDesktopGrid
+    ? HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO
+    : HOME_BEST_CHOICE_DESKTOP_GRID;
 
   return (
     <>
@@ -81,24 +105,28 @@ export function HomeBestChoiceStyleProductGrid({
       >
         {mobilePages.map((page, pageIndex) => (
           <div key={`page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
-            <div className={HOME_BEST_CHOICE_MOBILE_INNER_GRID}>
+            <div className={mobileInnerGridClass}>
               {page.map((product) => (
                 <BestChoiceProductCell
                   key={product.id}
                   product={product}
                   specialOffersHomeCard={specialOffersHomeCard}
+                  viewMode={cardViewMode}
+                  homeStyle
                 />
               ))}
             </div>
           </div>
         ))}
       </div>
-      <div className={HOME_BEST_CHOICE_DESKTOP_GRID}>
+      <div className={desktopGridClass}>
         {visible.map((product) => (
           <BestChoiceProductCell
             key={product.id}
             product={product}
             specialOffersHomeCard={specialOffersHomeCard}
+            viewMode="grid-2"
+            homeStyle={false}
           />
         ))}
       </div>
@@ -123,20 +151,27 @@ function SkeletonCell() {
 
 export function HomeBestChoiceStyleProductGridSkeleton({
   productsPerPage,
+  mobileCardsPerView,
   mobileCarouselAriaLabel,
   onMobileCarouselViewChange,
 }: {
   productsPerPage: number;
+  mobileCardsPerView: number;
   mobileCarouselAriaLabel: string;
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 }) {
+  const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
   const indices = [...Array(productsPerPage)].map((_, i) => i);
-  const mobilePages = chunkArray(indices, HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW);
+  const mobilePages = chunkArray(indices, mobileCardsPerView);
   const mobilePageCount = mobilePages.length;
+  const mobileInnerGridClass = homeBestChoiceMobileInnerGridClass(mobileCardsPerView);
   const carouselScrollRef = useHomeBestChoiceCarouselPageSync(
     mobilePageCount,
     onMobileCarouselViewChange,
   );
+  const desktopGridClass = isIpadProDesktopGrid
+    ? HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO
+    : HOME_BEST_CHOICE_DESKTOP_GRID;
 
   return (
     <>
@@ -150,7 +185,7 @@ export function HomeBestChoiceStyleProductGridSkeleton({
       >
         {mobilePages.map((pageIndices, pageIndex) => (
           <div key={`sk-page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
-            <div className={HOME_BEST_CHOICE_MOBILE_INNER_GRID}>
+            <div className={mobileInnerGridClass}>
               {pageIndices.map((i) => (
                 <SkeletonCell key={i} />
               ))}
@@ -158,7 +193,7 @@ export function HomeBestChoiceStyleProductGridSkeleton({
           </div>
         ))}
       </div>
-      <div className={HOME_BEST_CHOICE_DESKTOP_GRID} aria-hidden="true">
+      <div className={desktopGridClass} aria-hidden="true">
         {indices.map((i) => (
           <SkeletonCell key={`sk-d-${i}`} />
         ))}

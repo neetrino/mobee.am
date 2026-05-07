@@ -9,6 +9,7 @@ import type { CurrencyCode } from '../../lib/currency';
 import type { LanguageCode } from '../../lib/language';
 import { t } from '../../lib/i18n';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
+import { LAYOUT_DESKTOP_MIN_WIDTH_PX } from '../../lib/layout-breakpoints.constants';
 
 interface RelatedProduct {
   id: string;
@@ -98,7 +99,7 @@ export function RelatedProductCard({
                 alt={product.title}
                 fill
                 className="object-contain transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                sizes={`(max-width: 640px) 100vw, (max-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) 50vw, 25vw`}
                 unoptimized
                 onError={() => onImageError(product.id)}
               />

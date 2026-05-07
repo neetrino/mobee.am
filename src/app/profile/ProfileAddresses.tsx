@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { Button, Input, Card } from '@shop/ui';
+import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import type { Address, UserProfile } from './types';
 
 interface ProfileAddressesProps {
@@ -40,6 +41,7 @@ export function ProfileAddresses({
           <h2 className="text-xl font-semibold text-gray-900">{t('profile.addresses.title')}</h2>
           <Button
             variant={showAddressForm ? 'outline' : 'brand'}
+            className={PROFILE_PILL_BUTTON_CLASS}
             onClick={() => {
               onResetForm();
               setShowAddressForm(!showAddressForm);
@@ -79,12 +81,13 @@ export function ProfileAddresses({
               <span className="ml-2 text-sm text-gray-700">{t('profile.addresses.form.isDefault')}</span>
             </label>
             <div className="flex gap-2">
-              <Button type="submit" variant="brand" disabled={savingAddress}>
+              <Button type="submit" variant="brand" className={PROFILE_PILL_BUTTON_CLASS} disabled={savingAddress}>
                 {savingAddress ? t('profile.addresses.form.saving') : editingAddress ? t('profile.addresses.form.update') : t('profile.addresses.form.add')}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                className={PROFILE_PILL_BUTTON_CLASS}
                 onClick={() => {
                   setShowAddressForm(false);
                   onResetForm();
@@ -125,6 +128,7 @@ export function ProfileAddresses({
                       <Button
                         variant="outline"
                         size="sm"
+                        className={PROFILE_PILL_BUTTON_CLASS}
                         onClick={() => onSetDefault((address.id || address._id)!)}
                       >
                         {t('profile.addresses.setDefault')}
@@ -133,6 +137,7 @@ export function ProfileAddresses({
                     <Button
                       variant="outline"
                       size="sm"
+                      className={PROFILE_PILL_BUTTON_CLASS}
                       onClick={() => onEdit(address)}
                     >
                       {t('profile.addresses.edit')}
@@ -141,7 +146,7 @@ export function ProfileAddresses({
                       variant="outline"
                       size="sm"
                       onClick={() => onDelete((address.id || address._id)!)}
-                      className="text-red-600 hover:text-red-700 hover:border-red-300"
+                      className={`${PROFILE_PILL_BUTTON_CLASS} text-red-600 hover:text-red-700 hover:border-red-300`}
                     >
                       {t('profile.addresses.delete')}
                     </Button>

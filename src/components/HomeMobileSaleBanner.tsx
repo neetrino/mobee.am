@@ -24,7 +24,7 @@ export function HomeMobileSaleBanner() {
   const headlineClass = lang === 'hy' ? notoArmenian.className : montserrat.className;
 
   return (
-    <section className={`lg:hidden ${montserrat.className} bg-white pb-6 pt-2`} aria-labelledby="home-mobile-sale-title">
+    <section className={`lg:hidden ${montserrat.className} bg-white pb-[26px] pt-6`} aria-labelledby="home-mobile-sale-title">
       <h2 id="home-mobile-sale-title" className="sr-only">
         {t('home.hero_promo_headline')} {t('home.hero_discount_percent')}
       </h2>

@@ -32,12 +32,14 @@ type SlotKey =
   | 'headphones'
   | 'accessories';
 
-const MOBILE_CATEGORY_PILL_KEYS: readonly Exclude<SlotKey, 'accessories'>[] = [
+/** Same slots as desktop strip so every category has a labeled pill on mobile. */
+const MOBILE_CATEGORY_PILL_KEYS: readonly SlotKey[] = [
   'computers',
   'phones',
   'tablets',
   'watches',
   'headphones',
+  'accessories',
 ];
 
 interface CategorySlot {
@@ -123,6 +125,14 @@ const CATEGORY_STRIP_SLOTS: readonly CategorySlot[] = [
   },
 ];
 
+function categoryStripCardAspectClass(slot: CategorySlot): string {
+  return slot.tall ? 'aspect-[197/227]' : 'aspect-[197/201]';
+}
+
+function categoryStripInnerHeightClass(slot: CategorySlot): string {
+  return slot.tall ? 'h-[227px]' : 'h-[201px]';
+}
+
 function categoryHref(resolved: CategoryTreeNode | null, fallbackSlug: string): string {
   if (resolved) {
     return `/products?category=${encodeURIComponent(resolved.slug)}`;
@@ -148,7 +158,7 @@ export function TopCategories() {
   if (loading) {
     return (
       <section className={`bg-white ${montserrat.className}`} aria-hidden>
-        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-12`}>
+        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-6 xl:pt-8`}>
           <div className="flex gap-2 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:hidden">
             {MOBILE_CATEGORY_PILL_KEYS.map((key) => (
               <div
@@ -157,13 +167,11 @@ export function TopCategories() {
               />
             ))}
           </div>
-          <div className="hidden items-end gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:flex">
+          <div className="hidden lg:grid lg:grid-cols-6 lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3">
             {CATEGORY_STRIP_SLOTS.map((slot) => (
               <div
                 key={slot.key}
-                className={`shrink-0 rounded-[30px] bg-[#eceff2] ${
-                  slot.tall ? 'h-[227px] w-[197px]' : 'h-[201px] w-[197px]'
-                } animate-pulse`}
+                className={`min-w-0 animate-pulse rounded-[24px] bg-[#eceff2] xl:rounded-[30px] ${categoryStripCardAspectClass(slot)}`}
               />
             ))}
           </div>
@@ -174,7 +182,7 @@ export function TopCategories() {
 
   return (
     <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
-      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-12`}>
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-6 xl:pt-8`}>
         <div className="flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide lg:hidden">
           {MOBILE_CATEGORY_PILL_KEYS.map((key) => {
             const slot = CATEGORY_STRIP_SLOTS.find((s) => s.key === key);
@@ -195,59 +203,65 @@ export function TopCategories() {
             );
           })}
         </div>
-        <div className="hidden items-end justify-start gap-5 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory sm:justify-center sm:overflow-visible sm:pb-0 lg:flex">
+        <div className="hidden lg:grid lg:grid-cols-6 lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3">
           {CATEGORY_STRIP_SLOTS.map((slot) => {
             const resolved = resolvedBySlot[slot.key];
             const href = categoryHref(resolved, slot.fallbackSlug);
-            const cardHeight = slot.tall ? 'min-h-[227px]' : 'min-h-[201px]';
+            const innerH = categoryStripInnerHeightClass(slot);
 
             return (
               <Link
                 key={slot.key}
                 href={href}
-                className={`group relative flex w-[197px] shrink-0 snap-start flex-col ${cardHeight} overflow-hidden rounded-[30px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99]`}
+                className={`category-strip-card-cq group relative flex min-w-0 w-full flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(slot)}`}
               >
-                <div
-                  className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-2 pb-[22px] pt-2 text-center ${
-                    slot.tall ? 'pb-[25px]' : ''
-                  }`}
-                >
-                  <span className="text-[16px] font-bold leading-5 text-[#1c1c1c]">
-                    {t(slot.labelKey)}
-                  </span>
-                </div>
-                <div className={`pointer-events-none z-[2] ${slot.imageWrapperClassName}`}>
-                  {slot.key === 'watches' ? (
-                    <div className="flex size-full items-center justify-center">
-                      <div className="flex-none -rotate-[5.85deg]">
-                        <div className="relative size-[140px]">
+                <div className="relative h-full w-full min-h-0 overflow-hidden">
+                  <div
+                    className={`category-strip-tile-art absolute left-1/2 top-0 z-0 w-[197px] origin-top will-change-transform ${innerH}`}
+                  >
+                    <div className={`pointer-events-none z-[1] ${slot.imageWrapperClassName}`}>
+                      {slot.key === 'watches' ? (
+                        <div className="flex size-full items-center justify-center">
+                          <div className="flex-none -rotate-[5.85deg]">
+                            <div className="relative size-[140px]">
+                              <Image
+                                src={slot.imageSrc}
+                                alt=""
+                                width={slot.imageWidth}
+                                height={slot.imageHeight}
+                                className={`size-full max-w-none ${slot.imageClassName}`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className={
+                            slot.key === 'computers'
+                              ? 'relative size-full -scale-x-100'
+                              : 'relative size-full'
+                          }
+                        >
                           <Image
                             src={slot.imageSrc}
                             alt=""
-                            width={slot.imageWidth}
-                            height={slot.imageHeight}
-                            className={`size-full max-w-none ${slot.imageClassName}`}
+                            fill
+                            sizes="(max-width: 1279px) 17vw, 197px"
+                            className={slot.imageClassName}
                           />
                         </div>
-                      </div>
+                      )}
                     </div>
-                  ) : (
-                    <div
-                      className={
-                        slot.key === 'computers'
-                          ? 'relative size-full -scale-x-100'
-                          : 'relative size-full'
-                      }
-                    >
-                      <Image
-                        src={slot.imageSrc}
-                        alt=""
-                        fill
-                        sizes="(max-width: 640px) 42vw, 197px"
-                        className={slot.imageClassName}
-                      />
-                    </div>
-                  )}
+                  </div>
+                </div>
+                <div
+                  className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-1.5 pb-2.5 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
+                    slot.tall ? 'xl:pb-3' : ''
+                  }`}
+                >
+                  <span className="line-clamp-2 max-w-full break-words text-[13px] font-bold leading-snug text-[#1c1c1c] [overflow-wrap:anywhere] xl:text-[16px] xl:leading-5">
+                    {t(slot.labelKey)}
+                  </span>
                 </div>
               </Link>
             );

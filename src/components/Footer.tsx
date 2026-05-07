@@ -21,6 +21,9 @@ const footerNavLinkClass = 'block text-[14px] leading-5 text-[#6b7280] transitio
 const headingClass =
   'text-[16px] font-bold uppercase tracking-[0.55px] text-black leading-[16.5px]';
 
+/** Horizontal nudge for the middle “Sections” column on lg+ (desktop / iPad Pro). */
+const FOOTER_SECTIONS_OFFSET_RIGHT_CLASS = 'lg:ml-[90px]';
+
 type SocialIconLinkProps = {
   readonly href: string;
   readonly label: string;
@@ -86,10 +89,10 @@ export function Footer() {
     <footer
       className={`${montserrat.className} hidden border-t border-[#eee] bg-[#f3f4f6] lg:block`}
     >
-      <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-10 md:py-14 xl:py-8`}>
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-10 md:gap-y-12 xl:grid-cols-[minmax(320px,427px)_minmax(160px,280px)_minmax(220px,283px)] xl:items-start xl:justify-between xl:gap-x-14">
-          {/* Visit us */}
-          <div className="flex flex-col gap-6 xl:col-start-1">
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-10 md:py-14 lg:py-8`}>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-10 md:gap-y-12 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-start lg:gap-x-18">
+          {/* Visit us — left band; max width matches prior Figma column cap */}
+          <div className="flex w-full min-w-0 flex-col gap-6 lg:max-w-[427px] lg:justify-self-start">
             <h2 className={headingClass}>{t('common.footer.visitUs')}</h2>
             <Link
               href={mapsHref}
@@ -111,7 +114,9 @@ export function Footer() {
             <FooterPaymentMethodsRow />
           </div>
 
-          <div className="flex flex-col gap-6 xl:col-start-2">
+          <div
+            className={`flex w-full min-w-0 flex-col gap-6 lg:w-auto lg:justify-self-center ${FOOTER_SECTIONS_OFFSET_RIGHT_CLASS}`}
+          >
             <h2 className={headingClass}>{t('common.footer.sectionsHeading')}</h2>
             <nav className="flex flex-col gap-3" aria-label={t('common.footer.sectionsHeading')}>
               {sectionLinks.map((link) => (
@@ -122,7 +127,7 @@ export function Footer() {
             </nav>
           </div>
 
-          <div className="flex flex-col gap-6 xl:col-start-3">
+          <div className="flex w-full min-w-0 flex-col gap-6 lg:max-w-[283px] lg:justify-self-end">
             <h2 className={headingClass}>{t('common.footer.termsHeading')}</h2>
             <nav className="flex flex-col gap-3" aria-label={t('common.footer.legalBar.policiesNavLabel')}>
               {policyLinks.map((link) => (

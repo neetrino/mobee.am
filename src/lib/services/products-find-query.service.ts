@@ -1,5 +1,8 @@
 import { buildWhereClause } from "./products-find-query/query-builder";
-import { executeProductQuery } from "./products-find-query/query-executor";
+import {
+  executeProductQuery,
+  fetchProductsPageForPriceSort,
+} from "./products-find-query/query-executor";
 import { db } from "@white-shop/db";
 import type { ProductFilters, ProductWithRelations } from "./products-find-query/types";
 
@@ -29,6 +32,9 @@ class ProductsFindQueryService {
 
     const listingMode = !filters.ids?.length;
 
+    const isPriceSort =
+      filters.sort === "price-asc" || filters.sort === "price-desc";
+
     const needOverFetch =
       !filters.ids?.length &&
       (Boolean(filters.category || filters.search) ||
@@ -37,6 +43,26 @@ class ProductsFindQueryService {
         Boolean(filters.colors || filters.sizes || filters.brand) ||
         filters.sort === "name-asc" ||
         filters.sort === "name-desc");
+
+    if (isPriceSort && !needOverFetch && !filters.ids?.length) {
+      const priceSort =
+        filters.sort === "price-desc" ? "price-desc" : "price-asc";
+      const [total, products] = await Promise.all([
+        db.product.count({ where }),
+        fetchProductsPageForPriceSort(
+          where,
+          limit,
+          (page - 1) * limit,
+          priceSort,
+          listingMode
+        ),
+      ]);
+      return {
+        products,
+        bestsellerProductIds,
+        total,
+      };
+    }
 
     if (!needOverFetch) {
       const [total, products] = await Promise.all([

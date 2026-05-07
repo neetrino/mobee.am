@@ -1,5 +1,6 @@
-    import { Button, Card } from '@shop/ui';
+import { Button, Card } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
+import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
 import type { OrderDetails } from './types';
 
@@ -69,12 +70,14 @@ export function OrderDetailsModal({
                 disabled={isReordering}
                 variant="primary"
                 size="sm"
+                className={PROFILE_PILL_BUTTON_CLASS}
               >
                 {isReordering ? t('profile.orderDetails.adding') : t('profile.orderDetails.reorder')}
               </Button>
               <button
+                type="button"
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                 aria-label={t('profile.orderDetails.close')}
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +97,9 @@ export function OrderDetailsModal({
             ) : orderDetailsError ? (
               <div className="text-center py-12">
                 <p className="text-red-600 mb-4">{orderDetailsError}</p>
-                <Button onClick={onClose} variant="outline">{t('profile.orderDetails.close')}</Button>
+                <Button onClick={onClose} variant="outline" className={PROFILE_PILL_BUTTON_CLASS}>
+                  {t('profile.orderDetails.close')}
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

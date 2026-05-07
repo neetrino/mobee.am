@@ -1,8 +1,10 @@
+import { LAYOUT_DESKTOP_MIN_WIDTH_PX } from '../layout-breakpoints.constants';
+
 /** CustomEvent name — must match listeners in `CartFlyAnimationLayer`. */
 export const CART_FLY_ANIMATION_EVENT = 'cart-fly-animation';
 
-/** Tailwind `lg` — matches `HeaderSecondaryBar` (`lg:block`) vs mobile bottom nav (`lg:hidden`). */
-export const CART_FLY_DESKTOP_MIN_WIDTH_PX = 1024;
+/** Desktop fly target — matches Tailwind `lg` / header secondary bar vs mobile chrome. */
+export const CART_FLY_DESKTOP_MIN_WIDTH_PX = LAYOUT_DESKTOP_MIN_WIDTH_PX;
 
 export const CART_FLY_LAYER_Z_INDEX = 10050;
 

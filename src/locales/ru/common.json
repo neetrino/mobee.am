@@ -17,6 +17,7 @@
     "close": "Закрыть"
   },
   "navigation": {
+    "menuTitle": "Навигация",
     "home": "Главная",
     "products": "Товары",
     "categories": "Категории",
@@ -167,6 +168,10 @@
     "productNotFound": "Товар не найден. Пожалуйста, обновите страницу и попробуйте снова.",
     "failedToAddToCart": "Не удалось добавить товар в корзину. Пожалуйста, попробуйте снова."
   },
+  "localeMenu": {
+    "languageSection": "Язык",
+    "currencySection": "Валюта"
+  },
   "ariaLabels": {
     "addToCart": "Добавить в корзину",
     "removeFromCart": "Удалить из корзины",
@@ -180,6 +185,7 @@
     "openMenu": "Открыть меню навигации",
     "closeMenu": "Закрыть меню навигации",
     "changeLanguage": "Сменить язык",
+    "changeLanguageAndCurrency": "Язык и валюта",
     "instagram": "Instagram",
     "facebook": "Facebook",
     "linkedin": "LinkedIn",
