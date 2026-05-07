@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { Button, Input, Card } from '@shop/ui';
+import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import type { UserProfile } from './types';
 
 interface ProfilePersonalInfoProps {
@@ -57,12 +58,13 @@ export function ProfilePersonalInfo({
           placeholder={t('profile.personal.phonePlaceholder')}
         />
         <div className="flex items-center gap-2 pt-4">
-          <Button type="submit" variant="brand" disabled={savingPersonal}>
+          <Button type="submit" variant="brand" className={PROFILE_PILL_BUTTON_CLASS} disabled={savingPersonal}>
             {savingPersonal ? t('profile.personal.saving') : t('profile.personal.save')}
           </Button>
           <Button
             type="button"
             variant="outline"
+            className={PROFILE_PILL_BUTTON_CLASS}
             onClick={() => {
               setPersonalInfo({
                 firstName: profile?.firstName || '',

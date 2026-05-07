@@ -184,7 +184,7 @@ function MobileDrawerProfileCard({
     <Link
       href="/profile"
       onClick={onNavigate}
-      className="flex w-fit max-w-full min-w-0 items-center gap-3 self-start rounded-[1.75rem] border border-gray-200 bg-white px-3 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100"
+      className="flex w-fit max-w-full min-w-0 items-center gap-3 self-start rounded-[15px] border border-gray-200 bg-white px-3 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100"
       aria-label={profileFallbackLabel}
     >
       <span

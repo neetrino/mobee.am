@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { Button, Input, Card } from '@shop/ui';
+import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 
 interface ProfilePasswordProps {
   passwordForm: {
@@ -49,7 +50,7 @@ export function ProfilePassword({
           required
         />
         <div className="pt-4">
-          <Button type="submit" variant="brand" disabled={savingPassword}>
+          <Button type="submit" variant="brand" className={PROFILE_PILL_BUTTON_CLASS} disabled={savingPassword}>
             {savingPassword ? t('profile.password.changing') : t('profile.password.change')}
           </Button>
         </div>

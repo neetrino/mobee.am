@@ -1,9 +1,8 @@
 'use client';
 
-import { Card } from '@shop/ui';
 import { UserAvatar } from '../../components/UserAvatar';
-import { ProfileMenuDrawer } from '../../components/ProfileMenuDrawer';
 import { ProfileDeleteAccount } from './ProfileDeleteAccount';
+import { ProfileMobileMenuGrid } from './ProfileMobileMenuGrid';
 import type { UserProfile, ProfileTab, ProfileTabConfig } from './types';
 
 interface ProfileHeaderProps {
@@ -17,9 +16,9 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: ProfileHeaderProps) {
   return (
     <>
-      <div className="lg:w-64 flex-shrink-0 lg:sticky lg:top-8 lg:self-start">
+      <div className="w-full flex-shrink-0 lg:w-80 lg:sticky lg:top-8 lg:self-start">
         {/* Profile Header Section */}
-        <Card className="mb-4 p-4">
+        <div className="mb-3 rounded-[15px] border border-gray-200 bg-white p-4 shadow-sm lg:mb-4 lg:rounded-lg">
           <div className="flex flex-row items-center gap-4">
             {/* Avatar */}
             <UserAvatar
@@ -48,7 +47,7 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
               )}
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Sidebar Navigation */}
         <aside className="hidden lg:block">
@@ -57,7 +56,7 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? 'bg-admin text-white'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -74,15 +73,7 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
         </aside>
       </div>
 
-      {/* Mobile Menu Drawer */}
-      <div className="lg:hidden mb-6">
-        <ProfileMenuDrawer
-          tabs={tabs}
-          activeTab={activeTab}
-          onSelect={(tabId) => onTabChange(tabId as ProfileTab)}
-          footer={<ProfileDeleteAccount t={t} variant="drawer" />}
-        />
-      </div>
+      <ProfileMobileMenuGrid tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} t={t} />
     </>
   );
 }
