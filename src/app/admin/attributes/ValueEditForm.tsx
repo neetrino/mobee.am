@@ -81,7 +81,7 @@ export function ValueEditForm({
                 <button
                   type="button"
                   onClick={onRemoveImage}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors flex items-center justify-center"
+                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-admin-500 text-white transition-colors hover:bg-admin-600"
                   title={t('admin.attributes.valueModal.removeImage')}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

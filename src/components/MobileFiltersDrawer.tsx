@@ -67,7 +67,7 @@ export function MobileFiltersDrawer({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="h-10 w-10 rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
+                className="h-10 w-10 rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-admin-300 hover:bg-admin-50 hover:text-admin-600"
                 aria-label={t('products.mobileFilters.close')}
               >
                 <svg className="mx-auto h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>

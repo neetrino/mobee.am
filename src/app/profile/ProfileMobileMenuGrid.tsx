@@ -4,7 +4,7 @@ import type { ProfileTab, ProfileTabConfig } from './types';
 import { ProfileDeleteAccount } from './ProfileDeleteAccount';
 
 const TILE_BASE_CLASS =
-  'flex min-h-[5.5rem] w-full flex-col items-center justify-center gap-2 rounded-full px-3 py-4 text-center text-xs font-medium transition-colors sm:text-sm';
+  'flex min-h-[5.5rem] w-full flex-col items-center justify-center gap-2 rounded-[20px] px-3 py-4 text-center text-xs font-medium transition-colors sm:text-sm';
 
 const ICON_WRAP_CLASS = 'flex shrink-0 items-center justify-center [&_svg]:h-7 [&_svg]:w-7';
 

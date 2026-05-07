@@ -40,3 +40,11 @@ export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO = 'lg:grid-cols-3';
  * (home uses four columns on standard desktop — cart keeps three).
  */
 export const CART_LINE_ITEMS_GRID_CLASS = `grid ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO}`;
+
+/** Wishlist desktop: five columns so each card is a bit narrower than home’s four-up row. */
+export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_WISHLIST = 'lg:grid-cols-5';
+
+/**
+ * Wishlist page: same track/gaps as home; `lg` uses five columns for slightly narrower cards.
+ */
+export const WISHLIST_LINE_ITEMS_GRID_CLASS = `grid ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_WISHLIST}`;

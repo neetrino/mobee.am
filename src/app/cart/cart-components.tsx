@@ -11,10 +11,13 @@ import {
   CART_ITEM_ROW_DESKTOP_IMAGE_MAT_CLASS,
   CART_ITEM_ROW_DESKTOP_IMAGE_STACK_CLASS,
   CART_ITEM_ROW_DESKTOP_MIN_HEIGHT_CLASS,
+  CART_LINE_ITEM_CARD_FOOTER_CLASS,
+  CART_LINE_ITEM_CARD_FRAME_CLASS,
   ORDER_SUMMARY_PANEL_RADIUS_CLASS,
 } from './constants';
 import { CART_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
 import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
+import { DISMISS_ROUND_BUTTON_HOVER_CLASS } from '../../lib/dismiss-icon-button.constants';
 
 /**
  * Cart item row component
@@ -93,12 +96,12 @@ export function CartItemRow({
 
   return (
     <div
-      className={`relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:shadow-sm max-lg:hover:shadow-md ${CART_ITEM_ROW_DESKTOP_MIN_HEIGHT_CLASS}`}
+      className={`${CART_LINE_ITEM_CARD_FRAME_CLASS} ${CART_ITEM_ROW_DESKTOP_MIN_HEIGHT_CLASS}`}
     >
       <button
         type="button"
         onClick={() => onRemove(item.id)}
-        className="absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-full border border-gray-200 bg-white/95 shadow-md backdrop-blur-sm transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 text-gray-500"
+        className={`absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-full border border-gray-200 bg-white/95 shadow-md backdrop-blur-sm transition-colors text-gray-500 ${DISMISS_ROUND_BUTTON_HOVER_CLASS}`}
         aria-label={t('common.buttons.remove')}
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -154,7 +157,7 @@ export function CartItemRow({
         ) : null}
       </div>
 
-      <div className="mt-auto flex shrink-0 flex-col items-center gap-2 border-t border-[#e5e5e5] bg-[#f2f2f7] px-2 pb-3 pt-3 max-lg:border-0 lg:border-[#e5e5e5] lg:bg-transparent lg:px-5 lg:pb-4 lg:pt-3">
+      <div className={CART_LINE_ITEM_CARD_FOOTER_CLASS}>
         <span className="sr-only">{t('common.messages.subtotal')}</span>
         {priceBlock}
         <div

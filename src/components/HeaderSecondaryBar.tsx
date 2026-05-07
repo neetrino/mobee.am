@@ -9,6 +9,7 @@ import { getDockedBarTopMotionStyle, SITE_CONTENT_GUTTERS_CLASS } from './header
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
+import { HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS } from './header-nav-count-badge.constants';
 
 /** Trailing bar strokes — matches `CartIcon` (weight 2). */
 const SECONDARY_BAR_ICON_STROKE_WIDTH = 2;
@@ -397,20 +398,24 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
 
           <div className="flex shrink-0 items-center gap-3 pl-1 lg:gap-4 xl:gap-7">
             <div className="flex items-center gap-0.5 sm:gap-1.5">
-              <Link href="/compare" className={iconLinkClass} aria-label={compareAria}>
+              <Link href="/compare" className={`${iconLinkClass} relative`} aria-label={compareAria}>
                 <CompareIcon
                   size={20}
                   strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
                   className="shrink-0"
                 />
                 {compareCount > 0 ? (
-                  <span className="sr-only">{compareCount}</span>
+                  <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
+                    {compareCount > 99 ? '99+' : compareCount}
+                  </span>
                 ) : null}
               </Link>
-              <Link href="/wishlist" className={iconLinkClass} aria-label={wishlistAria}>
+              <Link href="/wishlist" className={`${iconLinkClass} relative`} aria-label={wishlistAria}>
                 <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
                 {wishlistCount > 0 ? (
-                  <span className="sr-only">{wishlistCount}</span>
+                  <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
+                    {wishlistCount > 99 ? '99+' : wishlistCount}
+                  </span>
                 ) : null}
               </Link>
               <Link
@@ -421,10 +426,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               >
                 <CartIcon size={18} className="shrink-0" />
                 {cartCount > 0 ? (
-                  <span
-                    className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[#2db2ff] px-0.5 text-[9px] font-normal leading-none text-white"
-                    aria-hidden
-                  >
+                  <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
                     {cartCount > 99 ? '99+' : cartCount}
                   </span>
                 ) : null}

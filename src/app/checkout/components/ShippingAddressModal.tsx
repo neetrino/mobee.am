@@ -86,7 +86,7 @@ export function ShippingAddressModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-1 text-gray-400 transition-colors hover:text-gray-600"
+            className="rounded-full p-1 text-gray-400 transition-colors hover:text-admin-600"
             aria-label={t('checkout.modals.closeModal')}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

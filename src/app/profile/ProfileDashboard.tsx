@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button, Card } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
-import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
+import { PROFILE_DASHBOARD_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor } from './utils';
 import type { DashboardData, ProfileTab } from './types';
 
@@ -116,7 +116,7 @@ export function ProfileDashboard({
           <Button
             variant="ghost"
             size="sm"
-            className={PROFILE_PILL_BUTTON_CLASS}
+            className={PROFILE_DASHBOARD_BUTTON_CLASS}
             onClick={() => onTabChange('orders')}
           >
             {t('profile.dashboard.viewAll')}
@@ -126,7 +126,7 @@ export function ProfileDashboard({
           <div className="text-center py-12">
             <p className="text-gray-600 mb-4">{t('profile.dashboard.noOrders')}</p>
             <Link href="/products">
-              <Button variant="brand" className={PROFILE_PILL_BUTTON_CLASS}>
+              <Button variant="brand" className={PROFILE_DASHBOARD_BUTTON_CLASS}>
                 {t('profile.dashboard.startShopping')}
               </Button>
             </Link>

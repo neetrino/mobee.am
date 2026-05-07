@@ -343,7 +343,7 @@ export function VariantBuilder({
                                       variantImageInputRefs.current[variant.id]!.value = '';
                                     }
                                   }}
-                                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600 transition-colors"
+                                  className="absolute -right-1 -top-1 rounded-full bg-admin-500 p-0.5 text-white transition-colors hover:bg-admin-600"
                                   title={t('admin.products.add.removeImage')}
                                 >
                                   <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

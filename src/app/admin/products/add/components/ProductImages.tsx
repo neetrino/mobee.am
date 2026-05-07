@@ -94,7 +94,7 @@ export function ProductImages({
                     <button
                       type="button"
                       onClick={() => onRemoveImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                      className="absolute right-2 top-2 rounded-full bg-admin-500 p-1.5 text-white opacity-0 transition-colors hover:bg-admin-600 group-hover:opacity-100"
                       title={t('admin.products.add.removeImage')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
