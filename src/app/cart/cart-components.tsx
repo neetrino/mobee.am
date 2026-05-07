@@ -6,11 +6,14 @@ import { Button } from '@shop/ui';
 import { formatPrice } from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
 import type { Cart, CartItem } from './types';
-import { useIpadProHomeDesktopGrid } from '../../components/useIpadProHomeDesktopGrid';
 import {
-  CART_LINE_ITEMS_GRID_CLASS,
-  CART_LINE_ITEMS_GRID_CLASS_IPAD_PRO,
-} from '../../components/home-best-choice.constants';
+  CART_ITEM_ROW_DESKTOP_IMAGE_FRAME_CLASS,
+  CART_ITEM_ROW_DESKTOP_IMAGE_MAT_CLASS,
+  CART_ITEM_ROW_DESKTOP_IMAGE_STACK_CLASS,
+  CART_ITEM_ROW_DESKTOP_MIN_HEIGHT_CLASS,
+  ORDER_SUMMARY_PANEL_RADIUS_CLASS,
+} from './constants';
+import { CART_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
 
 /**
  * Cart item row component
@@ -34,12 +37,12 @@ export function CartItemRow({
 }: CartItemRowProps) {
   const currencyCode = currency as CurrencyCode;
   const quantityControls = (
-    <div className="flex w-full min-w-0 items-center justify-center gap-1.5 lg:gap-2">
+    <div className="flex w-full min-w-0 items-center justify-center gap-1.5">
       <button
         type="button"
         onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
         disabled={updatingItems.has(item.id)}
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 lg:size-9 lg:rounded-xl lg:bg-white"
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
         aria-label={t('common.ariaLabels.decreaseQuantity')}
       >
         <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,14 +59,14 @@ export function CartItemRow({
           onUpdateQuantity(item.id, newQuantity);
         }}
         disabled={updatingItems.has(item.id)}
-        className="h-8 min-w-0 shrink rounded-lg border border-gray-300 bg-white px-1 text-center text-sm font-medium focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 max-lg:w-12 lg:h-9 lg:w-20 lg:rounded-xl lg:px-2 lg:pr-5 lg:text-right lg:text-base"
+        className="h-8 min-w-0 w-12 shrink rounded-lg border border-gray-300 bg-white px-1 py-0 text-center text-sm font-medium tabular-nums leading-8 [-moz-appearance:textfield] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         title={item.variant.stock !== undefined ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : ''}
       />
       <button
         type="button"
         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
         disabled={updatingItems.has(item.id) || (item.variant.stock !== undefined && item.quantity >= item.variant.stock)}
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 lg:size-9 lg:rounded-xl lg:bg-white"
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
         aria-label={t('common.ariaLabels.increaseQuantity')}
         title={item.variant.stock !== undefined && item.quantity >= item.variant.stock ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : t('common.messages.addQuantity')}
       >
@@ -76,11 +79,11 @@ export function CartItemRow({
 
   const priceBlock = (
     <div className="flex w-full flex-col items-center gap-0.5">
-      <span className="text-center text-sm font-bold tabular-nums text-gray-900 lg:text-[1.1875rem] lg:leading-[1.6625rem]">
+      <span className="text-center text-sm font-bold tabular-nums text-gray-900">
         {formatPrice(item.total, currencyCode)}
       </span>
       {item.originalPrice && item.originalPrice > item.price ? (
-        <span className="text-center text-xs tabular-nums text-gray-500 line-through lg:text-sm">
+        <span className="text-center text-xs tabular-nums text-gray-500 line-through">
           {formatPrice(item.originalPrice * item.quantity, currencyCode)}
         </span>
       ) : null}
@@ -88,11 +91,13 @@ export function CartItemRow({
   );
 
   return (
-    <div className="relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:shadow-sm max-lg:hover:shadow-md lg:min-h-[583px]">
+    <div
+      className={`relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:shadow-sm max-lg:hover:shadow-md ${CART_ITEM_ROW_DESKTOP_MIN_HEIGHT_CLASS}`}
+    >
       <button
         type="button"
         onClick={() => onRemove(item.id)}
-        className="absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-full border border-gray-200 bg-white/95 shadow-md backdrop-blur-sm transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 text-gray-500 lg:right-3 lg:top-3 lg:size-9"
+        className="absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-full border border-gray-200 bg-white/95 shadow-md backdrop-blur-sm transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 text-gray-500"
         aria-label={t('common.buttons.remove')}
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -100,9 +105,15 @@ export function CartItemRow({
         </svg>
       </button>
 
-      <div className="relative shrink-0 max-lg:min-h-[120px] max-lg:overflow-hidden lg:h-[380px]">
-        <div className="absolute inset-x-2 top-2 bottom-2 max-lg:bottom-2 lg:inset-x-5 lg:top-5 lg:bottom-auto lg:h-[320px]">
-          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-2 lg:py-[33px]">
+      <div
+        className={`relative shrink-0 max-lg:min-h-[120px] max-lg:overflow-hidden ${CART_ITEM_ROW_DESKTOP_IMAGE_STACK_CLASS}`}
+      >
+        <div
+          className={`absolute inset-x-2 top-2 bottom-2 max-lg:bottom-2 lg:inset-x-5 lg:top-5 lg:bottom-auto ${CART_ITEM_ROW_DESKTOP_IMAGE_FRAME_CLASS}`}
+        >
+          <div
+            className={`flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-2 ${CART_ITEM_ROW_DESKTOP_IMAGE_MAT_CLASS}`}
+          >
             <Link
               href={`/products/${item.variant.product.slug}`}
               className="relative block h-full min-h-[104px] w-full max-lg:min-h-[104px] lg:min-h-0"
@@ -128,21 +139,21 @@ export function CartItemRow({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col px-2 pb-1 pt-2 lg:px-5 lg:pb-2 lg:pt-3">
+      <div className="flex min-h-0 flex-1 flex-col px-2 pb-1 pt-2 lg:px-5 lg:pb-1 lg:pt-2">
         <Link
           href={`/products/${item.variant.product.slug}`}
-          className="line-clamp-2 pr-8 text-sm font-medium leading-snug text-gray-900 transition-colors hover:text-blue-600 lg:pr-10 lg:text-base lg:leading-normal"
+          className="line-clamp-2 pr-8 text-sm font-medium leading-snug text-gray-900 transition-colors hover:text-blue-600"
         >
           {item.variant.product.title}
         </Link>
         {item.variant.sku ? (
-          <p className="mt-1 line-clamp-1 text-[10px] text-gray-500 lg:text-xs">
+          <p className="mt-1 line-clamp-1 text-[10px] text-gray-500">
             {t('common.messages.sku')}: {item.variant.sku}
           </p>
         ) : null}
       </div>
 
-      <div className="mt-auto flex shrink-0 flex-col items-center gap-2 border-t border-[#e5e5e5] bg-[#f2f2f7] px-2 pb-3 pt-3 max-lg:border-0 lg:border-[#e5e5e5] lg:bg-transparent lg:px-5 lg:pb-5 lg:pt-3">
+      <div className="mt-auto flex shrink-0 flex-col items-center gap-2 border-t border-[#e5e5e5] bg-[#f2f2f7] px-2 pb-3 pt-3 max-lg:border-0 lg:border-[#e5e5e5] lg:bg-transparent lg:px-5 lg:pb-4 lg:pt-3">
         <span className="sr-only">{t('common.messages.subtotal')}</span>
         {priceBlock}
         <div
@@ -178,14 +189,9 @@ export function CartTable({
   onUpdateQuantity,
   t,
 }: CartTableProps) {
-  const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
-  const gridClass = isIpadProDesktopGrid
-    ? CART_LINE_ITEMS_GRID_CLASS_IPAD_PRO
-    : CART_LINE_ITEMS_GRID_CLASS;
-
   return (
     <div className="lg:col-span-2">
-      <div className={gridClass}>
+      <div className={CART_LINE_ITEMS_GRID_CLASS}>
         {cart.items.map((item) => (
           <CartItemRow
             key={item.id}
@@ -216,7 +222,9 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
   
   return (
     <div className="lg:col-span-1">
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 md:rounded-lg lg:sticky lg:top-24">
+      <div
+        className={`${ORDER_SUMMARY_PANEL_RADIUS_CLASS} border border-gray-200 bg-white p-6 lg:sticky lg:top-24`}
+      >
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           {t('common.cart.orderSummary')}
         </h2>
@@ -242,7 +250,7 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
         </div>
         <Button
           variant="primary"
-          className="w-full !rounded-2xl !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500 md:!rounded-md"
+          className="w-full !rounded-full !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500"
           size="lg"
           onClick={() => {
             // Allow guest checkout - no redirect to login
@@ -253,7 +261,7 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
         </Button>
         <Button
           variant="outline"
-          className="mt-3 w-full !rounded-2xl md:!rounded-md"
+          className="mt-3 w-full !rounded-full"
           size="md"
           onClick={() => {
             window.location.href = '/products';

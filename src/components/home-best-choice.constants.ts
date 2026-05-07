@@ -35,7 +35,8 @@ export const HOME_BEST_CHOICE_DESKTOP_GRID_TRACK =
 export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_DEFAULT = 'lg:grid-cols-4';
 export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO = 'lg:grid-cols-3';
 
-/** Cart page: same track widths as home desktop product cards. */
-export const CART_LINE_ITEMS_GRID_CLASS = `grid ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_DEFAULT}`;
-
-export const CART_LINE_ITEMS_GRID_CLASS_IPAD_PRO = `grid ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO}`;
+/**
+ * Cart page: same track as home desktop rows; three `lg` columns for wider cards
+ * (home uses four columns on standard desktop — cart keeps three).
+ */
+export const CART_LINE_ITEMS_GRID_CLASS = `grid ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO}`;
