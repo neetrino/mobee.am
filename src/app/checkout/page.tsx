@@ -28,6 +28,7 @@ export default function CheckoutPage() {
     setShowLoginRequiredModal,
     deliveryPrice,
     loadingDeliveryPrice,
+    requiresRegionalQuote,
     register,
     handleSubmit,
     errors,
@@ -36,6 +37,7 @@ export default function CheckoutPage() {
     paymentMethod,
     shippingMethod,
     shippingCity,
+    deliverySpeed,
     paymentMethods,
     orderSummary,
     handlePlaceOrder,
@@ -86,6 +88,7 @@ export default function CheckoutPage() {
             errors={errors}
             isSubmitting={isSubmitting}
             shippingMethod={shippingMethod}
+            deliverySpeed={deliverySpeed}
             paymentMethod={paymentMethod}
             paymentMethods={paymentMethods}
             logoErrors={logoErrors}
@@ -103,6 +106,7 @@ export default function CheckoutPage() {
             shippingCity={shippingCity}
             loadingDeliveryPrice={loadingDeliveryPrice}
             deliveryPrice={deliveryPrice}
+            requiresRegionalQuote={requiresRegionalQuote}
             error={error}
             isSubmitting={isSubmitting}
             onPlaceOrder={(e) => {
@@ -136,6 +140,7 @@ export default function CheckoutPage() {
         currency={currency}
         loadingDeliveryPrice={loadingDeliveryPrice}
         deliveryPrice={deliveryPrice}
+        requiresRegionalQuote={requiresRegionalQuote}
         logoErrors={logoErrors}
         setLogoErrors={setLogoErrors}
         isLoggedIn={isLoggedIn}

@@ -40,8 +40,51 @@
     "delivery": "Delivery",
     "deliveryDescription": "We will deliver your order to your address",
     "freePickup": "Free (Store Pickup)",
+    "freeDelivery": "Free delivery",
     "loading": "Loading...",
-    "enterCity": "Enter City"
+    "enterCity": "Enter City",
+    "deliverySpeedTitle": "Delivery speed",
+    "deliverySpeedHint": "Express delivery adds a surcharge to the quoted shipping amount.",
+    "standardDelivery": "Standard delivery",
+    "standardDeliveryDescription": "Via our service or partners (typically 1–3 business days).",
+    "expressDelivery": "Express delivery",
+    "expressDeliveryDescription": "Available for an additional fee depending on address and order contents."
+  },
+  "deliveryPolicy": {
+    "title": "Delivery & supply terms (summary)",
+    "lead": "We commit to fulfilling your order quickly, safely, and conveniently. Below are the main terms that apply when you place an order.",
+    "timeframesTitle": "Delivery timeframes",
+    "timeframesBody": "Orders are usually delivered within 1–3 business days depending on stock and address. If there is a delay, our team will contact you in advance.",
+    "optionsTitle": "Delivery options",
+    "optionStandard": "Standard delivery through our service or partners.",
+    "optionExpress": "Express delivery for an additional fee (select above).",
+    "optionPickup": "Self pick-up when available for your order.",
+    "feesTitle": "Delivery fees",
+    "feesFreeAbove": "Orders of AMD 8,000 or more may qualify for free delivery (after discounts on the subtotal).",
+    "feesYerevanBelow": "Below AMD 8,000, standard delivery within Yerevan is AMD 1,000 unless configured otherwise in admin.",
+    "feesRegions": "Regions: price is calculated separately based on address and carrier terms.",
+    "confirmationTitle": "Order confirmation",
+    "confirmationBody": "After checkout we may contact you to confirm details, address, payment, and stock. Phones and electronics may require extra verification.",
+    "inspectionTitle": "Inspection at delivery",
+    "inspectionItems": "Please check packaging, condition, model/color/storage, contents, and IMEI/serial (if applicable). Report issues immediately to the courier and us.",
+    "delaysTitle": "Possible delays",
+    "delaysBody": "Weather, transport, holidays, warehouse issues, or inaccurate address/contact data may cause delays. We will notify you and reschedule as quickly as possible.",
+    "specialNote": "Provide an accurate phone number and address—incorrect data may extend delivery times.",
+    "returnsLinkText": "Return & exchange policy",
+    "fullTermsLink": "Delivery page (details)"
+  },
+  "legal": {
+    "sectionTitle": "Acknowledgements",
+    "deliverySupplyTerms": "I have read and agree to the delivery/supply terms summarized above (including timelines, fees, delays, and special notes).",
+    "inspectionAtDelivery": "I understand I should inspect the parcel and product at delivery and immediately report damage, wrong items, or other issues.",
+    "orderVerification": "I allow the team to contact me (including by phone) to confirm the order, and I agree to additional verification when required (especially for electronics).",
+    "returnsPolicy": "I understand returns and exchanges are governed by the Return & Exchange Policy.",
+    "errors": {
+      "deliverySupplyTerms": "You must accept the delivery terms",
+      "inspectionAtDelivery": "You must acknowledge the inspection requirement",
+      "orderVerification": "You must accept the confirmation process",
+      "returnsPolicy": "You must accept the returns policy"
+    }
   },
   "payment": {
     "cashOnDelivery": "Cash on Delivery",
@@ -58,7 +101,9 @@
     "subtotal": "Subtotal",
     "shipping": "Shipping",
     "tax": "Tax",
-    "total": "Total"
+    "total": "Total",
+    "regionalQuotePending": "Regional delivery — price quoted separately",
+    "totalPendingShippingNote": "Total excludes regional shipping until confirmed by our team."
   },
   "buttons": {
     "placeOrder": "Place Order",
@@ -104,7 +149,8 @@
     "failedToLoadCart": "Failed to load cart",
     "failedToCreateOrder": "Failed to create order. Please try again.",
     "invalidPromoCode": "Promo code can contain only letters, numbers, underscores, and hyphens",
-    "promoCodeTooLong": "Promo code is too long"
+    "promoCodeTooLong": "Promo code is too long",
+    "regionalQuoteRequired": "Shipping to this address is quoted separately. Please contact us to complete your order."
   }
 }
 

@@ -24,11 +24,13 @@ interface ShippingAddressModalProps {
     taxDisplay: number;
     shippingDisplay: number;
     totalDisplay: number;
+    totalExcludesPendingShipping: boolean;
   };
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   shippingCity?: string;
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
   onSubmit: (data: CheckoutFormData) => void;
 }
 
@@ -48,6 +50,7 @@ export function ShippingAddressModal({
   shippingCity,
   loadingDeliveryPrice,
   deliveryPrice,
+  requiresRegionalQuote,
   onSubmit,
 }: ShippingAddressModalProps) {
   const { t } = useTranslation();
@@ -166,6 +169,7 @@ export function ShippingAddressModal({
               shippingCity={shippingCity}
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
+              requiresRegionalQuote={requiresRegionalQuote}
             />
           </>
         ) : (
@@ -207,6 +211,7 @@ export function ShippingAddressModal({
               shippingCity={shippingCity}
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
+              requiresRegionalQuote={requiresRegionalQuote}
             />
           </div>
         )}
@@ -232,7 +237,10 @@ export function ShippingAddressModal({
               },
               handleValidationError
             )}
-            disabled={isSubmitting}
+            disabled={
+              isSubmitting ||
+              (shippingMethod === 'delivery' && requiresRegionalQuote)
+            }
           >
             {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
           </Button>

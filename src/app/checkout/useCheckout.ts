@@ -42,6 +42,7 @@ export function useCheckout() {
       email: '',
       phone: '',
       shippingMethod: 'pickup',
+      deliverySpeed: 'standard',
       paymentMethod: 'cash_on_delivery',
       promoCode: '',
       shippingAddress: '',
@@ -50,21 +51,32 @@ export function useCheckout() {
       cardExpiry: '',
       cardCvv: '',
       cardHolderName: '',
+      acceptDeliverySupplyTerms: false,
+      acceptInspectionAtDelivery: false,
+      acceptOrderVerification: false,
+      acceptReturnsPolicy: false,
     },
   });
 
   const paymentMethod = watch('paymentMethod');
   const shippingMethod = watch('shippingMethod');
   const shippingCity = watch('shippingCity');
+  const deliverySpeed = watch('deliverySpeed');
 
-  const { deliveryPrice, loadingDeliveryPrice } = useDeliveryPrice(shippingMethod, shippingCity);
   const { cart, loading, fetchCart } = useCart(isLoggedIn);
+  const { deliveryPrice, loadingDeliveryPrice, requiresRegionalQuote } = useDeliveryPrice(
+    cart,
+    shippingMethod,
+    shippingCity,
+    deliverySpeed
+  );
   useUserProfile(isLoggedIn, isLoading, setValue);
 
   const { submitOrder } = useOrderSubmission({
     cart,
     isLoggedIn,
     deliveryPrice,
+    requiresRegionalQuote,
     setError,
   });
 
@@ -73,7 +85,14 @@ export function useCheckout() {
     shippingMethod,
     deliveryPrice,
     currency,
+    requiresRegionalQuote,
   });
+
+  useEffect(() => {
+    if (shippingMethod === 'pickup') {
+      setValue('deliverySpeed', 'standard');
+    }
+  }, [shippingMethod, setValue]);
 
   useEffect(() => {
     if (isLoading) {
@@ -116,7 +135,7 @@ export function useCheckout() {
       const formData = watch();
       const hasShippingAddress = formData.shippingAddress && formData.shippingAddress.trim().length > 0;
       const hasShippingCity = formData.shippingCity && formData.shippingCity.trim().length > 0;
-      
+
       if (!hasShippingAddress || !hasShippingCity) {
         setError(t('checkout.errors.fillShippingAddress'));
         const shippingSection = document.querySelector('[data-shipping-section]');
@@ -125,8 +144,17 @@ export function useCheckout() {
         }
         return;
       }
+
+      if (requiresRegionalQuote) {
+        setError(t('checkout.errors.regionalQuoteRequired'));
+        const shippingSection = document.querySelector('[data-shipping-section]');
+        if (shippingSection) {
+          shippingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
     }
-    
+
     if (!isLoggedIn) {
       setShowLoginRequiredModal(true);
       return;
@@ -145,7 +173,6 @@ export function useCheckout() {
   };
 
   return {
-    // State
     cart,
     loading,
     error,
@@ -161,23 +188,21 @@ export function useCheckout() {
     setShowLoginRequiredModal,
     deliveryPrice,
     loadingDeliveryPrice,
-    // Form
+    requiresRegionalQuote,
     register,
     handleSubmit,
     errors,
     isSubmitting,
     setValue,
     watch,
-    // Computed
     paymentMethod,
     shippingMethod,
     shippingCity,
+    deliverySpeed,
     paymentMethods,
     orderSummary,
-    // Actions
     handlePlaceOrder,
     onSubmit,
-    // Auth
     isLoggedIn,
   };
 }

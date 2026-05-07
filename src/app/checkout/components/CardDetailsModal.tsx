@@ -25,10 +25,12 @@ interface CardDetailsModalProps {
     taxDisplay: number;
     shippingDisplay: number;
     totalDisplay: number;
+    totalExcludesPendingShipping: boolean;
   };
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   isLoggedIn: boolean;
@@ -52,6 +54,7 @@ export function CardDetailsModal({
   currency,
   loadingDeliveryPrice,
   deliveryPrice,
+  requiresRegionalQuote,
   logoErrors,
   setLogoErrors,
   isLoggedIn,
@@ -151,6 +154,7 @@ export function CardDetailsModal({
             shippingCity={shippingCity}
             loadingDeliveryPrice={loadingDeliveryPrice}
             deliveryPrice={deliveryPrice}
+            requiresRegionalQuote={requiresRegionalQuote}
           />
         </div>
 
@@ -179,7 +183,7 @@ export function CardDetailsModal({
               },
               handleValidationError
             )}
-            disabled={isSubmitting}
+            disabled={isSubmitting || (shippingMethod === 'delivery' && requiresRegionalQuote)}
           >
             {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.continueToPayment')}
           </Button>

@@ -4,6 +4,8 @@ import { Card, Input } from '@shop/ui';
 import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
+import { DeliveryPolicyInfoCard } from './components/DeliveryPolicyInfoCard';
+import { CheckoutLegalAcknowledgements } from './components/CheckoutLegalAcknowledgements';
 
 interface CheckoutFormProps {
   register: UseFormRegister<CheckoutFormData>;
@@ -11,6 +13,7 @@ interface CheckoutFormProps {
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   paymentMethods: Array<{
     id: 'idram' | 'arca' | 'cash_on_delivery';
@@ -30,6 +33,7 @@ export function CheckoutForm({
   errors,
   isSubmitting,
   shippingMethod,
+  deliverySpeed,
   paymentMethod,
   paymentMethods,
   logoErrors,
@@ -41,7 +45,6 @@ export function CheckoutForm({
 
   return (
     <div className="lg:col-span-2 space-y-6">
-      {/* Contact Information */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.contactInformation')}</h2>
         <div className="space-y-4">
@@ -81,7 +84,6 @@ export function CheckoutForm({
         </div>
       </Card>
 
-      {/* Promo Code */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.promoCode.title')}</h2>
         <Input
@@ -94,7 +96,6 @@ export function CheckoutForm({
         />
       </Card>
 
-      {/* Shipping Method */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingMethod')}</h2>
         {errors.shippingMethod && (
@@ -148,17 +149,69 @@ export function CheckoutForm({
         </div>
       </Card>
 
-      {/* Shipping Address - Only show for delivery */}
+      {shippingMethod === 'delivery' && (
+        <>
+          <DeliveryPolicyInfoCard />
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('checkout.shipping.deliverySpeedTitle')}</h2>
+            <p className="text-sm text-gray-600 mb-4">{t('checkout.shipping.deliverySpeedHint')}</p>
+            <div className="space-y-3">
+              <label
+                className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  deliverySpeed === 'standard'
+                    ? 'border-purple-600 bg-purple-50'
+                    : 'border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  {...register('deliverySpeed')}
+                  value="standard"
+                  checked={deliverySpeed === 'standard'}
+                  onChange={(e) => setValue('deliverySpeed', e.target.value as 'standard' | 'express')}
+                  className="mr-4"
+                  disabled={isSubmitting}
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">{t('checkout.shipping.standardDelivery')}</div>
+                  <div className="text-sm text-gray-600">{t('checkout.shipping.standardDeliveryDescription')}</div>
+                </div>
+              </label>
+              <label
+                className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  deliverySpeed === 'express'
+                    ? 'border-purple-600 bg-purple-50'
+                    : 'border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  {...register('deliverySpeed')}
+                  value="express"
+                  checked={deliverySpeed === 'express'}
+                  onChange={(e) => setValue('deliverySpeed', e.target.value as 'standard' | 'express')}
+                  className="mr-4"
+                  disabled={isSubmitting}
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">{t('checkout.shipping.expressDelivery')}</div>
+                  <div className="text-sm text-gray-600">{t('checkout.shipping.expressDeliveryDescription')}</div>
+                </div>
+              </label>
+            </div>
+          </Card>
+        </>
+      )}
+
       {shippingMethod === 'delivery' && (
         <Card className="p-6" data-shipping-section>
           <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingAddress')}</h2>
-          {(error && error.includes('shipping address')) || (errors.shippingAddress || errors.shippingCity) ? (
+          {(error && error.includes('shipping address')) || errors.shippingAddress || errors.shippingCity ? (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-600">
-                {error && error.includes('shipping address') 
-                  ? error 
-                  : (errors.shippingAddress?.message || 
-                     errors.shippingCity?.message)}
+                {error && error.includes('shipping address')
+                  ? error
+                  : errors.shippingAddress?.message || errors.shippingCity?.message}
               </p>
             </div>
           ) : null}
@@ -173,7 +226,7 @@ export function CheckoutForm({
                     if (error && error.includes('shipping address')) {
                       setError(null);
                     }
-                  }
+                  },
                 })}
                 error={errors.shippingAddress?.message}
                 disabled={isSubmitting}
@@ -189,7 +242,7 @@ export function CheckoutForm({
                     if (error && error.includes('shipping address')) {
                       setError(null);
                     }
-                  }
+                  },
                 })}
                 error={errors.shippingCity?.message}
                 disabled={isSubmitting}
@@ -199,7 +252,13 @@ export function CheckoutForm({
         </Card>
       )}
 
-      {/* Payment Method */}
+      <CheckoutLegalAcknowledgements
+        register={register}
+        errors={errors}
+        shippingMethod={shippingMethod}
+        isSubmitting={isSubmitting}
+      />
+
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.paymentMethod')}</h2>
         {errors.paymentMethod && (
@@ -230,7 +289,12 @@ export function CheckoutForm({
                 <div className="relative w-20 h-12 flex-shrink-0 bg-white rounded border border-gray-200 flex items-center justify-center overflow-hidden">
                   {!method.logo || logoErrors[method.id] ? (
                     <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
                     </svg>
                   ) : (
                     <img
@@ -256,6 +320,3 @@ export function CheckoutForm({
     </div>
   );
 }
-
-
-

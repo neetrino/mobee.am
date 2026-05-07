@@ -27,10 +27,12 @@ interface CheckoutModalsProps {
     taxDisplay: number;
     shippingDisplay: number;
     totalDisplay: number;
+    totalExcludesPendingShipping: boolean;
   };
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   isLoggedIn: boolean;
@@ -57,6 +59,7 @@ export function CheckoutModals({
   currency,
   loadingDeliveryPrice,
   deliveryPrice,
+  requiresRegionalQuote,
   logoErrors,
   setLogoErrors,
   isLoggedIn,
@@ -85,6 +88,7 @@ export function CheckoutModals({
         shippingCity={shippingCity}
         loadingDeliveryPrice={loadingDeliveryPrice}
         deliveryPrice={deliveryPrice}
+        requiresRegionalQuote={requiresRegionalQuote}
         onSubmit={onSubmit}
       />
 
@@ -104,6 +108,7 @@ export function CheckoutModals({
         currency={currency}
         loadingDeliveryPrice={loadingDeliveryPrice}
         deliveryPrice={deliveryPrice}
+        requiresRegionalQuote={requiresRegionalQuote}
         logoErrors={logoErrors}
         setLogoErrors={setLogoErrors}
         isLoggedIn={isLoggedIn}
