@@ -3,6 +3,7 @@
 import { Card, Button } from '@shop/ui';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../lib/currency';
+import { DeliveryPricingHint } from './components/DeliveryPricingHint';
 import type { Cart } from './types';
 
 interface OrderSummaryProps {
@@ -81,6 +82,7 @@ export function OrderSummary({
             <span>{t('checkout.summary.shipping')}</span>
             <span className="text-right max-w-[60%]">{shippingLabel}</span>
           </div>
+          <DeliveryPricingHint currency={currency} visible={shippingMethod === 'delivery'} />
           <div className="flex justify-between text-gray-600">
             <span>{t('checkout.summary.tax')}</span>
             <span>{formatPriceInCurrency(orderSummary.taxDisplay, currency)}</span>

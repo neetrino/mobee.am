@@ -112,7 +112,8 @@
     "regionalQuotePending": "Regional delivery — price quoted separately",
     "totalPendingShippingNote": "Total excludes regional shipping until confirmed by our team.",
     "shippingStandard": "Standard",
-    "shippingExpress": "Express"
+    "shippingExpress": "Express",
+    "deliveryPricingHint": "Orders {threshold} or more: standard delivery may be free. Below that: {yerevanFee} within Yerevan. Regional delivery is priced separately by address."
   },
   "buttons": {
     "placeOrder": "Place Order",

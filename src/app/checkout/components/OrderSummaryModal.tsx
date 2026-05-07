@@ -2,6 +2,7 @@
 
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../../lib/currency';
+import { DeliveryPricingHint } from './DeliveryPricingHint';
 import { Cart } from '../types';
 
 interface OrderSummaryModalProps {
@@ -77,6 +78,7 @@ export function OrderSummaryModal({
         <span className="text-gray-600">{t('checkout.summary.shipping')}:</span>
         <span className="font-medium text-right max-w-[55%]">{shippingDisplay}</span>
       </div>
+      <DeliveryPricingHint currency={currency} visible={shippingMethod === 'delivery'} />
       <div className="flex justify-between text-sm">
         <span className="text-gray-600">{t('checkout.summary.tax')}:</span>
         <span className="font-medium">{formatPriceInCurrency(orderSummary.taxDisplay, currency)}</span>

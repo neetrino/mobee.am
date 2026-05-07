@@ -57,12 +57,12 @@ export async function resolveCheckoutShippingAmount(
   let baseShipping = 0;
   if (qualifiesFreeShipping) {
     baseShipping = 0;
+  } else if (isYerevanArea(city)) {
+    baseShipping = YEREVAN_FALLBACK_SHIPPING_BELOW_THRESHOLD_AMD;
   } else {
     const dbPrice = await adminDeliveryService.getDeliveryPrice(city, country);
     if (dbPrice > 0) {
       baseShipping = dbPrice;
-    } else if (isYerevanArea(city)) {
-      baseShipping = YEREVAN_FALLBACK_SHIPPING_BELOW_THRESHOLD_AMD;
     } else {
       return { amount: 0, requiresQuote: true };
     }

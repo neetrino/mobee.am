@@ -46,6 +46,33 @@ describe("checkout-shipping", () => {
     expect(result.amount).toBe(1000);
   });
 
+  it("uses fixed Yerevan rate below threshold even when DB has a different price", async () => {
+    vi.mocked(adminDeliveryService.getDeliveryPrice).mockResolvedValue(500);
+    const result = await resolveCheckoutShippingAmount({
+      shippingMethod: "delivery",
+      city: "Yerevan",
+      country: "Armenia",
+      subtotalAfterDiscountAmd: 1000,
+      deliverySpeed: "standard",
+    });
+    expect(adminDeliveryService.getDeliveryPrice).not.toHaveBeenCalled();
+    expect(result.requiresQuote).toBe(false);
+    expect(result.amount).toBe(1000);
+  });
+
+  it("uses admin price for non-Yerevan city below threshold", async () => {
+    vi.mocked(adminDeliveryService.getDeliveryPrice).mockResolvedValue(2500);
+    const result = await resolveCheckoutShippingAmount({
+      shippingMethod: "delivery",
+      city: "Gyumri",
+      country: "Armenia",
+      subtotalAfterDiscountAmd: 1000,
+      deliverySpeed: "standard",
+    });
+    expect(result.requiresQuote).toBe(false);
+    expect(result.amount).toBe(2500);
+  });
+
   it("requires quote for unknown region without DB price", async () => {
     vi.mocked(adminDeliveryService.getDeliveryPrice).mockResolvedValue(0);
     const result = await resolveCheckoutShippingAmount({
