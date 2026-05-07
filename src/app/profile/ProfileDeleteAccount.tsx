@@ -118,7 +118,7 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-account-title"
-            className="max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-xl"
+            className="max-w-md rounded-[15px] border border-gray-200 bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             {confirmStep === 1 ? (

@@ -36,7 +36,7 @@ export function ProfileAddresses({
 }: ProfileAddressesProps) {
   return (
     <div className="space-y-6">
-      <Card className="p-6">
+      <Card className="rounded-[15px] p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-gray-900">{t('profile.addresses.title')}</h2>
           <Button
@@ -53,7 +53,7 @@ export function ProfileAddresses({
 
         {/* Address Form */}
         {showAddressForm && (
-          <form onSubmit={onSave} className="mb-6 p-4 bg-gray-50 rounded-lg space-y-4">
+          <form onSubmit={onSave} className="mb-6 rounded-[15px] bg-gray-50 p-4 space-y-4">
             <h3 className="font-semibold text-gray-900">
               {editingAddress ? t('profile.addresses.form.editTitle') : t('profile.addresses.form.addTitle')}
             </h3>
@@ -105,7 +105,7 @@ export function ProfileAddresses({
             profile.addresses.map((address, index) => (
               <div
                 key={address.id || address._id || index}
-                className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                className="rounded-[15px] border border-gray-200 p-4 transition-colors hover:border-gray-300"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">

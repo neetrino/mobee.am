@@ -9,9 +9,12 @@ import {
 } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
 import type { CheckoutFormData } from '../types';
+import {
+  CHECKOUT_FORM_CARD_RADIUS_CLASS,
+  CHECKOUT_RADIO_ACCENT_CLASS,
+} from '../constants';
 
-const CHECKBOX_CLASS =
-  'mt-0.5 h-5 w-5 min-h-[1.25rem] min-w-[1.25rem] shrink-0 rounded border-gray-300 text-purple-600 focus:ring-purple-500';
+const CHECKBOX_CLASS = `mt-0.5 h-5 w-5 min-h-[1.25rem] min-w-[1.25rem] shrink-0 rounded border-gray-300 ${CHECKOUT_RADIO_ACCENT_CLASS} focus:outline-none focus:ring-2 focus:ring-admin-500 focus:ring-offset-0`;
 const TEXT_CLASS = 'text-sm leading-relaxed text-gray-700 min-w-0 flex-1';
 const ROW_GAP = 'gap-3';
 
@@ -47,7 +50,7 @@ export function CheckoutLegalAcknowledgements({
 
   return (
     <div
-      className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5"
+      className={`border border-dashed border-gray-300 bg-gray-50 p-5 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
       data-legal-acknowledgements
     >
       <div className="flex flex-col gap-5">

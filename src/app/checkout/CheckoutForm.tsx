@@ -7,6 +7,8 @@ import { CheckoutFormData } from './types';
 import {
   CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_CLASS,
+  CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS,
+  CHECKOUT_FORM_CARD_RADIUS_TOP_CLASS,
   CHECKOUT_OPTION_SELECTED_CHROME_CLASS,
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
@@ -140,15 +142,15 @@ export function CheckoutForm({
             </div>
           </label>
           <div
-            className={`rounded-lg border-2 transition-colors ${
+            className={`${CHECKOUT_FORM_CARD_RADIUS_CLASS} border-2 transition-colors ${
               shippingMethod === 'delivery'
-                ? 'border-purple-600 bg-purple-50/90 ring-1 ring-purple-200/80'
+                ? `${CHECKOUT_OPTION_SELECTED_CHROME_CLASS} ring-1 ring-admin-200/80`
                 : 'border-gray-300 bg-white hover:bg-gray-50/60'
             }`}
           >
             <label
-              className={`flex items-center p-4 cursor-pointer ${
-                shippingMethod === 'delivery' ? 'rounded-t-lg' : 'rounded-lg'
+              className={`flex cursor-pointer items-center p-4 ${
+                shippingMethod === 'delivery' ? CHECKOUT_FORM_CARD_RADIUS_TOP_CLASS : ''
               }`}
             >
               <input
@@ -160,7 +162,7 @@ export function CheckoutForm({
                   setValue('shippingMethod', 'delivery', { shouldValidate: true, shouldDirty: true });
                   setValue('deliverySpeed', 'standard', { shouldValidate: true });
                 }}
-                className="mr-4"
+                className={`mr-4 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
                 disabled={isSubmitting}
                 aria-controls={
                   shippingMethod === 'delivery' ? 'delivery-type-options' : undefined
@@ -177,19 +179,19 @@ export function CheckoutForm({
                 id="delivery-type-options"
                 role="group"
                 aria-label={t('checkout.shipping.deliveryTypesGroupLabel')}
-                className="border-t border-purple-200/90 bg-white/90 rounded-b-lg px-4 pb-4 pt-3"
+                className={`border-t border-admin-200/90 bg-white/90 px-4 pb-4 pt-3 ${CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS}`}
               >
-                <p className="text-xs font-semibold uppercase tracking-wide text-purple-900 mb-1">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-admin-900">
                   {t('checkout.shipping.deliveryTypesTitle')}
                 </p>
-                <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+                <p className="mb-3 text-xs leading-relaxed text-gray-600">
                   {t('checkout.shipping.deliveryTypesHint')}
                 </p>
-                <div className="space-y-2 border-l-2 border-purple-400 pl-3 ml-0.5">
+                <div className="ml-0.5 space-y-2 border-l-2 border-admin-400 pl-3">
                   <label
-                    className={`flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-all ${
+                    className={`flex cursor-pointer items-start gap-3 border p-3 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
                       deliverySpeed === 'standard'
-                        ? 'border-purple-500 bg-purple-50/90'
+                        ? `${CHECKOUT_OPTION_SELECTED_CHROME_CLASS}`
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
@@ -204,7 +206,7 @@ export function CheckoutForm({
                           shouldDirty: true,
                         })
                       }
-                      className="mt-0.5 h-4 w-4 shrink-0 text-purple-600 focus:ring-purple-500"
+                      className={`mt-0.5 h-4 w-4 shrink-0 ${CHECKOUT_RADIO_ACCENT_CLASS} focus:ring-2 focus:ring-admin-500 focus:ring-offset-0`}
                       disabled={isSubmitting}
                     />
                     <div className="min-w-0 flex-1">
@@ -217,9 +219,9 @@ export function CheckoutForm({
                     </div>
                   </label>
                   <label
-                    className={`flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-all ${
+                    className={`flex cursor-pointer items-start gap-3 border p-3 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
                       deliverySpeed === 'express'
-                        ? 'border-purple-500 bg-purple-50/90'
+                        ? `${CHECKOUT_OPTION_SELECTED_CHROME_CLASS}`
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
@@ -234,7 +236,7 @@ export function CheckoutForm({
                           shouldDirty: true,
                         })
                       }
-                      className="mt-0.5 h-4 w-4 shrink-0 text-purple-600 focus:ring-purple-500"
+                      className={`mt-0.5 h-4 w-4 shrink-0 ${CHECKOUT_RADIO_ACCENT_CLASS} focus:ring-2 focus:ring-admin-500 focus:ring-offset-0`}
                       disabled={isSubmitting}
                     />
                     <div className="min-w-0 flex-1">

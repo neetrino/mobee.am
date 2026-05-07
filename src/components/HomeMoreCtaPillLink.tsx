@@ -30,6 +30,7 @@ type HomeMoreCtaPillLinkProps = {
   readonly children: ReactNode;
   readonly variant: HomeMoreCtaPillVariant;
   readonly className?: string;
+  readonly labelClassName?: string;
   /** Replaces default arrow inside the trailing circle (circle chrome stays). */
   readonly circleContent?: ReactNode;
 } & Pick<React.ComponentProps<'a'>, 'onPointerEnter' | 'onPointerLeave'>;
@@ -42,6 +43,7 @@ export function HomeMoreCtaPillLink({
   children,
   variant,
   className = '',
+  labelClassName = '',
   circleContent,
   onPointerEnter,
   onPointerLeave,
@@ -69,7 +71,7 @@ export function HomeMoreCtaPillLink({
         aria-hidden
       />
       <span
-        className={`relative z-10 flex-1 -translate-x-5 text-right text-[14px] font-medium leading-none ${labelClass}`}
+        className={`relative z-10 flex-1 -translate-x-5 text-right text-[14px] font-medium leading-none ${labelClass} ${labelClassName}`.trim()}
       >
         {children}
       </span>

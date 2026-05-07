@@ -33,7 +33,7 @@ export function ProfileOrders({
 }: ProfileOrdersProps) {
   if (ordersLoading) {
     return (
-      <Card className="p-6">
+      <Card className="rounded-[15px] p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -48,7 +48,7 @@ export function ProfileOrders({
 
   if (orders.length === 0) {
     return (
-      <Card className="p-6">
+      <Card className="rounded-[15px] p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
         <div className="text-center py-12">
           <p className="text-gray-600 mb-4">{t('profile.orders.noOrders')}</p>
@@ -63,7 +63,7 @@ export function ProfileOrders({
   }
 
   return (
-    <Card className="p-6">
+    <Card className="w-full rounded-[15px] p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
       <div className="space-y-4">
         {orders.map((order) => (
@@ -71,12 +71,12 @@ export function ProfileOrders({
             key={order.id}
             href={`/orders/${order.number}`}
             onClick={(e) => onOrderClick(order.number, e)}
-            className="block border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-md transition-all cursor-pointer"
+            className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
           >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-6 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">{t('profile.orders.orderNumber')}{order.number}</h3>
+                  <h3 className="break-words text-lg font-semibold text-gray-900 [overflow-wrap:anywhere]">{t('profile.orders.orderNumber')}{order.number}</h3>
                   <div>
                     <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-0.5">{t('profile.dashboard.orderStatus')}</p>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(order.status)}`}>
@@ -94,8 +94,8 @@ export function ProfileOrders({
                   {order.itemsCount} {order.itemsCount !== 1 ? t('profile.orders.items') : t('profile.orders.item')} • {t('profile.dashboard.placedOn')} {new Date(order.createdAt).toLocaleDateString()}
                 </p>
               </div>
-              <div className="text-right ml-4">
-                <p className="text-lg font-bold text-gray-900">
+              <div className="shrink-0 text-left sm:ml-4 sm:text-right">
+                <p className="break-words text-lg font-bold text-gray-900 [overflow-wrap:anywhere]">
                   {(() => {
                     if (order.subtotal !== undefined && order.discountAmount !== undefined && order.taxAmount !== undefined) {
                       const subtotalAMD = convertPrice(order.subtotal, 'USD', 'AMD');
