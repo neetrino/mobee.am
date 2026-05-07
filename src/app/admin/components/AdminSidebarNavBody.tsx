@@ -51,6 +51,25 @@ function ProductsNavRow({
   const toggleAriaLabel = isExpanded ? collapseAria : expandAria;
 
   return (
+    <div className="flex w-full items-center gap-2">
+      <button
+        type="button"
+        onClick={onGoToProducts}
+        className={`flex flex-1 items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium transition-all ${
+          isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+        }`}
+      >
+        <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
+        <span>{tab.label}</span>
+      </button>
+      <button
+        type="button"
+        onClick={onToggleExpand}
+        aria-label={isExpanded ? collapseAria : expandAria}
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-all ${
+          isActive
+            ? 'text-admin hover:text-admin-700'
+            : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
     <button
       type="button"
       onClick={onToggleExpand}
