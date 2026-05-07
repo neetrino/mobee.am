@@ -16,6 +16,7 @@ interface OrderSummaryProps {
   };
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   shippingCity: string | undefined;
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
@@ -30,6 +31,7 @@ export function OrderSummary({
   orderSummary,
   currency,
   shippingMethod,
+  deliverySpeed,
   shippingCity,
   loadingDeliveryPrice,
   deliveryPrice,
@@ -42,6 +44,16 @@ export function OrderSummary({
 
   const checkoutBlocked = shippingMethod === 'delivery' && requiresRegionalQuote;
 
+  const deliveryTypeSuffix =
+    shippingMethod === 'delivery' &&
+    deliveryPrice !== null &&
+    !requiresRegionalQuote &&
+    !loadingDeliveryPrice
+      ? deliverySpeed === 'express'
+        ? ` · ${t('checkout.summary.shippingExpress')}`
+        : ` · ${t('checkout.summary.shippingStandard')}`
+      : '';
+
   const shippingLabel =
     shippingMethod === 'pickup'
       ? t('checkout.shipping.freePickup')
@@ -51,8 +63,8 @@ export function OrderSummary({
           ? t('checkout.summary.regionalQuotePending')
           : deliveryPrice !== null
             ? deliveryPrice === 0
-              ? t('checkout.shipping.freeDelivery')
-              : formatPriceInCurrency(orderSummary.shippingDisplay, currency) +
+              ? `${t('checkout.shipping.freeDelivery')}${deliveryTypeSuffix}`
+              : `${formatPriceInCurrency(orderSummary.shippingDisplay, currency)}${deliveryTypeSuffix}` +
                 (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
             : t('checkout.shipping.enterCity');
 

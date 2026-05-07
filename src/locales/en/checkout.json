@@ -45,6 +45,9 @@
     "enterCity": "Enter City",
     "deliverySpeedTitle": "Delivery speed",
     "deliverySpeedHint": "Express delivery adds a surcharge to the quoted shipping amount.",
+    "deliveryTypesGroupLabel": "Delivery type options",
+    "deliveryTypesTitle": "Delivery type",
+    "deliveryTypesHint": "Standard and Express are types of the same “Delivery” option (speed and price differ)—not a separate shipping method next to pickup.",
     "standardDelivery": "Standard delivery",
     "standardDeliveryDescription": "Via our service or partners (typically 1–3 business days).",
     "expressDelivery": "Express delivery",
@@ -105,7 +108,9 @@
     "tax": "Tax",
     "total": "Total",
     "regionalQuotePending": "Regional delivery — price quoted separately",
-    "totalPendingShippingNote": "Total excludes regional shipping until confirmed by our team."
+    "totalPendingShippingNote": "Total excludes regional shipping until confirmed by our team.",
+    "shippingStandard": "Standard",
+    "shippingExpress": "Express"
   },
   "buttons": {
     "placeOrder": "Place Order",

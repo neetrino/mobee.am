@@ -118,7 +118,12 @@ export function CheckoutForm({
               {...register('shippingMethod')}
               value="pickup"
               checked={shippingMethod === 'pickup'}
-              onChange={(e) => setValue('shippingMethod', e.target.value as 'pickup' | 'delivery')}
+              onChange={(e) =>
+                setValue('shippingMethod', e.target.value as 'pickup' | 'delivery', {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                })
+              }
               className="mr-4"
               disabled={isSubmitting}
             />
@@ -127,83 +132,122 @@ export function CheckoutForm({
               <div className="text-sm text-gray-600">{t('checkout.shipping.storePickupDescription')}</div>
             </div>
           </label>
-          <label
-            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+
+          <div
+            className={`rounded-lg border-2 transition-colors ${
               shippingMethod === 'delivery'
-                ? 'border-purple-600 bg-purple-50'
-                : 'border-gray-300 hover:bg-gray-50'
+                ? 'border-purple-600 bg-purple-50/90 ring-1 ring-purple-200/80'
+                : 'border-gray-300 bg-white hover:bg-gray-50/60'
             }`}
           >
-            <input
-              type="radio"
-              {...register('shippingMethod')}
-              value="delivery"
-              checked={shippingMethod === 'delivery'}
-              onChange={(e) => setValue('shippingMethod', e.target.value as 'pickup' | 'delivery')}
-              className="mr-4"
-              disabled={isSubmitting}
-            />
-            <div className="flex-1">
-              <div className="font-medium text-gray-900">{t('checkout.shipping.delivery')}</div>
-              <div className="text-sm text-gray-600">{t('checkout.shipping.deliveryDescription')}</div>
-            </div>
-          </label>
+            <label
+              className={`flex items-center p-4 cursor-pointer ${
+                shippingMethod === 'delivery' ? 'rounded-t-lg' : 'rounded-lg'
+              }`}
+            >
+              <input
+                type="radio"
+                {...register('shippingMethod')}
+                value="delivery"
+                checked={shippingMethod === 'delivery'}
+                onChange={() => {
+                  setValue('shippingMethod', 'delivery', { shouldValidate: true, shouldDirty: true });
+                  setValue('deliverySpeed', 'standard', { shouldValidate: true });
+                }}
+                className="mr-4"
+                disabled={isSubmitting}
+                aria-controls={
+                  shippingMethod === 'delivery' ? 'delivery-type-options' : undefined
+                }
+              />
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-gray-900">{t('checkout.shipping.delivery')}</div>
+                <div className="text-sm text-gray-600">{t('checkout.shipping.deliveryDescription')}</div>
+              </div>
+            </label>
+
+            {shippingMethod === 'delivery' && (
+              <div
+                id="delivery-type-options"
+                role="group"
+                aria-label={t('checkout.shipping.deliveryTypesGroupLabel')}
+                className="border-t border-purple-200/90 bg-white/90 rounded-b-lg px-4 pb-4 pt-3"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wide text-purple-900 mb-1">
+                  {t('checkout.shipping.deliveryTypesTitle')}
+                </p>
+                <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+                  {t('checkout.shipping.deliveryTypesHint')}
+                </p>
+                <div className="space-y-2 border-l-2 border-purple-400 pl-3 ml-0.5">
+                  <label
+                    className={`flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-all ${
+                      deliverySpeed === 'standard'
+                        ? 'border-purple-500 bg-purple-50/90'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      {...register('deliverySpeed')}
+                      value="standard"
+                      checked={deliverySpeed === 'standard'}
+                      onChange={(e) =>
+                        setValue('deliverySpeed', e.target.value as 'standard' | 'express', {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        })
+                      }
+                      className="mt-0.5 h-4 w-4 shrink-0 text-purple-600 focus:ring-purple-500"
+                      disabled={isSubmitting}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium text-gray-900">
+                        {t('checkout.shipping.standardDelivery')}
+                      </div>
+                      <div className="text-xs text-gray-600 leading-snug mt-0.5">
+                        {t('checkout.shipping.standardDeliveryDescription')}
+                      </div>
+                    </div>
+                  </label>
+                  <label
+                    className={`flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-all ${
+                      deliverySpeed === 'express'
+                        ? 'border-purple-500 bg-purple-50/90'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      {...register('deliverySpeed')}
+                      value="express"
+                      checked={deliverySpeed === 'express'}
+                      onChange={(e) =>
+                        setValue('deliverySpeed', e.target.value as 'standard' | 'express', {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        })
+                      }
+                      className="mt-0.5 h-4 w-4 shrink-0 text-purple-600 focus:ring-purple-500"
+                      disabled={isSubmitting}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium text-gray-900">
+                        {t('checkout.shipping.expressDelivery')}
+                      </div>
+                      <div className="text-xs text-gray-600 leading-snug mt-0.5">
+                        {t('checkout.shipping.expressDeliveryDescription')}
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Card>
 
-      {shippingMethod === 'delivery' && (
-        <>
-          <DeliveryPolicyInfoCard />
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('checkout.shipping.deliverySpeedTitle')}</h2>
-            <p className="text-sm text-gray-600 mb-4">{t('checkout.shipping.deliverySpeedHint')}</p>
-            <div className="space-y-3">
-              <label
-                className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                  deliverySpeed === 'standard'
-                    ? 'border-purple-600 bg-purple-50'
-                    : 'border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <input
-                  type="radio"
-                  {...register('deliverySpeed')}
-                  value="standard"
-                  checked={deliverySpeed === 'standard'}
-                  onChange={(e) => setValue('deliverySpeed', e.target.value as 'standard' | 'express')}
-                  className="mr-4"
-                  disabled={isSubmitting}
-                />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">{t('checkout.shipping.standardDelivery')}</div>
-                  <div className="text-sm text-gray-600">{t('checkout.shipping.standardDeliveryDescription')}</div>
-                </div>
-              </label>
-              <label
-                className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                  deliverySpeed === 'express'
-                    ? 'border-purple-600 bg-purple-50'
-                    : 'border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <input
-                  type="radio"
-                  {...register('deliverySpeed')}
-                  value="express"
-                  checked={deliverySpeed === 'express'}
-                  onChange={(e) => setValue('deliverySpeed', e.target.value as 'standard' | 'express')}
-                  className="mr-4"
-                  disabled={isSubmitting}
-                />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">{t('checkout.shipping.expressDelivery')}</div>
-                  <div className="text-sm text-gray-600">{t('checkout.shipping.expressDeliveryDescription')}</div>
-                </div>
-              </label>
-            </div>
-          </Card>
-        </>
-      )}
+      {shippingMethod === 'delivery' && <DeliveryPolicyInfoCard />}
 
       {shippingMethod === 'delivery' && (
         <Card className="p-6" data-shipping-section>

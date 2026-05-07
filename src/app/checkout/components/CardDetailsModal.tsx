@@ -18,6 +18,7 @@ interface CardDetailsModalProps {
   isSubmitting: boolean;
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   shippingCity?: string;
   cart: Cart | null;
   orderSummary: {
@@ -48,6 +49,7 @@ export function CardDetailsModal({
   isSubmitting,
   paymentMethod,
   shippingMethod,
+  deliverySpeed,
   shippingCity,
   cart,
   orderSummary,
@@ -151,6 +153,7 @@ export function CardDetailsModal({
             orderSummary={orderSummary}
             currency={currency}
             shippingMethod={shippingMethod}
+            deliverySpeed={deliverySpeed}
             shippingCity={shippingCity}
             loadingDeliveryPrice={loadingDeliveryPrice}
             deliveryPrice={deliveryPrice}

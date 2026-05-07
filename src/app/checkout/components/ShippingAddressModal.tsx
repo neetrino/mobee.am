@@ -17,6 +17,7 @@ interface ShippingAddressModalProps {
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   cart: Cart | null;
   orderSummary: {
@@ -43,6 +44,7 @@ export function ShippingAddressModal({
   errors,
   isSubmitting,
   shippingMethod,
+  deliverySpeed,
   paymentMethod,
   cart,
   orderSummary,
@@ -166,6 +168,7 @@ export function ShippingAddressModal({
               orderSummary={orderSummary}
               currency={currency}
               shippingMethod={shippingMethod}
+              deliverySpeed={deliverySpeed}
               shippingCity={shippingCity}
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
@@ -208,6 +211,7 @@ export function ShippingAddressModal({
               orderSummary={orderSummary}
               currency={currency}
               shippingMethod={shippingMethod}
+              deliverySpeed={deliverySpeed}
               shippingCity={shippingCity}
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}

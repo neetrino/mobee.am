@@ -19,6 +19,7 @@ interface CheckoutModalsProps {
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   shippingCity: string | undefined;
   cart: Cart | null;
@@ -52,6 +53,7 @@ export function CheckoutModals({
   errors,
   isSubmitting,
   shippingMethod,
+  deliverySpeed,
   paymentMethod,
   shippingCity,
   cart,
@@ -81,6 +83,7 @@ export function CheckoutModals({
         errors={errors}
         isSubmitting={isSubmitting}
         shippingMethod={shippingMethod}
+        deliverySpeed={deliverySpeed}
         paymentMethod={paymentMethod}
         cart={cart}
         orderSummary={orderSummary}
@@ -102,6 +105,7 @@ export function CheckoutModals({
         isSubmitting={isSubmitting}
         paymentMethod={paymentMethod}
         shippingMethod={shippingMethod}
+        deliverySpeed={deliverySpeed}
         shippingCity={shippingCity}
         cart={cart}
         orderSummary={orderSummary}

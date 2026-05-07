@@ -105,6 +105,7 @@ export default function CheckoutPage() {
             orderSummary={orderSummary}
             currency={currency}
             shippingMethod={shippingMethod}
+            deliverySpeed={deliverySpeed}
             shippingCity={shippingCity}
             loadingDeliveryPrice={loadingDeliveryPrice}
             deliveryPrice={deliveryPrice}
@@ -135,6 +136,7 @@ export default function CheckoutPage() {
         errors={errors}
         isSubmitting={isSubmitting}
         shippingMethod={shippingMethod}
+        deliverySpeed={deliverySpeed}
         paymentMethod={paymentMethod}
         shippingCity={shippingCity}
         cart={cart}

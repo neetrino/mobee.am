@@ -54,7 +54,7 @@ export function useDeliveryPrice(
 
     const timeoutId = setTimeout(() => {
       fetchDeliveryPrice();
-    }, 500);
+    }, 200);
 
     return () => {
       clearTimeout(timeoutId);
