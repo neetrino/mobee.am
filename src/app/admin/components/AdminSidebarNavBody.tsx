@@ -35,6 +35,7 @@ interface ProductsNavRowProps {
   tab: AdminMenuItem;
   isActive: boolean;
   isExpanded: boolean;
+  onNavigate: () => void;
   onToggleExpand: () => void;
   expandAria: string;
   collapseAria: string;
@@ -44,36 +45,48 @@ function ProductsNavRow({
   tab,
   isActive,
   isExpanded,
+  onNavigate,
   onToggleExpand,
   expandAria,
   collapseAria,
 }: ProductsNavRowProps) {
   const toggleAriaLabel = isExpanded ? collapseAria : expandAria;
+  const containerColors = isActive
+    ? 'bg-admin text-white'
+    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900';
+  const iconColor = isActive ? 'text-white' : 'text-gray-500';
 
   return (
-    <button
-      type="button"
-      onClick={onToggleExpand}
-      aria-expanded={isExpanded}
-      aria-label={`${tab.label}. ${toggleAriaLabel}`}
-      className={`flex w-full min-w-0 items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium transition-all ${
-        isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-      }`}
+    <div
+      className={`flex w-full min-w-0 items-stretch rounded-md text-sm font-medium transition-all ${containerColors}`}
     >
-      <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
-      <span className="min-w-0 flex-1 truncate">{tab.label}</span>
-      <svg
-        className={`h-4 w-4 shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''} ${
-          isActive ? 'text-white' : 'text-gray-500'
-        }`}
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        aria-hidden
+      <button
+        type="button"
+        onClick={onNavigate}
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-l-md px-4 py-3 text-left"
       >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
+        <span className={`flex-shrink-0 ${iconColor}`}>{tab.icon}</span>
+        <span className="min-w-0 flex-1 truncate">{tab.label}</span>
+      </button>
+      <button
+        type="button"
+        onClick={onToggleExpand}
+        aria-expanded={isExpanded}
+        aria-label={`${tab.label}. ${toggleAriaLabel}`}
+        aria-controls="admin-products-submenu"
+        className="flex shrink-0 items-center justify-center rounded-r-md px-3 py-3"
+      >
+        <svg
+          className={`h-4 w-4 shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''} ${iconColor}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </div>
   );
 }
 
@@ -126,6 +139,9 @@ function renderPrimaryNavItem(tab: AdminMenuItem, ctx: PrimaryNavContext) {
         tab={tab}
         isActive={isActive}
         isExpanded={isProductsExpanded}
+        onNavigate={() => {
+          goTo(tab.path);
+        }}
         onToggleExpand={() => {
           setIsProductsExpanded((prev) => !prev);
         }}
