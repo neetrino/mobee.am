@@ -127,8 +127,8 @@ function ProfilePageContent() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-8">
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <div className="flex w-full flex-col gap-4 lg:grid lg:grid-cols-[max-content_minmax(0,1fr)] lg:items-start lg:gap-8">
         <ProfileHeader
           profile={profile}
           tabs={tabs}
@@ -138,7 +138,7 @@ function ProfilePageContent() {
         />
 
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <div className="w-full min-w-0">
           {/* Alert messages */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">

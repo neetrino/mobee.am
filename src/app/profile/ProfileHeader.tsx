@@ -16,9 +16,9 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: ProfileHeaderProps) {
   return (
     <>
-      <div className="flex w-full flex-shrink-0 flex-col lg:sticky lg:top-8 lg:self-start lg:w-max lg:min-w-80 lg:max-w-2xl">
+      <div className="flex w-full flex-shrink-0 flex-col lg:sticky lg:top-8 lg:w-max lg:min-w-80 lg:max-w-2xl lg:self-start">
         {/* Profile Header Section */}
-        <div className="mb-3 w-full rounded-[15px] border border-gray-200 bg-white p-4 shadow-sm lg:mb-4 lg:w-auto lg:max-w-2xl lg:rounded-lg">
+        <div className="mb-3 w-full rounded-[15px] border border-gray-200 bg-white p-4 shadow-sm lg:mb-4 lg:rounded-lg">
           <div className="flex flex-row items-center gap-4">
             {/* Avatar */}
             <UserAvatar
@@ -40,7 +40,7 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
                       : t('profile.myProfile')}
               </h1>
               {profile?.email && (
-                <p className="mb-1 break-words text-sm font-bold text-gray-900 [overflow-wrap:anywhere]">
+                <p className="mb-1 break-words text-sm font-bold text-gray-900 [overflow-wrap:anywhere] lg:whitespace-nowrap">
                   {profile.email}
                 </p>
               )}
