@@ -75,6 +75,8 @@
   },
   "legal": {
     "sectionTitle": "Acknowledgements",
+    "bundleDeliveryAndInspection": "I have read and agree to the delivery and supply terms summarized above (including timelines, fees, delays, and special notes). I understand I must inspect the package and product at delivery and immediately report damage, wrong items, or other issues.",
+    "bundleVerificationAndReturns": "I allow the team to contact me (including by phone) to confirm my order and agree to additional verification when required (especially for electronics). I understand returns and exchanges are governed by the Return & Exchange Policy.",
     "deliverySupplyTerms": "I have read and agree to the delivery/supply terms summarized above (including timelines, fees, delays, and special notes).",
     "inspectionAtDelivery": "I understand I should inspect the parcel and product at delivery and immediately report damage, wrong items, or other issues.",
     "orderVerification": "I allow the team to contact me (including by phone) to confirm the order, and I agree to additional verification when required (especially for electronics).",

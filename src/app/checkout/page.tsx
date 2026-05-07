@@ -34,6 +34,7 @@ export default function CheckoutPage() {
     errors,
     isSubmitting,
     setValue,
+    watch,
     paymentMethod,
     shippingMethod,
     shippingCity,
@@ -85,6 +86,7 @@ export default function CheckoutPage() {
           <CheckoutForm
             register={register}
             setValue={setValue}
+            watch={watch}
             errors={errors}
             isSubmitting={isSubmitting}
             shippingMethod={shippingMethod}

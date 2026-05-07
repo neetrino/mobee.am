@@ -1,12 +1,24 @@
 'use client';
 
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { Card } from '@shop/ui';
+import { useId } from 'react';
+import {
+  UseFormRegister,
+  FieldErrors,
+  UseFormWatch,
+  UseFormSetValue,
+} from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
 import type { CheckoutFormData } from '../types';
 
+const CHECKBOX_CLASS =
+  'mt-0.5 h-5 w-5 min-h-[1.25rem] min-w-[1.25rem] shrink-0 rounded border-gray-300 text-purple-600 focus:ring-purple-500';
+const TEXT_CLASS = 'text-sm leading-relaxed text-gray-700 min-w-0 flex-1';
+const ROW_GAP = 'gap-3';
+
 interface CheckoutLegalAcknowledgementsProps {
   register: UseFormRegister<CheckoutFormData>;
+  setValue: UseFormSetValue<CheckoutFormData>;
+  watch: UseFormWatch<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
   shippingMethod: 'pickup' | 'delivery';
   isSubmitting: boolean;
@@ -14,69 +26,130 @@ interface CheckoutLegalAcknowledgementsProps {
 
 export function CheckoutLegalAcknowledgements({
   register,
+  setValue,
+  watch,
   errors,
   shippingMethod,
   isSubmitting,
 }: CheckoutLegalAcknowledgementsProps) {
   const { t } = useTranslation();
+  const baseId = useId();
+
+  const deliveryBundleChecked =
+    watch('acceptDeliverySupplyTerms') && watch('acceptInspectionAtDelivery');
+  const confirmBundleChecked =
+    watch('acceptOrderVerification') && watch('acceptReturnsPolicy');
+
+  const deliveryBundleError =
+    errors.acceptDeliverySupplyTerms?.message || errors.acceptInspectionAtDelivery?.message;
+  const confirmBundleError =
+    errors.acceptOrderVerification?.message || errors.acceptReturnsPolicy?.message;
 
   return (
-    <Card className="p-6" data-legal-acknowledgements>
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('checkout.legal.sectionTitle')}</h2>
-      <div className="space-y-4">
+    <div
+      className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5"
+      data-legal-acknowledgements
+    >
+      <div className="flex flex-col gap-5">
         {shippingMethod === 'delivery' && (
+          <div>
+            <div className={`flex items-start ${ROW_GAP}`}>
+              <input
+                id={`${baseId}-delivery-bundle`}
+                type="checkbox"
+                className={CHECKBOX_CLASS}
+                disabled={isSubmitting}
+                checked={deliveryBundleChecked}
+                onChange={(e) => {
+                  const next = e.target.checked;
+                  setValue('acceptDeliverySupplyTerms', next, { shouldValidate: true });
+                  setValue('acceptInspectionAtDelivery', next, { shouldValidate: true });
+                }}
+              />
+              <label
+                htmlFor={`${baseId}-delivery-bundle`}
+                className={`${TEXT_CLASS} cursor-pointer`}
+              >
+                {t('checkout.legal.bundleDeliveryAndInspection')}
+              </label>
+            </div>
+            {deliveryBundleError ? (
+              <p className="mt-1 pl-8 text-sm text-red-600">{deliveryBundleError}</p>
+            ) : null}
+          </div>
+        )}
+
+        {shippingMethod === 'delivery' ? (
+          <div>
+            <div className={`flex items-start ${ROW_GAP}`}>
+              <input
+                id={`${baseId}-confirm-bundle`}
+                type="checkbox"
+                className={CHECKBOX_CLASS}
+                disabled={isSubmitting}
+                checked={confirmBundleChecked}
+                onChange={(e) => {
+                  const next = e.target.checked;
+                  setValue('acceptOrderVerification', next, { shouldValidate: true });
+                  setValue('acceptReturnsPolicy', next, { shouldValidate: true });
+                }}
+              />
+              <label
+                htmlFor={`${baseId}-confirm-bundle`}
+                className={`${TEXT_CLASS} cursor-pointer`}
+              >
+                {t('checkout.legal.bundleVerificationAndReturns')}
+              </label>
+            </div>
+            {confirmBundleError ? (
+              <p className="mt-1 pl-8 text-sm text-red-600">{confirmBundleError}</p>
+            ) : null}
+          </div>
+        ) : (
           <>
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                disabled={isSubmitting}
-                {...register('acceptDeliverySupplyTerms')}
-              />
-              <span className="text-sm text-gray-700">{t('checkout.legal.deliverySupplyTerms')}</span>
-            </label>
-            {errors.acceptDeliverySupplyTerms?.message && (
-              <p className="text-sm text-red-600 -mt-2 ml-7">{errors.acceptDeliverySupplyTerms.message}</p>
-            )}
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                disabled={isSubmitting}
-                {...register('acceptInspectionAtDelivery')}
-              />
-              <span className="text-sm text-gray-700">{t('checkout.legal.inspectionAtDelivery')}</span>
-            </label>
-            {errors.acceptInspectionAtDelivery?.message && (
-              <p className="text-sm text-red-600 -mt-2 ml-7">{errors.acceptInspectionAtDelivery.message}</p>
-            )}
+            <div>
+              <label
+                htmlFor={`${baseId}-verify`}
+                className={`flex items-start ${ROW_GAP} cursor-pointer`}
+              >
+                <input
+                  id={`${baseId}-verify`}
+                  type="checkbox"
+                  className={CHECKBOX_CLASS}
+                  disabled={isSubmitting}
+                  {...register('acceptOrderVerification')}
+                />
+                <span className={TEXT_CLASS}>{t('checkout.legal.orderVerification')}</span>
+              </label>
+              {errors.acceptOrderVerification?.message ? (
+                <p className="mt-1 pl-8 text-sm text-red-600">
+                  {errors.acceptOrderVerification.message}
+                </p>
+              ) : null}
+            </div>
+            <div>
+              <label
+                htmlFor={`${baseId}-returns`}
+                className={`flex items-start ${ROW_GAP} cursor-pointer`}
+              >
+                <input
+                  id={`${baseId}-returns`}
+                  type="checkbox"
+                  className={CHECKBOX_CLASS}
+                  disabled={isSubmitting}
+                  {...register('acceptReturnsPolicy')}
+                />
+                <span className={TEXT_CLASS}>{t('checkout.legal.returnsPolicy')}</span>
+              </label>
+              {errors.acceptReturnsPolicy?.message ? (
+                <p className="mt-1 pl-8 text-sm text-red-600">
+                  {errors.acceptReturnsPolicy.message}
+                </p>
+              ) : null}
+            </div>
           </>
         )}
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-            disabled={isSubmitting}
-            {...register('acceptOrderVerification')}
-          />
-          <span className="text-sm text-gray-700">{t('checkout.legal.orderVerification')}</span>
-        </label>
-        {errors.acceptOrderVerification?.message && (
-          <p className="text-sm text-red-600 -mt-2 ml-7">{errors.acceptOrderVerification.message}</p>
-        )}
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-            disabled={isSubmitting}
-            {...register('acceptReturnsPolicy')}
-          />
-          <span className="text-sm text-gray-700">{t('checkout.legal.returnsPolicy')}</span>
-        </label>
-        {errors.acceptReturnsPolicy?.message && (
-          <p className="text-sm text-red-600 -mt-2 ml-7">{errors.acceptReturnsPolicy.message}</p>
-        )}
       </div>
-    </Card>
+    </div>
   );
 }

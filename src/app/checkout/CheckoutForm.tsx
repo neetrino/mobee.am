@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, Input } from '@shop/ui';
-import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
+import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
 import { DeliveryPolicyInfoCard } from './components/DeliveryPolicyInfoCard';
@@ -10,6 +10,7 @@ import { CheckoutLegalAcknowledgements } from './components/CheckoutLegalAcknowl
 interface CheckoutFormProps {
   register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
+  watch: UseFormWatch<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
@@ -30,6 +31,7 @@ interface CheckoutFormProps {
 export function CheckoutForm({
   register,
   setValue,
+  watch,
   errors,
   isSubmitting,
   shippingMethod,
@@ -252,13 +254,6 @@ export function CheckoutForm({
         </Card>
       )}
 
-      <CheckoutLegalAcknowledgements
-        register={register}
-        errors={errors}
-        shippingMethod={shippingMethod}
-        isSubmitting={isSubmitting}
-      />
-
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.paymentMethod')}</h2>
         {errors.paymentMethod && (
@@ -317,6 +312,15 @@ export function CheckoutForm({
           ))}
         </div>
       </Card>
+
+      <CheckoutLegalAcknowledgements
+        register={register}
+        setValue={setValue}
+        watch={watch}
+        errors={errors}
+        shippingMethod={shippingMethod}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }
