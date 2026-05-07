@@ -55,8 +55,12 @@ export function ProductCardList({
   onCompareToggle,
   onAddToCart,
 }: ProductCardListProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const imageSrc = resolveProductCardImageSrc(product.image);
+  const listPriceClass =
+    lang === 'ru'
+      ? 'text-[1.08rem] sm:text-[1.25rem]'
+      : 'text-[1.1875rem] sm:text-[1.425rem]';
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
@@ -115,7 +119,7 @@ export function ProductCardList({
           {/* Price */}
           <div className="flex flex-col">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="whitespace-nowrap text-[1.1875rem] font-semibold text-blue-600 sm:text-[1.425rem]">
+              <span className={`whitespace-nowrap ${listPriceClass} font-semibold text-blue-600`}>
                 {formatPrice(product.price || 0, currency)}
               </span>
               {product.discountPercent && product.discountPercent > 0 ? (

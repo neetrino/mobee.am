@@ -9,13 +9,13 @@ export const CURRENCIES = {
 
 export type CurrencyCode = keyof typeof CURRENCIES;
 
-function formatAmdAmountWithTrailingDram(value: number): string {
+function formatAmountWithTrailingCurrencySymbol(value: number, symbol: string): string {
   const formatted = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
-  /** NBSP so the amount and dram sign stay on one line (e.g. product cards). */
-  return `${formatted}\u00A0Դ`;
+  /** NBSP so the amount and currency symbol stay on one line (e.g. product cards). */
+  return `${formatted}\u00A0${symbol}`;
 }
 
 // Cache for currency rates from API
@@ -115,19 +115,7 @@ export function formatPrice(price: number, currency: CurrencyCode = 'USD'): stri
   
   const convertedPrice = price * rate;
 
-  if (currency === 'AMD') {
-    return formatAmdAmountWithTrailingDram(convertedPrice);
-  }
-
-  const minimumFractionDigits = 0;
-  const maximumFractionDigits = 0;
-
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currencyInfo.code,
-    minimumFractionDigits,
-    maximumFractionDigits,
-  }).format(convertedPrice);
+  return formatAmountWithTrailingCurrencySymbol(convertedPrice, currencyInfo.symbol);
 }
 
 /**
@@ -164,19 +152,7 @@ export function convertPrice(price: number, fromCurrency: CurrencyCode, toCurren
 export function formatPriceInCurrency(price: number, currency: CurrencyCode = 'AMD'): string {
   const currencyInfo = CURRENCIES[currency];
 
-  if (currency === 'AMD') {
-    return formatAmdAmountWithTrailingDram(price);
-  }
-
-  const minimumFractionDigits = 0;
-  const maximumFractionDigits = 0;
-
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currencyInfo.code,
-    minimumFractionDigits,
-    maximumFractionDigits,
-  }).format(price);
+  return formatAmountWithTrailingCurrencySymbol(price, currencyInfo.symbol);
 }
 
 

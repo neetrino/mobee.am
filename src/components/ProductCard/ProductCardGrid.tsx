@@ -71,6 +71,28 @@ export function ProductCardGrid({
   const ruDesktopAddToCart = lang === 'ru';
   const ruSpecialOffersDesktopCart =
     ruDesktopAddToCart && specialOffersHomeCard && !isCompact;
+  const footerPriceClass = (() => {
+    if (lang === 'ru') {
+      if (smallerFooterPrice) {
+        return isCompact
+          ? 'text-[0.78rem] leading-[1.28284734375rem] max-lg:text-[13px]'
+          : 'text-[0.86rem] leading-[1.28284734375rem] max-lg:text-[13px] max-lg:leading-tight';
+      }
+      return isCompact
+        ? 'text-[0.98rem] leading-[1.6625rem] max-lg:text-[13px]'
+        : 'text-[1.05rem] leading-[1.6625rem] max-lg:text-[13px]';
+    }
+
+    if (smallerFooterPrice) {
+      return isCompact
+        ? 'text-[0.824687578125rem] leading-[1.28284734375rem]'
+        : 'text-[0.91631953125rem] leading-[1.28284734375rem] max-lg:text-sm max-lg:leading-tight';
+    }
+
+    return isCompact
+      ? 'text-[1.06875rem] leading-[1.6625rem]'
+      : 'text-[1.1875rem] leading-[1.6625rem]';
+  })();
 
   const listPrice = product.compareAtPrice ?? product.originalPrice ?? null;
   const showStrike =
@@ -178,15 +200,7 @@ export function ProductCardGrid({
           <div className="min-w-0 flex flex-col gap-0.5">
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className={`whitespace-nowrap font-bold tabular-nums text-gray-900 max-lg:text-sm ${
-                  smallerFooterPrice
-                    ? isCompact
-                      ? 'text-[0.824687578125rem] leading-[1.28284734375rem]'
-                      : 'text-[0.91631953125rem] leading-[1.28284734375rem] max-lg:text-sm max-lg:leading-tight'
-                    : isCompact
-                      ? 'text-[1.06875rem] leading-[1.6625rem]'
-                      : 'text-[1.1875rem] leading-[1.6625rem]'
-                }`}
+                className={`whitespace-nowrap font-bold tabular-nums text-gray-900 ${footerPriceClass}`}
               >
                 {formatPrice(product.price || 0, currency)}
               </span>

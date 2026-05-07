@@ -1477,6 +1477,9 @@ export function Header() {
         compareCount={compareCount}
         wishlistCount={wishlistCount}
         cartCount={cartCount}
+        selectedCurrency={selectedCurrency}
+        currencies={Object.values(CURRENCIES)}
+        onCurrencyChange={handleCurrencyChange}
         isLoggedIn={isLoggedIn}
         loginLabel={t('common.navigation.login')}
         profileLabel={t('common.navigation.profile')}

@@ -94,7 +94,11 @@ export function HeroCarousel() {
                 <span className="block">{t('home.hero_promo_body_line2')}</span>
               </p>
               <div className="mt-8 md:mt-10">
-                <HomeMoreCtaPillLink href="/products" variant="heroDark">
+                <HomeMoreCtaPillLink
+                  href="/products"
+                  variant="heroDark"
+                  labelClassName={lang === 'ru' ? '-translate-x-1' : ''}
+                >
                   {t('home.hero_cta_more')}
                 </HomeMoreCtaPillLink>
               </div>
