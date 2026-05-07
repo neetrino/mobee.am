@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
+import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
 
 interface Category {
   id: string;
@@ -306,7 +307,7 @@ export function HomeCategoriesSidebar() {
       </div>
 
       {/* Product Preview on Hover */}
-      {hoveredCategory && hoveredProduct && hoveredProduct.image && (
+      {hoveredCategory && hoveredProduct && (
         <div
           ref={previewRef}
           className="absolute z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-48"
@@ -326,7 +327,7 @@ export function HomeCategoriesSidebar() {
         >
           <div className="relative w-full h-32 mb-2 rounded overflow-hidden bg-gray-100">
             <Image
-              src={hoveredProduct.image}
+              src={resolveProductCardImageSrc(hoveredProduct.image)}
               alt={hoveredProduct.title}
               fill
               className="object-cover"

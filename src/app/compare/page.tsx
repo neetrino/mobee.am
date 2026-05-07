@@ -9,7 +9,7 @@ import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
+import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { formatPrice, getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
@@ -210,7 +210,7 @@ export default function ComparePage() {
     const flySource = document.querySelector<HTMLElement>(
       `[data-compare-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
     );
-    const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+    const flyUrl = resolveProductCardImageSrc(product.image);
     dispatchCartFlyAnimation(flyUrl, flySource);
 
     addToCartInFlightRef.current.add(product.id);
@@ -353,20 +353,14 @@ export default function ComparePage() {
                           className="w-32 h-32 mx-auto bg-gray-100 rounded-lg overflow-hidden relative"
                           data-cart-fly-source
                         >
-                          {product.image ? (
-                            <Image
-                              src={product.image}
-                              alt={product.title}
-                              fill
-                              className="object-cover"
-                              sizes="128px"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-gray-400 text-xs">{t('common.messages.noImage')}</span>
-                            </div>
-                          )}
+                          <Image
+                            src={resolveProductCardImageSrc(product.image)}
+                            alt={product.title}
+                            fill
+                            className="object-cover"
+                            sizes="128px"
+                            unoptimized
+                          />
                         </div>
                       </Link>
                     </td>
