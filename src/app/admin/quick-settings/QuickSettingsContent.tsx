@@ -22,6 +22,13 @@ interface AdminBrand {
   logoUrl?: string;
 }
 
+interface AdminProductsListMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 interface QuickSettingsContentProps {
   currentPath: string;
   router: ReturnType<typeof useRouter>;
@@ -46,6 +53,8 @@ interface QuickSettingsContentProps {
   handleBrandDiscountSave: () => void;
   brandSaving: boolean;
   products: any[];
+  productsMeta: AdminProductsListMeta | null;
+  onProductsPageChange: (page: number) => void;
   productsLoading: boolean;
   productDiscounts: Record<string, number>;
   setProductDiscounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
@@ -77,6 +86,8 @@ export function QuickSettingsContent({
   handleBrandDiscountSave,
   brandSaving,
   products,
+  productsMeta,
+  onProductsPageChange,
   productsLoading,
   productDiscounts,
   setProductDiscounts,
@@ -135,6 +146,8 @@ export function QuickSettingsContent({
 
         <ProductDiscountsCard
           products={products}
+          productsMeta={productsMeta}
+          onProductsPageChange={onProductsPageChange}
           productsLoading={productsLoading}
           productDiscounts={productDiscounts}
           setProductDiscounts={setProductDiscounts}

@@ -3,6 +3,7 @@
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../../constants/adminDiscountSaveButton.constants';
+import { ProductDiscountsPagination } from './ProductDiscountsPagination';
 
 interface Product {
   id: string;
@@ -12,8 +13,17 @@ interface Product {
   discountPercent?: number;
 }
 
+interface ProductDiscountsListMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 interface ProductDiscountsCardProps {
   products: Product[];
+  productsMeta: ProductDiscountsListMeta | null;
+  onProductsPageChange: (page: number) => void;
   productsLoading: boolean;
   productDiscounts: Record<string, number>;
   setProductDiscounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
@@ -23,6 +33,8 @@ interface ProductDiscountsCardProps {
 
 export function ProductDiscountsCard({
   products,
+  productsMeta,
+  onProductsPageChange,
   productsLoading,
   productDiscounts,
   setProductDiscounts,
@@ -143,6 +155,13 @@ export function ProductDiscountsCard({
               </div>
             );
           })}
+          {productsMeta && productsMeta.totalPages > 1 ? (
+            <ProductDiscountsPagination
+              page={productsMeta.page}
+              totalPages={productsMeta.totalPages}
+              onPageChange={onProductsPageChange}
+            />
+          ) : null}
         </div>
       )}
     </Card>

@@ -229,6 +229,7 @@
     "products": "ապրանք"
   },
   "pagination": {
+    "ariaLabel": "Էջավորում",
     "previous": "Նախորդ",
     "next": "Հաջորդ",
     "pageOf": "Էջ {page} {totalPages}-ից"

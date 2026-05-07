@@ -6,6 +6,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { QuickSettingsContent } from './QuickSettingsContent';
+import { PRODUCT_DISCOUNTS_PAGE_SIZE } from './product-discounts-pagination.constants';
 
 interface AdminSettingsResponse {
   globalDiscount: number;
@@ -25,6 +26,13 @@ interface AdminBrand {
   logoUrl?: string;
 }
 
+interface AdminProductsListMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export default function QuickSettingsPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
@@ -34,6 +42,8 @@ export default function QuickSettingsPage() {
   const [discountLoading, setDiscountLoading] = useState(false);
   const [discountSaving, setDiscountSaving] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
+  const [productsPage, setProductsPage] = useState(1);
+  const [productsMeta, setProductsMeta] = useState<AdminProductsListMeta | null>(null);
   const [productsLoading, setProductsLoading] = useState(false);
   const [productDiscounts, setProductDiscounts] = useState<Record<string, number>>({});
   const [savingProductId, setSavingProductId] = useState<string | null>(null);
@@ -63,68 +73,57 @@ export default function QuickSettingsPage() {
     }
   }, []);
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (pageToFetch: number) => {
     try {
-      console.log('📦 [QUICK SETTINGS] Fetching products...');
+      console.log('📦 [QUICK SETTINGS] Fetching products page...', pageToFetch);
       setProductsLoading(true);
-      
-      // Սկզբում բեռնում ենք առաջին էջը limit=100-ով (առավելագույն արժեք)
-      const firstPageResponse = await apiClient.get<{ 
-        data: any[]; 
-        meta?: { totalPages: number; total: number } 
+
+      let response = await apiClient.get<{
+        data: any[];
+        meta?: AdminProductsListMeta;
       }>('/api/v1/admin/products', {
-        params: { page: '1', limit: '100' },
+        params: {
+          page: String(pageToFetch),
+          limit: String(PRODUCT_DISCOUNTS_PAGE_SIZE),
+        },
       });
-      
-      let allProducts: any[] = [];
-      
-      if (firstPageResponse?.data && Array.isArray(firstPageResponse.data)) {
-        allProducts = [...firstPageResponse.data];
-        console.log('📦 [QUICK SETTINGS] First page loaded:', firstPageResponse.data.length);
-        
-        // Եթե կան ավելի շատ էջեր, բեռնում ենք մնացածները
-        const totalPages = firstPageResponse.meta?.totalPages || 1;
-        if (totalPages > 1) {
-          console.log(`📦 [QUICK SETTINGS] Loading ${totalPages - 1} more pages...`);
-          
-          // Ստեղծում ենք բոլոր էջերի հարցումները
-          const pagePromises: Promise<{ data: any[] }>[] = [];
-          for (let page = 2; page <= totalPages; page++) {
-            pagePromises.push(
-              apiClient.get<{ data: any[] }>('/api/v1/admin/products', {
-                params: { page: page.toString(), limit: '100' },
-              })
-            );
-          }
-          
-          // Բեռնում ենք բոլոր էջերը զուգահեռ
-          const remainingPages = await Promise.all(pagePromises);
-          remainingPages.forEach((pageResponse, index) => {
-            if (pageResponse?.data && Array.isArray(pageResponse.data)) {
-              allProducts = [...allProducts, ...pageResponse.data];
-              console.log(`📦 [QUICK SETTINGS] Page ${index + 2} loaded:`, pageResponse.data.length);
-            }
-          });
-        }
-        
-        // Սահմանում ենք բոլոր ապրանքները
-        setProducts(allProducts);
-        
-        // Նախաձեռնում ենք ապրանքների զեղչերը API տվյալներից
-        const discounts: Record<string, number> = {};
-        allProducts.forEach((product: any) => {
-          discounts[product.id] = product.discountPercent || 0;
+
+      let meta = response.meta;
+      let effectivePage = pageToFetch;
+
+      if (meta && meta.totalPages > 0 && pageToFetch > meta.totalPages) {
+        effectivePage = meta.totalPages;
+        response = await apiClient.get<{
+          data: any[];
+          meta?: AdminProductsListMeta;
+        }>('/api/v1/admin/products', {
+          params: {
+            page: String(effectivePage),
+            limit: String(PRODUCT_DISCOUNTS_PAGE_SIZE),
+          },
         });
-        setProductDiscounts(discounts);
-        
-        console.log('✅ [QUICK SETTINGS] All products loaded:', allProducts.length);
-      } else {
-        setProducts([]);
-        console.warn('⚠️ [QUICK SETTINGS] No products data received');
+        meta = response.meta;
       }
-    } catch (err: any) {
+
+      const list = response?.data && Array.isArray(response.data) ? response.data : [];
+
+      setProductsPage(effectivePage);
+      setProducts(list);
+      setProductsMeta(meta ?? null);
+
+      setProductDiscounts((prev) => {
+        const next = { ...prev };
+        list.forEach((product: { id: string; discountPercent?: number }) => {
+          next[product.id] = product.discountPercent ?? 0;
+        });
+        return next;
+      });
+
+      console.log('✅ [QUICK SETTINGS] Products page loaded:', list.length);
+    } catch (err: unknown) {
       console.error('❌ [QUICK SETTINGS] Error fetching products:', err);
       setProducts([]);
+      setProductsMeta(null);
     } finally {
       setProductsLoading(false);
     }
@@ -223,6 +222,10 @@ export default function QuickSettingsPage() {
     });
   };
 
+  const handleProductsPageChange = (newPage: number) => {
+    void fetchProducts(newPage);
+  };
+
   const buildDiscountPayload = () => {
     const filterMap = (map: Record<string, number>) =>
       Object.entries(map || {}).reduce<Record<string, number>>((acc, [id, value]) => {
@@ -254,7 +257,7 @@ export default function QuickSettingsPage() {
       });
       
       // Refresh products to get updated labels with new discount percentage
-      await fetchProducts();
+      await fetchProducts(productsPage);
       
       alert(t('admin.quickSettings.savedSuccess'));
       console.log('✅ [QUICK SETTINGS] Global discount saved');
@@ -275,7 +278,7 @@ export default function QuickSettingsPage() {
         globalDiscount,
         ...buildDiscountPayload(),
       });
-      await fetchProducts();
+      await fetchProducts(productsPage);
       alert(t('admin.quickSettings.savedSuccess'));
       console.log('✅ [QUICK SETTINGS] Category discounts saved');
     } catch (err: any) {
@@ -295,7 +298,7 @@ export default function QuickSettingsPage() {
         globalDiscount,
         ...buildDiscountPayload(),
       });
-      await fetchProducts();
+      await fetchProducts(productsPage);
       alert(t('admin.quickSettings.savedSuccess'));
       console.log('✅ [QUICK SETTINGS] Brand discounts saved');
     } catch (err: any) {
@@ -329,7 +332,7 @@ export default function QuickSettingsPage() {
       await apiClient.patch(`/api/v1/admin/products/${productId}/discount`, updateData);
       
       // Refresh products to get updated labels with new discount percentage
-      await fetchProducts();
+      await fetchProducts(productsPage);
       
       alert(t('admin.quickSettings.productDiscountSaved'));
       console.log('✅ [QUICK SETTINGS] Product discount saved');
@@ -345,7 +348,7 @@ export default function QuickSettingsPage() {
   useEffect(() => {
     if (!isLoading && isLoggedIn && isAdmin) {
       fetchSettings();
-      fetchProducts();
+      fetchProducts(1);
       fetchCategories();
       fetchBrands();
     }
@@ -406,6 +409,8 @@ export default function QuickSettingsPage() {
       handleBrandDiscountSave={handleBrandDiscountSave}
       brandSaving={brandSaving}
       products={products}
+      productsMeta={productsMeta}
+      onProductsPageChange={handleProductsPageChange}
       productsLoading={productsLoading}
       productDiscounts={productDiscounts}
       setProductDiscounts={setProductDiscounts}

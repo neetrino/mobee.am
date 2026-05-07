@@ -231,6 +231,7 @@
     "products": "products"
   },
   "pagination": {
+    "ariaLabel": "Pagination",
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {page} of {totalPages}"

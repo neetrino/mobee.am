@@ -228,6 +228,7 @@
     "products": "товаров"
   },
   "pagination": {
+    "ariaLabel": "Пагинация",
     "previous": "Предыдущая",
     "next": "Следующая",
     "pageOf": "Страница {page} из {totalPages}"
