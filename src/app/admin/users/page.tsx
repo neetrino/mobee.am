@@ -7,8 +7,6 @@ import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
-import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
-
 interface User {
   id: string;
   email: string;
@@ -215,7 +213,7 @@ export default function UsersPage() {
                 placeholder={t('admin.users.searchPlaceholder')}
                 className="flex-1"
               />
-              <Button type="submit" variant="primary" className={ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}>
+              <Button type="submit" variant="admin">
                 {t('admin.users.search')}
               </Button>
             </div>

@@ -411,6 +411,7 @@ export function VariantBuilder({
               </Button>
               <Button
                 type="button"
+                variant="admin"
                 onClick={() => {
                   console.log('✅ [VARIANT BUILDER] Variants ready for submission:', generatedVariants);
                 }}

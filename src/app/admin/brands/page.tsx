@@ -285,7 +285,7 @@ function BrandsSection() {
                 </Button>
                 <Button
                   type="submit"
-                  variant="primary"
+                  variant="admin"
                   disabled={submitting}
                 >
                   {submitting ? t('admin.brands.saving') : (editingBrand ? t('admin.brands.update') : t('admin.brands.create'))}

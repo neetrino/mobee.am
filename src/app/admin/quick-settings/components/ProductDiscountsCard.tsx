@@ -2,7 +2,6 @@
 
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../../constants/adminDiscountSaveButton.constants';
 import { ProductDiscountsPagination } from './ProductDiscountsPagination';
 
 interface Product {
@@ -170,11 +169,11 @@ export function ProductDiscountsCard({
                   />
                   <span className="text-sm font-medium text-gray-700 w-6">%</span>
                   <Button
-                    variant="primary"
+                    variant="admin"
                     size="sm"
                     onClick={() => handleProductDiscountSave(product.id)}
                     disabled={savingProductId === product.id}
-                    className={`px-4 ${ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}`}
+                    className="px-4"
                   >
                     {savingProductId === product.id ? (
                       <div className="flex items-center gap-2">

@@ -2,8 +2,6 @@
 
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../../constants/adminDiscountSaveButton.constants';
-
 interface AdminBrand {
   id: string;
   name: string;
@@ -39,10 +37,9 @@ export function BrandDiscountsCard({
           <p className="text-sm text-gray-600">{t('admin.quickSettings.brandDiscountsSubtitle')}</p>
         </div>
         <Button
-          variant="primary"
+          variant="admin"
           onClick={handleBrandDiscountSave}
           disabled={brandSaving || brands.length === 0}
-          className={ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}
         >
           {brandSaving ? (
             <div className="flex items-center gap-2">
