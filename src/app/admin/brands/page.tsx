@@ -161,10 +161,11 @@ function BrandsSection() {
         <h2 className="text-xl font-semibold text-gray-900">{t('admin.brands.title')}</h2>
         <Button
           onClick={handleOpenAddModal}
-          variant="primary"
+          variant="admin"
           size="sm"
+          className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap"
         >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           {t('admin.brands.addNew')}
