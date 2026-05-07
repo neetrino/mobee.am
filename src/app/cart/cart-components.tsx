@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@shop/ui';
+import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { formatPrice } from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
 import type { Cart, CartItem } from './types';
@@ -28,6 +29,9 @@ export function CartItemRow({
   t,
 }: CartItemRowProps) {
   const currencyCode = currency as CurrencyCode;
+  const lineImageSrc = resolveProductCardImageSrc(
+    item.variant.product.image,
+  );
   return (
     <div
       className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 px-4 sm:px-6 py-6 hover:bg-gray-50 transition-colors relative"
@@ -48,22 +52,14 @@ export function CartItemRow({
           href={`/products/${item.variant.product.slug}`}
           className="w-24 h-24 sm:w-28 sm:h-28 bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden"
         >
-          {item.variant.product.image ? (
-            <Image
-              src={item.variant.product.image}
-              alt={item.variant.product.title}
-              fill
-              className="object-cover"
-              sizes="80px"
-              unoptimized
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-          )}
+          <Image
+            src={lineImageSrc}
+            alt={item.variant.product.title}
+            fill
+            className="object-cover"
+            sizes="80px"
+            unoptimized
+          />
         </Link>
         <div className="flex-1 min-w-0">
           <Link

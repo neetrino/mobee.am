@@ -8,6 +8,7 @@ interface UseOrderSubmissionProps {
   cart: Cart | null;
   isLoggedIn: boolean;
   deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
   setError: (error: string | null) => void;
 }
 
@@ -15,6 +16,7 @@ export function useOrderSubmission({
   cart,
   isLoggedIn,
   deliveryPrice,
+  requiresRegionalQuote,
   setError,
 }: UseOrderSubmissionProps) {
   const router = useRouter();
@@ -26,6 +28,10 @@ export function useOrderSubmission({
     try {
       if (!cart) {
         throw new Error(t('checkout.errors.cartEmpty'));
+      }
+
+      if (data.shippingMethod === 'delivery' && requiresRegionalQuote) {
+        throw new Error(t('checkout.errors.regionalQuoteRequired'));
       }
 
       let cartId = cart.id;
@@ -40,16 +46,25 @@ export function useOrderSubmission({
         cartId = 'guest-cart';
       }
 
-      const shippingAddress = data.shippingMethod === 'delivery' && 
-        data.shippingAddress && 
-        data.shippingCity
-        ? {
-            address: data.shippingAddress,
-            city: data.shippingCity,
-          }
-        : undefined;
+      const shippingAddress =
+        data.shippingMethod === 'delivery' && data.shippingAddress && data.shippingCity
+          ? {
+              address: data.shippingAddress,
+              city: data.shippingCity,
+            }
+          : undefined;
 
-      const shippingAmount = data.shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
+      const shippingAmount =
+        data.shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
+
+      const acknowledgements = {
+        deliverySupplyTerms:
+          data.shippingMethod === 'delivery' ? data.acceptDeliverySupplyTerms : false,
+        inspectionAtDelivery:
+          data.shippingMethod === 'delivery' ? data.acceptInspectionAtDelivery : false,
+        orderVerification: data.acceptOrderVerification,
+        returnsPolicy: data.acceptReturnsPolicy,
+      };
 
       const response = await apiClient.post<{
         order: {
@@ -74,11 +89,15 @@ export function useOrderSubmission({
         email: data.email,
         phone: data.phone,
         shippingMethod: data.shippingMethod,
+        ...(data.shippingMethod === 'delivery'
+          ? { deliverySpeed: data.deliverySpeed }
+          : {}),
         ...(shippingAddress ? { shippingAddress } : {}),
         shippingAmount: shippingAmount,
         paymentMethod: data.paymentMethod,
         promoCode: data.promoCode,
         locale: lang,
+        acknowledgements,
       });
 
       if (!isLoggedIn) {
@@ -99,7 +118,3 @@ export function useOrderSubmission({
 
   return { submitOrder };
 }
-
-
-
-

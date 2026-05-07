@@ -27,6 +27,7 @@
     "phone": "+374XXXXXXXX",
     "address": "Street, apartment, office, etc.",
     "city": "City",
+    "selectCity": "Select city",
     "postalCode": "Postal Code",
     "cardNumber": "1234 5678 9012 3456",
     "expiryDate": "MM/YY",
@@ -40,8 +41,38 @@
     "delivery": "Delivery",
     "deliveryDescription": "We will deliver your order to your address",
     "freePickup": "Free (Store Pickup)",
+    "freeDelivery": "Free delivery",
     "loading": "Loading...",
-    "enterCity": "Enter City"
+    "enterCity": "Enter City",
+    "loadingCities": "Loading cities…",
+    "deliverySpeedTitle": "Delivery speed",
+    "deliverySpeedHint": "Express delivery adds a surcharge to the quoted shipping amount.",
+    "deliveryTypesGroupLabel": "Delivery type options",
+    "deliveryTypesTitle": "Delivery type",
+    "deliveryTypesHint": "Standard and Express are types of the same “Delivery” option (speed and price differ)—not a separate shipping method next to pickup.",
+    "standardDelivery": "Standard delivery",
+    "standardDeliveryDescription": "Via our service or partners (typically 1–3 business days).",
+    "expressDelivery": "Express delivery",
+    "expressDeliveryDescription": "Available for an additional fee depending on address and order contents."
+  },
+  "deliveryPolicy": {
+    "returnsLinkText": "Return & exchange policy",
+    "fullTermsLink": "Delivery page (details)"
+  },
+  "legal": {
+    "sectionTitle": "Acknowledgements",
+    "bundleDeliveryAndInspection": "I have read and agree to the delivery and supply terms on the Delivery page (details), linked above. I understand I must inspect the package and product at delivery and immediately report damage, wrong items, or other issues.",
+    "bundleVerificationAndReturns": "I allow the team to contact me (including by phone) to confirm my order and agree to additional verification when required (especially for electronics). I understand returns and exchanges are governed by the Return & Exchange Policy, linked above.",
+    "deliverySupplyTerms": "I have read and agree to the delivery/supply terms on the Delivery page (details), linked above.",
+    "inspectionAtDelivery": "I understand I should inspect the parcel and product at delivery and immediately report damage, wrong items, or other issues.",
+    "orderVerification": "I allow the team to contact me (including by phone) to confirm the order, and I agree to additional verification when required (especially for electronics).",
+    "returnsPolicy": "I understand returns and exchanges are governed by the Return & Exchange Policy.",
+    "errors": {
+      "deliverySupplyTerms": "You must accept the delivery terms",
+      "inspectionAtDelivery": "You must acknowledge the inspection requirement",
+      "orderVerification": "You must accept the confirmation process",
+      "returnsPolicy": "You must accept the returns policy"
+    }
   },
   "payment": {
     "cashOnDelivery": "Cash on Delivery",
@@ -58,7 +89,12 @@
     "subtotal": "Subtotal",
     "shipping": "Shipping",
     "tax": "Tax",
-    "total": "Total"
+    "total": "Total",
+    "regionalQuotePending": "Regional delivery — price quoted separately",
+    "totalPendingShippingNote": "Total excludes regional shipping until confirmed by our team.",
+    "shippingStandard": "Standard",
+    "shippingExpress": "Express",
+    "deliveryPricingHint": "Orders {threshold} or more: standard delivery may be free. Below that: {yerevanFee} within Yerevan. Regional delivery is priced separately by address."
   },
   "buttons": {
     "placeOrder": "Place Order",
@@ -104,7 +140,8 @@
     "failedToLoadCart": "Failed to load cart",
     "failedToCreateOrder": "Failed to create order. Please try again.",
     "invalidPromoCode": "Promo code can contain only letters, numbers, underscores, and hyphens",
-    "promoCodeTooLong": "Promo code is too long"
+    "promoCodeTooLong": "Promo code is too long",
+    "regionalQuoteRequired": "Shipping to this address is quoted separately. Please contact us to complete your order."
   }
 }
 

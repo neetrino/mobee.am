@@ -3,20 +3,8 @@
 import { Card, Button } from '@shop/ui';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../lib/currency';
-
-interface Cart {
-  id: string;
-  items: any[];
-  totals: {
-    subtotal: number;
-    discount: number;
-    shipping: number;
-    tax: number;
-    total: number;
-    currency: string;
-  };
-  itemsCount: number;
-}
+import { DeliveryPricingHint } from './components/DeliveryPricingHint';
+import type { Cart } from './types';
 
 interface OrderSummaryProps {
   cart: Cart | null;
@@ -25,12 +13,15 @@ interface OrderSummaryProps {
     taxDisplay: number;
     shippingDisplay: number;
     totalDisplay: number;
+    totalExcludesPendingShipping: boolean;
   };
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   shippingCity: string | undefined;
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
   error: string | null;
   isSubmitting: boolean;
   onPlaceOrder: (e?: React.FormEvent) => void;
@@ -41,14 +32,42 @@ export function OrderSummary({
   orderSummary,
   currency,
   shippingMethod,
+  deliverySpeed,
   shippingCity,
   loadingDeliveryPrice,
   deliveryPrice,
+  requiresRegionalQuote,
   error,
   isSubmitting,
   onPlaceOrder,
 }: OrderSummaryProps) {
   const { t } = useTranslation();
+
+  const checkoutBlocked = shippingMethod === 'delivery' && requiresRegionalQuote;
+
+  const deliveryTypeSuffix =
+    shippingMethod === 'delivery' &&
+    deliveryPrice !== null &&
+    !requiresRegionalQuote &&
+    !loadingDeliveryPrice
+      ? deliverySpeed === 'express'
+        ? ` · ${t('checkout.summary.shippingExpress')}`
+        : ` · ${t('checkout.summary.shippingStandard')}`
+      : '';
+
+  const shippingLabel =
+    shippingMethod === 'pickup'
+      ? t('checkout.shipping.freePickup')
+      : loadingDeliveryPrice
+        ? t('checkout.shipping.loading')
+        : requiresRegionalQuote
+          ? t('checkout.summary.regionalQuotePending')
+          : deliveryPrice !== null
+            ? deliveryPrice === 0
+              ? `${t('checkout.shipping.freeDelivery')}${deliveryTypeSuffix}`
+              : `${formatPriceInCurrency(orderSummary.shippingDisplay, currency)}${deliveryTypeSuffix}` +
+                (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
+            : t('checkout.placeholders.selectCity');
 
   return (
     <div>
@@ -61,26 +80,22 @@ export function OrderSummary({
           </div>
           <div className="flex justify-between text-gray-600">
             <span>{t('checkout.summary.shipping')}</span>
-            <span>
-              {shippingMethod === 'pickup' 
-                ? t('checkout.shipping.freePickup')
-                : loadingDeliveryPrice
-                  ? t('checkout.shipping.loading')
-                  : deliveryPrice !== null
-                    ? formatPriceInCurrency(orderSummary.shippingDisplay, currency) + (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
-                    : t('checkout.shipping.enterCity')}
-            </span>
+            <span className="text-right max-w-[60%]">{shippingLabel}</span>
           </div>
+          <DeliveryPricingHint currency={currency} visible={shippingMethod === 'delivery'} />
           <div className="flex justify-between text-gray-600">
             <span>{t('checkout.summary.tax')}</span>
             <span>{formatPriceInCurrency(orderSummary.taxDisplay, currency)}</span>
           </div>
+          {orderSummary.totalExcludesPendingShipping && (
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">
+              {t('checkout.summary.totalPendingShippingNote')}
+            </p>
+          )}
           <div className="border-t border-gray-200 pt-4">
             <div className="flex justify-between text-lg font-bold text-gray-900">
               <span>{t('checkout.summary.total')}</span>
-              <span>
-                {formatPriceInCurrency(orderSummary.totalDisplay, currency)}
-              </span>
+              <span>{formatPriceInCurrency(orderSummary.totalDisplay, currency)}</span>
             </div>
           </div>
         </div>
@@ -96,7 +111,7 @@ export function OrderSummary({
           variant="brand"
           className="w-full"
           size="lg"
-          disabled={isSubmitting}
+          disabled={isSubmitting || checkoutBlocked}
           onClick={onPlaceOrder}
         >
           {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
@@ -105,4 +120,3 @@ export function OrderSummary({
     </div>
   );
 }
-

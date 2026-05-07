@@ -18,7 +18,7 @@ export function FormActions({ loading, isEditMode }: FormActionsProps) {
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-full">
         <Button
           type="submit"
-          variant="primary"
+          variant="admin"
           disabled={loading}
           className="flex-1 w-full sm:w-auto order-2 sm:order-1 !bg-admin-500 !text-white shadow-sm hover:!bg-admin-600 focus:!ring-admin-400 focus:!ring-offset-2 border-0"
         >

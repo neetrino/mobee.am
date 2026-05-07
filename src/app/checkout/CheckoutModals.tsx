@@ -19,6 +19,7 @@ interface CheckoutModalsProps {
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   shippingCity: string | undefined;
   cart: Cart | null;
@@ -27,10 +28,12 @@ interface CheckoutModalsProps {
     taxDisplay: number;
     shippingDisplay: number;
     totalDisplay: number;
+    totalExcludesPendingShipping: boolean;
   };
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   isLoggedIn: boolean;
@@ -50,6 +53,7 @@ export function CheckoutModals({
   errors,
   isSubmitting,
   shippingMethod,
+  deliverySpeed,
   paymentMethod,
   shippingCity,
   cart,
@@ -57,6 +61,7 @@ export function CheckoutModals({
   currency,
   loadingDeliveryPrice,
   deliveryPrice,
+  requiresRegionalQuote,
   logoErrors,
   setLogoErrors,
   isLoggedIn,
@@ -78,6 +83,7 @@ export function CheckoutModals({
         errors={errors}
         isSubmitting={isSubmitting}
         shippingMethod={shippingMethod}
+        deliverySpeed={deliverySpeed}
         paymentMethod={paymentMethod}
         cart={cart}
         orderSummary={orderSummary}
@@ -85,6 +91,7 @@ export function CheckoutModals({
         shippingCity={shippingCity}
         loadingDeliveryPrice={loadingDeliveryPrice}
         deliveryPrice={deliveryPrice}
+        requiresRegionalQuote={requiresRegionalQuote}
         onSubmit={onSubmit}
       />
 
@@ -98,12 +105,14 @@ export function CheckoutModals({
         isSubmitting={isSubmitting}
         paymentMethod={paymentMethod}
         shippingMethod={shippingMethod}
+        deliverySpeed={deliverySpeed}
         shippingCity={shippingCity}
         cart={cart}
         orderSummary={orderSummary}
         currency={currency}
         loadingDeliveryPrice={loadingDeliveryPrice}
         deliveryPrice={deliveryPrice}
+        requiresRegionalQuote={requiresRegionalQuote}
         logoErrors={logoErrors}
         setLogoErrors={setLogoErrors}
         isLoggedIn={isLoggedIn}

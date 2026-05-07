@@ -1,12 +1,15 @@
 import type { CSSProperties } from 'react';
-import { SHOP_FILTER_SIDEBAR_WIDTH_CSS } from './shop-layout.constants';
+import {
+  SHOP_FILTER_SIDEBAR_WIDTH_CSS,
+  SHOP_PAGE_FOOTER_GAP_CLASS,
+} from './shop-layout.constants';
 
 /**
  * Instant route feedback while the shop shell streams (same idea as other route loading UI).
  */
 export default function ShopLoading() {
   return (
-    <div className="w-full max-w-full animate-pulse">
+    <div className={`w-full max-w-full animate-pulse ${SHOP_PAGE_FOOTER_GAP_CLASS}`}>
       <div className="mx-auto max-w-[1917px] px-4 pt-6 sm:px-6 lg:px-[53px]">
         <div className="h-8 w-56 rounded bg-gray-200" />
       </div>

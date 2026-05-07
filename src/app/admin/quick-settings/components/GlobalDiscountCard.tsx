@@ -2,8 +2,6 @@
 
 import { Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../../constants/adminDiscountSaveButton.constants';
-
 interface GlobalDiscountCardProps {
   globalDiscount: number;
   setGlobalDiscount: (value: number) => void;
@@ -57,10 +55,10 @@ export function GlobalDiscountCard({
             />
             <span className="text-sm font-medium text-gray-700 w-8">%</span>
             <Button
-              variant="primary"
+              variant="admin"
               onClick={handleDiscountSave}
               disabled={discountSaving}
-              className={`px-6 ${ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}`}
+              className="px-6"
             >
               {discountSaving ? (
                 <div className="flex items-center gap-2">

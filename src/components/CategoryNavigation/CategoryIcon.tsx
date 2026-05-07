@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { getCategoryIcon, type Category } from './utils';
 
 interface Product {
@@ -34,9 +35,9 @@ export function CategoryIcon({ category, product, isActive, t }: CategoryIconPro
     <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white border-2 flex items-center justify-center overflow-hidden transition-all ${
       isActive ? 'border-gray-400 shadow-md' : 'border-gray-200'
     }`}>
-      {product?.image ? (
+      {product ? (
         <Image
-          src={product.image}
+          src={resolveProductCardImageSrc(product.image)}
           alt={category.title}
           width={80}
           height={80}

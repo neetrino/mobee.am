@@ -124,7 +124,7 @@ export function EditCategoryModal({
         </div>
         <div className="flex gap-3 mt-6">
           <Button
-            variant="primary"
+            variant="admin"
             onClick={onSubmit}
             disabled={saving || !formData.title.trim()}
             className="flex-1"

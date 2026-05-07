@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminService } from "@/lib/services/admin.service";
+import { resolveCheckoutShippingAmount } from "@/lib/services/orders/checkout-shipping";
 import { logger } from "@/lib/utils/logger";
 
 /**
  * GET /api/v1/delivery/price
- * Get delivery price for a specific city
+ * Quote delivery for checkout (city, cart subtotal after discount, speed).
  */
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
-    const city = searchParams.get('city');
-    const country = searchParams.get('country') || 'Armenia';
+    const city = searchParams.get("city");
+    const country = searchParams.get("country") || "Armenia";
+    const subtotalRaw = searchParams.get("subtotalAfterDiscountAmd");
+    const speedRaw = searchParams.get("deliverySpeed");
 
     if (!city) {
       return NextResponse.json(
@@ -25,12 +27,40 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    logger.debug("Delivery price request", { city, country });
-    const price = await adminService.getDeliveryPrice(city, country);
+    const parsedSubtotal = subtotalRaw !== null && subtotalRaw !== "" ? Number(subtotalRaw) : 0;
+    const subtotalAfterDiscountAmd =
+      Number.isFinite(parsedSubtotal) && parsedSubtotal >= 0 ? parsedSubtotal : 0;
+    const deliverySpeed = speedRaw === "express" ? "express" : "standard";
 
-    return NextResponse.json({ price });
+    logger.debug("Delivery price request", {
+      city,
+      country,
+      subtotalAfterDiscountAmd,
+      deliverySpeed,
+    });
+
+    const result = await resolveCheckoutShippingAmount({
+      shippingMethod: "delivery",
+      city,
+      country,
+      subtotalAfterDiscountAmd,
+      deliverySpeed,
+    });
+
+    return NextResponse.json({
+      price: result.requiresQuote ? null : result.amount,
+      requiresQuote: result.requiresQuote,
+    });
   } catch (error: unknown) {
-    const err = error as { message?: string; stack?: string; code?: string; type?: string; title?: string; status?: number; detail?: string; meta?: unknown };
+    const err = error as {
+      message?: string;
+      stack?: string;
+      code?: string;
+      type?: string;
+      title?: string;
+      status?: number;
+      detail?: string;
+    };
     logger.error("Delivery price error", {
       message: err?.message,
       code: err?.code,
@@ -49,4 +79,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

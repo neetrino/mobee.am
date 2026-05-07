@@ -7,7 +7,6 @@ import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
-import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
 
 interface DeliveryLocation {
   id?: string;
@@ -127,7 +126,7 @@ export default function DeliveryPage() {
         <Card className="p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">{t('admin.delivery.deliveryPricesByLocation')}</h2>
-            <Button variant="primary" onClick={handleAddLocation} disabled={saving}>
+            <Button variant="admin" onClick={handleAddLocation} disabled={saving}>
               {t('admin.delivery.addLocation')}
             </Button>
           </div>
@@ -193,10 +192,9 @@ export default function DeliveryPage() {
 
         <div className="flex gap-4">
           <Button
-            variant="primary"
+            variant="admin"
             onClick={handleSave}
             disabled={saving || locations.length === 0}
-            className={ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}
           >
             {saving ? t('admin.delivery.saving') : t('admin.delivery.saveSettings')}
           </Button>

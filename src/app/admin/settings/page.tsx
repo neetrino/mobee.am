@@ -8,8 +8,6 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
 import { AdminPageShell } from '../components/AdminPageShell';
-import { ADMIN_DISCOUNT_SAVE_BUTTON_CLASS } from '../constants/adminDiscountSaveButton.constants';
-
 interface Settings {
   defaultCurrency?: string;
   globalDiscount?: number;
@@ -440,10 +438,9 @@ export default function SettingsPage() {
         {/* Actions */}
         <div className="flex gap-4">
           <Button
-            variant="primary"
+            variant="admin"
             onClick={handleSave}
             disabled={saving}
-            className={ADMIN_DISCOUNT_SAVE_BUTTON_CLASS}
           >
             {saving ? t('admin.settings.saving') : t('admin.settings.saveSettings')}
           </Button>
