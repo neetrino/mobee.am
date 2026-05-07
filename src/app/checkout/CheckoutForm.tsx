@@ -248,8 +248,6 @@ export function CheckoutForm({
         </div>
       </Card>
 
-      {shippingMethod === 'delivery' && <DeliveryPolicyInfoCard />}
-
       {shippingMethod === 'delivery' && (
         <Card className="p-6" data-shipping-section>
           <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingAddress')}</h2>
@@ -353,6 +351,8 @@ export function CheckoutForm({
           ))}
         </div>
       </Card>
+
+      <DeliveryPolicyInfoCard />
 
       <CheckoutLegalAcknowledgements
         register={register}
