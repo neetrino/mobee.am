@@ -8,7 +8,9 @@ import { Heart, Home, UserRound } from 'lucide-react';
 import { getWishlistCount } from '../lib/storageCounts';
 import { useTranslation } from '../lib/i18n-client';
 import { MobileNavBagIcon } from './icons/MobileNavBagIcon';
+import { useMobileBottomNavCartCount } from './hooks/useMobileBottomNavCartCount';
 import {
+  MOBILE_BOTTOM_NAV_BADGE_CLASS,
   MOBILE_BOTTOM_NAV_INNER_PB_CLASS,
   MOBILE_BOTTOM_NAV_INNER_PT_CLASS,
   MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS,
@@ -83,25 +85,30 @@ interface MobileNavItemProps {
   active: boolean;
   label: string;
   wishlistCount: number;
+  cartCount: number;
 }
 
-function MobileNavItem({ item, active, label, wishlistCount }: MobileNavItemProps) {
+function MobileNavItem({ item, active, label, wishlistCount, cartCount }: MobileNavItemProps) {
   const showWishlistBadge = item.key === 'wishlist' && wishlistCount > 0;
+  const showCartBadge = item.key === 'cart' && cartCount > 0;
+  const badgeValue =
+    item.key === 'wishlist' ? wishlistCount : item.key === 'cart' ? cartCount : 0;
+  const showBadge = showWishlistBadge || showCartBadge;
 
   const iconWrap = (
-    <div className="relative flex items-center justify-center">
+    <div className="relative z-0 flex items-center justify-center overflow-visible">
       <MobileBottomNavIcon item={item} active={active} />
-      {showWishlistBadge ? (
-        <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
-          {wishlistCount > 99 ? '99+' : wishlistCount}
+      {showBadge ? (
+        <span className={MOBILE_BOTTOM_NAV_BADGE_CLASS} aria-hidden>
+          {badgeValue > 99 ? '99+' : badgeValue}
         </span>
       ) : null}
     </div>
   );
 
   const linkClass = active
-    ? `flex ${MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS} shrink-0 items-center gap-2 rounded-[65px] bg-[rgba(25,158,235,0.1)] px-4 py-2 transition-opacity active:opacity-80`
-    : `relative flex ${MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS} min-h-0 flex-1 items-center justify-center overflow-hidden py-1 transition-opacity active:opacity-80`;
+    ? `relative z-0 flex ${MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS} shrink-0 items-center gap-2 overflow-visible rounded-[65px] bg-[rgba(25,158,235,0.1)] px-4 py-2 transition-opacity active:opacity-80`
+    : `relative z-0 flex ${MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS} min-h-0 flex-1 items-center justify-center overflow-visible py-1 transition-opacity active:opacity-80`;
 
   return (
     <Link
@@ -134,6 +141,7 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const [wishlistCount, setWishlistCount] = useState(0);
+  const cartCount = useMobileBottomNavCartCount();
 
   useEffect(() => {
     const updateCounts = () => {
@@ -159,9 +167,9 @@ export function MobileBottomNav() {
   );
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 bg-white drop-shadow-[0px_0px_20px_rgba(0,0,0,0.15)] lg:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 overflow-visible bg-white drop-shadow-[0px_0px_20px_rgba(0,0,0,0.15)] lg:hidden">
       <div
-        className={`flex w-full items-center justify-center gap-4 px-6 ${MOBILE_BOTTOM_NAV_INNER_PT_CLASS} ${MOBILE_BOTTOM_NAV_INNER_PB_CLASS}`}
+        className={`flex w-full items-center justify-center gap-4 overflow-visible px-6 ${MOBILE_BOTTOM_NAV_INNER_PT_CLASS} ${MOBILE_BOTTOM_NAV_INNER_PB_CLASS}`}
       >
         {items.map((item) => (
           <MobileNavItem
@@ -170,6 +178,7 @@ export function MobileBottomNav() {
             active={pathIsActive(pathname, item)}
             label={t(item.labelKey)}
             wishlistCount={wishlistCount}
+            cartCount={cartCount}
           />
         ))}
       </div>
