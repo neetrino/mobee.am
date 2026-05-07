@@ -7,6 +7,10 @@ export const CHECKOUT_PAGE_SHELL_CLASS =
 /** `/checkout` form sections, order summary card, and in-card controls — 15px corners. */
 export const CHECKOUT_FORM_CARD_RADIUS_CLASS = 'rounded-[15px]';
 
+/** Top / bottom only — nested blocks inside a {@link CHECKOUT_FORM_CARD_RADIUS_CLASS} shell. */
+export const CHECKOUT_FORM_CARD_RADIUS_TOP_CLASS = 'rounded-t-[15px]';
+export const CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS = 'rounded-b-[15px]';
+
 /**
  * `@shop/ui` {@link Card} adds `shadow-sm`; cart order summary uses a flat bordered panel — match that.
  */

@@ -1,4 +1,5 @@
 /**
- * Cart + checkout order summary sidebar: same sticky insets (`top-4` narrow viewports, `top-28` on `lg+` under header).
+ * Cart + checkout order summary sidebar: `top-4` on small viewports; on `lg+` align under the docked
+ * desktop chrome (same inset as shop filter aside — {@link ../app/shop/page.tsx} `lg:top-[4.25rem]`).
  */
-export const ORDER_SUMMARY_SIDEBAR_STICKY_CLASS = 'sticky top-4 lg:top-28';
+export const ORDER_SUMMARY_SIDEBAR_STICKY_CLASS = 'sticky top-4 lg:top-[4.25rem]';
