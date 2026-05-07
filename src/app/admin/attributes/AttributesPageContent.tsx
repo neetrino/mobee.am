@@ -1,5 +1,7 @@
 ﻿'use client';
 
+import { useMemo, useState } from 'react';
+import { Input, Button } from '@shop/ui';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useAttributes } from './useAttributes';
 import { ValueEditForm } from './ValueEditForm';
@@ -49,6 +51,24 @@ export function AttributesPageContent() {
     handleSaveInlineValue,
     toggleExpand,
   } = useAttributes();
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredAttributes = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      return attributes;
+    }
+    return attributes.filter((attr) => {
+      if (attr.name.toLowerCase().includes(q) || attr.key.toLowerCase().includes(q)) {
+        return true;
+      }
+      return attr.values.some(
+        (v) =>
+          v.label.toLowerCase().includes(q) || v.value.toLowerCase().includes(q),
+      );
+    });
+  }, [attributes, searchQuery]);
 
   if (loading) {
     return (
@@ -127,6 +147,29 @@ export function AttributesPageContent() {
           </div>
         )}
 
+        {attributes.length > 0 ? (
+          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label className="sr-only" htmlFor="admin-attributes-search">
+              {t('admin.attributes.searchLabel')}
+            </label>
+            <Input
+              id="admin-attributes-search"
+              type="search"
+              role="searchbox"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('admin.attributes.searchPlaceholder')}
+              className="w-full sm:max-w-md"
+              autoComplete="off"
+            />
+            {searchQuery.trim().length > 0 ? (
+              <Button type="button" variant="ghost" size="sm" onClick={() => setSearchQuery('')}>
+                {t('admin.attributes.clearSearch')}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+
         {/* Attributes List */}
         {attributes.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
@@ -142,9 +185,13 @@ export function AttributesPageContent() {
               {t('admin.attributes.createAttribute')}
             </button>
           </div>
+        ) : filteredAttributes.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <p className="text-gray-600">{t('admin.attributes.noSearchResults')}</p>
+          </div>
         ) : (
           <div className="space-y-4">
-            {attributes.map((attribute) => {
+            {filteredAttributes.map((attribute) => {
               const isExpanded = expandedAttributes.has(attribute.id);
               return (
                 <div

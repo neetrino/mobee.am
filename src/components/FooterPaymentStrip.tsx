@@ -20,7 +20,7 @@ export function FooterPaymentStrip() {
   return (
     <div className={montserrat.className}>
       <div
-        className={`${SITE_CONTENT_GUTTERS_CLASS} flex max-w-full flex-row flex-nowrap items-baseline gap-6 overflow-x-auto pb-8 pt-[33px]`}
+        className={`${SITE_CONTENT_GUTTERS_CLASS} flex min-w-0 max-w-full flex-row flex-nowrap items-baseline gap-6 overflow-x-auto pb-8 pt-[33px]`}
       >
         <p className="shrink-0 text-[18px] font-black leading-[28px] text-black">
           {t('common.footer.legalBar.brand')}

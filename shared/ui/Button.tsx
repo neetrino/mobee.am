@@ -3,7 +3,7 @@
 import React, { ButtonHTMLAttributes, forwardRef, ReactElement } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'brand';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'brand' | 'admin';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
@@ -23,6 +23,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       /** Checkout / brand CTA — theme `admin` DEFAULT #2DB2FF */
       brand:
         '!rounded-2xl bg-admin-500 text-white shadow-sm hover:bg-admin-600 focus:ring-admin-500',
+      /** Admin panel primary actions — #2DB2FF (`admin-500`) */
+      admin: 'bg-admin-500 text-white hover:bg-admin-600 focus:ring-admin-500',
     };
     
     const sizeStyles = {
