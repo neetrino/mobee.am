@@ -6,6 +6,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { ContactInformation } from './ContactInformation';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
+import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 import { CheckoutFormData, Cart } from '../types';
 
 interface ShippingAddressModalProps {
@@ -72,7 +73,7 @@ export function ShippingAddressModal({
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
+        className={`max-h-[90vh] w-full max-w-lg overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
         onClick={(e) => e.stopPropagation()}
         style={{ zIndex: 10000 }}
       >
@@ -129,7 +130,9 @@ export function ShippingAddressModal({
             </div>
 
             {(errors.shippingAddress || errors.shippingCity) && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div
+                className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
                 <p className="text-sm text-red-600">
                   {errors.shippingAddress?.message || errors.shippingCity?.message}
                 </p>
@@ -152,7 +155,9 @@ export function ShippingAddressModal({
             )}
 
             {paymentMethod === 'cash_on_delivery' && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 mt-6">
+              <div
+                className={`mb-6 mt-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
                 <p className="text-sm text-green-800">
                   <strong>{t('checkout.payment.cashOnDelivery')}:</strong> {t('checkout.messages.cashOnDeliveryInfo')}
                 </p>
@@ -171,7 +176,9 @@ export function ShippingAddressModal({
           </>
         ) : (
           <div className="mb-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <div
+              className={`mb-4 border border-blue-200 bg-blue-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+            >
               <p className="text-sm text-blue-800">
                 <strong>{t('checkout.shipping.storePickup')}:</strong> {t('checkout.messages.storePickupInfo')}
               </p>
@@ -193,7 +200,9 @@ export function ShippingAddressModal({
             )}
 
             {paymentMethod === 'cash_on_delivery' && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div
+                className={`mb-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
                 <p className="text-sm text-green-800">
                   <strong>{t('checkout.payment.cashOnDelivery')}:</strong> {t('checkout.messages.cashOnDeliveryPickup')}
                 </p>

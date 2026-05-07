@@ -4,6 +4,10 @@ import { Card, Button } from '@shop/ui';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../lib/currency';
 import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
+import {
+  CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
+  CHECKOUT_FORM_CARD_RADIUS_CLASS,
+} from './constants';
 
 interface Cart {
   id: string;
@@ -53,7 +57,9 @@ export function OrderSummary({
 
   return (
     <div>
-      <Card className={`p-6 ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}>
+      <Card
+        className={`p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS} ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}
+      >
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.orderSummary')}</h2>
         <div className="space-y-4 mb-6">
           <div className="flex justify-between text-gray-600">
@@ -87,7 +93,9 @@ export function OrderSummary({
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+          >
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}

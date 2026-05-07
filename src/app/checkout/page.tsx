@@ -7,7 +7,11 @@ import { CheckoutForm } from './CheckoutForm';
 import { CheckoutModals } from './CheckoutModals';
 import { OrderSummary } from './OrderSummary';
 import { useCheckout } from './useCheckout';
-import { CHECKOUT_PAGE_SHELL_CLASS } from './constants';
+import {
+  CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
+  CHECKOUT_FORM_CARD_RADIUS_CLASS,
+  CHECKOUT_PAGE_SHELL_CLASS,
+} from './constants';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -51,9 +55,9 @@ export default function CheckoutPage() {
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="space-y-4 lg:col-span-2">
-              <div className="h-96 rounded bg-gray-200" />
+              <div className={`h-96 bg-gray-200 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`} />
             </div>
-            <div className="h-64 rounded bg-gray-200" />
+            <div className={`h-64 bg-gray-200 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`} />
           </div>
         </div>
       </div>
@@ -64,7 +68,9 @@ export default function CheckoutPage() {
     return (
       <div className={CHECKOUT_PAGE_SHELL_CLASS}>
         <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('checkout.title')}</h1>
-        <Card className="p-6 text-center">
+        <Card
+          className={`p-6 text-center ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS}`}
+        >
           <p className="text-gray-600 mb-4">{t('checkout.errors.cartEmpty')}</p>
           <Button variant="brand" className="!rounded-full" onClick={() => router.push('/products')}>
             {t('checkout.buttons.continueShopping')}

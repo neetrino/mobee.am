@@ -6,6 +6,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { PaymentMethodLogo } from './PaymentMethodLogo';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
+import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 import { CheckoutFormData, Cart } from '../types';
 
 interface CardDetailsModalProps {
@@ -84,7 +85,7 @@ export function CardDetailsModal({
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
+        className={`max-h-[90vh] w-full max-w-lg overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
         onClick={(e) => e.stopPropagation()}
         style={{ zIndex: 10000 }}
       >
@@ -132,7 +133,9 @@ export function CardDetailsModal({
         </div>
 
         {(errors.cardNumber || errors.cardExpiry || errors.cardCvv || errors.cardHolderName) && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+          >
             <p className="text-sm text-red-600">
               {errors.cardNumber?.message || 
                errors.cardExpiry?.message || 

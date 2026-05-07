@@ -2,6 +2,7 @@
 
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../../lib/currency';
+import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 import { Cart } from '../types';
 
 interface OrderSummaryModalProps {
@@ -44,7 +45,7 @@ export function OrderSummaryModal({
         : t('checkout.shipping.enterCity');
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+    <div className={`space-y-2 bg-gray-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}>
       <div className="flex justify-between text-sm">
         <span className="text-gray-600">{t('checkout.summary.items')}:</span>
         <span className="font-medium">{cart.itemsCount}</span>

@@ -4,6 +4,14 @@ import { Card, Input } from '@shop/ui';
 import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
+import {
+  CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
+  CHECKOUT_FORM_CARD_RADIUS_CLASS,
+  CHECKOUT_OPTION_SELECTED_CHROME_CLASS,
+  CHECKOUT_RADIO_ACCENT_CLASS,
+} from './constants';
+
+const CHECKOUT_FORM_SECTION_CARD_CLASS = `p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS}`;
 
 interface CheckoutFormProps {
   register: UseFormRegister<CheckoutFormData>;
@@ -42,7 +50,7 @@ export function CheckoutForm({
   return (
     <div className="space-y-6 lg:col-span-2">
       {/* Contact Information */}
-      <Card className="p-6">
+      <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.contactInformation')}</h2>
         <div className="flex flex-col gap-4">
           <Input
@@ -78,7 +86,7 @@ export function CheckoutForm({
       </Card>
 
       {/* Promo Code */}
-      <Card className="p-6">
+      <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.promoCode.title')}</h2>
         <Input
           label={t('checkout.form.promoCode')}
@@ -91,18 +99,20 @@ export function CheckoutForm({
       </Card>
 
       {/* Shipping Method */}
-      <Card className="p-6">
+      <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingMethod')}</h2>
         {errors.shippingMethod && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+          >
             <p className="text-sm text-red-600">{errors.shippingMethod.message}</p>
           </div>
         )}
         <div className="space-y-3">
           <label
-            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+            className={`flex cursor-pointer items-center border-2 p-4 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
               shippingMethod === 'pickup'
-                ? 'border-purple-600 bg-purple-50'
+                ? CHECKOUT_OPTION_SELECTED_CHROME_CLASS
                 : 'border-gray-300 hover:bg-gray-50'
             }`}
           >
@@ -112,7 +122,7 @@ export function CheckoutForm({
               value="pickup"
               checked={shippingMethod === 'pickup'}
               onChange={(e) => setValue('shippingMethod', e.target.value as 'pickup' | 'delivery')}
-              className="mr-4"
+              className={`mr-4 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
               disabled={isSubmitting}
             />
             <div className="flex-1">
@@ -121,9 +131,9 @@ export function CheckoutForm({
             </div>
           </label>
           <label
-            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+            className={`flex cursor-pointer items-center border-2 p-4 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
               shippingMethod === 'delivery'
-                ? 'border-purple-600 bg-purple-50'
+                ? CHECKOUT_OPTION_SELECTED_CHROME_CLASS
                 : 'border-gray-300 hover:bg-gray-50'
             }`}
           >
@@ -133,7 +143,7 @@ export function CheckoutForm({
               value="delivery"
               checked={shippingMethod === 'delivery'}
               onChange={(e) => setValue('shippingMethod', e.target.value as 'pickup' | 'delivery')}
-              className="mr-4"
+              className={`mr-4 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
               disabled={isSubmitting}
             />
             <div className="flex-1">
@@ -146,10 +156,12 @@ export function CheckoutForm({
 
       {/* Shipping Address - Only show for delivery */}
       {shippingMethod === 'delivery' && (
-        <Card className="p-6" data-shipping-section>
+        <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS} data-shipping-section>
           <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingAddress')}</h2>
           {(error && error.includes('shipping address')) || (errors.shippingAddress || errors.shippingCity) ? (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div
+              className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+            >
               <p className="text-sm text-red-600">
                 {error && error.includes('shipping address') 
                   ? error 
@@ -196,10 +208,12 @@ export function CheckoutForm({
       )}
 
       {/* Payment Method */}
-      <Card className="p-6">
+      <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.paymentMethod')}</h2>
         {errors.paymentMethod && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+          >
             <p className="text-sm text-red-600">{errors.paymentMethod.message}</p>
           </div>
         )}
@@ -207,9 +221,9 @@ export function CheckoutForm({
           {paymentMethods.map((method) => (
             <label
               key={method.id}
-              className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+              className={`flex cursor-pointer items-center border-2 p-4 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
                 paymentMethod === method.id
-                  ? 'border-purple-600 bg-purple-50'
+                  ? CHECKOUT_OPTION_SELECTED_CHROME_CLASS
                   : 'border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -219,7 +233,7 @@ export function CheckoutForm({
                 value={method.id}
                 checked={paymentMethod === method.id}
                 onChange={(e) => setValue('paymentMethod', e.target.value as 'idram' | 'arca' | 'cash_on_delivery')}
-                className="mr-4"
+                className={`mr-4 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
                 disabled={isSubmitting}
               />
               <div className="flex items-center gap-4 flex-1">
