@@ -41,3 +41,22 @@ export function getCompareCount(): number {
   return getStoredArrayLength(COMPARE_KEY);
 }
 
+/**
+ * Guest cart total quantity (sum of line quantities), for nav badges.
+ */
+export function getGuestCartItemsCount(): number {
+  if (typeof window === 'undefined') return 0;
+  try {
+    const stored = window.localStorage.getItem(CART_KEY);
+    if (!stored) return 0;
+    const guestCart = JSON.parse(stored) as unknown;
+    if (!Array.isArray(guestCart)) return 0;
+    return guestCart.reduce((sum: number, item: { quantity?: number }) => {
+      const q = item?.quantity;
+      return sum + (typeof q === 'number' && !Number.isNaN(q) ? q : 0);
+    }, 0);
+  } catch {
+    return 0;
+  }
+}
+

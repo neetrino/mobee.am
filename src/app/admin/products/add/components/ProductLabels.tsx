@@ -44,7 +44,7 @@ export function ProductLabels({
                 <h3 className="text-lg font-medium text-gray-900">
                   {t('admin.products.add.label').replace('{index}', (index + 1).toString())}
                 </h3>
-                <Button type="button" variant="ghost" onClick={() => onRemoveLabel(index)} className="text-red-600 hover:text-red-700">
+                <Button type="button" variant="ghost" onClick={() => onRemoveLabel(index)} className="text-admin-600 hover:text-admin-800">
                   {t('admin.products.add.remove')}
                 </Button>
               </div>

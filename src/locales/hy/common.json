@@ -60,8 +60,8 @@
     "supportPhoneTel": "+37410000000"
   },
   "stock": {
-    "inStock": "Պահեստում",
-    "outOfStock": "Արտադրված"
+    "inStock": "Առկա է",
+    "outOfStock": "Առկա չէ"
   },
   "cart": {
     "title": "Գնումների զամբյուղ",
@@ -82,11 +82,10 @@
     "empty": "Դեռ ոչինչ չեք ավելացրել ցանկում",
     "emptyDescription": "Դեռ ոչինչ չկա․ գտեք և ավելացրեք ձեր սիրելի ապրանքները",
     "emptyBrowseCta": "Ավելին",
-    "totalCount": "Ընդհանուր ապրանքներ լավագույնում",
     "tableHeaders": {
       "productName": "Ապրանքի անվանում",
       "unitPrice": "Միավորի գին",
-      "stockStatus": "Պահեստի կարգավիճակ",
+      "stockStatus": "Առկայություն",
       "action": "Գործողություն"
     }
   },
@@ -102,7 +101,7 @@
     "name": "Անվանում",
     "brand": "Բրենդ",
     "price": "Գին",
-    "availability": "Պահեստ",
+    "availability": "Առկայություն",
     "actions": "Գործողություններ",
     "viewDetails": "Դիտել մանրամասները",
     "browseProducts": "Դիտել ապրանքները"
@@ -162,7 +161,7 @@
     "noVariantsAvailable": "Տարբերակներ չկան",
     "stockExceeded": "Մատչելի քանակը {stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:",
     "stockInsufficient": "Մատչելի քանակը բավարար չէ: {message}",
-    "noMoreStockAvailable": "Պահեստում ավելի շատ ապրանք չկա",
+    "noMoreStockAvailable": "Առկա մնացորդից ավելի քանակ չկա",
     "productNotFound": "Ապրանքը չի գտնվել: Խնդրում ենք թարմացնել էջը և կրկին փորձել:",
     "failedToAddToCart": "Չհաջողվեց ավելացնել ապրանքը զամբյուղ: Խնդրում ենք կրկին փորձել:"
   },

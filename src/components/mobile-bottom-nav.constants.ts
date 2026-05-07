@@ -16,3 +16,9 @@ export const MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS = 'h-[34.2px]' as const;
  */
 export const MOBILE_BOTTOM_NAV_BODY_PADDING_BOTTOM_CLASS =
   'max-lg:pb-[calc(75.24px+env(safe-area-inset-bottom,0px))]' as const;
+
+/**
+ * Wishlist / cart count on icons — cyan pill, high z-index so slots don’t clip it.
+ */
+export const MOBILE_BOTTOM_NAV_BADGE_CLASS =
+  'pointer-events-none absolute -right-2 -top-1.5 z-20 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[#2db2ff] px-[2px] text-[8px] font-semibold leading-none text-white shadow-sm';

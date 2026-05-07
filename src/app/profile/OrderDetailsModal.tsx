@@ -77,7 +77,7 @@ export function OrderDetailsModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-admin-50 hover:text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-2"
                 aria-label={t('profile.orderDetails.close')}
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

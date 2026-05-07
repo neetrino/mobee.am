@@ -411,11 +411,11 @@ export function AttributesPageContent() {
                                     <button
                                       onClick={() => handleDeleteValue(attribute.id, value.id, value.label)}
                                       disabled={deletingValue === value.id}
-                                      className="text-red-600 hover:text-red-800 disabled:opacity-50 transition-colors"
+                                      className="text-admin-600 transition-colors hover:bg-admin-50 hover:text-admin-800 disabled:opacity-50"
                                       title={t('admin.attributes.deleteValue')}
                                     >
                                       {deletingValue === value.id ? (
-                                        <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-admin-600 border-t-transparent" />
                                       ) : (
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -29,6 +29,8 @@ import {
 import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
+import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.constants';
+import { USER_AVATAR_INITIALS_SURFACE_CLASS } from './user-avatar.constants';
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 
@@ -188,7 +190,7 @@ function MobileDrawerProfileCard({
       aria-label={profileFallbackLabel}
     >
       <span
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-900"
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold ${USER_AVATAR_INITIALS_SURFACE_CLASS}`}
         aria-hidden
       >
         {getMobileNavProfileInitials(user)}
@@ -1516,7 +1518,7 @@ export function Header() {
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-admin-300 hover:bg-admin-50 hover:text-admin-600"
                   aria-label={t('common.ariaLabels.closeMenu')}
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1561,7 +1563,7 @@ export function Header() {
                     </span>
                     <span className="flex shrink-0 items-center gap-2">
                       {compareCount > 0 ? (
-                        <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
+                        <span className={HEADER_NAV_COUNT_INLINE_BADGE_CLASS}>
                           {compareCount > 99 ? '99+' : compareCount}
                         </span>
                       ) : null}

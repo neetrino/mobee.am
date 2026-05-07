@@ -25,11 +25,14 @@ export default function CheckoutError({
           <button
             type="button"
             onClick={reset}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 font-medium"
+            className="px-4 py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 font-medium"
           >
             Try again
           </button>
-          <Link href="/cart" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
+          <Link
+            href="/cart"
+            className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-full hover:bg-gray-50 font-medium"
+          >
             Cart
           </Link>
         </div>

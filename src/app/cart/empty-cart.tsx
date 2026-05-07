@@ -8,6 +8,7 @@ import {
   EMPTY_CART_IMAGE_SRC,
   EMPTY_CART_IMAGE_WIDTH,
 } from './constants';
+import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
 
 interface EmptyCartProps {
   t: (key: string) => string;
@@ -18,7 +19,7 @@ interface EmptyCartProps {
  */
 export function EmptyCart({ t }: EmptyCartProps) {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-12`}>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('common.cart.title')}</h1>
 
       <div className="flex justify-center py-8">

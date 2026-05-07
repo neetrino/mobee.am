@@ -29,7 +29,6 @@ export const translations = {
       remove: 'Remove',
       items: 'items',
       item: 'item',
-      totalCount: 'Total items in wishlist',
     },
     compare: {
       title: 'Compare Products',
@@ -93,8 +92,8 @@ export const translations = {
   },
   hy: {
     stock: {
-      inStock: 'Պահեստում',
-      outOfStock: 'Արտադրված',
+      inStock: 'Առկա է',
+      outOfStock: 'Առկա չէ',
     },
     cart: {
       title: 'Գնումների զամբյուղ',
@@ -118,7 +117,6 @@ export const translations = {
       remove: 'Հեռացնել',
       items: 'ապրանք',
       item: 'ապրանք',
-      totalCount: 'Ընդհանուր ապրանքներ լավագույնում',
     },
     compare: {
       title: 'Համեմատել ապրանքները',
@@ -207,7 +205,6 @@ export const translations = {
       remove: 'Удалить',
       items: 'товаров',
       item: 'товар',
-      totalCount: 'Всего товаров в списке желаний',
     },
     compare: {
       title: 'Сравнить товары',
@@ -296,7 +293,6 @@ export const translations = {
       remove: 'წაშლა',
       items: 'ნივთი',
       item: 'ნივთი',
-      totalCount: 'სულ პროდუქტი სურვილების სიაში',
     },
     compare: {
       title: 'პროდუქტების შედარება',
