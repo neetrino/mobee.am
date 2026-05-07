@@ -1,10 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { Montserrat, Noto_Sans_Armenian } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
 import { HERO_MOBILE_CONTENT_GUTTERS_CLASS, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -20,28 +20,6 @@ const notoArmenian = Noto_Sans_Armenian({
 
 const IMG_AIRPODS = '/images/hero/airpods-max.png';
 const IMG_IPHONE = '/images/hero/iphone.png';
-
-function CtaArrowIcon() {
-  return (
-    <svg
-      width={15}
-      height={15}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="text-[#1e1e1e]"
-      aria-hidden
-    >
-      <path
-        d="M5 12h14M13 6l6 6-6 6"
-        stroke="currentColor"
-        strokeWidth={2.2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 function MobileHeroIphoneBanner() {
   const { t, lang } = useTranslation();
@@ -116,21 +94,9 @@ export function HeroCarousel() {
                 <span className="block">{t('home.hero_promo_body_line2')}</span>
               </p>
               <div className="mt-8 md:mt-10">
-                <Link
-                  href="/products"
-                  className="group relative inline-flex h-12 min-w-[159px] items-center justify-between gap-2 overflow-hidden rounded-full border-2 border-[#1e1e1e] bg-[#1e1e1e] pl-5 pr-1.5"
-                >
-                  <span
-                    className="pointer-events-none absolute inset-0 origin-[calc(100%-28px)_50%] scale-x-0 bg-[#2db2ff] transition-transform duration-500 ease-in-out group-hover:scale-x-100"
-                    aria-hidden
-                  />
-                  <span className="relative z-10 flex-1 text-right text-[12px] font-medium leading-none text-[#2db2ff] transition-colors duration-500 ease-in-out group-hover:text-[#1e1e1e]">
-                    {t('home.hero_cta_more')}
-                  </span>
-                  <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2db2ff]">
-                    <CtaArrowIcon />
-                  </span>
-                </Link>
+                <HomeMoreCtaPillLink href="/products" variant="heroDark">
+                  {t('home.hero_cta_more')}
+                </HomeMoreCtaPillLink>
               </div>
             </div>
 
