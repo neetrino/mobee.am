@@ -4,6 +4,7 @@ import { Button, Input } from '@shop/ui';
 import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ContactInformation } from './ContactInformation';
+import { ShippingCitySelect } from './ShippingCitySelect';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { CheckoutFormData, Cart } from '../types';
@@ -120,11 +121,8 @@ export function ShippingAddressModal({
                   />
                 </div>
                 <div>
-                  <Input
-                    label={t('checkout.form.city')}
-                    type="text"
-                    placeholder={t('checkout.placeholders.city')}
-                    {...register('shippingCity')}
+                  <ShippingCitySelect
+                    register={register}
                     error={errors.shippingCity?.message}
                     disabled={isSubmitting}
                   />

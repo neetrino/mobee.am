@@ -6,6 +6,7 @@ import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
 import { DeliveryPolicyInfoCard } from './components/DeliveryPolicyInfoCard';
 import { CheckoutLegalAcknowledgements } from './components/CheckoutLegalAcknowledgements';
+import { ShippingCitySelect } from './components/ShippingCitySelect';
 
 interface CheckoutFormProps {
   register: UseFormRegister<CheckoutFormData>;
@@ -279,19 +280,15 @@ export function CheckoutForm({
               />
             </div>
             <div>
-              <Input
-                label={t('checkout.form.city')}
-                type="text"
-                placeholder={t('checkout.placeholders.city')}
-                {...register('shippingCity', {
-                  onChange: () => {
-                    if (error && error.includes('shipping address')) {
-                      setError(null);
-                    }
-                  },
-                })}
+              <ShippingCitySelect
+                register={register}
                 error={errors.shippingCity?.message}
                 disabled={isSubmitting}
+                onAfterChange={() => {
+                  if (error && error.includes('shipping address')) {
+                    setError(null);
+                  }
+                }}
               />
             </div>
           </div>

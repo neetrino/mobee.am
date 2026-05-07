@@ -66,7 +66,7 @@ export function OrderSummary({
               ? `${t('checkout.shipping.freeDelivery')}${deliveryTypeSuffix}`
               : `${formatPriceInCurrency(orderSummary.shippingDisplay, currency)}${deliveryTypeSuffix}` +
                 (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
-            : t('checkout.shipping.enterCity');
+            : t('checkout.placeholders.selectCity');
 
   return (
     <div>

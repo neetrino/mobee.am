@@ -61,7 +61,7 @@ export function OrderSummaryModal({
               ? `${t('checkout.shipping.freeDelivery')}${deliveryTypeSuffix}`
               : `${formatPriceInCurrency(orderSummary.shippingDisplay, currency)}${deliveryTypeSuffix}` +
                 (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
-            : t('checkout.shipping.enterCity');
+            : t('checkout.placeholders.selectCity');
 
   return (
     <div className="bg-gray-50 rounded-lg p-4 space-y-2">
