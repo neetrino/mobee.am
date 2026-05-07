@@ -33,7 +33,7 @@ export function ProfileOrders({
 }: ProfileOrdersProps) {
   if (ordersLoading) {
     return (
-      <Card className="p-6">
+      <Card className="rounded-[15px] p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -48,7 +48,7 @@ export function ProfileOrders({
 
   if (orders.length === 0) {
     return (
-      <Card className="p-6">
+      <Card className="rounded-[15px] p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
         <div className="text-center py-12">
           <p className="text-gray-600 mb-4">{t('profile.orders.noOrders')}</p>
@@ -63,7 +63,7 @@ export function ProfileOrders({
   }
 
   return (
-    <Card className="w-full p-6">
+    <Card className="w-full rounded-[15px] p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
       <div className="space-y-4">
         {orders.map((order) => (
@@ -71,7 +71,7 @@ export function ProfileOrders({
             key={order.id}
             href={`/orders/${order.number}`}
             onClick={(e) => onOrderClick(order.number, e)}
-            className="block border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-md transition-all cursor-pointer"
+            className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">

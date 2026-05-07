@@ -141,12 +141,12 @@ function ProfilePageContent() {
         <div className="w-full min-w-0">
           {/* Alert messages */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="mb-6 rounded-[15px] border border-red-200 bg-red-50 p-4">
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
           {success && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="mb-6 rounded-[15px] border border-green-200 bg-green-50 p-4">
               <p className="text-sm text-green-600">{success}</p>
             </div>
           )}
