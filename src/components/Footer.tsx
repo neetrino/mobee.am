@@ -87,7 +87,7 @@ export function Footer() {
 
   return (
     <footer
-      className={`${montserrat.className} hidden border-t border-[#eee] bg-[#f3f4f6] lg:block`}
+      className={`${montserrat.className} hidden border-t border-[#eee] bg-white lg:block`}
     >
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-10 md:py-14 lg:py-8`}>
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-10 md:gap-y-12 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-start lg:gap-x-18">
