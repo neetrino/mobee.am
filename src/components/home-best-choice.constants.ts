@@ -48,3 +48,8 @@ export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_WISHLIST = 'lg:grid-cols-5';
  * Wishlist page: same track/gaps as home; `lg` uses five columns for slightly narrower cards.
  */
 export const WISHLIST_LINE_ITEMS_GRID_CLASS = `grid ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_WISHLIST}`;
+
+/**
+ * Desktop (`lg`): space between the home heading row (e.g. “best choice”, special offers) and the product grid under it.
+ */
+export const HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS = 'lg:mt-[42px]' as const;

@@ -94,7 +94,7 @@ export function HeroCarousel() {
     <section className={`bg-white ${montserrat.className}`}>
       <MobileHeroIphoneBanner />
 
-      <div className={`hidden lg:block ${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-[calc(theme(spacing.8)*4)]`}>
+      <div className={`hidden lg:block ${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-12 xl:pt-24`}>
         <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:gap-5">
           <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px] lg:min-h-[292px] xl:min-h-[346px]">
             <div className="absolute inset-0 z-0 rounded-[40px] bg-[#e9ecf0]" aria-hidden />
