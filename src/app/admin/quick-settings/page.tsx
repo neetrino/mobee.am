@@ -6,7 +6,10 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { QuickSettingsContent } from './QuickSettingsContent';
-import { PRODUCT_DISCOUNTS_PAGE_SIZE } from './product-discounts-pagination.constants';
+import {
+  PRODUCT_DISCOUNTS_PAGE_SIZE,
+  PRODUCT_DISCOUNTS_SEARCH_DEBOUNCE_MS,
+} from './product-discounts-pagination.constants';
 
 interface AdminSettingsResponse {
   globalDiscount: number;
@@ -44,6 +47,8 @@ export default function QuickSettingsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [productsPage, setProductsPage] = useState(1);
   const [productsMeta, setProductsMeta] = useState<AdminProductsListMeta | null>(null);
+  const [productsSearchInput, setProductsSearchInput] = useState('');
+  const [productsSearchApplied, setProductsSearchApplied] = useState('');
   const [productsLoading, setProductsLoading] = useState(false);
   const [productDiscounts, setProductDiscounts] = useState<Record<string, number>>({});
   const [savingProductId, setSavingProductId] = useState<string | null>(null);
@@ -73,8 +78,18 @@ export default function QuickSettingsPage() {
     }
   }, []);
 
-  const fetchProducts = useCallback(async (pageToFetch: number) => {
+  const fetchProducts = useCallback(
+    async (pageToFetch: number) => {
     try {
+      const searchQuery = productsSearchApplied.trim();
+      const listParams: Record<string, string> = {
+        page: String(pageToFetch),
+        limit: String(PRODUCT_DISCOUNTS_PAGE_SIZE),
+      };
+      if (searchQuery.length > 0) {
+        listParams.search = searchQuery;
+      }
+
       console.log('📦 [QUICK SETTINGS] Fetching products page...', pageToFetch);
       setProductsLoading(true);
 
@@ -82,10 +97,7 @@ export default function QuickSettingsPage() {
         data: any[];
         meta?: AdminProductsListMeta;
       }>('/api/v1/admin/products', {
-        params: {
-          page: String(pageToFetch),
-          limit: String(PRODUCT_DISCOUNTS_PAGE_SIZE),
-        },
+        params: listParams,
       });
 
       let meta = response.meta;
@@ -93,14 +105,18 @@ export default function QuickSettingsPage() {
 
       if (meta && meta.totalPages > 0 && pageToFetch > meta.totalPages) {
         effectivePage = meta.totalPages;
+        const retryParams: Record<string, string> = {
+          page: String(effectivePage),
+          limit: String(PRODUCT_DISCOUNTS_PAGE_SIZE),
+        };
+        if (searchQuery.length > 0) {
+          retryParams.search = searchQuery;
+        }
         response = await apiClient.get<{
           data: any[];
           meta?: AdminProductsListMeta;
         }>('/api/v1/admin/products', {
-          params: {
-            page: String(effectivePage),
-            limit: String(PRODUCT_DISCOUNTS_PAGE_SIZE),
-          },
+          params: retryParams,
         });
         meta = response.meta;
       }
@@ -127,7 +143,9 @@ export default function QuickSettingsPage() {
     } finally {
       setProductsLoading(false);
     }
-  }, []);
+  },
+    [productsSearchApplied],
+  );
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -346,13 +364,25 @@ export default function QuickSettingsPage() {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setProductsSearchApplied(productsSearchInput.trim());
+    }, PRODUCT_DISCOUNTS_SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [productsSearchInput]);
+
+  useEffect(() => {
     if (!isLoading && isLoggedIn && isAdmin) {
       fetchSettings();
-      fetchProducts(1);
       fetchCategories();
       fetchBrands();
     }
-  }, [isLoading, isLoggedIn, isAdmin, fetchSettings, fetchProducts, fetchCategories, fetchBrands]);
+  }, [isLoading, isLoggedIn, isAdmin, fetchSettings, fetchCategories, fetchBrands]);
+
+  useEffect(() => {
+    if (!isLoading && isLoggedIn && isAdmin) {
+      void fetchProducts(1);
+    }
+  }, [isLoading, isLoggedIn, isAdmin, productsSearchApplied, fetchProducts]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -411,6 +441,9 @@ export default function QuickSettingsPage() {
       products={products}
       productsMeta={productsMeta}
       onProductsPageChange={handleProductsPageChange}
+      productsSearchValue={productsSearchInput}
+      onProductsSearchChange={setProductsSearchInput}
+      productsSearchApplied={productsSearchApplied}
       productsLoading={productsLoading}
       productDiscounts={productDiscounts}
       setProductDiscounts={setProductDiscounts}

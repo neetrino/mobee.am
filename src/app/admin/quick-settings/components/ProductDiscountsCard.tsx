@@ -24,6 +24,9 @@ interface ProductDiscountsCardProps {
   products: Product[];
   productsMeta: ProductDiscountsListMeta | null;
   onProductsPageChange: (page: number) => void;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  searchApplied: string;
   productsLoading: boolean;
   productDiscounts: Record<string, number>;
   setProductDiscounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
@@ -35,6 +38,9 @@ export function ProductDiscountsCard({
   products,
   productsMeta,
   onProductsPageChange,
+  searchValue,
+  onSearchChange,
+  searchApplied,
   productsLoading,
   productDiscounts,
   setProductDiscounts,
@@ -51,11 +57,34 @@ export function ProductDiscountsCard({
     }).format(price);
   };
 
+  const hasSearchFilter = searchApplied.trim().length > 0;
+
   return (
     <Card className="p-6 bg-white border-gray-200">
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('admin.quickSettings.productDiscounts')}</h2>
         <p className="text-sm text-gray-600">{t('admin.quickSettings.productDiscountsSubtitle')}</p>
+      </div>
+
+      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <label className="sr-only" htmlFor="product-discounts-search">
+          {t('admin.quickSettings.productDiscountsSearchLabel')}
+        </label>
+        <Input
+          id="product-discounts-search"
+          type="search"
+          role="searchbox"
+          value={searchValue}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder={t('admin.quickSettings.productDiscountsSearchPlaceholder')}
+          className="w-full sm:max-w-md"
+          autoComplete="off"
+        />
+        {searchValue.trim().length > 0 ? (
+          <Button type="button" variant="ghost" size="sm" onClick={() => onSearchChange('')}>
+            {t('admin.quickSettings.productDiscountsClearSearch')}
+          </Button>
+        ) : null}
       </div>
 
       {productsLoading ? (
@@ -65,7 +94,11 @@ export function ProductDiscountsCard({
         </div>
       ) : products.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-600">{t('admin.quickSettings.noProducts')}</p>
+          <p className="text-gray-600">
+            {hasSearchFilter
+              ? t('admin.quickSettings.productDiscountsNoSearchResults')
+              : t('admin.quickSettings.noProducts')}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
