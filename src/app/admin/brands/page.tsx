@@ -1,9 +1,9 @@
 ﻿'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
-import { Card, Button } from '@shop/ui';
+import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
@@ -22,6 +22,17 @@ function BrandsSection() {
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [formData, setFormData] = useState({ name: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredBrands = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      return brands;
+    }
+    return brands.filter(
+      (b) => b.name.toLowerCase().includes(q) || b.slug.toLowerCase().includes(q),
+    );
+  }, [brands, searchQuery]);
 
   const fetchBrands = useCallback(async () => {
     try {
@@ -160,16 +171,35 @@ function BrandsSection() {
         </Button>
       </div>
 
-      {loading ? (
-        <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-admin mx-auto mb-2"></div>
-          <p className="text-sm text-gray-600">{t('admin.brands.loading')}</p>
-        </div>
-      ) : brands.length === 0 ? (
+      {brands.length === 0 ? (
         <p className="text-sm text-gray-500 py-2">{t('admin.brands.noBrands')}</p>
       ) : (
+        <>
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label className="sr-only" htmlFor="admin-brands-search">
+              {t('admin.brands.searchLabel')}
+            </label>
+            <Input
+              id="admin-brands-search"
+              type="search"
+              role="searchbox"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('admin.brands.searchPlaceholder')}
+              className="w-full sm:max-w-md"
+              autoComplete="off"
+            />
+            {searchQuery.trim().length > 0 ? (
+              <Button type="button" variant="ghost" size="sm" onClick={() => setSearchQuery('')}>
+                {t('admin.brands.clearSearch')}
+              </Button>
+            ) : null}
+          </div>
+          {filteredBrands.length === 0 ? (
+            <p className="text-sm text-gray-500 py-2">{t('admin.brands.noSearchResults')}</p>
+          ) : (
         <div className="space-y-2 max-h-96 overflow-y-auto">
-        {brands.map((brand) => (
+        {filteredBrands.map((brand) => (
           <div
             key={brand.id}
             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -205,6 +235,8 @@ function BrandsSection() {
           </div>
         ))}
         </div>
+          )}
+        </>
       )}
 
       {/* Add/Edit Modal */}
