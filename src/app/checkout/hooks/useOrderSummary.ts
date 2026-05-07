@@ -7,6 +7,7 @@ interface UseOrderSummaryProps {
   shippingMethod: 'pickup' | 'delivery';
   deliveryPrice: number | null;
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
+  requiresRegionalQuote: boolean;
 }
 
 export function useOrderSummary({
@@ -14,6 +15,7 @@ export function useOrderSummary({
   shippingMethod,
   deliveryPrice,
   currency,
+  requiresRegionalQuote,
 }: UseOrderSummaryProps) {
   const orderSummary = useMemo(() => {
     if (!cart || cart.items.length === 0) {
@@ -26,19 +28,26 @@ export function useOrderSummary({
         taxDisplay: 0,
         shippingDisplay: 0,
         totalDisplay: 0,
+        totalExcludesPendingShipping: false,
       };
     }
 
     const subtotalAMD = convertPrice(cart.totals.subtotal, 'USD', 'AMD');
     const taxAMD = convertPrice(cart.totals.tax, 'USD', 'AMD');
-    const shippingAMD = shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
+    const shippingBlocked = shippingMethod === 'delivery' && requiresRegionalQuote;
+    const shippingAMD =
+      shippingMethod === 'delivery' && deliveryPrice !== null && !shippingBlocked
+        ? deliveryPrice
+        : 0;
     const totalAMD = subtotalAMD + taxAMD + shippingAMD;
-    
+    const totalExcludesPendingShipping = shippingBlocked;
+
     const subtotalDisplay = currency === 'AMD' ? subtotalAMD : convertPrice(subtotalAMD, 'AMD', currency);
     const taxDisplay = currency === 'AMD' ? taxAMD : convertPrice(taxAMD, 'AMD', currency);
-    const shippingDisplay = currency === 'AMD' ? shippingAMD : convertPrice(shippingAMD, 'AMD', currency);
+    const shippingDisplay =
+      currency === 'AMD' ? shippingAMD : convertPrice(shippingAMD, 'AMD', currency);
     const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency);
-    
+
     return {
       subtotalAMD,
       taxAMD,
@@ -48,12 +57,9 @@ export function useOrderSummary({
       taxDisplay,
       shippingDisplay,
       totalDisplay,
+      totalExcludesPendingShipping,
     };
-  }, [cart, shippingMethod, deliveryPrice, currency]);
+  }, [cart, shippingMethod, deliveryPrice, currency, requiresRegionalQuote]);
 
   return { orderSummary };
 }
-
-
-
-

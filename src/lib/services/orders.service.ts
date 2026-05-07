@@ -3,7 +3,6 @@ import { Prisma } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import type { CheckoutData } from "../types/checkout";
 import { logger } from "../utils/logger";
-import { adminDeliveryService } from "./admin/admin-delivery.service";
 import { extractMediaUrl } from "../utils/extractMediaUrl";
 import {
   calculateDiscountAmount,
@@ -12,6 +11,10 @@ import {
   normalizePercent,
 } from "./orders/checkout-calculations";
 import { createPaymentUrl } from "./orders/checkout-payment";
+import {
+  resolveCheckoutShippingAmount,
+  type DeliverySpeed,
+} from "./orders/checkout-shipping";
 
 const orderNumberId = customAlphabet("0123456789ABCDEFGHJKLMNPQRSTUVWXYZ", 10);
 
@@ -106,9 +109,11 @@ class OrdersService {
         phone,
         shippingMethod = 'pickup',
         shippingAddress,
+        deliverySpeed: requestedDeliverySpeed,
         paymentMethod = 'idram',
         promoCode,
         locale,
+        acknowledgements,
       } = data;
       // shippingAmount is ignored — computed server-side from shippingMethod and address
 
@@ -329,16 +334,28 @@ class OrdersService {
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const discountPercent = await this.resolvePromoDiscountPercent(promoCode);
       const discountAmount = calculateDiscountAmount(subtotal, discountPercent);
+      const subtotalAfterDiscountAmd = Math.max(0, subtotal - discountAmount);
+      const speed: DeliverySpeed =
+        requestedDeliverySpeed === "express" ? "express" : "standard";
       // Shipping: computed server-side only (never trust client-provided amount)
-      let shippingAmount = 0;
-      if (shippingMethod === 'delivery' && shippingAddress?.city?.trim()) {
-        const country = (shippingAddress.countryCode ?? 'Armenia').toString();
-        shippingAmount = await adminDeliveryService.getDeliveryPrice(
-          shippingAddress.city.trim(),
-          country
-        );
-        if (shippingAmount < 0) shippingAmount = 0;
+      const shippingResolution = await resolveCheckoutShippingAmount({
+        shippingMethod,
+        city: shippingAddress?.city,
+        country: shippingAddress?.countryCode ?? "Armenia",
+        subtotalAfterDiscountAmd,
+        deliverySpeed: shippingMethod === "delivery" ? speed : "standard",
+      });
+      if (shippingResolution.requiresQuote) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Delivery quote required",
+          detail:
+            "Regional delivery price is calculated separately. Please contact support with your address to complete this order.",
+        };
       }
+      let shippingAmount = shippingResolution.amount;
+      if (shippingAmount < 0) shippingAmount = 0;
       const taxPercent = normalizePercent(process.env.CHECKOUT_TAX_PERCENT, 0);
       const applyTaxOnShipping = process.env.CHECKOUT_TAX_APPLY_ON_SHIPPING === "true";
       const totals = calculateTotals({
@@ -351,6 +368,11 @@ class OrdersService {
         },
       });
       const customerLocale = normalizeCheckoutLocale(locale);
+
+      const persistedShippingAddress =
+        shippingMethod === "delivery" && shippingAddress
+          ? { ...shippingAddress, deliverySpeed: speed }
+          : shippingAddress;
 
       // Generate order number
       const orderNumber = generateOrderNumber();
@@ -376,8 +398,12 @@ class OrdersService {
             customerPhone: phone,
             customerLocale,
             shippingMethod,
-            shippingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
-            billingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
+            shippingAddress: persistedShippingAddress
+              ? JSON.parse(JSON.stringify(persistedShippingAddress))
+              : null,
+            billingAddress: persistedShippingAddress
+              ? JSON.parse(JSON.stringify(persistedShippingAddress))
+              : null,
             items: {
               create: cartItems.map((item) => ({
                 variantId: item.variantId,
@@ -397,10 +423,18 @@ class OrdersService {
                   source: userId ? 'user' : 'guest',
                   paymentMethod,
                   shippingMethod,
+                  deliverySpeed:
+                    shippingMethod === "delivery" ? speed : undefined,
                   promoCode: promoCode ?? null,
                   discountPercent,
                   taxPercent,
-                },
+                  acknowledgements: {
+                    deliverySupplyTerms: acknowledgements.deliverySupplyTerms,
+                    inspectionAtDelivery: acknowledgements.inspectionAtDelivery,
+                    orderVerification: acknowledgements.orderVerification,
+                    returnsPolicy: acknowledgements.returnsPolicy,
+                  },
+                } as Prisma.InputJsonValue,
               },
             },
           },

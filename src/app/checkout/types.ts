@@ -4,6 +4,7 @@ export type CheckoutFormData = {
   email: string;
   phone: string;
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   promoCode?: string;
   shippingAddress?: string;
@@ -12,6 +13,10 @@ export type CheckoutFormData = {
   cardExpiry?: string;
   cardCvv?: string;
   cardHolderName?: string;
+  acceptDeliverySupplyTerms: boolean;
+  acceptInspectionAtDelivery: boolean;
+  acceptOrderVerification: boolean;
+  acceptReturnsPolicy: boolean;
 };
 
 export interface CartItem {
@@ -44,4 +49,3 @@ export interface Cart {
   };
   itemsCount: number;
 }
-

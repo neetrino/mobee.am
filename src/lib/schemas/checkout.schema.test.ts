@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { parseCheckoutBody, safeParseCheckout } from "./checkout.schema";
 
+const baseAck = {
+  deliverySupplyTerms: true,
+  inspectionAtDelivery: true,
+  orderVerification: true,
+  returnsPolicy: true,
+};
+
+const pickupAck = {
+  deliverySupplyTerms: false,
+  inspectionAtDelivery: false,
+  orderVerification: true,
+  returnsPolicy: true,
+};
+
 describe("checkout.schema", () => {
   it("parses a valid cart-based checkout payload", () => {
     const payload = {
@@ -13,6 +27,7 @@ describe("checkout.schema", () => {
       paymentMethod: "idram",
       locale: "hy",
       promoCode: "SPRING10",
+      acknowledgements: pickupAck,
     };
 
     expect(parseCheckoutBody(payload)).toEqual(payload);
@@ -27,11 +42,13 @@ describe("checkout.schema", () => {
       email: "guest@example.com",
       phone: "+37455123456",
       shippingMethod: "delivery",
+      deliverySpeed: "standard" as const,
       shippingAddress: {
         address: "Main street 10",
         city: "Yerevan",
       },
       paymentMethod: "cash_on_delivery",
+      acknowledgements: baseAck,
     };
 
     expect(safeParseCheckout(payload).success).toBe(true);
@@ -43,6 +60,7 @@ describe("checkout.schema", () => {
       phone: "+37499123456",
       shippingMethod: "pickup",
       paymentMethod: "idram",
+      acknowledgements: pickupAck,
     };
 
     expect(() => parseCheckoutBody(payload)).toThrow();
@@ -59,9 +77,31 @@ describe("checkout.schema", () => {
         address: "Main street 10",
       },
       paymentMethod: "arca",
+      acknowledgements: baseAck,
     };
 
     expect(() => parseCheckoutBody(payload)).toThrow();
+    expect(safeParseCheckout(payload).success).toBe(false);
+  });
+
+  it("rejects delivery without delivery acknowledgements", () => {
+    const payload = {
+      cartId: "cart-123",
+      email: "user@example.com",
+      phone: "+37499123456",
+      shippingMethod: "delivery",
+      shippingAddress: {
+        address: "Main street 10",
+        city: "Yerevan",
+      },
+      paymentMethod: "arca",
+      acknowledgements: {
+        ...pickupAck,
+        deliverySupplyTerms: false,
+        inspectionAtDelivery: false,
+      },
+    };
+
     expect(safeParseCheckout(payload).success).toBe(false);
   });
 
@@ -73,6 +113,7 @@ describe("checkout.schema", () => {
       shippingMethod: "pickup",
       paymentMethod: "idram",
       locale: "de",
+      acknowledgements: pickupAck,
     };
 
     expect(safeParseCheckout(payload).success).toBe(false);

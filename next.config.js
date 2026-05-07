@@ -37,6 +37,38 @@ const r2PublicRemotePattern = remotePatternFromAbsoluteUrl(
   process.env.R2_PUBLIC_URL
 );
 
+/**
+ * Next.js dev blocks /_next/* when Origin hostname is not allowlisted (block-cross-site-dev).
+ * - Dotted IPv4 private ranges (below) do not match single-label hosts like http://MY-PC:3000.
+ * - Wildcard `**` matches any hostname segment pattern used by Next's isCsrfOriginAllowed (dev only).
+ * @see https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ */
+const IS_PRODUCTION_CONFIG = process.env.NODE_ENV === 'production';
+
+const DEFAULT_LAN_DEV_ORIGIN_PATTERNS = [
+  '127.0.0.1',
+  '192.168.*.*',
+  '10.*.*.*',
+  '172.*.*.*',
+  '169.254.*.*',
+  '100.*.*.*',
+  '*.local',
+];
+
+/**
+ * @returns {string[]}
+ */
+function parseAllowedDevOriginsFromEnv() {
+  const raw = process.env.NEXT_DEV_ALLOWED_ORIGINS;
+  if (!raw || typeof raw !== 'string') {
+    return [];
+  }
+  return raw
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 const nextConfig = {
   reactStrictMode: true,
   /**
@@ -169,6 +201,11 @@ const nextConfig = {
   turbopack: {
     root: path.resolve(__dirname, '.'),
   },
+  allowedDevOrigins: [
+    ...(IS_PRODUCTION_CONFIG ? [] : ['**']),
+    ...DEFAULT_LAN_DEV_ORIGIN_PATTERNS,
+    ...parseAllowedDevOriginsFromEnv(),
+  ],
 };
 
 module.exports = nextConfig;

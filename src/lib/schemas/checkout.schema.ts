@@ -21,6 +21,13 @@ const guestItemSchema = z.object({
   quantity: z.int().positive("quantity must be greater than 0"),
 });
 
+const acknowledgementsSchema = z.object({
+  deliverySupplyTerms: z.boolean(),
+  inspectionAtDelivery: z.boolean(),
+  orderVerification: z.boolean(),
+  returnsPolicy: z.boolean(),
+});
+
 const checkoutSchema = z
   .object({
     cartId: z.string().trim().min(1).optional(),
@@ -30,6 +37,7 @@ const checkoutSchema = z
     email: z.string().email("Invalid email"),
     phone: z.string().trim().min(1, "phone is required"),
     shippingMethod: z.enum(["pickup", "delivery"]).default("pickup"),
+    deliverySpeed: z.enum(["standard", "express"]).optional(),
     shippingAddress: shippingAddressSchema.optional(),
     shippingAmount: z.number().min(0).optional(),
     paymentMethod: z.enum(["idram", "arca", "cash_on_delivery"]).default("idram"),
@@ -39,6 +47,7 @@ const checkoutSchema = z
     ),
     locale: z.enum(["en", "hy", "ru"]).optional(),
     billingAddress: shippingAddressSchema.optional(),
+    acknowledgements: acknowledgementsSchema,
   })
   .strict()
   .superRefine((data, context) => {
@@ -56,6 +65,24 @@ const checkoutSchema = z
         message: "shippingAddress.city is required for delivery",
         path: ["shippingAddress", "city"],
       });
+    }
+
+    const a = data.acknowledgements;
+    if (!a.orderVerification || !a.returnsPolicy) {
+      context.addIssue({
+        code: "custom",
+        message: "orderVerification and returnsPolicy acknowledgements are required",
+        path: ["acknowledgements", "orderVerification"],
+      });
+    }
+    if (data.shippingMethod === "delivery") {
+      if (!a.deliverySupplyTerms || !a.inspectionAtDelivery) {
+        context.addIssue({
+          code: "custom",
+          message: "delivery acknowledgements are required for delivery orders",
+          path: ["acknowledgements", "deliverySupplyTerms"],
+        });
+      }
     }
   });
 

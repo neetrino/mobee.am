@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../lib/api-client';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '../../lib/productCardDisplayImage';
+import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
@@ -152,7 +152,7 @@ export default function WishlistPage() {
     const flySource = document.querySelector<HTMLElement>(
       `[data-wishlist-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
     );
-    const flyUrl = product.image ?? PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+    const flyUrl = resolveProductCardImageSrc(product.image);
     dispatchCartFlyAnimation(flyUrl, flySource);
 
     addToCartInFlightRef.current.add(product.id);

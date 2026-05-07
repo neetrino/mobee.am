@@ -9,16 +9,9 @@ import type { Order } from '../types';
 interface OrderSummaryProps {
   order: Order;
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
-  calculatedShipping: number | null;
-  loadingShipping: boolean;
 }
 
-export function OrderSummary({
-  order,
-  currency,
-  calculatedShipping,
-  loadingShipping,
-}: OrderSummaryProps) {
+export function OrderSummary({ order, currency }: OrderSummaryProps) {
   const { t } = useTranslation();
 
   const subtotalDisplay = (() => {
@@ -31,17 +24,17 @@ export function OrderSummary({
     return currency === 'AMD' ? discountAMD : convertPrice(discountAMD, 'AMD', currency);
   })() : null;
 
-  const shippingDisplay = order.shippingMethod === 'pickup' 
-    ? t('checkout.shipping.freePickup')
-    : loadingShipping
-      ? t('checkout.shipping.loading')
+  const shippingDisplay =
+    order.shippingMethod === 'pickup'
+      ? t('checkout.shipping.freePickup')
       : (() => {
-          const shippingAMD = calculatedShipping !== null ? calculatedShipping : order.totals.shipping;
-          const shippingDisplayValue = currency === 'AMD' 
-            ? shippingAMD 
-            : convertPrice(shippingAMD, 'AMD', currency);
-          return formatPriceInCurrency(shippingDisplayValue, currency) + 
-            (order.shippingAddress?.city ? ` (${order.shippingAddress.city})` : '');
+          const shippingAMD = order.totals.shipping;
+          const shippingDisplayValue =
+            currency === 'AMD' ? shippingAMD : convertPrice(shippingAMD, 'AMD', currency);
+          return (
+            formatPriceInCurrency(shippingDisplayValue, currency) +
+            (order.shippingAddress?.city ? ` (${order.shippingAddress.city})` : '')
+          );
         })();
 
   const taxDisplay = (() => {
@@ -52,7 +45,7 @@ export function OrderSummary({
   const totalDisplay = (() => {
     const subtotalAMD = convertPrice(order.totals.subtotal, 'USD', 'AMD');
     const discountAMD = convertPrice(order.totals.discount, 'USD', 'AMD');
-    const shippingAMD = calculatedShipping !== null ? calculatedShipping : order.totals.shipping;
+    const shippingAMD = order.totals.shipping;
     const taxAMD = convertPrice(order.totals.tax, 'USD', 'AMD');
     const totalAMD = subtotalAMD - discountAMD + shippingAMD + taxAMD;
     return currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency);

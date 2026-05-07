@@ -19,6 +19,7 @@ interface CardDetailsModalProps {
   isSubmitting: boolean;
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   shippingCity?: string;
   cart: Cart | null;
   orderSummary: {
@@ -26,10 +27,12 @@ interface CardDetailsModalProps {
     taxDisplay: number;
     shippingDisplay: number;
     totalDisplay: number;
+    totalExcludesPendingShipping: boolean;
   };
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   isLoggedIn: boolean;
@@ -47,12 +50,14 @@ export function CardDetailsModal({
   isSubmitting,
   paymentMethod,
   shippingMethod,
+  deliverySpeed,
   shippingCity,
   cart,
   orderSummary,
   currency,
   loadingDeliveryPrice,
   deliveryPrice,
+  requiresRegionalQuote,
   logoErrors,
   setLogoErrors,
   isLoggedIn,
@@ -152,9 +157,11 @@ export function CardDetailsModal({
             orderSummary={orderSummary}
             currency={currency}
             shippingMethod={shippingMethod}
+            deliverySpeed={deliverySpeed}
             shippingCity={shippingCity}
             loadingDeliveryPrice={loadingDeliveryPrice}
             deliveryPrice={deliveryPrice}
+            requiresRegionalQuote={requiresRegionalQuote}
           />
         </div>
 
@@ -183,7 +190,7 @@ export function CardDetailsModal({
               },
               handleValidationError
             )}
-            disabled={isSubmitting}
+            disabled={isSubmitting || (shippingMethod === 'delivery' && requiresRegionalQuote)}
           >
             {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.continueToPayment')}
           </Button>

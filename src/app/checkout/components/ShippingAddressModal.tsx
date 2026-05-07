@@ -4,6 +4,7 @@ import { Button, Input } from '@shop/ui';
 import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ContactInformation } from './ContactInformation';
+import { ShippingCitySelect } from './ShippingCitySelect';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
@@ -18,6 +19,7 @@ interface ShippingAddressModalProps {
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   cart: Cart | null;
   orderSummary: {
@@ -25,11 +27,13 @@ interface ShippingAddressModalProps {
     taxDisplay: number;
     shippingDisplay: number;
     totalDisplay: number;
+    totalExcludesPendingShipping: boolean;
   };
   currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   shippingCity?: string;
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
   onSubmit: (data: CheckoutFormData) => void;
 }
 
@@ -42,6 +46,7 @@ export function ShippingAddressModal({
   errors,
   isSubmitting,
   shippingMethod,
+  deliverySpeed,
   paymentMethod,
   cart,
   orderSummary,
@@ -49,6 +54,7 @@ export function ShippingAddressModal({
   shippingCity,
   loadingDeliveryPrice,
   deliveryPrice,
+  requiresRegionalQuote,
   onSubmit,
 }: ShippingAddressModalProps) {
   const { t } = useTranslation();
@@ -117,11 +123,8 @@ export function ShippingAddressModal({
                   />
                 </div>
                 <div>
-                  <Input
-                    label={t('checkout.form.city')}
-                    type="text"
-                    placeholder={t('checkout.placeholders.city')}
-                    {...register('shippingCity')}
+                  <ShippingCitySelect
+                    register={register}
                     error={errors.shippingCity?.message}
                     disabled={isSubmitting}
                   />
@@ -169,9 +172,11 @@ export function ShippingAddressModal({
               orderSummary={orderSummary}
               currency={currency}
               shippingMethod={shippingMethod}
+              deliverySpeed={deliverySpeed}
               shippingCity={shippingCity}
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
+              requiresRegionalQuote={requiresRegionalQuote}
             />
           </>
         ) : (
@@ -214,9 +219,11 @@ export function ShippingAddressModal({
               orderSummary={orderSummary}
               currency={currency}
               shippingMethod={shippingMethod}
+              deliverySpeed={deliverySpeed}
               shippingCity={shippingCity}
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
+              requiresRegionalQuote={requiresRegionalQuote}
             />
           </div>
         )}
@@ -242,7 +249,10 @@ export function ShippingAddressModal({
               },
               handleValidationError
             )}
-            disabled={isSubmitting}
+            disabled={
+              isSubmitting ||
+              (shippingMethod === 'delivery' && requiresRegionalQuote)
+            }
           >
             {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
           </Button>

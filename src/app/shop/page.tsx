@@ -11,7 +11,10 @@ import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvide
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { ShopCatalogSection } from '@/components/shop/ShopCatalogSection';
 import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
-import { SHOP_FILTER_SIDEBAR_WIDTH_CSS } from './shop-layout.constants';
+import {
+  SHOP_FILTER_SIDEBAR_WIDTH_CSS,
+  SHOP_PAGE_FOOTER_GAP_CLASS,
+} from './shop-layout.constants';
 
 interface ProductsPageProps {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -43,7 +46,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const selectedBrands = brands ? brands.split(',').map((b: string) => b.trim()) : [];
 
   return (
-    <div className="w-full max-w-full">
+    <div className={`w-full max-w-full ${SHOP_PAGE_FOOTER_GAP_CLASS}`}>
       <div
         className={`flex w-full flex-col gap-6 pt-4 lg:flex-row lg:items-start ${SITE_CONTENT_GUTTERS_CLASS}`}
       >
