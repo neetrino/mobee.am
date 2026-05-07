@@ -19,7 +19,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     <div className={`flex min-h-screen flex-col ${MOBILE_BOTTOM_NAV_BODY_PADDING_BOTTOM_CLASS}`}>
       <Header />
       <CartFlyAnimationLayer />
-      <main className="flex-1 w-full">{children}</main>
+      <main className="min-w-0 flex-1 w-full">{children}</main>
       <Footer />
       <MobileBottomNav />
     </div>

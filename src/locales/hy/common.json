@@ -17,6 +17,7 @@
     "close": "Փակել"
   },
   "navigation": {
+    "menuTitle": "Նավիգացիա",
     "home": "Գլխավոր",
     "products": "Խանութ",
     "categories": "Կատեգորիաներ",
@@ -24,7 +25,7 @@
     "wishlist": "Լավագույն",
     "compare": "Համեմատել",
     "checkout": "Վճարում",
-    "profile": "Մուտք",
+    "profile": "Պրոֆիլ",
     "orders": "Պատվերներ",
     "login": "Մուտք",
     "register": "Գրանցում",
@@ -165,6 +166,10 @@
     "productNotFound": "Ապրանքը չի գտնվել: Խնդրում ենք թարմացնել էջը և կրկին փորձել:",
     "failedToAddToCart": "Չհաջողվեց ավելացնել ապրանքը զամբյուղ: Խնդրում ենք կրկին փորձել:"
   },
+  "localeMenu": {
+    "languageSection": "Լեզու",
+    "currencySection": "Արժույթ"
+  },
   "ariaLabels": {
     "addToCart": "Ավելացնել",
     "removeFromCart": "Հեռացնել զամբյուղից",
@@ -178,6 +183,7 @@
     "openMenu": "Բացել նավիգացիայի մենյու",
     "closeMenu": "Փակել նավիգացիայի մենյու",
     "changeLanguage": "Փոխել լեզուն",
+    "changeLanguageAndCurrency": "Լեզու և արժույթ",
     "instagram": "Instagram",
     "facebook": "Facebook",
     "linkedin": "LinkedIn",

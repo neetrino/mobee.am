@@ -88,12 +88,19 @@ export function ProductCardActions({
     ? 'max-lg:border max-lg:border-gray-100 max-lg:bg-white max-lg:text-gray-900 max-lg:shadow-sm max-lg:hover:bg-gray-50 border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5] lg:border-transparent lg:bg-[#e8f0f8]'
     : 'border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]';
 
+  /** Home mobile: wishlist/compare a bit closer to the image right edge; other cards keep uniform `right-*` below `lg`. */
+  const cornerOnImageStackPositionClass = homeProductGridCard
+    ? isCompact
+      ? 'top-[11px] gap-1.5 max-lg:right-[2px] lg:right-4'
+      : 'top-[12px] gap-[7px] max-lg:right-[4px] lg:right-[25px]'
+    : isCompact
+      ? 'top-[11px] gap-1.5 right-4'
+      : 'top-[12px] gap-[7px] right-[18px]';
+
   if (cornerOnImage) {
     return (
       <div
-        className={`pointer-events-auto absolute z-[40] flex flex-col opacity-100 ${
-          isCompact ? 'top-[11px] right-4 gap-1.5' : 'top-[12px] right-[18px] gap-[7px]'
-        }`}
+        className={`pointer-events-auto absolute z-[40] flex flex-col opacity-100 ${cornerOnImageStackPositionClass}`}
       >
         {/* Figma mobee-new 53:684 — heart above compare, ~11px from top, light blue circles */}
         <button

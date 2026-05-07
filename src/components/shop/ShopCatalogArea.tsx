@@ -20,7 +20,7 @@ export type ShopCatalogAreaProps = {
 
 function ShopGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-4 xl:grid-cols-3 xl:gap-6">
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
@@ -57,6 +57,7 @@ export function ShopCatalogArea({
         title: p.title,
         price: p.price,
         compareAtPrice: p.compareAtPrice ?? p.originalPrice ?? null,
+        discountPercent: p.discountPercent ?? null,
         image: p.image ?? null,
         inStock: p.inStock ?? true,
         brand: p.brand ?? null,

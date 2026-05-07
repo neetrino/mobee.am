@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from '../lib/i18n-client';
+import { MOBILE_FILTERS_EVENT } from '@/lib/events';
 import type { ProductSortOption } from '@/lib/products/sort';
 import {
   PRODUCTS_VIEW_MODE_CHANGED_EVENT,
@@ -14,7 +16,10 @@ import {
 
 const SORT_OPTIONS: ProductSortOption[] = ['default', 'price-asc', 'price-desc', 'name-asc', 'name-desc'];
 
-/** Grid listing icon: 24px viewBox artwork, +5% display size vs default 24px toolbar icons. */
+/** Filter + sort pill chrome on mobile (`lg` uses desktop sizing on the sort control). */
+const SHOP_MOBILE_TOOLBAR_PILL_BOX_CLASS = 'h-10 px-3 py-1.5';
+
+/** Grid listing icon: 24px viewBox, +5% display size vs default toolbar icons. */
 const SHOP_GRID_LISTING_ICON_DISPLAY_PX = 24 * 1.05;
 
 function getSortLabel(sort: ProductSortOption, t: (key: string) => string): string {
@@ -86,31 +91,55 @@ export function ShopSortFilter() {
     persistProductListingViewMode(mode);
   };
 
+  const openMobileFilters = () => {
+    window.dispatchEvent(new Event(MOBILE_FILTERS_EVENT));
+  };
+
   return (
-    <div className="relative z-10 flex w-full items-center gap-[10px]">
-      <div ref={containerRef} className="relative z-10 w-full max-w-[226px]">
+    <div
+      className={`relative flex w-full items-center max-lg:justify-between lg:gap-[10px] ${open ? 'z-[100]' : 'z-10'}`}
+    >
+      <button
+        type="button"
+        onClick={openMobileFilters}
+        className={`flex shrink-0 items-center gap-1.5 rounded-[9999px] border border-[#4B5563] ${SHOP_MOBILE_TOOLBAR_PILL_BOX_CLASS} lg:hidden`}
+        aria-label={t('products.mobileFilters.title')}
+      >
+        <SlidersHorizontal className="h-4 w-4 shrink-0 text-[#4B5563]" aria-hidden />
+        <span className="max-w-[7rem] truncate text-left text-[13px] font-normal leading-4 text-[#6B7280]">
+          {t('products.header.filters')}
+        </span>
+      </button>
+
+      <div
+        ref={containerRef}
+        className="relative min-w-0 w-full max-w-[min(168px,calc(100vw-8rem))] max-lg:shrink-0 lg:max-w-[226px] lg:w-full"
+      >
         <button
           type="button"
           onClick={() => setOpen((currentOpen) => !currentOpen)}
-          className="flex h-12 w-full items-center justify-between gap-2 rounded-[9999px] border border-[#4B5563] px-[21px] pb-[13px] pt-[12px]"
+          className={`relative flex w-full items-center justify-between gap-1.5 rounded-[9999px] border border-[#4B5563] ${SHOP_MOBILE_TOOLBAR_PILL_BOX_CLASS} lg:h-12 lg:gap-2 lg:px-[21px] lg:pb-[13px] lg:pt-[12px]`}
           aria-haspopup="menu"
           aria-expanded={open}
           aria-label={t('products.header.sortProducts')}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            className="hidden h-6 w-6 shrink-0 lg:block"
+          >
             <path d="M4 6H20" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
             <path d="M7 12H17" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
             <path d="M10 18H14" stroke="#4B5563" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
-          <span className="min-w-0 flex-1 truncate text-left text-[14px] font-normal leading-[20px] text-[#6B7280]">
+          <span className="min-w-0 flex-1 truncate text-left text-[13px] font-normal leading-[14px] text-[#6B7280] max-lg:absolute max-lg:left-[20px] max-lg:right-10 max-lg:flex max-lg:items-center max-lg:justify-start lg:static lg:inset-auto lg:text-[14px] lg:leading-[20px]">
             {getSortLabel(activeSort, t)}
           </span>
           <svg
-            width="18"
-            height="18"
             viewBox="0 0 18 18"
             fill="none"
-            className={`shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+            className={`absolute right-3 top-1/2 h-3.5 w-3.5 shrink-0 -translate-y-1/2 transition-transform lg:relative lg:right-auto lg:top-auto lg:translate-y-0 lg:h-[18px] lg:w-[18px] ${open ? 'rotate-180' : ''}`}
             aria-hidden="true"
           >
             <path d="M4.5 6.75L9 11.25L13.5 6.75" stroke="#6B7280" strokeWidth="1.8" strokeLinecap="round" />
@@ -118,7 +147,7 @@ export function ShopSortFilter() {
         </button>
 
         {open && (
-          <div className="absolute left-0 top-[calc(100%+8px)] z-30 w-full rounded-2xl border border-[#E2E8F0] bg-white p-2 shadow-[0_12px_30px_rgba(15,23,43,0.12)]">
+          <div className="absolute left-0 top-[calc(100%+8px)] z-[110] w-full rounded-2xl border border-[#E2E8F0] bg-white p-2 shadow-[0_12px_30px_rgba(15,23,43,0.12)]">
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option}
@@ -136,7 +165,7 @@ export function ShopSortFilter() {
       </div>
 
       <div
-        className="flex h-12 w-[110px] shrink-0 items-stretch gap-0.5 rounded-[90px] border border-[#4B5563] p-1"
+        className="hidden h-12 w-[110px] shrink-0 items-stretch gap-0.5 rounded-[90px] border border-[#4B5563] p-1 xl:flex"
         role="group"
         aria-label={`${t('products.header.viewModes.list')} / ${t('products.header.viewModes.grid2')}`}
       >

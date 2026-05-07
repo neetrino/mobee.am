@@ -7,7 +7,7 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } f
 import type { CSSProperties, FormEvent } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
-import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
+import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
 import { useInstantSearch } from './hooks/useInstantSearch';
 import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
@@ -30,6 +30,7 @@ import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
 import { useCategoriesTree } from './CategoriesTreeContext';
+import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 
 /** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
 const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
@@ -65,39 +66,11 @@ interface Category {
 }
 
 // Icon Components
-const ChevronDownIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
 // Arrow icon for categories with subcategories (▶)
 const ArrowRightIcon = () => (
   <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-auto">
     <path d="M3 2L5 4L3 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
-);
-
-/**
- * Profile icon for logged in state (filled style with background)
- */
-const ProfileIconFilled = () => (
-  <div className="relative w-[19px] h-[19px] flex items-center justify-center">
-    {/* Background circle */}
-    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full opacity-90 group-hover:opacity-100 transition-opacity duration-200 shadow-md"></div>
-    {/* Filled icon */}
-    <svg 
-      width="19" 
-      height="19" 
-      viewBox="0 0 20 20" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      className="relative z-10"
-    >
-      <circle cx="10" cy="7" r="3.2" fill="white" />
-      <path d="M5 17C5 14.5 7.5 12.5 10 12.5C12.5 12.5 15 14.5 15 17" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  </div>
 );
 
 const SearchIcon = () => (
@@ -140,6 +113,106 @@ const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
 
 const mobilePrimaryLangButtonClassName =
   'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
+
+/** Mobile drawer primary links — bordered pill buttons (aligned with strip icon radius). */
+const MOBILE_DRAWER_NAV_BUTTON_CLASS =
+  'flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100';
+
+interface MobileNavProfileUser {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+}
+
+function getMobileNavProfileInitials(user: MobileNavProfileUser): string {
+  const first = user.firstName?.trim();
+  const last = user.lastName?.trim();
+  if (first && last) {
+    return `${first[0]!}${last[0]!}`.toUpperCase();
+  }
+  if (first) {
+    return first.length >= 2 ? first.slice(0, 2).toUpperCase() : first[0]!.toUpperCase();
+  }
+  const email = user.email?.trim();
+  if (email) {
+    const local = email.split('@')[0] ?? '';
+    if (local.length >= 2) {
+      return local.slice(0, 2).toUpperCase();
+    }
+    return local.length === 1 ? local[0]!.toUpperCase() : '?';
+  }
+  const digits = user.phone?.replace(/\D/g, '') ?? '';
+  if (digits.length >= 2) {
+    return digits.slice(0, 2);
+  }
+  return '?';
+}
+
+function getMobileNavProfileCardLines(user: MobileNavProfileUser): {
+  title: string;
+  subtitle?: string;
+} {
+  const parts = [user.firstName?.trim(), user.lastName?.trim()].filter(Boolean);
+  const fullName = parts.join(' ');
+  const email = user.email?.trim() ?? '';
+  const phone = user.phone?.trim() ?? '';
+  if (fullName) {
+    return { title: fullName, subtitle: email || undefined };
+  }
+  if (email) {
+    return { title: email, subtitle: undefined };
+  }
+  if (phone) {
+    return { title: phone, subtitle: undefined };
+  }
+  return { title: '', subtitle: undefined };
+}
+
+function MobileDrawerProfileCard({
+  user,
+  profileFallbackLabel,
+  onNavigate,
+}: {
+  user: MobileNavProfileUser;
+  profileFallbackLabel: string;
+  onNavigate: () => void;
+}) {
+  const { title, subtitle } = getMobileNavProfileCardLines(user);
+  const heading = title || profileFallbackLabel;
+  return (
+    <Link
+      href="/profile"
+      onClick={onNavigate}
+      className="flex w-fit max-w-full min-w-0 items-center gap-3 self-start rounded-[15px] border border-gray-200 bg-white px-3 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100"
+      aria-label={profileFallbackLabel}
+    >
+      <span
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-900"
+        aria-hidden
+      >
+        {getMobileNavProfileInitials(user)}
+      </span>
+      <span className="flex min-w-0 max-w-full flex-col gap-0.5 text-left">
+        <span className="max-w-full break-words text-sm font-bold leading-tight text-gray-900">{heading}</span>
+        {subtitle ? (
+          <span className="max-w-full break-words text-xs font-normal leading-snug text-gray-500 [overflow-wrap:anywhere]">
+            {subtitle}
+          </span>
+        ) : null}
+      </span>
+      <svg
+        className="h-5 w-5 shrink-0 text-gray-300"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </Link>
+  );
+}
 
 /**
  * Component that syncs search params with state
@@ -314,9 +387,7 @@ function CategoryMenuItem({
             }, 150);
           }}
         >
-          <div 
-            className="bg-white rounded-xl shadow-2xl border border-gray-200/80 p-6 min-w-[500px]"
-          >
+          <div className="w-max max-w-[min(500px,calc(100vw-2rem))] rounded-xl border border-gray-200/80 bg-white p-6 shadow-2xl">
             <div 
               className="grid gap-6"
               style={{ gridTemplateColumns: `repeat(${subcategoryColumns.length}, minmax(150px, 1fr))` }}
@@ -406,7 +477,7 @@ function HeaderPhoneLangCluster({
       : 'truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151]';
 
   return (
-    <div className="flex min-w-0 shrink-0 items-center gap-6 sm:gap-[50px]">
+    <div className="flex min-w-0 shrink-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[50px]">
       <a href={telHref} className="flex min-w-0 items-center gap-2" aria-label={t('common.header.supportPhoneAria')}>
         <span className="relative size-6 shrink-0">
           <img
@@ -424,16 +495,48 @@ function HeaderPhoneLangCluster({
   );
 }
 
+/** Support call-to-action for mobile drawer — same chrome as `MOBILE_DRAWER_NAV_BUTTON_CLASS`. */
+function MobileDrawerSupportPhoneButton() {
+  const { t } = useTranslation();
+  const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
+  const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
+
+  return (
+    <a
+      href={telHref}
+      className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
+      aria-label={t('common.header.supportPhoneAria')}
+    >
+      <span className="flex min-w-0 flex-1 items-center gap-2">
+        <span className="relative size-6 shrink-0">
+          <img
+            src={HEADER_FIGMA_ASSETS.phoneIcon}
+            alt=""
+            width={24}
+            height={24}
+            className="absolute inset-0 block size-6 max-w-none"
+          />
+        </span>
+        <span className="min-w-0 truncate text-sm font-semibold text-[#374151]">
+          {t('common.header.supportPhoneNumber')}
+        </span>
+      </span>
+      <svg className="h-4 w-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </a>
+  );
+}
+
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isLoggedIn, logout, isAdmin } = useAuth();
+  const { isLoggedIn, logout, isAdmin, user } = useAuth();
   const { t } = useTranslation();
   const [compareCount, setCompareCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
   const [, setCartTotal] = useState(0);
-  const [showMobileCurrency, setShowMobileCurrency] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
@@ -452,7 +555,6 @@ export function Header() {
       ? 'whitespace-nowrap text-[13px] font-black leading-5 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
       : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
 
-  const mobileCurrencyRef = useRef<HTMLDivElement>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
@@ -477,6 +579,7 @@ export function Header() {
   const lastScrollYRef = useRef(0);
   const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
   const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
+  const [headerLayoutReady, setHeaderLayoutReady] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
 
@@ -484,7 +587,7 @@ export function Header() {
     if (typeof window === 'undefined') {
       return;
     }
-    const mq = window.matchMedia('(min-width: 1024px)');
+    const mq = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
     if (!mq.matches) {
       setSecondaryDocked(false);
       return;
@@ -507,7 +610,7 @@ export function Header() {
     if (typeof window === 'undefined') {
       return;
     }
-    if (window.matchMedia('(min-width: 1024px)').matches) {
+    if (window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY).matches) {
       setMobileSearchDocked(false);
       setMobileSearchFlowSpacerPx(0);
       return;
@@ -578,12 +681,14 @@ export function Header() {
     syncMobileSearchDock();
     const searchWrap = mobileSearchWrapRef.current;
     if (typeof ResizeObserver === 'undefined' || !searchWrap) {
+      setHeaderLayoutReady(true);
       return;
     }
     const ro = new ResizeObserver(() => {
       syncMobileSearchDock();
     });
     ro.observe(searchWrap);
+    setHeaderLayoutReady(true);
     return () => {
       ro.disconnect();
     };
@@ -616,7 +721,7 @@ export function Header() {
     syncMobileSearchDock();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
-    const mq = window.matchMedia('(min-width: 1024px)');
+    const mq = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
     const onMq = () => {
       syncSecondaryDock();
       syncMobileSearchDock();
@@ -858,14 +963,9 @@ export function Header() {
     return cats; // API already returns only root categories
   };
 
-  const selectedCurrencyInfo = CURRENCIES[selectedCurrency];
-
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(event.target as Node)) {
-        setShowMobileCurrency(false);
-      }
       if (mobilePrimaryLangRef.current && !mobilePrimaryLangRef.current.contains(event.target as Node)) {
         setShowMobilePrimaryLangMenu(false);
       }
@@ -1031,7 +1131,11 @@ export function Header() {
                   }`
                 : ''
             }`}
-            style={mobileStripPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
+            style={
+              mobileStripPeekActive && headerLayoutReady
+                ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE }
+                : undefined
+            }
           >
           <div className="relative flex items-center justify-between gap-3 py-2.5">
             <div className="relative z-20 shrink-0">
@@ -1071,41 +1175,79 @@ export function Header() {
                 type="button"
                 onClick={() => setShowMobilePrimaryLangMenu((open) => !open)}
                 className={mobilePrimaryLangButtonClassName}
-                aria-label={t('common.ariaLabels.changeLanguage')}
+                aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
                 aria-expanded={showMobilePrimaryLangMenu}
-                aria-haspopup="listbox"
+                aria-haspopup="dialog"
+                aria-controls="header-mobile-locale-menu"
               >
                 <GlobeLanguageIcon />
               </button>
               {showMobilePrimaryLangMenu ? (
                 <div
-                  className="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-2xl"
-                  role="listbox"
-                  aria-label={t('common.ariaLabels.changeLanguage')}
+                  id="header-mobile-locale-menu"
+                  className="absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),14rem)] overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-2xl"
+                  role="dialog"
+                  aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
                 >
-                  {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
-                    const active = getStoredLanguage() === code;
-                    const label = code === 'hy' ? 'ՀԱՅ' : code === 'ru' ? 'РУС' : 'EN';
-                    return (
-                      <button
-                        key={code}
-                        type="button"
-                        role="option"
-                        aria-selected={active}
-                        onClick={() => {
-                          setShowMobilePrimaryLangMenu(false);
-                          if (!active) setStoredLanguage(code);
-                        }}
-                        className={`w-full px-4 py-2.5 text-left text-sm font-semibold transition-colors duration-150 ${
-                          active
-                            ? 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900'
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
+                  <div
+                    className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400"
+                    id="header-mobile-locale-lang-heading"
+                  >
+                    {t('common.localeMenu.languageSection')}
+                  </div>
+                  <div role="group" aria-labelledby="header-mobile-locale-lang-heading">
+                    {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
+                      const active = getStoredLanguage() === code;
+                      const label = LANGUAGES[code].nativeName;
+                      return (
+                        <button
+                          key={code}
+                          type="button"
+                          onClick={() => {
+                            setShowMobilePrimaryLangMenu(false);
+                            if (!active) setStoredLanguage(code);
+                          }}
+                          className={`w-full px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
+                            active
+                              ? 'bg-gray-100 font-bold text-gray-900'
+                              : 'font-normal text-gray-800 hover:bg-gray-50'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="my-1 border-t border-gray-100" role="separator" />
+                  <div
+                    className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400"
+                    id="header-mobile-locale-currency-heading"
+                  >
+                    {t('common.localeMenu.currencySection')}
+                  </div>
+                  <div role="group" aria-labelledby="header-mobile-locale-currency-heading">
+                    {Object.values(CURRENCIES).map((currency) => {
+                      const active = selectedCurrency === currency.code;
+                      return (
+                        <button
+                          key={currency.code}
+                          type="button"
+                          onClick={() => {
+                            setShowMobilePrimaryLangMenu(false);
+                            if (!active) handleCurrencyChange(currency.code);
+                          }}
+                          className={`flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
+                            active
+                              ? 'bg-gray-100 font-bold text-gray-900'
+                              : 'font-normal text-gray-800 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span>{currency.code}</span>
+                          <span className={active ? 'text-gray-900' : 'text-gray-500'}>{currency.symbol}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : null}
             </div>
@@ -1113,7 +1255,7 @@ export function Header() {
           </div>
         </div>
 
-        {mobileDockedHeaderSpacerPx > 0 ? (
+        {headerLayoutReady && mobileDockedHeaderSpacerPx > 0 ? (
           <div
             aria-hidden
             className="shrink-0 motion-reduce:transition-none lg:hidden"
@@ -1127,11 +1269,13 @@ export function Header() {
         <div
           ref={mobileSearchWrapRef}
           className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
-            mobileSearchDocked ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none' : ''
+            headerLayoutReady && mobileSearchDocked
+              ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none'
+              : ''
           }`}
-          style={mobileDockedSearchTopStyle}
+          style={headerLayoutReady ? mobileDockedSearchTopStyle : undefined}
         >
-          <div className={mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
+          <div className={headerLayoutReady && mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
             <form
               ref={mobileHomeSearchFormRef}
               onSubmit={handleSearch}
@@ -1212,7 +1356,7 @@ export function Header() {
         >
         <div
           ref={desktopPrimaryRowRef}
-          className={`hidden items-center justify-between gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
+          className={`hidden min-w-0 w-full items-center justify-between gap-2 lg:gap-2 xl:gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
             desktopPrimaryPeekActive
               ? `fixed left-0 right-0 top-0 z-[55] border-b border-gray-200 bg-white will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
                   desktopPrimaryPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
@@ -1221,11 +1365,11 @@ export function Header() {
           }`}
           style={desktopPrimaryPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
         >
-          <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-10 2xl:gap-[76px]">
+          <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-3 xl:gap-6 2xl:gap-[76px]">
             <Link
               href="/"
               aria-label={t('common.navigation.home')}
-              className="flex max-w-[min(280px,32vw)] shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
+              className="flex max-w-[min(280px,28vw)] shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
             >
               <SiteBrandLogo
                 decorative
@@ -1235,7 +1379,7 @@ export function Header() {
               />
             </Link>
             <nav
-              className="flex min-w-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[60px]"
+              className="ml-[calc(1.5rem-10px)] flex min-w-0 items-center gap-2 lg:ml-[calc(1.75rem-10px)] lg:gap-2 xl:ml-[calc(2.75rem-24.5px)] xl:gap-5 2xl:gap-[60px]"
               aria-label="Primary"
             >
               <Link
@@ -1353,11 +1497,11 @@ export function Header() {
           onClick={() => setMobileMenuOpen(false)}
         >
           <div
-            className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
+            className="flex h-full min-h-screen w-[min(83vw,24rem)] min-w-[17rem] max-w-full flex-col bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
@@ -1366,44 +1510,9 @@ export function Header() {
                 >
                   <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
                 </Link>
-                <div className="relative shrink-0" ref={mobileCurrencyRef}>
-                  <button
-                    type="button"
-                    onClick={() => setShowMobileCurrency(!showMobileCurrency)}
-                    className="flex h-9 cursor-pointer items-center justify-center gap-1 rounded-full border border-gray-200 bg-white px-2 text-xs font-medium text-gray-800 transition-colors"
-                  >
-                    <span className="text-sm font-semibold leading-none">{selectedCurrencyInfo.symbol}</span>
-                    <span className="text-xs font-medium leading-none">{selectedCurrency}</span>
-                    <ChevronDownIcon />
-                  </button>
-                  {showMobileCurrency ? (
-                    <div className="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-2xl">
-                      {Object.values(CURRENCIES).map((currency) => (
-                        <button
-                          key={currency.code}
-                          type="button"
-                          onClick={() => {
-                            handleCurrencyChange(currency.code);
-                            setShowMobileCurrency(false);
-                          }}
-                          className={`w-full px-4 py-2.5 text-left text-sm transition-all duration-150 ${
-                            selectedCurrency === currency.code
-                              ? 'bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-gray-900'
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span>{currency.code}</span>
-                            <span className="text-gray-500">{currency.symbol}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-base font-semibold text-gray-900">{t('common.navigation.categories')}</p>
+                <p className="text-base font-semibold text-gray-900">{t('common.navigation.menuTitle')}</p>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
@@ -1417,22 +1526,25 @@ export function Header() {
               </div>
             </div>
 
-            <div className="border-b border-gray-100 px-4 py-2">
-              <HeaderPhoneLangCluster phoneNumberVisibility="always" showLanguageSwitcher={false} />
-            </div>
-
             <div className="flex-1 overflow-hidden min-h-0">
-              <nav className="flex h-full flex-col border-y border-gray-200 text-sm font-semibold uppercase tracking-wide text-gray-800 bg-white">
-                <div className="flex-1 overflow-y-auto divide-y divide-gray-200">
+              <nav className="flex h-full flex-col bg-white">
+                <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
+                  {isLoggedIn && user ? (
+                    <MobileDrawerProfileCard
+                      user={user}
+                      profileFallbackLabel={t('common.navigation.profile')}
+                      onNavigate={() => setMobileMenuOpen(false)}
+                    />
+                  ) : null}
                   {primaryNavLinks.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                      className={MOBILE_DRAWER_NAV_BUTTON_CLASS}
                     >
                       {t(link.translationKey)}
-                      <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
@@ -1441,39 +1553,37 @@ export function Header() {
                   <Link
                     href="/compare"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700`}
                   >
                     <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
                       <CompareIcon size={18} />
                       {t('common.navigation.compare')}
                     </span>
-                    {compareCount > 0 && (
-                      <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
-                        {compareCount > 99 ? '99+' : compareCount}
-                      </span>
-                    )}
+                    <span className="flex shrink-0 items-center gap-2">
+                      {compareCount > 0 ? (
+                        <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
+                          {compareCount > 99 ? '99+' : compareCount}
+                        </span>
+                      ) : null}
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
                   </Link>
 
                   {isLoggedIn ? (
                     <>
-                      <Link
-                        href="/profile"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 normal-case text-gray-800"
-                      >
-                        <span className="flex items-center gap-2">
-                          <ProfileIconFilled />
-                          {t('common.navigation.profile')}
-                        </span>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </Link>
                       {isAdmin && (
                         <Link
                           href="/supersudo"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center justify-between px-4 py-3 hover:bg-blue-50 normal-case text-blue-700"
+                          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} border-blue-200 normal-case text-blue-700 hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100/80`}
                         >
                           <span>{t('common.navigation.adminPanel')}</span>
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1481,12 +1591,14 @@ export function Header() {
                           </svg>
                         </Link>
                       )}
+                      <MobileDrawerSupportPhoneButton />
                       <button
+                        type="button"
                         onClick={() => {
                           setMobileMenuOpen(false);
                           logout();
                         }}
-                        className="flex w-full items-center justify-between px-4 py-3 text-left text-red-600 hover:bg-red-50 normal-case font-semibold"
+                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} w-full border-red-200 text-left normal-case font-semibold text-red-600 hover:border-red-300 hover:bg-red-50 active:bg-red-100/80`}
                       >
                         {t('common.navigation.logout')}
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1496,10 +1608,11 @@ export function Header() {
                     </>
                   ) : (
                     <>
+                      <MobileDrawerSupportPhoneButton />
                       <Link
                         href="/login"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 normal-case text-gray-800"
+                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
                       >
                         <span>{t('common.navigation.login')}</span>
                         <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1509,7 +1622,7 @@ export function Header() {
                       <Link
                         href="/register"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-900 hover:text-white normal-case text-gray-900 font-semibold"
+                        className="flex items-center justify-between rounded-2xl border border-gray-900 bg-gray-900 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-gray-800 hover:bg-gray-800 active:opacity-95"
                       >
                         <span>{t('common.navigation.register')}</span>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1520,7 +1633,7 @@ export function Header() {
                   )}
                 </div>
 
-                <div className="border-t border-gray-200 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
+                <div className="border-t border-gray-100 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
                   {t('common.footer.copyright').replace('{year}', String(currentYear))}
                 </div>
               </nav>

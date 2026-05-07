@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button, Card } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
+import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor } from './utils';
 import type { OrderListItem } from './types';
 
@@ -52,7 +53,9 @@ export function ProfileOrders({
         <div className="text-center py-12">
           <p className="text-gray-600 mb-4">{t('profile.orders.noOrders')}</p>
           <Link href="/products">
-            <Button variant="brand">{t('profile.dashboard.startShopping')}</Button>
+            <Button variant="brand" className={PROFILE_PILL_BUTTON_CLASS}>
+              {t('profile.dashboard.startShopping')}
+            </Button>
           </Link>
         </div>
       </Card>
@@ -126,6 +129,7 @@ export function ProfileOrders({
               <Button
                 variant="outline"
                 size="sm"
+                className={PROFILE_PILL_BUTTON_CLASS}
                 onClick={() => setOrdersPage(prev => Math.max(1, prev - 1))}
                 disabled={ordersPage === 1 || ordersLoading}
               >
@@ -134,6 +138,7 @@ export function ProfileOrders({
               <Button
                 variant="outline"
                 size="sm"
+                className={PROFILE_PILL_BUTTON_CLASS}
                 onClick={() => setOrdersPage(prev => Math.min(ordersMeta.totalPages, prev + 1))}
                 disabled={ordersPage === ordersMeta.totalPages || ordersLoading}
               >

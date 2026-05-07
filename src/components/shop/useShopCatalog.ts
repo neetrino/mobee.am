@@ -21,6 +21,7 @@ export interface ShopCatalogProduct {
   defaultVariantId?: string | null;
   colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
   originalPrice?: number | null;
+  discountPercent?: number | null;
   labels?: Array<{
     id: string;
     type: 'text' | 'percentage';

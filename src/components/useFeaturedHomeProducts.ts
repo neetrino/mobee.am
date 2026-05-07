@@ -58,14 +58,23 @@ async function fetchFeaturedHomePage(
   language: LanguageCode,
   filter: string | null,
 ): Promise<FeaturedHomeProduct[]> {
-  const params: Record<string, string> = {
-    page: '1',
-    limit: PRODUCTS_PER_PAGE.toString(),
-    lang: language,
+  const fetchByLanguage = async (requestedLanguage: LanguageCode): Promise<FeaturedHomeProduct[]> => {
+    const params: Record<string, string> = {
+      page: '1',
+      limit: PRODUCTS_PER_PAGE.toString(),
+      lang: requestedLanguage,
+    };
+    if (filter) params.filter = filter;
+    const response = await apiClient.get<ProductsResponse>('/api/v1/products', { params });
+    return (response.data || []).slice(0, PRODUCTS_PER_PAGE);
   };
-  if (filter) params.filter = filter;
-  const response = await apiClient.get<ProductsResponse>('/api/v1/products', { params });
-  return (response.data || []).slice(0, PRODUCTS_PER_PAGE);
+
+  const localizedProducts = await fetchByLanguage(language);
+  if (localizedProducts.length > 0 || language === 'en') {
+    return localizedProducts;
+  }
+
+  return fetchByLanguage('en');
 }
 
 export function useFeaturedHomeProducts() {

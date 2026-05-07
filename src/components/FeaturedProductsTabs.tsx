@@ -15,6 +15,7 @@ import {
   useSpecialOffersHomeProducts,
 } from './useSpecialOffersHomeProducts';
 import { useHomeProductSectionsCarousels } from './useHomeProductSectionsCarousels';
+import { useHomeBestChoiceMobileCardsPerView } from './useHomeBestChoiceMobileCardsPerView';
 import type { LanguageCode } from '../lib/language';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSync';
@@ -26,6 +27,7 @@ type HomeFeaturedCarouselSectionProps = {
   error: string | null;
   products: FeaturedHomeProduct[];
   productsPerPage: number;
+  mobileCardsPerView: number;
   onRetry: () => void;
   onFeaturedCarouselViewChange: (state: MobileCarouselViewState) => void;
 };
@@ -37,6 +39,7 @@ function HomeFeaturedCarouselSection({
   error,
   products,
   productsPerPage,
+  mobileCardsPerView,
   onRetry,
   onFeaturedCarouselViewChange,
 }: HomeFeaturedCarouselSectionProps) {
@@ -48,15 +51,18 @@ function HomeFeaturedCarouselSection({
         syncedCarouselPageIndex={featuredCarousel.pageIndex}
         syncedCarouselPageCount={featuredCarousel.pageCount}
       />
-      <FeaturedBestChoiceGrid
-        language={language}
-        loading={loading}
-        error={error}
-        products={products}
-        productsPerPage={productsPerPage}
-        onRetry={onRetry}
-        onMobileCarouselViewChange={onFeaturedCarouselViewChange}
-      />
+      <div className="mt-5 lg:mt-0">
+        <FeaturedBestChoiceGrid
+          language={language}
+          loading={loading}
+          error={error}
+          products={products}
+          productsPerPage={productsPerPage}
+          mobileCardsPerView={mobileCardsPerView}
+          onRetry={onRetry}
+          onMobileCarouselViewChange={onFeaturedCarouselViewChange}
+        />
+      </div>
     </>
   );
 }
@@ -68,6 +74,7 @@ type HomeSpecialOffersCarouselSectionProps = {
   specialOffersError: string | null;
   specialOffersProducts: FeaturedHomeProduct[];
   specialOffersProductsPerPage: number;
+  mobileCardsPerView: number;
   onRetrySpecialOffers: () => void;
   onSpecialOffersCarouselViewChange: (state: MobileCarouselViewState) => void;
 };
@@ -79,6 +86,7 @@ function HomeSpecialOffersCarouselSection({
   specialOffersError,
   specialOffersProducts,
   specialOffersProductsPerPage,
+  mobileCardsPerView,
   onRetrySpecialOffers,
   onSpecialOffersCarouselViewChange,
 }: HomeSpecialOffersCarouselSectionProps) {
@@ -87,13 +95,14 @@ function HomeSpecialOffersCarouselSection({
       syncedCarouselPageIndex={specialOffersCarousel.pageIndex}
       syncedCarouselPageCount={specialOffersCarousel.pageCount}
     >
-      <div className="mt-8 lg:mt-[7.5rem]">
+      <div className="mt-4 lg:mt-[7.5rem]">
         <SpecialOffersProductGrid
           language={specialOffersLanguage}
           loading={specialOffersLoading}
           error={specialOffersError}
           products={specialOffersProducts}
           productsPerPage={specialOffersProductsPerPage}
+          mobileCardsPerView={mobileCardsPerView}
           onRetry={onRetrySpecialOffers}
           onMobileCarouselViewChange={onSpecialOffersCarouselViewChange}
         />
@@ -119,6 +128,7 @@ type HomeProductSectionsBodyProps = {
   specialOffersCarousel: MobileCarouselViewState;
   onFeaturedCarouselViewChange: (state: MobileCarouselViewState) => void;
   onSpecialOffersCarouselViewChange: (state: MobileCarouselViewState) => void;
+  mobileCardsPerView: number;
 };
 
 function HomeProductSectionsBody(props: HomeProductSectionsBodyProps) {
@@ -135,6 +145,7 @@ function HomeProductSectionsBody(props: HomeProductSectionsBodyProps) {
         error={rest.error}
         products={rest.products}
         productsPerPage={rest.productsPerPage}
+        mobileCardsPerView={rest.mobileCardsPerView}
         onRetry={rest.onRetry}
         onFeaturedCarouselViewChange={rest.onFeaturedCarouselViewChange}
       />
@@ -145,6 +156,7 @@ function HomeProductSectionsBody(props: HomeProductSectionsBodyProps) {
         specialOffersError={rest.specialOffersError}
         specialOffersProducts={rest.specialOffersProducts}
         specialOffersProductsPerPage={rest.specialOffersProductsPerPage}
+        mobileCardsPerView={rest.mobileCardsPerView}
         onRetrySpecialOffers={rest.onRetrySpecialOffers}
         onSpecialOffersCarouselViewChange={rest.onSpecialOffersCarouselViewChange}
       />
@@ -176,15 +188,21 @@ export function HomeProductSections() {
     fetchSpecialOffersProducts(SPECIAL_OFFERS_HOME_FILTER_DEFAULT);
   }, [fetchSpecialOffersProducts]);
 
+  const mobileCardsPerView = useHomeBestChoiceMobileCardsPerView();
+
   const {
     featuredCarousel,
     specialOffersCarousel,
     onFeaturedCarouselViewChange,
     onSpecialOffersCarouselViewChange,
-  } = useHomeProductSectionsCarousels(productsPerPage, specialOffersProductsPerPage);
+  } = useHomeProductSectionsCarousels(
+    productsPerPage,
+    specialOffersProductsPerPage,
+    mobileCardsPerView,
+  );
 
   return (
-    <section className="bg-white pb-16 pt-2 lg:bg-gray-50 lg:pt-6" aria-labelledby="home-product-sections">
+    <section className="bg-white pb-0 pt-2 lg:bg-gray-50 lg:pb-16 lg:pt-6" aria-labelledby="home-product-sections">
       <HomeProductSectionsBody
         language={language}
         products={products}
@@ -202,6 +220,7 @@ export function HomeProductSections() {
         specialOffersCarousel={specialOffersCarousel}
         onFeaturedCarouselViewChange={onFeaturedCarouselViewChange}
         onSpecialOffersCarouselViewChange={onSpecialOffersCarouselViewChange}
+        mobileCardsPerView={mobileCardsPerView}
       />
 
       <div className="hidden lg:block">

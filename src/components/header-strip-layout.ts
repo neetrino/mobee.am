@@ -11,9 +11,20 @@ export const HEADER_STRIP_MIN_HEIGHT_LG = 'lg:min-h-[62px]';
 
 export const HEADER_STRIP_INNER_ROW = `items-center ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG}`;
 
-/** Max width + horizontal padding; matches hero/promo ({@link HeroCarousel}) so nav strips align with content. */
+/**
+ * Max width + horizontal padding; matches hero/promo ({@link HeroCarousel}) so nav strips align with content.
+ * `lg` uses modest side padding so desktop chrome (nav + search + icons) fits on iPad Pro width without overflow;
+ * `xl` restores generous gutters on wide screens.
+ */
 export const SITE_CONTENT_GUTTERS_CLASS =
-  'mx-auto w-full max-w-[1440px] px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20';
+  'mx-auto w-full min-w-0 max-w-[1440px] px-4 sm:px-6 md:px-10 lg:px-6 xl:px-16 2xl:px-20';
+
+/**
+ * Mobile hero strip (`lg:hidden`): slightly tighter padding than {@link SITE_CONTENT_GUTTERS_CLASS}
+ * so the promo card reads a bit wider.
+ */
+export const HERO_MOBILE_CONTENT_GUTTERS_CLASS =
+  'mx-auto w-full max-w-[1440px] px-3 sm:px-5 md:px-8';
 
 /**
  * Figma mobee-new node 180:1419 — mobile primary strip center logo frame (Overlay+Shadow group size).
