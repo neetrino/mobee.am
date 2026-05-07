@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { LAYOUT_DESKTOP_MIN_WIDTH_PX } from '../lib/layout-breakpoints.constants';
 import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
 
 /**
@@ -100,7 +101,7 @@ export function TeamCarousel() {
       const width = window.innerWidth;
       if (width < 640) {
         setVisibleCards(1); // mobile
-      } else if (width < 1024) {
+      } else if (width < LAYOUT_DESKTOP_MIN_WIDTH_PX) {
         setVisibleCards(2); // tablet
       } else if (width < 1280) {
         setVisibleCards(3); // desktop
@@ -182,7 +183,7 @@ export function TeamCarousel() {
                     alt={member.name}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                    sizes={`(max-width: 640px) 100vw, (max-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) 50vw, (max-width: 1280px) 33vw, 25vw`}
                     unoptimized
                   />
                 </div>

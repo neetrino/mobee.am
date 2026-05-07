@@ -26,6 +26,18 @@ const BENEFITS: readonly {
   { id: 'original', src: '/images/home/why-choose-us/original.png', width: 37, height: 48 },
 ];
 
+/** Benefit column horizontal nudge; bottom row uses this at all widths. */
+const WHY_CHOOSE_US_BENEFIT_SHIFT_X_CLASS = 'translate-x-[20%]';
+/** Top row (warranty, delivery) — align with bottom row on lg–xl two-column grid (e.g. iPad Pro). Full string for Tailwind JIT. */
+const WHY_CHOOSE_US_TOP_ROW_TABLET_SHIFT_X_CLASS = 'lg:max-xl:translate-x-[20%]';
+
+const BENEFIT_ITEM_LAYOUT_CLASS: Record<BenefitId, string> = {
+  warranty: WHY_CHOOSE_US_TOP_ROW_TABLET_SHIFT_X_CLASS,
+  delivery: WHY_CHOOSE_US_TOP_ROW_TABLET_SHIFT_X_CLASS,
+  installment: WHY_CHOOSE_US_BENEFIT_SHIFT_X_CLASS,
+  original: WHY_CHOOSE_US_BENEFIT_SHIFT_X_CLASS,
+};
+
 function WarrantyIcon() {
   return (
     <svg
@@ -153,9 +165,7 @@ function WhyChooseUsBenefitsList({ t }: { t: (path: string) => string }) {
       {BENEFITS.map((item) => (
         <li
           key={item.id}
-          className={`flex max-w-[289px] flex-col items-start ${
-            item.id === 'installment' || item.id === 'original' ? 'translate-x-[20%]' : ''
-          }`}
+          className={`flex max-w-[289px] flex-col items-start ${BENEFIT_ITEM_LAYOUT_CLASS[item.id]}`}
         >
           <div className="mb-6 shrink-0">
             {item.id === 'warranty' ? (

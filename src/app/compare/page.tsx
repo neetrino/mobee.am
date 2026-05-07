@@ -15,10 +15,16 @@ import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import {
-  COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS,
-  COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS,
-  COMPARE_EMPTY_STATE_LOWER_PANEL_FLEX_CLASS,
-  COMPARE_EMPTY_STATE_LOWER_PANEL_MIN_HEIGHT_CLASS,
+  COMPARE_EMPTY_STATE_DESCRIPTION_CLASS,
+  COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS,
+  COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS,
+  COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX,
+  COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_WIDTH_PX,
+  COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR,
+  COMPARE_EMPTY_STATE_IMAGE_SRC,
+  COMPARE_EMPTY_STATE_TEXT_BLOCK_CLASS,
+  COMPARE_EMPTY_STATE_TITLE_CLASS,
+  COMPARE_EMPTY_STATE_WRAPPER_CLASS,
 } from './compare-layout.constants';
 
 interface Product {
@@ -466,24 +472,30 @@ export default function ComparePage() {
           </div>
         </div>
       ) : (
-        <div
-          className={`${COMPARE_EMPTY_STATE_LOWER_PANEL_FLEX_CLASS} text-center ${COMPARE_EMPTY_STATE_LOWER_PANEL_MIN_HEIGHT_CLASS} ${COMPARE_EMPTY_STATE_FOOTER_GAP_CLASS}`}
-        >
-          <div className="max-w-md mx-auto w-full">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              {t('common.compare.empty')}
-            </h2>
-            <p className="text-sm text-gray-600">
-              {t('common.compare.emptyDescription')}
-            </p>
-            <Link
-              href="/products"
-              className={`inline-block ${COMPARE_EMPTY_STATE_BROWSE_BUTTON_TOP_OFFSET_CLASS}`}
-            >
+        <div className={COMPARE_EMPTY_STATE_WRAPPER_CLASS}>
+          <Image
+            src={COMPARE_EMPTY_STATE_IMAGE_SRC}
+            alt={t('common.compare.empty')}
+            width={COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_WIDTH_PX}
+            height={COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX}
+            sizes={COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR}
+            className={COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS}
+            unoptimized
+          />
+          <div className={COMPARE_EMPTY_STATE_TEXT_BLOCK_CLASS}>
+            <div className={COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS}>
+              <h2 className={COMPARE_EMPTY_STATE_TITLE_CLASS}>
+                {t('common.compare.empty')}
+              </h2>
+              <p className={COMPARE_EMPTY_STATE_DESCRIPTION_CLASS}>
+                {t('common.compare.emptyDescription')}
+              </p>
+            </div>
+            <Link href="/products" className="w-full">
               <Button
                 variant="primary"
-                size="md"
-                className="bg-[#2DB2FF] hover:bg-[#1CA8F9]"
+                size="lg"
+                className="h-14 w-full !rounded-full !bg-admin-500 px-2.5 text-sm font-semibold leading-normal !text-white hover:!bg-admin-500 active:!bg-admin-500 focus:!ring-admin-500 focus:!ring-offset-2"
               >
                 {t('common.compare.browseProducts')}
               </Button>

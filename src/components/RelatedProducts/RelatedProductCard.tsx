@@ -9,6 +9,7 @@ import type { CurrencyCode } from '../../lib/currency';
 import type { LanguageCode } from '../../lib/language';
 import { t } from '../../lib/i18n';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
+import { LAYOUT_DESKTOP_MIN_WIDTH_PX } from '../../lib/layout-breakpoints.constants';
 
 interface RelatedProduct {
   id: string;
@@ -105,6 +106,53 @@ export function RelatedProductCard({
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gray-200">
                 <span className="text-sm text-gray-400">{t(language, 'common.messages.noImage')}</span>
+          <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+            {/* Product Image */}
+            <div
+              className="relative aspect-square bg-white border border-gray-100 overflow-hidden flex-shrink-0"
+              data-cart-fly-source
+            >
+              {hasImage ? (
+                <Image
+                  src={imageSrc}
+                  alt={product.title}
+                  fill
+                  className="object-contain group-hover:scale-105 transition-transform duration-300"
+                  sizes={`(max-width: 640px) 100vw, (max-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) 50vw, 25vw`}
+                  unoptimized
+                  onError={() => onImageError(product.id)}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-400 text-sm">{t(language, 'common.messages.noImage')}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Product Info */}
+            <div className="p-4 flex flex-col flex-1">
+              {/* Title */}
+              <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-gray-600 transition-colors">
+                {product.title}
+              </h3>
+
+              {/* Category */}
+              <p className="text-xs text-gray-500 mb-3">
+                {categoryName}
+              </p>
+
+              {/* Price */}
+              <div className="mt-auto flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span className="whitespace-nowrap text-[1.06875rem] font-bold text-gray-900">
+                    {formatPrice(product.price, currency)}
+                  </span>
+                  {product.discountPercent && product.discountPercent > 0 && (
+                    <span className="text-[0.7125rem] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                      -{product.discountPercent}%
+                    </span>
+                  )}
+                </div>
               </div>
             )}
           </div>

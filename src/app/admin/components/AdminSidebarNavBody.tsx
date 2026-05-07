@@ -36,7 +36,6 @@ interface ProductsNavRowProps {
   isActive: boolean;
   isExpanded: boolean;
   onToggleExpand: () => void;
-  onGoToProducts: () => void;
   expandAria: string;
   collapseAria: string;
 }
@@ -46,10 +45,11 @@ function ProductsNavRow({
   isActive,
   isExpanded,
   onToggleExpand,
-  onGoToProducts,
   expandAria,
   collapseAria,
 }: ProductsNavRowProps) {
+  const toggleAriaLabel = isExpanded ? collapseAria : expandAria;
+
   return (
     <div className="flex w-full items-center gap-2">
       <button
@@ -70,19 +70,29 @@ function ProductsNavRow({
           isActive
             ? 'text-admin hover:text-admin-700'
             : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+    <button
+      type="button"
+      onClick={onToggleExpand}
+      aria-expanded={isExpanded}
+      aria-label={`${tab.label}. ${toggleAriaLabel}`}
+      className={`flex w-full min-w-0 items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium transition-all ${
+        isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+      }`}
+    >
+      <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
+      <span className="min-w-0 flex-1 truncate">{tab.label}</span>
+      <svg
+        className={`h-4 w-4 shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''} ${
+          isActive ? 'text-white' : 'text-gray-500'
         }`}
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden
       >
-        <svg
-          className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-    </div>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
   );
 }
 
@@ -137,9 +147,6 @@ function renderPrimaryNavItem(tab: AdminMenuItem, ctx: PrimaryNavContext) {
         isExpanded={isProductsExpanded}
         onToggleExpand={() => {
           setIsProductsExpanded((prev) => !prev);
-        }}
-        onGoToProducts={() => {
-          goTo(tab.path);
         }}
         expandAria={t('admin.sidebar.expandProductsMenu')}
         collapseAria={t('admin.sidebar.collapseProductsMenu')}

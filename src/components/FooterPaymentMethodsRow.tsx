@@ -7,7 +7,8 @@ const FOOTER_PAYMENT_IMAGE_BASE = '/images/footer/payments';
 
 /** Figma mobee-new node 211:2265 — payment methods row in first footer column. */
 const PAYMENT_CHIP_HEIGHT_PX = 30;
-const PAYMENT_CHIPS_GAP_CLASS = 'gap-[11px]';
+/** Tighter gap below `xl` so Idram / FastShift / Arca / Visa stay one row on iPad Pro; Figma spacing from `xl`. No overflow scroll — avoids a horizontal scrollbar “stripe”. */
+const PAYMENT_CHIPS_ROW_LAYOUT_CLASS = 'flex flex-nowrap items-center gap-1 xl:gap-[11px]';
 
 type PaymentTile = {
   readonly file: string;
@@ -45,7 +46,7 @@ export function FooterPaymentMethodsRow() {
   const { t } = useTranslation();
 
   return (
-    <div className={`flex flex-wrap items-center ${PAYMENT_CHIPS_GAP_CLASS}`} aria-label={t('common.footer.legalBar.paymentMethodsLabel')}>
+    <div className={PAYMENT_CHIPS_ROW_LAYOUT_CLASS} aria-label={t('common.footer.legalBar.paymentMethodsLabel')}>
       {PAYMENT_TILES.map((tile) => (
         <PaymentLogoChip key={tile.file} tile={tile} />
       ))}

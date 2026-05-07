@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Montserrat, Noto_Sans_Armenian } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
-import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { HERO_MOBILE_CONTENT_GUTTERS_CLASS, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -51,8 +51,8 @@ function MobileHeroIphoneBanner() {
     <div
       className={`pb-2 pt-[calc(theme(spacing.4)*1.05+4px)] lg:hidden ${montserrat.className}`}
     >
-      <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        <div className="relative isolate min-h-[168px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-2 pt-4">
+      <div className={HERO_MOBILE_CONTENT_GUTTERS_CLASS}>
+        <div className="relative isolate min-h-[208px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-3 pt-5 sm:min-h-[220px]">
           <div className="relative z-10 flex max-w-[55%] flex-col items-start gap-2">
             <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-normal leading-normal text-[#14ae5c]">
               {t('home.hero_free_shipping')}
@@ -70,7 +70,7 @@ function MobileHeroIphoneBanner() {
               )}
             </p>
           </div>
-          <div className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[min(52%,140px)] w-[min(58%,220px)] min-h-[118px] min-w-[160px] max-w-[220px]">
+          <div className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[min(56%,168px)] w-[min(58%,220px)] min-h-[140px] min-w-[160px] max-w-[220px]">
             <Image
               src={IMG_IPHONE}
               alt=""
@@ -96,7 +96,7 @@ export function HeroCarousel() {
 
       <div className={`hidden lg:block ${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-[calc(theme(spacing.8)*4)]`}>
         <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:gap-5">
-          <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px]">
+          <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px] lg:min-h-[292px] xl:min-h-[346px]">
             <div className="absolute inset-0 z-0 rounded-[40px] bg-[#e9ecf0]" aria-hidden />
             <div className="absolute right-4 top-4 z-30 sm:right-8 sm:top-8 md:right-10 md:top-10">
               <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[12px] font-normal leading-normal text-[#14ae5c]">
@@ -134,13 +134,15 @@ export function HeroCarousel() {
               </div>
             </div>
 
-            <div className="pointer-events-none relative z-10 mx-auto mt-2 h-[214px] w-full max-w-[287px] -translate-x-1/2 -translate-y-[40%] sm:absolute sm:bottom-0 sm:right-0 sm:mx-0 sm:mt-0 sm:h-[369px] sm:w-[280px] sm:max-w-none sm:-translate-x-[47%] sm:-translate-y-[20.5px]">
+            <div
+              className="pointer-events-none relative z-10 mx-auto mt-2 h-[214px] w-full max-w-[287px] -translate-x-1/2 -translate-y-[40%] sm:absolute sm:bottom-0 sm:right-0 sm:mx-0 sm:mt-0 sm:h-[369px] sm:w-[280px] sm:max-w-none sm:-translate-x-[47%] sm:-translate-y-[20.5px] lg:h-[248px] lg:w-[188px] lg:-translate-x-[42%] lg:-translate-y-[14px] xl:h-[369px] xl:w-[280px] xl:-translate-x-[47%] xl:-translate-y-[20.5px]"
+            >
               <Image
                 src={IMG_AIRPODS}
                 alt=""
                 fill
                 className="object-contain object-center sm:object-right-bottom"
-                sizes="(max-width: 640px) 287px, 280px"
+                sizes="(max-width: 1279px) 188px, 280px"
                 priority
               />
             </div>
@@ -182,13 +184,13 @@ export function HeroCarousel() {
                   {t('home.hero_iphone_title')}
                 </p>
               </div>
-              <div className="absolute bottom-0 right-0 h-[132px] w-[215px] overflow-hidden rounded-bl-[14px] rounded-br-[38px] rounded-tl-[14px] rounded-tr-[14px] sm:h-[131px]">
+              <div className="absolute bottom-0 right-0 h-[132px] w-[215px] overflow-hidden rounded-bl-[14px] rounded-br-[38px] rounded-tl-[14px] rounded-tr-[14px] sm:h-[131px] lg:h-[118px] lg:w-[188px] xl:h-[132px] xl:w-[215px]">
                 <Image
                   src={IMG_IPHONE}
                   alt=""
                   fill
                   className="object-cover object-right-bottom"
-                  sizes="215px"
+                  sizes="(max-width: 1279px) 188px, 215px"
                 />
               </div>
             </div>

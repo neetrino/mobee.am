@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button, Card } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
+import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor } from './utils';
 import type { DashboardData, ProfileTab } from './types';
 
@@ -39,11 +40,11 @@ export function ProfileDashboard({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:w-full lg:min-w-0">
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
+      <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+        <Card className="flex h-full flex-col p-6">
+          <div className="flex flex-1 items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">{t('profile.dashboard.totalOrders')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
@@ -58,8 +59,8 @@ export function ProfileDashboard({
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between gap-4">
+        <Card className="flex h-full flex-col p-6">
+          <div className="flex flex-1 items-center justify-between gap-4">
             <div className="min-w-0 flex-1 overflow-hidden">
               <p className="text-sm font-medium text-gray-600">{t('profile.dashboard.totalSpent')}</p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1 break-words overflow-wrap-anywhere">
@@ -74,8 +75,8 @@ export function ProfileDashboard({
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
+        <Card className="flex h-full flex-col p-6">
+          <div className="flex flex-1 items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">{t('profile.dashboard.pendingOrders')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
@@ -90,8 +91,8 @@ export function ProfileDashboard({
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
+        <Card className="flex h-full flex-col p-6">
+          <div className="flex flex-1 items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">{t('profile.dashboard.savedAddresses')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
@@ -115,6 +116,7 @@ export function ProfileDashboard({
           <Button
             variant="ghost"
             size="sm"
+            className={PROFILE_PILL_BUTTON_CLASS}
             onClick={() => onTabChange('orders')}
           >
             {t('profile.dashboard.viewAll')}
@@ -124,7 +126,9 @@ export function ProfileDashboard({
           <div className="text-center py-12">
             <p className="text-gray-600 mb-4">{t('profile.dashboard.noOrders')}</p>
             <Link href="/products">
-              <Button variant="brand">{t('profile.dashboard.startShopping')}</Button>
+              <Button variant="brand" className={PROFILE_PILL_BUTTON_CLASS}>
+                {t('profile.dashboard.startShopping')}
+              </Button>
             </Link>
           </div>
         ) : (

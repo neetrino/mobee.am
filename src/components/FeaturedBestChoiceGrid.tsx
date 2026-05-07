@@ -15,6 +15,7 @@ type FeaturedBestChoiceGridProps = {
   error: string | null;
   products: FeaturedHomeProduct[];
   productsPerPage: number;
+  mobileCardsPerView: number;
   onRetry: () => void;
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 };
@@ -25,6 +26,7 @@ export function FeaturedBestChoiceGrid({
   error,
   products,
   productsPerPage,
+  mobileCardsPerView,
   onRetry,
   onMobileCarouselViewChange,
 }: FeaturedBestChoiceGridProps) {
@@ -32,6 +34,7 @@ export function FeaturedBestChoiceGrid({
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
+        mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
@@ -56,6 +59,7 @@ export function FeaturedBestChoiceGrid({
       <HomeBestChoiceStyleProductGrid
         products={products}
         productsPerPage={productsPerPage}
+        mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />

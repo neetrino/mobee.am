@@ -159,7 +159,12 @@ function ProfileAccountMenu({
       >
         <UserOutlineIcon className="shrink-0" />
         <span className="whitespace-nowrap text-[13px] font-semibold leading-normal">{profileLabel}</span>
-        <span className="flex h-4 w-4 shrink-0 items-center justify-center text-gray-500" aria-hidden>
+        <span
+          className={`flex h-4 w-4 shrink-0 items-center justify-center text-gray-500 transition-transform duration-200 ease-out motion-reduce:transition-none ${
+            open ? 'rotate-180' : 'rotate-0'
+          }`}
+          aria-hidden
+        >
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M3 4.5L6 7.5L9 4.5"
@@ -317,13 +322,13 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
       style={positionStyle}
     >
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        <div className="flex items-center justify-between gap-3 py-2 lg:min-h-[52px]">
-          <div className="flex min-w-0 flex-1 items-center gap-4 xl:gap-6">
+        <div className="flex items-center justify-between gap-2 py-2 lg:min-h-[52px] xl:gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3 xl:gap-6">
             <div className="relative shrink-0" ref={categoriesWrapRef}>
               <button
                 type="button"
                 onClick={onCategoriesButtonClick}
-                className="flex h-9 w-full min-w-[156px] max-w-[210px] items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-4 pr-3 text-left text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/90 active:opacity-90"
+                className="flex h-9 w-full min-w-[132px] max-w-[180px] items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-3 pr-2.5 text-left text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/90 active:opacity-90 xl:min-w-[156px] xl:max-w-[210px] xl:pl-4 xl:pr-3"
                 aria-expanded={isCategoriesMenuOpen}
                 aria-haspopup="true"
               >
@@ -331,8 +336,13 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   <CategoriesMenuLinesIcon className="shrink-0 text-white" />
                   <span className="truncate text-[13px] font-bold leading-7">{categoriesLabel}</span>
                 </span>
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center text-white" aria-hidden>
-                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <span
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center text-white transition-transform duration-200 ease-out motion-reduce:transition-none ${
+                    isCategoriesMenuOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                  aria-hidden
+                >
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M3 4.5L6 7.5L9 4.5"
                       stroke="currentColor"
@@ -346,7 +356,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               {categoriesMenu}
             </div>
 
-            <div className="relative min-w-0 max-w-[299px] flex-1 xl:max-w-[374px]">
+            <div className="relative min-w-0 max-w-[203px] flex-1 lg:max-w-[273px] xl:max-w-[312px] 2xl:max-w-[387px]">
               <form onSubmit={onSearchSubmit} className="relative w-full">
                 <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">
                   <SecondarySearchGlyph className="text-gray-400" />
@@ -385,7 +395,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-5 pl-1.5 xl:gap-7">
+          <div className="flex shrink-0 items-center gap-3 pl-1 lg:gap-4 xl:gap-7">
             <div className="flex items-center gap-0.5 sm:gap-1.5">
               <Link href="/compare" className={iconLinkClass} aria-label={compareAria}>
                 <CompareIcon

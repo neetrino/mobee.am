@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import {
   ACCESSORIES_SLUG_PARTS,
@@ -19,6 +18,15 @@ interface CategoriesResponse {
   data: Category[];
 }
 
+function isCategoriesResponse(value: unknown): value is CategoriesResponse {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const data = (value as { data?: unknown }).data;
+  return Array.isArray(data);
+}
+
 function hrefFor(category: CategoryTreeNode | null): string {
   if (!category) return '/products';
   return `/products?category=${encodeURIComponent(category.slug)}`;
@@ -30,10 +38,23 @@ export function useFooterCategoryHrefs() {
   const loadCategories = useCallback(async () => {
     try {
       const lang = getStoredLanguage();
-      const response = await apiClient.get<CategoriesResponse>('/api/v1/categories/tree', {
-        params: { lang },
+      const response = await fetch(`/api/v1/categories/tree?lang=${encodeURIComponent(lang)}`, {
+        method: 'GET',
+        cache: 'no-store',
       });
-      setCategories(response.data || []);
+
+      if (!response.ok) {
+        setCategories([]);
+        return;
+      }
+
+      const rawData: unknown = await response.json();
+      if (!isCategoriesResponse(rawData)) {
+        setCategories([]);
+        return;
+      }
+
+      setCategories(rawData.data);
     } catch {
       setCategories([]);
     }

@@ -10,6 +10,18 @@ export type ProductListPayload = Awaited<ReturnType<typeof productsService.findA
 
 export { buildProductListCacheKey, productListCacheTtlSeconds };
 
+function isDatabaseConfigurationError(error: unknown): boolean {
+  const detail = error instanceof Error ? error.message : String(error);
+  return (
+    detail.includes("Error validating datasource `db`") ||
+    detail.includes("env(\"DATABASE_URL\")") ||
+    detail.includes("Invalid `prisma.") ||
+    detail.includes("PrismaClientInitializationError") ||
+    detail.includes("P1001") ||
+    detail.includes("Can't reach database server")
+  );
+}
+
 /**
  * Redis / in-memory cached product list — use from the HTTP route and from RSC (/shop).
  */
@@ -26,7 +38,32 @@ export async function getCachedProductList(
     return { result: data, cacheStatus: "HIT" };
   }
 
-  const result = await productsService.findAll(filters);
+  let result: ProductListPayload;
+  try {
+    result = await productsService.findAll(filters);
+  } catch (error: unknown) {
+    if (!isDatabaseConfigurationError(error)) {
+      throw error;
+    }
+
+    const page = Number.isFinite(filters.page) && (filters.page ?? 0) > 0 ? (filters.page as number) : 1;
+    const limitRaw = Number.isFinite(filters.limit) && (filters.limit ?? 0) > 0 ? (filters.limit as number) : 12;
+    const limit = Math.min(limitRaw, 200);
+
+    return {
+      result: {
+        data: [],
+        meta: {
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        },
+      },
+      cacheStatus: "MISS",
+    };
+  }
+
   const ttl = productListCacheTtlSeconds(filters);
   await cacheService.setex(cacheKey, ttl, JSON.stringify(result));
   return { result, cacheStatus: "MISS" };
