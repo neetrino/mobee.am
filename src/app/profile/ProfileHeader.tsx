@@ -27,17 +27,17 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
               size="lg"
               className="flex-shrink-0"
             />
-            
+
             {/* User Info */}
             <div className="flex-1 min-w-0 break-words">
               <h1 className="text-lg font-bold text-gray-900 mb-1 break-words">
                 {profile?.firstName && profile?.lastName
                   ? `${profile.firstName} ${profile.lastName}`
                   : profile?.firstName
-                  ? profile.firstName
-                  : profile?.lastName
-                  ? profile.lastName
-                  : t('profile.myProfile')}
+                    ? profile.firstName
+                    : profile?.lastName
+                      ? profile.lastName
+                      : t('profile.myProfile')}
               </h1>
               {profile?.email && (
                 <p className="text-sm font-bold text-gray-900 mb-1 break-words">{profile.email}</p>
@@ -77,6 +77,3 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
     </>
   );
 }
-
-
-
