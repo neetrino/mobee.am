@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useCallback } from 'react';
+import { useState, useEffect, use } from 'react';
 import { getStoredCurrency } from '../../../lib/currency';
 import { getStoredLanguage, type LanguageCode } from '../../../lib/language';
 import { t } from '../../../lib/i18n';
@@ -8,7 +8,6 @@ import { useAttributeGroups } from './useAttributeGroups';
 import { useProductImages } from './hooks/useProductImages';
 import { useProductFetch } from './hooks/useProductFetch';
 import { useWishlistCompare } from './hooks/useWishlistCompare';
-import { useProductReviews } from './hooks/useProductReviews';
 import { useVariantSelection } from './hooks/useVariantSelection';
 import { useProductActions } from './hooks/useProductActions';
 import { useProductQuantity } from './hooks/useProductQuantity';
@@ -92,11 +91,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     productId: product?.id || null,
   });
 
-  const { reviews, averageRating } = useProductReviews({
-    slug,
-    productId: product?.id || null,
-  });
-
   const { handleAddToWishlist, handleCompareToggle } = useProductActions({
     productId: product?.id || null,
     compareCategoryId: product ? resolveCompareCategoryId(product) : '',
@@ -141,13 +135,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     }
   }, [product, variantIdFromUrl, setSelectedVariant]);
 
-  const scrollToReviews = useCallback(() => {
-    const reviewsElement = document.getElementById('product-reviews');
-    if (reviewsElement) {
-      reviewsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, []);
-
   const getRequiredAttributesMessage = (): string => {
     const needsColor = colorGroups.length > 0 && colorGroups.some(g => g.stock > 0) && !selectedColor;
     const needsSize = sizeGroups.length > 0 && sizeGroups.some(g => g.stock > 0) && !selectedSize;
@@ -177,8 +164,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     isInWishlist,
     isInCompare,
     quantity,
-    reviews,
-    averageRating,
     slug,
     attributeGroups,
     colorGroups,
@@ -194,7 +179,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     hasUnavailableAttributes,
     unavailableAttributes,
     canAddToCart,
-    scrollToReviews,
     getOptionValue,
     adjustQuantity,
     handleColorSelect,
