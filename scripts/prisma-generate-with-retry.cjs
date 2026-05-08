@@ -1,7 +1,8 @@
 /**
  * Runs `pnpm run db:generate` in shared/db with retries.
- * Mitigates Windows EPERM when Prisma renames query_engine-windows.dll.node.
- * If generate still fails but @prisma/client is already resolvable, exits 0 unless
+ * Mitigates Windows EPERM when Prisma renames query_engine-windows.dll.node
+ * (custom client output under shared/db/generated/client avoids pnpm store locks).
+ * If generate still fails but the generated client is present, exits 0 unless
  * FORCE_PRISMA_GENERATE=1 (then exits 1).
  */
 
@@ -9,7 +10,9 @@ const { spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const SHARED_DB = path.join(__dirname, "..", "shared", "db");
+const REPO_ROOT = path.join(__dirname, "..");
+const SHARED_DB = path.join(REPO_ROOT, "shared", "db");
+const GENERATED_CLIENT_DIR = path.join(SHARED_DB, "generated", "client");
 const MAX_ATTEMPTS = 5;
 const DELAY_MS = 2000;
 
@@ -28,16 +31,54 @@ function sleepMs(ms) {
   }
 }
 
-function isPrismaClientResolvable() {
+function isGeneratedPrismaClientPresent() {
+  const indexJs = path.join(GENERATED_CLIENT_DIR, "index.js");
+  return fs.existsSync(indexJs);
+}
+
+/**
+ * Prisma on Windows renames query_engine-windows.dll.node.tmp* → .dll.node; EPERM
+ * can leave stale tmp files. Best-effort cleanup before retries.
+ */
+function tryCleanupPrismaWindowsEngineArtifacts() {
+  if (process.platform !== "win32") {
+    return;
+  }
+  const dirs = [GENERATED_CLIENT_DIR];
   try {
-    const resolved = require.resolve("@prisma/client", { paths: [path.join(__dirname, "..")] });
-    return Boolean(resolved && fs.existsSync(resolved));
+    const pkgJson = require.resolve("@prisma/client/package.json", { paths: [REPO_ROOT] });
+    dirs.push(path.join(path.dirname(pkgJson), "..", ".prisma", "client"));
   } catch {
-    return false;
+    /* ignore */
+  }
+  for (const prismaClientDir of dirs) {
+    if (!fs.existsSync(prismaClientDir)) {
+      continue;
+    }
+    try {
+      for (const name of fs.readdirSync(prismaClientDir)) {
+        const isTmp = name.startsWith("query_engine-windows.dll.node.tmp");
+        const isEngine = name === "query_engine-windows.dll.node";
+        if (!isTmp && !isEngine) {
+          continue;
+        }
+        try {
+          fs.unlinkSync(path.join(prismaClientDir, name));
+        } catch {
+          /* locked or in use */
+        }
+      }
+    } catch {
+      /* fs errors */
+    }
   }
 }
 
 for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+  if (attempt > 1) {
+    tryCleanupPrismaWindowsEngineArtifacts();
+  }
+
   const result = spawnSync("pnpm", ["run", "db:generate"], {
     cwd: SHARED_DB,
     stdio: "inherit",
@@ -60,9 +101,9 @@ if (process.env.FORCE_PRISMA_GENERATE === "1") {
   process.exit(1);
 }
 
-if (isPrismaClientResolvable()) {
+if (isGeneratedPrismaClientPresent()) {
   console.warn(
-    "[prebuild] prisma generate failed after retries, but @prisma/client is present — continuing build. " +
+    "[prebuild] prisma generate failed after retries, but shared/db/generated/client is present — continuing build. " +
       "Stop other Node processes or fix AV locks if you need a fresh generate. Use FORCE_PRISMA_GENERATE=1 to fail hard.",
   );
   process.exit(0);
