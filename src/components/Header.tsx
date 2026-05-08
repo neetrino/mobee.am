@@ -27,9 +27,7 @@ import {
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
 import { SiteBrandLogo } from './SiteBrandLogo';
-import { CompareIcon } from './icons/CompareIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
-import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.constants';
 import { USER_AVATAR_INITIALS_SURFACE_CLASS } from './user-avatar.constants';
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
@@ -1554,33 +1552,6 @@ export function Header() {
                       </svg>
                     </Link>
                   ))}
-
-                  <Link
-                    href="/compare"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700`}
-                  >
-                    <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
-                      <CompareIcon size={18} />
-                      {t('common.navigation.compare')}
-                    </span>
-                    <span className="flex shrink-0 items-center gap-2">
-                      {compareCount > 0 ? (
-                        <span className={HEADER_NAV_COUNT_INLINE_BADGE_CLASS}>
-                          {compareCount > 99 ? '99+' : compareCount}
-                        </span>
-                      ) : null}
-                      <svg
-                        className="h-5 w-5 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        aria-hidden
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </Link>
 
                   {isLoggedIn ? (
                     <>

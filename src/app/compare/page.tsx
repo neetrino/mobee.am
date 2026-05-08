@@ -9,6 +9,7 @@ import { apiClient } from '../../lib/api-client';
 import { getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
+import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
 import type { CompareEntry } from '../../lib/shop/compare-storage';
 import {
   readCompareEntries,
@@ -165,7 +166,7 @@ export default function ComparePage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-6`}>
         <div className="py-6 text-center">
           <div className="animate-pulse space-y-4">
             <div className="mx-auto h-6 w-1/4 rounded bg-gray-200"></div>
@@ -180,12 +181,9 @@ export default function ComparePage() {
   const groupedEntries = groupCompareEntriesByResolvedCategory(compareEntries, productById);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">{t('common.compare.title')}</h1>
-        {products.length > 0 && (
-          <p className="text-sm text-gray-600">{t('common.compare.perCategoryHint')}</p>
-        )}
+    <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-6`}>
+      <div className="mb-8 mt-3 flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-900">{t('common.compare.title')}</h1>
       </div>
 
       {products.length > 0 ? (
@@ -199,9 +197,7 @@ export default function ComparePage() {
             const heading = resolveCategorySectionTitle(categoryId, rowProducts[0], t);
             const sectionDomId = `compare-group-${categoryId}-${index}`;
             const n = rowProducts.length;
-            const summaryLine = `${n} / ${MAX_COMPARE_PER_CATEGORY} ${
-              n === 1 ? t('common.compare.product') : t('common.compare.products')
-            }`;
+            const summaryLine = `${n}/${MAX_COMPARE_PER_CATEGORY}`;
             return (
               <CompareGroupTable
                 key={sectionDomId}

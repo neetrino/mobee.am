@@ -97,7 +97,7 @@ export function HeroCarousel() {
                 <HomeMoreCtaPillLink
                   href="/products"
                   variant="heroDark"
-                  labelClassName={lang === 'ru' ? '-translate-x-1' : ''}
+                  labelClassName={lang === 'ru' ? '!translate-x-0' : ''}
                 >
                   {t('home.hero_cta_more')}
                 </HomeMoreCtaPillLink>
@@ -118,7 +118,7 @@ export function HeroCarousel() {
             </div>
           </div>
 
-          <div className="flex w-full min-w-0 shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:justify-between lg:gap-0">
+          <div className="flex w-full min-w-0 shrink-0 flex-col gap-5 lg:w-[min(100%,413px)] lg:gap-5">
             <div className="flex min-w-0 flex-col gap-4 overflow-hidden rounded-[40px] bg-[#cde6ff] px-8 pb-7 pt-7 sm:gap-5 sm:px-12 sm:pb-8 sm:pt-8 lg:h-[178px] lg:w-full lg:shrink-0 lg:gap-2 lg:px-12 lg:py-6">
               <p className="w-full min-w-0 max-w-full break-words text-[12px] font-normal leading-4 text-[#111]">
                 <span className="block">{t('home.hero_chat_line1')}</span>

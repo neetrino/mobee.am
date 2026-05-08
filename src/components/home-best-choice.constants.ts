@@ -30,7 +30,7 @@ export const HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA = `(min-width: ${HOME_BE
  * Home wraps with `hidden` + `lg:grid` + column variant (see {@link HomeBestChoiceStyleProductGrid}).
  */
 export const HOME_BEST_CHOICE_DESKTOP_GRID_TRACK =
-  'grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:gap-6';
+  'grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 md:gap-6 lg:gap-6';
 
 export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_DEFAULT = 'lg:grid-cols-4';
 export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO = 'lg:grid-cols-3';
@@ -39,7 +39,8 @@ export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO = 'lg:grid-cols-3';
  * Cart page: same track as home desktop rows; three `lg` columns for wider cards
  * (home uses four columns on standard desktop — cart keeps three).
  */
-export const CART_LINE_ITEMS_GRID_CLASS = `grid ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO}`;
+export const CART_LINE_ITEMS_GRID_CLASS =
+  'grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 md:gap-6 lg:grid-cols-3 lg:gap-6';
 
 /** Wishlist desktop: five columns so each card is a bit narrower than home’s four-up row. */
 export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_WISHLIST = 'lg:grid-cols-5';

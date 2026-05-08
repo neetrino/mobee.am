@@ -137,13 +137,13 @@ export function ProductCardList({
               onClick={onCompareToggle}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                 isInCompare
-                  ? 'border-gray-900 text-gray-900 bg-white shadow-sm'
+                  ? 'border-gray-200 bg-white text-admin-500 shadow-sm'
                   : 'border-gray-200 text-gray-700 bg-white hover:border-gray-300 hover:bg-gray-50'
               }`}
               title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
               aria-label={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
             >
-              <CompareIcon isActive={isInCompare} />
+              <CompareIcon isActive={isInCompare} size={22} />
             </button>
 
             {/* Wishlist Icon */}
@@ -151,7 +151,7 @@ export function ProductCardList({
               onClick={onWishlistToggle}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
                 isInWishlist
-                  ? 'bg-red-600 text-white'
+                  ? 'bg-white text-admin-500 shadow-sm'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
               title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}

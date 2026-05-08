@@ -278,7 +278,7 @@ export function CompareGroupTable({
                     <div className="flex flex-col items-center gap-2">
                       <Link
                         href={`/products/${product.slug}`}
-                        className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                        className="text-sm font-medium text-black transition-colors hover:text-admin-500"
                       >
                         {t('common.compare.viewDetails')}
                       </Link>
@@ -286,7 +286,7 @@ export function CompareGroupTable({
                         <button
                           type="button"
                           onClick={(e) => handleAddToCart(e, product)}
-                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                          className="rounded-full bg-admin-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-admin-500"
                         >
                           {t('common.buttons.addToCart')}
                         </button>

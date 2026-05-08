@@ -31,8 +31,8 @@ const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
 
 function homeBestChoiceMobileInnerGridClass(cardsPerView: number): string {
   return cardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET
-    ? 'grid grid-cols-3 gap-2'
-    : 'grid grid-cols-2 gap-2';
+    ? 'grid grid-cols-3 gap-5'
+    : 'grid grid-cols-2 gap-4';
 }
 
 type HomeBestChoiceStyleProductGridProps = {

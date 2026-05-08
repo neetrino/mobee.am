@@ -255,7 +255,7 @@ function ProfileAccountMenu({
   }, [open]);
 
   const itemClass =
-    'flex w-full items-center gap-2 px-3 py-2.5 text-left text-[13px] font-normal leading-normal text-gray-800 transition-colors hover:bg-gray-50';
+    'mx-1 flex w-[calc(100%-0.5rem)] items-center gap-2 rounded-full px-3 py-2.5 text-left text-[13px] font-normal leading-normal text-gray-800 transition-colors hover:bg-admin-50';
 
   return (
     <div ref={wrapRef} className="relative shrink-0">
@@ -290,12 +290,12 @@ function ProfileAccountMenu({
       </button>
       {open ? (
         <>
-          <div className="absolute right-0 top-full z-[60] h-2 w-full min-w-[160px]" aria-hidden />
+          <div className="absolute right-0 top-full z-[60] h-2 w-full min-w-[144px]" aria-hidden />
           <div
             id={PROFILE_MENU_ID}
             role="menu"
             aria-labelledby={`${PROFILE_MENU_ID}-trigger`}
-            className="absolute right-0 top-full z-[60] min-w-[200px] pt-2"
+            className="absolute right-0 top-full z-[60] min-w-[100px] pt-2"
           >
             <div className="overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-2xl">
               <Link href="/profile" role="menuitem" className={itemClass} onClick={close}>
