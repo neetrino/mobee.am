@@ -97,7 +97,7 @@ export function HeroCarousel() {
                 <HomeMoreCtaPillLink
                   href="/products"
                   variant="heroDark"
-                  labelClassName={lang === 'ru' ? '-translate-x-1' : ''}
+                  labelClassName={lang === 'ru' ? '!translate-x-0' : ''}
                 >
                   {t('home.hero_cta_more')}
                 </HomeMoreCtaPillLink>
