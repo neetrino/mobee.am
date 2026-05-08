@@ -7,6 +7,15 @@ import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { ARMENIA_FALLBACK_DELIVERY_CITIES } from '../../../lib/constants/armenia-delivery-cities.constants';
+
+const SUPPORTED_COUNTRIES = ['Armenia'] as const;
+
+const SELECT_CLASS =
+  'w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-admin appearance-none bg-[length:1.25rem] bg-[right_0.75rem_center] bg-no-repeat pr-10';
+
+const SELECT_CHEVRON_BG =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")";
 
 interface DeliveryLocation {
   id?: string;
@@ -126,7 +135,12 @@ export default function DeliveryPage() {
         <Card className="p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">{t('admin.delivery.deliveryPricesByLocation')}</h2>
-            <Button variant="admin" onClick={handleAddLocation} disabled={saving}>
+            <Button
+              variant="admin"
+              onClick={handleAddLocation}
+              disabled={saving}
+              style={{ backgroundColor: '#2DB2FF' }}
+            >
               {t('admin.delivery.addLocation')}
             </Button>
           </div>
@@ -142,23 +156,37 @@ export default function DeliveryPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.delivery.country')}</label>
-                      <input
-                        type="text"
+                      <select
                         value={location.country}
                         onChange={(e) => handleUpdateLocation(index, 'country', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
-                        placeholder={t('admin.delivery.countryPlaceholder')}
-                      />
+                        className={SELECT_CLASS}
+                        style={{ backgroundImage: SELECT_CHEVRON_BG }}
+                        disabled={saving}
+                      >
+                        <option value="">{t('admin.delivery.selectCountry')}</option>
+                        {SUPPORTED_COUNTRIES.map((country) => (
+                          <option key={country} value={country}>
+                            {country}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.delivery.city')}</label>
-                      <input
-                        type="text"
+                      <select
                         value={location.city}
                         onChange={(e) => handleUpdateLocation(index, 'city', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
-                        placeholder={t('admin.delivery.cityPlaceholder')}
-                      />
+                        className={SELECT_CLASS}
+                        style={{ backgroundImage: SELECT_CHEVRON_BG }}
+                        disabled={saving || !location.country}
+                      >
+                        <option value="">{t('admin.delivery.selectCity')}</option>
+                        {ARMENIA_FALLBACK_DELIVERY_CITIES.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.delivery.price')}</label>
