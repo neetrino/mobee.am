@@ -9,7 +9,6 @@ interface UseProductActionsProps {
   compareCategoryId: string;
   isInWishlist: boolean;
   setIsInWishlist: (value: boolean) => void;
-  isInCompare: boolean;
   setIsInCompare: (value: boolean) => void;
   setShowMessage: (message: string | null) => void;
   language: LanguageCode;
@@ -20,7 +19,6 @@ export function useProductActions({
   compareCategoryId,
   isInWishlist,
   setIsInWishlist,
-  isInCompare,
   setIsInCompare,
   setShowMessage,
   language,

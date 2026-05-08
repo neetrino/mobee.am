@@ -102,7 +102,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     compareCategoryId: product ? resolveCompareCategoryId(product) : '',
     isInWishlist,
     setIsInWishlist,
-    isInCompare,
     setIsInCompare,
     setShowMessage,
     language,
