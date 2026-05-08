@@ -1,18 +1,26 @@
 /**
  * API Client
- * 
+ *
  * Client for making requests to the backend API
- * 
+ *
  * In Next.js, when API routes are in the same app, we use relative paths.
  * If NEXT_PUBLIC_API_URL is set, it can still be used for non-internal endpoints.
- * Internal `/api/*` calls are normalized to same-origin in browser via url-builder.
+ * Internal `/api/*` calls are normalized to same-origin via url-builder.
  */
 
 import { ApiError } from "./api-client/types";
 import type { RequestOptions } from "./api-client/types";
 import { getRequest, postRequest, putRequest, patchRequest, deleteRequest } from "./api-client/http-methods";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+function resolvePublicApiBaseUrl(): string {
+  const sameOrigin = process.env.NEXT_PUBLIC_SAME_ORIGIN_API;
+  if (sameOrigin === "1" || sameOrigin === "true" || sameOrigin === "yes") {
+    return "";
+  }
+  return (process.env.NEXT_PUBLIC_API_URL ?? "").trim();
+}
+
+const API_BASE_URL = resolvePublicApiBaseUrl();
 
 class ApiClient {
   private baseUrl: string;
