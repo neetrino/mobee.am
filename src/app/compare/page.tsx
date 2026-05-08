@@ -14,6 +14,7 @@ import { formatPrice, getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
+import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
 import {
   COMPARE_EMPTY_STATE_DESCRIPTION_CLASS,
   COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS,
@@ -276,7 +277,7 @@ export default function ComparePage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-6`}>
         <div className="text-center py-6">
           <div className="animate-pulse space-y-4">
             <div className="h-6 bg-gray-200 rounded w-1/4 mx-auto"></div>
@@ -288,12 +289,12 @@ export default function ComparePage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-gray-900">{t('common.compare.title')}</h1>
+    <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-6`}>
+      <div className="mb-8 mt-3 flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-900">{t('common.compare.title')}</h1>
         {products.length > 0 && (
           <p className="text-sm text-gray-600">
-            {products.length} of 4 {products.length === 1 ? t('common.compare.product') : t('common.compare.products')}
+            {products.length}/4
           </p>
         )}
       </div>
@@ -444,7 +445,7 @@ export default function ComparePage() {
                       <div className="flex flex-col gap-2 items-center">
                         <Link
                           href={`/products/${product.slug}`}
-                          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                          className="text-sm font-medium text-black transition-colors hover:text-admin-500"
                         >
                           {t('common.compare.viewDetails')}
                         </Link>
@@ -452,7 +453,7 @@ export default function ComparePage() {
                           <button
                             type="button"
                             onClick={(e) => handleAddToCart(e, product)}
-                            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                            className="rounded-full bg-admin-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-admin-500"
                           >
                             {t('common.buttons.addToCart')}
                           </button>
