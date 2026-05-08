@@ -30,7 +30,7 @@ import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
 import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.constants';
-import { USER_AVATAR_INITIALS_SURFACE_CLASS } from './user-avatar.constants';
+import { DEFAULT_USER_AVATAR_SRC } from './user-avatar.constants';
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 
@@ -127,30 +127,6 @@ interface MobileNavProfileUser {
   phone?: string;
 }
 
-function getMobileNavProfileInitials(user: MobileNavProfileUser): string {
-  const first = user.firstName?.trim();
-  const last = user.lastName?.trim();
-  if (first && last) {
-    return `${first[0]!}${last[0]!}`.toUpperCase();
-  }
-  if (first) {
-    return first.length >= 2 ? first.slice(0, 2).toUpperCase() : first[0]!.toUpperCase();
-  }
-  const email = user.email?.trim();
-  if (email) {
-    const local = email.split('@')[0] ?? '';
-    if (local.length >= 2) {
-      return local.slice(0, 2).toUpperCase();
-    }
-    return local.length === 1 ? local[0]!.toUpperCase() : '?';
-  }
-  const digits = user.phone?.replace(/\D/g, '') ?? '';
-  if (digits.length >= 2) {
-    return digits.slice(0, 2);
-  }
-  return '?';
-}
-
 function getMobileNavProfileCardLines(user: MobileNavProfileUser): {
   title: string;
   subtitle?: string;
@@ -189,12 +165,12 @@ function MobileDrawerProfileCard({
       className="flex w-fit max-w-full min-w-0 items-center gap-3 self-start rounded-[15px] border border-gray-200 bg-white px-3 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100"
       aria-label={profileFallbackLabel}
     >
-      <span
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold ${USER_AVATAR_INITIALS_SURFACE_CLASS}`}
+      <img
+        src={DEFAULT_USER_AVATAR_SRC}
+        alt=""
+        className="h-12 w-12 shrink-0 rounded-full object-cover"
         aria-hidden
-      >
-        {getMobileNavProfileInitials(user)}
-      </span>
+      />
       <span className="flex min-w-0 max-w-full flex-col gap-0.5 text-left">
         <span className="max-w-full break-words text-sm font-bold leading-tight text-gray-900">{heading}</span>
         {subtitle ? (
