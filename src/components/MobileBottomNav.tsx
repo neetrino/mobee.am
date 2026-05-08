@@ -108,7 +108,13 @@ function MobileNavItem({ item, active, label, compareCount, wishlistCount, cartC
   const showWishlistBadge = item.key === 'wishlist' && wishlistCount > 0;
   const showCartBadge = item.key === 'cart' && cartCount > 0;
   const badgeValue =
-    item.key === 'compare' ? compareCount : item.key === 'wishlist' ? wishlistCount : item.key === 'cart' ? cartCount : 0;
+    item.key === 'compare'
+      ? compareCount
+      : item.key === 'wishlist'
+        ? wishlistCount
+        : item.key === 'cart'
+          ? cartCount
+          : 0;
   const showBadge = showCompareBadge || showWishlistBadge || showCartBadge;
 
   const iconWrap = (
