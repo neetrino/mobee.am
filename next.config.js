@@ -77,9 +77,18 @@ const nextConfig = {
    * `'/*'` matches only one segment (e.g. `/x`), not `/api/v1/...` — use `'/**'` for all routes.
    */
   outputFileTracingIncludes: {
-    '/**': ['./shared/db/generated/client/**/*'],
+    '/**': [
+      './shared/db/generated/client/**/*',
+      './generated/client/**/*',
+      './node_modules/.prisma/client/**/*',
+    ],
+    '/api/:path*': [
+      './shared/db/generated/client/**/*',
+      './generated/client/**/*',
+      './node_modules/.prisma/client/**/*',
+    ],
   },
-  serverExternalPackages: ['@prisma/client', 'prisma'],
+  serverExternalPackages: ['@prisma/client', 'prisma', '@white-shop/db'],
   /**
    * Admin UI files live under `src/app/admin` but are only exposed at `/supersudo`.
    * `beforeFiles` runs before filesystem matching, so `/admin` never resolves to that tree.

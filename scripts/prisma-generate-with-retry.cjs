@@ -15,6 +15,10 @@ const SHARED_DB = path.join(REPO_ROOT, "shared", "db");
 const GENERATED_CLIENT_DIR = path.join(SHARED_DB, "generated", "client");
 const MAX_ATTEMPTS = 5;
 const DELAY_MS = 2000;
+const SHOULD_FAIL_HARD =
+  process.env.FORCE_PRISMA_GENERATE === "1" ||
+  process.env.VERCEL === "1" ||
+  process.env.VERCEL === "true";
 
 function sleepMs(ms) {
   try {
@@ -97,7 +101,7 @@ for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
   }
 }
 
-if (process.env.FORCE_PRISMA_GENERATE === "1") {
+if (SHOULD_FAIL_HARD) {
   process.exit(1);
 }
 
