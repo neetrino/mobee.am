@@ -6,8 +6,7 @@
  */
 
 import { useMemo, useCallback, useState, useEffect } from 'react';
-import { type LanguageCode } from './language';
-import { getStoredLanguage } from './language';
+import { type LanguageCode, DEFAULT_LANGUAGE, getStoredLanguage } from './language';
 import { t, getProductText, getAttributeLabel, clearTranslationCache, type ProductField } from './i18n';
 
 // Import translations to check available languages
@@ -34,16 +33,15 @@ const translations: Partial<Record<LanguageCode, any>> = {
  * ```
  */
 export function useTranslation() {
-  // Always start with 'en' to prevent hydration mismatch
-  // The language will be updated after mount in useEffect
-  const [lang, setLang] = useState<LanguageCode>('en');
+  const [lang, setLang] = useState<LanguageCode>(() => getStoredLanguage());
 
   // Listen to language changes and update state reactively
   useEffect(() => {
     // Update language on mount to ensure we have the latest from localStorage
     const updateLanguage = () => {
       const storedLang = getStoredLanguage();
-      const newLang: LanguageCode = (storedLang && storedLang in translations) ? storedLang : 'en';
+      const newLang: LanguageCode =
+        storedLang && storedLang in translations ? storedLang : DEFAULT_LANGUAGE;
       setLang((currentLang) => {
         if (newLang !== currentLang) {
           // Clear translation cache when language changes

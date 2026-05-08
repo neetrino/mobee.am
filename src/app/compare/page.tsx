@@ -4,16 +4,23 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { MouseEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { Button } from '@shop/ui';
 import { apiClient } from '../../lib/api-client';
-import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
-import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
-import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
-import { formatPrice, getStoredCurrency } from '../../lib/currency';
+import { getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
-import { useAuth } from '../../lib/auth/AuthContext';
+import type { CompareEntry } from '../../lib/shop/compare-storage';
+import {
+  readCompareEntries,
+  writeCompareEntries,
+  getCompareProductIds,
+  reconcileCompareEntriesWithProducts,
+  groupCompareEntriesByResolvedCategory,
+  resolveCompareCategoryId,
+  COMPARE_UNCATEGORIZED_KEY,
+  MAX_COMPARE_PER_CATEGORY,
+} from '../../lib/shop/compare-storage';
+import { CompareGroupTable, type CompareTableProduct } from './CompareGroupTable';
 import {
   COMPARE_EMPTY_STATE_DESCRIPTION_CLASS,
   COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS,
@@ -27,58 +34,43 @@ import {
   COMPARE_EMPTY_STATE_WRAPPER_CLASS,
 } from './compare-layout.constants';
 
-interface Product {
-  id: string;
-  slug: string;
-  title: string;
-  price: number;
-  defaultVariantId?: string | null;
-  originalPrice: number | null;
-  compareAtPrice: number | null;
-  discountPercent: number | null;
-  image: string | null;
-  inStock: boolean;
-  brand: {
-    id: string;
-    name: string;
-  } | null;
-  description?: string;
+interface Product extends CompareTableProduct {
+  primaryCategoryId?: string | null;
+  categories?: Array<{ id: string; slug: string; title: string }>;
 }
 
-const COMPARE_KEY = 'shop_compare';
-
-function getCompare(): string[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const stored = localStorage.getItem(COMPARE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
+function resolveCategorySectionTitle(
+  categoryId: string,
+  sample: Product | undefined,
+  t: (key: string) => string,
+): string {
+  if (categoryId === COMPARE_UNCATEGORIZED_KEY) {
+    return t('common.compare.uncategorized');
   }
+  const match = sample?.categories?.find((c) => c.id === categoryId);
+  if (match?.title?.trim()) {
+    return match.title.trim();
+  }
+  return t('common.compare.category');
 }
-
 
 /**
- * Compare page renders up to four products side-by-side with quick actions.
+ * Compare page: one table per category; up to four products per category block.
  */
 export default function ComparePage() {
-  const router = useRouter();
-  const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
+  const [compareEntries, setCompareEntries] = useState(() =>
+    typeof window === 'undefined' ? [] : readCompareEntries(),
+  );
   const [loading, setLoading] = useState(true);
-  const [compareIds, setCompareIds] = useState<string[]>([]);
   const [currency, setCurrency] = useState(getStoredCurrency());
   const addToCartInFlightRef = useRef<Set<string>>(new Set());
-  // Track if we updated locally to prevent unnecessary re-fetch
   const isLocalUpdateRef = useRef(false);
 
-  /**
-   * Fetch compare products for provided ids and update UI state.
-   */
-  const fetchCompareProducts = useCallback(async (idsToLoad: string[]) => {
+  const fetchCompareProducts = useCallback(async (entriesSnapshot: CompareEntry[]) => {
+    const idsToLoad = getCompareProductIds(entriesSnapshot);
     if (idsToLoad.length === 0) {
-      console.info('[Compare] Skip fetch because ids array is empty');
       setProducts([]);
       setLoading(false);
       return;
@@ -86,7 +78,6 @@ export default function ComparePage() {
 
     try {
       setLoading(true);
-      console.info(`[Compare] Fetching ${idsToLoad.length} products for render`);
       const languagePreference = getStoredLanguage();
       const response = await apiClient.get<{
         data: Product[];
@@ -104,11 +95,14 @@ export default function ComparePage() {
         },
       });
 
+      const reconciled = reconcileCompareEntriesWithProducts(response.data);
+      setCompareEntries(reconciled);
+
       const byId = new Map(response.data.map((p) => [p.id, p]));
-      const compareProducts = idsToLoad
+      const ordered = getCompareProductIds(reconciled)
         .map((id) => byId.get(id))
         .filter((p): p is Product => Boolean(p));
-      setProducts(compareProducts);
+      setProducts(ordered);
     } catch (error) {
       console.error('[Compare] Error fetching compare products:', error);
     } finally {
@@ -117,24 +111,18 @@ export default function ComparePage() {
   }, []);
 
   useEffect(() => {
-    // Get compare IDs from localStorage
-    const ids = getCompare();
-    setCompareIds(ids);
-    fetchCompareProducts(ids);
+    const entries = readCompareEntries();
+    setCompareEntries(entries);
+    void fetchCompareProducts(entries);
 
-    // Listen for compare updates from other components (header, etc.)
-    // But don't re-fetch if we already updated locally
     const handleCompareUpdate = () => {
-      // If we just updated locally, skip re-fetch to avoid page reload
       if (isLocalUpdateRef.current) {
         isLocalUpdateRef.current = false;
         return;
       }
-      
-      // Only re-fetch if update came from external source (another component)
-      const updatedIds = getCompare();
-      setCompareIds(updatedIds);
-      fetchCompareProducts(updatedIds);
+      const updated = readCompareEntries();
+      setCompareEntries(updated);
+      void fetchCompareProducts(updated);
     };
 
     window.addEventListener('compare-updated', handleCompareUpdate);
@@ -143,17 +131,14 @@ export default function ComparePage() {
     };
   }, [fetchCompareProducts]);
 
-  // Listen for currency and language updates
   useEffect(() => {
     const handleCurrencyUpdate = () => {
       setCurrency(getStoredCurrency());
     };
 
     const handleLanguageUpdate = () => {
-      // Reload products with new language preference
-      // Get current IDs from localStorage to avoid dependency on state
-      const currentIds = getCompare();
-      fetchCompareProducts(currentIds);
+      const current = readCompareEntries();
+      void fetchCompareProducts(current);
     };
 
     window.addEventListener('currency-updated', handleCurrencyUpdate);
@@ -167,303 +152,70 @@ export default function ComparePage() {
   const handleRemove = (e: MouseEvent, productId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    console.info(`[Compare] Removing product ${productId} from compare UI`);
-    
-    // Mark as local update to prevent re-fetch in event handler
+
     isLocalUpdateRef.current = true;
-    
-    // Optimistic update: remove from UI immediately (no loading state, no page reload)
-    const updatedIds = compareIds.filter((id) => id !== productId);
-    const updatedProducts = products.filter((p) => p.id !== productId);
-    
-    // Update localStorage first
-    localStorage.setItem(COMPARE_KEY, JSON.stringify(updatedIds));
-    
-    // Update state immediately (no page reload, no loading spinner)
-    setCompareIds(updatedIds);
-    setProducts(updatedProducts);
-    
-    // Dispatch event for other components (header, etc.) - but our handler won't re-fetch
-    // because isLocalUpdateRef.current is true
+
+    const updatedEntries = readCompareEntries().filter((entry) => entry.productId !== productId);
+    writeCompareEntries(updatedEntries);
+    setCompareEntries(updatedEntries);
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
+
     window.dispatchEvent(new Event('compare-updated'));
-  };
-
-  const handleAddToCart = (e: MouseEvent, product: Product) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!product.inStock || addToCartInFlightRef.current.has(product.id)) {
-      return;
-    }
-
-    if (!isLoggedIn) {
-      router.push(`/login?redirect=/compare`);
-      return;
-    }
-
-    window.dispatchEvent(
-      new CustomEvent('cart-updated', {
-        detail: { optimisticAdd: { quantity: 1, price: product.price } },
-      }),
-    );
-    const flySource = document.querySelector<HTMLElement>(
-      `[data-compare-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
-    );
-    const flyUrl = resolveProductCardImageSrc(product.image);
-    dispatchCartFlyAnimation(flyUrl, flySource);
-
-    addToCartInFlightRef.current.add(product.id);
-
-    void (async () => {
-      try {
-        interface ProductDetails {
-          id: string;
-          variants?: Array<{
-            id: string;
-            sku: string;
-            price: number;
-            stock: number;
-            available: boolean;
-          }>;
-        }
-
-        let variantId: string;
-        let bodyProductId = product.id;
-
-        if (product.defaultVariantId) {
-          variantId = product.defaultVariantId;
-        } else {
-          const encodedSlug = encodeURIComponent(product.slug.trim());
-          const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
-
-          if (!productDetails.variants || productDetails.variants.length === 0) {
-            alert(t('common.alerts.noVariantsAvailable'));
-            window.dispatchEvent(new Event('cart-updated'));
-            return;
-          }
-
-          variantId = productDetails.variants[0].id;
-          bodyProductId = productDetails.id;
-        }
-
-        const response = await apiClient.post<{ cartSummary?: { itemsCount: number; total: number } }>(
-          '/api/v1/cart/items',
-          {
-            productId: bodyProductId,
-            variantId,
-            quantity: 1,
-          },
-        );
-
-        window.dispatchEvent(
-          new CustomEvent('cart-updated', {
-            detail: response.cartSummary ?? null,
-          }),
-        );
-      } catch (error: unknown) {
-        console.error('Error adding to cart:', error);
-        window.dispatchEvent(new Event('cart-updated'));
-        const err = error as { message?: string };
-        if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-          router.push(`/login?redirect=/compare`);
-        }
-      } finally {
-        addToCartInFlightRef.current.delete(product.id);
-      }
-    })();
   };
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="text-center py-6">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="py-6 text-center">
           <div className="animate-pulse space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-1/4 mx-auto"></div>
-            <div className="mt-4 bg-gray-200 rounded-lg h-48"></div>
+            <div className="mx-auto h-6 w-1/4 rounded bg-gray-200"></div>
+            <div className="mt-4 h-48 rounded-lg bg-gray-200"></div>
           </div>
         </div>
       </div>
     );
   }
 
+  const productById = new Map(products.map((p) => [p.id, p]));
+  const groupedEntries = groupCompareEntriesByResolvedCategory(compareEntries, productById);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="flex justify-between items-center mb-4">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-gray-900">{t('common.compare.title')}</h1>
         {products.length > 0 && (
-          <p className="text-sm text-gray-600">
-            {products.length} of 4 {products.length === 1 ? t('common.compare.product') : t('common.compare.products')}
-          </p>
+          <p className="text-sm text-gray-600">{t('common.compare.perCategoryHint')}</p>
         )}
       </div>
 
       {products.length > 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[150px] sticky left-0 bg-gray-50 z-10">
-                    {t('common.compare.characteristic')}
-                  </th>
-                  {products.map((product) => (
-                    <th
-                      key={product.id}
-                      className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-[220px] relative"
-                    >
-                      <button
-                        onClick={(e) => handleRemove(e, product.id)}
-                        className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-all hover:bg-admin-50 hover:text-admin-600"
-                        title={t('common.buttons.remove')}
-                        aria-label={t('common.buttons.remove')}
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {/* Изображение */}
-                <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10">
-                    {t('common.compare.image')}
-                  </td>
-                  {products.map((product) => (
-                    <td
-                      key={product.id}
-                      className="px-4 py-4 text-center"
-                      data-compare-product-id={product.id}
-                    >
-                      <Link href={`/products/${product.slug}`} className="inline-block">
-                        <div
-                          className="w-32 h-32 mx-auto bg-gray-100 rounded-lg overflow-hidden relative"
-                          data-cart-fly-source
-                        >
-                          <Image
-                            src={resolveProductCardImageSrc(product.image)}
-                            alt={product.title}
-                            fill
-                            className="object-cover"
-                            sizes="128px"
-                            unoptimized
-                          />
-                        </div>
-                      </Link>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Название */}
-                <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10">
-                    {t('common.compare.name')}
-                  </td>
-                  {products.map((product) => (
-                    <td key={product.id} className="px-4 py-4">
-                      <Link
-                        href={`/products/${product.slug}`}
-                        className="text-base font-semibold text-gray-900 hover:text-blue-600 transition-colors block text-center"
-                      >
-                        {product.title}
-                      </Link>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Бренд */}
-                <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10">
-                    {t('common.compare.brand')}
-                  </td>
-                  {products.map((product) => (
-                    <td key={product.id} className="px-4 py-4 text-center text-sm text-gray-600">
-                      {product.brand ? product.brand.name : '-'}
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Цена */}
-                <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10">
-                    {t('common.compare.price')}
-                  </td>
-                  {products.map((product) => (
-                    <td key={product.id} className="px-4 py-4 text-center">
-                      <div className="flex items-center justify-center gap-3">
-                        <p className="text-lg font-bold text-gray-900 select-none">
-                          {formatPrice(product.price, currency)}
-                        </p>
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Наличие */}
-                <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10">
-                    {t('common.compare.availability')}
-                  </td>
-                  {products.map((product) => (
-                    <td key={product.id} className="px-4 py-4 text-center">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                          product.inStock
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {product.inStock
-                          ? t('common.stock.inStock')
-                          : t('common.stock.outOfStock')}
-                      </span>
-                    </td>
-                  ))}
-                </tr>
-
-                {/* Действия */}
-                <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10">
-                    {t('common.compare.actions')}
-                  </td>
-                  {products.map((product) => (
-                    <td key={product.id} className="px-4 py-4 text-center">
-                      <div className="flex flex-col gap-2 items-center">
-                        <Link
-                          href={`/products/${product.slug}`}
-                          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                          {t('common.compare.viewDetails')}
-                        </Link>
-                        {product.inStock && (
-                          <button
-                            type="button"
-                            onClick={(e) => handleAddToCart(e, product)}
-                            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                          >
-                            {t('common.buttons.addToCart')}
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div>
+          {groupedEntries.map((group, index) => {
+            const rowProducts = group
+              .map((e) => productById.get(e.productId))
+              .filter((p): p is Product => Boolean(p));
+            if (rowProducts.length === 0) return null;
+            const categoryId = resolveCompareCategoryId(rowProducts[0]);
+            const heading = resolveCategorySectionTitle(categoryId, rowProducts[0], t);
+            const sectionDomId = `compare-group-${categoryId}-${index}`;
+            const n = rowProducts.length;
+            const summaryLine = `${n} / ${MAX_COMPARE_PER_CATEGORY} ${
+              n === 1 ? t('common.compare.product') : t('common.compare.products')
+            }`;
+            return (
+              <CompareGroupTable
+                key={sectionDomId}
+                sectionDomId={sectionDomId}
+                categoryHeading={heading}
+                compareSummaryLine={summaryLine}
+                products={rowProducts}
+                currency={currency}
+                t={t}
+                addToCartInFlightRef={addToCartInFlightRef}
+                onRemove={handleRemove}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className={COMPARE_EMPTY_STATE_WRAPPER_CLASS}>
@@ -478,12 +230,8 @@ export default function ComparePage() {
           />
           <div className={COMPARE_EMPTY_STATE_TEXT_BLOCK_CLASS}>
             <div className={COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS}>
-              <h2 className={COMPARE_EMPTY_STATE_TITLE_CLASS}>
-                {t('common.compare.empty')}
-              </h2>
-              <p className={COMPARE_EMPTY_STATE_DESCRIPTION_CLASS}>
-                {t('common.compare.emptyDescription')}
-              </p>
+              <h2 className={COMPARE_EMPTY_STATE_TITLE_CLASS}>{t('common.compare.empty')}</h2>
+              <p className={COMPARE_EMPTY_STATE_DESCRIPTION_CLASS}>{t('common.compare.emptyDescription')}</p>
             </div>
             <Link href="/products" className="w-full">
               <Button
@@ -499,4 +247,4 @@ export default function ComparePage() {
       )}
     </div>
   );
-}  
+}

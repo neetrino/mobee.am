@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { MouseEvent } from 'react';
 import { t } from '../../../lib/i18n';
 import type { ProductPageProps, ProductVariant } from './types';
-import { WISHLIST_KEY, COMPARE_KEY } from './constants';
+import { WISHLIST_KEY } from './constants';
+import { resolveCompareCategoryId, toggleCompareProduct } from '../../../lib/shop/compare-storage';
 import {
   getOptionValue,
   findVariantByColorAndSize,
@@ -286,24 +287,16 @@ export default function ProductPage({ params }: ProductPageProps) {
     e.stopPropagation();
     if (!product || typeof window === 'undefined') return;
     try {
-      const stored = localStorage.getItem(COMPARE_KEY);
-      const compare: string[] = stored ? JSON.parse(stored) : [];
-      if (isInCompare) {
-        localStorage.setItem(
-          COMPARE_KEY,
-          JSON.stringify(compare.filter((id) => id !== product.id))
-        );
+      const categoryId = resolveCompareCategoryId(product);
+      const { outcome } = toggleCompareProduct(product.id, categoryId);
+      if (outcome === 'group_full') {
+        setShowMessage(t(language, 'product.compareListFull'));
+      } else if (outcome === 'removed') {
         setIsInCompare(false);
         setShowMessage(t(language, 'product.removedFromCompare'));
       } else {
-        if (compare.length >= 4) {
-          setShowMessage(t(language, 'product.compareListFull'));
-        } else {
-          compare.push(product.id);
-          localStorage.setItem(COMPARE_KEY, JSON.stringify(compare));
-          setIsInCompare(true);
-          setShowMessage(t(language, 'product.addedToCompare'));
-        }
+        setIsInCompare(true);
+        setShowMessage(t(language, 'product.addedToCompare'));
       }
       setTimeout(() => setShowMessage(null), 2000);
       window.dispatchEvent(new Event('compare-updated'));

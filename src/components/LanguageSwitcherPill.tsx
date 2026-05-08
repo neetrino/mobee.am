@@ -15,7 +15,7 @@ function segmentForLang(lang: LanguageCode): PillSegment {
 }
 
 export function LanguageSwitcherPill() {
-  const [lang, setLang] = useState<LanguageCode>('en');
+  const [lang, setLang] = useState<LanguageCode>(() => getStoredLanguage());
 
   useEffect(() => {
     setLang(getStoredLanguage());

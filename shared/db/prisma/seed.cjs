@@ -22,7 +22,7 @@ function loadEnv(filePath) {
 loadEnv(path.join(__dirname, "../../.env"));
 loadEnv(path.join(process.cwd(), ".env"));
 
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require("../generated/client");
 const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();

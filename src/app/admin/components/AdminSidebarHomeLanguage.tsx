@@ -11,7 +11,7 @@ export const ADMIN_LANGUAGE_TABS: Array<{ code: LanguageCode; label: string }> =
 ];
 
 export function useAdminSidebarLanguage(): LanguageCode {
-  const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(() => getStoredLanguage());
 
   useEffect(() => {
     setCurrentLanguage(getStoredLanguage());

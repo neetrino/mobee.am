@@ -13,11 +13,12 @@ import { useVariantSelection } from './hooks/useVariantSelection';
 import { useProductActions } from './hooks/useProductActions';
 import { useProductQuantity } from './hooks/useProductQuantity';
 import { useProductCalculations } from './hooks/useProductCalculations';
+import { resolveCompareCategoryId } from '../../../lib/shop/compare-storage';
 
 export function useProductPage(params: Promise<{ slug?: string }>) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
   const [showMessage, setShowMessage] = useState<string | null>(null);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
 
@@ -98,9 +99,9 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
 
   const { handleAddToWishlist, handleCompareToggle } = useProductActions({
     productId: product?.id || null,
+    compareCategoryId: product ? resolveCompareCategoryId(product) : '',
     isInWishlist,
     setIsInWishlist,
-    isInCompare,
     setIsInCompare,
     setShowMessage,
     language,

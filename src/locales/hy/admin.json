@@ -223,6 +223,8 @@
     "country": "Երկիր",
     "city": "Քաղաք",
     "price": "Գին (ԴՐԱՄ)",
+    "selectCountry": "Ընտրեք երկիրը",
+    "selectCity": "Ընտրեք քաղաքը",
     "countryPlaceholder": "օր.՝ Հայաստան",
     "cityPlaceholder": "օր.՝ Երևան",
     "pricePlaceholder": "1000",

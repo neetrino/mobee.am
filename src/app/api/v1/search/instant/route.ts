@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@white-shop/db';
 import { db } from '@white-shop/db';
 import { PRODUCT_VARIANT_DB_SELECT } from '@/lib/database/productVariantDb.constants';
 import { extractMediaUrl } from '@/lib/utils/extractMediaUrl';

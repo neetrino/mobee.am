@@ -92,7 +92,10 @@
   "compare": {
     "title": "Compare Products",
     "empty": "No products to compare",
-    "emptyDescription": "Add up to 4 products to compare their features and prices.",
+    "emptyDescription": "Add products to compare by category — up to 4 in each category (e.g. phones with phones, watches with watches). Different categories appear in separate sections.",
+    "perCategoryHint": "Each category has its own comparison table (up to 4 products per category).",
+    "uncategorized": "Other products",
+    "category": "Category",
     "products": "products",
     "product": "product",
     "isFull": "Comparison list is full",
@@ -143,7 +146,7 @@
     "selectOptions": "Select options",
     "adding": "Adding...",
     "pcs": "pcs",
-    "compareMaxReached": "You can compare a maximum of 4 products",
+    "compareMaxReached": "You can compare up to 4 products in the same category",
     "invalidProduct": "Invalid product. Please refresh the page and try again.",
     "noVariantsAvailable": "No variants available",
     "stockExceeded": "Available quantity is {stock} pcs. You cannot add more:",
@@ -158,7 +161,7 @@
     "sku": "SKU"
   },
   "alerts": {
-    "compareMaxReached": "You can compare a maximum of 4 products",
+    "compareMaxReached": "You can compare up to 4 products in the same category",
     "invalidProduct": "Invalid product. Please refresh the page and try again.",
     "noVariantsAvailable": "No variants available",
     "stockExceeded": "Available quantity is {stock} pcs. You cannot add more:",

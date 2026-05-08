@@ -7,7 +7,8 @@ import { getStoredLanguage } from '../../../lib/language';
 import { apiClient } from '../../../lib/api-client';
 import { getStoredCurrency, type CurrencyCode } from '../../../lib/currency';
 import type { Product } from './types';
-import { RESERVED_ROUTES, WISHLIST_KEY, COMPARE_KEY } from './constants';
+import { RESERVED_ROUTES, WISHLIST_KEY } from './constants';
+import { isProductIdInCompare } from '../../../lib/shop/compare-storage';
 import {
   processImageUrl,
   smartSplitUrls,
@@ -47,7 +48,7 @@ export function useProductData({
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isInCompare, setIsInCompare] = useState(false);
   const [reviews, setReviews] = useState<Array<{ rating: number }>>([]);
@@ -239,9 +240,7 @@ export function useProductData({
     const checkCompare = () => {
       if (typeof window === 'undefined') return;
       try {
-        const stored = localStorage.getItem(COMPARE_KEY);
-        const compare = stored ? JSON.parse(stored) : [];
-        setIsInCompare(compare.includes(product.id));
+        setIsInCompare(isProductIdInCompare(product.id));
       } catch {
         setIsInCompare(false);
       }

@@ -1,5 +1,5 @@
 import { db } from "@white-shop/db";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@white-shop/db";
 import {
   PRODUCT_VARIANT_DB_SELECT,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,

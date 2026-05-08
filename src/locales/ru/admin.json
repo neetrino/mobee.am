@@ -223,6 +223,8 @@
     "country": "Страна",
     "city": "Город",
     "price": "Цена (AMD)",
+    "selectCountry": "Выберите страну",
+    "selectCity": "Выберите город",
     "countryPlaceholder": "например, Армения",
     "cityPlaceholder": "например, Ереван",
     "pricePlaceholder": "1000",

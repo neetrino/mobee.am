@@ -80,6 +80,10 @@ export interface Product {
     id: string;
     name: string;
   };
+  /** Leaf / primary category for compare grouping. */
+  primaryCategoryId?: string | null;
+  /** Assigned category ids (no extra join); used when primary is unset. */
+  categoryIds?: string[];
   categories?: Array<{
     id: string;
     slug: string;

@@ -1,5 +1,7 @@
 generator client {
   provider = "prisma-client-js"
+  // Avoid Windows EPERM when renaming query_engine inside pnpm's node_modules store
+  output   = "../generated/client"
 }
 
 datasource db {
