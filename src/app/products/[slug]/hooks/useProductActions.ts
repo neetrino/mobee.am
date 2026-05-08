@@ -1,13 +1,14 @@
 import type { MouseEvent } from 'react';
-import { WISHLIST_KEY, COMPARE_KEY } from '../types';
+import { WISHLIST_KEY } from '../types';
 import { t } from '../../../../lib/i18n';
 import type { LanguageCode } from '../../../../lib/language';
+import { toggleCompareProduct } from '../../../../lib/shop/compare-storage';
 
 interface UseProductActionsProps {
   productId: string | null;
+  compareCategoryId: string;
   isInWishlist: boolean;
   setIsInWishlist: (value: boolean) => void;
-  isInCompare: boolean;
   setIsInCompare: (value: boolean) => void;
   setShowMessage: (message: string | null) => void;
   language: LanguageCode;
@@ -15,9 +16,9 @@ interface UseProductActionsProps {
 
 export function useProductActions({
   productId,
+  compareCategoryId,
   isInWishlist,
   setIsInWishlist,
-  isInCompare,
   setIsInCompare,
   setShowMessage,
   language,
@@ -53,26 +54,19 @@ export function useProductActions({
     e.preventDefault();
     e.stopPropagation();
     if (!productId || typeof window === 'undefined') return;
-    
+
     try {
-      const stored = localStorage.getItem(COMPARE_KEY);
-      const compare: string[] = stored ? JSON.parse(stored) : [];
-      
-      if (isInCompare) {
-        localStorage.setItem(COMPARE_KEY, JSON.stringify(compare.filter(id => id !== productId)));
+      const { outcome } = toggleCompareProduct(productId, compareCategoryId);
+      if (outcome === 'group_full') {
+        setShowMessage(t(language, 'product.compareListFull'));
+      } else if (outcome === 'removed') {
         setIsInCompare(false);
         setShowMessage(t(language, 'product.removedFromCompare'));
       } else {
-        if (compare.length >= 4) {
-          setShowMessage(t(language, 'product.compareListFull'));
-        } else {
-          compare.push(productId);
-          localStorage.setItem(COMPARE_KEY, JSON.stringify(compare));
-          setIsInCompare(true);
-          setShowMessage(t(language, 'product.addedToCompare'));
-        }
+        setIsInCompare(true);
+        setShowMessage(t(language, 'product.addedToCompare'));
       }
-      
+
       setTimeout(() => setShowMessage(null), 2000);
       window.dispatchEvent(new Event('compare-updated'));
     } catch {

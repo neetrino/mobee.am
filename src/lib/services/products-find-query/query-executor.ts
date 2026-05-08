@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 import {
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,

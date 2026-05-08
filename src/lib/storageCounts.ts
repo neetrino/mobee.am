@@ -1,11 +1,13 @@
 'use client';
 
+import { readCompareEntries, SHOP_COMPARE_STORAGE_KEY } from './shop/compare-storage';
+
 /**
  * Shared storage keys used to keep wishlist, compare and cart data in localStorage.
  */
 export const STORAGE_KEYS = {
   wishlist: 'shop_wishlist',
-  compare: 'shop_compare',
+  compare: SHOP_COMPARE_STORAGE_KEY,
   cart: 'shop_cart_guest',
 } as const;
 
@@ -38,7 +40,12 @@ export function getWishlistCount(): number {
  * Retrieves compare items count from localStorage.
  */
 export function getCompareCount(): number {
-  return getStoredArrayLength(COMPARE_KEY);
+  if (typeof window === 'undefined') return 0;
+  try {
+    return readCompareEntries().length;
+  } catch {
+    return 0;
+  }
 }
 
 /**

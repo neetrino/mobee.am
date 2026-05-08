@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="hy" className="h-full">
       <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
           <ClientProviders>

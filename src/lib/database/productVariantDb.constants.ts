@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@white-shop/db";
 
 /**
  * Explicit scalar selection for `product_variants` so queries stay valid when the

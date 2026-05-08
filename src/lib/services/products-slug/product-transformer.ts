@@ -383,6 +383,8 @@ export async function transformProduct(
     title: translation?.title || "",
     subtitle: translation?.subtitle || null,
     description: translation?.descriptionHtml || null,
+    primaryCategoryId: product.primaryCategoryId ?? null,
+    categoryIds: Array.isArray(product.categoryIds) ? [...product.categoryIds] : [],
     /** Same as product list/card: first gallery URL from raw `media[0]` (before variant separation). */
     image: listingCardImage,
     brand: product.brand

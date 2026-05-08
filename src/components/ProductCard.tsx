@@ -9,6 +9,7 @@ import { useCompare } from './hooks/useCompare';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
 import { useAddToCart } from './hooks/useAddToCart';
 import { useCurrency } from './hooks/useCurrency';
+import { resolveCompareCategoryId } from '../lib/shop/compare-storage';
 import { ProductCardList } from './ProductCard/ProductCardList';
 import { ProductCardGrid } from './ProductCard/ProductCardGrid';
 
@@ -31,6 +32,9 @@ interface Product {
   globalDiscount?: number | null;
   discountPercent?: number | null;
   colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+  primaryCategoryId?: string | null;
+  categoryIds?: string[];
+  categories?: Array<{ id: string; slug?: string; title?: string }>;
 }
 
 type ViewMode = 'list' | 'grid-2' | 'grid-3';
@@ -68,7 +72,8 @@ export function ProductCard({
   const { isLoggedIn } = useAuth();
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(product.id);
-  const { isInCompare, toggleCompare } = useCompare(product.id);
+  const compareCategoryId = resolveCompareCategoryId(product);
+  const { isInCompare, toggleCompare } = useCompare(product.id, compareCategoryId);
   const { isAddingToCart, addToCart } = useAddToCart({
     productId: product.id,
     productSlug: product.slug,
