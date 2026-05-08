@@ -43,7 +43,7 @@ export function LoginRequiredModal({ isOpen, onClose }: LoginRequiredModalProps)
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+            className="shrink-0 rounded-full p-1 text-gray-400 transition-colors hover:text-admin-600"
             aria-label={t('checkout.modals.closeModal')}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -55,7 +55,7 @@ export function LoginRequiredModal({ isOpen, onClose }: LoginRequiredModalProps)
         <button
           type="button"
           onClick={handleGoToLogin}
-          className="w-full rounded-lg py-3 px-4 font-medium text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-400"
+          className="w-full rounded-full py-3 px-4 font-medium text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-400"
           style={{ backgroundColor: LOGIN_CTA_BACKGROUND }}
         >
           {t('checkout.modals.goToLogin')}

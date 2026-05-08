@@ -78,7 +78,7 @@ function ToastItem({ toast, onClose }: ToastProps) {
       <div className="flex-1 text-sm font-medium">{toast.message}</div>
       <button
         onClick={() => onClose(toast.id)}
-        className={`flex-shrink-0 ${iconColors[toast.type]} hover:opacity-70 transition-opacity`}
+        className="flex-shrink-0 text-gray-500 transition-colors hover:text-admin-600"
         aria-label="Close"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

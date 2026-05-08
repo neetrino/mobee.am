@@ -41,7 +41,7 @@ export function ProductCardInfo({
   omitBrandRow = false,
   titleSizeMobileFigma = false,
 }: ProductCardInfoProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   const paddingClass = (() => {
     if (hidePrice) {
@@ -65,6 +65,13 @@ export function ProductCardInfo({
       return `text-base font-bold text-gray-900 line-clamp-2 ${subtitle ? 'mb-0.5' : 'mb-1'}`;
     }
     return `text-[18px] leading-7 font-bold text-gray-900 line-clamp-2 ${subtitle ? 'mb-1' : 'mb-2'}`;
+  })();
+  const priceClass = (() => {
+    if (lang === 'ru') {
+      return isCompact ? 'text-[0.98rem]' : 'text-[1.25rem]';
+    }
+
+    return isCompact ? 'text-[1.06875rem]' : 'text-[1.425rem]';
   })();
 
   return (
@@ -96,9 +103,7 @@ export function ProductCardInfo({
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <span
-                className={`whitespace-nowrap ${
-                  isCompact ? 'text-[1.06875rem]' : 'text-[1.425rem]'
-                } font-semibold text-gray-900`}
+                className={`whitespace-nowrap ${priceClass} font-semibold text-gray-900`}
               >
                 {formatPrice(price || 0, currency)}
               </span>

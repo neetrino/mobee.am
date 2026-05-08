@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
+import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
 const montserrat = Montserrat({
@@ -134,28 +134,6 @@ function OriginalIcon() {
   );
 }
 
-function ArrowRightIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      width="8"
-      height="8"
-      viewBox="0 0 8 8"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <path
-        d="M1 4h6M4.5 1.5L7 4l-2.5 2.5"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function WhyChooseUsBenefitsList({ t }: { t: (path: string) => string }) {
   return (
     <ul
@@ -220,24 +198,9 @@ export function WhyChooseUsSection() {
               {t('home.why_choose_us_heading.subtitle')}
             </p>
           </div>
-          <Link
-            href="/about"
-            className="group relative flex h-12 w-[min(100%,159px)] shrink-0 items-center justify-between overflow-hidden rounded-full border-2 border-[#2db2ff] bg-[#2db2ff] pl-5 pr-0.5 active:scale-[0.99] sm:w-[159px]"
-          >
-            <span
-              className="pointer-events-none absolute inset-0 origin-[calc(100%-24px)_50%] scale-x-0 bg-[#1e1e1e] transition-transform duration-500 ease-in-out group-hover:scale-x-100"
-              aria-hidden
-            />
-            <span className="relative z-10 text-right text-[12px] font-medium leading-none text-[#1e1e1e] transition-colors duration-500 ease-in-out group-hover:text-white">
-              {t('home.why_choose_us_heading.cta')}
-            </span>
-            <span
-              className="relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full bg-[#1e1e1e] text-white"
-              aria-hidden
-            >
-              <ArrowRightIcon className="size-2" />
-            </span>
-          </Link>
+          <HomeMoreCtaPillLink href="/about" variant="cyanPromo">
+            {t('home.why_choose_us_heading.cta')}
+          </HomeMoreCtaPillLink>
         </div>
 
         <WhyChooseUsBenefitsList t={t} />

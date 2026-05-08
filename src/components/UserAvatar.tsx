@@ -1,5 +1,7 @@
 'use client';
 
+import { USER_AVATAR_INITIALS_SURFACE_CLASS } from './user-avatar.constants';
+
 /**
  * UserAvatar Component
  * 
@@ -41,11 +43,11 @@ export function UserAvatar({
     return '?';
   };
 
-  // Size classes
+  // Size classes (`lg` tuned for profile header — between `md` and old 96px)
   const sizeClasses = {
     sm: 'w-10 h-10 text-sm',
     md: 'w-16 h-16 text-lg',
-    lg: 'w-24 h-24 text-2xl',
+    lg: 'h-20 w-20 text-xl',
     xl: 'w-32 h-32 text-3xl',
   };
 
@@ -60,7 +62,9 @@ export function UserAvatar({
           className="w-full h-full rounded-full object-cover border-2 border-gray-200"
         />
       ) : (
-        <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white font-semibold border-2 border-gray-200 shadow-sm">
+        <div
+          className={`flex h-full w-full items-center justify-center rounded-full font-semibold ${USER_AVATAR_INITIALS_SURFACE_CLASS}`}
+        >
           {initials}
         </div>
       )}

@@ -314,7 +314,7 @@ export default function ComparePage() {
                     >
                       <button
                         onClick={(e) => handleRemove(e, product.id)}
-                        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all"
+                        className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-all hover:bg-admin-50 hover:text-admin-600"
                         title={t('common.buttons.remove')}
                         aria-label={t('common.buttons.remove')}
                       >

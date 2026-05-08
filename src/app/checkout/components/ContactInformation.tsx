@@ -4,6 +4,7 @@ import { Input } from '@shop/ui';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
 import { CheckoutFormData } from '../types';
+import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 
 interface ContactInformationProps {
   register: UseFormRegister<CheckoutFormData>;
@@ -41,7 +42,9 @@ export function ContactInformation({
         />
       </div>
       {(errors.email || errors.phone) && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div
+          className={`border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+        >
           <p className="text-sm text-red-600">
             {errors.email?.message || errors.phone?.message}
           </p>

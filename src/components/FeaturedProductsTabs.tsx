@@ -8,6 +8,7 @@ import { WhyChooseUsSection } from './WhyChooseUsSection';
 import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
 import { HomeMobileSaleBanner } from './HomeMobileSaleBanner';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS } from './home-best-choice.constants';
 import { t } from '../lib/i18n';
 import { FEATURED_HOME_FILTER_DEFAULT, useFeaturedHomeProducts } from './useFeaturedHomeProducts';
 import {
@@ -51,7 +52,7 @@ function HomeFeaturedCarouselSection({
         syncedCarouselPageIndex={featuredCarousel.pageIndex}
         syncedCarouselPageCount={featuredCarousel.pageCount}
       />
-      <div className="mt-5 lg:mt-0">
+      <div className={`mt-5 ${HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS}`}>
         <FeaturedBestChoiceGrid
           language={language}
           loading={loading}
@@ -95,7 +96,7 @@ function HomeSpecialOffersCarouselSection({
       syncedCarouselPageIndex={specialOffersCarousel.pageIndex}
       syncedCarouselPageCount={specialOffersCarousel.pageCount}
     >
-      <div className="mt-4 lg:mt-[7.5rem]">
+      <div className={`mt-4 ${HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS}`}>
         <SpecialOffersProductGrid
           language={specialOffersLanguage}
           loading={specialOffersLoading}
@@ -202,7 +203,7 @@ export function HomeProductSections() {
   );
 
   return (
-    <section className="bg-white pb-0 pt-2 lg:bg-gray-50 lg:pb-16 lg:pt-6" aria-labelledby="home-product-sections">
+    <section className="bg-white pb-0 pt-2 lg:pb-16 lg:pt-0" aria-labelledby="home-product-sections">
       <HomeProductSectionsBody
         language={language}
         products={products}

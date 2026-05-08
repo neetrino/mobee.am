@@ -2,7 +2,12 @@
 
 import { ProductCard } from './ProductCard';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
-import { HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET } from './home-best-choice.constants';
+import {
+  HOME_BEST_CHOICE_DESKTOP_GRID_COLS_DEFAULT,
+  HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO,
+  HOME_BEST_CHOICE_DESKTOP_GRID_TRACK,
+  HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET,
+} from './home-best-choice.constants';
 import { chunkArray } from '../lib/chunk-array';
 import {
   useHomeBestChoiceCarouselPageSync,
@@ -13,12 +18,10 @@ import { useIpadProHomeDesktopGrid } from './useIpadProHomeDesktopGrid';
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
 /** Desktop layout for home best-choice rows (hidden below `lg`). */
-const HOME_BEST_CHOICE_DESKTOP_GRID =
-  'hidden grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid lg:grid-cols-4 lg:gap-6';
+const HOME_BEST_CHOICE_DESKTOP_GRID = `hidden ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} lg:grid ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_DEFAULT}`;
 
 /** iPad Pro only: three columns on the desktop grid (see {@link useIpadProHomeDesktopGrid}). */
-const HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO =
-  'hidden grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid lg:grid-cols-3 lg:gap-6';
+const HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO = `hidden ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} lg:grid ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO}`;
 
 /** Horizontal snap carousel below `lg`. */
 const HOME_BEST_CHOICE_MOBILE_CAROUSEL =

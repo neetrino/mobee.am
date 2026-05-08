@@ -16,9 +16,9 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: ProfileHeaderProps) {
   return (
     <>
-      <div className="w-full flex-shrink-0 lg:w-80 lg:sticky lg:top-8 lg:self-start">
+      <div className="flex w-full flex-shrink-0 flex-col lg:sticky lg:top-8 lg:w-max lg:min-w-80 lg:max-w-2xl lg:self-start">
         {/* Profile Header Section */}
-        <div className="mb-3 rounded-[15px] border border-gray-200 bg-white p-4 shadow-sm lg:mb-4 lg:rounded-lg">
+        <div className="mb-3 w-full rounded-[15px] border border-gray-200 bg-white p-4 shadow-sm lg:mb-4">
           <div className="flex flex-row items-center gap-4">
             {/* Avatar */}
             <UserAvatar
@@ -40,7 +40,9 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
                       : t('profile.myProfile')}
               </h1>
               {profile?.email && (
-                <p className="text-sm font-bold text-gray-900 mb-1 break-words">{profile.email}</p>
+                <p className="mb-1 break-words text-sm font-bold text-gray-900 [overflow-wrap:anywhere] lg:whitespace-nowrap">
+                  {profile.email}
+                </p>
               )}
               {profile?.phone && (
                 <p className="text-sm text-gray-500 break-words">{profile.phone}</p>
@@ -50,8 +52,8 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
         </div>
 
         {/* Sidebar Navigation */}
-        <aside className="hidden lg:block">
-          <nav className="bg-white border border-gray-200 rounded-lg p-2 space-y-1">
+        <aside className="hidden w-full lg:block">
+          <nav className="rounded-[15px] border border-gray-200 bg-white p-2 space-y-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}

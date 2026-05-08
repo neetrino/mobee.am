@@ -55,7 +55,7 @@ export function OrderDetailsModal({
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+        <div className="relative transform overflow-hidden rounded-[15px] bg-white shadow-xl transition-all w-full max-w-6xl max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
             <div>
@@ -77,7 +77,7 @@ export function OrderDetailsModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-admin-50 hover:text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-2"
                 aria-label={t('profile.orderDetails.close')}
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,7 +106,7 @@ export function OrderDetailsModal({
                 {/* Order Details */}
                 <div className="lg:col-span-2 space-y-6">
                   {/* Status */}
-                  <Card className="p-6">
+                  <Card className="rounded-[15px] p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.orderDetails.orderStatus')}</h3>
                     <div className="flex flex-wrap items-center gap-4">
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedOrder.status)}`}>
@@ -119,7 +119,7 @@ export function OrderDetailsModal({
                   </Card>
 
                   {/* Order Items */}
-                  <Card className="p-6">
+                  <Card className="rounded-[15px] p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('profile.orderDetails.orderItems')}</h3>
                     <div className="space-y-4">
                       {selectedOrder.items.map((item, index) => {
@@ -128,7 +128,7 @@ export function OrderDetailsModal({
                         return (
                           <div key={index} className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
                             {item.imageUrl && (
-                              <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                              <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded-[15px] bg-gray-100">
                                 <img 
                                   src={item.imageUrl} 
                                   alt={item.productTitle}
@@ -206,7 +206,7 @@ export function OrderDetailsModal({
 
                 {/* Order Summary + Shipping */}
                 <div className="space-y-4">
-                  <Card className="p-6 sticky top-4">
+                  <Card className="sticky top-4 rounded-[15px] p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('profile.orderDetails.orderSummary')}</h3>
                     <div className="space-y-4 mb-6">
                       {selectedOrder.totals ? (
@@ -279,7 +279,7 @@ export function OrderDetailsModal({
                   </Card>
 
                   {/* Shipping Method */}
-                  <Card className="p-6">
+                  <Card className="rounded-[15px] p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.orderDetails.shippingMethod')}</h3>
                     <div className="text-gray-700 space-y-3">
                       <div>

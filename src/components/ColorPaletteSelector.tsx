@@ -75,7 +75,7 @@ export function ColorPaletteSelector({ colors, onColorsChange }: ColorPaletteSel
                 <button
                   type="button"
                   onClick={() => handleRemoveColor(index)}
-                  className="text-red-600 hover:text-red-800 transition-colors"
+                  className="text-admin-600 transition-colors hover:text-admin-800"
                   title={t('admin.attributes.valueModal.removeColor')}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

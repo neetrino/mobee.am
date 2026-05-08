@@ -22,7 +22,7 @@ export function ProfilePassword({
   t,
 }: ProfilePasswordProps) {
   return (
-    <Card className="p-6">
+    <Card className="rounded-[15px] p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.password.title')}</h2>
       <form onSubmit={onSave} className="space-y-4 max-w-2xl">
         <Input

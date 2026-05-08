@@ -255,7 +255,7 @@ export function TopCategories() {
                   </div>
                 </div>
                 <div
-                  className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-1.5 pb-2.5 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
+                  className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex -translate-y-[8px] justify-center px-1.5 pb-2.5 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
                     slot.tall ? 'xl:pb-3' : ''
                   }`}
                 >

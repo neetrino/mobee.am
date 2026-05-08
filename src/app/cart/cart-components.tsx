@@ -3,10 +3,21 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@shop/ui';
-import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { formatPrice } from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
 import type { Cart, CartItem } from './types';
+import {
+  CART_ITEM_ROW_DESKTOP_IMAGE_FRAME_CLASS,
+  CART_ITEM_ROW_DESKTOP_IMAGE_MAT_CLASS,
+  CART_ITEM_ROW_DESKTOP_IMAGE_STACK_CLASS,
+  CART_ITEM_ROW_DESKTOP_MIN_HEIGHT_CLASS,
+  CART_LINE_ITEM_CARD_FOOTER_CLASS,
+  CART_LINE_ITEM_CARD_FRAME_CLASS,
+  ORDER_SUMMARY_PANEL_RADIUS_CLASS,
+} from './constants';
+import { CART_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
+import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
+import { DISMISS_ROUND_BUTTON_HOVER_CLASS } from '../../lib/dismiss-icon-button.constants';
 
 /**
  * Cart item row component
@@ -29,108 +40,133 @@ export function CartItemRow({
   t,
 }: CartItemRowProps) {
   const currencyCode = currency as CurrencyCode;
-  const lineImageSrc = resolveProductCardImageSrc(
-    item.variant.product.image,
+  const quantityControls = (
+    <div className="flex w-full min-w-0 items-center justify-center gap-1.5">
+      <button
+        type="button"
+        onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+        disabled={updatingItems.has(item.id)}
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        aria-label={t('common.ariaLabels.decreaseQuantity')}
+      >
+        <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+        </svg>
+      </button>
+      <input
+        type="number"
+        min="1"
+        max={item.variant.stock !== undefined ? item.variant.stock : undefined}
+        value={item.quantity}
+        onChange={(e) => {
+          const newQuantity = parseInt(e.target.value) || 1;
+          onUpdateQuantity(item.id, newQuantity);
+        }}
+        disabled={updatingItems.has(item.id)}
+        className="h-8 min-w-0 w-12 shrink rounded-lg border border-gray-300 bg-white px-1 py-0 text-center text-sm font-medium tabular-nums leading-8 [-moz-appearance:textfield] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        title={item.variant.stock !== undefined ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : ''}
+      />
+      <button
+        type="button"
+        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+        disabled={updatingItems.has(item.id) || (item.variant.stock !== undefined && item.quantity >= item.variant.stock)}
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        aria-label={t('common.ariaLabels.increaseQuantity')}
+        title={item.variant.stock !== undefined && item.quantity >= item.variant.stock ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : t('common.messages.addQuantity')}
+      >
+        <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
+    </div>
   );
+
+  const priceBlock = (
+    <div className="flex w-full flex-col items-center gap-0.5">
+      <span className="text-center text-sm font-bold tabular-nums text-gray-900">
+        {formatPrice(item.total, currencyCode)}
+      </span>
+      {item.originalPrice && item.originalPrice > item.price ? (
+        <span className="text-center text-xs tabular-nums text-gray-500 line-through">
+          {formatPrice(item.originalPrice * item.quantity, currencyCode)}
+        </span>
+      ) : null}
+    </div>
+  );
+
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 px-4 sm:px-6 py-6 hover:bg-gray-50 transition-colors relative"
+      className={`${CART_LINE_ITEM_CARD_FRAME_CLASS} ${CART_ITEM_ROW_DESKTOP_MIN_HEIGHT_CLASS}`}
     >
       <button
+        type="button"
         onClick={() => onRemove(item.id)}
-        className="absolute top-2 right-2 md:top-4 md:right-4 w-7 h-7 rounded-full bg-white hover:bg-red-50 flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors shadow-md border border-gray-200 hover:border-red-300 z-10"
+        className={`absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-full border border-gray-200 bg-white/95 shadow-md backdrop-blur-sm transition-colors text-gray-500 ${DISMISS_ROUND_BUTTON_HOVER_CLASS}`}
         aria-label={t('common.buttons.remove')}
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-      
-      {/* Product */}
-      <div className="md:col-span-6 flex items-start gap-4">
+
+      <div
+        className={`relative shrink-0 max-lg:min-h-[120px] max-lg:overflow-hidden ${CART_ITEM_ROW_DESKTOP_IMAGE_STACK_CLASS}`}
+      >
+        <div
+          className={`absolute inset-x-2 top-2 bottom-2 max-lg:bottom-2 lg:inset-x-5 lg:top-5 lg:bottom-auto ${CART_ITEM_ROW_DESKTOP_IMAGE_FRAME_CLASS}`}
+        >
+          <div
+            className={`flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-2 ${CART_ITEM_ROW_DESKTOP_IMAGE_MAT_CLASS}`}
+          >
+            <Link
+              href={`/products/${item.variant.product.slug}`}
+              className="relative block h-full min-h-[104px] w-full max-lg:min-h-[104px] lg:min-h-0"
+            >
+              {item.variant.product.image ? (
+                <Image
+                  src={item.variant.product.image}
+                  alt={item.variant.product.title}
+                  fill
+                  className="object-contain p-2"
+                  sizes="(max-width: 833px) 45vw, (max-width: 1279px) 30vw, 22vw"
+                  unoptimized
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <svg className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              )}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col px-2 pb-1 pt-2 lg:px-5 lg:pb-1 lg:pt-2">
         <Link
           href={`/products/${item.variant.product.slug}`}
-          className="w-24 h-24 sm:w-28 sm:h-28 bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden"
+          className="line-clamp-2 pr-8 text-sm font-medium leading-snug text-gray-900 transition-colors hover:text-blue-600"
         >
-          <Image
-            src={lineImageSrc}
-            alt={item.variant.product.title}
-            fill
-            className="object-cover"
-            sizes="80px"
-            unoptimized
-          />
+          {item.variant.product.title}
         </Link>
-        <div className="flex-1 min-w-0">
-          <Link
-            href={`/products/${item.variant.product.slug}`}
-            className="text-base font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2"
-          >
-            {item.variant.product.title}
-          </Link>
-          {item.variant.sku && (
-            <p className="text-xs text-gray-500 mt-1">{t('common.messages.sku')}: {item.variant.sku}</p>
-          )}
-        </div>
+        {item.variant.sku ? (
+          <p className="mt-1 line-clamp-1 text-[10px] text-gray-500">
+            {t('common.messages.sku')}: {item.variant.sku}
+          </p>
+        ) : null}
       </div>
 
-      {/* Quantity */}
-      <div className="md:col-span-2 flex flex-col items-start md:items-center justify-center">
-        <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase md:hidden">
-          {t('common.messages.quantity')}
-        </p>
-        <div className="flex items-center justify-center gap-2 w-full md:w-auto">
-          <button
-            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-            disabled={updatingItems.has(item.id)}
-            className="w-9 h-9 flex-shrink-0 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label={t('common.ariaLabels.decreaseQuantity')}
-          >
-            <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
-          </button>
-          <input
-            type="number"
-            min="1"
-            max={item.variant.stock !== undefined ? item.variant.stock : undefined}
-            value={item.quantity}
-            onChange={(e) => {
-              const newQuantity = parseInt(e.target.value) || 1;
-              onUpdateQuantity(item.id, newQuantity);
-            }}
-            disabled={updatingItems.has(item.id)}
-            className="w-20 h-9 text-right border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 font-medium pl-2 pr-5"
-            title={item.variant.stock !== undefined ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : ''}
-          />
-          <button
-            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-            disabled={updatingItems.has(item.id) || (item.variant.stock !== undefined && item.quantity >= item.variant.stock)}
-            className="w-9 h-9 flex-shrink-0 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label={t('common.ariaLabels.increaseQuantity')}
-            title={item.variant.stock !== undefined && item.quantity >= item.variant.stock ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : t('common.messages.addQuantity')}
-          >
-            <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Subtotal */}
-      <div className="md:col-span-3 flex flex-col md:flex-row md:items-center md:justify-start md:ml-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 md:hidden">
-          {t('common.messages.subtotal')}
-        </p>
-        <div className="flex flex-col gap-1 mt-1 md:mt-0">
-          <span className="text-lg font-semibold text-blue-600">
-            {formatPrice(item.total, currencyCode)}
-          </span>
-          {item.originalPrice && item.originalPrice > item.price && (
-            <span className="text-sm text-gray-500 line-through">
-              {formatPrice(item.originalPrice * item.quantity, currencyCode)}
-            </span>
-          )}
+      <div className={CART_LINE_ITEM_CARD_FOOTER_CLASS}>
+        <span className="sr-only">{t('common.messages.subtotal')}</span>
+        {priceBlock}
+        <div
+          className="flex w-full flex-col items-stretch justify-center"
+          role="group"
+          aria-label={t('common.messages.quantity')}
+        >
+          <span className="sr-only">{t('common.messages.quantity')}</span>
+          {quantityControls}
         </div>
       </div>
     </div>
@@ -159,35 +195,18 @@ export function CartTable({
 }: CartTableProps) {
   return (
     <div className="lg:col-span-2">
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        {/* Table Header */}
-        <div className="hidden md:grid md:grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200">
-          <div className="md:col-span-6">
-            <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('common.messages.product')}</span>
-          </div>
-          <div className="md:col-span-2 text-center">
-            <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('common.messages.quantity')}</span>
-          </div>
-          <div className="md:col-span-3 text-center">
-            <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('common.messages.subtotal')}</span>
-          </div>
-          <div className="md:col-span-1"></div>
-        </div>
-
-        {/* Table Body */}
-        <div className="divide-y divide-gray-200">
-          {cart.items.map((item) => (
-            <CartItemRow
-              key={item.id}
-              item={item}
-              currency={currency}
-              updatingItems={updatingItems}
-              onRemove={onRemove}
-              onUpdateQuantity={onUpdateQuantity}
-              t={t}
-            />
-          ))}
-        </div>
+      <div className={CART_LINE_ITEMS_GRID_CLASS}>
+        {cart.items.map((item) => (
+          <CartItemRow
+            key={item.id}
+            item={item}
+            currency={currency}
+            updatingItems={updatingItems}
+            onRemove={onRemove}
+            onUpdateQuantity={onUpdateQuantity}
+            t={t}
+          />
+        ))}
       </div>
     </div>
   );
@@ -207,7 +226,9 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
   
   return (
     <div className="lg:col-span-1">
-      <div className="bg-white rounded-lg border border-gray-200 p-6 lg:sticky lg:top-24">
+      <div
+        className={`${ORDER_SUMMARY_PANEL_RADIUS_CLASS} border border-gray-200 bg-white p-6 ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}
+      >
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           {t('common.cart.orderSummary')}
         </h2>
@@ -233,7 +254,7 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
         </div>
         <Button
           variant="primary"
-          className="w-full !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500"
+          className="w-full !rounded-full !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500"
           size="lg"
           onClick={() => {
             // Allow guest checkout - no redirect to login
@@ -244,7 +265,7 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
         </Button>
         <Button
           variant="outline"
-          className="w-full mt-3"
+          className="mt-3 w-full !rounded-full"
           size="md"
           onClick={() => {
             window.location.href = '/products';

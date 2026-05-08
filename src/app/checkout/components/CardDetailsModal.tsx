@@ -6,6 +6,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { PaymentMethodLogo } from './PaymentMethodLogo';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
+import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 import { CheckoutFormData, Cart } from '../types';
 
 interface CardDetailsModalProps {
@@ -89,7 +90,7 @@ export function CardDetailsModal({
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
+        className={`max-h-[90vh] w-full max-w-lg overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
         onClick={(e) => e.stopPropagation()}
         style={{ zIndex: 10000 }}
       >
@@ -101,8 +102,9 @@ export function CardDetailsModal({
             )}
           </h2>
           <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="rounded-full p-1 text-gray-400 transition-colors hover:text-admin-600"
             aria-label={t('checkout.modals.closeModal')}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -136,7 +138,9 @@ export function CardDetailsModal({
         </div>
 
         {(errors.cardNumber || errors.cardExpiry || errors.cardCvv || errors.cardHolderName) && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+          >
             <p className="text-sm text-red-600">
               {errors.cardNumber?.message || 
                errors.cardExpiry?.message || 
@@ -165,7 +169,7 @@ export function CardDetailsModal({
           <Button
             type="button"
             variant="outline"
-            className="flex-1"
+            className="flex-1 !rounded-full"
             onClick={onClose}
             disabled={isSubmitting}
           >
@@ -174,7 +178,7 @@ export function CardDetailsModal({
           <Button
             type="button"
             variant="primary"
-            className="flex-1"
+            className="flex-1 !rounded-full"
             onClick={handleSubmit(
               (data) => {
                 onClose();

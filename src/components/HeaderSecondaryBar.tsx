@@ -9,6 +9,8 @@ import { getDockedBarTopMotionStyle, SITE_CONTENT_GUTTERS_CLASS } from './header
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
+import { HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS } from './header-nav-count-badge.constants';
+import type { CurrencyCode } from '../lib/currency';
 
 /** Trailing bar strokes — matches `CartIcon` (weight 2). */
 const SECONDARY_BAR_ICON_STROKE_WIDTH = 2;
@@ -95,6 +97,116 @@ const iconLinkClass =
   'flex h-8 w-8 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
 
 const PROFILE_MENU_ID = 'header-secondary-profile-menu';
+const CURRENCY_MENU_ID = 'header-secondary-currency-menu';
+
+interface HeaderCurrencyOption {
+  code: CurrencyCode;
+  symbol: string;
+  name: string;
+}
+
+function HeaderCurrencyMenu({
+  selectedCurrency,
+  currencies,
+  onCurrencyChange,
+}: {
+  selectedCurrency: CurrencyCode;
+  currencies: HeaderCurrencyOption[];
+  onCurrencyChange: (currency: CurrencyCode) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const onDocMouseDown = (event: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocMouseDown);
+    return () => document.removeEventListener('mousedown', onDocMouseDown);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  return (
+    <div ref={wrapRef} className="relative -translate-x-4 shrink-0">
+      <button
+        type="button"
+        id={`${CURRENCY_MENU_ID}-trigger`}
+        aria-expanded={open}
+        aria-haspopup="true"
+        aria-controls={CURRENCY_MENU_ID}
+        onClick={() => setOpen((v) => !v)}
+        className="flex h-8 min-w-[64px] items-center justify-center gap-1.5 rounded-full bg-[#2db2ff] px-3 text-[12px] font-bold leading-none text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff] active:opacity-90"
+        aria-label="Change currency"
+      >
+        <span>{selectedCurrency}</span>
+        <svg
+          className={`h-3 w-3 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
+          fill="none"
+          viewBox="0 0 12 12"
+          stroke="currentColor"
+          aria-hidden
+        >
+          <path d="M3 4.5L6 7.5L9 4.5" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      {open ? (
+        <div
+          id={CURRENCY_MENU_ID}
+          role="menu"
+          aria-labelledby={`${CURRENCY_MENU_ID}-trigger`}
+          className="absolute -left-2 top-full z-[60] w-[86px] pt-2"
+        >
+          <div className="overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-2xl">
+            {currencies.map((currency) => {
+              const active = selectedCurrency === currency.code;
+              return (
+                <button
+                  key={currency.code}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={active}
+                  onClick={() => {
+                    close();
+                    if (!active) {
+                      onCurrencyChange(currency.code);
+                    }
+                  }}
+                  className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-[13px] transition-colors ${
+                    active
+                      ? 'bg-blue-50 font-bold text-[#007acc]'
+                      : 'font-normal text-gray-800 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>{currency.code}</span>
+                  <span className={active ? 'text-[#007acc]' : 'text-gray-500'}>{currency.symbol}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function ProfileAccountMenu({
   profileLabel,
@@ -239,6 +351,9 @@ export interface HeaderSecondaryBarProps {
   compareCount: number;
   wishlistCount: number;
   cartCount: number;
+  selectedCurrency: CurrencyCode;
+  currencies: HeaderCurrencyOption[];
+  onCurrencyChange: (currency: CurrencyCode) => void;
   isLoggedIn: boolean;
   loginLabel: string;
   profileLabel: string;
@@ -292,6 +407,9 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
       compareCount,
       wishlistCount,
       cartCount,
+      selectedCurrency,
+      currencies,
+      onCurrencyChange,
       isLoggedIn,
       loginLabel,
       profileLabel,
@@ -397,20 +515,29 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
 
           <div className="flex shrink-0 items-center gap-3 pl-1 lg:gap-4 xl:gap-7">
             <div className="flex items-center gap-0.5 sm:gap-1.5">
-              <Link href="/compare" className={iconLinkClass} aria-label={compareAria}>
+              <HeaderCurrencyMenu
+                selectedCurrency={selectedCurrency}
+                currencies={currencies}
+                onCurrencyChange={onCurrencyChange}
+              />
+              <Link href="/compare" className={`${iconLinkClass} relative`} aria-label={compareAria}>
                 <CompareIcon
                   size={20}
                   strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
                   className="shrink-0"
                 />
                 {compareCount > 0 ? (
-                  <span className="sr-only">{compareCount}</span>
+                  <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
+                    {compareCount > 99 ? '99+' : compareCount}
+                  </span>
                 ) : null}
               </Link>
-              <Link href="/wishlist" className={iconLinkClass} aria-label={wishlistAria}>
+              <Link href="/wishlist" className={`${iconLinkClass} relative`} aria-label={wishlistAria}>
                 <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
                 {wishlistCount > 0 ? (
-                  <span className="sr-only">{wishlistCount}</span>
+                  <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
+                    {wishlistCount > 99 ? '99+' : wishlistCount}
+                  </span>
                 ) : null}
               </Link>
               <Link
@@ -421,10 +548,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               >
                 <CartIcon size={18} className="shrink-0" />
                 {cartCount > 0 ? (
-                  <span
-                    className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[#2db2ff] px-0.5 text-[9px] font-normal leading-none text-white"
-                    aria-hidden
-                  >
+                  <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
                     {cartCount > 99 ? '99+' : cartCount}
                   </span>
                 ) : null}

@@ -10,6 +10,7 @@ import { handleRemoveItem, handleUpdateQuantity } from './cart-handlers';
 import { CartTable, OrderSummary } from './cart-components';
 import { EmptyCart } from './empty-cart';
 import { LoadingState } from './loading-state';
+import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
 
 export default function CartPage() {
   const { isLoggedIn } = useAuth();
@@ -100,7 +101,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-12`}>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('common.cart.title')}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

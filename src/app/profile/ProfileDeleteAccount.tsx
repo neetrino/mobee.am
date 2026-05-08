@@ -66,7 +66,7 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
     'mt-2 flex w-full items-center gap-3 rounded-full border border-red-200 bg-white px-4 py-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50';
 
   const gridButtonClass =
-    'flex min-h-[5.5rem] w-full flex-col items-center justify-center gap-2 rounded-full border border-[#FFDADA] bg-white px-3 py-4 text-center text-xs font-medium text-[#C0392B] transition-colors hover:bg-red-50 sm:text-sm';
+    'flex min-h-[5.5rem] w-full flex-col items-center justify-center gap-2 rounded-[20px] border border-[#FFDADA] bg-white px-3 py-4 text-center text-xs font-medium text-[#C0392B] transition-colors hover:bg-red-50 sm:text-sm';
 
   const buttonClass = variant === 'grid' ? gridButtonClass : sidebarButtonClass;
 
@@ -118,7 +118,7 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-account-title"
-            className="max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-xl"
+            className="max-w-md rounded-[15px] border border-gray-200 bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             {confirmStep === 1 ? (
