@@ -77,9 +77,24 @@ const nextConfig = {
    * `'/*'` matches only one segment (e.g. `/x`), not `/api/v1/...` — use `'/**'` for all routes.
    */
   outputFileTracingIncludes: {
-    '/**': ['./shared/db/generated/client/**/*'],
+    '/**': [
+      './shared/db/generated/client/**/*',
+      './generated/client/**/*',
+      './node_modules/.prisma/client/**/*',
+    ],
+    '/api/:path*': [
+      './shared/db/generated/client/**/*',
+      './generated/client/**/*',
+      './node_modules/.prisma/client/**/*',
+    ],
   },
-  serverExternalPackages: ['@prisma/client', 'prisma'],
+  /**
+   * On Vercel, bundling workspace DB package helps tracing include Prisma engines
+   * generated under shared/db/generated/client.
+   */
+  serverExternalPackages: process.env.VERCEL
+    ? ['@prisma/client', 'prisma']
+    : ['@prisma/client', 'prisma', '@white-shop/db'],
   /**
    * Admin UI files live under `src/app/admin` but are only exposed at `/supersudo`.
    * `beforeFiles` runs before filesystem matching, so `/admin` never resolves to that tree.
