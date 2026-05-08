@@ -1,3 +1,6 @@
+/** Default hue shown in “add color” flow before the admin adjusts it. */
+export const ADMIN_CUSTOM_COLOR_PICKER_SEED = '#6366f1';
+
 /**
  * Preset hex colors for admin UI (product labels, attribute swatches).
  * Curated for badges and ecommerce accents; keep contrast-friendly saturated tones.

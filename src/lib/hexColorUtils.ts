@@ -35,6 +35,18 @@ export function hexForColorInput(value: string | null | undefined): string {
   return normalizeHexToSixDigits(value);
 }
 
+const DEFAULT_PICKER_FALLBACK = '#94a3b8';
+
+/**
+ * Valid 6-digit hex for drag-based pickers when value is empty or invalid.
+ */
+export function safeHexForPicker(value: string | null | undefined, fallback = DEFAULT_PICKER_FALLBACK): string {
+  if (!value || !isValidHexColor(value)) {
+    return fallback;
+  }
+  return normalizeHexToSixDigits(value);
+}
+
 export function hexEquals(a: string | null | undefined, b: string | null | undefined): boolean {
   if (!a || !b) {
     return false;
