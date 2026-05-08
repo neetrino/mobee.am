@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '../../lib/api-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
@@ -42,7 +41,6 @@ interface UseAddToCartProps {
  * `isAddingToCart` stays false so buttons never show a loading state (in-flight guarded by ref).
  */
 export function useAddToCart({ productId, productSlug, inStock, defaultVariantId, price: propPrice }: UseAddToCartProps) {
-  const router = useRouter();
   const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
   const inFlightRef = useRef(false);
@@ -106,7 +104,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           if (err?.message?.includes('does not exist') || err?.message?.includes('404') || err?.status === 404) {
             alert(t('common.alerts.productNotFound'));
           } else {
-            router.push(`/login?redirect=/products`);
+            alert(t('common.alerts.failedToAddToCart'));
           }
         } finally {
           inFlightRef.current = false;
@@ -188,16 +186,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           return;
         }
 
-        if (
-          err.message?.includes('401') ||
-          err.message?.includes('Unauthorized') ||
-          err?.status === 401 ||
-          err?.statusCode === 401
-        ) {
-          router.push(`/login?redirect=/products`);
-        } else {
-          alert(t('common.alerts.failedToAddToCart'));
-        }
+        alert(t('common.alerts.failedToAddToCart'));
         window.dispatchEvent(new Event('cart-updated'));
       } finally {
         inFlightRef.current = false;
