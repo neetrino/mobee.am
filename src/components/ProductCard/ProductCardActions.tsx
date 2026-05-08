@@ -51,13 +51,13 @@ export function ProductCardActions({
         onClick={onCompareToggle}
         className={`${buttonSize} rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
           isInCompare
-            ? 'border-gray-900 text-gray-900 bg-white shadow-sm'
+            ? 'border-gray-200 bg-white text-admin-500 shadow-lg'
             : 'border-gray-200 text-gray-700 bg-white hover:border-gray-300 hover:bg-gray-50'
         }`}
         title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
         aria-label={isInCompare ? t('common.ariaLabels.removeFromCompare') : t('common.ariaLabels.addToCompare')}
       >
-        <CompareIcon isActive={isInCompare} size={isCompact ? 16 : 18} />
+        <CompareIcon isActive={isInCompare} size={isCompact ? 20 : 22} />
       </button>
 
       {/* Wishlist Icon */}
@@ -65,7 +65,7 @@ export function ProductCardActions({
         onClick={onWishlistToggle}
         className={`${buttonSize} rounded-full flex items-center justify-center transition-all duration-200 ${
           isInWishlist
-            ? 'bg-red-600 text-white shadow-lg'
+            ? 'bg-white text-admin-500 shadow-lg'
             : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg'
         }`}
         title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
@@ -108,7 +108,7 @@ export function ProductCardActions({
           onClick={onWishlistToggle}
           className={`${gridCornerSize} flex shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
             isInWishlist
-              ? 'bg-red-600 text-white shadow-md'
+              ? 'bg-white text-admin-500 shadow-md'
               : cornerIdleWishlist
           }`}
           title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
@@ -121,13 +121,13 @@ export function ProductCardActions({
           onClick={onCompareToggle}
           className={`${gridCornerSize} flex shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
             isInCompare
-              ? 'border-gray-900 bg-white text-gray-900 shadow-sm'
+              ? 'border-transparent bg-white text-admin-500 shadow-md'
               : cornerIdleCompare
           }`}
           title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
           aria-label={isInCompare ? t('common.ariaLabels.removeFromCompare') : t('common.ariaLabels.addToCompare')}
         >
-          <CompareIcon isActive={isInCompare} size={gridCornerIconCompare} />
+          <CompareIcon isActive={isInCompare} size={gridCornerIconCompare + 4} />
         </button>
       </div>
     );
