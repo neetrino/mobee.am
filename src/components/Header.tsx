@@ -118,7 +118,63 @@ const mobilePrimaryLangButtonClassName =
 
 /** Mobile drawer primary links — bordered pill buttons (aligned with strip icon radius). */
 const MOBILE_DRAWER_NAV_BUTTON_CLASS =
-  'flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100';
+  'flex w-full min-w-0 items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100 text-pretty';
+
+/** Primary label cell inside drawer rows (avoids one-character orphan lines next to chevrons). */
+const MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS = 'min-w-0 flex-1 pr-1 text-pretty';
+
+const MOBILE_DRAWER_MIN_WIDTH_REM = 17;
+const MOBILE_DRAWER_DEFAULT_MAX_WIDTH_REM = 24;
+const MOBILE_DRAWER_WIDE_MAX_VIEWPORT_PERCENT = 95;
+/** Rough advance per character when email uses `text-xs` under the name (px). */
+const MOBILE_DRAWER_EMAIL_CHAR_WIDTH_XS_PX = 7;
+/** Rough advance when email is the main `text-sm` line (px). */
+const MOBILE_DRAWER_EMAIL_CHAR_WIDTH_SM_PX = 8;
+/** Avatar, gaps, horizontal padding, and chevron in the profile row (px). */
+const MOBILE_DRAWER_PROFILE_ROW_CHROME_PX = 152;
+/** Subtract from computed email-aware drawer width (px). */
+const MOBILE_DRAWER_EMAIL_PANEL_WIDTH_TRIM_PX = 50;
+
+function getMobileDrawerEmailLayout(user: MobileNavProfileUser | null | undefined): {
+  charCount: number;
+  emailLineScale: 'sm' | 'xs';
+} {
+  if (!user?.email?.trim()) {
+    return { charCount: 0, emailLineScale: 'xs' };
+  }
+  const email = user.email.trim();
+  const parts = [user.firstName?.trim(), user.lastName?.trim()].filter(Boolean);
+  const fullName = parts.join(' ');
+  if (fullName) {
+    return { charCount: email.length, emailLineScale: 'xs' };
+  }
+  return { charCount: email.length, emailLineScale: 'sm' };
+}
+
+function getMobileDrawerPanelWidthStyle(layout: {
+  charCount: number;
+  emailLineScale: 'sm' | 'xs';
+}): CSSProperties | undefined {
+  if (layout.charCount === 0) {
+    return undefined;
+  }
+  const minPx = MOBILE_DRAWER_MIN_WIDTH_REM * 16;
+  const baseCapPx = MOBILE_DRAWER_DEFAULT_MAX_WIDTH_REM * 16;
+  const perChar =
+    layout.emailLineScale === 'sm'
+      ? MOBILE_DRAWER_EMAIL_CHAR_WIDTH_SM_PX
+      : MOBILE_DRAWER_EMAIL_CHAR_WIDTH_XS_PX;
+  const contentPx = Math.ceil(layout.charCount * perChar + MOBILE_DRAWER_PROFILE_ROW_CHROME_PX);
+  const targetPx = Math.max(
+    minPx,
+    Math.max(baseCapPx, contentPx) - MOBILE_DRAWER_EMAIL_PANEL_WIDTH_TRIM_PX,
+  );
+  return {
+    width: `min(${MOBILE_DRAWER_WIDE_MAX_VIEWPORT_PERCENT}vw, ${targetPx}px)`,
+    minWidth: `${MOBILE_DRAWER_MIN_WIDTH_REM}rem`,
+    maxWidth: '100%',
+  };
+}
 
 interface MobileNavProfileUser {
   firstName?: string;
@@ -158,29 +214,39 @@ function MobileDrawerProfileCard({
 }) {
   const { title, subtitle } = getMobileNavProfileCardLines(user);
   const heading = title || profileFallbackLabel;
+  const headingIsEmail = heading.includes('@');
+
   return (
     <Link
       href="/profile"
       onClick={onNavigate}
-      className="flex w-fit max-w-full min-w-0 items-center gap-3 self-start rounded-[15px] border border-gray-200 bg-white px-3 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100"
+      className="flex w-full min-w-0 items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100"
       aria-label={profileFallbackLabel}
     >
-      <img
-        src={DEFAULT_USER_AVATAR_SRC}
-        alt=""
-        className="h-12 w-12 shrink-0 rounded-full object-cover"
-        aria-hidden
-      />
-      <span className="flex min-w-0 max-w-full flex-col gap-0.5 text-left">
-        <span className="max-w-full break-words text-sm font-bold leading-tight text-gray-900">{heading}</span>
-        {subtitle ? (
-          <span className="max-w-full break-words text-xs font-normal leading-snug text-gray-500 [overflow-wrap:anywhere]">
-            {subtitle}
+      <span className="flex min-w-0 flex-1 items-center gap-3">
+        <img
+          src={DEFAULT_USER_AVATAR_SRC}
+          alt=""
+          className="h-12 w-12 shrink-0 rounded-full object-cover"
+          aria-hidden
+        />
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5 text-left">
+          <span
+            className={`max-w-full min-w-0 text-sm font-bold leading-tight text-gray-900 break-words ${
+              headingIsEmail ? '' : 'text-pretty'
+            }`}
+          >
+            {heading}
           </span>
-        ) : null}
+          {subtitle ? (
+            <span className="max-w-full min-w-0 text-xs font-normal leading-snug text-gray-500 break-words [overflow-wrap:anywhere]">
+              {subtitle}
+            </span>
+          ) : null}
+        </span>
       </span>
       <svg
-        className="h-5 w-5 shrink-0 text-gray-300"
+        className="h-4 w-4 shrink-0 text-gray-400"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -555,6 +621,7 @@ export function Header() {
   const [mobileStrip1HeightPx, setMobileStrip1HeightPx] = useState(0);
   const [desktopPrimaryBarHeightPx, setDesktopPrimaryBarHeightPx] = useState(0);
   const lastScrollYRef = useRef(0);
+  const prevMobileSearchDockedRef = useRef<boolean | null>(null);
   const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
   const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
   const [headerLayoutReady, setHeaderLayoutReady] = useState(false);
@@ -672,6 +739,17 @@ export function Header() {
     };
   }, [syncMobileSearchDock]);
 
+  /**
+   * When the mobile search bar returns to the normal flow (no longer docked), drop peek state so a
+   * later dock does not reopen the strip without an intentional scroll-up gesture.
+   */
+  useEffect(() => {
+    if (prevMobileSearchDockedRef.current === true && mobileSearchDocked === false) {
+      setPrimaryBarPeekFromScrollUp(false);
+    }
+    prevMobileSearchDockedRef.current = mobileSearchDocked;
+  }, [mobileSearchDocked]);
+
   useEffect(() => {
     lastScrollYRef.current = window.scrollY;
     const onScroll = () => {
@@ -686,9 +764,14 @@ export function Header() {
       }
       syncSecondaryDock();
       syncMobileSearchDock();
-      const primaryEl = primaryStripRef.current;
-      if (primaryEl && primaryEl.getBoundingClientRect().bottom > 0) {
-        setPrimaryBarPeekFromScrollUp(false);
+      const isDesktopLayout =
+        typeof window !== 'undefined' &&
+        window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY).matches;
+      if (isDesktopLayout) {
+        const primaryEl = primaryStripRef.current;
+        if (primaryEl && primaryEl.getBoundingClientRect().bottom > 0) {
+          setPrimaryBarPeekFromScrollUp(false);
+        }
       }
     };
     const onResize = () => {
@@ -1074,6 +1157,10 @@ export function Header() {
   const mobileDockedSearchTopStyle: CSSProperties | undefined = mobileSearchDocked
     ? { top: mobileSearchPeekTopPx, ...getDockedBarTopMotionStyle(mobileSearchPeekTopPx) }
     : undefined;
+
+  const mobileDrawerEmailLayout = isLoggedIn && user ? getMobileDrawerEmailLayout(user) : { charCount: 0, emailLineScale: 'xs' as const };
+  const mobileDrawerPanelWidthStyle = getMobileDrawerPanelWidthStyle(mobileDrawerEmailLayout);
+  const mobileDrawerUseWideEmailPanel = mobileDrawerPanelWidthStyle !== undefined;
 
   return (
     <div className={`relative z-50 ${montserrat.className}`}>
@@ -1478,7 +1565,10 @@ export function Header() {
           onClick={() => setMobileMenuOpen(false)}
         >
           <div
-            className="flex h-full min-h-screen w-[min(83vw,24rem)] min-w-[17rem] max-w-full flex-col bg-white shadow-2xl"
+            className={`flex h-full min-h-screen min-w-[17rem] max-w-full flex-col bg-white shadow-2xl ${
+              mobileDrawerUseWideEmailPanel ? '' : 'w-[min(83vw,24rem)]'
+            }`}
+            style={mobileDrawerPanelWidthStyle}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
@@ -1492,8 +1582,10 @@ export function Header() {
                   <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
                 </Link>
               </div>
-              <div className="flex items-center justify-between">
-                <p className="text-base font-semibold text-gray-900">{t('common.navigation.menuTitle')}</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="min-w-0 flex-1 text-pretty text-base font-semibold text-gray-900">
+                  {t('common.navigation.menuTitle')}
+                </p>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
@@ -1524,7 +1616,7 @@ export function Header() {
                       onClick={() => setMobileMenuOpen(false)}
                       className={MOBILE_DRAWER_NAV_BUTTON_CLASS}
                     >
-                      {t(link.translationKey)}
+                      <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
                       <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -1536,9 +1628,9 @@ export function Header() {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700`}
                   >
-                    <span className="flex items-center gap-2 normal-case font-medium text-gray-700">
-                      <CompareIcon size={18} />
-                      {t('common.navigation.compare')}
+                    <span className="flex min-w-0 flex-1 items-center gap-2 normal-case font-medium text-gray-700">
+                      <CompareIcon size={18} className="shrink-0" />
+                      <span className="min-w-0 flex-1 text-pretty">{t('common.navigation.compare')}</span>
                     </span>
                     <span className="flex shrink-0 items-center gap-2">
                       {compareCount > 0 ? (
@@ -1566,8 +1658,8 @@ export function Header() {
                           onClick={() => setMobileMenuOpen(false)}
                           className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} border-blue-200 normal-case text-blue-700 hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100/80`}
                         >
-                          <span>{t('common.navigation.adminPanel')}</span>
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.adminPanel')}</span>
+                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </Link>
@@ -1579,10 +1671,10 @@ export function Header() {
                           setMobileMenuOpen(false);
                           logout();
                         }}
-                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} w-full border-red-200 text-left normal-case font-semibold text-red-600 hover:border-red-300 hover:bg-red-50 active:bg-red-100/80`}
+                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} border-red-200 text-left normal-case font-semibold text-red-600 hover:border-red-300 hover:bg-red-50 active:bg-red-100/80`}
                       >
-                        {t('common.navigation.logout')}
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.logout')}</span>
+                        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </button>
@@ -1595,18 +1687,18 @@ export function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                         className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
                       >
-                        <span>{t('common.navigation.login')}</span>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.login')}</span>
+                        <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </Link>
                       <Link
                         href="/register"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between rounded-2xl border border-gray-900 bg-gray-900 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-gray-800 hover:bg-gray-800 active:opacity-95"
+                        className="flex w-full min-w-0 items-center justify-between rounded-2xl border border-gray-900 bg-gray-900 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-gray-800 hover:bg-gray-800 active:opacity-95 text-pretty"
                       >
-                        <span>{t('common.navigation.register')}</span>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.register')}</span>
+                        <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </Link>
