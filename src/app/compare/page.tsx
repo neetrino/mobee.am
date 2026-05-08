@@ -184,9 +184,6 @@ export default function ComparePage() {
     <div className={`${SITE_CONTENT_GUTTERS_CLASS} py-6`}>
       <div className="mb-8 mt-3 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">{t('common.compare.title')}</h1>
-        {products.length > 0 && (
-          <p className="text-sm text-gray-600">{t('common.compare.perCategoryHint')}</p>
-        )}
       </div>
 
       {products.length > 0 ? (
