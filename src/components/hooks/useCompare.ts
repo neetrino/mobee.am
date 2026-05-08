@@ -2,16 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
-
-const COMPARE_KEY = 'shop_compare';
-const MAX_COMPARE_ITEMS = 4;
+import { isProductIdInCompare, toggleCompareProduct } from '../../lib/shop/compare-storage';
 
 /**
- * Hook for managing compare state for a product
- * @param productId - The product ID to check/manage
- * @returns Object with compare state and toggle function
+ * Hook for managing compare state for a product (grouped by category, max 4 per category).
  */
-export function useCompare(productId: string) {
+export function useCompare(productId: string, compareCategoryId: string) {
   const { t } = useTranslation();
   const [isInCompare, setIsInCompare] = useState(false);
 
@@ -19,9 +15,7 @@ export function useCompare(productId: string) {
     const checkCompare = () => {
       if (typeof window === 'undefined') return;
       try {
-        const stored = localStorage.getItem(COMPARE_KEY);
-        const compare = stored ? JSON.parse(stored) : [];
-        setIsInCompare(compare.includes(productId));
+        setIsInCompare(isProductIdInCompare(productId));
       } catch {
         setIsInCompare(false);
       }
@@ -35,29 +29,18 @@ export function useCompare(productId: string) {
     return () => {
       window.removeEventListener('compare-updated', handleCompareUpdate);
     };
-  }, [productId]);
+  }, [productId, compareCategoryId]);
 
   const toggleCompare = () => {
     if (typeof window === 'undefined') return;
-    
+
     try {
-      const stored = localStorage.getItem(COMPARE_KEY);
-      const compare: string[] = stored ? JSON.parse(stored) : [];
-      
-      if (isInCompare) {
-        const updated = compare.filter((id) => id !== productId);
-        localStorage.setItem(COMPARE_KEY, JSON.stringify(updated));
-        setIsInCompare(false);
-      } else {
-        if (compare.length >= MAX_COMPARE_ITEMS) {
-          alert(t('common.alerts.compareMaxReached'));
-          return;
-        }
-        compare.push(productId);
-        localStorage.setItem(COMPARE_KEY, JSON.stringify(compare));
-        setIsInCompare(true);
+      const { outcome } = toggleCompareProduct(productId, compareCategoryId);
+      if (outcome === 'group_full') {
+        alert(t('common.alerts.compareMaxReached'));
+        return;
       }
-      
+      setIsInCompare(isProductIdInCompare(productId));
       window.dispatchEvent(new Event('compare-updated'));
     } catch (error) {
       console.error('Error updating compare:', error);

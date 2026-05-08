@@ -19,7 +19,7 @@
   "removedFromWishlist": "Removed from wishlist",
   "addedToCompare": "Added to compare",
   "removedFromCompare": "Removed from compare",
-  "compareListFull": "Comparison list is full",
+  "compareListFull": "This category already has 4 products in compare (maximum per category)",
   "errorAddingToCart": "Error adding to cart",
   "pcs": "pcs",
   "outOfStockLabel": "Out of Stock",

@@ -7,7 +7,8 @@ import { getStoredLanguage } from '../../../lib/language';
 import { apiClient } from '../../../lib/api-client';
 import { getStoredCurrency, type CurrencyCode } from '../../../lib/currency';
 import type { Product } from './types';
-import { RESERVED_ROUTES, WISHLIST_KEY, COMPARE_KEY } from './constants';
+import { RESERVED_ROUTES, WISHLIST_KEY } from './constants';
+import { isProductIdInCompare } from '../../../lib/shop/compare-storage';
 import {
   processImageUrl,
   smartSplitUrls,
@@ -239,9 +240,7 @@ export function useProductData({
     const checkCompare = () => {
       if (typeof window === 'undefined') return;
       try {
-        const stored = localStorage.getItem(COMPARE_KEY);
-        const compare = stored ? JSON.parse(stored) : [];
-        setIsInCompare(compare.includes(product.id));
+        setIsInCompare(isProductIdInCompare(product.id));
       } catch {
         setIsInCompare(false);
       }
