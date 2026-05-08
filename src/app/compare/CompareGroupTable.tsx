@@ -3,12 +3,12 @@
 import type { MouseEvent, MutableRefObject } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '../../lib/api-client';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
+import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
 import { useAuth } from '../../lib/auth/AuthContext';
 
 export interface CompareTableProduct {
@@ -53,7 +53,6 @@ export function CompareGroupTable({
   addToCartInFlightRef,
   onRemove,
 }: CompareGroupTableProps) {
-  const router = useRouter();
   const { isLoggedIn } = useAuth();
 
   const handleAddToCart = (e: MouseEvent, product: CompareTableProduct) => {
@@ -64,8 +63,59 @@ export function CompareGroupTable({
       return;
     }
 
+    const flySource = document.querySelector<HTMLElement>(
+      `[data-compare-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
+    );
+    const flyUrl = resolveProductCardImageSrc(product.image);
+
     if (!isLoggedIn) {
-      router.push(`/login?redirect=/compare`);
+      addToCartInFlightRef.current.add(product.id);
+      void (async () => {
+        try {
+          interface ProductDetails {
+            id: string;
+            variants?: Array<{
+              id: string;
+              sku: string;
+              price: number;
+              stock: number;
+              available: boolean;
+            }>;
+          }
+
+          let variantId: string;
+          let bodyProductId = product.id;
+
+          if (product.defaultVariantId) {
+            variantId = product.defaultVariantId;
+          } else {
+            const encodedSlug = encodeURIComponent(product.slug.trim());
+            const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
+
+            if (!productDetails.variants || productDetails.variants.length === 0) {
+              alert(t('common.alerts.noVariantsAvailable'));
+              return;
+            }
+
+            variantId = productDetails.variants[0].id;
+            bodyProductId = productDetails.id;
+          }
+
+          upsertGuestCartItem({
+            productId: bodyProductId,
+            productSlug: product.slug,
+            variantId,
+            quantity: 1,
+          });
+          window.dispatchEvent(new Event('cart-updated'));
+          dispatchCartFlyAnimation(flyUrl, flySource);
+        } catch (error: unknown) {
+          console.error('Error adding to guest cart:', error);
+          alert(t('common.alerts.failedToAddToCart'));
+        } finally {
+          addToCartInFlightRef.current.delete(product.id);
+        }
+      })();
       return;
     }
 
@@ -74,10 +124,6 @@ export function CompareGroupTable({
         detail: { optimisticAdd: { quantity: 1, price: product.price } },
       }),
     );
-    const flySource = document.querySelector<HTMLElement>(
-      `[data-compare-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
-    );
-    const flyUrl = resolveProductCardImageSrc(product.image);
     dispatchCartFlyAnimation(flyUrl, flySource);
 
     addToCartInFlightRef.current.add(product.id);
@@ -131,10 +177,7 @@ export function CompareGroupTable({
       } catch (error: unknown) {
         console.error('Error adding to cart:', error);
         window.dispatchEvent(new Event('cart-updated'));
-        const err = error as { message?: string };
-        if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-          router.push(`/login?redirect=/compare`);
-        }
+        alert(t('common.alerts.failedToAddToCart'));
       } finally {
         addToCartInFlightRef.current.delete(product.id);
       }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '../../lib/api-client';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
@@ -9,6 +8,7 @@ import { getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
+import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
 import { EmptyWishlist } from './empty-wishlist';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
@@ -31,7 +31,6 @@ function getWishlist(): string[] {
  * Wishlist page that shows saved products and supports lightweight CRUD actions.
  */
 export default function WishlistPage() {
-  const router = useRouter();
   const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
   const [products, setProducts] = useState<WishlistItemCardProduct[]>([]);
@@ -139,8 +138,59 @@ export default function WishlistPage() {
       return;
     }
 
+    const flySource = document.querySelector<HTMLElement>(
+      `[data-wishlist-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
+    );
+    const flyUrl = resolveProductCardImageSrc(product.image);
+
     if (!isLoggedIn) {
-      router.push(`/login?redirect=/wishlist`);
+      addToCartInFlightRef.current.add(product.id);
+      void (async () => {
+        try {
+          interface ProductDetails {
+            id: string;
+            variants?: Array<{
+              id: string;
+              sku: string;
+              price: number;
+              stock: number;
+              available: boolean;
+            }>;
+          }
+
+          let variantId: string;
+          let bodyProductId = product.id;
+
+          if (product.defaultVariantId) {
+            variantId = product.defaultVariantId;
+          } else {
+            const encodedSlug = encodeURIComponent(product.slug.trim());
+            const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
+
+            if (!productDetails.variants || productDetails.variants.length === 0) {
+              alert(t('common.alerts.noVariantsAvailable'));
+              return;
+            }
+
+            variantId = productDetails.variants[0].id;
+            bodyProductId = productDetails.id;
+          }
+
+          upsertGuestCartItem({
+            productId: bodyProductId,
+            productSlug: product.slug,
+            variantId,
+            quantity: 1,
+          });
+          window.dispatchEvent(new Event('cart-updated'));
+          dispatchCartFlyAnimation(flyUrl, flySource);
+        } catch (error: unknown) {
+          console.error('Error adding to guest cart:', error);
+          alert(t('common.alerts.failedToAddToCart'));
+        } finally {
+          addToCartInFlightRef.current.delete(product.id);
+        }
+      })();
       return;
     }
 
@@ -149,10 +199,6 @@ export default function WishlistPage() {
         detail: { optimisticAdd: { quantity: 1, price: product.price } },
       }),
     );
-    const flySource = document.querySelector<HTMLElement>(
-      `[data-wishlist-product-id="${CSS.escape(product.id)}"] [data-cart-fly-source]`,
-    );
-    const flyUrl = resolveProductCardImageSrc(product.image);
     dispatchCartFlyAnimation(flyUrl, flySource);
 
     addToCartInFlightRef.current.add(product.id);
@@ -206,10 +252,7 @@ export default function WishlistPage() {
       } catch (error: unknown) {
         console.error('Error adding to cart:', error);
         window.dispatchEvent(new Event('cart-updated'));
-        const err = error as { message?: string };
-        if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-          router.push(`/login?redirect=/wishlist`);
-        }
+        alert(t('common.alerts.failedToAddToCart'));
       } finally {
         addToCartInFlightRef.current.delete(product.id);
       }
