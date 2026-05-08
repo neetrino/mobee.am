@@ -64,11 +64,11 @@ export function ProductCardList({
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 px-4 sm:px-6 py-4">
+      <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:px-7 sm:py-5">
         {/* Product Image */}
         <Link
           href={`/products/${product.slug}`}
-          className="w-20 h-20 bg-white border border-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden self-start sm:self-center"
+          className="relative h-20 w-20 flex-shrink-0 self-start overflow-hidden rounded-lg border border-gray-100 bg-white sm:h-28 sm:w-28 sm:self-center"
           data-cart-fly-source
         >
           {!imageError ? (
@@ -77,7 +77,7 @@ export function ProductCardList({
               alt={product.title}
               fill
               className="object-contain"
-              sizes="80px"
+              sizes="(max-width: 639px) 80px, 112px"
               unoptimized
               onError={onImageError}
             />
@@ -119,7 +119,7 @@ export function ProductCardList({
           {/* Price */}
           <div className="flex flex-col">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`whitespace-nowrap ${listPriceClass} font-semibold text-blue-600`}>
+              <span className={`whitespace-nowrap ${listPriceClass} font-semibold text-black`}>
                 {formatPrice(product.price || 0, currency)}
               </span>
               {product.discountPercent && product.discountPercent > 0 ? (
@@ -137,7 +137,7 @@ export function ProductCardList({
               onClick={onCompareToggle}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                 isInCompare
-                  ? 'border-gray-200 bg-white text-admin-500 shadow-sm'
+                  ? 'border-transparent bg-white text-admin-500 shadow-md'
                   : 'border-gray-200 text-gray-700 bg-white hover:border-gray-300 hover:bg-gray-50'
               }`}
               title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
@@ -151,7 +151,7 @@ export function ProductCardList({
               onClick={onWishlistToggle}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
                 isInWishlist
-                  ? 'bg-white text-admin-500 shadow-sm'
+                  ? 'bg-white text-admin-500 shadow-md'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
               title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
@@ -166,7 +166,7 @@ export function ProductCardList({
               disabled={!product.inStock || isAddingToCart}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
                 product.inStock && !isAddingToCart
-                  ? 'bg-gray-100 text-gray-700 hover:bg-green-600 hover:text-white'
+                  ? 'bg-gray-100 text-gray-700 hover:bg-admin-500 hover:text-white'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
               title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
