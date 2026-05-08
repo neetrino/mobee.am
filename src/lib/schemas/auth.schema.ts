@@ -4,12 +4,8 @@ const emptyToUndefined = (value: unknown): unknown =>
   value === "" || value === null ? undefined : value;
 
 const loginSchema = z.object({
-  email: z.string().email().optional(),
-  phone: z.string().min(1).optional(),
+  email: z.string().email("Valid email is required"),
   password: z.string().min(1, "Password is required"),
-}).refine((data) => data.email ?? data.phone, {
-  message: "Either email or phone is required",
-  path: ["email"],
 });
 
 const registerSchema = z
