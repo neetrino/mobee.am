@@ -8,11 +8,31 @@ export function buildUrl(
 ): string {
   // Ensure endpoint starts with /
   const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const isBrowser = typeof window !== 'undefined';
+
+  // Keep internal API route calls same-origin.
+  // This avoids TLS/CORS issues from misconfigured external API domains.
+  if (normalizedEndpoint.startsWith('/api/')) {
+    if (isBrowser) {
+      let url = normalizedEndpoint;
+      if (params && Object.keys(params).length > 0) {
+        const searchParams = Object.entries(params)
+          .filter(([_, value]) => value !== undefined && value !== null)
+          .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+          .join('&');
+        url = `${url}${url.includes('?') ? '&' : '?'}${searchParams}`;
+      }
+      return url;
+    }
+
+    // On server, force internal URL construction below.
+    baseUrl = '';
+  }
   
   // If baseUrl is empty (relative paths for Next.js API routes)
   if (!baseUrl || baseUrl.trim() === '') {
     // Check if we're on the server (Node.js environment)
-    const isServer = typeof window === 'undefined';
+    const isServer = !isBrowser;
     
     // On server, we need an absolute URL
     if (isServer) {

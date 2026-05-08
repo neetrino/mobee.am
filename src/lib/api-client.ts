@@ -1,11 +1,11 @@
 /**
  * API Client
  *
- * Same Next.js deployment: use relative `/api/...` (empty base URL).
- * Separate backend: set `NEXT_PUBLIC_API_URL` to that origin.
+ * Client for making requests to the backend API
  *
- * `NEXT_PUBLIC_SAME_ORIGIN_API=true` forces an empty base URL so a stray
- * `NEXT_PUBLIC_API_URL` on Vercel does not override the bundled Route Handlers.
+ * In Next.js, when API routes are in the same app, we use relative paths.
+ * If NEXT_PUBLIC_API_URL is set, it can still be used for non-internal endpoints.
+ * Internal `/api/*` calls are normalized to same-origin via url-builder.
  */
 
 import { ApiError } from "./api-client/types";
