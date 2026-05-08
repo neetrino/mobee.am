@@ -29,7 +29,7 @@ interface RelatedProductsProps {
 export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
   const addToCartInFlightRef = useRef<Set<string>>(new Set());
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());

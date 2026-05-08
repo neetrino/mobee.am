@@ -8,6 +8,9 @@ export const LANGUAGES = {
 
 export type LanguageCode = keyof typeof LANGUAGES;
 
+/** Default storefront language when no cookie/localStorage preference exists. */
+export const DEFAULT_LANGUAGE: LanguageCode = 'hy';
+
 const LANGUAGE_STORAGE_KEY = 'shop_language';
 
 /** Cookie mirrored from localStorage so server components can read the UI language. */
@@ -29,14 +32,14 @@ export function readLanguageFromCookies(
   cookieStore: { get(name: string): { value: string } | undefined },
 ): LanguageCode {
   const raw = cookieStore.get(LANGUAGE_COOKIE_NAME)?.value;
-  if (!raw) return 'en';
+  if (!raw) return DEFAULT_LANGUAGE;
   try {
     const decoded = decodeURIComponent(raw);
     if (decoded in LANGUAGES) return decoded as LanguageCode;
   } catch {
     if (raw in LANGUAGES) return raw as LanguageCode;
   }
-  return 'en';
+  return DEFAULT_LANGUAGE;
 }
 
 /** Align cookie with localStorage (e.g. returning visitors who only had LS). */
@@ -46,7 +49,7 @@ export function syncLanguageCookieFromStorage(): void {
 }
 
 export function getStoredLanguage(): LanguageCode {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined') return DEFAULT_LANGUAGE;
   try {
     const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (stored && stored in LANGUAGES) {
@@ -55,7 +58,7 @@ export function getStoredLanguage(): LanguageCode {
   } catch {
     // Ignore errors
   }
-  return 'en';
+  return DEFAULT_LANGUAGE;
 }
 
 export function setStoredLanguage(language: LanguageCode, options?: { skipReload?: boolean }): void {

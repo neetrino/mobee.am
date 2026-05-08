@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { readLanguageFromCookies } from "./language";
 
 describe("readLanguageFromCookies", () => {
-  it("returns en when cookie missing", () => {
-    expect(readLanguageFromCookies({ get: () => undefined })).toBe("en");
+  it("returns hy when cookie missing", () => {
+    expect(readLanguageFromCookies({ get: () => undefined })).toBe("hy");
   });
 
   it("returns valid locale from cookie", () => {
@@ -20,6 +20,6 @@ describe("readLanguageFromCookies", () => {
       readLanguageFromCookies({
         get: () => ({ value: "xx" }),
       }),
-    ).toBe("en");
+    ).toBe("hy");
   });
 });

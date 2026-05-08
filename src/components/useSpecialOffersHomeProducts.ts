@@ -30,7 +30,7 @@ const PRODUCTS_PER_PAGE = 10;
 export const SPECIAL_OFFERS_HOME_FILTER_DEFAULT = 'featured' as const;
 
 function useClientSyncedLanguage(): LanguageCode {
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
   useEffect(() => {
     const sync = () => setLanguage(getStoredLanguage());
     sync();

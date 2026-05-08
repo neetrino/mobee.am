@@ -17,7 +17,7 @@ import { useProductCalculations } from './hooks/useProductCalculations';
 export function useProductPage(params: Promise<{ slug?: string }>) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
   const [showMessage, setShowMessage] = useState<string | null>(null);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
 

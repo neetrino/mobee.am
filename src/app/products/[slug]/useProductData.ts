@@ -47,7 +47,7 @@ export function useProductData({
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isInCompare, setIsInCompare] = useState(false);
   const [reviews, setReviews] = useState<Array<{ rating: number }>>([]);
