@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef, type MouseEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredCurrency } from '../lib/currency';
 import { getStoredLanguage, type LanguageCode } from '../lib/language';
@@ -27,7 +26,6 @@ interface RelatedProductsProps {
  * Shown at the bottom of the single product page
  */
 export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
-  const router = useRouter();
   const { isLoggedIn } = useAuth();
   const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
   const addToCartInFlightRef = useRef<Set<string>>(new Set());
@@ -165,12 +163,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         if (isLoggedIn) {
           window.dispatchEvent(new Event('cart-updated'));
         }
-        const err = error as { message?: string };
-        if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-          router.push(`/login?redirect=/products/${product.slug}`);
-        } else {
-          alert('Failed to add product to cart. Please try again.');
-        }
+        alert('Failed to add product to cart. Please try again.');
       } finally {
         addToCartInFlightRef.current.delete(product.id);
         setAddingProductId((current) => (current === product.id ? null : current));

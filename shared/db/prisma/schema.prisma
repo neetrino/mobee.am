@@ -2,6 +2,8 @@ generator client {
   provider = "prisma-client-js"
   // Avoid Windows EPERM when renaming query_engine inside pnpm's node_modules store
   output   = "../generated/client"
+  // Vercel serverless uses rhel-openssl-3.0.x; "native" keeps local dev (Windows/Linux) engines
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
