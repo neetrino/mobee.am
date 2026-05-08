@@ -73,11 +73,13 @@ const nextConfig = {
   reactStrictMode: true,
   /**
    * Prisma client is generated to shared/db/generated/client (not node_modules/.prisma).
-   * Standalone/serverless tracing can omit *.node query engines — include only binaries (not full client tree).
+   * Serverless output tracing can omit engines; keys use picomatch on route paths.
+   * `'/*'` matches only one segment (e.g. `/x`), not `/api/v1/...` — use `'/**'` for all routes.
    */
   outputFileTracingIncludes: {
-    '/*': ['./shared/db/generated/client/**/*.node'],
+    '/**': ['./shared/db/generated/client/**/*'],
   },
+  serverExternalPackages: ['@prisma/client', 'prisma'],
   /**
    * Admin UI files live under `src/app/admin` but are only exposed at `/supersudo`.
    * `beforeFiles` runs before filesystem matching, so `/admin` never resolves to that tree.

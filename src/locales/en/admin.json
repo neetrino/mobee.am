@@ -179,7 +179,11 @@
       "addCustomColor": "Add Color",
       "hide": "Hide",
       "add": "Add",
-      "removeColor": "Remove Color"
+      "removeColor": "Remove Color",
+      "presetPalette": "Preset palette",
+      "customColor": "Custom color",
+      "clearColor": "Clear color",
+      "adjustColorDrag": "Drag on the color field and hue slider to choose a shade"
     }
   },
   "categories": {

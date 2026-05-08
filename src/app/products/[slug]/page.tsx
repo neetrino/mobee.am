@@ -6,7 +6,6 @@ import { t, getProductText } from '../../../lib/i18n';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { RelatedProducts } from '../../../components/RelatedProducts';
-import { ProductReviews } from '../../../components/ProductReviews';
 import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
 import { useProductPage } from './useProductPage';
@@ -41,9 +40,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     isInWishlist,
     isInCompare,
     quantity,
-    reviews,
-    averageRating,
-    slug,
     attributeGroups,
     colorGroups,
     sizeGroups,
@@ -56,7 +52,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     hasUnavailableAttributes,
     unavailableAttributes,
     canAddToCart,
-    scrollToReviews,
     getOptionValue,
     adjustQuantity,
     handleColorSelect,
@@ -153,8 +148,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             discountPercent={discountPercent}
             currency={currency}
             language={language}
-            averageRating={averageRating}
-            reviewsCount={reviews.length}
             quantity={quantity}
             maxQuantity={maxQuantity}
             isOutOfStock={isOutOfStock}
@@ -176,7 +169,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             onAddToCart={handleAddToCart}
             onAddToWishlist={handleAddToWishlist}
             onCompareToggle={handleCompareToggle}
-            onScrollToReviews={scrollToReviews}
             onScrollToDetails={scrollToProductDetails}
             onColorSelect={handleColorSelect}
             onSizeSelect={handleSizeSelect}
@@ -201,9 +193,6 @@ export default function ProductPage({ params }: ProductPageProps) {
         />
       </section>
 
-      <div id="product-reviews" className="mt-24 scroll-mt-24">
-        <ProductReviews productSlug={slug} productId={product.id} />
-      </div>
       <div className="mt-16">
         <RelatedProducts currentProductSlug={product.slug} />
       </div>

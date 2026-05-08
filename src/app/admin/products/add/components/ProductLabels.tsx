@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { Button, Input } from '@shop/ui';
+import { AdminSingleColorPicker } from '../../../../../components/AdminSingleColorPicker';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import type { ProductLabel } from '../types';
 
@@ -104,18 +105,16 @@ export function ProductLabels({
                 </div>
 
                 {/* Label Color (Optional) */}
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.products.add.colorOptional')}
                   </label>
-                  <Input
-                    type="text"
-                    value={label.color || ''}
-                    onChange={(e) => onUpdateLabel(index, 'color', e.target.value || null)}
-                    placeholder={t('admin.products.add.colorHexPlaceholder')}
-                    className="w-full"
+                  <AdminSingleColorPicker
+                    value={label.color ?? null}
+                    onChange={(next) => onUpdateLabel(index, 'color', next)}
+                    hexPlaceholder={t('admin.products.add.colorHexPlaceholder')}
+                    hexHint={t('admin.products.add.hexColorHint')}
                   />
-                  <p className="mt-1 text-xs text-gray-500">{t('admin.products.add.hexColorHint')}</p>
                 </div>
               </div>
             </div>

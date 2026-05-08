@@ -1,7 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from '../lib/i18n-client';
+import { ADMIN_CUSTOM_COLOR_PICKER_SEED } from '../lib/adminColorPalette.constants';
+import { AdminDragColorPicker } from './AdminDragColorPicker';
+import { PresetColorSwatchGrid } from './PresetColorSwatchGrid';
+import { normalizeHexToSixDigits } from '../lib/hexColorUtils';
 
 interface ColorPaletteSelectorProps {
   colors: string[];
@@ -14,20 +18,27 @@ interface ColorPaletteSelectorProps {
  */
 export function ColorPaletteSelector({ colors, onColorsChange }: ColorPaletteSelectorProps) {
   const { t } = useTranslation();
-  const [customColor, setCustomColor] = useState('#000000');
-  const colorInputRef = useRef<HTMLInputElement>(null);
+  const [customColor, setCustomColor] = useState(ADMIN_CUSTOM_COLOR_PICKER_SEED);
 
-  const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only update the swatch color preview, don't add to list yet
-    const newColor = e.target.value;
-    setCustomColor(newColor);
+  const activeHexSet = useMemo(() => {
+    return new Set(colors.map((c) => normalizeHexToSixDigits(c).toLowerCase()));
+  }, [colors]);
+
+  const handlePresetPick = (hex: string) => {
+    const normalized = normalizeHexToSixDigits(hex);
+    const key = normalized.toLowerCase();
+    if (activeHexSet.has(key)) {
+      return;
+    }
+    onColorsChange([...colors, normalized]);
   };
 
   const handleAddColor = () => {
-    // Add color when user clicks the add button
-    if (customColor && customColor !== '#000000' && !colors.includes(customColor)) {
-      onColorsChange([...colors, customColor]);
-      setCustomColor('#000000');
+    const normalized = normalizeHexToSixDigits(customColor);
+    const key = normalized.toLowerCase();
+    if (!activeHexSet.has(key)) {
+      onColorsChange([...colors, normalized]);
+      setCustomColor(ADMIN_CUSTOM_COLOR_PICKER_SEED);
     }
   };
 
@@ -43,6 +54,17 @@ export function ColorPaletteSelector({ colors, onColorsChange }: ColorPaletteSel
 
   return (
     <div className="space-y-4">
+      <div>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          {t('admin.attributes.valueModal.presetPalette')}
+        </label>
+        <PresetColorSwatchGrid
+          onPick={handlePresetPick}
+          activeHexSet={activeHexSet}
+          ariaLabel={t('admin.attributes.valueModal.presetPalette')}
+        />
+      </div>
+
       {/* Selected Colors */}
       {colors.length > 0 && (
         <div className="space-y-2">
@@ -51,26 +73,29 @@ export function ColorPaletteSelector({ colors, onColorsChange }: ColorPaletteSel
           </label>
           <div className="flex flex-wrap gap-2">
             {colors.map((color, index) => (
-              <div key={index} className="flex items-center gap-2 bg-gray-50 rounded-lg p-2 border border-gray-200">
-                <div className="relative">
-                  <div
-                    className="w-10 h-10 rounded-lg border-2 border-gray-300 shadow-sm cursor-pointer"
-                    style={{ backgroundColor: color }}
-                    title={color}
-                  />
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => handleColorChange(index, e.target.value)}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </div>
+              <div key={index} className="flex flex-wrap items-start gap-2 bg-gray-50 rounded-lg p-2 border border-gray-200">
+                <details className="relative group">
+                  <summary
+                    className="block cursor-pointer list-none [&::-webkit-details-marker]:hidden"
+                    aria-label={t('admin.attributes.valueModal.adjustColorDrag')}
+                  >
+                    <div
+                      className="h-10 w-10 rounded-lg border-2 border-gray-300 shadow-sm transition hover:border-gray-500 group-open:ring-2 group-open:ring-admin group-open:ring-offset-2"
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  </summary>
+                  <div className="absolute left-0 top-full z-20 mt-2 rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+                    <AdminDragColorPicker color={color} onChange={(hex) => handleColorChange(index, hex)} />
+                  </div>
+                </details>
                 <input
                   type="text"
                   value={color}
                   onChange={(e) => handleColorChange(index, e.target.value)}
-                  className="w-24 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-28 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                   placeholder="#000000"
+                  aria-label={t('admin.attributes.valueModal.colors')}
                 />
                 <button
                   type="button"
@@ -88,32 +113,23 @@ export function ColorPaletteSelector({ colors, onColorsChange }: ColorPaletteSel
         </div>
       )}
 
-      {/* Add Color Swatch */}
+      {/* Add Color — drag picker + add to list */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700">
           {t('admin.attributes.valueModal.addColor')}
         </label>
-        <div className="flex items-center gap-3">
-          <div className="relative inline-block">
-            <div
-              className="w-12 h-12 rounded-lg border-2 border-gray-300 shadow-sm cursor-pointer hover:border-gray-500 transition-colors"
-              style={{ backgroundColor: customColor }}
-              onClick={() => colorInputRef.current?.click()}
-              title={t('admin.attributes.valueModal.addColor')}
-            />
-            <input
-              ref={colorInputRef}
-              type="color"
-              value={customColor}
-              onChange={handleColorPickerChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-          </div>
+        <p className="mb-2 text-xs text-gray-500">{t('admin.attributes.valueModal.adjustColorDrag')}</p>
+        <div className="flex flex-wrap items-end gap-4">
+          <AdminDragColorPicker
+            color={customColor}
+            onChange={setCustomColor}
+            emptyFallbackHex={ADMIN_CUSTOM_COLOR_PICKER_SEED}
+          />
           <button
             type="button"
             onClick={handleAddColor}
-            disabled={!customColor || customColor === '#000000' || colors.includes(customColor)}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            disabled={activeHexSet.has(normalizeHexToSixDigits(customColor).toLowerCase())}
+            className="rounded-lg bg-gray-900 px-4 py-2 text-sm text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t('admin.attributes.valueModal.add')}
           </button>
