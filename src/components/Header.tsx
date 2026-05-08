@@ -1695,7 +1695,7 @@ export function Header() {
                       <Link
                         href="/register"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex w-full min-w-0 items-center justify-between rounded-2xl border border-gray-900 bg-gray-900 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-gray-800 hover:bg-gray-800 active:opacity-95 text-pretty"
+                        className="flex w-full min-w-0 items-center justify-between rounded-2xl border border-admin-500 bg-admin-500 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-admin-600 hover:bg-admin-600 active:opacity-95 text-pretty"
                       >
                         <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.register')}</span>
                         <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
