@@ -72,6 +72,13 @@ function parseAllowedDevOriginsFromEnv() {
 const nextConfig = {
   reactStrictMode: true,
   /**
+   * Prisma client is generated to shared/db/generated/client (not node_modules/.prisma).
+   * Standalone/serverless tracing can omit *.node query engines — include only binaries (not full client tree).
+   */
+  outputFileTracingIncludes: {
+    '/*': ['./shared/db/generated/client/**/*.node'],
+  },
+  /**
    * Admin UI files live under `src/app/admin` but are only exposed at `/supersudo`.
    * `beforeFiles` runs before filesystem matching, so `/admin` never resolves to that tree.
    */
