@@ -179,7 +179,10 @@
       "addCustomColor": "Добавить цвет",
       "hide": "Скрыть",
       "add": "Добавить",
-      "removeColor": "Удалить цвет"
+      "removeColor": "Удалить цвет",
+      "presetPalette": "Готовая палитра",
+      "customColor": "Свой цвет",
+      "clearColor": "Сбросить цвет"
     }
   },
   "categories": {

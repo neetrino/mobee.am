@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { useTranslation } from '../lib/i18n-client';
+import { PresetColorSwatchGrid } from './PresetColorSwatchGrid';
+import { normalizeHexToSixDigits } from '../lib/hexColorUtils';
 
 interface ColorPaletteSelectorProps {
   colors: string[];
@@ -16,6 +18,19 @@ export function ColorPaletteSelector({ colors, onColorsChange }: ColorPaletteSel
   const { t } = useTranslation();
   const [customColor, setCustomColor] = useState('#000000');
   const colorInputRef = useRef<HTMLInputElement>(null);
+
+  const activeHexSet = useMemo(() => {
+    return new Set(colors.map((c) => normalizeHexToSixDigits(c).toLowerCase()));
+  }, [colors]);
+
+  const handlePresetPick = (hex: string) => {
+    const normalized = normalizeHexToSixDigits(hex);
+    const key = normalized.toLowerCase();
+    if (activeHexSet.has(key)) {
+      return;
+    }
+    onColorsChange([...colors, normalized]);
+  };
 
   const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only update the swatch color preview, don't add to list yet
@@ -43,6 +58,17 @@ export function ColorPaletteSelector({ colors, onColorsChange }: ColorPaletteSel
 
   return (
     <div className="space-y-4">
+      <div>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          {t('admin.attributes.valueModal.presetPalette')}
+        </label>
+        <PresetColorSwatchGrid
+          onPick={handlePresetPick}
+          activeHexSet={activeHexSet}
+          ariaLabel={t('admin.attributes.valueModal.presetPalette')}
+        />
+      </div>
+
       {/* Selected Colors */}
       {colors.length > 0 && (
         <div className="space-y-2">

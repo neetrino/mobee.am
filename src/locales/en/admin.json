@@ -179,7 +179,10 @@
       "addCustomColor": "Add Color",
       "hide": "Hide",
       "add": "Add",
-      "removeColor": "Remove Color"
+      "removeColor": "Remove Color",
+      "presetPalette": "Preset palette",
+      "customColor": "Custom color",
+      "clearColor": "Clear color"
     }
   },
   "categories": {

@@ -179,7 +179,10 @@
       "addCustomColor": "Ավելացնել գույն",
       "hide": "Թաքցնել",
       "add": "Ավելացնել",
-      "removeColor": "Հեռացնել գույնը"
+      "removeColor": "Հեռացնել գույնը",
+      "presetPalette": "Նախապես ընտրված գունապալիտրա",
+      "customColor": "Ձեր գույնը",
+      "clearColor": "Մաքրել գույնը"
     }
   },
   "categories": {
