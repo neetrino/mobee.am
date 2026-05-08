@@ -9,6 +9,7 @@
 const { spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
+const { syncPrismaClient } = require("./sync-prisma-client.cjs");
 
 const REPO_ROOT = path.join(__dirname, "..");
 const SHARED_DB = path.join(REPO_ROOT, "shared", "db");
@@ -90,6 +91,7 @@ for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
   });
 
   if (result.status === 0) {
+    syncPrismaClient();
     process.exit(0);
   }
 
@@ -106,6 +108,11 @@ if (SHOULD_FAIL_HARD) {
 }
 
 if (isGeneratedPrismaClientPresent()) {
+  try {
+    syncPrismaClient();
+  } catch (syncError) {
+    console.error("[prebuild] failed to sync Prisma client to generated/client:", syncError);
+  }
   console.warn(
     "[prebuild] prisma generate failed after retries, but shared/db/generated/client is present — continuing build. " +
       "Stop other Node processes or fix AV locks if you need a fresh generate. Use FORCE_PRISMA_GENERATE=1 to fail hard.",
