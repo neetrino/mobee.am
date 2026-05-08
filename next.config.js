@@ -99,8 +99,11 @@ const nextConfig = {
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
   devIndicators: false,
   transpilePackages: ['@shop/ui', '@shop/design-tokens'],
-  // Standalone output - prevents prerendering of 404 page
-  output: 'standalone',
+  /**
+   * Standalone is for self-hosted / Docker images. Vercel bundles Serverless functions separately;
+   * standalone + wrong outputDirectory can omit Prisma engines (rhel-openssl-3.0.x).
+   */
+  output: process.env.VERCEL ? undefined : 'standalone',
   // Security headers (P1-SEC-07)
   async headers() {
     return [
