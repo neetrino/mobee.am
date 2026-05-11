@@ -214,6 +214,13 @@
   },
   "footer": {
     "visitUs": "Visit us",
+    "locationHeading": "Our location",
+    "locationSubtitle": "Visit or contact us any time",
+    "viewLargerMap": "View larger map",
+    "footerNavAriaLabel": "Footer primary links",
+    "socialNavAriaLabel": "Social links",
+    "copyrightIntro": "Copyright © {startYear} - {year}",
+    "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Products",
     "sectionsHeading": "Sections",
     "termsHeading": "Terms",
@@ -221,6 +228,12 @@
     "openInMaps": "Open address in Google Maps",
     "shop": "Shop",
     "copyright": "© {year} Mobee. All rights reserved.",
+    "policiesRow": {
+      "refund": "Refund Policy",
+      "delivery": "Delivery Policy",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    },
     "legalBar": {
       "brand": "MOBEE",
       "copyrightLead": "Copyright © {year} | All Rights Reserved,",

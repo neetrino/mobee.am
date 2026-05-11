@@ -211,6 +211,13 @@
   },
   "footer": {
     "visitUs": "Посетите нас",
+    "locationHeading": "Наш адрес",
+    "locationSubtitle": "Приходите или свяжитесь с нами в любое время",
+    "viewLargerMap": "Открыть карту крупнее",
+    "footerNavAriaLabel": "Основные ссылки в подвале",
+    "socialNavAriaLabel": "Соцсети",
+    "copyrightIntro": "Авторское право © {startYear} - {year}",
+    "allRightsReserved": "Все права защищены.",
     "productsHeading": "Товары",
     "sectionsHeading": "Разделы",
     "termsHeading": "Условия",
@@ -218,6 +225,12 @@
     "openInMaps": "Открыть адрес в Google Картах",
     "shop": "Магазин",
     "copyright": "© {year} Mobee. Все права защищены.",
+    "policiesRow": {
+      "refund": "Политика возврата средств",
+      "delivery": "Политика доставки",
+      "terms": "Условия обслуживания",
+      "privacy": "Политика конфиденциальности"
+    },
     "legalBar": {
       "brand": "MOBEE",
       "copyrightLead": "Авторское право © {year} | Все права защищены,",
