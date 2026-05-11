@@ -17,7 +17,7 @@ interface ProfileDesktopMainProps {
   dashboardLoading: boolean;
   currency: CurrencyCode;
   handleTabChange: (tab: ProfileTab) => void;
-  handleOrderClick: (orderNumber: string, e: MouseEvent<HTMLAnchorElement>) => void;
+  handleOrderClick: (order: OrderListItem, e: MouseEvent<HTMLAnchorElement>) => void;
   t: (key: string) => string;
   personalInfo: {
     firstName: string;

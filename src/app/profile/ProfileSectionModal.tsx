@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, type ReactNode } from 'react';
+import { acquireBodyScrollLock } from '../../lib/body-scroll-lock';
 
 interface ProfileSectionModalProps {
   open: boolean;
@@ -25,11 +26,7 @@ export function ProfileSectionModal({
 }: ProfileSectionModalProps) {
   useEffect(() => {
     if (!open || !lockBodyScroll) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
+    return acquireBodyScrollLock();
   }, [open, lockBodyScroll]);
 
   useEffect(() => {
@@ -49,7 +46,7 @@ export function ProfileSectionModal({
     <div className="fixed inset-0 z-[55] flex flex-col justify-end sm:justify-center sm:p-4">
       <button
         type="button"
-        className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/50"
         aria-label={closeLabel}
         onClick={onClose}
       />

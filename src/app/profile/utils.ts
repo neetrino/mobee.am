@@ -1,3 +1,30 @@
+import type { OrderDetails, OrderListItem } from './types';
+
+/**
+ * Minimal order payload so the details modal can mount immediately while the full order is fetched.
+ */
+export function orderListItemToDetailsPlaceholder(row: OrderListItem): OrderDetails {
+  return {
+    id: row.id,
+    number: row.number,
+    status: row.status,
+    paymentStatus: row.paymentStatus,
+    fulfillmentStatus: row.fulfillmentStatus,
+    items: [],
+    totals: {
+      subtotal: row.subtotal ?? row.total,
+      discount: row.discountAmount ?? 0,
+      shipping: row.shippingAmount ?? 0,
+      tax: row.taxAmount ?? 0,
+      total: row.total,
+      currency: row.currency,
+    },
+    shippingMethod: 'delivery',
+    createdAt: row.createdAt,
+    updatedAt: row.createdAt,
+  };
+}
+
 export const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
     case 'pending':

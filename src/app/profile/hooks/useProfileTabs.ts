@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { startTransition, useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../../../lib/layout-breakpoints.constants';
 import { isProfileTabParam, type ProfileTab } from '../types';
@@ -16,19 +16,24 @@ export function useProfileTabs() {
   const initialFromUrl = isProfileTabParam(tabFromUrl) ? tabFromUrl : null;
 
   const [activeTab, setActiveTab] = useState<ProfileTab>(initialFromUrl ?? 'dashboard');
+  /** Until the URL catches up after `router.replace`, keep the mobile sheet open (instant open). */
+  const [pendingTabNavigation, setPendingTabNavigation] = useState<ProfileTab | null>(null);
 
   useEffect(() => {
     const tab = searchParams.get('tab');
     if (isProfileTabParam(tab)) {
       setActiveTab(tab);
+      setPendingTabNavigation(null);
     } else {
       setActiveTab('dashboard');
+      setPendingTabNavigation(null);
     }
   }, [searchParams]);
 
   const handleTabChange = useCallback(
     (tab: ProfileTab) => {
       setActiveTab(tab);
+      setPendingTabNavigation(tab);
       const path = `/profile?tab=${tab}`;
       if (isDesktopViewport()) {
         router.push(path, { scroll: false });
@@ -40,11 +45,15 @@ export function useProfileTabs() {
   );
 
   const closeProfileSheet = useCallback(() => {
+    startTransition(() => {
+      setPendingTabNavigation(null);
+      setActiveTab('dashboard');
+    });
     router.replace('/profile', { scroll: false });
   }, [router]);
 
   const openTabParam = searchParams.get('tab');
-  const profileSheetOpen = isProfileTabParam(openTabParam);
+  const profileSheetOpen = isProfileTabParam(openTabParam) || pendingTabNavigation !== null;
   const highlightedTab: ProfileTab | null = profileSheetOpen ? activeTab : null;
 
   return {

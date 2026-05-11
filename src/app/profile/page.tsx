@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo } from 'react';
+import { Suspense, startTransition, useMemo } from 'react';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
 import { useProfilePage } from './useProfilePage';
@@ -270,7 +270,7 @@ function ProfilePageContent() {
           orderDetailsError={orderDetailsError}
           isReordering={isReordering}
           currency={currency}
-          onClose={() => setSelectedOrder(null)}
+          onClose={() => startTransition(() => setSelectedOrder(null))}
           onReOrder={handleReOrder}
           t={t}
         />

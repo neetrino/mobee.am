@@ -3,14 +3,14 @@ import { Button, Card } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { PROFILE_DASHBOARD_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor } from './utils';
-import type { DashboardData, ProfileTab } from './types';
+import type { DashboardData, OrderListItem, ProfileTab } from './types';
 
 interface ProfileDashboardProps {
   dashboardData: DashboardData | null;
   dashboardLoading: boolean;
   currency: CurrencyCode;
   onTabChange: (tab: ProfileTab) => void;
-  onOrderClick: (orderNumber: string, e: React.MouseEvent<HTMLAnchorElement>) => void;
+  onOrderClick: (order: OrderListItem, e: React.MouseEvent<HTMLAnchorElement>) => void;
   t: (key: string) => string;
 }
 
@@ -137,7 +137,7 @@ export function ProfileDashboard({
               <Link
                 key={order.id}
                 href={`/orders/${order.number}`}
-                onClick={(e) => onOrderClick(order.number, e)}
+                onClick={(e) => onOrderClick(order as OrderListItem, e)}
                 className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
               >
                 <div className="flex items-start justify-between">

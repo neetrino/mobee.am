@@ -17,7 +17,7 @@ interface ProfileOrdersProps {
     totalPages: number;
   } | null;
   currency: CurrencyCode;
-  onOrderClick: (orderNumber: string, e: React.MouseEvent<HTMLAnchorElement>) => void;
+  onOrderClick: (order: OrderListItem, e: React.MouseEvent<HTMLAnchorElement>) => void;
   t: (key: string) => string;
 }
 
@@ -70,7 +70,7 @@ export function ProfileOrders({
           <Link
             key={order.id}
             href={`/orders/${order.number}`}
-            onClick={(e) => onOrderClick(order.number, e)}
+            onClick={(e) => onOrderClick(order, e)}
             className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

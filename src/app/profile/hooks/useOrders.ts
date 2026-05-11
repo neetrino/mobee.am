@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, type MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { acquireBodyScrollLock } from '../../../lib/body-scroll-lock';
 import { apiClient } from '../../../lib/api-client';
 import { LAYOUT_DESKTOP_MIN_WIDTH_PX } from '../../../lib/layout-breakpoints.constants';
 import { useTranslation } from '../../../lib/i18n-client';
+import { orderListItemToDetailsPlaceholder } from '../utils';
 import type { OrderDetails, OrderListItem, ProfileTab } from '../types';
 
 interface OrdersMeta {
@@ -43,16 +45,9 @@ export function useOrders({
   const [orderDetailsError, setOrderDetailsError] = useState<string | null>(null);
   const [isReordering, setIsReordering] = useState(false);
 
-  // Lock body scroll when order modal is open
   useEffect(() => {
-    if (selectedOrder) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    if (!selectedOrder) return;
+    return acquireBodyScrollLock();
   }, [selectedOrder]);
 
   const loadOrders = useCallback(async () => {
@@ -100,10 +95,12 @@ export function useOrders({
     }
   };
 
-  const handleOrderClick = (orderNumber: string, e: MouseEvent<HTMLAnchorElement>) => {
+  const handleOrderClick = (order: OrderListItem, e: MouseEvent<HTMLAnchorElement>) => {
     if (window.innerWidth >= LAYOUT_DESKTOP_MIN_WIDTH_PX) {
       e.preventDefault();
-      loadOrderDetails(orderNumber);
+      setOrderDetailsError(null);
+      setSelectedOrder(orderListItemToDetailsPlaceholder(order));
+      void loadOrderDetails(order.number);
     }
   };
 

@@ -11,6 +11,7 @@ import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } fr
 import { useInstantSearch } from './hooks/useInstantSearch';
 import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
+import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import { apiClient } from '../lib/api-client';
 import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCounts';
 import { LanguageSwitcherPill } from './LanguageSwitcherPill';
@@ -1057,13 +1058,10 @@ export function Header() {
       return;
     }
 
-    if (mobileMenuOpen) {
-      const previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = previousOverflow;
-      };
+    if (!mobileMenuOpen) {
+      return;
     }
+    return acquireBodyScrollLock();
   }, [mobileMenuOpen]);
 
   // Focus search input when modal opens; sync dropdown with query. When modal is closed, do not
@@ -1559,7 +1557,7 @@ export function Header() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-50 flex bg-black/40 lg:hidden"
           role="dialog"
           aria-modal="true"
           onClick={() => setMobileMenuOpen(false)}
@@ -1717,7 +1715,7 @@ export function Header() {
 
       {/* Search Modal */}
       {showSearchModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-start justify-center pt-20 px-4">
+        <div className="fixed inset-0 bg-black/20 z-50 flex items-start justify-center pt-20 px-4">
           <div 
             ref={searchModalRef}
             className="w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-gray-200/80 p-4 animate-in fade-in slide-in-from-top-2 duration-200 relative"

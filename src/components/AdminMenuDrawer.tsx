@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import { SiteBrandLogo } from './SiteBrandLogo';
 
 export interface AdminMenuItem {
@@ -39,15 +40,8 @@ export function AdminMenuDrawer({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
+    if (!open) return;
+    return acquireBodyScrollLock();
   }, [open]);
 
   return (
@@ -68,7 +62,7 @@ export function AdminMenuDrawer({
 
       {open ? (
         <div
-          className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex bg-black/40"
           onClick={() => {
             setOpen(false);
           }}
