@@ -5,6 +5,7 @@ import { ProductCard } from './ProductCard';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import {
   HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET,
+  HOME_BEST_CHOICE_ONE_ROW_COLUMN_SHELL_CLASS,
   HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS,
   HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_COMPACT_CLASS,
   HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_DESKTOP_CLASS,
@@ -22,7 +23,7 @@ import { useIpadProHomeDesktopGrid } from './useIpadProHomeDesktopGrid';
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
-/** Horizontal 2-row strip: container query size + overflow; column widths use `cqi` (see home-best-choice.constants). */
+/** Horizontal product strip: container query size + overflow; column widths use `cqi` (see home-best-choice.constants). */
 const HOME_BEST_CHOICE_PRODUCT_STRIP =
   '[container-type:inline-size] flex min-w-0 w-full flex-nowrap snap-x snap-mandatory flex-row gap-x-4 overflow-x-auto overscroll-x-contain [touch-action:pan-x_pan-y] [-webkit-overflow-scrolling:touch] scrollbar-hide min-[744px]:max-lg:gap-x-5 lg:gap-x-6';
 
@@ -53,6 +54,8 @@ type HomeBestChoiceStyleProductGridProps = {
   specialOffersHomeCard?: boolean;
   /** Reports scroll “page” for {@link HomeMobileSectionTitle} indicators (`lg:hidden`). */
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
+  /** `2` = featured “best choice” (two cards stacked per column); `1` = special offers (one card per column). */
+  stripRowCount?: 1 | 2;
 };
 
 function BestChoiceProductCell({
@@ -90,6 +93,12 @@ function homeBestChoiceColumnWidthClass(isIpadProDesktopGrid: boolean): string {
   ].join(' ');
 }
 
+function homeBestChoiceColumnShellClass(stripRowCount: 1 | 2): string {
+  return stripRowCount === 1
+    ? HOME_BEST_CHOICE_ONE_ROW_COLUMN_SHELL_CLASS
+    : HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS;
+}
+
 export function HomeBestChoiceStyleProductGrid({
   products,
   productsPerPage,
@@ -99,11 +108,13 @@ export function HomeBestChoiceStyleProductGrid({
   scrollNextAriaLabel,
   specialOffersHomeCard = false,
   onMobileCarouselViewChange,
+  stripRowCount = 2,
 }: HomeBestChoiceStyleProductGridProps) {
   const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
   const isDesktopShell = useHomeBestChoiceDesktopShellActive();
   const visible = products.slice(0, productsPerPage);
-  const columns = chunkArray(visible, 2);
+  const columns = chunkArray(visible, stripRowCount);
+  const columnShellClass = homeBestChoiceColumnShellClass(stripRowCount);
   const columnWidthClass = homeBestChoiceColumnWidthClass(isIpadProDesktopGrid);
   const cardViewMode: 'grid-2' | 'grid-3' =
     mobileCardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET ? 'grid-3' : 'grid-2';
@@ -138,7 +149,7 @@ export function HomeBestChoiceStyleProductGrid({
         {columns.map((pair, columnIndex) => (
           <div
             key={`col-${pair[0]?.id ?? columnIndex}`}
-            className={`${HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS} ${columnWidthClass}`}
+            className={`${columnShellClass} ${columnWidthClass}`}
           >
             {pair.map((product) => (
               <BestChoiceProductCell
@@ -175,14 +186,17 @@ export function HomeBestChoiceStyleProductGridSkeleton({
   productsPerPage,
   mobileCarouselAriaLabel,
   onMobileCarouselViewChange,
+  stripRowCount = 2,
 }: {
   productsPerPage: number;
   mobileCarouselAriaLabel: string;
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
+  stripRowCount?: 1 | 2;
 }) {
   const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
   const indices = [...Array(productsPerPage)].map((_, i) => i);
-  const columns = chunkArray(indices, 2);
+  const columns = chunkArray(indices, stripRowCount);
+  const columnShellClass = homeBestChoiceColumnShellClass(stripRowCount);
   const columnWidthClass = homeBestChoiceColumnWidthClass(isIpadProDesktopGrid);
   const { scrollRef } = useHomeBestChoiceCarouselPageSync(onMobileCarouselViewChange);
 
@@ -199,7 +213,7 @@ export function HomeBestChoiceStyleProductGridSkeleton({
         {columns.map((pairIndices, columnIndex) => (
           <div
             key={`sk-col-${columnIndex}`}
-            className={`${HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS} ${columnWidthClass}`}
+            className={`${columnShellClass} ${columnWidthClass}`}
           >
             {pairIndices.map((i) => (
               <SkeletonCell key={i} />

@@ -29,6 +29,10 @@ export const HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_IPAD_PRO_CLASS = `lg:w-[calc(
 export const HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS =
   'flex min-w-0 shrink-0 snap-start flex-col gap-4 min-[744px]:max-lg:gap-5 lg:gap-6';
 
+/** Single-card column (special offers one-row strip); same horizontal track widths as two-row. */
+export const HOME_BEST_CHOICE_ONE_ROW_COLUMN_SHELL_CLASS =
+  'flex min-w-0 shrink-0 snap-start flex-col';
+
 /**
  * Home “best choice” / special-offers: {@link HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_COMPACT_CLASS} shows
  * four cards (two columns × two rows); this value drives {@link ProductCard} density and carousel dot estimates.
