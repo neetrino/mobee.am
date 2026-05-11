@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
-import { HomeCtaPillArrowIcon, HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
+import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
 
 const montserrat = Montserrat({
@@ -11,18 +11,6 @@ const montserrat = Montserrat({
   weight: ['400', '500', '700'],
   display: 'swap',
 });
-
-type CtaArrowMotion = 'idle' | 'hoverIn' | 'hoverOut';
-
-function getCtaArrowMotionClass(motion: CtaArrowMotion): string {
-  if (motion === 'hoverIn') {
-    return 'animate-cta-arrow-nudge-in';
-  }
-  if (motion === 'hoverOut') {
-    return 'animate-cta-arrow-nudge-out';
-  }
-  return '';
-}
 
 type SpecialOffersSectionHeadingProps = {
   /** Product grid — same card system as “best choice”, placed under the title row. */
@@ -40,18 +28,6 @@ export function SpecialOffersSectionHeading({
   syncedCarouselPageCount,
 }: SpecialOffersSectionHeadingProps) {
   const { t } = useTranslation();
-  const [ctaArrowMotion, setCtaArrowMotion] = useState<CtaArrowMotion>('idle');
-  const [ctaArrowMotionKey, setCtaArrowMotionKey] = useState(0);
-
-  function handleCtaPointerEnter() {
-    setCtaArrowMotion('hoverIn');
-    setCtaArrowMotionKey((key) => key + 1);
-  }
-
-  function handleCtaPointerLeave() {
-    setCtaArrowMotion('hoverOut');
-    setCtaArrowMotionKey((key) => key + 1);
-  }
 
   return (
     <div
@@ -70,20 +46,7 @@ export function SpecialOffersSectionHeading({
             {t('home.special_offers_heading.subtitle')}
           </p>
         </div>
-        <HomeMoreCtaPillLink
-          href="/products"
-          variant="cyanPromo"
-          onPointerEnter={handleCtaPointerEnter}
-          onPointerLeave={handleCtaPointerLeave}
-          circleContent={
-            <span
-              key={ctaArrowMotionKey}
-              className={`inline-flex items-center justify-center ${getCtaArrowMotionClass(ctaArrowMotion)}`}
-            >
-              <HomeCtaPillArrowIcon className="size-5 shrink-0 text-white" />
-            </span>
-          }
-        >
+        <HomeMoreCtaPillLink href="/products" variant="cyanPromo" arrowHoverAnimation>
           {t('home.special_offers_heading.cta')}
         </HomeMoreCtaPillLink>
       </div>
