@@ -1,7 +1,6 @@
 ﻿'use client';
 
 import { Button, Input } from '@/app/admin/lib/adminShopUi';
-import { Button, Input } from '@shop/ui';
 import { AdminSingleColorPicker } from '../../../../../components/AdminSingleColorPicker';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import type { ProductLabel } from '../types';
