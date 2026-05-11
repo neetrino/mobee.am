@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 export interface Address {
   id?: string;
   _id?: string; // For backward compatibility
@@ -121,10 +123,22 @@ export interface OrderListItem {
 
 export type ProfileTab = 'dashboard' | 'personal' | 'addresses' | 'password' | 'orders';
 
+export const PROFILE_TAB_IDS: ProfileTab[] = [
+  'dashboard',
+  'orders',
+  'personal',
+  'addresses',
+  'password',
+];
+
+export function isProfileTabParam(value: string | null): value is ProfileTab {
+  return value !== null && PROFILE_TAB_IDS.includes(value as ProfileTab);
+}
+
 export interface ProfileTabConfig {
   id: ProfileTab;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 

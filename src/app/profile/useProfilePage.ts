@@ -5,13 +5,14 @@ import { usePassword } from './hooks/usePassword';
 import { useDashboard } from './hooks/useDashboard';
 import { useOrders } from './hooks/useOrders';
 import { useProfileTabs } from './hooks/useProfileTabs';
+import { useProfileDesktopLayout } from './hooks/useProfileDesktopLayout';
 import { useCurrency } from './hooks/useCurrency';
 import { useTranslation } from '../../lib/i18n-client';
 
 export function useProfilePage() {
   const { t } = useTranslation();
-  
-  // Core profile hook
+  const isDesktopProfileLayout = useProfileDesktopLayout();
+
   const {
     profile,
     setProfile,
@@ -25,7 +26,6 @@ export function useProfilePage() {
     authLoading,
   } = useProfile();
 
-  // Personal info hook
   const personalInfo = usePersonalInfo({
     profile,
     onProfileUpdate: (updated) => {
@@ -35,7 +35,6 @@ export function useProfilePage() {
     onSuccess: setSuccess,
   });
 
-  // Addresses hook
   const addresses = useAddresses({
     profile,
     onProfileReload: loadProfile,
@@ -43,10 +42,16 @@ export function useProfilePage() {
     onSuccess: setSuccess,
   });
 
-  // Tabs management
-  const { activeTab, handleTabChange: baseHandleTabChange } = useProfileTabs();
+  const {
+    activeTab,
+    handleTabChange: baseHandleTabChange,
+    closeProfileSheet,
+    profileSheetOpen,
+    highlightedTab,
+  } = useProfileTabs();
 
-  // Enhanced tab change with address form cleanup
+  const tabDataEnabled = profileSheetOpen || isDesktopProfileLayout;
+
   const handleTabChange = (tab: typeof activeTab) => {
     baseHandleTabChange(tab);
     setError(null);
@@ -57,34 +62,31 @@ export function useProfilePage() {
     }
   };
 
-  // Password hook
   const password = usePassword({
     onError: setError,
     onSuccess: setSuccess,
   });
 
-  // Dashboard hook
   const dashboard = useDashboard({
     isLoggedIn,
     authLoading,
     activeTab,
+    tabDataEnabled,
     onError: setError,
   });
 
-  // Orders hook
   const orders = useOrders({
     isLoggedIn,
     authLoading,
     activeTab,
+    tabDataEnabled,
     onError: setError,
     onSuccess: setSuccess,
   });
 
-  // Currency hook
   const { currency } = useCurrency();
 
   return {
-    // Auth & loading
     isLoggedIn,
     authLoading,
     loading,
@@ -92,21 +94,16 @@ export function useProfilePage() {
     success,
     setError,
     setSuccess,
-    
-    // Profile
     profile,
-    
-    // Tabs
     activeTab,
     handleTabChange,
-    
-    // Personal info
+    closeProfileSheet,
+    profileSheetOpen,
+    highlightedTab,
     personalInfo: personalInfo.personalInfo,
     setPersonalInfo: personalInfo.setPersonalInfo,
     savingPersonal: personalInfo.savingPersonal,
     handleSavePersonalInfo: personalInfo.handleSavePersonalInfo,
-    
-    // Addresses
     showAddressForm: addresses.showAddressForm,
     setShowAddressForm: addresses.setShowAddressForm,
     editingAddress: addresses.editingAddress,
@@ -118,25 +115,17 @@ export function useProfilePage() {
     handleSetDefaultAddress: addresses.handleSetDefaultAddress,
     handleEditAddress: addresses.handleEditAddress,
     resetAddressForm: addresses.resetAddressForm,
-    
-    // Password
     passwordForm: password.passwordForm,
     setPasswordForm: password.setPasswordForm,
     savingPassword: password.savingPassword,
     handleChangePassword: password.handleChangePassword,
-    
-    // Dashboard
     dashboardData: dashboard.dashboardData,
     dashboardLoading: dashboard.dashboardLoading,
-    
-    // Orders
     orders: orders.orders,
     ordersLoading: orders.ordersLoading,
     ordersPage: orders.ordersPage,
     setOrdersPage: orders.setOrdersPage,
     ordersMeta: orders.ordersMeta,
-    
-    // Order details
     selectedOrder: orders.selectedOrder,
     setSelectedOrder: orders.setSelectedOrder,
     orderDetailsLoading: orders.orderDetailsLoading,
@@ -144,11 +133,7 @@ export function useProfilePage() {
     isReordering: orders.isReordering,
     handleOrderClick: orders.handleOrderClick,
     handleReOrder: orders.handleReOrder,
-    
-    // Currency
     currency,
-    
-    // Translation
     t,
   };
 }

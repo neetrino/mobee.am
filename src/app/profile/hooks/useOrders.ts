@@ -16,6 +16,7 @@ interface UseOrdersProps {
   isLoggedIn: boolean;
   authLoading: boolean;
   activeTab: ProfileTab;
+  tabDataEnabled: boolean;
   onError: (error: string) => void;
   onSuccess: (message: string) => void;
 }
@@ -24,6 +25,7 @@ export function useOrders({
   isLoggedIn,
   authLoading,
   activeTab,
+  tabDataEnabled,
   onError,
   onSuccess,
 }: UseOrdersProps) {
@@ -77,12 +79,11 @@ export function useOrders({
     }
   }, [ordersPage, t, onError]);
 
-  // Load orders when orders tab is active
   useEffect(() => {
-    if (isLoggedIn && !authLoading && activeTab === 'orders') {
+    if (isLoggedIn && !authLoading && activeTab === 'orders' && tabDataEnabled) {
       loadOrders();
     }
-  }, [isLoggedIn, authLoading, activeTab, loadOrders]);
+  }, [isLoggedIn, authLoading, activeTab, tabDataEnabled, loadOrders]);
 
   const loadOrderDetails = async (orderNumber: string) => {
     try {
