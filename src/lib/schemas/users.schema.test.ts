@@ -39,6 +39,28 @@ describe("users.schema", () => {
     }
   });
 
+  it("accepts address create with empty optional string fields (profile form payload)", () => {
+    const parsed = safeParseAddressCreate({
+      firstName: "",
+      lastName: "",
+      company: "",
+      addressLine1: "12 Main St",
+      addressLine2: "",
+      city: "Yerevan",
+      state: "",
+      postalCode: "",
+      countryCode: "AM",
+      phone: "",
+      isDefault: false,
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.firstName).toBeUndefined();
+      expect(parsed.data.phone).toBeUndefined();
+    }
+  });
+
   it("rejects invalid address create payload", () => {
     const parsed = safeParseAddressCreate({
       city: "Yerevan",
