@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
@@ -33,6 +33,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
                 router={router}
                 t={t}
                 onAfterNavigate={onAfterNavigate}
+                presentation="mobileDrawer"
               />
             )}
             logoHref={siteHomeHref}

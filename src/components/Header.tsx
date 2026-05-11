@@ -25,6 +25,7 @@ import {
   HEADER_STRIP_PADDING_Y,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
+  MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
 import { SiteBrandLogo } from './SiteBrandLogo';
@@ -34,6 +35,12 @@ import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.co
 import { DEFAULT_USER_AVATAR_SRC } from './user-avatar.constants';
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
+import {
+  MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS,
+  MOBILE_DRAWER_NAV_BUTTON_CLASS,
+  MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
+  MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS,
+} from './mobile-drawer-nav.constants';
 
 /** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
 const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
@@ -116,20 +123,6 @@ const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
 
 const mobilePrimaryLangButtonClassName =
   'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
-
-/** Mobile drawer primary links — bordered pill buttons (aligned with strip icon radius). */
-const MOBILE_DRAWER_NAV_BUTTON_CLASS =
-  'flex w-full min-w-0 items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100 text-pretty';
-
-/** Primary label cell inside drawer rows (avoids one-character orphan lines next to chevrons). */
-const MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS = 'min-w-0 flex-1 pr-1 text-pretty';
-
-/** Solid Mobee CTA in mobile drawer (e.g. register, admin panel). */
-const MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS =
-  'flex w-full min-w-0 items-center justify-between rounded-2xl border border-admin-500 bg-admin-500 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-admin-600 hover:bg-admin-600 active:opacity-95 text-pretty';
-
-/** Home / Shop / About / Contact — blue hover (overrides gray hover on `MOBILE_DRAWER_NAV_BUTTON_CLASS`). */
-const MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS = `${MOBILE_DRAWER_NAV_BUTTON_CLASS} hover:!border-admin-300 hover:!bg-admin-50 hover:!text-[#00a1ff]`;
 
 const MOBILE_DRAWER_MIN_WIDTH_REM = 17;
 const MOBILE_DRAWER_DEFAULT_MAX_WIDTH_REM = 24;
@@ -1216,7 +1209,7 @@ export function Header() {
                   setShowMobilePrimaryLangMenu(false);
                   setMobileMenuOpen(true);
                 }}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
                 aria-expanded={mobileMenuOpen}
                 aria-label={t('common.ariaLabels.openMenu')}
               >
