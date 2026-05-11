@@ -19,7 +19,7 @@ describe("extractMediaUrl", () => {
 
   it("returns first element when it is a string", () => {
     expect(extractMediaUrl(["https://example.com/img.jpg"])).toBe("https://example.com/img.jpg");
-    expect(extractMediaUrl(["a", "b"])).toBe("a");
+    expect(extractMediaUrl(["/uploads/a.jpg", "/uploads/b.jpg"])).toBe("/uploads/a.jpg");
   });
 
   it("returns url when first element is object with url", () => {
@@ -28,6 +28,10 @@ describe("extractMediaUrl", () => {
 
   it("returns src when first element is object with src", () => {
     expect(extractMediaUrl([{ src: "https://cdn.example/2.jpg" }])).toBe("https://cdn.example/2.jpg");
+  });
+
+  it("returns value when first element is object with value", () => {
+    expect(extractMediaUrl([{ value: "https://cdn.example/3.jpg" }])).toBe("https://cdn.example/3.jpg");
   });
 
   it("prefers url over src when both present", () => {
