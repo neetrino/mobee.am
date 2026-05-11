@@ -7,8 +7,7 @@ import {
   MOBILE_DRAWER_ADMIN_MENU_ITEM_ACTIVE_CLASS,
   MOBILE_DRAWER_ADMIN_MENU_ITEM_CLASS,
   MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS,
-  MOBILE_DRAWER_ADMIN_SUBMENU_ITEM_ACTIVE_CLASS,
-  MOBILE_DRAWER_ADMIN_SUBMENU_ITEM_CLASS,
+  MOBILE_DRAWER_ADMIN_SUBMENU_HORIZONTAL_TRIM_CLASS,
 } from '../../../components/mobile-drawer-nav.constants';
 import { getAdminMenuTABS } from '../admin-menu.config';
 
@@ -172,31 +171,11 @@ interface NavItemButtonProps {
 
 function NavItemButton({ tab, isActive, onNavigate, presentation }: NavItemButtonProps) {
   const rowClass = isActive ? MOBILE_DRAWER_ADMIN_MENU_ITEM_ACTIVE_CLASS : MOBILE_DRAWER_ADMIN_MENU_ITEM_CLASS;
+  const subTrimClass = tab.isSubCategory ? MOBILE_DRAWER_ADMIN_SUBMENU_HORIZONTAL_TRIM_CLASS : '';
 
   if (presentation === 'mobileDrawer') {
-    if (tab.isSubCategory) {
-      const subClass = isActive ? MOBILE_DRAWER_ADMIN_SUBMENU_ITEM_ACTIVE_CLASS : MOBILE_DRAWER_ADMIN_SUBMENU_ITEM_CLASS;
-      return (
-        <button type="button" onClick={onNavigate} className={subClass}>
-          <span className="flex min-w-0 flex-1 items-center justify-start gap-2 text-left [&_svg]:h-4 [&_svg]:w-4">
-            <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
-            <span className={`${MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS} !text-xs !font-medium`}>{tab.label}</span>
-          </span>
-          <svg
-            className={`h-3.5 w-3.5 shrink-0 ${rowChevronRightClassName(isActive)}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      );
-    }
-
     return (
-      <button type="button" onClick={onNavigate} className={rowClass}>
+      <button type="button" onClick={onNavigate} className={`${rowClass} ${subTrimClass}`.trim()}>
         <span className="flex min-w-0 flex-1 items-center justify-start gap-3 text-left">
           <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-600'}`}>{tab.icon}</span>
           <span className={MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS}>{tab.label}</span>
@@ -214,30 +193,13 @@ function NavItemButton({ tab, isActive, onNavigate, presentation }: NavItemButto
     );
   }
 
-  if (tab.isSubCategory) {
-    return (
-      <button
-        type="button"
-        onClick={onNavigate}
-        className={`flex w-full items-center gap-2 rounded-lg px-4 py-2 text-left text-xs font-medium transition-all [&_svg]:h-4 [&_svg]:w-4 ${
-          isActive
-            ? 'bg-admin text-white shadow-sm'
-            : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-        }`}
-      >
-        <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
-        <span className="min-w-0 flex-1 truncate">{tab.label}</span>
-      </button>
-    );
-  }
-
   return (
     <button
       type="button"
       onClick={onNavigate}
-      className={`flex w-full items-center gap-3 rounded-supersudo px-4 py-3 text-left text-sm font-medium transition-all ${
+      className={`flex w-full items-center gap-3 rounded-supersudo px-4 py-3 text-left text-sm font-medium transition-all ${subTrimClass} ${
         isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-      }`}
+      }`.trim()}
     >
       <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
       <span>{tab.label}</span>

@@ -23,12 +23,12 @@ export const MOBILE_DRAWER_ADMIN_MENU_ITEM_CLASS = `${MOBILE_DRAWER_NAV_BUTTON_C
 export const MOBILE_DRAWER_ADMIN_MENU_ITEM_ACTIVE_CLASS =
   'flex w-full min-w-0 items-center justify-between rounded-2xl border border-admin-500 bg-admin-500 px-4 py-3 text-left text-sm font-semibold normal-case text-white shadow-sm transition-colors active:opacity-95 text-pretty';
 
-/** Admin drawer — Products submenu: `px-4` like siblings, shorter vertically (`py-2`, `text-xs`). */
-export const MOBILE_DRAWER_ADMIN_SUBMENU_ITEM_CLASS =
-  'flex w-full min-w-0 items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-2 text-left text-xs font-medium normal-case text-gray-600 shadow-sm transition-colors hover:border-admin-200 hover:bg-admin-50 hover:text-gray-900';
-
-export const MOBILE_DRAWER_ADMIN_SUBMENU_ITEM_ACTIVE_CLASS =
-  'flex w-full min-w-0 items-center justify-between rounded-lg border border-admin-400 bg-admin-500 px-4 py-2 text-left text-xs font-semibold normal-case text-white shadow-sm transition-colors active:opacity-95';
+/**
+ * Products sub-rows (Categories / Brands / Attributes): 20px narrower than the nav rail, right-aligned.
+ * Used in admin mobile drawer and desktop sidebar.
+ */
+export const MOBILE_DRAWER_ADMIN_SUBMENU_HORIZONTAL_TRIM_CLASS =
+  'ml-auto min-w-0 !w-[calc(100%-20px)] max-w-full';
 
 /** Drawer panel — same width as Header mobile menu (`w-[min(83vw,24rem)]`). */
 export const MOBILE_DRAWER_SHELL_PANEL_CLASS =
