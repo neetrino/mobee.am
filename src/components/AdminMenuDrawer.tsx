@@ -7,7 +7,7 @@ import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import {
   MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
-  MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS,
+  MOBILE_PRIMARY_MENU_OPEN_BUTTON_WITH_LABEL_CLASS,
 } from './header-strip-layout';
 import { MOBILE_DRAWER_SHELL_PANEL_CLASS } from './mobile-drawer-nav.constants';
 import { SiteBrandLogo } from './SiteBrandLogo';
@@ -29,6 +29,7 @@ interface AdminMenuDrawerProps {
   siteLogoAlt: string;
   /** Accessible name for the open drawer surface. */
   drawerTitle: string;
+  /** Visible label next to the burger (e.g. “Menu”); also used as the control’s accessible name. */
   drawerMenuButton: string;
   closeMenuAria: string;
 }
@@ -59,14 +60,14 @@ export function AdminMenuDrawer({
         onClick={() => {
           setOpen(true);
         }}
-        aria-label={drawerMenuButton}
-        className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
+        className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_WITH_LABEL_CLASS}
       >
         <span className={MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS} aria-hidden>
           <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
           <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
           <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
         </span>
+        <span className="text-base font-bold leading-tight text-gray-900">{drawerMenuButton}</span>
       </button>
 
       {open ? (
