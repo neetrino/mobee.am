@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { CSSProperties, FormEvent } from 'react';
+import type { CSSProperties, FormEvent, RefObject } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
@@ -73,6 +73,65 @@ interface Category {
   title: string;
   fullPath: string;
   children: Category[];
+}
+
+/** Root categories pill dropdown: scroll container marker for submenu position sync. */
+const CATEGORIES_ROOT_SCROLL_DATA_ATTR = 'data-categories-root-scroll';
+
+const CATEGORY_SUBMENU_VIEWPORT_TOP_OFFSET_PX = -12;
+const CATEGORY_SUBMENU_VIEWPORT_RIGHT_GUTTER_PX = 20;
+const CATEGORY_SUBMENU_MAX_WIDTH_PX = 600;
+
+function useCategoryMegaPanelPosition(
+  open: boolean,
+  menuItemRef: RefObject<HTMLDivElement | null>,
+  panelRef: RefObject<HTMLDivElement | null>,
+): CSSProperties {
+  const [style, setStyle] = useState<CSSProperties>({});
+
+  useLayoutEffect(() => {
+    const menuItemEl = menuItemRef.current;
+    const panelEl = panelRef.current;
+    if (!open || !menuItemEl || !panelEl) {
+      return;
+    }
+
+    const updatePosition = () => {
+      const menuItem = menuItemRef.current;
+      if (!menuItem) {
+        return;
+      }
+      const itemRect = menuItem.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const maxWidth = Math.min(
+        CATEGORY_SUBMENU_MAX_WIDTH_PX,
+        viewportWidth - itemRect.right - CATEGORY_SUBMENU_VIEWPORT_RIGHT_GUTTER_PX,
+      );
+      setStyle({
+        position: 'fixed',
+        left: `${itemRect.right}px`,
+        top: `${itemRect.top + CATEGORY_SUBMENU_VIEWPORT_TOP_OFFSET_PX}px`,
+        maxWidth: `${Math.max(0, maxWidth)}px`,
+        zIndex: 60,
+      });
+    };
+
+    updatePosition();
+
+    const scrollRoot = menuItemEl.closest(`[${CATEGORIES_ROOT_SCROLL_DATA_ATTR}]`) ?? undefined;
+
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+    scrollRoot?.addEventListener('scroll', updatePosition);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+      scrollRoot?.removeEventListener('scroll', updatePosition);
+    };
+  }, [open, menuItemRef, panelRef]);
+
+  return style;
 }
 
 // Icon Components
@@ -304,7 +363,8 @@ function HeaderSearchSync({
 
 /**
  * Category Menu Item Component with nested submenu support
- * Displays subcategories in a multi-column layout without scroll
+ * Displays subcategories in a multi-column layout; mega-panel uses fixed positioning
+ * so it stays visible when the root categories list scrolls.
  */
 function CategoryMenuItem({ 
   category, 
@@ -314,10 +374,10 @@ function CategoryMenuItem({
   onClose: () => void;
 }) {
   const [showSubmenu, setShowSubmenu] = useState(false);
-  const [submenuStyle, setSubmenuStyle] = useState<CSSProperties>({});
   const submenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const submenuRef = useRef<HTMLDivElement>(null);
   const menuItemRef = useRef<HTMLDivElement>(null);
+  const submenuStyle = useCategoryMegaPanelPosition(showSubmenu, menuItemRef, submenuRef);
   const hasChildren = category.children && category.children.length > 0;
 
   const handleMouseEnter = () => {
@@ -345,31 +405,6 @@ function CategoryMenuItem({
       }
     };
   }, []);
-
-  // Calculate submenu position relative to Products dropdown
-  useEffect(() => {
-    if (showSubmenu && submenuRef.current && menuItemRef.current) {
-      const menuItem = menuItemRef.current;
-      
-      // Find Products dropdown container (parent with w-64 class)
-      const productsDropdown = menuItem.closest('.w-64');
-      if (productsDropdown) {
-        const dropdownRect = productsDropdown.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        
-        // Position submenu to the right of Products dropdown, aligned higher than dropdown
-        const leftPosition = dropdownRect.width; // Right edge of Products dropdown
-        const topPosition = -12; // Move up a bit from top of dropdown
-        const maxWidth = Math.min(600, viewportWidth - dropdownRect.right - 20);
-        
-        setSubmenuStyle({
-          left: `${leftPosition}px`,
-          top: `${topPosition}px`,
-          maxWidth: `${maxWidth}px`
-        });
-      }
-    }
-  }, [showSubmenu]);
 
   // Organize subcategories into columns (4 columns max)
   // Distributes items evenly across columns
@@ -417,7 +452,7 @@ function CategoryMenuItem({
       {hasChildren && showSubmenu && (
         <div 
           ref={submenuRef}
-          className="absolute top-0 z-[60]"
+          className="z-[60]"
           style={submenuStyle}
           onMouseEnter={() => {
             if (submenuTimeoutRef.current) {
@@ -486,7 +521,10 @@ function CategoriesMenuFlyout({
     <>
       <div className="absolute left-0 top-full z-[55] h-2 w-full" aria-hidden />
       <div className="absolute left-0 top-full z-[55] w-64 max-w-[min(16rem,calc(100vw-2rem))] pt-2">
-        <div className="overflow-visible rounded-xl border border-gray-200/80 bg-white shadow-2xl">
+        <div
+          {...{ [CATEGORIES_ROOT_SCROLL_DATA_ATTR]: true }}
+          className="max-h-96 overflow-y-auto overscroll-y-contain rounded-xl border border-gray-200/80 bg-white shadow-2xl [scrollbar-gutter:stable]"
+        >
           {loading ? (
             <div className="px-4 py-2 text-sm text-gray-500">{loadingLabel}</div>
           ) : (

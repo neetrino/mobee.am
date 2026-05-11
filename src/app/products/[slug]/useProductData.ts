@@ -24,7 +24,6 @@ interface UseProductDataReturn {
   product: Product | null;
   loading: boolean;
   images: string[];
-  reviews: Array<{ rating: number }>;
   currency: CurrencyCode;
   language: LanguageCode;
   isInWishlist: boolean;
@@ -51,7 +50,6 @@ export function useProductData({
   const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isInCompare, setIsInCompare] = useState(false);
-  const [reviews, setReviews] = useState<Array<{ rating: number }>>([]);
 
   const resolvedParams = use(params);
   const rawSlug = resolvedParams?.slug ?? '';
@@ -250,34 +248,6 @@ export function useProductData({
     return () => window.removeEventListener('compare-updated', checkCompare);
   }, [product?.id]);
 
-  useEffect(() => {
-    if (!product || !slug) return;
-
-    const loadReviews = async () => {
-      try {
-        const data = await apiClient.get<Array<{ rating: number }>>(
-          `/api/v1/products/${slug}/reviews`
-        );
-        setReviews(data || []);
-      } catch (error: any) {
-        // If 404, product might not have reviews yet - that's okay
-        setReviews([]);
-      }
-    };
-
-    loadReviews();
-
-    // Listen for review updates
-    const handleReviewUpdate = () => {
-      loadReviews();
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('review-updated', handleReviewUpdate);
-      return () => window.removeEventListener('review-updated', handleReviewUpdate);
-    }
-  }, [product?.id, slug]);
-
   // Placeholder setters for image index and thumbnail start index
   // These will be provided by the component
   const setCurrentImageIndex = useCallback((_index: number) => {
@@ -292,7 +262,6 @@ export function useProductData({
     product,
     loading,
     images,
-    reviews,
     currency,
     language,
     isInWishlist,

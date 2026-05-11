@@ -1,7 +1,22 @@
 import { z } from "zod";
 
+/** Maps null, undefined, and whitespace-only strings to undefined so `.optional()` matches client `""` payloads. */
+function emptyOptionalStringToUndefined(value: unknown): unknown {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  if (typeof value !== "string") {
+    return value;
+  }
+  const trimmed = value.trim();
+  return trimmed === "" ? undefined : trimmed;
+}
+
 const optionalTrimmedString = (maxLength: number) =>
-  z.string().trim().min(1).max(maxLength).optional();
+  z.preprocess(
+    emptyOptionalStringToUndefined,
+    z.string().min(1).max(maxLength).optional()
+  );
 
 const countryCodeSchema = z.string().trim().length(2).toUpperCase();
 

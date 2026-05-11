@@ -73,11 +73,28 @@ const nextConfig = {
   reactStrictMode: true,
   /**
    * Prisma client is generated to shared/db/generated/client (not node_modules/.prisma).
-   * Standalone/serverless tracing can omit *.node query engines — include only binaries (not full client tree).
+   * Serverless output tracing can omit engines; keys use picomatch on route paths.
+   * `'/*'` matches only one segment (e.g. `/x`), not `/api/v1/...` — use `'/**'` for all routes.
    */
   outputFileTracingIncludes: {
-    '/*': ['./shared/db/generated/client/**/*.node'],
+    '/**': [
+      './shared/db/generated/client/**/*',
+      './generated/client/**/*',
+      './node_modules/.prisma/client/**/*',
+    ],
+    '/api/:path*': [
+      './shared/db/generated/client/**/*',
+      './generated/client/**/*',
+      './node_modules/.prisma/client/**/*',
+    ],
   },
+  /**
+   * On Vercel, bundling workspace DB package helps tracing include Prisma engines
+   * generated under shared/db/generated/client.
+   */
+  serverExternalPackages: process.env.VERCEL
+    ? ['@prisma/client', 'prisma']
+    : ['@prisma/client', 'prisma', '@white-shop/db'],
   /**
    * Admin UI files live under `src/app/admin` but are only exposed at `/supersudo`.
    * `beforeFiles` runs before filesystem matching, so `/admin` never resolves to that tree.
@@ -97,8 +114,11 @@ const nextConfig = {
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
   devIndicators: false,
   transpilePackages: ['@shop/ui', '@shop/design-tokens'],
-  // Standalone output - prevents prerendering of 404 page
-  output: 'standalone',
+  /**
+   * Standalone is for self-hosted / Docker images. Vercel bundles Serverless functions separately;
+   * standalone + wrong outputDirectory can omit Prisma engines (rhel-openssl-3.0.x).
+   */
+  output: process.env.VERCEL ? undefined : 'standalone',
   // Security headers (P1-SEC-07)
   async headers() {
     return [
@@ -120,7 +140,7 @@ const nextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https: blob:",
+              "img-src 'self' data: https: http: blob:",
               "connect-src 'self' https:",
               "frame-src 'self' https://www.google.com https://maps.google.com",
               "frame-ancestors 'none'",

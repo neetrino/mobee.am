@@ -142,7 +142,11 @@ NEXTAUTH_SECRET=your-secret-32-chars-min
 NEXTAUTH_URL=https://your-domain.com
 
 # Հրապարակային (հասանելի բրաուզերում)
-NEXT_PUBLIC_API_URL=https://api.example.com
+# Նույն Next deploy + /api route-ներ. դատարկ թողնել կամ vercel.json-ում NEXT_PUBLIC_SAME_ORIGIN_API=true
+NEXT_PUBLIC_API_URL=
+NEXT_PUBLIC_SAME_ORIGIN_API=true
+# Առանձին backend-ի դեպքում միայն. `NEXT_PUBLIC_SAME_ORIGIN_API` մի միացնել
+# NEXT_PUBLIC_API_URL=https://api.example.com
 NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
 

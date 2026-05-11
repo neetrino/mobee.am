@@ -18,5 +18,11 @@
     "emailInvalid": "Please enter a valid email address",
     "passwordRequired": "Please enter your password",
     "loginFailed": "Login failed. Please try again."
+  },
+  "forgotPasswordPage": {
+    "title": "Reset password",
+    "subtitle": "Password reset is not available online yet.",
+    "body": "Please contact support and we will help you regain access to your account.",
+    "backToLogin": "Back to sign in"
   }
 }

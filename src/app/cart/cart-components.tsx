@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { Button } from '@shop/ui';
 import { formatPrice } from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
+import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
+import { ProductImagePlaceholder } from '../../components/ProductImagePlaceholder';
 import type { Cart, CartItem } from './types';
 import {
   CART_ITEM_ROW_DESKTOP_IMAGE_FRAME_CLASS,
@@ -40,6 +43,12 @@ export function CartItemRow({
   t,
 }: CartItemRowProps) {
   const currencyCode = currency as CurrencyCode;
+  const [imageError, setImageError] = useState(false);
+  const imageSrc = resolveProductCardImageSrc(item.variant.product.image);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [item.id, imageSrc]);
   const quantityControls = (
     <div className="flex w-full min-w-0 items-center justify-center gap-1.5">
       <button
@@ -122,21 +131,25 @@ export function CartItemRow({
               href={`/products/${item.variant.product.slug}`}
               className="relative block h-full min-h-[104px] w-full max-lg:min-h-[104px] lg:min-h-0"
             >
-              {item.variant.product.image ? (
+              {imageError ? (
+                <ProductImagePlaceholder
+                  className="absolute inset-0"
+                  aria-label={
+                    item.variant.product.title
+                      ? `No image for ${item.variant.product.title}`
+                      : 'No image'
+                  }
+                />
+              ) : (
                 <Image
-                  src={item.variant.product.image}
+                  src={imageSrc}
                   alt={item.variant.product.title}
                   fill
                   className="object-contain p-2"
                   sizes="(max-width: 833px) 45vw, (max-width: 1279px) 30vw, 22vw"
                   unoptimized
+                  onError={() => setImageError(true)}
                 />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                  <svg className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
               )}
             </Link>
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { MouseEvent } from 'react';
 import { t } from '../../../lib/i18n';
 import type { ProductPageProps, ProductVariant } from './types';
@@ -33,7 +33,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     product,
     loading,
     images,
-    reviews,
     currency,
     language,
     isInWishlist,
@@ -304,18 +303,6 @@ export default function ProductPage({ params }: ProductPageProps) {
       // Ignore errors
     }
   };
-
-  const averageRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-      : 0;
-
-  const scrollToReviews = useCallback(() => {
-    const reviewsElement = document.getElementById('product-reviews');
-    if (reviewsElement) {
-      reviewsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, []);
 
   useEffect(() => {
     if (images.length > 0 && currentImageIndex >= images.length) {
