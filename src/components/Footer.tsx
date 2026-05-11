@@ -32,6 +32,9 @@ const FOOTER_CREDIT_COMPANY_HREF = 'https://neetrino.com/';
 /** Address lines sit slightly below the location icon baseline. */
 const FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS = 'pt-[8px]';
 
+/** Phone / mail / address text columns — same left nudge next to icons. */
+const FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS = 'lg:-translate-x-[13px]';
+
 /** Space under location title block before phone / mail / address (Figma-tuned). */
 const FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS = 'gap-20 lg:gap-24';
 
@@ -175,6 +178,7 @@ function FooterLocationCard(props: {
         <div className="grid grid-cols-1 gap-y-3.5 lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_auto] lg:gap-x-10 lg:gap-y-3.5 lg:-translate-x-2.5 xl:gap-x-14">
           <ContactIconBlock
             className="lg:col-start-1 lg:row-start-1"
+            bodyClassName={FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS}
             icon={<FooterContactPhoneGlyph />}
           >
             <Link href={telHref} className="hover:underline">
@@ -183,7 +187,7 @@ function FooterLocationCard(props: {
           </ContactIconBlock>
           <ContactIconBlock
             alignIconTop
-            bodyClassName={FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS}
+            bodyClassName={`${FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS} ${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS}`}
             className="lg:col-start-2 lg:row-span-2 lg:row-start-1"
             icon={<FooterContactLocationGlyph className="size-6" />}
           >
@@ -191,6 +195,7 @@ function FooterLocationCard(props: {
           </ContactIconBlock>
           <ContactIconBlock
             className="lg:col-start-1 lg:row-start-2"
+            bodyClassName={FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS}
             icon={<FooterContactMailGlyph />}
           >
             <Link href={mailHref} className="hover:underline">
