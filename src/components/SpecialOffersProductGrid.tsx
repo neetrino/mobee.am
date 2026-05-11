@@ -37,7 +37,6 @@ export function SpecialOffersProductGrid({
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
-        mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />

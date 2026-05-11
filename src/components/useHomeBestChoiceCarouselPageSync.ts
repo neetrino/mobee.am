@@ -8,32 +8,35 @@ export type MobileCarouselViewState = {
 };
 
 /**
- * Tracks which full-width snap page of the home best-choice mobile carousel is visible.
+ * Tracks horizontal “screenfuls” for the home best-choice 2-row scroll strip (scrollWidth ÷ viewport).
  */
 export function useHomeBestChoiceCarouselPageSync(
-  pageCount: number,
   onViewChange?: (state: MobileCarouselViewState) => void,
 ) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const emit = useCallback(() => {
-    if (!onViewChange || pageCount < 1) {
+    if (!onViewChange) {
       return;
     }
     const el = scrollRef.current;
     if (!el) {
       return;
     }
-    const pageWidth = el.clientWidth;
-    const pageIndex =
-      pageWidth > 0
-        ? Math.min(pageCount - 1, Math.max(0, Math.round(el.scrollLeft / pageWidth)))
-        : 0;
+    const viewport = el.clientWidth;
+    if (viewport <= 0) {
+      return;
+    }
+    const pageCount = Math.max(1, Math.ceil(el.scrollWidth / viewport));
+    const pageIndex = Math.min(
+      pageCount - 1,
+      Math.max(0, Math.round(el.scrollLeft / viewport)),
+    );
     onViewChange({ pageIndex, pageCount });
-  }, [onViewChange, pageCount]);
+  }, [onViewChange]);
 
   useEffect(() => {
-    if (!onViewChange || pageCount < 1) {
+    if (!onViewChange) {
       return;
     }
     const el = scrollRef.current;
@@ -55,7 +58,7 @@ export function useHomeBestChoiceCarouselPageSync(
       el.removeEventListener('scroll', onScroll);
       ro.disconnect();
     };
-  }, [emit, onViewChange, pageCount]);
+  }, [emit, onViewChange]);
 
   return scrollRef;
 }

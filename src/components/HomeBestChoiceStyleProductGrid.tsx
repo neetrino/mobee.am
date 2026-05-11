@@ -1,14 +1,18 @@
 'use client';
 
+import { useLayoutEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import {
-  HOME_BEST_CHOICE_DESKTOP_GRID_COLS_DEFAULT,
-  HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO,
-  HOME_BEST_CHOICE_DESKTOP_GRID_TRACK,
   HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET,
+  HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS,
+  HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_COMPACT_CLASS,
+  HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_DESKTOP_CLASS,
+  HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_IPAD_PRO_CLASS,
+  HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_TABLET_CLASS,
 } from './home-best-choice.constants';
 import { chunkArray } from '../lib/chunk-array';
+import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 import {
   useHomeBestChoiceCarouselPageSync,
   type MobileCarouselViewState,
@@ -17,34 +21,34 @@ import { useIpadProHomeDesktopGrid } from './useIpadProHomeDesktopGrid';
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
-/** Desktop layout for home best-choice rows (hidden below `lg`). */
-const HOME_BEST_CHOICE_DESKTOP_GRID = `hidden ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} lg:grid ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_DEFAULT}`;
+/** Horizontal 2-row strip: container query size + overflow; column widths use `cqi` (see home-best-choice.constants). */
+const HOME_BEST_CHOICE_PRODUCT_STRIP =
+  '[container-type:inline-size] flex min-w-0 w-full flex-nowrap snap-x snap-mandatory flex-row gap-x-4 overflow-x-auto overscroll-x-contain [touch-action:pan-x_pan-y] [-webkit-overflow-scrolling:touch] scrollbar-hide min-[744px]:max-lg:gap-x-5 lg:gap-x-6';
 
-/** iPad Pro only: three columns on the desktop grid (see {@link useIpadProHomeDesktopGrid}). */
-const HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO = `hidden ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} lg:grid ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO}`;
+function useHomeBestChoiceDesktopShellActive(): boolean {
+  const [active, setActive] = useState(false);
 
-/** Horizontal snap carousel below `lg`. */
-const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
-  'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
+  useLayoutEffect(() => {
+    const mq = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
+    const apply = () => setActive(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
 
-const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
-
-function homeBestChoiceMobileInnerGridClass(cardsPerView: number): string {
-  return cardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET
-    ? 'grid grid-cols-3 gap-5'
-    : 'grid grid-cols-2 gap-4';
+  return active;
 }
 
 type HomeBestChoiceStyleProductGridProps = {
   products: FeaturedHomeProduct[];
   productsPerPage: number;
-  /** Cards per horizontal snap page below `lg` (4 = 2×2 phone, 6 = 3×2 tablet). */
+  /** Drives card density on non-desktop widths (4 vs 6); strip layout uses CSS breakpoints. */
   mobileCardsPerView: number;
-  /** Accessible name for the horizontal product strip on small screens. */
+  /** Accessible name for the horizontal product strip. */
   mobileCarouselAriaLabel: string;
   /** Home “Специальные предложения” row — RU desktop add-to-cart pill sizing. */
   specialOffersHomeCard?: boolean;
-  /** Reports visible snap page for {@link HomeMobileSectionTitle} indicators. */
+  /** Reports scroll “page” for {@link HomeMobileSectionTitle} indicators (`lg:hidden`). */
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 };
 
@@ -57,7 +61,6 @@ function BestChoiceProductCell({
   product: FeaturedHomeProduct;
   specialOffersHomeCard: boolean;
   viewMode: 'grid-2' | 'grid-3';
-  /** Mobile / iPad carousel styling; desktop uses default product card chrome. */
   homeStyle: boolean;
 }) {
   return (
@@ -74,6 +77,16 @@ function BestChoiceProductCell({
   );
 }
 
+function homeBestChoiceColumnWidthClass(isIpadProDesktopGrid: boolean): string {
+  return [
+    HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_COMPACT_CLASS,
+    HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_TABLET_CLASS,
+    isIpadProDesktopGrid
+      ? HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_IPAD_PRO_CLASS
+      : HOME_BEST_CHOICE_TWO_ROW_COLUMN_WIDTH_DESKTOP_CLASS,
+  ].join(' ');
+}
+
 export function HomeBestChoiceStyleProductGrid({
   products,
   productsPerPage,
@@ -83,57 +96,40 @@ export function HomeBestChoiceStyleProductGrid({
   onMobileCarouselViewChange,
 }: HomeBestChoiceStyleProductGridProps) {
   const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
+  const isDesktopShell = useHomeBestChoiceDesktopShellActive();
   const visible = products.slice(0, productsPerPage);
-  const mobilePages = chunkArray(visible, mobileCardsPerView);
-  const mobilePageCount = mobilePages.length;
+  const columns = chunkArray(visible, 2);
+  const columnWidthClass = homeBestChoiceColumnWidthClass(isIpadProDesktopGrid);
   const cardViewMode: 'grid-2' | 'grid-3' =
     mobileCardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET ? 'grid-3' : 'grid-2';
-  const mobileInnerGridClass = homeBestChoiceMobileInnerGridClass(mobileCardsPerView);
-  const carouselScrollRef = useHomeBestChoiceCarouselPageSync(
-    mobilePageCount,
-    onMobileCarouselViewChange,
-  );
-  const desktopGridClass = isIpadProDesktopGrid
-    ? HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO
-    : HOME_BEST_CHOICE_DESKTOP_GRID;
+  const carouselScrollRef = useHomeBestChoiceCarouselPageSync(onMobileCarouselViewChange);
+  const homeStyle = !isDesktopShell;
 
   return (
-    <>
-      <div
-        ref={carouselScrollRef}
-        className={HOME_BEST_CHOICE_MOBILE_CAROUSEL}
-        role="region"
-        aria-roledescription="carousel"
-        aria-label={mobileCarouselAriaLabel}
-      >
-        {mobilePages.map((page, pageIndex) => (
-          <div key={`page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
-            <div className={mobileInnerGridClass}>
-              {page.map((product) => (
-                <BestChoiceProductCell
-                  key={product.id}
-                  product={product}
-                  specialOffersHomeCard={specialOffersHomeCard}
-                  viewMode={cardViewMode}
-                  homeStyle
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className={desktopGridClass}>
-        {visible.map((product) => (
-          <BestChoiceProductCell
-            key={product.id}
-            product={product}
-            specialOffersHomeCard={specialOffersHomeCard}
-            viewMode="grid-2"
-            homeStyle={false}
-          />
-        ))}
-      </div>
-    </>
+    <div
+      ref={carouselScrollRef}
+      className={HOME_BEST_CHOICE_PRODUCT_STRIP}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={mobileCarouselAriaLabel}
+    >
+      {columns.map((pair, columnIndex) => (
+        <div
+          key={`col-${pair[0]?.id ?? columnIndex}`}
+          className={`${HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS} ${columnWidthClass}`}
+        >
+          {pair.map((product) => (
+            <BestChoiceProductCell
+              key={product.id}
+              product={product}
+              specialOffersHomeCard={specialOffersHomeCard}
+              viewMode={cardViewMode}
+              homeStyle={homeStyle}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -154,53 +150,38 @@ function SkeletonCell() {
 
 export function HomeBestChoiceStyleProductGridSkeleton({
   productsPerPage,
-  mobileCardsPerView,
   mobileCarouselAriaLabel,
   onMobileCarouselViewChange,
 }: {
   productsPerPage: number;
-  mobileCardsPerView: number;
   mobileCarouselAriaLabel: string;
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 }) {
   const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
   const indices = [...Array(productsPerPage)].map((_, i) => i);
-  const mobilePages = chunkArray(indices, mobileCardsPerView);
-  const mobilePageCount = mobilePages.length;
-  const mobileInnerGridClass = homeBestChoiceMobileInnerGridClass(mobileCardsPerView);
-  const carouselScrollRef = useHomeBestChoiceCarouselPageSync(
-    mobilePageCount,
-    onMobileCarouselViewChange,
-  );
-  const desktopGridClass = isIpadProDesktopGrid
-    ? HOME_BEST_CHOICE_DESKTOP_GRID_IPAD_PRO
-    : HOME_BEST_CHOICE_DESKTOP_GRID;
+  const columns = chunkArray(indices, 2);
+  const columnWidthClass = homeBestChoiceColumnWidthClass(isIpadProDesktopGrid);
+  const carouselScrollRef = useHomeBestChoiceCarouselPageSync(onMobileCarouselViewChange);
 
   return (
-    <>
-      <div
-        ref={carouselScrollRef}
-        className={HOME_BEST_CHOICE_MOBILE_CAROUSEL}
-        role="region"
-        aria-roledescription="carousel"
-        aria-label={mobileCarouselAriaLabel}
-        aria-busy="true"
-      >
-        {mobilePages.map((pageIndices, pageIndex) => (
-          <div key={`sk-page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
-            <div className={mobileInnerGridClass}>
-              {pageIndices.map((i) => (
-                <SkeletonCell key={i} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className={desktopGridClass} aria-hidden="true">
-        {indices.map((i) => (
-          <SkeletonCell key={`sk-d-${i}`} />
-        ))}
-      </div>
-    </>
+    <div
+      ref={carouselScrollRef}
+      className={HOME_BEST_CHOICE_PRODUCT_STRIP}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={mobileCarouselAriaLabel}
+      aria-busy="true"
+    >
+      {columns.map((pairIndices, columnIndex) => (
+        <div
+          key={`sk-col-${columnIndex}`}
+          className={`${HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS} ${columnWidthClass}`}
+        >
+          {pairIndices.map((i) => (
+            <SkeletonCell key={i} />
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }

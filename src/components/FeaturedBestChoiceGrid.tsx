@@ -34,7 +34,6 @@ export function FeaturedBestChoiceGrid({
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
-        mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
