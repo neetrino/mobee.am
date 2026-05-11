@@ -1,11 +1,10 @@
 interface MobileNavBagIconProps {
   /**
-   * Iconly Light “Bag” — paths from `react-iconly` `website/icons/light/Bag.svg`
-   * (matches Figma mobee-new node 183:1964, Iconly/Light/Bag).
+   * Vuesax Linear “shopping-cart” — matches Figma MARCO node 352:2852 cart tab.
    */
   size?: number;
   className?: string;
-  /** Iconly Light uses 1.5 stroke; optional bump when tab is active. */
+  /** Vuesax Linear uses 1.5 stroke; optional bump when tab is active. */
   strokeWidth?: number;
 }
 
@@ -25,30 +24,28 @@ export function MobileNavBagIcon({
       aria-hidden
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M7.48626 21.5H15.8341C18.9004 21.5 21.2528 20.3924 20.5847 15.9348L19.8066 9.89357C19.3947 7.66931 17.976 6.81805 16.7311 6.81805H6.55262C5.28946 6.81805 3.95308 7.73339 3.4771 9.89357L2.69907 15.9348C2.13157 19.889 4.4199 21.5 7.48626 21.5Z"
+        d="M2 2H3.74C4.82 2 5.67 2.93 5.58 4L4.75 13.96C4.61 15.59 5.9 16.99 7.54 16.99H18.19C19.63 16.99 20.89 15.81 21 14.38L21.54 6.88C21.66 5.22 20.4 3.87 18.73 3.87H5.82"
         stroke="currentColor"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M7.34896 6.59839C7.34896 4.21232 9.28325 2.27802 11.6693 2.27802V2.27802C12.8183 2.27315 13.9219 2.72618 14.7361 3.53694C15.5503 4.34769 16.008 5.44938 16.008 6.59839V6.59839"
+        d="M16.25 22C16.9404 22 17.5 21.4404 17.5 20.75C17.5 20.0596 16.9404 19.5 16.25 19.5C15.5596 19.5 15 20.0596 15 20.75C15 21.4404 15.5596 22 16.25 22Z"
         stroke="currentColor"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M8.70365 11.1018H8.74942"
+        d="M8.25 22C8.94036 22 9.5 21.4404 9.5 20.75C9.5 20.0596 8.94036 19.5 8.25 19.5C7.55964 19.5 7 20.0596 7 20.75C7 21.4404 7.55964 22 8.25 22Z"
         stroke="currentColor"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M14.5343 11.1018H14.5801"
+        d="M9 8H21"
         stroke="currentColor"
         strokeWidth={strokeWidth}
         strokeLinecap="round"

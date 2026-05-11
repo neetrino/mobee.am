@@ -26,6 +26,11 @@ const MapPinIcon = () => (
   </svg>
 );
 
+const CONTACT_FORM_FIELD_CLASS =
+  '!h-12 !rounded-[14px] !border-[#e5e7eb] !bg-[#f2f2f4] !px-5 !text-sm !text-gray-900 placeholder:!text-[#767987] focus:!border-transparent focus:!ring-2 focus:!ring-[#2DB2FF]';
+
+const CONTACT_FORM_LABEL_CLASS = 'sr-only';
+
 export default function ContactPage() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
@@ -135,74 +140,79 @@ export default function ContactPage() {
 
           {/* Right Side: Contact Form */}
           <div>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">
-                  {t('contact.form.name')}
-                </label>
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full"
-                  placeholder={t('contact.form.namePlaceholder')}
-                />
+            <form
+              onSubmit={handleSubmit}
+              className="w-full max-w-[480px] rounded-[18px] border border-gray-200 bg-white p-6 shadow-sm sm:p-8 lg:ml-auto"
+            >
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="name" className={CONTACT_FORM_LABEL_CLASS}>
+                    {t('contact.form.name')}
+                  </label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={CONTACT_FORM_FIELD_CLASS}
+                    placeholder={t('contact.form.namePlaceholder')}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className={CONTACT_FORM_LABEL_CLASS}>
+                    {t('contact.form.email')}
+                  </label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={CONTACT_FORM_FIELD_CLASS}
+                    placeholder={t('contact.form.emailPlaceholder')}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="subject" className={CONTACT_FORM_LABEL_CLASS}>
+                    {t('contact.form.subject')}
+                  </label>
+                  <Input
+                    id="subject"
+                    name="subject"
+                    type="text"
+                    required
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className={CONTACT_FORM_FIELD_CLASS}
+                    placeholder={t('contact.form.subjectPlaceholder')}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="message" className={CONTACT_FORM_LABEL_CLASS}>
+                    {t('contact.form.message')}
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={6}
+                    value={formData.message}
+                    onChange={handleChange}
+                    className="min-h-[140px] w-full resize-y rounded-[14px] border border-[#e5e7eb] bg-[#f2f2f4] px-5 py-4 text-sm text-gray-900 placeholder:text-[#767987] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#2DB2FF]"
+                    placeholder={t('contact.form.messagePlaceholder')}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="h-12 w-full !rounded-full !bg-[#2DB2FF] text-sm font-semibold uppercase tracking-wide text-white hover:!bg-[#25A0E0] focus:!ring-[#2DB2FF]"
+                  disabled={submitting}
+                >
+                  {submitting ? (t('contact.form.submitting') || 'Ուղարկվում է...') : t('contact.form.submit')}
+                </Button>
               </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">
-                  {t('contact.form.email')}
-                </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full"
-                  placeholder={t('contact.form.emailPlaceholder')}
-                />
-              </div>
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-900 mb-2">
-                  {t('contact.form.subject')}
-                </label>
-                <Input
-                  id="subject"
-                  name="subject"
-                  type="text"
-                  required
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className="w-full"
-                  placeholder={t('contact.form.subjectPlaceholder')}
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-900 mb-2">
-                  {t('contact.form.message')}
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={6}
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                  placeholder={t('contact.form.messagePlaceholder')}
-                />
-              </div>
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full !bg-[#2DB2FF] text-white hover:!bg-[#25A0E0] rounded-md py-3 font-semibold uppercase tracking-wide focus:!ring-[#2DB2FF]"
-                disabled={submitting}
-              >
-                {submitting ? (t('contact.form.submitting') || 'Ուղարկվում է...') : t('contact.form.submit')}
-              </Button>
             </form>
           </div>
         </div>

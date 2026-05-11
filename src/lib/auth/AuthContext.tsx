@@ -27,7 +27,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAdmin: boolean;
   roles: string[];
-  login: (_emailOrPhone: string, _password: string) => Promise<void>;
+  login: (_email: string, _password: string) => Promise<void>;
   register: (_data: RegisterData) => Promise<void>;
   logout: () => void;
 }
@@ -142,17 +142,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /**
    * Login user
    */
-  const login = async (emailOrPhone: string, password: string) => {
-    console.log('🔐 [AUTH] Login attempt:', { emailOrPhone: emailOrPhone ? 'provided' : 'not provided', password: password ? 'provided' : 'not provided' });
+  const login = async (email: string, password: string) => {
+    console.log('🔐 [AUTH] Login attempt:', { email: email ? 'provided' : 'not provided', password: password ? 'provided' : 'not provided' });
     
     try {
       setIsLoading(true);
 
-      // Determine if it's email or phone
-      const isEmail = emailOrPhone.includes('@');
-      const requestData = isEmail
-        ? { email: emailOrPhone, password }
-        : { phone: emailOrPhone, password };
+      const requestData = { email: email.trim(), password };
 
       console.log('📤 [AUTH] Sending login request to API...');
       const response = await apiClient.post<AuthResponse>('/api/v1/auth/login', requestData, {
@@ -169,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await mergeGuestCartAfterAuth();
 
       // Don't redirect here - let the login page handle redirect based on query params
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ [AUTH] Login error:', error);
       
       // Extract error message from API response
@@ -178,23 +174,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Check if it's an ApiError
       if (error instanceof ApiError) {
         if (error.status === 401) {
-          errorMessage = error.message || 'Invalid email/phone or password';
+          errorMessage = error.message || 'Invalid email or password';
         } else if (error.status === 403) {
           errorMessage = error.message || 'Your account has been blocked';
         } else if (error.status === 400) {
-          errorMessage = error.message || 'Please provide email/phone and password';
+          errorMessage = error.message || 'Please provide email and password';
         } else {
           errorMessage = error.message || errorMessage;
         }
-      } else if (error.status === 401) {
-        errorMessage = error.message || 'Invalid email/phone or password';
-      } else if (error.status === 403) {
-        errorMessage = error.message || 'Your account has been blocked';
-      } else if (error.status === 400) {
-        errorMessage = error.message || 'Please provide email/phone and password';
-      } else if (error.message) {
-        // Use the error message directly if available
-        errorMessage = error.message;
+      } else {
+        const err = error as { status?: number; message?: string };
+        if (err.status === 401) {
+          errorMessage = err.message || 'Invalid email or password';
+        } else if (err.status === 403) {
+          errorMessage = err.message || 'Your account has been blocked';
+        } else if (err.status === 400) {
+          errorMessage = err.message || 'Please provide email and password';
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
       }
 
       throw new Error(errorMessage);

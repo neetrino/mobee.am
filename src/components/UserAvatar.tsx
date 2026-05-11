@@ -1,12 +1,11 @@
 'use client';
 
-import { USER_AVATAR_INITIALS_SURFACE_CLASS } from './user-avatar.constants';
+import { DEFAULT_USER_AVATAR_SRC } from './user-avatar.constants';
 
 /**
  * UserAvatar Component
  * 
- * Displays a user avatar with initials placeholder.
- * If avatarUrl is provided, shows the image, otherwise shows initials.
+ * Displays a user avatar image with a default profile picture fallback.
  * 
  * @param firstName - User's first name
  * @param lastName - User's last name
@@ -28,21 +27,6 @@ export function UserAvatar({
   size = 'md',
   className = '' 
 }: UserAvatarProps) {
-  // Generate initials from first and last name
-  const getInitials = (): string => {
-    const firstInitial = firstName?.charAt(0)?.toUpperCase() || '';
-    const lastInitial = lastName?.charAt(0)?.toUpperCase() || '';
-    
-    if (firstInitial && lastInitial) {
-      return `${firstInitial}${lastInitial}`;
-    } else if (firstInitial) {
-      return firstInitial;
-    } else if (lastInitial) {
-      return lastInitial;
-    }
-    return '?';
-  };
-
   // Size classes (`lg` tuned for profile header — between `md` and old 96px)
   const sizeClasses = {
     sm: 'w-10 h-10 text-sm',
@@ -51,23 +35,15 @@ export function UserAvatar({
     xl: 'w-32 h-32 text-3xl',
   };
 
-  const initials = getInitials();
+  const displayName = `${firstName || ''} ${lastName || ''}`.trim();
 
   return (
     <div className={`relative flex-shrink-0 ${sizeClasses[size]} ${className}`}>
-      {avatarUrl ? (
-        <img
-          src={avatarUrl}
-          alt={`${firstName || ''} ${lastName || ''}`.trim() || 'User avatar'}
-          className="w-full h-full rounded-full object-cover border-2 border-gray-200"
-        />
-      ) : (
-        <div
-          className={`flex h-full w-full items-center justify-center rounded-full font-semibold ${USER_AVATAR_INITIALS_SURFACE_CLASS}`}
-        >
-          {initials}
-        </div>
-      )}
+      <img
+        src={avatarUrl || DEFAULT_USER_AVATAR_SRC}
+        alt={displayName || 'User avatar'}
+        className="h-full w-full rounded-full object-cover"
+      />
     </div>
   );
 }

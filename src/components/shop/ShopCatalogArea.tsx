@@ -20,7 +20,7 @@ export type ShopCatalogAreaProps = {
 
 function ShopGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-4 xl:grid-cols-3 xl:gap-6">
+    <div className="grid grid-cols-2 gap-x-2 gap-y-5 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-4 xl:grid-cols-3 xl:gap-6">
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}

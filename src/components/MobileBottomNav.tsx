@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation';
 import { Montserrat } from 'next/font/google';
 import type { LucideIcon } from 'lucide-react';
 import { Heart, Home, UserRound } from 'lucide-react';
-import { getCompareCount, getWishlistCount } from '../lib/storageCounts';
+import { getWishlistCount } from '../lib/storageCounts';
 import { useTranslation } from '../lib/i18n-client';
-import { CompareIcon } from './icons/CompareIcon';
+import { CartIcon } from './icons/CartIcon';
 import { MobileNavBagIcon } from './icons/MobileNavBagIcon';
 import { useMobileBottomNavCartCount } from './hooks/useMobileBottomNavCartCount';
 import {
@@ -24,16 +24,16 @@ const montserratNav = Montserrat({
   display: 'swap',
 });
 
-type NavKey = 'home' | 'compare' | 'cart' | 'wishlist' | 'profile';
+type NavKey = 'home' | 'shop' | 'cart' | 'wishlist' | 'profile';
 
 type MobileNavDef =
   | { key: 'cart'; labelKey: string; href: string }
-  | { key: 'compare'; labelKey: string; href: string }
-  | { key: Exclude<NavKey, 'cart' | 'compare'>; labelKey: string; href: string; icon: LucideIcon };
+  | { key: 'shop'; labelKey: string; href: string }
+  | { key: Exclude<NavKey, 'cart' | 'shop'>; labelKey: string; href: string; icon: LucideIcon };
 
 const INACTIVE_ICON_BOX: Record<NavKey, string> = {
   home: 'h-5 w-5',
-  compare: 'h-5 w-5',
+  shop: 'h-5 w-5',
   cart: 'h-5 w-5',
   wishlist: 'h-6 w-6',
   profile: 'h-[22px] w-[22px]',
@@ -63,18 +63,17 @@ function MobileBottomNavIcon({ item, active }: NavIconProps) {
   if (item.key === 'cart') {
     return (
       <MobileNavBagIcon
-        size={20}
+        size={24}
         strokeWidth={1.5}
-        className={`shrink-0 ${iconBox} ${iconColor}`}
+        className={`h-6 w-6 shrink-0 ${iconColor}`}
       />
     );
   }
 
-  if (item.key === 'compare') {
+  if (item.key === 'shop') {
     return (
-      <CompareIcon
+      <CartIcon
         size={20}
-        strokeWidth={active ? 2.5 : 1.5}
         className={`shrink-0 ${iconBox} ${iconColor}`}
       />
     );
@@ -98,24 +97,20 @@ interface MobileNavItemProps {
   item: MobileNavDef;
   active: boolean;
   label: string;
-  compareCount: number;
   wishlistCount: number;
   cartCount: number;
 }
 
-function MobileNavItem({ item, active, label, compareCount, wishlistCount, cartCount }: MobileNavItemProps) {
-  const showCompareBadge = item.key === 'compare' && compareCount > 0;
+function MobileNavItem({ item, active, label, wishlistCount, cartCount }: MobileNavItemProps) {
   const showWishlistBadge = item.key === 'wishlist' && wishlistCount > 0;
   const showCartBadge = item.key === 'cart' && cartCount > 0;
   const badgeValue =
-    item.key === 'compare'
-      ? compareCount
-      : item.key === 'wishlist'
+    item.key === 'wishlist'
         ? wishlistCount
         : item.key === 'cart'
           ? cartCount
           : 0;
-  const showBadge = showCompareBadge || showWishlistBadge || showCartBadge;
+  const showBadge = showWishlistBadge || showCartBadge;
 
   const iconWrap = (
     <div className="relative z-0 flex items-center justify-center overflow-visible">
@@ -162,7 +157,6 @@ function MobileNavItem({ item, active, label, compareCount, wishlistCount, cartC
 export function MobileBottomNav() {
   const pathname = usePathname();
   const { t } = useTranslation();
-  const [compareCount, setCompareCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const cartCount = useMobileBottomNavCartCount();
 
@@ -170,25 +164,19 @@ export function MobileBottomNav() {
     const updateWishlistCount = () => {
       setWishlistCount(getWishlistCount());
     };
-    const updateCompareCount = () => {
-      setCompareCount(getCompareCount());
-    };
 
     updateWishlistCount();
-    updateCompareCount();
     window.addEventListener('wishlist-updated', updateWishlistCount);
-    window.addEventListener('compare-updated', updateCompareCount);
 
     return () => {
       window.removeEventListener('wishlist-updated', updateWishlistCount);
-      window.removeEventListener('compare-updated', updateCompareCount);
     };
   }, []);
 
   const items: MobileNavDef[] = useMemo(
     () => [
       { key: 'home', labelKey: 'common.navigation.home', href: '/', icon: Home },
-      { key: 'compare', labelKey: 'common.navigation.compare', href: '/compare' },
+      { key: 'shop', labelKey: 'common.navigation.products', href: '/shop' },
       { key: 'cart', labelKey: 'common.navigation.cart', href: '/cart' },
       { key: 'wishlist', labelKey: 'common.navigation.wishlist', href: '/wishlist', icon: Heart },
       { key: 'profile', labelKey: 'common.navigation.profile', href: '/profile', icon: UserRound },
@@ -207,7 +195,6 @@ export function MobileBottomNav() {
             item={item}
             active={pathIsActive(pathname, item)}
             label={t(item.labelKey)}
-            compareCount={compareCount}
             wishlistCount={wishlistCount}
             cartCount={cartCount}
           />
