@@ -59,7 +59,14 @@ export function ProfilePersonalInfo({
         />
         <div className="flex items-center gap-2 pt-4">
           <Button type="submit" variant="brand" className={PROFILE_PILL_BUTTON_CLASS} disabled={savingPersonal}>
-            {savingPersonal ? t('profile.personal.saving') : t('profile.personal.save')}
+            {savingPersonal ? (
+              t('profile.personal.saving')
+            ) : (
+              <>
+                <span className="md:hidden">{t('profile.personal.saveMobile')}</span>
+                <span className="hidden md:inline">{t('profile.personal.save')}</span>
+              </>
+            )}
           </Button>
           <Button
             type="button"
