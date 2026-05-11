@@ -12,8 +12,7 @@ export interface RegisterData {
 }
 
 export interface LoginData {
-  email?: string;
-  phone?: string;
+  email: string;
   password: string;
 }
 
@@ -157,14 +156,14 @@ class AuthService {
    * Login user
    */
   async login(data: LoginData): Promise<AuthResponse> {
-    logger.debug("Auth login attempt", { hasEmail: !!data.email, hasPhone: !!data.phone });
+    logger.debug("Auth login attempt", { hasEmail: !!data.email });
 
-    if (!data.email && !data.phone) {
+    if (!data.email?.trim()) {
       throw {
         status: 400,
         type: "https://api.shop.am/problems/validation-error",
         title: "Validation failed",
-        detail: "Either email or phone is required",
+        detail: "Email is required",
       };
     }
 
@@ -180,10 +179,7 @@ class AuthService {
     // Find user
     const user = await db.user.findFirst({
       where: {
-        OR: [
-          ...(data.email ? [{ email: data.email }] : []),
-          ...(data.phone ? [{ phone: data.phone }] : []),
-        ],
+        email: data.email.trim(),
         deletedAt: null,
       },
       select: {
@@ -204,7 +200,7 @@ class AuthService {
         status: 401,
         type: "https://api.shop.am/problems/unauthorized",
         title: "Invalid credentials",
-        detail: "Invalid email/phone or password",
+        detail: "Invalid email or password",
       };
     }
 
@@ -220,7 +216,7 @@ class AuthService {
         status: 401,
         type: "https://api.shop.am/problems/unauthorized",
         title: "Invalid credentials",
-        detail: "Invalid email/phone or password",
+        detail: "Invalid email or password",
       };
     }
 

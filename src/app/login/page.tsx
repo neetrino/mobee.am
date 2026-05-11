@@ -8,12 +8,15 @@ import { useAuth } from '../../lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
 import { Eye, EyeOff } from 'lucide-react';
-import { authFormClasses } from '../../lib/auth/authFormTailwind';
+import { z } from 'zod';
+import { LOGIN_PAGE_CARD_CLASS, authFormClasses } from '../../lib/auth/authFormTailwind';
 import { AuthPageBrandMark } from '../../components/AuthPageBrandMark';
+
+const loginFormEmailSchema = z.string().email();
 
 function LoginPageContent() {
   const { t } = useTranslation();
-  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -32,9 +35,15 @@ function LoginPageContent() {
 
     console.log('🔐 [LOGIN PAGE] Form submitted');
 
-    // Validation
-    if (!emailOrPhone.trim()) {
-      setError(t('login.errors.emailOrPhoneRequired'));
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError(t('login.errors.emailRequired'));
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!loginFormEmailSchema.safeParse(trimmedEmail).success) {
+      setError(t('login.errors.emailInvalid'));
       setIsSubmitting(false);
       return;
     }
@@ -47,13 +56,14 @@ function LoginPageContent() {
 
     try {
       console.log('📤 [LOGIN PAGE] Calling login function...');
-      await login(emailOrPhone.trim(), password);
+      await login(trimmedEmail, password);
       console.log('✅ [LOGIN PAGE] Login successful, redirecting to:', redirectTo);
       // Redirect to the specified page or home
       router.push(redirectTo);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [LOGIN PAGE] Login error:', err);
-      setError(err.message || t('login.errors.loginFailed'));
+      const message = err instanceof Error ? err.message : t('login.errors.loginFailed');
+      setError(message || t('login.errors.loginFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -69,7 +79,7 @@ function LoginPageContent() {
   return (
     <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <AuthPageBrandMark homeAriaLabel={t('common.navigation.home')} siteLogoAlt={t('common.ariaLabels.siteLogo')} />
-      <Card className="p-8">
+      <Card className={LOGIN_PAGE_CARD_CLASS}>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('login.title')}</h1>
         <p className="text-gray-600 mb-8">{t('login.subtitle')}</p>
 
@@ -81,16 +91,17 @@ function LoginPageContent() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="emailOrPhone" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('login.form.emailOrPhone')}
+            <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('login.form.email')}
             </label>
             <Input
-              id="emailOrPhone"
-              type="text"
-              placeholder={t('login.form.emailOrPhonePlaceholder')}
+              id="login-email"
+              type="email"
+              autoComplete="email"
+              placeholder={t('login.form.emailPlaceholder')}
               className={`w-full ${authFormClasses.input}`}
-              value={emailOrPhone}
-              onChange={(e) => setEmailOrPhone(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               disabled={isSubmitting || isLoading}
               required
             />
@@ -169,7 +180,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Card className="p-8">
+        <Card className={LOGIN_PAGE_CARD_CLASS}>
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>

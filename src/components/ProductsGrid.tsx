@@ -39,14 +39,15 @@ interface ProductsGridProps {
 /**
  * Below `xl`: 2 cols phone; `md`–`lg` exclusive three cols (e.g. iPad mini); from `lg` (iPad Pro) two cols until legacy desktop.
  */
+/** Mobile: tighter column gap, larger row gap between product cards. */
 const SHOP_COMPACT_GRID_CLASS =
-  'grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-6';
+  'grid grid-cols-2 gap-x-2 gap-y-5 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-6';
 
 function desktopShopGridClass(viewMode: ProductListingViewMode): string {
   if (viewMode === 'list') {
-    return 'grid grid-cols-2 gap-2 lg:grid-cols-1 lg:gap-4';
+    return 'grid grid-cols-2 gap-x-2 gap-y-5 lg:grid-cols-1 lg:gap-4';
   }
-  return 'grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
+  return 'grid grid-cols-2 gap-x-2 gap-y-5 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
 }
 
 export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
