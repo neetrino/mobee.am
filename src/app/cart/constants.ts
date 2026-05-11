@@ -10,6 +10,15 @@ export const EMPTY_CART_IMAGE_WIDTH = 285;
 
 export const EMPTY_CART_IMAGE_HEIGHT = 256;
 
+/** Lifts the whole empty-state block (illustration + copy + CTA) together (px). */
+export const EMPTY_CART_EMPTY_STATE_LIFT_PX = 40;
+
+/** Pulls copy + CTA toward the illustration (negative margin under the image, px). */
+export const EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX = 80;
+
+/** Lowers only the empty-cart CTA vs the copy block (px). */
+export const EMPTY_CART_EMPTY_STATE_CTA_LOWER_PX = 30;
+
 /**
  * Desktop cart line card: shorter than home ProductCard (583px) but same visual rhythm.
  */

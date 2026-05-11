@@ -4,6 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@shop/ui';
 import {
+  EMPTY_CART_EMPTY_STATE_CTA_LOWER_PX,
+  EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX,
+  EMPTY_CART_EMPTY_STATE_LIFT_PX,
   EMPTY_CART_IMAGE_HEIGHT,
   EMPTY_CART_IMAGE_SRC,
   EMPTY_CART_IMAGE_WIDTH,
@@ -23,7 +26,10 @@ export function EmptyCart({ t }: EmptyCartProps) {
       <h1 className="mb-0 text-3xl font-bold text-gray-900">{t('common.cart.title')}</h1>
 
       <div className="flex justify-center">
-        <div className="flex w-full max-w-[328px] flex-col items-center gap-0.5">
+        <div
+          className="flex w-full max-w-[338px] flex-col items-center gap-0.5"
+          style={{ transform: `translateY(-${EMPTY_CART_EMPTY_STATE_LIFT_PX}px)` }}
+        >
           <Image
             src={EMPTY_CART_IMAGE_SRC}
             alt={t('common.cart.empty')}
@@ -32,7 +38,10 @@ export function EmptyCart({ t }: EmptyCartProps) {
             className="h-auto w-full max-w-[285px]"
             priority
           />
-          <div className="flex w-full flex-col gap-2">
+          <div
+            className="flex w-full flex-col gap-2"
+            style={{ marginTop: `-${EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX}px` }}
+          >
             <div className="flex w-full flex-col items-center gap-1 text-center">
               <h2 className="w-full max-w-[284px] text-[24px] font-bold leading-[1.2] text-[#1c1b1b]">
                 {t('common.cart.empty')}
@@ -41,7 +50,11 @@ export function EmptyCart({ t }: EmptyCartProps) {
                 {t('common.cart.emptyDescription')}
               </p>
             </div>
-            <Link href="/products" className="w-full">
+            <Link
+              href="/products"
+              className="w-full"
+              style={{ transform: `translateY(${EMPTY_CART_EMPTY_STATE_CTA_LOWER_PX}px)` }}
+            >
               <Button
                 variant="primary"
                 size="lg"
