@@ -36,7 +36,7 @@ export default function AboutPage() {
             {/* Текст справа */}
             <div className="space-y-6">
               {/* Подзаголовок */}
-              <p className="text-sm md:text-base font-semibold uppercase tracking-wider text-[#7CB342]">
+              <p className="text-sm md:text-base font-semibold uppercase tracking-wider text-[#2DB2FF]">
                 {t('about.subtitle')}
               </p>
 
