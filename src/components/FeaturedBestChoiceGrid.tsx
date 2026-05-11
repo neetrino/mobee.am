@@ -60,6 +60,8 @@ export function FeaturedBestChoiceGrid({
         productsPerPage={productsPerPage}
         mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
+        scrollPreviousAriaLabel={t(language, 'home.featured_products.scrollPrevious')}
+        scrollNextAriaLabel={t(language, 'home.featured_products.scrollNext')}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
     );

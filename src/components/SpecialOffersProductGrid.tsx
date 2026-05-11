@@ -63,6 +63,8 @@ export function SpecialOffersProductGrid({
         productsPerPage={productsPerPage}
         mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
+        scrollPreviousAriaLabel={t(language, 'home.special_offers_heading.scrollPrevious')}
+        scrollNextAriaLabel={t(language, 'home.special_offers_heading.scrollNext')}
         specialOffersHomeCard
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />

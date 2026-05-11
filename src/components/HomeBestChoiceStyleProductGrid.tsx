@@ -13,6 +13,7 @@ import {
 } from './home-best-choice.constants';
 import { chunkArray } from '../lib/chunk-array';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
+import { HomeBestChoiceStripArrowRail } from './HomeBestChoiceStripArrowRail';
 import {
   useHomeBestChoiceCarouselPageSync,
   type MobileCarouselViewState,
@@ -46,6 +47,8 @@ type HomeBestChoiceStyleProductGridProps = {
   mobileCardsPerView: number;
   /** Accessible name for the horizontal product strip. */
   mobileCarouselAriaLabel: string;
+  scrollPreviousAriaLabel: string;
+  scrollNextAriaLabel: string;
   /** Home “Специальные предложения” row — RU desktop add-to-cart pill sizing. */
   specialOffersHomeCard?: boolean;
   /** Reports scroll “page” for {@link HomeMobileSectionTitle} indicators (`lg:hidden`). */
@@ -92,6 +95,8 @@ export function HomeBestChoiceStyleProductGrid({
   productsPerPage,
   mobileCardsPerView,
   mobileCarouselAriaLabel,
+  scrollPreviousAriaLabel,
+  scrollNextAriaLabel,
   specialOffersHomeCard = false,
   onMobileCarouselViewChange,
 }: HomeBestChoiceStyleProductGridProps) {
@@ -102,33 +107,51 @@ export function HomeBestChoiceStyleProductGrid({
   const columnWidthClass = homeBestChoiceColumnWidthClass(isIpadProDesktopGrid);
   const cardViewMode: 'grid-2' | 'grid-3' =
     mobileCardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET ? 'grid-3' : 'grid-2';
-  const carouselScrollRef = useHomeBestChoiceCarouselPageSync(onMobileCarouselViewChange);
+  const {
+    scrollRef,
+    scrollToPrevPage,
+    scrollToNextPage,
+    canScrollLeft,
+    canScrollRight,
+    stripOverflows,
+  } = useHomeBestChoiceCarouselPageSync(onMobileCarouselViewChange);
   const homeStyle = !isDesktopShell;
 
   return (
-    <div
-      ref={carouselScrollRef}
-      className={HOME_BEST_CHOICE_PRODUCT_STRIP}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={mobileCarouselAriaLabel}
-    >
-      {columns.map((pair, columnIndex) => (
-        <div
-          key={`col-${pair[0]?.id ?? columnIndex}`}
-          className={`${HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS} ${columnWidthClass}`}
-        >
-          {pair.map((product) => (
-            <BestChoiceProductCell
-              key={product.id}
-              product={product}
-              specialOffersHomeCard={specialOffersHomeCard}
-              viewMode={cardViewMode}
-              homeStyle={homeStyle}
-            />
-          ))}
-        </div>
-      ))}
+    <div className="relative min-w-0">
+      <HomeBestChoiceStripArrowRail
+        visible={stripOverflows}
+        canScrollLeft={canScrollLeft}
+        canScrollRight={canScrollRight}
+        onPrevious={scrollToPrevPage}
+        onNext={scrollToNextPage}
+        previousAriaLabel={scrollPreviousAriaLabel}
+        nextAriaLabel={scrollNextAriaLabel}
+      />
+      <div
+        ref={scrollRef}
+        className={HOME_BEST_CHOICE_PRODUCT_STRIP}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={mobileCarouselAriaLabel}
+      >
+        {columns.map((pair, columnIndex) => (
+          <div
+            key={`col-${pair[0]?.id ?? columnIndex}`}
+            className={`${HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS} ${columnWidthClass}`}
+          >
+            {pair.map((product) => (
+              <BestChoiceProductCell
+                key={product.id}
+                product={product}
+                specialOffersHomeCard={specialOffersHomeCard}
+                viewMode={cardViewMode}
+                homeStyle={homeStyle}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -161,27 +184,29 @@ export function HomeBestChoiceStyleProductGridSkeleton({
   const indices = [...Array(productsPerPage)].map((_, i) => i);
   const columns = chunkArray(indices, 2);
   const columnWidthClass = homeBestChoiceColumnWidthClass(isIpadProDesktopGrid);
-  const carouselScrollRef = useHomeBestChoiceCarouselPageSync(onMobileCarouselViewChange);
+  const { scrollRef } = useHomeBestChoiceCarouselPageSync(onMobileCarouselViewChange);
 
   return (
-    <div
-      ref={carouselScrollRef}
-      className={HOME_BEST_CHOICE_PRODUCT_STRIP}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={mobileCarouselAriaLabel}
-      aria-busy="true"
-    >
-      {columns.map((pairIndices, columnIndex) => (
-        <div
-          key={`sk-col-${columnIndex}`}
-          className={`${HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS} ${columnWidthClass}`}
-        >
-          {pairIndices.map((i) => (
-            <SkeletonCell key={i} />
-          ))}
-        </div>
-      ))}
+    <div className="relative min-w-0">
+      <div
+        ref={scrollRef}
+        className={HOME_BEST_CHOICE_PRODUCT_STRIP}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={mobileCarouselAriaLabel}
+        aria-busy="true"
+      >
+        {columns.map((pairIndices, columnIndex) => (
+          <div
+            key={`sk-col-${columnIndex}`}
+            className={`${HOME_BEST_CHOICE_TWO_ROW_COLUMN_SHELL_CLASS} ${columnWidthClass}`}
+          >
+            {pairIndices.map((i) => (
+              <SkeletonCell key={i} />
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
