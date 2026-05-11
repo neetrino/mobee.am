@@ -5,14 +5,18 @@ const mocks = vi.hoisted(() => ({
   transaction: vi.fn(),
 }));
 
-vi.mock("@white-shop/db", () => ({
-  db: {
-    productVariant: {
-      findUnique: mocks.findUnique,
+vi.mock("@white-shop/db", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@white-shop/db")>();
+  return {
+    ...actual,
+    db: {
+      productVariant: {
+        findUnique: mocks.findUnique,
+      },
+      $transaction: mocks.transaction,
     },
-    $transaction: mocks.transaction,
-  },
-}));
+  };
+});
 
 import { cartService } from "./cart.service";
 
