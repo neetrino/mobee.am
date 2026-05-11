@@ -56,6 +56,9 @@ export default function AboutPage() {
                 <p>
                   {t('about.description.paragraph3')}
                 </p>
+                <p>
+                  {t('about.description.paragraph4')}
+                </p>
               </div>
             </div>
           </div>
