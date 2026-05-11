@@ -5,8 +5,9 @@
  * This file is separated from i18n.ts to allow server-side usage of t() function
  */
 
-import { useMemo, useCallback, useState, useEffect } from 'react';
+import { useMemo, useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 import { type LanguageCode, DEFAULT_LANGUAGE, getStoredLanguage } from './language';
+import { subscribeLanguageStore } from './useClientSyncedLanguage';
 import { t, getProductText, getAttributeLabel, clearTranslationCache, type ProductField } from './i18n';
 
 // Import translations to check if language is available
@@ -19,6 +20,15 @@ const translations: Partial<Record<LanguageCode, any>> = {
   hy: { common: hyCommon },
   ru: { common: ruCommon },
 };
+
+function getTranslationLanguageSnapshot(): LanguageCode {
+  const stored = getStoredLanguage();
+  return stored && stored in translations ? stored : DEFAULT_LANGUAGE;
+}
+
+function getServerTranslationLanguageSnapshot(): LanguageCode {
+  return DEFAULT_LANGUAGE;
+}
 
 /**
  * React hook for translations in client components
@@ -33,38 +43,19 @@ const translations: Partial<Record<LanguageCode, any>> = {
  * ```
  */
 export function useTranslation() {
-  const [lang, setLang] = useState<LanguageCode>(() => getStoredLanguage());
+  const lang = useSyncExternalStore(
+    subscribeLanguageStore,
+    getTranslationLanguageSnapshot,
+    getServerTranslationLanguageSnapshot,
+  );
 
-  // Listen to language changes and update state reactively
+  const prevLangRef = useRef<LanguageCode | undefined>(undefined);
   useEffect(() => {
-    // Update language on mount to ensure we have the latest from localStorage
-    const updateLanguage = () => {
-      const storedLang = getStoredLanguage();
-      const newLang: LanguageCode =
-        storedLang && storedLang in translations ? storedLang : DEFAULT_LANGUAGE;
-      setLang((currentLang) => {
-        if (newLang !== currentLang) {
-          // Clear translation cache when language changes
-          clearTranslationCache();
-          return newLang;
-        }
-        return currentLang;
-      });
-    };
-
-    // Update immediately on mount
-    updateLanguage();
-
-    // Listen to language-updated events
-    const handleLanguageUpdate = () => {
-      updateLanguage();
-    };
-
-    window.addEventListener('language-updated', handleLanguageUpdate);
-    return () => {
-      window.removeEventListener('language-updated', handleLanguageUpdate);
-    };
-  }, []); // Empty dependency array - only run on mount/unmount
+    if (prevLangRef.current !== undefined && prevLangRef.current !== lang) {
+      clearTranslationCache();
+    }
+    prevLangRef.current = lang;
+  }, [lang]);
 
   // Memoized translation function with validation
   const translate = useCallback(

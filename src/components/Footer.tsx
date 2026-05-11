@@ -27,8 +27,14 @@ const inter = Inter({
 /** Figma mobee-new footer (582:740) — brand line start year in copyright. */
 const FOOTER_BRAND_START_YEAR = 2017;
 
+/** Footer credit company name links to Neetrino site. */
+const FOOTER_CREDIT_COMPANY_HREF = 'https://neetrino.com/';
+
 /** Address lines sit slightly below the location icon baseline. */
 const FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS = 'pt-[8px]';
+
+/** Space under location title block before phone / mail / address (Figma-tuned). */
+const FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS = 'gap-20 lg:gap-24';
 
 const FOOTER_CARD_CLASS =
   'rounded-[40px] bg-[#f6f6f6] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.1)] md:p-8 lg:flex lg:items-stretch lg:gap-10 lg:p-4 lg:pl-14 xl:pl-16';
@@ -141,7 +147,7 @@ function FooterLocationCard(props: {
 
   return (
     <div className={FOOTER_CARD_CLASS}>
-      <div className="flex min-w-0 flex-1 flex-col gap-6 lg:py-4">
+      <div className={`flex min-w-0 flex-1 flex-col lg:py-4 ${FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS}`}>
         <div>
           <h2 className="text-3xl font-black uppercase leading-none text-black md:text-4xl lg:text-[52px]">
             {t('common.footer.locationHeading')}
@@ -238,7 +244,14 @@ function FooterCopyrightPoliciesRow() {
     <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
       <p className="max-w-xl text-[16px] leading-5 text-black/75">
         <span>{copyrightLead} </span>
-        <span className="text-[18px] font-black text-[#00a1ff]">{t('common.footer.legalBar.creditCompany')}</span>
+        <Link
+          href={FOOTER_CREDIT_COMPANY_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[18px] font-black text-[#00a1ff] underline-offset-2 transition-opacity hover:opacity-80 hover:underline"
+        >
+          {t('common.footer.legalBar.creditCompany')}.
+        </Link>
         <span>{' '}</span>
         <span>{t('common.footer.allRightsReserved')}</span>
       </p>

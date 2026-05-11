@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../lib/language';
+import { setStoredLanguage, type LanguageCode } from '../lib/language';
+import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
 
 /**
  * ՀԱՅ / EN / РУС — Figma mobee-new Component 5 (node 178:544): bordered pill, #2db2ff sliding inset.
@@ -15,14 +15,7 @@ function segmentForLang(lang: LanguageCode): PillSegment {
 }
 
 export function LanguageSwitcherPill() {
-  const [lang, setLang] = useState<LanguageCode>(() => getStoredLanguage());
-
-  useEffect(() => {
-    setLang(getStoredLanguage());
-    const onUpdate = () => setLang(getStoredLanguage());
-    window.addEventListener('language-updated', onUpdate);
-    return () => window.removeEventListener('language-updated', onUpdate);
-  }, []);
+  const lang = useClientSyncedLanguage();
 
   const seg = segmentForLang(lang);
   const slideTranslate =
