@@ -1,6 +1,7 @@
 import { apiClient } from "../api-client";
 import { fetchProductBySlugWithLang } from "../shop/fetchProductBySlugWithLang";
 import { logger } from "../utils/logger";
+import { resolveCartLineProductImageUrl } from "./resolveCartLineProductImage";
 
 export interface GuestCartItem {
   productId: string;
@@ -54,6 +55,7 @@ interface ProductData {
     price: number;
     originalPrice?: number | null;
     stock?: number;
+    imageUrl?: string | null;
   }>;
 }
 
@@ -202,11 +204,10 @@ async function fetchGuestCartItemDetails(
     }
 
     const translation = productData.translations?.[0];
-    const imageUrl = productData.media?.[0]
-      ? typeof productData.media[0] === "string"
-        ? productData.media[0]
-        : productData.media[0].url || productData.media[0].src
-      : null;
+    const imageUrl = resolveCartLineProductImageUrl(
+      { media: productData.media },
+      { imageUrl: variant.imageUrl ?? null },
+    );
 
     return {
       item: {

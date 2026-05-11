@@ -1,6 +1,6 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
-import { extractMediaUrl } from "../utils/extractMediaUrl";
+import { resolveCartLineProductImageUrl } from "../cart/resolveCartLineProductImage";
 import {
   calculateReservationDelta,
   releaseVariantStockReservation,
@@ -111,6 +111,7 @@ class CartService {
           stock: number;
           price: number;
           compareAtPrice?: number | null;
+          imageUrl?: string | null;
         };
       }) => {
         const product = item.product;
@@ -119,7 +120,10 @@ class CartService {
           product?.translations?.find((t: { locale: string }) => t.locale === locale) ||
           product?.translations?.[0];
 
-        const imageUrl = extractMediaUrl(product?.media);
+        const imageUrl = resolveCartLineProductImageUrl(
+          { media: product?.media },
+          { imageUrl: variant?.imageUrl ?? null },
+        );
 
         const productDiscount = product?.discountPercent ?? 0;
         let appliedDiscount = 0;
