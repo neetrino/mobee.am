@@ -4,7 +4,6 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import type { AdminMenuItem } from '../../../components/AdminMenuDrawer';
 import { getAdminMenuTABS } from '../admin-menu.config';
-import { AdminSidebarHomeLanguageBlock, useAdminSidebarLanguage } from './AdminSidebarHomeLanguage';
 
 const PRODUCT_SUBMENU_IDS = new Set(['categories', 'brands', 'attributes']);
 const PRODUCT_GROUP_PATHS = [
@@ -180,8 +179,7 @@ export interface AdminSidebarNavBodyProps {
 }
 
 /**
- * Shared admin sidebar navigation: primary items, expandable products group,
- * home + language switcher — same behavior in desktop aside and mobile drawer.
+ * Shared admin sidebar navigation: primary items and expandable products group.
  */
 export function AdminSidebarNavBody({
   currentPath,
@@ -190,11 +188,9 @@ export function AdminSidebarNavBody({
   onAfterNavigate,
 }: AdminSidebarNavBodyProps) {
   const adminTabs = getAdminMenuTABS(t);
-  const homeTab = adminTabs.find((tab) => tab.id === 'home');
   const primaryTabs = adminTabs.filter((tab) => tab.id !== 'home');
   const productGroupActive = isProductGroupPathActive(currentPath);
   const [isProductsExpanded, setIsProductsExpanded] = useState(productGroupActive);
-  const currentLanguage = useAdminSidebarLanguage();
 
   useEffect(() => {
     if (productGroupActive) {
@@ -220,17 +216,6 @@ export function AdminSidebarNavBody({
           t={t}
         />
       </div>
-      {homeTab ? (
-        <AdminSidebarHomeLanguageBlock
-          layout="stack"
-          homeTab={homeTab}
-          currentPath={currentPath}
-          currentLanguage={currentLanguage}
-          onGoHome={() => {
-            goTo(homeTab.path);
-          }}
-        />
-      ) : null}
     </div>
   );
 }
