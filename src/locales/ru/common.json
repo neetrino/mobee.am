@@ -214,6 +214,7 @@
     "locationHeading": "Наш адрес",
     "locationSubtitle": "Приходите или свяжитесь с нами в любое время",
     "viewLargerMap": "Открыть карту крупнее",
+    "mapEmbedTitle": "Карта с адресом магазина",
     "footerNavAriaLabel": "Основные ссылки в подвале",
     "socialNavAriaLabel": "Соцсети",
     "copyrightIntro": "Авторское право © {startYear} - {year}",
@@ -222,7 +223,6 @@
     "sectionsHeading": "Разделы",
     "termsHeading": "Условия",
     "connectHeading": "Связь",
-    "openInMaps": "Открыть адрес в Google Картах",
     "shop": "Магазин",
     "copyright": "© {year} Mobee. Все права защищены.",
     "policiesRow": {

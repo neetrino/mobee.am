@@ -217,6 +217,7 @@
     "locationHeading": "Our location",
     "locationSubtitle": "Visit or contact us any time",
     "viewLargerMap": "View larger map",
+    "mapEmbedTitle": "Map of store location",
     "footerNavAriaLabel": "Footer primary links",
     "socialNavAriaLabel": "Social links",
     "copyrightIntro": "Copyright © {startYear} - {year}",
@@ -225,7 +226,6 @@
     "sectionsHeading": "Sections",
     "termsHeading": "Terms",
     "connectHeading": "Connect",
-    "openInMaps": "Open address in Google Maps",
     "shop": "Shop",
     "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {

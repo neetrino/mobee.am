@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { useTranslation } from '../lib/i18n-client';
@@ -36,14 +35,22 @@ const FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS = 'pt-[8px]';
 /** Space under location title block before phone / mail / address (Figma-tuned). */
 const FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS = 'gap-20 lg:gap-24';
 
-const FOOTER_CARD_CLASS =
-  'rounded-[40px] bg-[#f6f6f6] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.1)] md:p-8 lg:flex lg:items-stretch lg:gap-10 lg:p-4 lg:pl-14 xl:pl-16';
+/** Location card + map shell — light gray (Figma mobee-new footer reference). */
+const FOOTER_LOCATION_SURFACE_BG_CLASS = 'bg-[#f9f9f9]';
 
-const FOOTER_MAP_LINK_CLASS =
-  'relative mt-8 block h-[220px] w-full min-w-0 shrink-0 overflow-hidden rounded-[26px] bg-[#e2e8f0] lg:mt-0 lg:h-[262px] lg:w-[min(100%,707px)] lg:max-w-[52%]';
+/** Outer border matches product grid cards (`border-[#f3f4f6]`); no shadow per design. */
+const FOOTER_CARD_CLASS = `rounded-[40px] border border-[#f3f4f6] ${FOOTER_LOCATION_SURFACE_BG_CLASS} p-6 md:p-8 lg:flex lg:items-stretch lg:gap-10 lg:p-4 lg:pl-14 xl:pl-16`;
+
+const FOOTER_MAP_EMBED_SHELL_CLASS = `relative mt-8 block h-[220px] w-full min-w-0 shrink-0 overflow-hidden rounded-[26px] ${FOOTER_LOCATION_SURFACE_BG_CLASS} lg:mt-3.5 lg:h-[262px] lg:w-[min(100%,707px)] lg:max-w-[52%] lg:-translate-x-[45px]`;
+
+/** Google Maps embed from address (no API key). */
+function footerGoogleMapsEmbedSrc(addressQuery: string): string {
+  const q = encodeURIComponent(addressQuery);
+  return `https://www.google.com/maps?q=${q}&z=15&output=embed`;
+}
 
 const FOOTER_NAV_LINK_CLASS =
-  'px-6 py-2.5 text-[14px] font-bold leading-7 tracking-[0.2px] text-black transition-opacity hover:opacity-70';
+  'px-6 py-2.5 text-[14px] font-bold leading-7 tracking-[0.2px] text-black transition-colors hover:text-[#00a1ff]';
 
 const FOOTER_POLICY_LINK_CLASS =
   'whitespace-nowrap text-[14px] font-medium text-black transition-opacity hover:opacity-70';
@@ -108,41 +115,32 @@ function ContactIconBlock({ icon, children, className, alignIconTop = false, bod
   );
 }
 
-function FooterMapLink({ mapsHref }: { readonly mapsHref: string }) {
+function FooterMapEmbed({ addressText }: { readonly addressText: string }) {
   const { t } = useTranslation();
+  const embedSrc = footerGoogleMapsEmbedSrc(addressText);
 
   return (
-    <Link
-      href={mapsHref}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={FOOTER_MAP_LINK_CLASS}
-      aria-label={t('common.footer.openInMaps')}
-    >
-      <Image
-        src="/images/footer/visit-map.png"
-        alt=""
-        fill
-        className="object-cover object-center grayscale opacity-60"
-        sizes="(max-width: 1024px) 100vw, 45vw"
+    <div className={FOOTER_MAP_EMBED_SHELL_CLASS}>
+      <iframe
+        title={t('common.footer.mapEmbedTitle')}
+        src={embedSrc}
+        className="pointer-events-auto absolute inset-0 h-full w-full border-0"
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        allowFullScreen
       />
-      <div aria-hidden="true" className="absolute inset-0 bg-white/20" />
-      <span className="absolute left-3 top-3 rounded bg-[#f6f6f6] px-3 py-1 text-[12px] leading-[1.45] text-[#0369f0]">
-        {t('common.footer.viewLargerMap')}
-      </span>
-    </Link>
+    </div>
   );
 }
 
 function FooterLocationCard(props: {
-  readonly mapsHref: string;
   readonly addressText: string;
   readonly phoneText: string;
   readonly telHref: string;
   readonly email: string;
 }) {
   const { t } = useTranslation();
-  const { mapsHref, addressText, phoneText, telHref, email } = props;
+  const { addressText, phoneText, telHref, email } = props;
   const mailHref = `mailto:${email}`;
 
   return (
@@ -156,7 +154,7 @@ function FooterLocationCard(props: {
         </div>
 
         {/* Figma 582:746 + 582:764 — phone + mail column; address row-span beside (not under phone). */}
-        <div className="grid grid-cols-1 gap-y-3.5 lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_auto] lg:gap-x-10 lg:gap-y-3.5 xl:gap-x-14">
+        <div className="grid grid-cols-1 gap-y-3.5 lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_auto] lg:gap-x-10 lg:gap-y-3.5 lg:-translate-x-2.5 xl:gap-x-14">
           <ContactIconBlock
             className="lg:col-start-1 lg:row-start-1"
             icon={<FooterContactPhoneGlyph />}
@@ -184,7 +182,7 @@ function FooterLocationCard(props: {
         </div>
       </div>
 
-      <FooterMapLink mapsHref={mapsHref} />
+      <FooterMapEmbed addressText={addressText} />
     </div>
   );
 }
@@ -208,7 +206,10 @@ function FooterNavAndSocialRow() {
 
   return (
     <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-center">
-      <nav className="flex flex-wrap justify-center gap-1 md:justify-start" aria-label={t('common.footer.footerNavAriaLabel')}>
+      <nav
+        className="flex flex-wrap justify-center gap-1 md:justify-start lg:-translate-x-[23px]"
+        aria-label={t('common.footer.footerNavAriaLabel')}
+      >
         {primaryLinks.map((link) => (
           <Link key={link.href} href={link.href} className={FOOTER_NAV_LINK_CLASS}>
             {link.label}
@@ -283,7 +284,6 @@ export function Footer() {
   const { t } = useTranslation();
 
   const addressText = t('contact.address');
-  const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressText)}`;
   const phoneText = t('contact.phone');
   const telHref = `tel:${phoneText.replace(/\s+/g, '')}`;
   const email = t('contact.email');
@@ -294,7 +294,6 @@ export function Footer() {
     >
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-12 lg:gap-16`}>
         <FooterLocationCard
-          mapsHref={mapsHref}
           addressText={addressText}
           phoneText={phoneText}
           telHref={telHref}
