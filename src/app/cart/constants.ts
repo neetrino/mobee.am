@@ -17,7 +17,10 @@ export const EMPTY_CART_EMPTY_STATE_LIFT_PX = 40;
 export const EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX = 80;
 
 /** Lowers only the empty-cart CTA vs the copy block (px). */
-export const EMPTY_CART_EMPTY_STATE_CTA_LOWER_PX = 30;
+export const EMPTY_CART_EMPTY_STATE_CTA_LOWER_PX = 25;
+
+/** Vertical gap between empty-state title and description (px). */
+export const EMPTY_CART_EMPTY_STATE_TITLE_DESCRIPTION_GAP_PX = 18;
 
 /**
  * Desktop cart line card: shorter than home ProductCard (583px) but same visual rhythm.

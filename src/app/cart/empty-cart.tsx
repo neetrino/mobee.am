@@ -7,6 +7,7 @@ import {
   EMPTY_CART_EMPTY_STATE_CTA_LOWER_PX,
   EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX,
   EMPTY_CART_EMPTY_STATE_LIFT_PX,
+  EMPTY_CART_EMPTY_STATE_TITLE_DESCRIPTION_GAP_PX,
   EMPTY_CART_IMAGE_HEIGHT,
   EMPTY_CART_IMAGE_SRC,
   EMPTY_CART_IMAGE_WIDTH,
@@ -42,7 +43,10 @@ export function EmptyCart({ t }: EmptyCartProps) {
             className="flex w-full flex-col gap-2"
             style={{ marginTop: `-${EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX}px` }}
           >
-            <div className="flex w-full flex-col items-center gap-1 text-center">
+            <div
+              className="flex w-full flex-col items-center text-center"
+              style={{ gap: `${EMPTY_CART_EMPTY_STATE_TITLE_DESCRIPTION_GAP_PX}px` }}
+            >
               <h2 className="w-full max-w-[284px] text-[24px] font-bold leading-[1.2] text-[#1c1b1b]">
                 {t('common.cart.empty')}
               </h2>
