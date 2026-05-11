@@ -124,6 +124,13 @@ const MOBILE_DRAWER_NAV_BUTTON_CLASS =
 /** Primary label cell inside drawer rows (avoids one-character orphan lines next to chevrons). */
 const MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS = 'min-w-0 flex-1 pr-1 text-pretty';
 
+/** Solid Mobee CTA in mobile drawer (e.g. register, admin panel). */
+const MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS =
+  'flex w-full min-w-0 items-center justify-between rounded-2xl border border-admin-500 bg-admin-500 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-admin-600 hover:bg-admin-600 active:opacity-95 text-pretty';
+
+/** Home / Shop / About / Contact — blue hover (overrides gray hover on `MOBILE_DRAWER_NAV_BUTTON_CLASS`). */
+const MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS = `${MOBILE_DRAWER_NAV_BUTTON_CLASS} hover:!border-admin-300 hover:!bg-admin-50 hover:!text-[#00a1ff]`;
+
 const MOBILE_DRAWER_MIN_WIDTH_REM = 17;
 const MOBILE_DRAWER_DEFAULT_MAX_WIDTH_REM = 24;
 const MOBILE_DRAWER_WIDE_MAX_VIEWPORT_PERCENT = 95;
@@ -598,7 +605,7 @@ export function Header() {
   const navTextClass = (href: string) =>
     isNavActive(href)
       ? 'whitespace-nowrap text-[13px] font-black leading-5 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
-      : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
+      : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] transition-colors duration-150 hover:text-[#00a1ff] xl:text-[14px]';
 
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -1612,7 +1619,7 @@ export function Header() {
                       key={link.href}
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={MOBILE_DRAWER_NAV_BUTTON_CLASS}
+                      className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
                     >
                       <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
                       <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1650,32 +1657,19 @@ export function Header() {
 
                   {isLoggedIn ? (
                     <>
+                      <MobileDrawerSupportPhoneButton />
                       {isAdmin && (
                         <Link
                           href="/supersudo"
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} border-blue-200 normal-case text-blue-700 hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100/80`}
+                          className={MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS}
                         >
                           <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.adminPanel')}</span>
-                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </Link>
                       )}
-                      <MobileDrawerSupportPhoneButton />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          logout();
-                        }}
-                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} border-red-200 text-left normal-case font-semibold text-red-600 hover:border-red-300 hover:bg-red-50 active:bg-red-100/80`}
-                      >
-                        <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.logout')}</span>
-                        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
                     </>
                   ) : (
                     <>
@@ -1693,7 +1687,7 @@ export function Header() {
                       <Link
                         href="/register"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex w-full min-w-0 items-center justify-between rounded-2xl border border-admin-500 bg-admin-500 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-admin-600 hover:bg-admin-600 active:opacity-95 text-pretty"
+                        className={MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS}
                       >
                         <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.register')}</span>
                         <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
