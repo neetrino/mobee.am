@@ -12,6 +12,7 @@ import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { ShopCatalogSection } from '@/components/shop/ShopCatalogSection';
 import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
 import {
+  SHOP_FILTER_SECTIONS_STACK_CLASS,
   SHOP_FILTER_SIDEBAR_WIDTH_CSS,
   SHOP_PAGE_FOOTER_GAP_CLASS,
 } from './shop-layout.constants';
@@ -73,32 +74,34 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   {t(language, 'products.filters.sidebar.subtitle')}
                 </p>
               </div>
-              <PriceFilter
-                currentMinPrice={params?.minPrice}
-                currentMaxPrice={params?.maxPrice}
-                category={params?.category}
-                search={params?.search}
-              />
-              <CategoryFilter
-                currentCategory={params?.category}
-                search={params?.search}
-                minPrice={params?.minPrice}
-                maxPrice={params?.maxPrice}
-              />
-              <BrandFilter
-                category={params?.category}
-                search={params?.search}
-                minPrice={params?.minPrice}
-                maxPrice={params?.maxPrice}
-                selectedBrands={selectedBrands}
-              />
-              <ColorFilter
-                category={params?.category}
-                search={params?.search}
-                minPrice={params?.minPrice}
-                maxPrice={params?.maxPrice}
-                selectedColors={selectedColors}
-              />
+              <div className={SHOP_FILTER_SECTIONS_STACK_CLASS}>
+                <PriceFilter
+                  currentMinPrice={params?.minPrice}
+                  currentMaxPrice={params?.maxPrice}
+                  category={params?.category}
+                  search={params?.search}
+                />
+                <CategoryFilter
+                  currentCategory={params?.category}
+                  search={params?.search}
+                  minPrice={params?.minPrice}
+                  maxPrice={params?.maxPrice}
+                />
+                <BrandFilter
+                  category={params?.category}
+                  search={params?.search}
+                  minPrice={params?.minPrice}
+                  maxPrice={params?.maxPrice}
+                  selectedBrands={selectedBrands}
+                />
+                <ColorFilter
+                  category={params?.category}
+                  search={params?.search}
+                  minPrice={params?.minPrice}
+                  maxPrice={params?.maxPrice}
+                  selectedColors={selectedColors}
+                />
+              </div>
             </div>
           </aside>
 
@@ -107,7 +110,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </Suspense>
 
           <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
-            <div className="space-y-6 p-4">
+            <div className={`${SHOP_FILTER_SECTIONS_STACK_CLASS} p-4`}>
               <PriceFilter
                 currentMinPrice={params?.minPrice}
                 currentMaxPrice={params?.maxPrice}

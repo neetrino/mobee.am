@@ -42,7 +42,8 @@ class ProductsFindQueryService {
         filters.maxPrice != null ||
         Boolean(filters.colors || filters.sizes || filters.brand) ||
         filters.sort === "name-asc" ||
-        filters.sort === "name-desc");
+        filters.sort === "name-desc" ||
+        filters.sort === "bestseller");
 
     if (isPriceSort && !needOverFetch && !filters.ids?.length) {
       const priceSort =

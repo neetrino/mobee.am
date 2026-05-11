@@ -9,3 +9,6 @@ export const SHOP_FILTER_SIDEBAR_WIDTH_CSS = `calc(${SHOP_FILTER_SIDEBAR_BASE_WI
 
 /** Space between `/shop` content (filters + catalog) and the site footer; all breakpoints. */
 export const SHOP_PAGE_FOOTER_GAP_CLASS = 'pb-12';
+
+/** Vertical gap between filter sections (each ends with `border-b`). Desktop sidebar + mobile drawer. */
+export const SHOP_FILTER_SECTIONS_STACK_CLASS = 'flex flex-col gap-6';

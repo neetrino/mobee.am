@@ -111,13 +111,17 @@ export function CategoryFilter({
               key={category.id}
               type="button"
               onClick={() => toggleCategory(category.slug)}
-              className="flex w-full items-center gap-3 text-left"
+              className="group -mx-2 flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[#EFF6FF]"
             >
               <span
-                className={`h-5 w-5 rounded border-2 ${selected ? 'border-[#2CA1E2] bg-[#2CA1E2]' : 'border-[#CAD5E2] bg-white'}`}
+                className={`h-5 w-5 shrink-0 rounded border-2 transition-colors ${
+                  selected
+                    ? 'border-[#2CA1E2] bg-[#2CA1E2]'
+                    : 'border-[#CAD5E2] bg-white group-hover:border-[#2CA1E2]'
+                }`}
                 aria-hidden
               />
-              <span className="flex-1 truncate text-base leading-6 tracking-[-0.02em] text-[#314158]">
+              <span className="flex-1 truncate text-base leading-6 tracking-[-0.02em] text-[#314158] transition-colors group-hover:text-[#0F172B]">
                 {category.title}
               </span>
               <span className="text-base leading-6 tracking-[-0.02em] text-[#90A1B9]">

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from '../lib/i18n-client';
 import { MOBILE_FILTERS_EVENT } from '@/lib/events';
-import type { ProductSortOption } from '@/lib/products/sort';
+import { PRODUCT_SORT_OPTIONS, type ProductSortOption } from '@/lib/products/sort';
 import {
   PRODUCTS_VIEW_MODE_CHANGED_EVENT,
   PRODUCTS_VIEW_MODE_STORAGE_KEY,
@@ -14,7 +14,7 @@ import {
   type ProductListingViewMode,
 } from '@/lib/products/view-mode';
 
-const SORT_OPTIONS: ProductSortOption[] = ['default', 'price-asc', 'price-desc', 'name-asc', 'name-desc'];
+const SORT_OPTIONS: ProductSortOption[] = [...PRODUCT_SORT_OPTIONS];
 
 /** Filter + sort pill chrome on mobile (`lg` uses desktop sizing on the sort control). */
 const SHOP_MOBILE_TOOLBAR_PILL_BOX_CLASS = 'h-10 px-3 py-1.5';
@@ -24,6 +24,8 @@ const SHOP_GRID_LISTING_ICON_DISPLAY_PX = 24 * 1.05;
 
 function getSortLabel(sort: ProductSortOption, t: (key: string) => string): string {
   switch (sort) {
+    case 'bestseller':
+      return t('products.header.sort.bestsellers');
     case 'price-asc':
       return t('products.header.sort.priceAsc');
     case 'price-desc':
