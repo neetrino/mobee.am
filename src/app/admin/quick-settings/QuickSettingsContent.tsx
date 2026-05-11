@@ -1,6 +1,6 @@
 'use client';
 
-import { Card } from '@shop/ui';
+import { Card } from '@/app/admin/lib/adminShopUi';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';

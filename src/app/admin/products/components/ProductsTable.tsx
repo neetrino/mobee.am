@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useRouter } from 'next/navigation';
-import { Card, Button } from '@shop/ui';
+import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../../../lib/currency';
 import type { Product, ProductsResponse } from '../types';
@@ -247,7 +247,7 @@ export function ProductsTable({
                           <img
                             src={processImageUrl(product.image)}
                             alt={product.title}
-                            className="h-12 w-12 rounded object-cover mr-3"
+                            className="h-12 w-12 rounded-supersudo object-cover mr-3"
                           />
                         )}
                         <div>
@@ -262,7 +262,7 @@ export function ProductsTable({
                           {product.colorStocks.map((colorStock) => (
                             <div
                               key={colorStock.color}
-                              className="px-3 py-1 bg-gray-100 rounded-lg text-sm"
+                              className="px-3 py-1 bg-gray-100 rounded-supersudo text-sm"
                             >
                               <span className="font-medium text-gray-900">{colorStock.color}:</span>
                               <span className="ml-1 text-gray-600">{colorStock.stock} {t('admin.products.pcs')}</span>
@@ -299,7 +299,7 @@ export function ProductsTable({
                     <td className="px-3 py-4 whitespace-nowrap text-center">
                       <button
                         onClick={() => handleToggleFeatured(product.id, product.featured || false, product.title)}
-                        className="inline-flex items-center justify-center w-8 h-8 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-2 rounded"
+                        className="inline-flex items-center justify-center w-8 h-8 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-2 rounded-supersudo"
                         title={product.featured ? t('admin.products.clickToRemoveFeatured') : t('admin.products.clickToMarkFeatured')}
                       >
                         <svg

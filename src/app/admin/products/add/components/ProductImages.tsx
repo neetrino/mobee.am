@@ -42,7 +42,7 @@ export function ProductImages({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={imageUploadLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-admin-500 border border-admin-500 rounded-md shadow-sm hover:bg-admin-600 hover:border-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-white bg-admin-500 border border-admin-500 rounded-supersudo shadow-sm hover:bg-admin-600 hover:border-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -64,7 +64,7 @@ export function ProductImages({
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {imageUrls.map((imageUrl, index) => (
                 <div key={index} className="relative group">
-                  <div className={`relative border-2 rounded-md overflow-hidden ${
+                  <div className={`relative border-2 rounded-supersudo overflow-hidden ${
                     featuredImageIndex === index 
                       ? 'border-admin-500 ring-2 ring-admin-300' 
                       : 'border-gray-300'
@@ -77,12 +77,12 @@ export function ProductImages({
                     
                     {/* Main Checkbox */}
                     <div className="absolute top-2 left-2">
-                      <label className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md cursor-pointer hover:bg-white transition-colors">
+                      <label className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-supersudo cursor-pointer hover:bg-white transition-colors">
                         <input
                           type="checkbox"
                           checked={featuredImageIndex === index}
                           onChange={() => onSetFeaturedImage(index)}
-                          className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+                          className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
                         />
                         <span className="text-xs font-medium text-gray-700">
                           {featuredImageIndex === index ? t('admin.products.add.main') : t('admin.products.add.setAsMain')}
@@ -104,7 +104,7 @@ export function ProductImages({
 
                     {/* Main Badge */}
                     {featuredImageIndex === index && (
-                      <div className="absolute bottom-2 left-2 bg-admin-500 text-white px-2 py-1 rounded text-xs font-medium">
+                      <div className="absolute bottom-2 left-2 bg-admin-500 text-white px-2 py-1 rounded-supersudo text-xs font-medium">
                         {t('admin.products.add.main')}
                       </div>
                     )}

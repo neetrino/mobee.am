@@ -58,12 +58,12 @@ function ProductsNavRow({
 
   return (
     <div
-      className={`flex w-full min-w-0 items-stretch rounded-md text-sm font-medium transition-all ${containerColors}`}
+      className={`flex w-full min-w-0 items-stretch rounded-supersudo text-sm font-medium transition-all ${containerColors}`}
     >
       <button
         type="button"
         onClick={onNavigate}
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-l-md px-4 py-3 text-left"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-l-supersudo px-4 py-3 text-left"
       >
         <span className={`flex-shrink-0 ${iconColor}`}>{tab.icon}</span>
         <span className="min-w-0 flex-1 truncate">{tab.label}</span>
@@ -74,7 +74,7 @@ function ProductsNavRow({
         aria-expanded={isExpanded}
         aria-label={`${tab.label}. ${toggleAriaLabel}`}
         aria-controls="admin-products-submenu"
-        className="flex shrink-0 items-center justify-center rounded-r-md px-3 py-3"
+        className="flex shrink-0 items-center justify-center rounded-r-supersudo px-3 py-3"
       >
         <svg
           className={`h-4 w-4 shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''} ${iconColor}`}
@@ -101,7 +101,7 @@ function NavItemButton({ tab, isActive, onNavigate }: NavItemButtonProps) {
     <button
       type="button"
       onClick={onNavigate}
-      className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium transition-all ${
+      className={`flex w-full items-center gap-3 rounded-supersudo px-4 py-3 text-left text-sm font-medium transition-all ${
         tab.isSubCategory ? 'pl-12' : ''
       } ${isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}
     >

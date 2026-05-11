@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Button, Input } from '@shop/ui';
+import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import type { ProductLabel } from '../types';
 
@@ -32,14 +32,14 @@ export function ProductLabels({
         </Button>
       </div>
       {labels.length === 0 ? (
-        <div className="text-center py-4 border-2 border-dashed border-gray-300 rounded-lg">
+        <div className="text-center py-4 border-2 border-dashed border-gray-300 rounded-supersudo">
           <p className="text-gray-500 mb-2">{t('admin.products.add.noLabelsAdded')}</p>
           <p className="text-sm text-gray-400">{t('admin.products.add.addLabelsHint')}</p>
         </div>
       ) : (
         <div className="space-y-4">
           {labels.map((label, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div key={index} className="border border-gray-200 rounded-supersudo p-4 bg-gray-50">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
                   {t('admin.products.add.label').replace('{index}', (index + 1).toString())}
@@ -55,7 +55,7 @@ export function ProductLabels({
                     {t('admin.products.add.type')} *
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
                     value={label.type}
                     onChange={(e) => onUpdateLabel(index, 'type', e.target.value as 'text' | 'percentage')}
                     required
@@ -91,7 +91,7 @@ export function ProductLabels({
                     {t('admin.products.add.position')} *
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
                     value={label.position}
                     onChange={(e) => onUpdateLabel(index, 'position', e.target.value)}
                     required

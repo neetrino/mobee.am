@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Card, Button } from '@shop/ui';
+import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { apiClient } from '../../../lib/api-client';
@@ -193,7 +193,7 @@ export default function PromoCodesPage() {
                   maxLength={64}
                   onChange={(event) => setCode(event.target.value.toUpperCase())}
                   placeholder={t('admin.promocodes.codePlaceholder')}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
+                  className="w-full rounded-supersudo border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
                 />
               </div>
 
@@ -209,7 +209,7 @@ export default function PromoCodesPage() {
                   step="0.01"
                   value={discountPercent}
                   onChange={(event) => setDiscountPercent(event.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
+                  className="w-full rounded-supersudo border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
                 />
               </div>
 
@@ -234,7 +234,7 @@ export default function PromoCodesPage() {
             ) : (
               <div className="space-y-3">
                 {promoCodes.map((promoCode) => (
-                  <div key={promoCode.id} className="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                  <div key={promoCode.id} className="border border-gray-200 rounded-supersudo p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div>
                       <p className="text-base font-semibold text-gray-900">{promoCode.code}</p>
                       <p className="text-sm text-gray-600">

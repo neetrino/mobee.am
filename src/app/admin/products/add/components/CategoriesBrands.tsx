@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Input } from '@shop/ui';
+import { Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import type { Category, Brand } from '../types';
 
@@ -140,7 +140,7 @@ export function CategoriesBrands({
                 <button
                   type="button"
                   onClick={() => onCategoriesExpandedChange(!categoriesExpanded)}
-                  className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin bg-white text-sm flex items-center justify-between"
+                  className="w-full px-3 py-2 text-left border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin bg-white text-sm flex items-center justify-between"
                 >
                   <span className="text-gray-700">
                     {categoryIds.length === 0
@@ -161,13 +161,13 @@ export function CategoriesBrands({
                   </svg>
                 </button>
                 {categoriesExpanded && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-supersudo shadow-lg max-h-60 overflow-y-auto">
                     <div className="p-2">
                       <div className="space-y-1">
                         {displayCategories.map((category) => (
                           <label
                             key={category.id}
-                            className={`flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded ${
+                            className={`flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded-supersudo ${
                               category.isSubcategory ? 'pl-6' : ''
                             }`}
                           >
@@ -175,7 +175,7 @@ export function CategoriesBrands({
                               type="checkbox"
                               checked={categoryIds.includes(category.id)}
                               onChange={(e) => handleCategoryChange(category.id, e.target.checked)}
-                              className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+                              className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
                             />
                             <span
                               className={`text-gray-700 ${
@@ -236,7 +236,7 @@ export function CategoriesBrands({
                 <button
                   type="button"
                   onClick={() => onBrandsExpandedChange(!brandsExpanded)}
-                  className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin bg-white text-sm flex items-center justify-between"
+                  className="w-full px-3 py-2 text-left border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin bg-white text-sm flex items-center justify-between"
                 >
                   <span className="text-gray-700">
                     {brandIds.length === 0
@@ -257,13 +257,13 @@ export function CategoriesBrands({
                   </svg>
                 </button>
                 {brandsExpanded && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-supersudo shadow-lg max-h-60 overflow-y-auto">
                     <div className="p-2">
                       <div className="space-y-1">
                         {brands.map((brand) => (
                           <label
                             key={brand.id}
-                            className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                            className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded-supersudo"
                           >
                             <input
                               type="checkbox"
@@ -274,7 +274,7 @@ export function CategoriesBrands({
                                   : brandIds.filter((id) => id !== brand.id);
                                 onBrandIdsChange(newBrandIds);
                               }}
-                              className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+                              className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
                             />
                             <span className="text-sm text-gray-700">{brand.name}</span>
                           </label>

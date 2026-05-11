@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Card } from '@shop/ui';
+import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatDate } from '../utils';
 import type { AnalyticsData } from '../types';
@@ -27,11 +27,11 @@ export function PeriodSelector({
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6 mb-6 bg-white shadow-sm border border-gray-200 rounded-xl">
+    <Card className="p-6 mb-6 bg-white shadow-sm border border-gray-200 rounded-supersudo">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <h2 className="text-xl font-semibold text-gray-900">{t('admin.analytics.timePeriod')}</h2>
         {analytics && (
-          <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1.5 rounded-lg">
+          <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1.5 rounded-supersudo">
             {formatDate(analytics.dateRange.start)} - {formatDate(analytics.dateRange.end)}
           </div>
         )}
@@ -50,7 +50,7 @@ export function PeriodSelector({
                 onEndDateChange('');
               }
             }}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin transition-all bg-white"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin transition-all bg-white"
           >
             <option value="day">{t('admin.analytics.today')}</option>
             <option value="week">{t('admin.analytics.last7Days')}</option>
@@ -69,7 +69,7 @@ export function PeriodSelector({
                 type="date"
                 value={startDate}
                 onChange={(e) => onStartDateChange(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin transition-all bg-white"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin transition-all bg-white"
               />
             </div>
             <div className="flex-1 min-w-[200px]">
@@ -80,7 +80,7 @@ export function PeriodSelector({
                 type="date"
                 value={endDate}
                 onChange={(e) => onEndDateChange(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin transition-all bg-white"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin transition-all bg-white"
               />
             </div>
           </>

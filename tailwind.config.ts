@@ -20,6 +20,10 @@ const config: Config = {
       '2xl': '1536px',
     },
     extend: {
+      borderRadius: {
+        /** Admin `/supersudo` UI — unified corner radius */
+        supersudo: '15px',
+      },
       colors: {
         primary: '#000000',
         secondary: '#FFFFFF',

@@ -98,7 +98,7 @@ export function OrderRow({
             <select
               value={order.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getStatusColor(order.status)}`}
+              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-supersudo border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getStatusColor(order.status)}`}
             >
               <option value="pending">{t('admin.orders.pending')}</option>
               <option value="processing">{t('admin.orders.processing')}</option>
@@ -119,7 +119,7 @@ export function OrderRow({
             <select
               value={order.paymentStatus}
               onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
+              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-supersudo border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
             >
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>
@@ -139,7 +139,7 @@ export function OrderRow({
             <select
               value={order.fulfillmentStatus}
               onChange={(e) => onFulfillmentStatusChange(e.target.value)}
-              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getFulfillmentStatusColor(order.fulfillmentStatus)}`}
+              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-supersudo border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getFulfillmentStatusColor(order.fulfillmentStatus)}`}
             >
               <option value="unfulfilled">{t('admin.orders.unfulfilled')}</option>
               <option value="fulfilled">{t('admin.orders.fulfilled')}</option>

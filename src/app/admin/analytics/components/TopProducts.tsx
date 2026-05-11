@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Card } from '@shop/ui';
+import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatCurrency } from '../utils';
 import type { AnalyticsData } from '../types';
@@ -14,10 +14,10 @@ export function TopProducts({ products, currency }: TopProductsProps) {
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6 bg-white shadow-sm border border-gray-200 rounded-xl">
+    <Card className="p-6 bg-white shadow-sm border border-gray-200 rounded-supersudo">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900">{t('admin.analytics.topSellingProducts')}</h2>
-        <div className="w-10 h-10 bg-admin-100 rounded-lg flex items-center justify-center">
+        <div className="w-10 h-10 bg-admin-100 rounded-supersudo flex items-center justify-center">
           <svg className="w-5 h-5 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
@@ -32,10 +32,10 @@ export function TopProducts({ products, currency }: TopProductsProps) {
           products.map((product, index) => (
             <div
               key={product.variantId}
-              className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-admin-300 hover:shadow-md transition-all duration-200 bg-gray-50 hover:bg-white group"
+              className="flex items-center gap-4 p-4 border border-gray-200 rounded-supersudo hover:border-admin-300 hover:shadow-md transition-all duration-200 bg-gray-50 hover:bg-white group"
             >
               <div className="flex-shrink-0">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${
+                <div className={`w-10 h-10 rounded-supersudo flex items-center justify-center text-sm font-bold transition-colors ${
                   index === 0 ? 'bg-yellow-400 text-yellow-900' :
                   index === 1 ? 'bg-gray-300 text-gray-700' :
                   index === 2 ? 'bg-orange-300 text-orange-900' :
@@ -49,7 +49,7 @@ export function TopProducts({ products, currency }: TopProductsProps) {
                   <img
                     src={product.image}
                     alt={product.title}
-                    className="w-14 h-14 object-cover rounded-lg border border-gray-200 group-hover:scale-105 transition-transform"
+                    className="w-14 h-14 object-cover rounded-supersudo border border-gray-200 group-hover:scale-105 transition-transform"
                   />
                 </div>
               )}

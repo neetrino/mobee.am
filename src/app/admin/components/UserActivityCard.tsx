@@ -1,6 +1,6 @@
 'use client';
 
-import { Card } from '@shop/ui';
+import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatCurrency, formatDate } from '../utils/dashboardUtils';
 
@@ -40,7 +40,7 @@ export function UserActivityCard({ userActivity, userActivityLoading }: UserActi
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[1, 2].map((i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-32 bg-gray-200 rounded"></div>
+              <div className="h-32 bg-gray-200 rounded-supersudo"></div>
             </div>
           ))}
         </div>
@@ -53,7 +53,7 @@ export function UserActivityCard({ userActivity, userActivityLoading }: UserActi
                 <p className="text-sm text-gray-600">{t('admin.dashboard.noRecentRegistrations')}</p>
               ) : (
                 userActivity.recentRegistrations.slice(0, 5).map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                  <div key={user.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-supersudo">
                     <div>
                       <p className="text-sm font-medium text-gray-900">{user.name}</p>
                       <p className="text-xs text-gray-600">{user.email || user.phone || 'N/A'}</p>
@@ -72,7 +72,7 @@ export function UserActivityCard({ userActivity, userActivityLoading }: UserActi
                 <p className="text-sm text-gray-600">{t('admin.dashboard.noActiveUsers')}</p>
               ) : (
                 userActivity.activeUsers.slice(0, 5).map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                  <div key={user.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-supersudo">
                     <div>
                       <p className="text-sm font-medium text-gray-900">{user.name}</p>
                       <p className="text-xs text-gray-600">{user.email || user.phone || 'N/A'}</p>

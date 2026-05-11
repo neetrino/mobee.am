@@ -35,13 +35,13 @@ interface LangPillProps {
 
 function homeButtonClasses(layout: 'stack' | 'toolbar', homeActive: boolean): string {
   if (layout === 'toolbar') {
-    return `flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-all ${
+    return `flex shrink-0 items-center gap-2 rounded-supersudo border px-3 py-2 text-sm font-medium transition-all ${
       homeActive
         ? 'border-admin bg-admin text-white'
         : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50 hover:text-gray-900'
     }`;
   }
-  return `flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium transition-all ${
+  return `flex w-full items-center gap-3 rounded-supersudo px-4 py-3 text-left text-sm font-medium transition-all ${
     homeActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
   }`;
 }
@@ -58,7 +58,7 @@ function LangPill({ language, currentLanguage, layout }: LangPillProps) {
           setStoredLanguage(language.code);
         }
       }}
-      className={`rounded-md border px-2 py-1.5 text-center text-xs font-semibold uppercase tracking-wide transition-all ${widthClass} ${
+      className={`rounded-supersudo border px-2 py-1.5 text-center text-xs font-semibold uppercase tracking-wide transition-all ${widthClass} ${
         isLangActive
           ? 'border-admin bg-admin text-white'
           : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'

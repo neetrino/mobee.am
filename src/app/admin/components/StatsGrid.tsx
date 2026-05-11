@@ -1,6 +1,6 @@
-﻿'use client';
+'use client';
 
-import { Card } from '@shop/ui';
+import { Card } from '@/app/admin/lib/adminShopUi';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatCurrency } from '../utils/dashboardUtils';
@@ -31,7 +31,7 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
           <div>
             <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.totalUsers')}</p>
             {statsLoading ? (
-              <div className="animate-pulse h-8 w-16 bg-gray-200 rounded mt-1"></div>
+              <div className="animate-pulse h-8 w-16 bg-gray-200 rounded-supersudo mt-1"></div>
             ) : (
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {stats?.users.total ?? 0}
@@ -54,15 +54,15 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
           <div>
             <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.totalProducts')}</p>
             {statsLoading ? (
-              <div className="animate-pulse h-8 w-16 bg-gray-200 rounded mt-1"></div>
+              <div className="animate-pulse h-8 w-16 bg-gray-200 rounded-supersudo mt-1"></div>
             ) : (
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {stats?.products.total ?? 0}
               </p>
             )}
           </div>
-          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-12 h-12 bg-admin-100 rounded-full flex items-center justify-center">
+            <svg className="w-6 h-6 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
@@ -77,15 +77,15 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
           <div>
             <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.totalOrders')}</p>
             {statsLoading ? (
-              <div className="animate-pulse h-8 w-16 bg-gray-200 rounded mt-1"></div>
+              <div className="animate-pulse h-8 w-16 bg-gray-200 rounded-supersudo mt-1"></div>
             ) : (
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {stats?.orders.total ?? 0}
               </p>
             )}
           </div>
-          <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-            <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-12 h-12 bg-admin-100 rounded-full flex items-center justify-center">
+            <svg className="w-6 h-6 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
@@ -100,7 +100,7 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
           <div>
             <p className="text-sm font-medium text-gray-600">{t('admin.dashboard.revenue')}</p>
             {statsLoading ? (
-              <div className="animate-pulse h-8 w-24 bg-gray-200 rounded mt-1"></div>
+              <div className="animate-pulse h-8 w-24 bg-gray-200 rounded-supersudo mt-1"></div>
             ) : (
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {stats ? formatCurrency(stats.revenue.total, stats.revenue.currency) : '0 USD'}

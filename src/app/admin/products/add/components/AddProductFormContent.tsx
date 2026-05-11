@@ -1,7 +1,7 @@
 'use client';
 
 import type { ChangeEvent } from 'react';
-import { Card } from '@shop/ui';
+import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import type {
   Brand,
@@ -271,7 +271,7 @@ export function AddProductFormContent({
             />
           )}
 
-        <details className="rounded-lg border border-dashed border-gray-300 bg-gray-50/50 px-4 py-3">
+        <details className="rounded-supersudo border border-dashed border-gray-300 bg-gray-50/50 px-4 py-3">
           <summary className="cursor-pointer select-none text-sm font-semibold text-gray-800">
             {t('admin.products.add.moreOptionsOptional')}
           </summary>
