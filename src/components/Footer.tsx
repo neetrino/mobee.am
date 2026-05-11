@@ -41,7 +41,12 @@ const FOOTER_LOCATION_SURFACE_BG_CLASS = 'bg-[#f9f9f9]';
 /** Outer border matches product grid cards (`border-[#f3f4f6]`); no shadow per design. */
 const FOOTER_CARD_CLASS = `rounded-[40px] border border-[#f3f4f6] ${FOOTER_LOCATION_SURFACE_BG_CLASS} p-6 md:p-8 lg:flex lg:items-stretch lg:gap-10 lg:p-4 lg:pl-14 xl:pl-16`;
 
-const FOOTER_MAP_EMBED_SHELL_CLASS = `relative mt-8 block h-[220px] w-full min-w-0 shrink-0 overflow-hidden rounded-[26px] ${FOOTER_LOCATION_SURFACE_BG_CLASS} lg:mt-3.5 lg:h-[262px] lg:w-[min(100%,707px)] lg:max-w-[52%] lg:-translate-x-[45px]`;
+const FOOTER_MAP_EMBED_SHELL_BASE_CLASS = `relative mt-8 block h-[220px] w-full min-w-0 shrink-0 overflow-hidden rounded-[26px] ${FOOTER_LOCATION_SURFACE_BG_CLASS} lg:h-[262px] lg:w-[min(100%,707px)] lg:max-w-[52%] lg:-translate-x-[45px]`;
+
+const FOOTER_MAP_LG_MARGIN_TOP_DEFAULT_CLASS = 'lg:mt-3.5';
+
+/** HY: map sits a bit lower under longer location block. */
+const FOOTER_MAP_LG_MARGIN_TOP_HY_CLASS = 'lg:mt-6';
 
 /** Google Maps embed from address (no API key). */
 function footerGoogleMapsEmbedSrc(addressQuery: string): string {
@@ -54,6 +59,18 @@ const FOOTER_NAV_LINK_CLASS =
 
 const FOOTER_POLICY_LINK_CLASS =
   'whitespace-nowrap text-[14px] font-medium text-black transition-opacity hover:opacity-70';
+
+const FOOTER_POLICIES_NAV_ROW_CLASS =
+  'flex flex-wrap items-center gap-x-8 gap-y-3 lg:justify-end';
+
+/** RU: 2×2 grid; start-aligned so left column lines up (refund + terms share one x). */
+const FOOTER_POLICIES_NAV_RU_GRID_CLASS =
+  'grid grid-cols-2 gap-x-8 gap-y-3 lg:ml-auto lg:justify-items-start';
+
+const FOOTER_REFUND_POLICY_HREF = '/refund-policy';
+
+/** Armenian-only: nudge “Վերադարձի քաղաքականություն” left in the policies row. */
+const FOOTER_HY_REFUND_POLICY_NUDGE_CLASS = 'lg:-translate-x-[39px]';
 
 /** 24px tap target; glyph draws at 22px inside (see footerSocialGlyphs GLYPH_CLASS). */
 const FOOTER_SOCIAL_ICON_SLOT_CLASS =
@@ -116,11 +133,12 @@ function ContactIconBlock({ icon, children, className, alignIconTop = false, bod
 }
 
 function FooterMapEmbed({ addressText }: { readonly addressText: string }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const embedSrc = footerGoogleMapsEmbedSrc(addressText);
+  const mapLgTopClass = lang === 'hy' ? FOOTER_MAP_LG_MARGIN_TOP_HY_CLASS : FOOTER_MAP_LG_MARGIN_TOP_DEFAULT_CLASS;
 
   return (
-    <div className={FOOTER_MAP_EMBED_SHELL_CLASS}>
+    <div className={`${FOOTER_MAP_EMBED_SHELL_BASE_CLASS} ${mapLgTopClass}`}>
       <iframe
         title={t('common.footer.mapEmbedTitle')}
         src={embedSrc}
@@ -227,10 +245,10 @@ function FooterNavAndSocialRow() {
 }
 
 function FooterCopyrightPoliciesRow() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   const policyLinks = [
-    { href: '/refund-policy', label: t('common.footer.policiesRow.refund') },
+    { href: FOOTER_REFUND_POLICY_HREF, label: t('common.footer.policiesRow.refund') },
     { href: '/delivery-terms', label: t('common.footer.policiesRow.delivery') },
     { href: '/terms', label: t('common.footer.policiesRow.terms') },
     { href: '/privacy', label: t('common.footer.policiesRow.privacy') },
@@ -257,14 +275,22 @@ function FooterCopyrightPoliciesRow() {
         <span>{t('common.footer.allRightsReserved')}</span>
       </p>
       <nav
-        className="flex flex-wrap items-center gap-x-8 gap-y-3 lg:justify-end"
+        className={lang === 'ru' ? FOOTER_POLICIES_NAV_RU_GRID_CLASS : FOOTER_POLICIES_NAV_ROW_CLASS}
         aria-label={t('common.footer.legalBar.policiesNavLabel')}
       >
-        {policyLinks.map((link) => (
-          <Link key={link.href} href={link.href} className={FOOTER_POLICY_LINK_CLASS}>
-            {link.label}
-          </Link>
-        ))}
+        {policyLinks.map((link) => {
+          const hyRefundNudge = lang === 'hy' && link.href === FOOTER_REFUND_POLICY_HREF;
+          const ruGridLinkClass = lang === 'ru' ? ' !whitespace-normal text-left' : '';
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`${FOOTER_POLICY_LINK_CLASS}${ruGridLinkClass}${hyRefundNudge ? ` ${FOOTER_HY_REFUND_POLICY_NUDGE_CLASS}` : ''}`}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );
