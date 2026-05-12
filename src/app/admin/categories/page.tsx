@@ -1,9 +1,9 @@
 ﻿'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
-import { Card, Button } from '@/app/admin/lib/adminShopUi';
+import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useCategories } from './hooks/useCategories';
 import { useCategoryActions } from './hooks/useCategoryActions';
@@ -18,6 +18,7 @@ export default function CategoriesPage() {
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
   const { categories, loading, fetchCategories } = useCategories();
+  const [categorySearchQuery, setCategorySearchQuery] = useState('');
   const {
     showAddModal,
     showEditModal,
@@ -63,8 +64,34 @@ export default function CategoriesPage() {
       <div className="max-w-7xl">
         <CategoriesHeader />
         <Card className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">{t('admin.categories.title')}</h2>
+          <div
+            className={`mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 ${
+              !loading && categories.length > 0 ? 'sm:justify-between' : 'sm:justify-end'
+            }`}
+          >
+            {!loading && categories.length > 0 ? (
+              <div className="flex min-w-0 flex-1 flex-col gap-2 sm:max-w-md sm:flex-row sm:items-center">
+                <label className="sr-only" htmlFor="admin-categories-search">
+                  {t('admin.categories.searchLabel')}
+                </label>
+                <Input
+                  id="admin-categories-search"
+                  type="search"
+                  role="searchbox"
+                  value={categorySearchQuery}
+                  onChange={(e) => setCategorySearchQuery(e.target.value)}
+                  placeholder={t('admin.categories.searchPlaceholder')}
+                  className="w-full"
+                  autoComplete="off"
+                />
+                {categorySearchQuery.trim().length > 0 ? (
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategorySearchQuery('')}>
+                    {t('admin.categories.clearSearch')}
+                  </Button>
+                ) : null}
+              </div>
+            ) : null}
+            <div className="flex shrink-0 justify-end">
             <Button
               variant="admin"
               onClick={() => {
@@ -78,6 +105,7 @@ export default function CategoriesPage() {
               </svg>
               {t('admin.categories.addCategory')}
             </Button>
+            </div>
           </div>
 
           {loading ? (
@@ -88,6 +116,8 @@ export default function CategoriesPage() {
           ) : (
             <CategoriesList
               categories={categories}
+              searchQuery={categorySearchQuery}
+              onSearchQueryChange={setCategorySearchQuery}
               onEdit={handleEditCategory}
               onDelete={(categoryId, categoryTitle) =>
                 handleDeleteCategory(categoryId, categoryTitle, fetchCategories)

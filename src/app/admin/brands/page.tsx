@@ -157,26 +157,13 @@ function BrandsSection() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">{t('admin.brands.title')}</h2>
-        <Button
-          onClick={handleOpenAddModal}
-          variant="admin"
-          size="sm"
-          className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap"
-        >
-          <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          {t('admin.brands.addNew')}
-        </Button>
-      </div>
-
-      {brands.length === 0 ? (
-        <p className="text-sm text-gray-500 py-2">{t('admin.brands.noBrands')}</p>
-      ) : (
-        <>
-          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div
+        className={`mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 ${
+          brands.length > 0 ? 'sm:justify-between' : 'sm:justify-end'
+        }`}
+      >
+        {brands.length > 0 ? (
+          <div className="flex min-w-0 flex-1 flex-col gap-2 sm:max-w-md sm:flex-row sm:items-center">
             <label className="sr-only" htmlFor="admin-brands-search">
               {t('admin.brands.searchLabel')}
             </label>
@@ -187,7 +174,7 @@ function BrandsSection() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('admin.brands.searchPlaceholder')}
-              className="w-full sm:max-w-md"
+              className="w-full"
               autoComplete="off"
             />
             {searchQuery.trim().length > 0 ? (
@@ -196,6 +183,25 @@ function BrandsSection() {
               </Button>
             ) : null}
           </div>
+        ) : null}
+        <div className="flex shrink-0 justify-end">
+        <Button
+          onClick={handleOpenAddModal}
+          variant="admin"
+          className="flex items-center gap-2"
+        >
+          <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          {t('admin.brands.addNew')}
+        </Button>
+        </div>
+      </div>
+
+      {brands.length === 0 ? (
+        <p className="text-sm text-gray-500 py-2">{t('admin.brands.noBrands')}</p>
+      ) : (
+        <>
           {filteredBrands.length === 0 ? (
             <p className="text-sm text-gray-500 py-2">{t('admin.brands.noSearchResults')}</p>
           ) : (
