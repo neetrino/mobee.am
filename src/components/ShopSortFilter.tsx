@@ -156,7 +156,9 @@ export function ShopSortFilter() {
                 type="button"
                 onClick={() => applySort(option)}
                 className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
-                  option === activeSort ? 'bg-[#EFF6FF] font-medium text-[#0F172B]' : 'text-[#475569] hover:bg-[#F8FAFC]'
+                  option === activeSort
+                    ? 'bg-[#EFF6FF] font-medium text-[#0F172B]'
+                    : 'text-[#475569] hover:bg-[#F8FAFC]'
                 }`}
               >
                 {getSortLabel(option, t)}

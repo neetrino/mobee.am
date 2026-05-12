@@ -1,5 +1,9 @@
 import { db } from "@white-shop/db";
+import type { Prisma } from "@white-shop/db";
 import { logger } from "../../utils/logger";
+
+/** Max distinct category slugs in `category=a,b,c` shop URL (same order of magnitude as brand list). */
+export const MAX_CATEGORY_SLUGS = 15;
 
 /**
  * Get all child category IDs recursively
@@ -82,6 +86,45 @@ export async function findCategoryBySlug(
   return categoryDoc;
 }
 
+/**
+ * OR of category trees: each slug expands to primary + descendants (same rules as shop single-category).
+ * Invalid slugs are skipped; returns null if none resolve (caller may treat as empty catalog).
+ */
+export async function buildCategoryTreesOrWhere(
+  categoryParam: string,
+  lang: string,
+): Promise<Prisma.ProductWhereInput | null> {
+  const slugs = [
+    ...new Set(
+      categoryParam
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
+  ].slice(0, MAX_CATEGORY_SLUGS);
+  if (slugs.length === 0) {
+    return null;
+  }
 
+  const treeBlocks: { OR: Prisma.ProductWhereInput[] }[] = [];
 
+  for (const slug of slugs) {
+    const categoryDoc = await findCategoryBySlug(slug, lang);
+    if (!categoryDoc) {
+      continue;
+    }
+    const childCategoryIds = await getAllChildCategoryIds(categoryDoc.id);
+    const allCategoryIds = [categoryDoc.id, ...childCategoryIds];
+    const categoryConditions = allCategoryIds.flatMap((catId: string) => [
+      { primaryCategoryId: catId },
+      { categoryIds: { has: catId } },
+    ]);
+    treeBlocks.push({ OR: categoryConditions });
+  }
+
+  if (treeBlocks.length === 0) {
+    return null;
+  }
+  return treeBlocks.length === 1 ? treeBlocks[0]! : { OR: treeBlocks };
+}
 

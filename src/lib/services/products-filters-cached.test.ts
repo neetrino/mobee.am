@@ -34,6 +34,12 @@ describe("buildProductFiltersCacheKey", () => {
     expect(a).toBe(b);
     expect(a.startsWith("products:filters:")).toBe(true);
   });
+
+  it("normalizes multi-category param order for cache key", () => {
+    const a = buildProductFiltersCacheKey({ lang: "en", category: "b,a" });
+    const b = buildProductFiltersCacheKey({ lang: "en", category: "a,b" });
+    expect(a).toBe(b);
+  });
 });
 
 describe("getCachedProductFilters", () => {

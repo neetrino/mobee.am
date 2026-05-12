@@ -1,5 +1,6 @@
 import { cacheService } from "@/lib/services/cache.service";
 import { productsService } from "@/lib/services/products.service";
+import { normalizeCommaListCacheValue } from "@/lib/shop/product-list-cache-key";
 
 const FILTERS_CACHE_TTL_SECONDS = 120;
 
@@ -19,7 +20,9 @@ export type ProductFiltersCacheInput = {
 export function buildProductFiltersCacheKey(filters: ProductFiltersCacheInput): string {
   const pairs: [string, string][] = [];
   pairs.push(["lang", filters.lang || "en"]);
-  if (filters.category) pairs.push(["category", filters.category]);
+  if (filters.category) {
+    pairs.push(["category", normalizeCommaListCacheValue(filters.category)]);
+  }
   if (filters.search) pairs.push(["search", filters.search]);
   if (filters.minPrice != null && !Number.isNaN(filters.minPrice)) {
     pairs.push(["minPrice", String(filters.minPrice)]);

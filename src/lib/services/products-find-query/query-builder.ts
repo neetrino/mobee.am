@@ -1,8 +1,7 @@
 import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
-import { logger } from "../../utils/logger";
 import type { ProductFilters } from "./types";
-import { getAllChildCategoryIds, findCategoryBySlug } from "./category-utils";
+import { buildCategoryTreesOrWhere } from "./category-utils";
 
 /**
  * Build search filter for where clause
@@ -45,49 +44,25 @@ function buildSearchFilter(search: string): Prisma.ProductWhereInput {
 }
 
 /**
- * Build category filter for where clause
+ * Build category filter for where clause (supports comma-separated slugs).
  */
 async function buildCategoryFilter(
   category: string,
   lang: string,
   existingWhere: Prisma.ProductWhereInput
 ): Promise<Prisma.ProductWhereInput | null> {
-  const categoryDoc = await findCategoryBySlug(category, lang);
-
-  if (!categoryDoc) {
-    return null; // Category not found - return null to indicate empty result
+  const combined = await buildCategoryTreesOrWhere(category, lang);
+  if (!combined) {
+    return null;
   }
 
-  // Get all child categories (subcategories) recursively
-  const childCategoryIds = await getAllChildCategoryIds(categoryDoc.id);
-  const allCategoryIds = [categoryDoc.id, ...childCategoryIds];
-  
-  logger.debug('Category IDs to include', {
-    parent: categoryDoc.id,
-    children: childCategoryIds,
-    total: allCategoryIds.length
-  });
-  
-  // Build OR conditions for all categories (parent + children)
-  const categoryConditions = allCategoryIds.flatMap((catId: string) => [
-    { primaryCategoryId: catId },
-    { categoryIds: { has: catId } },
-  ]);
-  
   if (existingWhere.OR) {
     return {
-      AND: [
-        { OR: existingWhere.OR },
-        {
-          OR: categoryConditions,
-        },
-      ],
+      AND: [{ OR: existingWhere.OR }, combined],
     };
   }
-  
-  return {
-    OR: categoryConditions,
-  };
+
+  return combined;
 }
 
 type BestsellerVariantRow = {

@@ -25,6 +25,9 @@ function CategoriesSidebarContent() {
   const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const currentCategory = searchParams?.get('category');
+  const selectedCategorySlugs = currentCategory
+    ? currentCategory.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
 
   useEffect(() => {
     fetchCategories();
@@ -125,7 +128,7 @@ function CategoriesSidebarContent() {
               key={category.id}
               onClick={() => handleCategoryClick(category.slug)}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                currentCategory === category.slug
+                selectedCategorySlugs.includes(category.slug)
                   ? 'bg-blue-50 text-blue-700 font-medium'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}

@@ -355,7 +355,11 @@ function HeaderSearchSync({
         return result;
       };
       const allCategories = flattenCategories(categories);
-      const foundCategory = allCategories.find((cat) => cat.slug === categoryParam);
+      const slugs = categoryParam.split(',').map((s) => s.trim()).filter(Boolean);
+      const firstSlug = slugs[0];
+      const foundCategory = firstSlug
+        ? allCategories.find((cat) => cat.slug === firstSlug)
+        : null;
       setSelectedCategory(foundCategory || null);
     } else {
       setSelectedCategory(null);

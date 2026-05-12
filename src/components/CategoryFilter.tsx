@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Check } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
@@ -8,7 +9,7 @@ import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
 
 interface CategoryFilterProps {
-  currentCategory?: string;
+  selectedCategories?: string[];
   search?: string;
   minPrice?: string;
   maxPrice?: string;
@@ -26,7 +27,7 @@ interface CategoriesResponse {
 }
 
 export function CategoryFilter({
-  currentCategory,
+  selectedCategories = [],
   search,
   minPrice,
   maxPrice,
@@ -37,11 +38,11 @@ export function CategoryFilter({
   const filtersCtx = useProductsFilters();
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(currentCategory);
+  const [selected, setSelected] = useState<string[]>(selectedCategories);
 
   useEffect(() => {
-    setSelectedCategory(currentCategory);
-  }, [currentCategory]);
+    setSelected(selectedCategories);
+  }, [selectedCategories]);
 
   useEffect(() => {
     if (filtersCtx !== null) {
@@ -80,14 +81,16 @@ export function CategoryFilter({
   }, [filtersCtx, filtersCtx?.loading, filtersCtx?.topCategories, search, minPrice, maxPrice]);
 
   const toggleCategory = (slug: string) => {
-    const nextCategory = selectedCategory === slug ? undefined : slug;
-    setSelectedCategory(nextCategory);
+    const next = selected.includes(slug)
+      ? selected.filter((s) => s !== slug)
+      : [...selected, slug];
+    setSelected(next);
 
     const params = new URLSearchParams(searchParams.toString());
-    if (nextCategory === undefined) {
-      params.delete('category');
+    if (next.length > 0) {
+      params.set('category', next.join(','));
     } else {
-      params.set('category', nextCategory);
+      params.delete('category');
     }
     params.delete('page');
     router.push(`/shop?${params.toString()}`);
@@ -105,7 +108,7 @@ export function CategoryFilter({
 
       <div className="mt-4 space-y-3">
         {categories.map((category) => {
-          const selected = selectedCategory === category.slug;
+          const isSelected = selected.includes(category.slug);
           return (
             <button
               key={category.id}
@@ -114,13 +117,17 @@ export function CategoryFilter({
               className="group -mx-2 flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[#EFF6FF]"
             >
               <span
-                className={`h-5 w-5 shrink-0 rounded border-2 transition-colors ${
-                  selected
-                    ? 'border-[#2CA1E2] bg-[#2CA1E2]'
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded border-2 transition-colors ${
+                  isSelected
+                    ? 'border-[#2CA1E2] bg-white'
                     : 'border-[#CAD5E2] bg-white group-hover:border-[#2CA1E2]'
                 }`}
                 aria-hidden
-              />
+              >
+                {isSelected ? (
+                  <Check className="h-4 w-4 text-[#2CA1E2]" strokeWidth={2.5} aria-hidden />
+                ) : null}
+              </span>
               <span className="flex-1 truncate text-base leading-6 tracking-[-0.02em] text-[#314158] transition-colors group-hover:text-[#0F172B]">
                 {category.title}
               </span>

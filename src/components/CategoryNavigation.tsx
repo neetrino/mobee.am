@@ -16,6 +16,9 @@ function CategoryNavigationContent() {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const currentCategory = searchParams?.get('category');
+  const selectedCategorySlugs = currentCategory
+    ? currentCategory.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
   
   const { categories, loading: categoriesLoading } = useCategories();
   const { categoryProducts, loading: productsLoading } = useCategoryProducts(categories, t);
@@ -83,9 +86,10 @@ function CategoryNavigationContent() {
             style={{ scrollBehavior: 'smooth' }}
           >
             {displayCategories.map((category) => {
-              const isActive = category.slug === 'all' 
-                ? !currentCategory 
-                : currentCategory === category.slug;
+              const isActive =
+                category.slug === 'all'
+                  ? selectedCategorySlugs.length === 0
+                  : selectedCategorySlugs.includes(category.slug);
               const product = categoryProducts[category.slug];
 
               return (

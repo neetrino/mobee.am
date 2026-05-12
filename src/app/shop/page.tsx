@@ -45,6 +45,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const brands = params?.brand;
   const selectedColors = colors ? colors.split(',').map((c: string) => c.trim().toLowerCase()) : [];
   const selectedBrands = brands ? brands.split(',').map((b: string) => b.trim()) : [];
+  const categoryParam = params?.category;
+  const selectedCategories = categoryParam
+    ? categoryParam.split(',').map((c: string) => c.trim()).filter(Boolean)
+    : [];
 
   return (
     <div className={`w-full max-w-full ${SHOP_PAGE_FOOTER_GAP_CLASS}`}>
@@ -82,7 +86,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   search={params?.search}
                 />
                 <CategoryFilter
-                  currentCategory={params?.category}
+                  selectedCategories={selectedCategories}
                   search={params?.search}
                   minPrice={params?.minPrice}
                   maxPrice={params?.maxPrice}
@@ -118,7 +122,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 search={params?.search}
               />
               <CategoryFilter
-                currentCategory={params?.category}
+                selectedCategories={selectedCategories}
                 search={params?.search}
                 minPrice={params?.minPrice}
                 maxPrice={params?.maxPrice}
