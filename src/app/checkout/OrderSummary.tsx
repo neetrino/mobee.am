@@ -80,7 +80,7 @@ export function OrderSummary({
             : t('checkout.placeholders.selectCity');
 
   return (
-    <div>
+    <div className="lg:col-span-5">
       <Card
         className={`p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS} ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}
       >
@@ -105,10 +105,6 @@ export function OrderSummary({
             <span className="text-right max-w-[60%]">{shippingLabel}</span>
           </div>
           <DeliveryPricingHint currency={currency} visible={shippingMethod === 'delivery'} />
-          <div className="flex justify-between text-gray-600">
-            <span>{t('checkout.summary.tax')}</span>
-            <span>{formatPriceInCurrency(orderSummary.taxDisplay, currency)}</span>
-          </div>
           {orderSummary.totalExcludesPendingShipping && (
             <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">
               {t('checkout.summary.totalPendingShippingNote')}

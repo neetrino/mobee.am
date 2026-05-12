@@ -5,6 +5,7 @@ import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
 import {
+  CHECKOUT_CONTACT_FIELDS_GRID_CLASS,
   CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS,
@@ -54,10 +55,10 @@ export function CheckoutForm({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-6 lg:col-span-2">
+    <div className="space-y-6 lg:col-span-7">
       <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.contactInformation')}</h2>
-        <div className="flex flex-col gap-4">
+        <div className={CHECKOUT_CONTACT_FIELDS_GRID_CLASS}>
           <Input
             label={t('checkout.form.firstName')}
             type="text"
