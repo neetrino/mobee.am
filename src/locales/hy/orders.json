@@ -15,7 +15,10 @@
   },
   "shippingAddress": {
     "title": "Առաքման հասցե",
-    "phone": "Հեռախոս: {phone}"
+    "phone": "Հեռախոս: {phone}",
+    "deliveryType": "Առաքման տեսակ",
+    "deliveryTypeStandard": "Ստանդարտ առաքում",
+    "deliveryTypeExpress": "Շտապ առաքում"
   },
   "orderSummary": {
     "title": "Պատվերի ամփոփում",

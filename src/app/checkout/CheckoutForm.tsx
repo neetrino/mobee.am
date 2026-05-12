@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, Input } from '@shop/ui';
-import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
+import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
 import {
@@ -13,7 +13,6 @@ import {
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
 import { DeliveryPolicyInfoCard } from './components/DeliveryPolicyInfoCard';
-import { CheckoutLegalAcknowledgements } from './components/CheckoutLegalAcknowledgements';
 import { ShippingCitySelect } from './components/ShippingCitySelect';
 
 const CHECKOUT_FORM_SECTION_CARD_CLASS = `p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS}`;
@@ -21,7 +20,6 @@ const CHECKOUT_FORM_SECTION_CARD_CLASS = `p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}
 interface CheckoutFormProps {
   register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
-  watch: UseFormWatch<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
@@ -42,7 +40,6 @@ interface CheckoutFormProps {
 export function CheckoutForm({
   register,
   setValue,
-  watch,
   errors,
   isSubmitting,
   shippingMethod,
@@ -91,18 +88,6 @@ export function CheckoutForm({
             disabled={isSubmitting}
           />
         </div>
-      </Card>
-
-      <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.promoCode.title')}</h2>
-        <Input
-          label={t('checkout.form.promoCode')}
-          type="text"
-          placeholder={t('checkout.placeholders.promoCode')}
-          {...register('promoCode')}
-          error={errors.promoCode?.message}
-          disabled={isSubmitting}
-        />
       </Card>
 
       <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
@@ -181,12 +166,6 @@ export function CheckoutForm({
                 aria-label={t('checkout.shipping.deliveryTypesGroupLabel')}
                 className={`border-t border-admin-200/90 bg-white/90 px-4 pb-4 pt-3 ${CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS}`}
               >
-                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-admin-900">
-                  {t('checkout.shipping.deliveryTypesTitle')}
-                </p>
-                <p className="mb-3 text-xs leading-relaxed text-gray-600">
-                  {t('checkout.shipping.deliveryTypesHint')}
-                </p>
                 <div className="ml-0.5 space-y-2 border-l-2 border-admin-400 pl-3">
                   <label
                     className={`flex cursor-pointer items-start gap-3 border p-3 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
@@ -369,15 +348,6 @@ export function CheckoutForm({
       </Card>
 
       <DeliveryPolicyInfoCard />
-
-      <CheckoutLegalAcknowledgements
-        register={register}
-        setValue={setValue}
-        watch={watch}
-        errors={errors}
-        shippingMethod={shippingMethod}
-        isSubmitting={isSubmitting}
-      />
     </div>
   );
 }

@@ -57,15 +57,6 @@ export function useOrderSubmission({
       const shippingAmount =
         data.shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
 
-      const acknowledgements = {
-        deliverySupplyTerms:
-          data.shippingMethod === 'delivery' ? data.acceptDeliverySupplyTerms : false,
-        inspectionAtDelivery:
-          data.shippingMethod === 'delivery' ? data.acceptInspectionAtDelivery : false,
-        orderVerification: data.acceptOrderVerification,
-        returnsPolicy: data.acceptReturnsPolicy,
-      };
-
       const response = await apiClient.post<{
         order: {
           id: string;
@@ -97,7 +88,6 @@ export function useOrderSubmission({
         paymentMethod: data.paymentMethod,
         promoCode: data.promoCode,
         locale: lang,
-        acknowledgements,
       });
 
       if (!isLoggedIn) {

@@ -33,10 +33,6 @@ export function useCheckoutSchema() {
       cardExpiry: z.string().optional(),
       cardCvv: z.string().optional(),
       cardHolderName: z.string().optional(),
-      acceptDeliverySupplyTerms: z.boolean(),
-      acceptInspectionAtDelivery: z.boolean(),
-      acceptOrderVerification: z.boolean(),
-      acceptReturnsPolicy: z.boolean(),
     })
     .refine(
       (data) => {
@@ -108,38 +104,6 @@ export function useCheckoutSchema() {
       {
         message: t('checkout.errors.cardHolderNameRequired'),
         path: ['cardHolderName'],
-      }
-    )
-    .refine((data) => data.acceptOrderVerification === true, {
-      message: t('checkout.legal.errors.orderVerification'),
-      path: ['acceptOrderVerification'],
-    })
-    .refine((data) => data.acceptReturnsPolicy === true, {
-      message: t('checkout.legal.errors.returnsPolicy'),
-      path: ['acceptReturnsPolicy'],
-    })
-    .refine(
-      (data) => {
-        if (data.shippingMethod !== 'delivery') {
-          return true;
-        }
-        return data.acceptDeliverySupplyTerms === true;
-      },
-      {
-        message: t('checkout.legal.errors.deliverySupplyTerms'),
-        path: ['acceptDeliverySupplyTerms'],
-      }
-    )
-    .refine(
-      (data) => {
-        if (data.shippingMethod !== 'delivery') {
-          return true;
-        }
-        return data.acceptInspectionAtDelivery === true;
-      },
-      {
-        message: t('checkout.legal.errors.inspectionAtDelivery'),
-        path: ['acceptInspectionAtDelivery'],
       }
     );
 }

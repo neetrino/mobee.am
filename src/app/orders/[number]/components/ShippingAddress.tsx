@@ -15,6 +15,14 @@ export function ShippingAddress({ shippingAddress }: ShippingAddressProps) {
     return null;
   }
 
+  const deliverySpeed = shippingAddress.deliverySpeed;
+  const deliveryTypeLabel =
+    deliverySpeed === 'express'
+      ? t('orders.shippingAddress.deliveryTypeExpress')
+      : deliverySpeed === 'standard'
+        ? t('orders.shippingAddress.deliveryTypeStandard')
+        : null;
+
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('orders.shippingAddress.title')}</h2>
@@ -34,6 +42,22 @@ export function ShippingAddress({ shippingAddress }: ShippingAddressProps) {
         {shippingAddress.phone && (
           <p className="mt-2">
             {t('orders.shippingAddress.phone').replace('{phone}', shippingAddress.phone)}
+          </p>
+        )}
+        {deliveryTypeLabel && (
+          <p className="mt-3 flex items-center gap-2">
+            <span className="font-medium text-gray-900">
+              {t('orders.shippingAddress.deliveryType')}:
+            </span>
+            <span
+              className={
+                deliverySpeed === 'express'
+                  ? 'inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-semibold text-orange-800'
+                  : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-800'
+              }
+            >
+              {deliveryTypeLabel}
+            </span>
           </p>
         )}
       </div>

@@ -13,10 +13,6 @@ export type CheckoutFormData = {
   cardExpiry?: string;
   cardCvv?: string;
   cardHolderName?: string;
-  acceptDeliverySupplyTerms: boolean;
-  acceptInspectionAtDelivery: boolean;
-  acceptOrderVerification: boolean;
-  acceptReturnsPolicy: boolean;
 };
 
 export interface CartItem {

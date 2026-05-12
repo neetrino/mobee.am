@@ -20,11 +20,18 @@ const optionalTrimmedString = (maxLength: number) =>
 
 const countryCodeSchema = z.string().trim().length(2).toUpperCase();
 
+const optionalProfileEmail = z.preprocess(
+  emptyOptionalStringToUndefined,
+  z.string().email().max(255).optional()
+);
+
 const profileUpdateSchema = z
   .object({
     firstName: optionalTrimmedString(64),
     lastName: optionalTrimmedString(64),
     locale: z.string().trim().min(2).max(10).optional(),
+    email: optionalProfileEmail,
+    phone: optionalTrimmedString(32),
   })
   .strict();
 

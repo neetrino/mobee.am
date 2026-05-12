@@ -28,6 +28,13 @@ const acknowledgementsSchema = z.object({
   returnsPolicy: z.boolean(),
 });
 
+const DEFAULT_ACKNOWLEDGEMENTS = {
+  deliverySupplyTerms: true,
+  inspectionAtDelivery: true,
+  orderVerification: true,
+  returnsPolicy: true,
+} as const;
+
 const checkoutSchema = z
   .object({
     cartId: z.string().trim().min(1).optional(),
@@ -47,7 +54,7 @@ const checkoutSchema = z
     ),
     locale: z.enum(["en", "hy", "ru"]).optional(),
     billingAddress: shippingAddressSchema.optional(),
-    acknowledgements: acknowledgementsSchema,
+    acknowledgements: acknowledgementsSchema.default(DEFAULT_ACKNOWLEDGEMENTS),
   })
   .strict()
   .superRefine((data, context) => {
@@ -65,24 +72,6 @@ const checkoutSchema = z
         message: "shippingAddress.city is required for delivery",
         path: ["shippingAddress", "city"],
       });
-    }
-
-    const a = data.acknowledgements;
-    if (!a.orderVerification || !a.returnsPolicy) {
-      context.addIssue({
-        code: "custom",
-        message: "orderVerification and returnsPolicy acknowledgements are required",
-        path: ["acknowledgements", "orderVerification"],
-      });
-    }
-    if (data.shippingMethod === "delivery") {
-      if (!a.deliverySupplyTerms || !a.inspectionAtDelivery) {
-        context.addIssue({
-          code: "custom",
-          message: "delivery acknowledgements are required for delivery orders",
-          path: ["acknowledgements", "deliverySupplyTerms"],
-        });
-      }
     }
   });
 

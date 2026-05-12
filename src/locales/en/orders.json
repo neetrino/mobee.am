@@ -15,7 +15,10 @@
   },
   "shippingAddress": {
     "title": "Shipping Address",
-    "phone": "Phone: {phone}"
+    "phone": "Phone: {phone}",
+    "deliveryType": "Delivery type",
+    "deliveryTypeStandard": "Standard delivery",
+    "deliveryTypeExpress": "Express delivery"
   },
   "orderSummary": {
     "title": "Order Summary",

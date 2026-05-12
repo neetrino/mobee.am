@@ -1,10 +1,12 @@
 'use client';
 
+import { UseFormRegister } from 'react-hook-form';
+import { Input } from '@shop/ui';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../../lib/currency';
 import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 import { DeliveryPricingHint } from './DeliveryPricingHint';
-import { Cart } from '../types';
+import type { Cart, CheckoutFormData } from '../types';
 
 interface OrderSummaryModalProps {
   cart: Cart | null;
@@ -22,6 +24,9 @@ interface OrderSummaryModalProps {
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
   requiresRegionalQuote: boolean;
+  register: UseFormRegister<CheckoutFormData>;
+  promoCodeError?: string;
+  isSubmitting: boolean;
 }
 
 export function OrderSummaryModal({
@@ -34,6 +39,9 @@ export function OrderSummaryModal({
   loadingDeliveryPrice,
   deliveryPrice,
   requiresRegionalQuote,
+  register,
+  promoCodeError,
+  isSubmitting,
 }: OrderSummaryModalProps) {
   const { t } = useTranslation();
 
@@ -67,6 +75,16 @@ export function OrderSummaryModal({
 
   return (
     <div className={`space-y-2 bg-gray-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}>
+      <div className="mb-3">
+        <Input
+          label={t('checkout.form.promoCode')}
+          type="text"
+          placeholder={t('checkout.placeholders.promoCode')}
+          {...register('promoCode')}
+          error={promoCodeError}
+          disabled={isSubmitting}
+        />
+      </div>
       <div className="flex justify-between text-sm">
         <span className="text-gray-600">{t('checkout.summary.items')}:</span>
         <span className="font-medium">{cart.itemsCount}</span>
