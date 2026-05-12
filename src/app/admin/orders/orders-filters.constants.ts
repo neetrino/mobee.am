@@ -1,8 +1,15 @@
+/** Blue filter pill triggers on `/supersudo/orders` — 15px corner radius (Tailwind arbitrary). */
+export const ORDERS_FILTER_DROPDOWN_TRIGGER_RADIUS_CLASS = 'rounded-[15px]';
+
 /**
- * Mobee pill — `bg-admin-500`, `rounded-full` (navbar categories tone; larger tap target, no menu icon).
+ * Mobee pill — `bg-admin-500`, `ORDERS_FILTER_DROPDOWN_TRIGGER_RADIUS_CLASS`.
  */
-export const ORDERS_FILTER_DROPDOWN_TRIGGER_CLASS =
-  'flex w-max max-w-[min(100vw-2rem,28rem)] min-h-10 flex-nowrap items-center justify-between gap-2 rounded-full bg-admin-500 px-4 py-2 text-left text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80 active:opacity-90';
+export const ORDERS_FILTER_DROPDOWN_TRIGGER_CLASS = [
+  'flex w-max max-w-[min(100vw-2rem,28rem)] min-h-10 flex-nowrap items-center justify-between gap-2',
+  ORDERS_FILTER_DROPDOWN_TRIGGER_RADIUS_CLASS,
+  'bg-admin-500 px-4 py-2 text-left text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-95',
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80 active:opacity-90',
+].join(' ');
 
 export const ORDERS_FILTER_DROPDOWN_CHEVRON_WRAP_CLASS =
   'flex h-6 w-6 shrink-0 items-center justify-center text-white transition-transform duration-200 ease-out motion-reduce:transition-none';
