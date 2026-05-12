@@ -25,6 +25,13 @@
 
   html {
     scrollbar-gutter: stable;
+  }
+
+  /*
+   * Firefox / standard track: apply to every scroll container so inner panels match the main page
+   * (previously only `html` was styled, so overflow areas looked different from the home viewport).
+   */
+  * {
     scrollbar-color: var(--app-scrollbar-thumb) var(--app-scrollbar-track);
     scrollbar-width: thin;
   }
