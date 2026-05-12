@@ -21,7 +21,7 @@ type SpecialOffersProductGridProps = {
 };
 
 /**
- * Same horizontal strip + arrows as featured grid, but {@link HomeBestChoiceStyleProductGrid} uses `stripRowCount={1}` (one card per column).
+ * Same card treatment as {@link FeaturedBestChoiceGrid} — grid-2, shifted art, compact price, first hero tile.
  */
 export function SpecialOffersProductGrid({
   language,
@@ -37,8 +37,8 @@ export function SpecialOffersProductGrid({
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
+        mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
-        stripRowCount={1}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
     );
@@ -64,10 +64,6 @@ export function SpecialOffersProductGrid({
         productsPerPage={productsPerPage}
         mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
-        scrollPreviousAriaLabel={t(language, 'home.special_offers_heading.scrollPrevious')}
-        scrollNextAriaLabel={t(language, 'home.special_offers_heading.scrollNext')}
-        specialOffersHomeCard
-        stripRowCount={1}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
     );
