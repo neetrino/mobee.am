@@ -43,6 +43,9 @@ import {
 } from './mobile-drawer-nav.constants';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
 
+/** Desktop navbar strip only; drawer + contact + footer keep `contact.phone` i18n. */
+const NAVBAR_SUPPORT_PHONE_DISPLAY = '055-81-11-81';
+
 /** Handset glyph — slight left nudge next to stacked numbers (navbar + mobile drawer). */
 const HEADER_SUPPORT_PHONE_ICON_NUDGE_LEFT_CLASS = '-translate-x-3';
 
@@ -559,7 +562,7 @@ function HeaderPhoneLangCluster({
   showLanguageSwitcher?: boolean;
 }) {
   const { t } = useTranslation();
-  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
+  const phoneLines = splitContactPhoneDisplay(NAVBAR_SUPPORT_PHONE_DISPLAY);
 
   const numberWrapperClass =
     phoneNumberVisibility === 'smUp'
