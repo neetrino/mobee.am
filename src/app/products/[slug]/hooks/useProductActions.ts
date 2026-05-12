@@ -1,8 +1,13 @@
+'use client';
+
 import type { MouseEvent } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { WISHLIST_KEY } from '../types';
 import { t } from '../../../../lib/i18n';
 import type { LanguageCode } from '../../../../lib/language';
 import { toggleCompareProduct } from '../../../../lib/shop/compare-storage';
+import { useAuth } from '../../../../lib/auth/AuthContext';
+import { getLoginUrlWithRedirect } from '../../../../lib/auth/loginRedirectUrl';
 
 interface UseProductActionsProps {
   productId: string | null;
@@ -23,11 +28,23 @@ export function useProductActions({
   setShowMessage,
   language,
 }: UseProductActionsProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { isLoggedIn, isLoading: authLoading } = useAuth();
+
   const handleAddToWishlist = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!productId || typeof window === 'undefined') return;
-    
+
+    if (authLoading && !isInWishlist) {
+      return;
+    }
+    if (!isLoggedIn && !isInWishlist) {
+      router.push(getLoginUrlWithRedirect(pathname || '/'));
+      return;
+    }
+
     try {
       const stored = localStorage.getItem(WISHLIST_KEY);
       const wishlist: string[] = stored ? JSON.parse(stored) : [];
