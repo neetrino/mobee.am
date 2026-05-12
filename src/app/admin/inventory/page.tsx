@@ -105,7 +105,7 @@ export default function AdminInventoryPage() {
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.inventory.title')}</h1>
           <p className="text-gray-600 mt-2">{t('admin.inventory.subtitle')}</p>
         </div>
-        <div className="space-y-6 pb-10">
+        <div className="space-y-6">
           <section className="bg-white border border-gray-200 rounded-supersudo p-4">
             <h2 className="text-lg font-semibold mb-3">{t('admin.inventory.reconciliation')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">

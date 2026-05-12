@@ -4,6 +4,7 @@ import type { ReactNode, SetStateAction } from 'react';
 import { useCallback, useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS,
   ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS,
   ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS,
 } from '../admin-sidebar-layout.constants';
@@ -59,7 +60,7 @@ export function AdminPageShell({
           onDesktopCollapsedChange={setDesktopSidebarCollapsed}
         />
         <div
-          className={`flex-1 min-w-0 ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
+          className={`flex-1 min-w-0 ${ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS} ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
             desktopSidebarCollapsed ? '' : (mainClassName ?? '')
           }`.trim()}
         >

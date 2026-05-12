@@ -452,7 +452,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Actions */}
-        <div className="flex flex-wrap gap-4 pb-10">
+        <div className="flex flex-wrap gap-4">
           <Button
             variant="admin"
             onClick={handleSave}
