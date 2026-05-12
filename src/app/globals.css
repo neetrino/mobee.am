@@ -8,6 +8,19 @@
     --app-scrollbar-thumb: #2db2ff;
     --app-scrollbar-thumb-hover: #1a9fe6;
     --app-scrollbar-track: #f3f4f6;
+    /* WebKit scrollbar chrome; desktop — align with prior 10px / 2px border */
+    --app-scrollbar-size: 10px;
+    --app-scrollbar-thumb-border: 2px;
+  }
+
+  /*
+   * Narrow viewports — smaller scrollbar (matches `lg` floor 834px in tailwind.config).
+   */
+  @media (max-width: 833px) {
+    :root {
+      --app-scrollbar-size: 6px;
+      --app-scrollbar-thumb-border: 1px;
+    }
   }
 
   html {
@@ -17,8 +30,8 @@
   }
 
   *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: var(--app-scrollbar-size);
+    height: var(--app-scrollbar-size);
   }
 
   *::-webkit-scrollbar-track {
@@ -28,7 +41,7 @@
   *::-webkit-scrollbar-thumb {
     background-color: var(--app-scrollbar-thumb);
     border-radius: 9999px;
-    border: 2px solid var(--app-scrollbar-track);
+    border: var(--app-scrollbar-thumb-border) solid var(--app-scrollbar-track);
   }
 
   *::-webkit-scrollbar-thumb:hover {

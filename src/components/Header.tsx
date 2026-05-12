@@ -1755,18 +1755,6 @@ export function Header() {
                   {isLoggedIn ? (
                     <>
                       <MobileDrawerSupportPhoneButton />
-                      {isAdmin && (
-                        <Link
-                          href="/supersudo"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS}
-                        >
-                          <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.adminPanel')}</span>
-                          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </Link>
-                      )}
                     </>
                   ) : (
                     <>
