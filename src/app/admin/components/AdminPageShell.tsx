@@ -1,12 +1,16 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { useState } from 'react';
+import type { ReactNode, SetStateAction } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS,
   ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS,
 } from '../admin-sidebar-layout.constants';
+import {
+  readAdminSidebarDesktopCollapsedFromSession,
+  writeAdminSidebarDesktopCollapsedToSession,
+} from '../admin-sidebar-session';
 import { AdminSidebar } from './AdminSidebar';
 
 interface AdminPageShellProps {
@@ -24,7 +28,19 @@ export function AdminPageShell({
   children,
   mainClassName,
 }: AdminPageShellProps) {
-  const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(false);
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsedState] = useState(false);
+
+  useLayoutEffect(() => {
+    setDesktopSidebarCollapsedState(readAdminSidebarDesktopCollapsedFromSession());
+  }, []);
+
+  const setDesktopSidebarCollapsed = useCallback((update: SetStateAction<boolean>) => {
+    setDesktopSidebarCollapsedState((prev) => {
+      const next = typeof update === 'function' ? (update as (p: boolean) => boolean)(prev) : update;
+      writeAdminSidebarDesktopCollapsedToSession(next);
+      return next;
+    });
+  }, []);
 
   const mainHorizontalPaddingClass = desktopSidebarCollapsed
     ? 'px-4 pt-2 sm:px-6 sm:pt-4 lg:px-0 lg:pt-[30px]'

@@ -41,3 +41,6 @@ export const ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS = [
   'box-border min-w-0 w-full max-w-7xl lg:mx-auto px-4 sm:px-6 lg:px-8',
   ADMIN_PAGE_MAIN_COLLAPSED_SHIFT_LEFT_CLASS,
 ].join(' ');
+
+/** sessionStorage: persist desktop sidebar icon-rail across admin navigations (each page mounts its own shell). */
+export const ADMIN_SIDEBAR_DESKTOP_COLLAPSED_SESSION_STORAGE_KEY = 'mobee.admin.sidebarDesktopCollapsed';
