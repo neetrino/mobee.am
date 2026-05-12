@@ -2,6 +2,7 @@
 
 import type { FormEvent } from 'react';
 import { Button } from '@/app/admin/lib/adminShopUi';
+import { ADMIN_PRODUCTS_STOCK_FILTER_SELECT_CLASS } from '../product-filters.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category } from '../types';
 
@@ -178,7 +179,7 @@ export function ProductFilters({
               setStockFilter(e.target.value as 'all' | 'inStock' | 'outOfStock');
               setPage(1);
             }}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin bg-white text-sm"
+            className={ADMIN_PRODUCTS_STOCK_FILTER_SELECT_CLASS}
           >
             <option value="all">{t('admin.products.allProducts')}</option>
             <option value="inStock">{t('admin.products.inStock')}</option>

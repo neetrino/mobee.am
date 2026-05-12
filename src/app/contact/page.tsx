@@ -7,16 +7,11 @@ import type { FormEvent, ChangeEvent } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../../lib/contactPhoneDisplay';
 import { apiClient } from '../../lib/api-client';
-
-const CONTACT_PHONE_ICON_SRC = '/images/contact/phone-call-icon.png';
-const CONTACT_EMAIL_ICON_SRC = '/images/contact/email-envelope-icon.png';
-
-const MapPinIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
+import {
+  CONTACT_ICON_EMAIL_SRC,
+  CONTACT_ICON_LOCATION_SRC,
+  CONTACT_ICON_PHONE_SRC,
+} from '../../lib/constants/contact-icons.constants';
 
 const CONTACT_FORM_FIELD_CLASS =
   '!h-12 !rounded-[14px] !border-[#e5e7eb] !bg-[#f2f2f4] !px-5 !text-sm !text-gray-900 placeholder:!text-[#767987] focus:!border-transparent focus:!ring-2 focus:!ring-[#2DB2FF]';
@@ -84,7 +79,7 @@ export default function ContactPage() {
               <div className="flex items-center gap-3 mb-3">
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
                   <Image
-                    src={CONTACT_PHONE_ICON_SRC}
+                    src={CONTACT_ICON_PHONE_SRC}
                     alt=""
                     width={48}
                     height={48}
@@ -113,7 +108,7 @@ export default function ContactPage() {
               <div className="flex items-center gap-3 mb-3">
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
                   <Image
-                    src={CONTACT_EMAIL_ICON_SRC}
+                    src={CONTACT_ICON_EMAIL_SRC}
                     alt=""
                     width={48}
                     height={48}
@@ -135,8 +130,15 @@ export default function ContactPage() {
             {/* Headquarter */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700">
-                  <MapPinIcon />
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
+                  <Image
+                    src={CONTACT_ICON_LOCATION_SRC}
+                    alt=""
+                    width={48}
+                    height={48}
+                    className="h-full w-full object-cover"
+                    sizes="48px"
+                  />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.headquarter.title')}</h3>
               </div>
