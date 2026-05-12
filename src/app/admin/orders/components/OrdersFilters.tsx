@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { Search } from 'lucide-react';
 import { Card } from '@/app/admin/lib/adminShopUi';
-import { ORDERS_FILTER_SELECT_CLASS } from '../orders-filters.constants';
 import type { useOrders } from '../useOrders';
+import { OrdersFilterDropdown } from './OrdersFilterDropdown';
 
 interface OrdersFiltersProps {
   statusFilter: string;
@@ -20,6 +22,8 @@ interface OrdersFiltersProps {
   searchParams: ReturnType<typeof useOrders>['searchParams'];
 }
 
+type OpenOrdersFilterMenu = 'status' | 'payment' | 'fulfillment' | null;
+
 export function OrdersFilters({
   statusFilter,
   paymentStatusFilter,
@@ -35,6 +39,62 @@ export function OrdersFilters({
   searchParams,
 }: OrdersFiltersProps) {
   const { t } = useTranslation();
+  const [openMenu, setOpenMenu] = useState<OpenOrdersFilterMenu>(null);
+  const [searchDraft, setSearchDraft] = useState(searchQuery);
+  const filtersBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSearchDraft(searchQuery);
+  }, [searchQuery]);
+
+  const statusOptions = useMemo(
+    () =>
+      [
+        { value: '', label: t('admin.orders.allStatuses') },
+        { value: 'pending', label: t('admin.orders.pending') },
+        { value: 'processing', label: t('admin.orders.processing') },
+        { value: 'completed', label: t('admin.orders.completed') },
+        { value: 'cancelled', label: t('admin.orders.cancelled') },
+      ] as const,
+    [t],
+  );
+
+  const paymentOptions = useMemo(
+    () =>
+      [
+        { value: '', label: t('admin.orders.allPaymentStatuses') },
+        { value: 'paid', label: t('admin.orders.paid') },
+        { value: 'pending', label: t('admin.orders.pendingPayment') },
+        { value: 'failed', label: t('admin.orders.failed') },
+      ] as const,
+    [t],
+  );
+
+  const fulfillmentOptions = useMemo(
+    () =>
+      [
+        { value: '', label: t('admin.orders.allFulfillmentStatuses') },
+        { value: 'unfulfilled', label: t('admin.orders.unfulfilled') },
+        { value: 'fulfilled', label: t('admin.orders.fulfilled') },
+        { value: 'shipped', label: t('admin.orders.shipped') },
+        { value: 'delivered', label: t('admin.orders.delivered') },
+      ] as const,
+    [t],
+  );
+
+  useEffect(() => {
+    if (!openMenu) {
+      return;
+    }
+    const handlePointerDown = (event: MouseEvent) => {
+      const root = filtersBarRef.current;
+      if (root && !root.contains(event.target as Node)) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, [openMenu]);
 
   const handleStatusChange = (newStatus: string) => {
     setStatusFilter(newStatus);
@@ -75,6 +135,11 @@ export function OrdersFilters({
     router.push(newUrl, { scroll: false });
   };
 
+  const handleSearchSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    handleSearchChange(searchDraft);
+  };
+
   const handleFulfillmentStatusChange = (newFulfillmentStatus: string) => {
     setFulfillmentStatusFilter(newFulfillmentStatus);
     setPage(1);
@@ -89,50 +154,61 @@ export function OrdersFilters({
   };
 
   return (
-    <Card className="p-4 mb-6">
-      <div className="flex gap-4 items-center flex-wrap">
-        <select
-          className={ORDERS_FILTER_SELECT_CLASS}
-          value={statusFilter}
-          onChange={(e) => handleStatusChange(e.target.value)}
-        >
-          <option value="">{t('admin.orders.allStatuses')}</option>
-          <option value="pending">{t('admin.orders.pending')}</option>
-          <option value="processing">{t('admin.orders.processing')}</option>
-          <option value="completed">{t('admin.orders.completed')}</option>
-          <option value="cancelled">{t('admin.orders.cancelled')}</option>
-        </select>
-        <select
-          className={ORDERS_FILTER_SELECT_CLASS}
-          value={paymentStatusFilter}
-          onChange={(e) => handlePaymentStatusChange(e.target.value)}
-        >
-          <option value="">{t('admin.orders.allPaymentStatuses')}</option>
-          <option value="paid">{t('admin.orders.paid')}</option>
-          <option value="pending">{t('admin.orders.pendingPayment')}</option>
-          <option value="failed">{t('admin.orders.failed')}</option>
-        </select>
-        <select
-          className={ORDERS_FILTER_SELECT_CLASS}
-          value={fulfillmentStatusFilter}
-          onChange={(e) => handleFulfillmentStatusChange(e.target.value)}
-        >
-          <option value="">{t('admin.orders.allFulfillmentStatuses')}</option>
-          <option value="unfulfilled">{t('admin.orders.unfulfilled')}</option>
-          <option value="fulfilled">{t('admin.orders.fulfilled')}</option>
-          <option value="shipped">{t('admin.orders.shipped')}</option>
-          <option value="delivered">{t('admin.orders.delivered')}</option>
-        </select>
-        <input
-          type="text"
-          placeholder={t('admin.orders.searchPlaceholder')}
-          className="px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin flex-1 min-w-[200px]"
-          value={searchQuery}
-          onChange={(e) => handleSearchChange(e.target.value)}
-        />
-        {updateMessage && (
+    <Card className="mb-6 p-3">
+      <div ref={filtersBarRef} className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <OrdersFilterDropdown
+            id="orders-filter-status"
+            isOpen={openMenu === 'status'}
+            onOpenChange={(open) => setOpenMenu(open ? 'status' : null)}
+            value={statusFilter}
+            onValueChange={handleStatusChange}
+            options={statusOptions}
+            ariaLabel={t('admin.orders.filterStatusAria')}
+          />
+          <OrdersFilterDropdown
+            id="orders-filter-payment"
+            isOpen={openMenu === 'payment'}
+            onOpenChange={(open) => setOpenMenu(open ? 'payment' : null)}
+            value={paymentStatusFilter}
+            onValueChange={handlePaymentStatusChange}
+            options={paymentOptions}
+            ariaLabel={t('admin.orders.filterPaymentAria')}
+          />
+          <OrdersFilterDropdown
+            id="orders-filter-fulfillment"
+            isOpen={openMenu === 'fulfillment'}
+            onOpenChange={(open) => setOpenMenu(open ? 'fulfillment' : null)}
+            value={fulfillmentStatusFilter}
+            onValueChange={handleFulfillmentStatusChange}
+            options={fulfillmentOptions}
+            ariaLabel={t('admin.orders.filterFulfillmentAria')}
+          />
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex min-w-0 w-full flex-1 basis-full gap-1.5 sm:min-w-[12rem] sm:basis-[min(100%,18rem)] sm:flex-1 md:max-w-sm"
+          >
+            <input
+              type="search"
+              name="orders-search"
+              autoComplete="off"
+              placeholder={t('admin.orders.searchPlaceholder')}
+              className="h-10 min-h-10 min-w-0 flex-1 rounded-supersudo border border-gray-300 px-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-admin"
+              value={searchDraft}
+              onChange={(e) => setSearchDraft(e.target.value)}
+            />
+            <button
+              type="submit"
+              aria-label={t('admin.orders.search')}
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-supersudo bg-admin-500 text-white shadow-sm transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-admin-600 active:opacity-90"
+            >
+              <Search className="h-5 w-5" aria-hidden strokeWidth={2} />
+            </button>
+          </form>
+        </div>
+        {updateMessage ? (
           <div
-            className={`px-4 py-2 rounded-supersudo text-sm ${
+            className={`rounded-supersudo px-3 py-1.5 text-sm ${
               updateMessage.type === 'success'
                 ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800'
@@ -140,9 +216,8 @@ export function OrdersFilters({
           >
             {updateMessage.text}
           </div>
-        )}
+        ) : null}
       </div>
     </Card>
   );
 }
-

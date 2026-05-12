@@ -303,39 +303,52 @@ export function useOrders() {
     try {
       const ids = Array.from(selectedIds);
       console.log('🗑️ [ADMIN] Starting bulk delete for orders:', ids);
-      
+
       const results = await Promise.allSettled(
         ids.map(async (id) => {
           try {
             const response = await apiClient.delete(`/api/v1/admin/orders/${id}`);
             console.log('✅ [ADMIN] Order deleted successfully:', id, response);
             return { id, success: true };
-          } catch (error: any) {
+          } catch (error: unknown) {
             console.error('❌ [ADMIN] Failed to delete order:', id, error);
-            return { id, success: false, error: error.message || t('admin.common.unknownErrorFallback') };
+            const message =
+              error instanceof Error ? error.message : t('admin.common.unknownErrorFallback');
+            return { id, success: false, error: message };
           }
-        })
+        }),
       );
-      
-      const successful = results.filter(r => r.status === 'fulfilled' && r.value.success);
-      const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
-      
+
+      const successful = results.filter((r) => r.status === 'fulfilled' && r.value.success);
+      const failed = results.filter(
+        (r) => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success),
+      );
+
       console.log('📊 [ADMIN] Bulk delete results:', {
         total: ids.length,
         successful: successful.length,
         failed: failed.length,
       });
-      
+
       setSelectedIds(new Set());
       await fetchOrders();
-      
+
       if (failed.length > 0) {
-        const failedIds = failed.map(r => 
-          r.status === 'fulfilled' ? r.value.id : 'unknown'
+        const failedIds = failed.map((r) =>
+          r.status === 'fulfilled' ? r.value.id : 'unknown',
         );
-        alert(t('admin.orders.bulkDeleteFailed').replace('{success}', successful.length.toString()).replace('{total}', ids.length.toString()).replace('{failed}', failedIds.join(', ')));
+        alert(
+          t('admin.orders.bulkDeleteFailed')
+            .replace('{success}', successful.length.toString())
+            .replace('{total}', ids.length.toString())
+            .replace('{failed}', failedIds.join(', ')),
+        );
       } else {
-        alert(t('admin.orders.bulkDeleteFinished').replace('{success}', successful.length.toString()).replace('{total}', ids.length.toString()));
+        alert(
+          t('admin.orders.bulkDeleteFinished')
+            .replace('{success}', successful.length.toString())
+            .replace('{total}', ids.length.toString()),
+        );
       }
     } catch (err) {
       console.error('❌ [ADMIN] Bulk delete orders error:', err);

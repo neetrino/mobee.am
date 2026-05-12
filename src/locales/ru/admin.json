@@ -636,7 +636,11 @@
     "loading": "Загрузка...",
     "loadingOrders": "Загрузка заказов...",
     "noOrders": "Заказы не найдены",
-    "searchPlaceholder": "Поиск по номеру заказа, клиенту, email, телефону...",
+    "searchPlaceholder": "№, email, тел...",
+    "search": "Поиск",
+    "filterStatusAria": "Фильтр заказов по статусу",
+    "filterPaymentAria": "Фильтр заказов по статусу оплаты",
+    "filterFulfillmentAria": "Фильтр заказов по статусу выполнения",
     "allStatuses": "Все статусы",
     "allPaymentStatuses": "Все статусы оплаты",
     "allFulfillmentStatuses": "Все статусы выполнения",
@@ -749,6 +753,7 @@
     "update": "Обновить",
     "saving": "Сохранение...",
     "back": "Назад",
-    "backToAdmin": "Вернуться в панель администратора"
+    "backToAdmin": "Вернуться в панель администратора",
+    "unknownErrorFallback": "Неизвестная ошибка"
   }
 }
