@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
-import { Card, Button, Input } from '@shop/ui';
+import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
@@ -347,7 +347,7 @@ export default function PriceFilterSettingsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-admin-50 border border-admin-200 rounded-lg p-4">
+                  <div className="bg-admin-50 border border-admin-200 rounded-supersudo p-4">
                     <div className="flex items-start gap-3">
                       <svg className="w-5 h-5 text-admin-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

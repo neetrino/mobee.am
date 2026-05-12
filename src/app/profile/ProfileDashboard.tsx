@@ -3,14 +3,14 @@ import { Button, Card } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { PROFILE_DASHBOARD_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor } from './utils';
-import type { DashboardData, ProfileTab } from './types';
+import type { DashboardData, OrderListItem, ProfileTab } from './types';
 
 interface ProfileDashboardProps {
   dashboardData: DashboardData | null;
   dashboardLoading: boolean;
   currency: CurrencyCode;
   onTabChange: (tab: ProfileTab) => void;
-  onOrderClick: (orderNumber: string, e: React.MouseEvent<HTMLAnchorElement>) => void;
+  onOrderClick: (order: OrderListItem, e: React.MouseEvent<HTMLAnchorElement>) => void;
   t: (key: string) => string;
 }
 
@@ -51,8 +51,8 @@ export function ProfileDashboard({
                 {dashboardData.stats.totalOrders}
               </p>
             </div>
-            <div className="translate-y-9 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 sm:translate-y-0">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="translate-y-9 w-12 h-12 bg-admin-100 rounded-full flex items-center justify-center flex-shrink-0 sm:translate-y-0">
+              <svg className="w-6 h-6 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
@@ -67,8 +67,8 @@ export function ProfileDashboard({
                 {formatPriceInCurrency(dashboardData.stats.totalSpent, currency)}
               </p>
             </div>
-            <div className="translate-y-9 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 sm:translate-y-0">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="translate-y-9 w-12 h-12 bg-admin-100 rounded-full flex items-center justify-center flex-shrink-0 sm:translate-y-0">
+              <svg className="w-6 h-6 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -83,8 +83,8 @@ export function ProfileDashboard({
                 {dashboardData.stats.pendingOrders}
               </p>
             </div>
-            <div className="translate-y-9 w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0 sm:translate-y-0">
-              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex h-12 w-12 flex-shrink-0 translate-y-9 items-center justify-center rounded-full bg-admin-100 sm:translate-y-0">
+              <svg className="h-6 w-6 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -99,8 +99,8 @@ export function ProfileDashboard({
                 {dashboardData.stats.addressesCount}
               </p>
             </div>
-            <div className="translate-y-9 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 sm:translate-y-0">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="translate-y-9 w-12 h-12 bg-admin-100 rounded-full flex items-center justify-center flex-shrink-0 sm:translate-y-0">
+              <svg className="w-6 h-6 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -137,7 +137,7 @@ export function ProfileDashboard({
               <Link
                 key={order.id}
                 href={`/orders/${order.number}`}
-                onClick={(e) => onOrderClick(order.number, e)}
+                onClick={(e) => onOrderClick(order as OrderListItem, e)}
                 className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
               >
                 <div className="flex items-start justify-between">

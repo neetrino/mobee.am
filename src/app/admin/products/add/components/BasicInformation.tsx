@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
-import { Input } from '@shop/ui';
+import { Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 
 interface BasicInformationProps {
@@ -35,7 +35,7 @@ export function BasicInformation({
   };
 
   const typeButtonClass = (active: boolean) =>
-    `flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+    `flex-1 rounded-supersudo px-3 py-2 text-sm font-medium transition-colors ${
       active ? 'bg-admin-500 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
     }`;
 
@@ -59,7 +59,7 @@ export function BasicInformation({
         <div>
           <span className="block text-sm font-medium text-gray-700 mb-1">{t('admin.products.add.productType')} *</span>
           <p className="text-xs text-gray-500 mb-2">{t('admin.products.add.productTypeHintShort')}</p>
-          <div className="inline-flex w-full max-w-md rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+          <div className="inline-flex w-full max-w-md rounded-supersudo border border-gray-200 bg-gray-50 p-0.5">
             <button
               type="button"
               className={typeButtonClass(productType === 'simple')}
@@ -78,7 +78,7 @@ export function BasicInformation({
         </div>
 
         <details
-          className="rounded-lg border border-gray-200 bg-gray-50/80 px-3 py-2"
+          className="rounded-supersudo border border-gray-200 bg-gray-50/80 px-3 py-2"
           open={isSlugSectionOpen}
           onToggle={handleSlugDetailsToggle}
         >
@@ -97,14 +97,14 @@ export function BasicInformation({
           </div>
         </details>
 
-        <details className="rounded-lg border border-gray-200 bg-gray-50/80 px-3 py-2">
+        <details className="rounded-supersudo border border-gray-200 bg-gray-50/80 px-3 py-2">
           <summary className="cursor-pointer select-none text-sm font-medium text-gray-800">
             {t('admin.products.add.descriptionOptionalSection')}
           </summary>
           <div className="mt-3 pb-1">
             <label className="block text-xs font-medium text-gray-600 mb-1">{t('admin.products.add.description')}</label>
             <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
+              className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
               rows={5}
               value={descriptionHtml}
               onChange={onDescriptionChange}

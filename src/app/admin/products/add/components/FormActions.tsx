@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@shop/ui';
+import { Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { useRouter } from 'next/navigation';
 

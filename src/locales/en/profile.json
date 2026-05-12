@@ -39,6 +39,7 @@
     "email": "Email",
     "phone": "Phone",
     "save": "Save Changes",
+    "saveMobile": "Save",
     "saving": "Saving...",
     "updatedSuccess": "Personal information successfully updated",
     "failedToUpdate": "Failed to update personal information",

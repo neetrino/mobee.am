@@ -294,7 +294,7 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
               handleMouseDown('min');
             }}
           >
-            <div className="h-5 w-5 rounded-full border border-[#E2E8F0] bg-white shadow-sm" />
+            <div className="h-5 w-5 rounded-full border border-[#E2E8F0] bg-white shadow-sm transition-colors hover:border-[#2CA1E2] hover:shadow-md" />
           </div>
 
           <div
@@ -309,7 +309,7 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
               handleMouseDown('max');
             }}
           >
-            <div className="h-5 w-5 rounded-full border border-[#E2E8F0] bg-white shadow-sm" />
+            <div className="h-5 w-5 rounded-full border border-[#E2E8F0] bg-white shadow-sm transition-colors hover:border-[#2CA1E2] hover:shadow-md" />
           </div>
         </div>
       </div>

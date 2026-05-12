@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { SiteBrandLogo } from '../../../components/SiteBrandLogo';
 import { getAdminMenuTABS } from '../admin-menu.config';
-import { AdminSidebarHomeLanguageBlock, useAdminSidebarLanguage } from './AdminSidebarHomeLanguage';
 import { AdminSidebarNavBody } from './AdminSidebarNavBody';
 
 interface AdminSidebarProps {
@@ -17,14 +16,16 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
-  const homeTab = useMemo(() => getAdminMenuTABS(t).find((tab) => tab.id === 'home'), [t]);
-  const mobileLanguage = useAdminSidebarLanguage();
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
+  const siteHomeHref = useMemo(
+    () => getAdminMenuTABS(t).find((tab) => tab.id === 'home')?.path ?? '/',
+    [t],
+  );
 
   return (
     <>
-      <div className="mb-6 flex flex-col gap-3 lg:hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-2 mt-admin-mobile-menu-top ml-admin-mobile-menu-left flex flex-col gap-3 lg:hidden">
+        <div className="flex flex-wrap items-center gap-3">
           <AdminMenuDrawer
             renderNav={(onAfterNavigate) => (
               <AdminSidebarNavBody
@@ -32,25 +33,16 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
                 router={router}
                 t={t}
                 onAfterNavigate={onAfterNavigate}
+                presentation="mobileDrawer"
               />
             )}
+            logoHref={siteHomeHref}
             logoLinkAria={t('admin.sidebar.logoLinkAria')}
             siteLogoAlt={t('common.ariaLabels.siteLogo')}
             drawerTitle={t('admin.sidebar.drawerTitle')}
             drawerMenuButton={t('admin.sidebar.drawerMenuButton')}
             closeMenuAria={t('common.ariaLabels.closeMenu')}
           />
-          {homeTab ? (
-            <AdminSidebarHomeLanguageBlock
-              layout="toolbar"
-              homeTab={homeTab}
-              currentPath={currentPath}
-              currentLanguage={mobileLanguage}
-              onGoHome={() => {
-                router.push(homeTab.path);
-              }}
-            />
-          ) : null}
         </div>
       </div>
       <aside
@@ -60,10 +52,10 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
             : 'hidden h-screen w-64 flex-shrink-0 lg:sticky lg:top-0 lg:block'
         }
       >
-        <nav className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-2">
+        <nav className="flex h-full flex-col overflow-hidden rounded-supersudo border border-gray-200 bg-white p-2">
           <div className="flex shrink-0 items-center justify-between gap-2 border-b border-gray-200 px-4 py-3">
             <Link
-              href="/supersudo"
+              href={siteHomeHref}
               aria-label={t('admin.sidebar.logoLinkAria')}
               className="flex min-w-0 max-w-[160px] shrink-0 transition-opacity hover:opacity-90"
             >
@@ -89,7 +81,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
           onClick={() => {
             setIsDesktopSidebarCollapsed(false);
           }}
-          className="fixed left-0 top-24 z-40 hidden h-12 w-10 items-center justify-center rounded-r-lg border border-l-0 border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 lg:inline-flex"
+          className="fixed left-0 top-24 z-40 hidden h-12 w-10 items-center justify-center rounded-r-supersudo border border-l-0 border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 lg:inline-flex"
           aria-label={t('admin.sidebar.expandSidebarAria')}
         >
           <ChevronRight className="h-5 w-5" aria-hidden strokeWidth={2} />

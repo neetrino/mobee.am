@@ -1,5 +1,9 @@
 import type { Config } from 'tailwindcss';
 import {
+  ADMIN_MOBILE_MENU_OFFSET_LEFT_PX,
+  ADMIN_MOBILE_MENU_OFFSET_TOP_PX,
+} from './src/app/admin/admin-mobile-menu-layout.constants';
+import {
   LAYOUT_DESKTOP_MIN_WIDTH_PX,
   SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX,
 } from './src/lib/layout-breakpoints.constants';
@@ -20,6 +24,14 @@ const config: Config = {
       '2xl': '1536px',
     },
     extend: {
+      spacing: {
+        'admin-mobile-menu-top': `${ADMIN_MOBILE_MENU_OFFSET_TOP_PX}px`,
+        'admin-mobile-menu-left': `${ADMIN_MOBILE_MENU_OFFSET_LEFT_PX}px`,
+      },
+      borderRadius: {
+        /** Admin `/supersudo` UI — unified corner radius */
+        supersudo: '15px',
+      },
       colors: {
         primary: '#000000',
         secondary: '#FFFFFF',

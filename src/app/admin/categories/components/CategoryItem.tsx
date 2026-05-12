@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Button } from '@shop/ui';
+import { Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryWithLevel } from '../types';
 
@@ -16,14 +16,14 @@ export function CategoryItem({ category, parentCategory, onEdit, onDelete }: Cat
 
   return (
     <div
-      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+      className="flex items-center justify-between p-3 bg-gray-50 rounded-supersudo hover:bg-gray-100 transition-colors"
       style={{ paddingLeft: `${16 + category.level * 24}px` }}
     >
       <div className="flex-1">
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium text-gray-900">{category.title}</div>
           {category.requiresSizes && (
-            <span className="text-xs bg-admin-100 text-admin-800 px-2 py-0.5 rounded">
+            <span className="text-xs bg-admin-100 text-admin-800 px-2 py-0.5 rounded-supersudo">
               Sizes
             </span>
           )}

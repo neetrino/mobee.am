@@ -32,7 +32,7 @@ export function FeaturedIntroHeading() {
               {t('home.featured_intro.subtitle')}
             </p>
           </div>
-          <HomeMoreCtaPillLink href="/products" variant="cyanPromo">
+          <HomeMoreCtaPillLink href="/products" variant="cyanPromo" arrowHoverAnimation>
             {t('home.featured_intro.cta')}
           </HomeMoreCtaPillLink>
         </div>

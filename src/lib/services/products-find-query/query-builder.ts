@@ -90,6 +90,65 @@ async function buildCategoryFilter(
   };
 }
 
+type BestsellerVariantRow = {
+  variantId: string | null;
+  _sum: { quantity: number | null };
+};
+
+/**
+ * Product IDs ordered by total sold quantity (order items), most sold first.
+ */
+async function getBestsellerProductIdsRanked(): Promise<string[]> {
+  const raw = await db.orderItem.groupBy({
+    by: ["variantId"],
+    _sum: { quantity: true },
+    where: {
+      variantId: {
+        not: null,
+      },
+    },
+    orderBy: {
+      _sum: {
+        quantity: "desc" as const,
+      },
+    },
+    take: 200,
+  });
+  const bestsellerVariants = raw as BestsellerVariantRow[];
+
+  const variantIds = bestsellerVariants
+    .map((item) => item.variantId)
+    .filter((id): id is string => Boolean(id));
+
+  if (variantIds.length === 0) {
+    return [];
+  }
+
+  const variantProductMap = await db.productVariant.findMany({
+    where: { id: { in: variantIds } },
+    select: { id: true, productId: true },
+  });
+
+  const variantToProduct = new Map<string, string>();
+  variantProductMap.forEach(({ id, productId }: { id: string; productId: string }) => {
+    variantToProduct.set(id, productId);
+  });
+
+  const productSales = new Map<string, number>();
+  bestsellerVariants.forEach((item: BestsellerVariantRow) => {
+    const variantId = item.variantId;
+    if (!variantId) return;
+    const productId = variantToProduct.get(variantId);
+    if (!productId) return;
+    const qty = item._sum?.quantity || 0;
+    productSales.set(productId, (productSales.get(productId) || 0) + qty);
+  });
+
+  return Array.from(productSales.entries())
+    .sort((a, b) => (b[1] || 0) - (a[1] || 0))
+    .map(([productId]) => productId);
+}
+
 /**
  * Build filter for new, featured, bestseller
  */
@@ -125,66 +184,19 @@ async function buildFilterFilter(
   }
 
   if (filter === "bestseller") {
-    type BestsellerVariant = { variantId: string | null; _sum: { quantity: number | null } };
-    const raw = await db.orderItem.groupBy({
-      by: ["variantId"],
-      _sum: { quantity: true },
-      where: {
-        variantId: {
-          not: null,
-        },
-      },
-      orderBy: {
-        _sum: {
-          quantity: "desc" as const,
-        },
-      },
-      take: 200,
-    });
-    const bestsellerVariants: BestsellerVariant[] = raw as BestsellerVariant[];
+    const ranked = await getBestsellerProductIdsRanked();
+    bestsellerProductIds.push(...ranked);
 
-    const variantIds = bestsellerVariants
-      .map((item) => item.variantId)
-      .filter((id): id is string => Boolean(id));
-
-    if (variantIds.length > 0) {
-      const variantProductMap = await db.productVariant.findMany({
-        where: { id: { in: variantIds } },
-        select: { id: true, productId: true },
-      });
-
-      const variantToProduct = new Map<string, string>();
-      variantProductMap.forEach(({ id, productId }: { id: string; productId: string }) => {
-        variantToProduct.set(id, productId);
-      });
-
-      const productSales = new Map<string, number>();
-      bestsellerVariants.forEach((item: BestsellerVariant) => {
-        const variantId = item.variantId;
-        if (!variantId) return;
-        const productId = variantToProduct.get(variantId);
-        if (!productId) return;
-        const qty = item._sum?.quantity || 0;
-        productSales.set(productId, (productSales.get(productId) || 0) + qty);
-      });
-
-      bestsellerProductIds.push(
-        ...Array.from(productSales.entries())
-          .sort((a, b) => (b[1] || 0) - (a[1] || 0))
-          .map(([productId]) => productId)
-      );
-
-      if (bestsellerProductIds.length > 0) {
-        return {
-          where: {
-            ...existingWhere,
-            id: {
-              in: bestsellerProductIds,
-            },
+    if (bestsellerProductIds.length > 0) {
+      return {
+        where: {
+          ...existingWhere,
+          id: {
+            in: bestsellerProductIds,
           },
-          bestsellerProductIds,
-        };
-      }
+        },
+        bestsellerProductIds,
+      };
     }
   }
 
@@ -203,8 +215,6 @@ export async function buildWhereClause(
   where: Prisma.ProductWhereInput | null;
   bestsellerProductIds: string[];
 }> {
-  const bestsellerProductIds: string[] = [];
-
   if (filters.ids && filters.ids.length > 0) {
     return {
       where: {
@@ -221,6 +231,7 @@ export async function buildWhereClause(
     search,
     filter,
     lang = "en",
+    sort,
   } = filters;
 
   // Build base where clause
@@ -251,7 +262,11 @@ export async function buildWhereClause(
   // Add filter for new, featured, bestseller
   const filterResult = await buildFilterFilter(filter || "", where);
   where = filterResult.where;
-  bestsellerProductIds.push(...filterResult.bestsellerProductIds);
+  let bestsellerProductIds = [...filterResult.bestsellerProductIds];
+
+  if (sort === "bestseller" && filter !== "bestseller") {
+    bestsellerProductIds = await getBestsellerProductIdsRanked();
+  }
 
   return {
     where,

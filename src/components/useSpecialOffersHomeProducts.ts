@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getStoredLanguage, type LanguageCode } from '../lib/language';
+import { type LanguageCode } from '../lib/language';
+import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
 import { t } from '../lib/i18n';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 
@@ -28,17 +29,6 @@ function isProductsResponse(value: unknown): value is ProductsResponse {
 const PRODUCTS_PER_PAGE = 10;
 /** Store “featured” products for the home special-offers row (distinct from best-choice `new`). */
 export const SPECIAL_OFFERS_HOME_FILTER_DEFAULT = 'featured' as const;
-
-function useClientSyncedLanguage(): LanguageCode {
-  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
-  useEffect(() => {
-    const sync = () => setLanguage(getStoredLanguage());
-    sync();
-    window.addEventListener('language-updated', sync);
-    return () => window.removeEventListener('language-updated', sync);
-  }, []);
-  return language;
-}
 
 async function fetchSpecialOffersHomePage(
   language: LanguageCode,

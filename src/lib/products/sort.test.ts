@@ -13,6 +13,7 @@ describe("parseProductSortOption", () => {
   });
 
   it("keeps known sort values", () => {
+    expect(parseProductSortOption("bestseller")).toBe("bestseller");
     expect(parseProductSortOption("price-asc")).toBe("price-asc");
     expect(parseProductSortOption("price-desc")).toBe("price-desc");
     expect(parseProductSortOption("name-asc")).toBe("name-asc");

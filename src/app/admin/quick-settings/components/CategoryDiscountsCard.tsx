@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Card, Button, Input } from '@shop/ui';
+import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 interface AdminCategory {
   id: string;
@@ -58,11 +58,11 @@ export function CategoryDiscountsCard({
           <p className="text-gray-600">{t('admin.quickSettings.loadingCategories')}</p>
         </div>
       ) : categories.length === 0 ? (
-        <div className="text-center py-6 text-gray-600 border border-dashed border-gray-200 rounded">
+        <div className="text-center py-6 text-gray-600 border border-dashed border-gray-200 rounded-supersudo">
           {t('admin.quickSettings.noCategories')}
         </div>
       ) : (
-        <div className="max-h-[420px] overflow-y-auto divide-y divide-gray-100 border border-gray-100 rounded-lg">
+        <div className="max-h-[420px] overflow-y-auto divide-y divide-gray-100 border border-gray-100 rounded-supersudo">
           {categories.map((category) => {
             const currentValue = categoryDiscounts[category.id];
             return (

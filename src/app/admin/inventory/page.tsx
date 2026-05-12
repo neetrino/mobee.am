@@ -106,7 +106,7 @@ export default function AdminInventoryPage() {
           <p className="text-gray-600 mt-2">{t('admin.inventory.subtitle')}</p>
         </div>
         <div className="space-y-6">
-          <section className="bg-white border border-gray-200 rounded-lg p-4">
+          <section className="bg-white border border-gray-200 rounded-supersudo p-4">
             <h2 className="text-lg font-semibold mb-3">{t('admin.inventory.reconciliation')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div><span className="text-gray-500">{t('admin.inventory.variants')}</span><div>{summary?.variantsCount ?? 0}</div></div>
@@ -116,20 +116,20 @@ export default function AdminInventoryPage() {
             </div>
           </section>
 
-          <section className="bg-white border border-gray-200 rounded-lg p-4">
+          <section className="bg-white border border-gray-200 rounded-supersudo p-4">
             <h2 className="text-lg font-semibold mb-3">{t('admin.inventory.adjustStock')}</h2>
             <form className="grid grid-cols-1 md:grid-cols-4 gap-3" onSubmit={handleSubmit}>
-              <input className="border rounded px-3 py-2" placeholder="variantId" value={variantId} onChange={(e) => setVariantId(e.target.value)} required />
-              <input className="border rounded px-3 py-2" placeholder="quantity delta" value={quantityDelta} onChange={(e) => setQuantityDelta(e.target.value)} required />
-              <input className="border rounded px-3 py-2" placeholder="reason" value={reason} onChange={(e) => setReason(e.target.value)} required />
-              <input className="border rounded px-3 py-2" placeholder="note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
-              <button type="submit" disabled={submitting} className="md:col-span-4 bg-admin text-white rounded px-4 py-2 disabled:opacity-70">
+              <input className="border rounded-supersudo px-3 py-2" placeholder="variantId" value={variantId} onChange={(e) => setVariantId(e.target.value)} required />
+              <input className="border rounded-supersudo px-3 py-2" placeholder="quantity delta" value={quantityDelta} onChange={(e) => setQuantityDelta(e.target.value)} required />
+              <input className="border rounded-supersudo px-3 py-2" placeholder="reason" value={reason} onChange={(e) => setReason(e.target.value)} required />
+              <input className="border rounded-supersudo px-3 py-2" placeholder="note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
+              <button type="submit" disabled={submitting} className="md:col-span-4 bg-admin text-white rounded-supersudo px-4 py-2 disabled:opacity-70">
                 {submitting ? t('admin.common.saving') : t('admin.inventory.applyAdjustment')}
               </button>
             </form>
           </section>
 
-          <section className="bg-white border border-gray-200 rounded-lg p-4">
+          <section className="bg-white border border-gray-200 rounded-supersudo p-4">
             <h2 className="text-lg font-semibold mb-3">{t('admin.inventory.currentStock')}</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">

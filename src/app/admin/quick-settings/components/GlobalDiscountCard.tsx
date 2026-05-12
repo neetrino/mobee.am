@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Input } from '@shop/ui';
+import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 interface GlobalDiscountCardProps {
   globalDiscount: number;
@@ -20,7 +20,7 @@ export function GlobalDiscountCard({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-lg p-4 border border-gray-200">
+    <div className="bg-white rounded-supersudo p-4 border border-gray-200">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
           <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@ export function GlobalDiscountCard({
 
       {discountLoading ? (
         <div className="animate-pulse">
-          <div className="h-10 bg-gray-200 rounded"></div>
+          <div className="h-10 bg-gray-200 rounded-supersudo"></div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -72,13 +72,13 @@ export function GlobalDiscountCard({
           </div>
 
           {globalDiscount > 0 ? (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+            <div className="p-3 bg-green-50 border border-green-200 rounded-supersudo">
               <p className="text-sm text-green-800">
                 <strong>{t('admin.quickSettings.active')}</strong> {t('admin.quickSettings.discountApplied').replace('{percent}', globalDiscount.toString())}
               </p>
             </div>
           ) : (
-            <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+            <div className="p-3 bg-gray-50 border border-gray-200 rounded-supersudo">
               <p className="text-sm text-gray-600">
                 {t('admin.quickSettings.noGlobalDiscount')}
               </p>

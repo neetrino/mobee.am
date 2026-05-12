@@ -136,7 +136,11 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
                 type="button"
                 onClick={() => handleColorToggle(color.value)}
                 aria-pressed={isSelected}
-                className={`h-8 w-8 rounded-full border transition ${isSelected ? 'border-[#2CA1E2] ring-2 ring-[#2CA1E2]/30' : 'border-transparent'}`}
+                className={`h-8 w-8 rounded-full border transition ${
+                  isSelected
+                    ? 'border-[#2CA1E2] ring-2 ring-[#2CA1E2]/30'
+                    : 'border-transparent hover:border-[#2CA1E2] hover:ring-2 hover:ring-[#2CA1E2]/25'
+                }`}
                 title={color.label}
               >
                 <span

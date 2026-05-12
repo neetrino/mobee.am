@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import type { ChangeEvent, RefObject } from 'react';
-import { Button, Input } from '@shop/ui';
+import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { getColorHex } from '../../../../../lib/colorMap';
 import { CURRENCIES, type CurrencyCode } from '../../../../../lib/currency';
@@ -70,7 +70,7 @@ export function VariantBuilder({
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.products.add.variantBuilder')}</h2>
-      <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
+      <div className="bg-white border border-gray-200 rounded-supersudo p-6 space-y-6">
         {/* Generated Variants Table */}
         {generatedVariants.length > 0 && (
           <div>
@@ -148,7 +148,7 @@ export function VariantBuilder({
               </div>
             </div>
 
-            <div className="border border-gray-300 rounded-lg" style={{ overflowX: 'hidden', overflowY: 'hidden' }}>
+            <div className="border border-gray-300 rounded-supersudo" style={{ overflowX: 'hidden', overflowY: 'hidden' }}>
               <table className="w-full divide-y divide-gray-200 bg-white">
                 <thead className="bg-gray-50">
                   <tr>
@@ -220,20 +220,20 @@ export function VariantBuilder({
                                   onClick={() => {
                                     onOpenValueModal({ variantId: variant.id, attributeId });
                                   }}
-                                  className="w-full text-left flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-admin"
+                                  className="w-full text-left flex items-center gap-1 p-1.5 border border-gray-300 rounded-supersudo hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-admin"
                                 >
                                   <div className="flex-1 flex flex-wrap items-center gap-1 min-w-0">
                                     {selectedValues.length > 0 ? (
                                       selectedValues.map((val) => (
                                         <span
                                           key={val.id}
-                                          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-admin-50 text-admin-700 rounded text-xs"
+                                          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-admin-50 text-admin-700 rounded-supersudo text-xs"
                                         >
                                           {val.imageUrl ? (
                                             <img
                                               src={val.imageUrl}
                                               alt={val.label}
-                                              className="w-3 h-3 object-cover rounded border border-gray-300"
+                                              className="w-3 h-3 object-cover rounded-supersudo border border-gray-300"
                                             />
                                           ) : isColor && val.colorHex ? (
                                             <span
@@ -331,7 +331,7 @@ export function VariantBuilder({
                                 <img
                                   src={variant.image}
                                   alt="Variant image"
-                                  className="w-12 h-12 object-cover border border-gray-300 rounded-md"
+                                  className="w-12 h-12 object-cover border border-gray-300 rounded-supersudo"
                                 />
                                 <button
                                   type="button"
@@ -356,7 +356,7 @@ export function VariantBuilder({
                                 type="button"
                                 onClick={() => variantImageInputRefs.current?.[variant.id]?.click()}
                                 disabled={imageUploadLoading}
-                                className="px-2 py-1 text-xs font-medium text-white bg-admin-500 border border-admin-500 rounded-md shadow-sm hover:bg-admin-600 hover:border-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                className="px-2 py-1 text-xs font-medium text-white bg-admin-500 border border-admin-500 rounded-supersudo shadow-sm hover:bg-admin-600 hover:border-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -384,7 +384,7 @@ export function VariantBuilder({
                           <button
                             type="button"
                             onClick={() => onVariantDelete(variant.id)}
-                            className="px-2 py-1 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors flex items-center gap-1"
+                            className="px-2 py-1 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-supersudo hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors flex items-center gap-1"
                             title={t('admin.products.add.deleteVariant') || 'Delete variant'}
                           >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

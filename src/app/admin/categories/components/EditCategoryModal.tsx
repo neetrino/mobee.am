@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Button, Input } from '@shop/ui';
+import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
 
@@ -31,7 +31,7 @@ export function EditCategoryModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="bg-white rounded-supersudo p-6 max-w-md w-full mx-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.categories.editCategory')}</h3>
         <div className="space-y-4">
           <div>
@@ -53,7 +53,7 @@ export function EditCategoryModal({
             <select
               value={formData.parentId}
               onChange={(e) => onFormDataChange({ ...formData, parentId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
+              className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
             >
               <option value="">{t('admin.categories.rootCategory')}</option>
               {categories
@@ -73,7 +73,7 @@ export function EditCategoryModal({
                 type="checkbox"
                 checked={formData.requiresSizes}
                 onChange={(e) => onFormDataChange({ ...formData, requiresSizes: e.target.checked })}
-                className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+                className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
               />
               <span className="text-sm text-gray-700">
                 {t('admin.categories.requiresSizes')}
@@ -84,13 +84,13 @@ export function EditCategoryModal({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Subcategories
             </label>
-            <div className="max-h-60 overflow-y-auto border border-gray-300 rounded-md p-3 space-y-2">
+            <div className="max-h-60 overflow-y-auto border border-gray-300 rounded-supersudo p-3 space-y-2">
               {categories
                 .filter((cat) => cat.id !== editingCategory.id)
                 .map((cat) => {
                   const isChecked = formData.subcategoryIds.includes(cat.id);
                   return (
-                    <label key={cat.id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <label key={cat.id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-supersudo">
                       <input
                         type="checkbox"
                         checked={isChecked}
@@ -107,7 +107,7 @@ export function EditCategoryModal({
                             });
                           }
                         }}
-                        className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+                        className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
                       />
                       <span className="text-sm text-gray-700">{cat.title}</span>
                     </label>

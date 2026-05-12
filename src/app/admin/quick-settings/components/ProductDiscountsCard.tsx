@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Card, Button, Input } from '@shop/ui';
+import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { ProductDiscountsPagination } from './ProductDiscountsPagination';
 
@@ -111,14 +111,14 @@ export function ProductDiscountsCard({
             return (
               <div
                 key={product.id}
-                className="flex items-center gap-4 p-4 border-2 border-admin-300 rounded-lg hover:bg-admin-50 transition-colors bg-admin-50/30"
+                className="flex items-center gap-4 p-4 border-2 border-admin-300 rounded-supersudo hover:bg-admin-50 transition-colors bg-admin-50/30"
               >
                 {product.image && (
                   <div className="flex-shrink-0">
                     <img
                       src={product.image}
                       alt={product.title}
-                      className="w-16 h-16 object-cover rounded"
+                      className="w-16 h-16 object-cover rounded-supersudo"
                     />
                   </div>
                 )}

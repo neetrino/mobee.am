@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
-import { Card, Button } from '@shop/ui';
+import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
@@ -12,7 +12,7 @@ import { ARMENIA_FALLBACK_DELIVERY_CITIES } from '../../../lib/constants/armenia
 const SUPPORTED_COUNTRIES = ['Armenia'] as const;
 
 const SELECT_CLASS =
-  'w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-admin appearance-none bg-[length:1.25rem] bg-[right_0.75rem_center] bg-no-repeat pr-10';
+  'w-full px-3 py-2 border border-gray-300 rounded-supersudo bg-white focus:outline-none focus:ring-2 focus:ring-admin appearance-none bg-[length:1.25rem] bg-[right_0.75rem_center] bg-no-repeat pr-10';
 
 const SELECT_CHEVRON_BG =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")";
@@ -152,7 +152,7 @@ export default function DeliveryPage() {
           ) : (
             <div className="space-y-4">
               {locations.map((location, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div key={index} className="border border-gray-200 rounded-supersudo p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.delivery.country')}</label>
@@ -195,14 +195,14 @@ export default function DeliveryPage() {
                           type="number"
                           value={location.price}
                           onChange={(e) => handleUpdateLocation(index, 'price', parseFloat(e.target.value) || 0)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
                           placeholder={t('admin.delivery.pricePlaceholder')}
                           min="0"
                           step="100"
                         />
                         <button
                           onClick={() => handleDeleteLocation(index)}
-                          className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-md"
+                          className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-supersudo"
                           disabled={saving}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

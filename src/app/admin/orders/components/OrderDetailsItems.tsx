@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
-import { Card } from '@shop/ui';
+import { Card } from '@/app/admin/lib/adminShopUi';
 import { CurrencyCode } from '../../../../lib/currency';
 import { getColorValue } from '../utils/orderUtils';
 import type { OrderDetails } from '../useOrders';
@@ -43,7 +43,7 @@ export function OrderDetailsItems({
   return (
     <Card className="p-4 md:p-6">
       <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('admin.orders.orderDetails.items')}</h3>
-      <div className="overflow-x-auto border border-gray-200 rounded-md">
+      <div className="overflow-x-auto border border-gray-200 rounded-supersudo">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
@@ -79,7 +79,7 @@ export function OrderDetailsItems({
                                 <img
                                   src={opt.imageUrl!}
                                   alt={displayLabel}
-                                  className="w-4 h-4 rounded border border-gray-300 object-cover flex-shrink-0"
+                                  className="w-4 h-4 rounded-supersudo border border-gray-300 object-cover flex-shrink-0"
                                   onError={(e) => {
                                     (e.target as HTMLImageElement).style.display = 'none';
                                   }}

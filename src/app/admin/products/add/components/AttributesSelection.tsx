@@ -31,7 +31,7 @@ export function AttributesSelection({
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.products.add.selectAttributesForVariants')}</h2>
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-200 rounded-supersudo p-6">
         <label className="block text-sm font-medium text-gray-700 mb-3">
           {t('admin.products.add.attributes')} <span className="text-gray-500 font-normal">{t('admin.products.add.selectMultiple')}</span>
         </label>
@@ -39,7 +39,7 @@ export function AttributesSelection({
           <button
             type="button"
             onClick={onAttributesDropdownToggle}
-            className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin bg-white text-sm flex items-center justify-between"
+            className="w-full px-3 py-2 text-left border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin bg-white text-sm flex items-center justify-between"
           >
             <span className="text-gray-700">
               {selectedAttributesForVariants.size === 0
@@ -60,7 +60,7 @@ export function AttributesSelection({
             </svg>
           </button>
           {attributesDropdownOpen && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-96 overflow-y-auto">
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-supersudo shadow-lg max-h-96 overflow-y-auto">
               <div className="p-4">
                 <div className="mb-3 pb-3 border-b border-gray-200">
                   <h3 className="text-sm font-semibold text-gray-900">
@@ -79,7 +79,7 @@ export function AttributesSelection({
                     {attributes.map((attribute) => (
                       <label
                         key={attribute.id}
-                        className={`flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-3 rounded-lg border transition-colors ${
+                        className={`flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-3 rounded-supersudo border transition-colors ${
                           selectedAttributesForVariants.has(attribute.id)
                             ? 'bg-admin-50 border-admin-300'
                             : 'border-gray-200 bg-white'
@@ -89,7 +89,7 @@ export function AttributesSelection({
                           type="checkbox"
                           checked={selectedAttributesForVariants.has(attribute.id)}
                           onChange={(e) => onAttributeToggle(attribute.id, e.target.checked)}
-                          className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+                          className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
                         />
                         <span className="text-sm font-medium text-gray-900">{attribute.name}</span>
                       </label>
@@ -123,13 +123,13 @@ export function AttributesSelection({
                 return (
                   <span
                     key={attributeId}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-admin-50 text-admin-700 rounded-lg text-sm font-medium border border-admin-200"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-admin-50 text-admin-700 rounded-supersudo text-sm font-medium border border-admin-200"
                   >
                     {previewImage ? (
                       <img
                         src={previewImage}
                         alt={attribute.name}
-                        className="w-4 h-4 object-cover rounded border border-gray-300"
+                        className="w-4 h-4 object-cover rounded-supersudo border border-gray-300"
                       />
                     ) : previewColor ? (
                       <span

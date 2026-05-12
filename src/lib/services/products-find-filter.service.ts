@@ -145,7 +145,10 @@ class ProductsFindFilterService {
 
     // Sort
     const { filter, sort = "default" } = filters;
-    if (filter === "bestseller" && bestsellerProductIds.length > 0) {
+    if (
+      bestsellerProductIds.length > 0 &&
+      (filter === "bestseller" || sort === "bestseller")
+    ) {
       const rank = new Map<string, number>();
       bestsellerProductIds.forEach((id, index) => rank.set(id, index));
       products.sort((a: ProductWithRelations, b: ProductWithRelations) => {

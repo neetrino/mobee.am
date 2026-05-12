@@ -11,6 +11,7 @@ import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } fr
 import { useInstantSearch } from './hooks/useInstantSearch';
 import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
+import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import { apiClient } from '../lib/api-client';
 import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCounts';
 import { LanguageSwitcherPill } from './LanguageSwitcherPill';
@@ -24,6 +25,7 @@ import {
   HEADER_STRIP_PADDING_Y,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
+  MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
 import { SiteBrandLogo } from './SiteBrandLogo';
@@ -33,6 +35,12 @@ import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.co
 import { DEFAULT_USER_AVATAR_SRC } from './user-avatar.constants';
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
+import {
+  MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS,
+  MOBILE_DRAWER_NAV_BUTTON_CLASS,
+  MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
+  MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS,
+} from './mobile-drawer-nav.constants';
 
 /** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
 const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
@@ -174,13 +182,6 @@ const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
 
 const mobilePrimaryLangButtonClassName =
   'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
-
-/** Mobile drawer primary links — bordered pill buttons (aligned with strip icon radius). */
-const MOBILE_DRAWER_NAV_BUTTON_CLASS =
-  'flex w-full min-w-0 items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100 text-pretty';
-
-/** Primary label cell inside drawer rows (avoids one-character orphan lines next to chevrons). */
-const MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS = 'min-w-0 flex-1 pr-1 text-pretty';
 
 const MOBILE_DRAWER_MIN_WIDTH_REM = 17;
 const MOBILE_DRAWER_DEFAULT_MAX_WIDTH_REM = 24;
@@ -635,7 +636,7 @@ export function Header() {
   const navTextClass = (href: string) =>
     isNavActive(href)
       ? 'whitespace-nowrap text-[13px] font-black leading-5 tracking-[0.2px] text-[#00a1ff] xl:text-[14px]'
-      : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] hover:text-gray-900 xl:text-[14px]';
+      : 'whitespace-nowrap text-[13px] font-semibold leading-5 tracking-[0.2px] text-[#374151] transition-colors duration-150 hover:text-[#00a1ff] xl:text-[14px]';
 
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -1095,13 +1096,10 @@ export function Header() {
       return;
     }
 
-    if (mobileMenuOpen) {
-      const previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = previousOverflow;
-      };
+    if (!mobileMenuOpen) {
+      return;
     }
+    return acquireBodyScrollLock();
   }, [mobileMenuOpen]);
 
   // Focus search input when modal opens; sync dropdown with query. When modal is closed, do not
@@ -1249,7 +1247,7 @@ export function Header() {
                   setShowMobilePrimaryLangMenu(false);
                   setMobileMenuOpen(true);
                 }}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
                 aria-expanded={mobileMenuOpen}
                 aria-label={t('common.ariaLabels.openMenu')}
               >
@@ -1597,7 +1595,7 @@ export function Header() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-50 flex bg-black/40 lg:hidden"
           role="dialog"
           aria-modal="true"
           onClick={() => setMobileMenuOpen(false)}
@@ -1652,7 +1650,7 @@ export function Header() {
                       key={link.href}
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={MOBILE_DRAWER_NAV_BUTTON_CLASS}
+                      className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
                     >
                       <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
                       <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1690,32 +1688,19 @@ export function Header() {
 
                   {isLoggedIn ? (
                     <>
+                      <MobileDrawerSupportPhoneButton />
                       {isAdmin && (
                         <Link
                           href="/supersudo"
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} border-blue-200 normal-case text-blue-700 hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100/80`}
+                          className={MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS}
                         >
                           <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.adminPanel')}</span>
-                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </Link>
                       )}
-                      <MobileDrawerSupportPhoneButton />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          logout();
-                        }}
-                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} border-red-200 text-left normal-case font-semibold text-red-600 hover:border-red-300 hover:bg-red-50 active:bg-red-100/80`}
-                      >
-                        <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.logout')}</span>
-                        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
                     </>
                   ) : (
                     <>
@@ -1733,7 +1718,7 @@ export function Header() {
                       <Link
                         href="/register"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex w-full min-w-0 items-center justify-between rounded-2xl border border-admin-500 bg-admin-500 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-admin-600 hover:bg-admin-600 active:opacity-95 text-pretty"
+                        className={MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS}
                       >
                         <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.register')}</span>
                         <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1755,7 +1740,7 @@ export function Header() {
 
       {/* Search Modal */}
       {showSearchModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-start justify-center pt-20 px-4">
+        <div className="fixed inset-0 bg-black/20 z-50 flex items-start justify-center pt-20 px-4">
           <div 
             ref={searchModalRef}
             className="w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-gray-200/80 p-4 animate-in fade-in slide-in-from-top-2 duration-200 relative"

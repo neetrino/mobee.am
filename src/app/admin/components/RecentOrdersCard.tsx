@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Button } from '@shop/ui';
+import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatCurrency, formatDate } from '../utils/dashboardUtils';
@@ -44,7 +44,7 @@ export function RecentOrdersCard({ recentOrders, recentOrdersLoading }: RecentOr
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-16 bg-gray-200 rounded"></div>
+                <div className="h-16 bg-gray-200 rounded-supersudo"></div>
               </div>
             ))}
           </div>
@@ -56,7 +56,7 @@ export function RecentOrdersCard({ recentOrders, recentOrdersLoading }: RecentOr
           recentOrders.map((order) => (
             <div
               key={order.id}
-              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+              className="border border-gray-200 rounded-supersudo p-4 hover:bg-gray-50 cursor-pointer transition-colors"
               onClick={() => router.push(`/supersudo/orders?search=${order.number}`)}
             >
               <div className="flex items-start justify-between">
