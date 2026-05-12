@@ -4,7 +4,7 @@ import tseslint from "typescript-eslint";
 /** @type {import("eslint").Linter.Config[]} */
 const config = [
   {
-    ignores: ["shared/db/generated/**"],
+    ignores: ["shared/db/generated/**", "generated/**"],
   },
   ...nextConfig,
   ...tseslint.configs.recommended,

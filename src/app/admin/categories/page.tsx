@@ -117,7 +117,6 @@ export default function CategoriesPage() {
             <CategoriesList
               categories={categories}
               searchQuery={categorySearchQuery}
-              onSearchQueryChange={setCategorySearchQuery}
               onEdit={handleEditCategory}
               onDelete={(categoryId, categoryTitle) =>
                 handleDeleteCategory(categoryId, categoryTitle, fetchCategories)

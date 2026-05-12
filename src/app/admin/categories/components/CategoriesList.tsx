@@ -10,7 +10,6 @@ import type { Category, CategoryWithLevel } from '../types';
 interface CategoriesListProps {
   categories: Category[];
   searchQuery: string;
-  onSearchQueryChange: (value: string) => void;
   onEdit: (category: Category) => void;
   onDelete: (categoryId: string, categoryTitle: string) => void;
 }
@@ -20,7 +19,6 @@ const ITEMS_PER_PAGE = 20;
 export function CategoriesList({
   categories,
   searchQuery,
-  onSearchQueryChange,
   onEdit,
   onDelete,
 }: CategoriesListProps) {

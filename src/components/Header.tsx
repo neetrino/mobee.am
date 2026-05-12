@@ -194,18 +194,18 @@ const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
 const mobilePrimaryLangButtonClassName =
   'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
 
-/** Mobile locale flyout — Mobee storefront (admin accent, list rows with dividers). */
+/** Mobile locale flyout — white card (no outer gray frame). */
 const MOBILE_LOCALE_MENU_PANEL_CLASS =
-  'absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),15rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white py-0 shadow-2xl ring-1 ring-black/5';
+  'absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),8rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white py-0 shadow-xl ring-1 ring-black/5';
 
 const MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS =
-  'border-b border-gray-100 bg-gray-50/80 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-gray-500';
+  'border-b border-gray-100 bg-gray-50/80 px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500';
 
 const MOBILE_LOCALE_MENU_ROW_LANG =
-  'w-full px-3 py-2.5 text-left text-sm transition-colors duration-150';
+  'w-full px-3 py-2.5 text-center text-sm transition-colors duration-150';
 
 const MOBILE_LOCALE_MENU_ROW_CURRENCY =
-  'flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors duration-150';
+  'flex w-full items-center justify-center gap-2 px-3 py-2.5 text-sm transition-colors duration-150';
 
 function mobileLocaleMenuLangRowClass(active: boolean): string {
   if (active) {
