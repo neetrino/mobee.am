@@ -6,6 +6,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
 import { AdminPageShell } from '../components/AdminPageShell';
 import { ARMENIA_FALLBACK_DELIVERY_CITIES } from '../../../lib/constants/armenia-delivery-cities.constants';
 
@@ -217,7 +218,13 @@ export default function DeliveryPage() {
           >
             {saving ? t('admin.delivery.saving') : t('admin.delivery.saveSettings')}
           </Button>
-          <Button variant="ghost" onClick={() => router.push('/supersudo')} disabled={saving}>
+          <Button
+            type="button"
+            variant="outline"
+            className={ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS}
+            onClick={() => router.push('/supersudo')}
+            disabled={saving}
+          >
             {t('admin.delivery.cancel')}
           </Button>
         </div>

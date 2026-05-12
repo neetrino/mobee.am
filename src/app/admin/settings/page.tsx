@@ -7,6 +7,8 @@ import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
+import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
+import { ADMIN_SETTINGS_ONLINE_PAYMENTS_CHECKBOX_CLASS } from './online-payments-checkbox.constants';
 import { AdminPageShell } from '../components/AdminPageShell';
 interface Settings {
   defaultCurrency?: string;
@@ -221,11 +223,11 @@ export default function SettingsPage() {
               </div>
             </div>
             <div>
-              <label className="flex items-center">
+              <label className="flex cursor-pointer items-center gap-3">
                 <input
                   type="checkbox"
                   defaultChecked
-                  className="mr-2"
+                  className={ADMIN_SETTINGS_ONLINE_PAYMENTS_CHECKBOX_CLASS}
                 />
                 <span className="text-sm font-medium text-gray-700">{t('admin.settings.enableOnlinePayments')}</span>
               </label>
@@ -461,7 +463,9 @@ export default function SettingsPage() {
             {saving ? t('admin.settings.saving') : t('admin.settings.saveSettings')}
           </Button>
           <Button
-            variant="ghost"
+            type="button"
+            variant="outline"
+            className={ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS}
             onClick={() => router.push('/supersudo')}
             disabled={saving}
           >

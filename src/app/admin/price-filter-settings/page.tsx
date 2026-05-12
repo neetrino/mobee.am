@@ -6,6 +6,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
 import { AdminPageShell } from '../components/AdminPageShell';
 
 export default function PriceFilterSettingsPage() {
@@ -373,7 +374,9 @@ export default function PriceFilterSettingsPage() {
                       )}
                     </Button>
                     <Button
-                      variant="ghost"
+                      type="button"
+                      variant="outline"
+                      className={ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS}
                       onClick={() => {
                         setMinPrice('');
                         setMaxPrice('');

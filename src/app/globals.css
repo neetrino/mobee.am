@@ -288,3 +288,18 @@
   margin-top: 0.25rem;
 }
 
+/* `/supersudo/settings` — online payments checkbox (white tick; no blue focus ring) */
+@layer components {
+  .admin-settings-online-payments-checkbox {
+    @apply h-5 w-5 shrink-0 cursor-pointer appearance-none rounded border-2 border-gray-400 bg-white;
+    @apply focus:outline-none focus:ring-0 focus:ring-offset-0;
+    @apply focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1;
+  }
+
+  .admin-settings-online-payments-checkbox:checked {
+    @apply border-admin-600 bg-admin-600 bg-center bg-no-repeat;
+    background-size: 0.875rem;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M4%208l2.5%202.5L12%205%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E");
+  }
+}
+
