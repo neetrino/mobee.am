@@ -30,6 +30,16 @@ export const CHECKOUT_CONTACT_FIELDS_GRID_CLASS =
 /** Selected shipping/payment option — Mobee brand blue (replaces purple accent). */
 export const CHECKOUT_OPTION_SELECTED_CHROME_CLASS = 'border-admin-500 bg-admin-50';
 
+/** Payment logo in the fixed 80×48 slot (`CheckoutForm`). */
+export const CHECKOUT_PAYMENT_LOGO_IMG_CLASS =
+  'w-full h-full object-contain p-1.5';
+
+/**
+ * ArCa wordmark PNG — less padding + scale so the mark fills the frame more than Idram/cash.
+ */
+export const CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA =
+  'w-full h-full object-contain p-0 scale-[1.18] origin-center';
+
 /**
  * Checkout option radios: custom paint so WebKit/Safari does not show a black inner dot
  * when combining `accent-color` with fixed control size.

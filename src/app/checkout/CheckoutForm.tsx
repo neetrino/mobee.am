@@ -11,6 +11,8 @@ import {
   CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_TOP_CLASS,
   CHECKOUT_OPTION_SELECTED_CHROME_CLASS,
+  CHECKOUT_PAYMENT_LOGO_IMG_CLASS,
+  CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA,
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
 import { DeliveryPolicyInfoCard } from './components/DeliveryPolicyInfoCard';
@@ -330,7 +332,11 @@ export function CheckoutForm({
                     <img
                       src={method.logo}
                       alt={method.name}
-                      className="w-full h-full object-contain p-1.5"
+                      className={
+                        method.id === 'arca'
+                          ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA
+                          : CHECKOUT_PAYMENT_LOGO_IMG_CLASS
+                      }
                       loading="lazy"
                       onError={() => {
                         setLogoErrors((prev) => ({ ...prev, [method.id]: true }));
