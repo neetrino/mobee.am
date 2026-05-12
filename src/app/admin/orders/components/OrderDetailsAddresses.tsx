@@ -13,6 +13,11 @@ interface OrderDetailsAddressesProps {
 export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDetailsAddressesProps) {
   const { t } = useTranslation();
 
+  const deliverySpeed = orderDetails.shippingAddress?.deliverySpeed as
+    | 'standard'
+    | 'express'
+    | undefined;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="p-4 md:p-6">
@@ -26,9 +31,17 @@ export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDet
           </div>
         ) : orderDetails.shippingMethod === 'delivery' && orderDetails.shippingAddress ? (
           <div className="text-sm text-gray-700 space-y-1">
-            <div className="mb-2">
+            <div className="mb-2 flex items-center gap-2 flex-wrap">
               <span className="font-medium">{t('admin.orders.orderDetails.shippingMethod')}</span>{' '}
-              {t('checkout.shipping.delivery')}
+              <span
+                className={
+                  deliverySpeed === 'express'
+                    ? 'inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800'
+                    : 'inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-800'
+                }
+              >
+                {deliverySpeed === 'express' ? 'Express' : 'Standard'}
+              </span>
             </div>
             {(orderDetails.shippingAddress.address || orderDetails.shippingAddress.addressLine1) && (
               <div>
@@ -63,7 +76,9 @@ export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDet
                 {orderDetails.shippingMethod === 'pickup'
                   ? t('admin.orders.orderDetails.pickup')
                   : orderDetails.shippingMethod === 'delivery'
-                  ? t('checkout.shipping.delivery')
+                  ? deliverySpeed === 'express'
+                    ? 'Express'
+                    : 'Standard'
                   : orderDetails.shippingMethod}
               </p>
             )}
