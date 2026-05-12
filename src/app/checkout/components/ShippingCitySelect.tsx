@@ -1,7 +1,12 @@
 'use client';
 
+import { useMemo } from 'react';
 import { UseFormRegister } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
+import {
+  ARMENIA_SUGGESTED_CITY_LABEL_SLUG,
+  compareSuggestedArmeniaDeliveryCities,
+} from '../../../lib/constants/armenia-delivery-cities.constants';
 import { useDeliveryCities } from '../hooks/useDeliveryCities';
 import type { CheckoutFormData } from '../types';
 
@@ -19,11 +24,21 @@ export function ShippingCitySelect({ register, error, disabled, onAfterChange }:
   const { t } = useTranslation();
   const { cities, loading } = useDeliveryCities();
 
+  const orderedCities = useMemo(
+    () => [...cities].sort(compareSuggestedArmeniaDeliveryCities),
+    [cities]
+  );
+
   const registration = register('shippingCity', {
     onChange: () => {
       onAfterChange?.();
     },
   });
+
+  const labelForCity = (city: string): string => {
+    const slug = ARMENIA_SUGGESTED_CITY_LABEL_SLUG[city];
+    return slug ? t(`checkout.shipping.suggestedCities.${slug}`) : city;
+  };
 
   return (
     <div className="w-full">
@@ -45,9 +60,9 @@ export function ShippingCitySelect({ register, error, disabled, onAfterChange }:
           <option value="">
             {loading ? t('checkout.shipping.loadingCities') : t('checkout.placeholders.selectCity')}
           </option>
-          {cities.map((city) => (
+          {orderedCities.map((city) => (
             <option key={city} value={city}>
-              {city}
+              {labelForCity(city)}
             </option>
           ))}
         </select>
