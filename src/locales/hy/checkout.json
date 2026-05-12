@@ -53,7 +53,7 @@
     "standardDelivery": "Ստանդարտ առաքում",
     "standardDeliveryDescription": "Իրականացվում է մեր կամ գործընկեր առաքման ծառայությունների միջոցով (սովորաբար 1–3 աշխատանքային օր)։",
     "expressDelivery": "Շտապ առաքում",
-    "expressDeliveryDescription": "Հնարավոր է լրացուցիչ վճարով՝ կախված հասցեից և պատվերի բովանդակությունից։"
+    "expressDeliveryDescription": "Հնարավոր է լրացուցիչ վճարով՝ կախված հասցեից և պատվերից։"
   },
   "deliveryPolicy": {
     "returnsLinkText": "Վերադարձի և փոխանակման քաղաքականություն",
