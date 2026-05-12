@@ -41,6 +41,10 @@ import {
   MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
   MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS,
 } from './mobile-drawer-nav.constants';
+import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
+
+/** Handset glyph — slight left nudge next to stacked numbers (navbar + mobile drawer). */
+const HEADER_SUPPORT_PHONE_ICON_NUDGE_LEFT_CLASS = '-translate-x-3';
 
 /** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
 const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
@@ -551,18 +555,21 @@ function HeaderPhoneLangCluster({
   showLanguageSwitcher?: boolean;
 }) {
   const { t } = useTranslation();
-  const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
-  const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
+  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
 
-  const numberClass =
+  const numberWrapperClass =
     phoneNumberVisibility === 'smUp'
-      ? 'hidden truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151] sm:inline'
-      : 'truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151]';
+      ? 'hidden min-w-0 flex-col gap-0.5 sm:flex'
+      : 'flex min-w-0 flex-col gap-0.5';
 
   return (
     <div className="flex min-w-0 shrink-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[50px]">
-      <a href={telHref} className="flex min-w-0 items-center gap-2" aria-label={t('common.header.supportPhoneAria')}>
-        <span className="relative size-6 shrink-0">
+      <div
+        className="flex min-w-0 items-center gap-2"
+        role="group"
+        aria-label={t('common.header.supportPhoneAria')}
+      >
+        <span className={`relative size-6 shrink-0 ${HEADER_SUPPORT_PHONE_ICON_NUDGE_LEFT_CLASS}`}>
           <img
             src={HEADER_FIGMA_ASSETS.phoneIcon}
             alt=""
@@ -571,8 +578,16 @@ function HeaderPhoneLangCluster({
             className="absolute inset-0 block size-6 max-w-none"
           />
         </span>
-        <span className={numberClass}>{t('common.header.supportPhoneNumber')}</span>
-      </a>
+        <span
+          className={`${numberWrapperClass} text-[14px] font-semibold leading-6 tracking-[0.2px] text-[#374151] tabular-nums`}
+        >
+          {phoneLines.map((line, index) => (
+            <a key={`${line}-${index}`} href={phoneDisplayToTelHref(line)} className="block hover:underline">
+              {line}
+            </a>
+          ))}
+        </span>
+      </div>
       {showLanguageSwitcher ? <LanguageSwitcherPill /> : null}
     </div>
   );
@@ -581,17 +596,16 @@ function HeaderPhoneLangCluster({
 /** Support call-to-action for mobile drawer — same chrome as `MOBILE_DRAWER_NAV_BUTTON_CLASS`. */
 function MobileDrawerSupportPhoneButton() {
   const { t } = useTranslation();
-  const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
-  const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
+  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
 
   return (
-    <a
-      href={telHref}
+    <div
       className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
+      role="group"
       aria-label={t('common.header.supportPhoneAria')}
     >
       <span className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="relative size-6 shrink-0">
+        <span className={`relative size-6 shrink-0 ${HEADER_SUPPORT_PHONE_ICON_NUDGE_LEFT_CLASS}`}>
           <img
             src={HEADER_FIGMA_ASSETS.phoneIcon}
             alt=""
@@ -600,14 +614,18 @@ function MobileDrawerSupportPhoneButton() {
             className="absolute inset-0 block size-6 max-w-none"
           />
         </span>
-        <span className="min-w-0 truncate text-sm font-semibold text-[#374151]">
-          {t('common.header.supportPhoneNumber')}
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5 text-sm font-semibold tabular-nums text-[#374151]">
+          {phoneLines.map((line, index) => (
+            <a key={`${line}-${index}`} href={phoneDisplayToTelHref(line)} className="min-w-0 hover:underline">
+              {line}
+            </a>
+          ))}
         </span>
       </span>
       <svg className="h-4 w-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
-    </a>
+    </div>
   );
 }
 

@@ -1,13 +1,15 @@
 'use client';
 
 import { Card } from '@shop/ui';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
 import { getStoredLanguage } from '../../lib/language';
 import { loadTranslation } from '../../lib/i18n';
+import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../../lib/contactPhoneDisplay';
 
 export default function DeliveryPage() {
   const { t } = useTranslation();
+  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
   const [methods, setMethods] = useState<Array<{
     id: string;
     enabled: boolean;
@@ -160,15 +162,22 @@ export default function DeliveryPage() {
           <div className="space-y-2 text-gray-700">
             <p>
               <span className="font-semibold">{t('delivery.contact.email')}</span>{' '}
-              <a href="mailto:support@whiteshop.com" className="text-blue-600 hover:underline">
-                support@whiteshop.com
+              <a href={`mailto:${t('contact.email')}`} className="text-blue-600 hover:underline">
+                {t('contact.email')}
               </a>
             </p>
             <p>
               <span className="font-semibold">{t('delivery.contact.phone')}</span>{' '}
-              <a href="tel:+1234567890" className="text-blue-600 hover:underline">
-                +1 (234) 567-890
-              </a>
+              <span className="text-blue-600">
+                {phoneLines.map((line, index) => (
+                  <Fragment key={`${line}-${index}`}>
+                    {index > 0 ? <span className="text-gray-500"> · </span> : null}
+                    <a href={phoneDisplayToTelHref(line)} className="hover:underline">
+                      {line}
+                    </a>
+                  </Fragment>
+                ))}
+              </span>
             </p>
             <p>
               <span className="font-semibold">{t('delivery.contact.hours')}</span> {t('delivery.contact.hoursValue')}

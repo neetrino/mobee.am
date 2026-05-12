@@ -4,6 +4,7 @@ import { Button, Input } from '@shop/ui';
 import { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
+import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../../lib/contactPhoneDisplay';
 import { apiClient } from '../../lib/api-client';
 
 // Icons
@@ -33,6 +34,7 @@ const CONTACT_FORM_LABEL_CLASS = 'sr-only';
 
 export default function ContactPage() {
   const { t } = useTranslation();
+  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -95,12 +97,17 @@ export default function ContactPage() {
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.callToUs.title')}</h3>
               </div>
               <p className="text-gray-600 mb-2">{t('contact.callToUs.description')}</p>
-              <a
-                href={`tel:${t('contact.phone')}`}
-                className="font-medium text-[#2DB2FF] hover:text-[#2DB2FF] hover:underline"
-              >
-                {t('contact.phone')}
-              </a>
+              <span className="flex flex-col gap-1 font-medium tabular-nums text-[#2DB2FF]">
+                {phoneLines.map((line, index) => (
+                  <a
+                    key={`${line}-${index}`}
+                    href={phoneDisplayToTelHref(line)}
+                    className="hover:text-[#2DB2FF] hover:underline"
+                  >
+                    {line}
+                  </a>
+                ))}
+              </span>
             </div>
 
             {/* Write to Us */}
