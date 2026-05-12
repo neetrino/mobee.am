@@ -208,7 +208,7 @@ export function OrdersFilters({
         </div>
         {updateMessage ? (
           <div
-            className={`rounded-supersudo px-3 py-1.5 text-sm ${
+            className={`rounded-supersudo px-3 py-1.5 text-sm whitespace-pre-wrap ${
               updateMessage.type === 'success'
                 ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800'

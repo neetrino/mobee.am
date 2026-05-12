@@ -3,6 +3,7 @@
 import { useTranslation } from '../../../lib/i18n-client';
 import { useOrders } from './useOrders';
 import { OrdersFilters } from './components/OrdersFilters';
+import { BulkDeleteConfirmSheet } from './components/BulkDeleteConfirmSheet';
 import { BulkSelectionControls } from './components/BulkSelectionControls';
 import { OrdersTable } from './components/OrdersTable';
 import { OrderDetailsModal } from './components/OrderDetailsModal';
@@ -28,6 +29,7 @@ export function OrdersPageContent() {
     updateMessage,
     selectedIds,
     bulkDeleting,
+    bulkDeleteConfirmOpen,
     selectedOrderId,
     orderDetails,
     loadingOrderDetails,
@@ -42,7 +44,9 @@ export function OrdersPageContent() {
     toggleSelect,
     toggleSelectAll,
     handleSort,
-    handleBulkDelete,
+    openBulkDeleteConfirm,
+    closeBulkDeleteConfirm,
+    executeBulkDelete,
     handleStatusChange,
     handlePaymentStatusChange,
     handleFulfillmentStatusChange,
@@ -74,8 +78,20 @@ export function OrdersPageContent() {
 
         <BulkSelectionControls
           selectedCount={selectedIds.size}
-          onBulkDelete={handleBulkDelete}
+          onBulkDelete={openBulkDeleteConfirm}
           bulkDeleting={bulkDeleting}
+        />
+
+        <BulkDeleteConfirmSheet
+          isOpen={bulkDeleteConfirmOpen}
+          title={t('admin.orders.deleteSelected')}
+          closeLabel={t('admin.common.close')}
+          selectedCount={selectedIds.size}
+          bulkDeleting={bulkDeleting}
+          onCancel={closeBulkDeleteConfirm}
+          onConfirm={() => {
+            void executeBulkDelete();
+          }}
         />
 
         <OrdersTable

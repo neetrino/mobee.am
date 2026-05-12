@@ -117,6 +117,7 @@ export function useOrders() {
   const [updateMessage, setUpdateMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [loadingOrderDetails, setLoadingOrderDetails] = useState(false);
@@ -296,67 +297,81 @@ export function useOrders() {
     setPage(1); // Reset to first page when sorting changes
   };
 
-  const handleBulkDelete = async () => {
-    if (selectedIds.size === 0) return;
-    if (!confirm(t('admin.orders.deleteConfirm').replace('{count}', selectedIds.size.toString()))) return;
-    setBulkDeleting(true);
-    try {
-      const ids = Array.from(selectedIds);
-      console.log('🗑️ [ADMIN] Starting bulk delete for orders:', ids);
+  const openBulkDeleteConfirm = useCallback(() => {
+    if (selectedIds.size === 0 || bulkDeleting) {
+      return;
+    }
+    setBulkDeleteConfirmOpen(true);
+  }, [selectedIds, bulkDeleting]);
 
+  const closeBulkDeleteConfirm = useCallback(() => {
+    if (bulkDeleting) {
+      return;
+    }
+    setBulkDeleteConfirmOpen(false);
+  }, [bulkDeleting]);
+
+  const executeBulkDelete = useCallback(async () => {
+    if (selectedIds.size === 0) {
+      return;
+    }
+    setBulkDeleting(true);
+    setUpdateMessage(null);
+    const ids = Array.from(selectedIds);
+    try {
       const results = await Promise.allSettled(
         ids.map(async (id) => {
           try {
-            const response = await apiClient.delete(`/api/v1/admin/orders/${id}`);
-            console.log('✅ [ADMIN] Order deleted successfully:', id, response);
-            return { id, success: true };
+            await apiClient.delete(`/api/v1/admin/orders/${id}`);
+            return { id, success: true as const };
           } catch (error: unknown) {
-            console.error('❌ [ADMIN] Failed to delete order:', id, error);
             const message =
               error instanceof Error ? error.message : t('admin.common.unknownErrorFallback');
-            return { id, success: false, error: message };
+            return { id, success: false as const, error: message };
           }
         }),
       );
 
-      const successful = results.filter((r) => r.status === 'fulfilled' && r.value.success);
-      const failed = results.filter(
-        (r) => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success),
+      const successful = results.filter(
+        (r): r is PromiseFulfilledResult<{ id: string; success: true }> =>
+          r.status === 'fulfilled' && r.value.success,
       );
-
-      console.log('📊 [ADMIN] Bulk delete results:', {
-        total: ids.length,
-        successful: successful.length,
-        failed: failed.length,
-      });
+      const failed = results.filter(
+        (r): r is PromiseFulfilledResult<{ id: string; success: false; error: string }> =>
+          r.status === 'fulfilled' && !r.value.success,
+      );
 
       setSelectedIds(new Set());
       await fetchOrders();
 
       if (failed.length > 0) {
-        const failedIds = failed.map((r) =>
-          r.status === 'fulfilled' ? r.value.id : 'unknown',
-        );
-        alert(
-          t('admin.orders.bulkDeleteFailed')
+        const failedIds = failed.map((r) => (r.status === 'fulfilled' ? r.value.id : 'unknown'));
+        setUpdateMessage({
+          type: 'error',
+          text: t('admin.orders.bulkDeleteFailed')
             .replace('{success}', successful.length.toString())
             .replace('{total}', ids.length.toString())
             .replace('{failed}', failedIds.join(', ')),
-        );
+        });
+        setTimeout(() => setUpdateMessage(null), 8000);
       } else {
-        alert(
-          t('admin.orders.bulkDeleteFinished')
+        setUpdateMessage({
+          type: 'success',
+          text: t('admin.orders.bulkDeleteFinished')
             .replace('{success}', successful.length.toString())
             .replace('{total}', ids.length.toString()),
-        );
+        });
+        setTimeout(() => setUpdateMessage(null), 5000);
       }
     } catch (err) {
       console.error('❌ [ADMIN] Bulk delete orders error:', err);
-      alert(t('admin.orders.failedToDelete'));
+      setUpdateMessage({ type: 'error', text: t('admin.orders.failedToDelete') });
+      setTimeout(() => setUpdateMessage(null), 5000);
     } finally {
       setBulkDeleting(false);
+      setBulkDeleteConfirmOpen(false);
     }
-  };
+  }, [selectedIds, t, fetchOrders]);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
@@ -506,6 +521,7 @@ export function useOrders() {
     updateMessage,
     selectedIds,
     bulkDeleting,
+    bulkDeleteConfirmOpen,
     selectedOrderId,
     orderDetails,
     loadingOrderDetails,
@@ -522,7 +538,9 @@ export function useOrders() {
     toggleSelect,
     toggleSelectAll,
     handleSort,
-    handleBulkDelete,
+    openBulkDeleteConfirm,
+    closeBulkDeleteConfirm,
+    executeBulkDelete,
     handleStatusChange,
     handlePaymentStatusChange,
     handleFulfillmentStatusChange,

@@ -33,16 +33,16 @@ export function OrderDetailsItems({
 
   if (!Array.isArray(orderDetails.items) || orderDetails.items.length === 0) {
     return (
-      <Card className="p-4 md:p-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('admin.orders.orderDetails.items')}</h3>
+      <Card className="p-3 md:p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('admin.orders.orderDetails.items')}</h3>
         <div className="text-sm text-gray-500">{t('admin.orders.orderDetails.noItemsFound')}</div>
       </Card>
     );
   }
 
   return (
-    <Card className="p-4 md:p-6">
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('admin.orders.orderDetails.items')}</h3>
+    <Card className="p-3 md:p-4">
+      <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('admin.orders.orderDetails.items')}</h3>
       <div className="overflow-x-auto border border-gray-200 rounded-supersudo">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50">

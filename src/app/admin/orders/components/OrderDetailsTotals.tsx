@@ -23,9 +23,9 @@ export function OrderDetailsTotals({
   }
 
   return (
-    <Card className="p-4 md:p-6">
-      <h3 className="text-sm font-semibold text-gray-900 mb-4">{t('orders.orderSummary.title')}</h3>
-      <div className="space-y-3">
+    <Card className="p-3 md:p-4">
+      <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('orders.orderSummary.title')}</h3>
+      <div className="space-y-2">
         <div className="flex justify-between text-sm text-gray-700">
           <span>{t('orders.orderSummary.subtotal')}</span>
           <span>{formatCurrency(orderDetails.totals.subtotal, (orderDetails.totals.currency || 'AMD') as CurrencyCode, 'USD')}</span>

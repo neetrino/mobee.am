@@ -19,8 +19,8 @@ export function OrderDetailsSummary({
   const { t } = useTranslation();
 
   return (
-    <Card className="p-4 md:p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <Card className="p-3 md:p-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
         <div>
           <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('admin.orders.orderDetails.summary')}</h3>
           <div className="text-sm text-gray-700 space-y-1">

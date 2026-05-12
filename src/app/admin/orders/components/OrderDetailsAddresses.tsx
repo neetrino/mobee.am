@@ -19,8 +19,8 @@ export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDet
     | undefined;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="p-4 md:p-6">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
+      <Card className="p-3 md:p-4">
         <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('admin.orders.orderDetails.shippingAddress')}</h3>
         {orderDetails.shippingMethod === 'pickup' ? (
           <div className="text-sm text-gray-700 space-y-1">
@@ -85,7 +85,7 @@ export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDet
           </div>
         )}
       </Card>
-      <Card className="p-4 md:p-6">
+      <Card className="p-3 md:p-4">
         <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('admin.orders.orderDetails.paymentInfo')}</h3>
         {orderDetails.payment ? (
           <div className="text-sm text-gray-700 space-y-1">
