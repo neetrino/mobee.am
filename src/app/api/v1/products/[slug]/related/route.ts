@@ -72,7 +72,17 @@ export async function GET(
     const lang = searchParams.get("lang") || "en";
     const limit = parseLimit(searchParams.get("limit"));
 
-    const currentProduct = await productsService.findBySlug(slug, lang);
+    let currentProduct: ProductForRelated;
+    try {
+      currentProduct = await productsService.findBySlug(slug, lang);
+    } catch (loadError: unknown) {
+      const status = (loadError as { status?: number }).status;
+      if (status === 404) {
+        return NextResponse.json({ data: [] });
+      }
+      throw loadError;
+    }
+
     const primaryCategorySlug = await resolveCategorySlugForRelated(currentProduct, lang);
 
     if (!primaryCategorySlug) {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import type { CSSProperties, FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
+import type { CSSProperties, FormEvent, KeyboardEvent, ReactNode, Ref, RefObject } from 'react';
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
 import { getDockedBarTopMotionStyle, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
@@ -367,6 +367,8 @@ export interface HeaderSecondaryBarProps {
   onLogout: () => void;
   /** When the global search modal is open, hide this dropdown so only one listbox is active. */
   suppressSearchDropdown: boolean;
+  /** Wraps desktop search field + results; used for outside-click to close the listbox. */
+  secondarySearchBoundaryRef?: Ref<HTMLDivElement>;
   /**
    * Pins the bar to the viewport top with `position: fixed` (used when CSS sticky is unreliable
    * inside flex layouts). Parent renders a same-height flow spacer while this is true.
@@ -422,6 +424,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
       logoutLabel,
       onLogout,
       suppressSearchDropdown,
+      secondarySearchBoundaryRef,
       dockToViewportTop = false,
       dockedViewportTopOffsetPx = 0,
     },
@@ -474,7 +477,10 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               {categoriesMenu}
             </div>
 
-            <div className="relative min-w-0 max-w-[203px] flex-1 lg:max-w-[273px] xl:max-w-[312px] 2xl:max-w-[387px]">
+            <div
+              ref={secondarySearchBoundaryRef}
+              className="relative min-w-0 max-w-[203px] flex-1 lg:max-w-[273px] xl:max-w-[312px] 2xl:max-w-[387px]"
+            >
               <form onSubmit={onSearchSubmit} className="relative w-full">
                 <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">
                   <SecondarySearchGlyph className="text-gray-400" />
@@ -532,14 +538,16 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   </span>
                 ) : null}
               </Link>
-              <Link href="/wishlist" className={`${iconLinkClass} relative`} aria-label={wishlistAria}>
-                <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
-                {wishlistCount > 0 ? (
-                  <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
-                    {wishlistCount > 99 ? '99+' : wishlistCount}
-                  </span>
-                ) : null}
-              </Link>
+              {isLoggedIn ? (
+                <Link href="/wishlist" className={`${iconLinkClass} relative`} aria-label={wishlistAria}>
+                  <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
+                  {wishlistCount > 0 ? (
+                    <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
+                      {wishlistCount > 99 ? '99+' : wishlistCount}
+                    </span>
+                  ) : null}
+                </Link>
+              ) : null}
               <Link
                 href="/cart"
                 className={`${iconLinkClass} relative`}

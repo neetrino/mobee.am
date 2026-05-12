@@ -1,6 +1,5 @@
 import { db } from "@white-shop/db";
 import { processImageUrl } from "../utils/image-utils";
-import { translations } from "../translations";
 import { cacheService } from "./cache.service";
 import { ProductWithRelations } from "./products-find-query.service";
 
@@ -63,15 +62,6 @@ export async function loadProductDiscountContext(): Promise<ProductDiscountConte
   }
 
   return ctx;
-};
-
-/**
- * Get "Out of Stock" translation for a given language
- */
-const getOutOfStockLabel = (lang: string = "en"): string => {
-  const langKey = lang as keyof typeof translations;
-  const translation = translations[langKey] || translations.en;
-  return translation.stock.outOfStock;
 };
 
 class ProductsFindTransformService {
@@ -283,49 +273,15 @@ class ProductsFindTransformService {
           return firstImage || null;
         })(),
         inStock: (variant?.stock || 0) > 0,
-        labels: (() => {
-          // Map existing labels
-          const existingLabels = Array.isArray(product.labels) ? product.labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({
-            id: label.id,
-            type: label.type,
-            value: label.value,
-            position: label.position,
-            color: label.color,
-          })) : [];
-          
-          // Check if product is out of stock
-          const isOutOfStock = (variant?.stock || 0) <= 0;
-          
-          // If out of stock, add "Out of Stock" label
-          if (isOutOfStock) {
-            // Check if "Out of Stock" label already exists
-            const outOfStockText = getOutOfStockLabel(lang);
-            const hasOutOfStockLabel = existingLabels.some(
-              (label) => label.value.toLowerCase() === outOfStockText.toLowerCase() ||
-                         label.value.toLowerCase().includes('out of stock') ||
-                         label.value.toLowerCase().includes('արտադրված') ||
-                         label.value.toLowerCase().includes('нет в наличии') ||
-                         label.value.toLowerCase().includes('არ არის მარაგში')
-            );
-            
-            if (!hasOutOfStockLabel) {
-              // Check if top-left position is available, otherwise use top-right
-              const topLeftOccupied = existingLabels.some((l) => l.position === 'top-left');
-              const position = topLeftOccupied ? 'top-right' : 'top-left';
-              
-              existingLabels.push({
-                id: `out-of-stock-${product.id}`,
-                type: 'text',
-                value: outOfStockText,
-                position: position as 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
-                color: '#6B7280', // Gray color for out of stock
-              });
-              
-            }
-          }
-          
-          return existingLabels;
-        })(),
+        labels: Array.isArray(product.labels)
+          ? product.labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({
+              id: label.id,
+              type: label.type,
+              value: label.value,
+              position: label.position,
+              color: label.color,
+            }))
+          : [],
         colors: availableColors, // Add available colors array
       };
     });

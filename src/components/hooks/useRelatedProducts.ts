@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../lib/api-client';
+import { ApiError } from '../../lib/api-client/types';
 import type { LanguageCode } from '../../lib/language';
 
 interface RelatedProduct {
@@ -63,8 +64,12 @@ export function useRelatedProducts({ currentProductSlug, language }: UseRelatedP
 
         setProducts(response.data.slice(0, 10));
       } catch (error) {
-        console.error('[RelatedProducts] Error fetching related products:', error);
-        setProducts([]);
+        if (error instanceof ApiError && error.status === 404) {
+          setProducts([]);
+        } else {
+          console.error('[RelatedProducts] Error fetching related products:', error);
+          setProducts([]);
+        }
       } finally {
         setLoading(false);
       }

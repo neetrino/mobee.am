@@ -1,6 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '../../lib/auth/AuthContext';
+import { getLoginUrlWithRedirect } from '../../lib/auth/loginRedirectUrl';
+import { queueWishlistProductForAfterLogin } from '../../lib/wishlist/pendingWishlistAfterLogin';
 
 const WISHLIST_KEY = 'shop_wishlist';
 
@@ -11,6 +15,9 @@ const WISHLIST_KEY = 'shop_wishlist';
  */
 export function useWishlist(productId: string) {
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const { isLoggedIn, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const checkWishlist = () => {
@@ -36,7 +43,16 @@ export function useWishlist(productId: string) {
 
   const toggleWishlist = () => {
     if (typeof window === 'undefined') return;
-    
+
+    if (authLoading && !isInWishlist) {
+      return;
+    }
+    if (!isLoggedIn && !isInWishlist) {
+      queueWishlistProductForAfterLogin(productId);
+      router.push(getLoginUrlWithRedirect(pathname || '/'));
+      return;
+    }
+
     try {
       const stored = localStorage.getItem(WISHLIST_KEY);
       const wishlist: string[] = stored ? JSON.parse(stored) : [];
