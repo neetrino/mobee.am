@@ -1,6 +1,5 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
-import { customAlphabet } from "nanoid";
 import type { CheckoutData } from "../types/checkout";
 import { logger } from "../utils/logger";
 import { extractMediaUrl } from "../utils/extractMediaUrl";
@@ -16,15 +15,24 @@ import {
   type DeliverySpeed,
 } from "./orders/checkout-shipping";
 
-const orderNumberId = customAlphabet("0123456789ABCDEFGHJKLMNPQRSTUVWXYZ", 10);
+const ORDER_NUMBER_START = 1000;
 
-function generateOrderNumber(): string {
-  const now = new Date();
-  const ymd =
-    now.getFullYear().toString().slice(-2) +
-    String(now.getMonth() + 1).padStart(2, "0") +
-    String(now.getDate()).padStart(2, "0");
-  return `${ymd}-${orderNumberId()}`;
+/**
+ * Generate the next sequential order number (>= 1000).
+ * Looks up the current max purely-numeric order number inside the active
+ * transaction so concurrent checkouts read a consistent value. Any rare
+ * collision is still caught by the unique constraint on `orders.number`
+ * and surfaces as a 409 (handled in `checkout`).
+ */
+async function generateSequentialOrderNumber(
+  tx: Prisma.TransactionClient
+): Promise<string> {
+  const rows = await tx.$queryRaw<Array<{ max: bigint | null }>>(
+    Prisma.sql`SELECT MAX(CAST("number" AS BIGINT)) AS max FROM "orders" WHERE "number" ~ '^[0-9]+$'`
+  );
+  const currentMax = Number(rows[0]?.max ?? 0);
+  const next = Math.max(currentMax + 1, ORDER_NUMBER_START);
+  return String(next);
 }
 type CartItemWithRelations = Prisma.CartItemGetPayload<{
   include: {
@@ -374,12 +382,14 @@ class OrdersService {
           ? { ...shippingAddress, deliverySpeed: speed }
           : shippingAddress;
 
-      // Generate order number
-      const orderNumber = generateOrderNumber();
-
       // Create order with items in a transaction (timeout to avoid hung connections)
       const order = await db.$transaction(
         async (tx: Prisma.TransactionClient) => {
+        // Generate sequential order number inside the transaction so the
+        // MAX lookup and the insert are atomic. Unique constraint on
+        // `orders.number` still guards against rare races (returns 409).
+        const orderNumber = await generateSequentialOrderNumber(tx);
+
         // Create order
         const newOrder = await tx.order.create({
           data: {
