@@ -20,9 +20,9 @@ export default function AboutPage() {
       {/* Секция: About our online store */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:items-stretch gap-12">
             {/* Изображение слева */}
-            <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden shadow-lg">
+            <div className="relative w-full h-[400px] md:h-[500px] lg:min-h-[600px] rounded-lg overflow-hidden shadow-lg">
               <Image
                 src="https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 alt="Our team working together"
@@ -36,7 +36,7 @@ export default function AboutPage() {
             {/* Текст справа */}
             <div className="space-y-6">
               {/* Подзаголовок */}
-              <p className="text-sm md:text-base font-semibold uppercase tracking-wider text-[#7CB342]">
+              <p className="text-sm md:text-base font-semibold uppercase tracking-wider text-[#2DB2FF]">
                 {t('about.subtitle')}
               </p>
 
@@ -55,6 +55,9 @@ export default function AboutPage() {
                 </p>
                 <p>
                   {t('about.description.paragraph3')}
+                </p>
+                <p>
+                  {t('about.description.paragraph4')}
                 </p>
               </div>
             </div>

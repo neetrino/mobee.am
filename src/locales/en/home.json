@@ -22,7 +22,9 @@
     "title": "Special offers",
     "subtitle": "Selected devices with special conditions",
     "cta": "More",
-    "carouselAriaLabel": "Special offers — swipe sideways to see more"
+    "carouselAriaLabel": "Special offers — swipe sideways to see more",
+    "scrollPrevious": "Previous special offers",
+    "scrollNext": "Next special offers"
   },
   "why_choose_us_heading": {
     "title": "Why choose us",
@@ -52,7 +54,9 @@
     "errorLoading": "Failed to load products",
     "tryAgain": "Try Again",
     "noProducts": "No products in this category.",
-    "carouselAriaLabel": "Featured products — swipe sideways to see more"
+    "carouselAriaLabel": "Featured products — swipe sideways to see more",
+    "scrollPrevious": "Previous products",
+    "scrollNext": "Next products"
   },
   "mobile_home": {
     "featuredSectionTitle": "Featured",

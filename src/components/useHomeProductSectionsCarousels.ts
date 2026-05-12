@@ -5,12 +5,17 @@ import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSyn
 
 function initialMobileCarouselState(
   productsPerPage: number,
-  mobileCardsPerView: number,
+  cardsPerViewportEstimate: number,
 ): MobileCarouselViewState {
   return {
     pageIndex: 0,
-    pageCount: Math.max(1, Math.ceil(productsPerPage / mobileCardsPerView)),
+    pageCount: Math.max(1, Math.ceil(productsPerPage / cardsPerViewportEstimate)),
   };
+}
+
+/** Special-offers strip is one row tall — fewer cards per viewport than the two-row featured strip (estimate for dots until scroll sync). */
+function specialOffersCarouselCardsPerViewportEstimate(mobileCardsPerView: number): number {
+  return Math.max(1, mobileCardsPerView / 2);
 }
 
 export function useHomeProductSectionsCarousels(
@@ -18,19 +23,26 @@ export function useHomeProductSectionsCarousels(
   specialOffersProductsPerPage: number,
   mobileCardsPerView: number,
 ) {
+  const specialOffersCardsEstimate = specialOffersCarouselCardsPerViewportEstimate(mobileCardsPerView);
+
   const [featuredCarousel, setFeaturedCarousel] = useState(() =>
     initialMobileCarouselState(featuredProductsPerPage, mobileCardsPerView),
   );
   const [specialOffersCarousel, setSpecialOffersCarousel] = useState(() =>
-    initialMobileCarouselState(specialOffersProductsPerPage, mobileCardsPerView),
+    initialMobileCarouselState(specialOffersProductsPerPage, specialOffersCardsEstimate),
   );
 
   useEffect(() => {
     setFeaturedCarousel(initialMobileCarouselState(featuredProductsPerPage, mobileCardsPerView));
     setSpecialOffersCarousel(
-      initialMobileCarouselState(specialOffersProductsPerPage, mobileCardsPerView),
+      initialMobileCarouselState(specialOffersProductsPerPage, specialOffersCardsEstimate),
     );
-  }, [featuredProductsPerPage, specialOffersProductsPerPage, mobileCardsPerView]);
+  }, [
+    featuredProductsPerPage,
+    specialOffersProductsPerPage,
+    mobileCardsPerView,
+    specialOffersCardsEstimate,
+  ]);
 
   const onFeaturedCarouselViewChange = useCallback((state: MobileCarouselViewState) => {
     setFeaturedCarousel((prev) =>
