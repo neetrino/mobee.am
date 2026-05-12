@@ -3,6 +3,7 @@ import {
   ADMIN_MOBILE_MENU_OFFSET_LEFT_PX,
   ADMIN_MOBILE_MENU_OFFSET_TOP_PX,
 } from './src/app/admin/admin-mobile-menu-layout.constants';
+import { CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX } from './src/app/checkout/constants';
 import {
   LAYOUT_DESKTOP_MIN_WIDTH_PX,
   SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX,
@@ -27,6 +28,8 @@ const config: Config = {
       spacing: {
         'admin-mobile-menu-top': `${ADMIN_MOBILE_MENU_OFFSET_TOP_PX}px`,
         'admin-mobile-menu-left': `${ADMIN_MOBILE_MENU_OFFSET_LEFT_PX}px`,
+        /** `/checkout` — horizontal gutter from viewport at `lg+` (both sides). */
+        'checkout-viewport-x': `${CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX}px`,
       },
       borderRadius: {
         /** Admin `/supersudo` UI — unified corner radius */

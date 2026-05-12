@@ -5,7 +5,8 @@ export const CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX = 150;
  * Checkout page shell: responsive padding on small screens; `lg+` uses full width with
  * {@link CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX}px side gutters so cards align ~150px from each edge.
  */
-export const CHECKOUT_PAGE_SHELL_CLASS = `mx-auto w-full px-4 py-12 sm:px-6 lg:max-w-none lg:px-[${CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX}px]`;
+export const CHECKOUT_PAGE_SHELL_CLASS =
+  'mx-auto w-full px-4 py-12 sm:px-6 lg:max-w-none lg:px-checkout-viewport-x';
 
 /** `/checkout` form sections, order summary card, and in-card controls — 15px corners. */
 export const CHECKOUT_FORM_CARD_RADIUS_CLASS = 'rounded-[15px]';
