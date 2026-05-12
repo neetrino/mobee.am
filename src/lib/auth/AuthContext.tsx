@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useRouter } from 'next/navigation';
 import { apiClient, ApiError } from '../api-client';
 import { mergeGuestCartIntoUserCart } from '../cart/guest-cart';
+import { applyPendingWishlistProductAfterAuth } from '../wishlist/pendingWishlistAfterLogin';
 
 /**
  * User interface
@@ -162,6 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       persistAuthResponse(response);
+      applyPendingWishlistProductAfterAuth();
       await mergeGuestCartAfterAuth();
 
       // Don't redirect here - let the login page handle redirect based on query params
@@ -223,6 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('✅ [AUTH] Registration response received:', response);
 
       persistAuthResponse(response);
+      applyPendingWishlistProductAfterAuth();
       await mergeGuestCartAfterAuth();
       console.log('✅ [AUTH] Registration successful:', { userId: response.user.id });
 

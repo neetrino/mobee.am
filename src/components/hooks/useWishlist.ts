@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { getLoginUrlWithRedirect } from '../../lib/auth/loginRedirectUrl';
+import { queueWishlistProductForAfterLogin } from '../../lib/wishlist/pendingWishlistAfterLogin';
 
 const WISHLIST_KEY = 'shop_wishlist';
 
@@ -47,6 +48,7 @@ export function useWishlist(productId: string) {
       return;
     }
     if (!isLoggedIn && !isInWishlist) {
+      queueWishlistProductForAfterLogin(productId);
       router.push(getLoginUrlWithRedirect(pathname || '/'));
       return;
     }

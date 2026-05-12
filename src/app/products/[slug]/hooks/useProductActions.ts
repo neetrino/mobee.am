@@ -8,6 +8,7 @@ import type { LanguageCode } from '../../../../lib/language';
 import { toggleCompareProduct } from '../../../../lib/shop/compare-storage';
 import { useAuth } from '../../../../lib/auth/AuthContext';
 import { getLoginUrlWithRedirect } from '../../../../lib/auth/loginRedirectUrl';
+import { queueWishlistProductForAfterLogin } from '../../../../lib/wishlist/pendingWishlistAfterLogin';
 
 interface UseProductActionsProps {
   productId: string | null;
@@ -41,6 +42,7 @@ export function useProductActions({
       return;
     }
     if (!isLoggedIn && !isInWishlist) {
+      queueWishlistProductForAfterLogin(productId);
       router.push(getLoginUrlWithRedirect(pathname || '/'));
       return;
     }
