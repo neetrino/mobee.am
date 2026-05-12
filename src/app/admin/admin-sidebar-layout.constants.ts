@@ -39,7 +39,7 @@ export const ADMIN_SIDEBAR_DESKTOP_TOGGLE_SQUIRCLE_CLASS = [
  * Expanded desktop sidebar header: compact collapse control (smaller than icon-rail expand).
  */
 export const ADMIN_SIDEBAR_DESKTOP_TOGGLE_COMPACT_CLASS = [
-  'flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-md border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors',
+  'flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors',
   'hover:border-gray-300 hover:text-gray-900',
   'focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2',
 ].join(' ');
