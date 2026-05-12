@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { getAdminMenuTABS } from '../admin-menu.config';
-import { ADMIN_SIDEBAR_NAV_SCROLL_TOP_PADDING_CLASS } from '../admin-sidebar-layout.constants';
+import {
+  ADMIN_SIDEBAR_COLLAPSED_RAIL_NAV_SCROLL_PADDING_X_CLASS,
+  ADMIN_SIDEBAR_NAV_SCROLL_TOP_PADDING_CLASS,
+} from '../admin-sidebar-layout.constants';
 import type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
 import { isProductGroupPathActive, PrimaryNavList } from './AdminSidebarPrimaryNav';
 
@@ -50,7 +53,13 @@ export function AdminSidebarNavBody({
   const scrollShellClass =
     presentation === 'mobileDrawer'
       ? 'flex w-full flex-col gap-2'
-      : `admin-sidebar-nav-scroll-desktop min-h-0 flex-1 space-y-1 overflow-y-auto pr-1 lg:pr-0 ${ADMIN_SIDEBAR_NAV_SCROLL_TOP_PADDING_CLASS}`;
+      : desktopCollapsed
+        ? [
+            'admin-sidebar-nav-scroll-desktop min-h-0 flex-1 space-y-1 overflow-y-auto',
+            ADMIN_SIDEBAR_COLLAPSED_RAIL_NAV_SCROLL_PADDING_X_CLASS,
+            ADMIN_SIDEBAR_NAV_SCROLL_TOP_PADDING_CLASS,
+          ].join(' ')
+        : `admin-sidebar-nav-scroll-desktop min-h-0 flex-1 space-y-1 overflow-y-auto pr-1 lg:pr-0 ${ADMIN_SIDEBAR_NAV_SCROLL_TOP_PADDING_CLASS}`;
 
   const rootClass =
     presentation === 'mobileDrawer'

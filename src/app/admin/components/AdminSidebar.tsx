@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { SiteBrandLogo } from '../../../components/SiteBrandLogo';
 import {
+  ADMIN_SIDEBAR_DESKTOP_TOGGLE_COMPACT_CLASS,
+  ADMIN_SIDEBAR_DESKTOP_TOGGLE_SQUIRCLE_CLASS,
   ADMIN_SIDEBAR_DESKTOP_WIDTH_FULL_CLASS,
   ADMIN_SIDEBAR_DESKTOP_WIDTH_ICON_RAIL_CLASS,
 } from '../admin-sidebar-layout.constants';
@@ -84,7 +86,7 @@ export function AdminSidebar({
                 onClick={() => {
                   onDesktopCollapsedChange(false);
                 }}
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
+                className={ADMIN_SIDEBAR_DESKTOP_TOGGLE_SQUIRCLE_CLASS}
                 aria-label={t('admin.sidebar.expandSidebarAria')}
               >
                 <ChevronRight className="h-5 w-5" aria-hidden strokeWidth={2} />
@@ -104,10 +106,10 @@ export function AdminSidebar({
                 onClick={() => {
                   onDesktopCollapsedChange(true);
                 }}
-                className="inline-flex h-9 w-9 shrink-0 translate-x-1 items-center justify-center rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
+                className={ADMIN_SIDEBAR_DESKTOP_TOGGLE_COMPACT_CLASS}
                 aria-label={t('admin.sidebar.collapseSidebarAria')}
               >
-                <ChevronLeft className="h-5 w-5" aria-hidden strokeWidth={2} />
+                <ChevronLeft className="h-3.5 w-3.5" aria-hidden strokeWidth={2} />
               </button>
             </div>
           )}
