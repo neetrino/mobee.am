@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@/app/admin/lib/adminShopUi';
+import { ORDERS_FILTER_SELECT_CLASS } from '../orders-filters.constants';
 import type { useOrders } from '../useOrders';
 
 interface OrdersFiltersProps {
@@ -91,7 +92,7 @@ export function OrdersFilters({
     <Card className="p-4 mb-6">
       <div className="flex gap-4 items-center flex-wrap">
         <select
-          className="px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
+          className={ORDERS_FILTER_SELECT_CLASS}
           value={statusFilter}
           onChange={(e) => handleStatusChange(e.target.value)}
         >
@@ -102,7 +103,7 @@ export function OrdersFilters({
           <option value="cancelled">{t('admin.orders.cancelled')}</option>
         </select>
         <select
-          className="px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
+          className={ORDERS_FILTER_SELECT_CLASS}
           value={paymentStatusFilter}
           onChange={(e) => handlePaymentStatusChange(e.target.value)}
         >
@@ -112,7 +113,7 @@ export function OrdersFilters({
           <option value="failed">{t('admin.orders.failed')}</option>
         </select>
         <select
-          className="px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
+          className={ORDERS_FILTER_SELECT_CLASS}
           value={fulfillmentStatusFilter}
           onChange={(e) => handleFulfillmentStatusChange(e.target.value)}
         >
