@@ -27,5 +27,17 @@ export const ADMIN_SIDEBAR_COLLAPSED_HOME_MARK_LETTER_CLASS =
 /** Space below sidebar header chrome (`border-b`) before first nav item (e.g. dashboard). */
 export const ADMIN_SIDEBAR_NAV_SCROLL_TOP_PADDING_CLASS = 'pt-3';
 
-/** When desktop sidebar is icon rail: cap main width and center in the remaining row space. */
-export const ADMIN_PAGE_MAIN_CENTER_WHEN_SIDEBAR_COLLAPSED_CLASS = 'lg:mx-auto lg:max-w-7xl';
+/** Nudge main column slightly left when desktop sidebar is expanded (lg+). */
+export const ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS = 'lg:-translate-x-[15px]';
+
+/** Nudge collapsed-rail main column content left (1.25rem = 20px at 16px root). */
+export const ADMIN_PAGE_MAIN_COLLAPSED_SHIFT_LEFT_CLASS = 'lg:-translate-x-5';
+
+/**
+ * When desktop sidebar is icon rail: center content in the main flex column (not 100vw — avoids
+ * double-counting rail+gap and uneven left/right vs viewport).
+ */
+export const ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS = [
+  'box-border min-w-0 w-full max-w-7xl lg:mx-auto px-4 sm:px-6 lg:px-8',
+  ADMIN_PAGE_MAIN_COLLAPSED_SHIFT_LEFT_CLASS,
+].join(' ');

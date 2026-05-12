@@ -3,7 +3,10 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ADMIN_PAGE_MAIN_CENTER_WHEN_SIDEBAR_COLLAPSED_CLASS } from '../admin-sidebar-layout.constants';
+import {
+  ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS,
+  ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS,
+} from '../admin-sidebar-layout.constants';
 import { AdminSidebar } from './AdminSidebar';
 
 interface AdminPageShellProps {
@@ -23,7 +26,11 @@ export function AdminPageShell({
 }: AdminPageShellProps) {
   const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(false);
 
-  const mainCenterClass = desktopSidebarCollapsed ? ADMIN_PAGE_MAIN_CENTER_WHEN_SIDEBAR_COLLAPSED_CLASS : '';
+  const mainHorizontalPaddingClass = desktopSidebarCollapsed
+    ? 'px-4 pt-2 sm:px-6 sm:pt-4 lg:px-0 lg:pt-[30px]'
+    : 'px-4 pt-2 sm:px-6 sm:pt-4 lg:px-8 lg:pt-[30px]';
+
+  const mainExpandedShiftClass = desktopSidebarCollapsed ? '' : ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS;
 
   return (
     <div className="min-h-screen bg-[#F2F5F8]">
@@ -36,9 +43,17 @@ export function AdminPageShell({
           onDesktopCollapsedChange={setDesktopSidebarCollapsed}
         />
         <div
-          className={`flex-1 min-w-0 px-4 pt-2 sm:px-6 sm:pt-4 lg:px-8 lg:pt-[30px] ${mainCenterClass} ${mainClassName ?? ''}`.trim()}
+          className={`flex-1 min-w-0 ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
+            desktopSidebarCollapsed ? '' : (mainClassName ?? '')
+          }`.trim()}
         >
-          {children}
+          {desktopSidebarCollapsed ? (
+            <div className={`${ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS} ${mainClassName ?? ''}`.trim()}>
+              {children}
+            </div>
+          ) : (
+            children
+          )}
         </div>
       </div>
     </div>
