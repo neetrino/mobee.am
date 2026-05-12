@@ -42,6 +42,14 @@ const FOOTER_ADDRESS_ROW_NUDGE_LEFT_CLASS = '-translate-x-[20px]';
 /** Space under location title block before phone / mail / address (Figma-tuned). */
 const FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS = 'gap-20 lg:gap-24';
 
+/** Location block title — default (en/ru), Figma mobee-new. */
+const FOOTER_LOCATION_HEADING_SIZE_DEFAULT_CLASS =
+  'text-3xl font-black uppercase leading-none text-black md:text-4xl lg:text-[52px]';
+
+/** HY: smaller type + tighter tracking + 5px left nudge so «Մեր գտնվելու վայրը» fits one line. */
+const FOOTER_LOCATION_HEADING_SIZE_HY_CLASS =
+  '-translate-x-[5px] text-[1.375rem] font-black uppercase leading-none tracking-[-0.025em] text-black sm:text-2xl md:text-[1.875rem] lg:text-[38px] xl:text-[42px]';
+
 /** Location card + map shell — light gray (Figma mobee-new footer reference). */
 const FOOTER_LOCATION_SURFACE_BG_CLASS = 'bg-[#f9f9f9]';
 
@@ -164,7 +172,7 @@ function FooterLocationCard(props: {
   readonly phoneLines: readonly string[];
   readonly email: string;
 }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { addressText, phoneLines, email } = props;
   const mailHref = `mailto:${email}`;
 
@@ -172,7 +180,11 @@ function FooterLocationCard(props: {
     <div className={FOOTER_CARD_CLASS}>
       <div className={`flex min-w-0 flex-1 flex-col lg:py-4 ${FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS}`}>
         <div>
-          <h2 className="text-3xl font-black uppercase leading-none text-black md:text-4xl lg:text-[52px]">
+          <h2
+            className={
+              lang === 'hy' ? FOOTER_LOCATION_HEADING_SIZE_HY_CLASS : FOOTER_LOCATION_HEADING_SIZE_DEFAULT_CLASS
+            }
+          >
             {t('common.footer.locationHeading')}
           </h2>
           <p className="mt-2 text-[14px] leading-5 text-black">{t('common.footer.locationSubtitle')}</p>
