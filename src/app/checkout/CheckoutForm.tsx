@@ -186,7 +186,7 @@ export function CheckoutForm({
                           shouldDirty: true,
                         })
                       }
-                      className={`mt-0.5 h-4 w-4 shrink-0 ${CHECKOUT_RADIO_ACCENT_CLASS} focus:ring-2 focus:ring-admin-500 focus:ring-offset-0`}
+                      className={`mt-0.5 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
                       disabled={isSubmitting}
                     />
                     <div className="min-w-0 flex-1">
@@ -216,7 +216,7 @@ export function CheckoutForm({
                           shouldDirty: true,
                         })
                       }
-                      className={`mt-0.5 h-4 w-4 shrink-0 ${CHECKOUT_RADIO_ACCENT_CLASS} focus:ring-2 focus:ring-admin-500 focus:ring-offset-0`}
+                      className={`mt-0.5 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
                       disabled={isSubmitting}
                     />
                     <div className="min-w-0 flex-1">

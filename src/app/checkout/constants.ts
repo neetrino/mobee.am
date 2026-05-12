@@ -30,5 +30,9 @@ export const CHECKOUT_CONTACT_FIELDS_GRID_CLASS =
 /** Selected shipping/payment option — Mobee brand blue (replaces purple accent). */
 export const CHECKOUT_OPTION_SELECTED_CHROME_CLASS = 'border-admin-500 bg-admin-50';
 
-/** Native `radio` accent color in checkout option lists. */
-export const CHECKOUT_RADIO_ACCENT_CLASS = 'accent-admin-500';
+/**
+ * Checkout option radios: custom paint so WebKit/Safari does not show a black inner dot
+ * when combining `accent-color` with fixed control size.
+ */
+export const CHECKOUT_RADIO_ACCENT_CLASS =
+  'appearance-none size-4 shrink-0 rounded-full border-2 border-gray-300 bg-white outline-none transition-[border-color,box-shadow] focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 checked:border-admin-500 checked:bg-[radial-gradient(circle_at_center,theme(colors.admin.500)_42%,theme(colors.white)_43%)]';

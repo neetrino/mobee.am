@@ -90,12 +90,12 @@ export default function ContactPage() {
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.callToUs.title')}</h3>
               </div>
               <p className="text-gray-600 mb-2">{t('contact.callToUs.description')}</p>
-              <span className="flex flex-col gap-1 font-medium tabular-nums text-[#2DB2FF]">
+              <span className="flex flex-col items-start gap-1 font-medium tabular-nums text-[#2DB2FF]">
                 {phoneLines.map((line, index) => (
                   <a
                     key={`${line}-${index}`}
                     href={phoneDisplayToTelHref(line)}
-                    className="hover:text-[#2DB2FF] hover:underline"
+                    className="w-fit max-w-full hover:text-[#2DB2FF] hover:underline"
                   >
                     {line}
                   </a>
@@ -119,12 +119,15 @@ export default function ContactPage() {
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.writeToUs.title')}</h3>
               </div>
               <p className="text-gray-600 mb-2">{t('contact.writeToUs.description')}</p>
-              <a
-                href={`mailto:${t('contact.email')}`}
-                className="font-medium text-[#2DB2FF] hover:text-[#2DB2FF] hover:underline"
-              >
-                {t('contact.writeToUs.emailLabel')} {t('contact.email')}
-              </a>
+              <div className="flex flex-wrap items-baseline gap-2">
+                <span className="font-medium text-[#2DB2FF]">{t('contact.writeToUs.emailLabel')}</span>
+                <a
+                  href={`mailto:${t('contact.email')}`}
+                  className="font-medium text-[#2DB2FF] hover:text-[#2DB2FF] hover:underline"
+                >
+                  {t('contact.email')}
+                </a>
+              </div>
             </div>
 
             {/* Headquarter */}
