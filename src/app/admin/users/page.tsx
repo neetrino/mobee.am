@@ -214,7 +214,7 @@ export default function UsersPage() {
               <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
                 {t('admin.users.adminCustomer')}
               </span>
-              <div className="inline-flex rounded-full bg-gray-100 p-1 text-sm font-medium">
+              <div className="inline-flex rounded-full bg-gray-100 p-1.5 text-sm font-medium">
                 <button
                   type="button"
                   onClick={() => {
@@ -222,7 +222,7 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: all');
                   }}
-                  className={`rounded-full px-4 py-1.5 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
+                  className={`rounded-full px-4 py-2 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'all'
                       ? 'bg-admin-500 font-semibold text-white shadow-sm'
                       : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
@@ -237,7 +237,7 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: admin');
                   }}
-                  className={`rounded-full px-4 py-1.5 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
+                  className={`rounded-full px-4 py-2 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'admin'
                       ? 'bg-admin-500 font-semibold text-white shadow-sm'
                       : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
@@ -252,7 +252,7 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: customer');
                   }}
-                  className={`rounded-full px-4 py-1.5 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
+                  className={`rounded-full px-4 py-2 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'customer'
                       ? 'bg-admin-500 font-semibold text-white shadow-sm'
                       : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
