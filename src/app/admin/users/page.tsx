@@ -188,7 +188,7 @@ export default function UsersPage() {
 
   return (
     <AdminPageShell currentPath={pathname || '/supersudo/users'} router={router} t={t}>
-      <div className="max-w-7xl">
+      <div className="w-full min-w-0">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.users.title')}</h1>
         </div>
@@ -305,7 +305,7 @@ export default function UsersPage() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.status')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="min-w-[7.5rem] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-normal">
                         {t('admin.users.created')}
                       </th>
                     </tr>
@@ -374,7 +374,7 @@ export default function UsersPage() {
                             />
                           </button>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="min-w-[7.5rem] px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                       </tr>
@@ -409,13 +409,24 @@ export default function UsersPage() {
               )}
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm text-gray-700">{t('admin.users.selectedUsers').replace('{count}', selectedIds.size.toString())}</div>
-                <Button
-                  variant="outline"
+                <button
+                  type="button"
                   onClick={handleBulkDelete}
                   disabled={selectedIds.size === 0 || bulkDeleting}
+                  className="flex shrink-0 items-center gap-3 rounded-[15px] border border-red-200 bg-white px-4 py-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {bulkDeleting ? t('admin.users.deleting') : t('admin.users.deleteSelected')}
-                </Button>
+                  <span className="flex-shrink-0 text-red-500" aria-hidden>
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </span>
+                  <span>{bulkDeleting ? t('admin.users.deleting') : t('admin.users.deleteSelected')}</span>
+                </button>
               </div>
             </>
           )}

@@ -194,6 +194,33 @@ const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
 const mobilePrimaryLangButtonClassName =
   'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
 
+/** Mobile locale flyout — Mobee storefront (admin accent, list rows with dividers). */
+const MOBILE_LOCALE_MENU_PANEL_CLASS =
+  'absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),15rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white py-0 shadow-2xl ring-1 ring-black/5';
+
+const MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS =
+  'border-b border-gray-100 bg-gray-50/80 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-gray-500';
+
+const MOBILE_LOCALE_MENU_ROW_LANG =
+  'w-full px-3 py-2.5 text-left text-sm transition-colors duration-150';
+
+const MOBILE_LOCALE_MENU_ROW_CURRENCY =
+  'flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors duration-150';
+
+function mobileLocaleMenuLangRowClass(active: boolean): string {
+  if (active) {
+    return `${MOBILE_LOCALE_MENU_ROW_LANG} bg-admin-50 font-semibold text-admin-800`;
+  }
+  return `${MOBILE_LOCALE_MENU_ROW_LANG} font-normal text-gray-800 hover:bg-admin-50/40`;
+}
+
+function mobileLocaleMenuCurrencyRowClass(active: boolean): string {
+  if (active) {
+    return `${MOBILE_LOCALE_MENU_ROW_CURRENCY} bg-admin-50 font-semibold text-admin-800`;
+  }
+  return `${MOBILE_LOCALE_MENU_ROW_CURRENCY} font-normal text-gray-800 hover:bg-admin-50/40`;
+}
+
 /**
  * Component that syncs search params with state
  * Must be wrapped in Suspense because it uses useSearchParams()
@@ -1216,17 +1243,14 @@ export function Header() {
               {showMobilePrimaryLangMenu ? (
                 <div
                   id="header-mobile-locale-menu"
-                  className="absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),14rem)] overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-2xl"
+                  className={MOBILE_LOCALE_MENU_PANEL_CLASS}
                   role="dialog"
                   aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
                 >
-                  <div
-                    className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400"
-                    id="header-mobile-locale-lang-heading"
-                  >
+                  <div className={MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} id="header-mobile-locale-lang-heading">
                     {t('common.localeMenu.languageSection')}
                   </div>
-                  <div role="group" aria-labelledby="header-mobile-locale-lang-heading">
+                  <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-lang-heading">
                     {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
                       const active = getStoredLanguage() === code;
                       const label = LANGUAGES[code].nativeName;
@@ -1238,25 +1262,20 @@ export function Header() {
                             setShowMobilePrimaryLangMenu(false);
                             if (!active) setStoredLanguage(code);
                           }}
-                          className={`w-full px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
-                            active
-                              ? 'bg-gray-100 font-bold text-gray-900'
-                              : 'font-normal text-gray-800 hover:bg-gray-50'
-                          }`}
+                          className={mobileLocaleMenuLangRowClass(active)}
                         >
                           {label}
                         </button>
                       );
                     })}
                   </div>
-                  <div className="my-1 border-t border-gray-100" role="separator" />
                   <div
-                    className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400"
+                    className={`${MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} border-t border-gray-200`}
                     id="header-mobile-locale-currency-heading"
                   >
                     {t('common.localeMenu.currencySection')}
                   </div>
-                  <div role="group" aria-labelledby="header-mobile-locale-currency-heading">
+                  <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-currency-heading">
                     {Object.values(CURRENCIES).map((currency) => {
                       const active = selectedCurrency === currency.code;
                       return (
@@ -1267,14 +1286,10 @@ export function Header() {
                             setShowMobilePrimaryLangMenu(false);
                             if (!active) handleCurrencyChange(currency.code);
                           }}
-                          className={`flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
-                            active
-                              ? 'bg-gray-100 font-bold text-gray-900'
-                              : 'font-normal text-gray-800 hover:bg-gray-50'
-                          }`}
+                          className={mobileLocaleMenuCurrencyRowClass(active)}
                         >
                           <span>{currency.code}</span>
-                          <span className={active ? 'text-gray-900' : 'text-gray-500'}>{currency.symbol}</span>
+                          <span className={active ? 'text-admin-700' : 'text-gray-500'}>{currency.symbol}</span>
                         </button>
                       );
                     })}

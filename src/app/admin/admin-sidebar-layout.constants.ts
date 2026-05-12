@@ -71,7 +71,7 @@ export const ADMIN_PAGE_MAIN_COLLAPSED_SHIFT_LEFT_CLASS = 'lg:-translate-x-5';
  * double-counting rail+gap and uneven left/right vs viewport).
  */
 export const ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS = [
-  'box-border min-w-0 w-full max-w-7xl lg:mx-auto px-4 sm:px-6 lg:px-8',
+  'box-border min-w-0 w-full max-w-[min(100%,90rem)] lg:mx-auto px-4 sm:px-6 lg:px-8',
   ADMIN_PAGE_MAIN_COLLAPSED_SHIFT_LEFT_CLASS,
 ].join(' ');
 
