@@ -24,6 +24,9 @@ import {
   HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS,
   HEADER_STRIP_PADDING_Y,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
+  MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS,
+  MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS,
+  MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
@@ -1544,12 +1547,13 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-admin-300 hover:bg-admin-50 hover:text-admin-600"
+                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
                 aria-label={t('common.ariaLabels.closeMenu')}
               >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <span className={MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS} aria-hidden>
+                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS} />
+                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS} />
+                </span>
               </button>
             </div>
 
