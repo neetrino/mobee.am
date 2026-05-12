@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Input, Button } from '@shop/ui';
+import { Input, Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { buildCategoryTree } from '../utils';
 import { CategoryItem } from './CategoryItem';

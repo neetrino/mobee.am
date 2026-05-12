@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
-import { Card } from '@shop/ui';
+import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useAnalytics } from './hooks/useAnalytics';
 import { AnalyticsHeader } from './components/AnalyticsHeader';

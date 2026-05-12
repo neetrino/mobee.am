@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
-import { Card, Button } from '@shop/ui';
+import { Card, Button } from '@/app/admin/lib/adminShopUi';
 
 interface BulkSelectionControlsProps {
   selectedCount: number;

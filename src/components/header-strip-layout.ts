@@ -50,6 +50,14 @@ export const MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS =
 
 export const MOBILE_PRIMARY_MENU_BAR_CLASS = 'h-[2px] w-full rounded-full bg-black';
 
+/** Mobile strip — open main menu (same chrome as storefront header burger). */
+export const MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS =
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
+
+/** Same chrome as {@link MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS} with horizontal padding for a text label (e.g. `/supersudo` drawer trigger). */
+export const MOBILE_PRIMARY_MENU_OPEN_BUTTON_WITH_LABEL_CLASS =
+  'flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
+
 /** Primary strip peek (scroll-up) and docked bar offset — duration (ms). */
 export const HEADER_PRIMARY_PEEK_TRANSITION_MS = 280;
 

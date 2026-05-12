@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Button, Input } from '@shop/ui';
+import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
 
@@ -29,7 +29,7 @@ export function AddCategoryModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="bg-white rounded-supersudo p-6 max-w-md w-full mx-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.categories.addCategory')}</h3>
         <div className="space-y-4">
           <div>
@@ -51,7 +51,7 @@ export function AddCategoryModal({
             <select
               value={formData.parentId}
               onChange={(e) => onFormDataChange({ ...formData, parentId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin"
+              className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
             >
               <option value="">{t('admin.categories.rootCategory')}</option>
               {categories
@@ -69,7 +69,7 @@ export function AddCategoryModal({
                 type="checkbox"
                 checked={formData.requiresSizes}
                 onChange={(e) => onFormDataChange({ ...formData, requiresSizes: e.target.checked })}
-                className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+                className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
               />
               <span className="text-sm text-gray-700">
                 {t('admin.categories.requiresSizes')}

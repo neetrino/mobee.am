@@ -7,8 +7,8 @@ import { DELETE_ACCOUNT_CONFIRM_PHRASE } from './profile-delete-account.constant
 
 interface ProfileDeleteAccountProps {
   t: (key: string) => string;
-  /** `sidebar`: left nav row · `grid`: mobile 2-col tile (destructive). */
-  variant?: 'sidebar' | 'grid';
+  /** `sidebar`: legacy nav · `grid`: tile · `listRow`: profile menu row with chevron. */
+  variant?: 'sidebar' | 'grid' | 'listRow';
 }
 
 /**
@@ -68,7 +68,17 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
   const gridButtonClass =
     'flex min-h-[5.5rem] w-full flex-col items-center justify-center gap-2 rounded-[20px] border border-[#FFDADA] bg-white px-3 py-4 text-center text-xs font-medium text-[#C0392B] transition-colors hover:bg-red-50 sm:text-sm';
 
-  const buttonClass = variant === 'grid' ? gridButtonClass : sidebarButtonClass;
+  const listRowButtonClass =
+    'flex w-full items-center gap-3 rounded-2xl border border-red-200 bg-white px-4 py-3.5 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50';
+
+  const buttonClass =
+    variant === 'grid' ? gridButtonClass : variant === 'listRow' ? listRowButtonClass : sidebarButtonClass;
+
+  const chevron = (
+    <svg className="ml-auto h-5 w-5 shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  );
 
   return (
     <>
@@ -91,6 +101,21 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
             </svg>
             <span className="line-clamp-2 leading-tight">{t('profile.deleteAccount.button')}</span>
           </>
+        ) : variant === 'listRow' ? (
+          <>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center text-red-500" aria-hidden>
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </span>
+            <span className="min-w-0 flex-1 leading-snug">{t('profile.deleteAccount.button')}</span>
+            {chevron}
+          </>
         ) : (
           <>
             <span className="flex-shrink-0 text-red-500" aria-hidden>
@@ -110,7 +135,7 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
 
       {modalOpen && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
           role="presentation"
           onClick={closeModal}
         >

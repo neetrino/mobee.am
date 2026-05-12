@@ -1,5 +1,6 @@
 export const PRODUCT_SORT_OPTIONS = [
   "default",
+  "bestseller",
   "price-asc",
   "price-desc",
   "name-asc",

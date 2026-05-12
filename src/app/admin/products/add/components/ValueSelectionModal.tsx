@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Button } from '@shop/ui';
+import { Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { getColorHex } from '../../../../../lib/colorMap';
 import type { Attribute, GeneratedVariant } from '../types';
@@ -120,7 +120,7 @@ export function ValueSelectionModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-supersudo shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -142,12 +142,12 @@ export function ValueSelectionModal({
         {/* Content */}
         <div className="p-6">
           {/* "All" option */}
-          <label className="flex items-center gap-2 p-2 rounded-lg cursor-pointer hover:bg-gray-50 mb-3 border border-gray-200">
+          <label className="flex items-center gap-2 p-2 rounded-supersudo cursor-pointer hover:bg-gray-50 mb-3 border border-gray-200">
             <input
               type="checkbox"
               checked={attribute.values.length > 0 && selectedValueIds.length === attribute.values.length}
               onChange={(e) => handleSelectAll(e.target.checked)}
-              className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+              className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
             />
             <span className="text-sm font-medium text-gray-900">All</span>
           </label>
@@ -168,7 +168,7 @@ export function ValueSelectionModal({
               return (
                 <label
                   key={value.id}
-                  className={`flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all border-2 ${
+                  className={`flex flex-col items-center gap-1.5 p-2 rounded-supersudo cursor-pointer transition-all border-2 ${
                     isSelected
                       ? 'bg-admin-50 border-admin-600'
                       : 'bg-gray-50 border-transparent hover:bg-gray-100 hover:border-gray-300'
@@ -178,14 +178,14 @@ export function ValueSelectionModal({
                     type="checkbox"
                     checked={isSelected}
                     onChange={(e) => handleValueToggle(value.id, e.target.checked)}
-                    className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin flex-shrink-0"
+                    className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin flex-shrink-0"
                   />
                   {/* Display image, color, or nothing */}
                   {value.imageUrl ? (
                     <img
                       src={value.imageUrl}
                       alt={value.label}
-                      className="w-8 h-8 object-cover rounded border border-gray-300 flex-shrink-0"
+                      className="w-8 h-8 object-cover rounded-supersudo border border-gray-300 flex-shrink-0"
                     />
                   ) : isColor && valueColorHex ? (
                     <span

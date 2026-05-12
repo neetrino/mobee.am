@@ -134,7 +134,13 @@ function OriginalIcon() {
   );
 }
 
-function WhyChooseUsBenefitsList({ t }: { t: (path: string) => string }) {
+function WhyChooseUsBenefitsList({
+  t,
+  lang,
+}: {
+  readonly t: (path: string) => string;
+  readonly lang: string;
+}) {
   return (
     <ul
       className="grid grid-cols-1 gap-x-[50px] gap-y-10 sm:grid-cols-2 xl:grid-cols-4"
@@ -167,7 +173,13 @@ function WhyChooseUsBenefitsList({ t }: { t: (path: string) => string }) {
           <h3 className="mb-3 text-[14px] font-bold uppercase leading-[21px] tracking-[0.7px] text-[#1a1c1d]">
             {t(`home.why_choose_us_benefits.${item.id}_title`)}
           </h3>
-          <p className="text-[14px] font-normal leading-[22.75px] text-[#52525b]">
+          <p
+            className={`text-[14px] font-normal leading-[22.75px] text-[#52525b]${
+              (item.id === 'original' || item.id === 'delivery') && lang === 'hy'
+                ? ' whitespace-pre-line'
+                : ''
+            }`}
+          >
             {t(`home.why_choose_us_benefits.${item.id}_description`)}
           </p>
         </li>
@@ -181,7 +193,7 @@ function WhyChooseUsBenefitsList({ t }: { t: (path: string) => string }) {
  * benefit row matches Figma node 1:322.
  */
 export function WhyChooseUsSection() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   return (
     <section className="mt-[7.5rem]" aria-labelledby="why-choose-us-heading">
@@ -198,12 +210,12 @@ export function WhyChooseUsSection() {
               {t('home.why_choose_us_heading.subtitle')}
             </p>
           </div>
-          <HomeMoreCtaPillLink href="/about" variant="cyanPromo">
+          <HomeMoreCtaPillLink href="/about" variant="cyanPromo" arrowHoverAnimation>
             {t('home.why_choose_us_heading.cta')}
           </HomeMoreCtaPillLink>
         </div>
 
-        <WhyChooseUsBenefitsList t={t} />
+        <WhyChooseUsBenefitsList t={t} lang={lang} />
       </div>
     </section>
   );

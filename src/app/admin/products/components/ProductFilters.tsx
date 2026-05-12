@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import type { FormEvent } from 'react';
-import { Button } from '@shop/ui';
+import { Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category } from '../types';
 
@@ -75,7 +75,7 @@ export function ProductFilters({
               }
             }}
             placeholder={t('admin.products.searchPlaceholder')}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin text-sm"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin text-sm"
           />
         </div>
         
@@ -91,7 +91,7 @@ export function ProductFilters({
               setPage(1);
             }}
             placeholder={t('admin.products.skuPlaceholder')}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin text-sm"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin text-sm"
           />
         </div>
       </div>
@@ -107,7 +107,7 @@ export function ProductFilters({
             <button
               type="button"
               onClick={() => setCategoriesExpanded(!categoriesExpanded)}
-              className="w-full px-4 py-2.5 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin bg-white text-sm flex items-center justify-between"
+              className="w-full px-4 py-2.5 text-left border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin bg-white text-sm flex items-center justify-between"
             >
               <span className="text-gray-700">
                 {selectedCategories.size === 0
@@ -128,7 +128,7 @@ export function ProductFilters({
               </svg>
             </button>
             {categoriesExpanded && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-supersudo shadow-lg max-h-60 overflow-y-auto">
                 {categoriesLoading ? (
                   <div className="p-3 text-sm text-gray-500 text-center">{t('admin.products.loadingCategories')}</div>
                 ) : categories.length === 0 ? (
@@ -139,7 +139,7 @@ export function ProductFilters({
                       {categories.map((category) => (
                         <label
                           key={category.id}
-                          className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                          className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded-supersudo"
                         >
                           <input
                             type="checkbox"
@@ -154,7 +154,7 @@ export function ProductFilters({
                               setSelectedCategories(newSelected);
                               setPage(1);
                             }}
-                            className="w-4 h-4 text-admin-600 border-gray-300 rounded focus:ring-admin"
+                            className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
                           />
                           <span className="text-sm text-gray-700">{category.title}</span>
                         </label>
@@ -178,7 +178,7 @@ export function ProductFilters({
               setStockFilter(e.target.value as 'all' | 'inStock' | 'outOfStock');
               setPage(1);
             }}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin bg-white text-sm"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin bg-white text-sm"
           >
             <option value="all">{t('admin.products.allProducts')}</option>
             <option value="inStock">{t('admin.products.inStock')}</option>
@@ -189,7 +189,7 @@ export function ProductFilters({
 
       {/* Selected Products and Delete */}
       {selectedIds.size > 0 && (
-        <div className="px-4 py-3 flex items-center justify-between border border-gray-200 rounded-md bg-white">
+        <div className="px-4 py-3 flex items-center justify-between border border-gray-200 rounded-supersudo bg-white">
           <div className="text-sm text-gray-700">
             {t('admin.products.selectedProducts').replace('{count}', selectedIds.size.toString())}
           </div>

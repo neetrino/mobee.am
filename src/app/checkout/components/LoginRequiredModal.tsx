@@ -25,7 +25,7 @@ export function LoginRequiredModal({ isOpen, onClose }: LoginRequiredModalProps)
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4"
       onClick={onClose}
       role="presentation"
     >

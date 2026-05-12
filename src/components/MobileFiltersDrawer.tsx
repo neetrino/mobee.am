@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import { useTranslation } from '../lib/i18n-client';
 
 interface MobileFiltersDrawerProps {
@@ -25,14 +26,8 @@ export function MobileFiltersDrawer({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    if (!open) return;
+    return acquireBodyScrollLock();
   }, [open]);
 
   useEffect(() => {
@@ -53,7 +48,7 @@ export function MobileFiltersDrawer({
     <div className="lg:hidden">
       {open && (
         <div
-          className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex bg-black/40"
           onClick={() => setOpen(false)}
         >
           <div

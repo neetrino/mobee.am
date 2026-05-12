@@ -46,16 +46,16 @@ export function OrderDetailsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[70] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+      <div
+        className="fixed inset-0 bg-gray-500 bg-opacity-75"
         onClick={onClose}
       ></div>
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative transform overflow-hidden rounded-[15px] bg-white shadow-xl transition-all w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+        <div className="relative overflow-hidden rounded-[15px] bg-white shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
             <div>

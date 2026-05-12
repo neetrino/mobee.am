@@ -7,6 +7,8 @@ interface UseDashboardProps {
   isLoggedIn: boolean;
   authLoading: boolean;
   activeTab: string;
+  /** Mobile: sheet open. Desktop: inline tab layout — always fetch when tab matches. */
+  tabDataEnabled: boolean;
   onError: (error: string) => void;
 }
 
@@ -14,6 +16,7 @@ export function useDashboard({
   isLoggedIn,
   authLoading,
   activeTab,
+  tabDataEnabled,
   onError,
 }: UseDashboardProps) {
   const { t } = useTranslation();
@@ -23,27 +26,23 @@ export function useDashboard({
 
   const loadDashboard = useCallback(async () => {
     try {
-      console.log('📊 [PROFILE] Loading dashboard data...');
       setDashboardLoading(true);
       onError('');
       const data = await apiClient.get<DashboardData>('/api/v1/users/dashboard');
-      console.log('✅ [PROFILE] Dashboard data loaded:', data);
       setDashboardData(data);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('❌ [PROFILE] Error loading dashboard:', err);
       onError(errorMessage || t('profile.dashboard.failedToLoad'));
     } finally {
       setDashboardLoading(false);
     }
   }, [t, onError]);
 
-  // Load dashboard when dashboard tab is active
   useEffect(() => {
-    if (isLoggedIn && !authLoading && activeTab === 'dashboard') {
+    if (isLoggedIn && !authLoading && activeTab === 'dashboard' && tabDataEnabled) {
       loadDashboard();
     }
-  }, [isLoggedIn, authLoading, activeTab, loadDashboard]);
+  }, [isLoggedIn, authLoading, activeTab, tabDataEnabled, loadDashboard]);
 
   return {
     dashboardData,

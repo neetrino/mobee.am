@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useMemo, useState } from 'react';
-import { Input, Button } from '@shop/ui';
+import { Input, Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useAttributes } from './useAttributes';
 import { ValueEditForm } from './ValueEditForm';
@@ -94,7 +94,7 @@ export function AttributesPageContent() {
           </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -105,7 +105,7 @@ export function AttributesPageContent() {
 
         {/* Add Attribute Form */}
         {showAddForm && (
-          <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="mb-6 bg-white rounded-supersudo shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.attributes.createNewAttribute')}</h2>
             <form onSubmit={handleCreateAttribute} className="space-y-4">
               <div>
@@ -117,7 +117,7 @@ export function AttributesPageContent() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder={t('admin.attributes.namePlaceholder')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:ring-2 focus:ring-admin focus:border-transparent"
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -128,7 +128,7 @@ export function AttributesPageContent() {
               <div className="flex gap-3 pt-2">
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors"
+                  className="px-4 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors"
                 >
                   {t('admin.attributes.createAttribute')}
                 </button>
@@ -138,7 +138,7 @@ export function AttributesPageContent() {
                     setShowAddForm(false);
                     setFormData({ name: '' });
                   }}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-supersudo hover:bg-gray-300 transition-colors"
                 >
                   {t('admin.attributes.cancel')}
                 </button>
@@ -172,7 +172,7 @@ export function AttributesPageContent() {
 
         {/* Attributes List */}
         {attributes.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+          <div className="bg-white rounded-supersudo shadow-sm border border-gray-200 p-12 text-center">
             <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
@@ -180,13 +180,13 @@ export function AttributesPageContent() {
             <p className="text-gray-600 mb-4">{t('admin.attributes.getStarted')}</p>
             <button
               onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors"
+              className="px-4 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors"
             >
               {t('admin.attributes.createAttribute')}
             </button>
           </div>
         ) : filteredAttributes.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+          <div className="bg-white rounded-supersudo shadow-sm border border-gray-200 p-8 text-center">
             <p className="text-gray-600">{t('admin.attributes.noSearchResults')}</p>
           </div>
         ) : (
@@ -196,7 +196,7 @@ export function AttributesPageContent() {
               return (
                 <div
                   key={attribute.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                  className="bg-white rounded-supersudo shadow-sm border border-gray-200 overflow-hidden"
                 >
                   {/* Attribute Header */}
                   <div className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
@@ -226,13 +226,13 @@ export function AttributesPageContent() {
                                   handleUpdateAttributeName(attribute.id);
                                 }
                               }}
-                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin focus:border-transparent text-lg font-semibold"
+                              className="px-3 py-2 border border-gray-300 rounded-supersudo focus:ring-2 focus:ring-admin focus:border-transparent text-lg font-semibold"
                               autoFocus
                             />
                             <button
                               onClick={() => handleUpdateAttributeName(attribute.id)}
                               disabled={!editingAttributeName.trim() || savingAttribute}
-                              className="px-3 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                              className="px-3 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
                               {savingAttribute ? (
                                 <>
@@ -251,7 +251,7 @@ export function AttributesPageContent() {
                             <button
                               onClick={() => toggleAttributeEdit(attribute)}
                               disabled={savingAttribute}
-                              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+                              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-supersudo hover:bg-gray-300 transition-colors disabled:opacity-50"
                             >
                               {t('admin.attributes.cancel')}
                             </button>
@@ -260,11 +260,11 @@ export function AttributesPageContent() {
                           <>
                             <div className="flex items-center gap-3">
                               <h3 className="text-lg font-semibold text-gray-900">{attribute.name}</h3>
-                              <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
+                              <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-supersudo">
                                 {attribute.key}
                               </span>
                               {attribute.filterable && (
-                                <span className="text-xs px-2 py-1 bg-admin-100 text-admin-700 rounded">
+                                <span className="text-xs px-2 py-1 bg-admin-100 text-admin-700 rounded-supersudo">
                                   {t('admin.attributes.filterable')}
                                 </span>
                               )}
@@ -283,7 +283,7 @@ export function AttributesPageContent() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => toggleAttributeEdit(attribute)}
-                          className="px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-supersudo transition-colors"
                           title={t('admin.attributes.editAttribute') || 'Edit attribute'}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,7 +292,7 @@ export function AttributesPageContent() {
                         </button>
                         <button
                           onClick={() => handleDeleteAttribute(attribute.id, attribute.name)}
-                          className="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                          className="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-supersudo transition-colors"
                           title={t('admin.attributes.deleteAttribute')}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -327,7 +327,7 @@ export function AttributesPageContent() {
                               }}
                               placeholder={t('admin.attributes.addNewValue')}
                               className={`
-                                w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition-colors
+                                w-full px-3 py-2 border rounded-supersudo focus:ring-2 focus:border-transparent transition-colors
                                 ${valueError 
                                   ? 'border-red-300 bg-red-50 focus:ring-red-500' 
                                   : 'border-gray-300 focus:ring-admin'
@@ -346,7 +346,7 @@ export function AttributesPageContent() {
                           <button
                             onClick={() => handleAddValue(attribute.id)}
                             disabled={!newValue.trim() || addingValueTo === attribute.id}
-                            className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="px-4 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                           >
                             {addingValueTo === attribute.id ? (
                               <>
@@ -373,7 +373,7 @@ export function AttributesPageContent() {
                           {attribute.values.map((value) => {
                             const isExpanded = expandedValueId === value.id;
                             return (
-                              <div key={value.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                              <div key={value.id} className="bg-white rounded-supersudo border border-gray-200 overflow-hidden">
                                 {/* Value Card */}
                                 <div className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors">
                                   <div className="flex items-center gap-2 flex-1">
@@ -388,7 +388,7 @@ export function AttributesPageContent() {
                                       <img
                                         src={value.imageUrl}
                                         alt={value.label}
-                                        className="w-5 h-5 object-cover rounded border border-gray-300 flex-shrink-0"
+                                        className="w-5 h-5 object-cover rounded-supersudo border border-gray-300 flex-shrink-0"
                                       />
                                     ) : null}
                                     <span className="text-sm font-medium text-gray-900">{value.label}</span>

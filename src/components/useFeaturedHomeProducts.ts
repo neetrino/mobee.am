@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../lib/api-client';
-import { getStoredLanguage, type LanguageCode } from '../lib/language';
+import { type LanguageCode } from '../lib/language';
+import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
 import { t } from '../lib/i18n';
 import type { ProductLabel } from './ProductLabels';
 
@@ -42,17 +43,6 @@ interface ProductsResponse {
 
 const PRODUCTS_PER_PAGE = 10;
 export const FEATURED_HOME_FILTER_DEFAULT = 'new' as const;
-
-function useClientSyncedLanguage(): LanguageCode {
-  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
-  useEffect(() => {
-    const sync = () => setLanguage(getStoredLanguage());
-    sync();
-    window.addEventListener('language-updated', sync);
-    return () => window.removeEventListener('language-updated', sync);
-  }, []);
-  return language;
-}
 
 async function fetchFeaturedHomePage(
   language: LanguageCode,

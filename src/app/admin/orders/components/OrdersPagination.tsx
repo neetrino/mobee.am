@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
-import { Button } from '@shop/ui';
+import { Button } from '@/app/admin/lib/adminShopUi';
 
 interface OrdersPaginationProps {
   page: number;

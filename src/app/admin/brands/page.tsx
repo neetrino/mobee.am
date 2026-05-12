@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
-import { Card, Button, Input } from '@shop/ui';
+import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
@@ -203,7 +203,7 @@ function BrandsSection() {
         {filteredBrands.map((brand) => (
           <div
             key={brand.id}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            className="flex items-center justify-between p-3 bg-gray-50 rounded-supersudo hover:bg-gray-100 transition-colors"
           >
             <div>
               <div className="text-sm font-medium text-gray-900">{brand.name}</div>
@@ -243,7 +243,7 @@ function BrandsSection() {
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <div className="bg-white rounded-supersudo shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
                 {editingBrand ? t('admin.brands.editBrand') : t('admin.brands.addNewBrand')}
@@ -268,7 +268,7 @@ function BrandsSection() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:ring-2 focus:ring-admin focus:border-transparent"
                   placeholder={t('admin.brands.enterBrandName')}
                   required
                 />

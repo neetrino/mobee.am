@@ -25,11 +25,11 @@ export default function AdminError({
           <button
             type="button"
             onClick={reset}
-            className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 font-medium"
+            className="px-4 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 font-medium"
           >
             Try again
           </button>
-          <Link href="/supersudo" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
+          <Link href="/supersudo" className="px-4 py-2 border border-gray-300 rounded-supersudo hover:bg-gray-50 font-medium">
             Admin
           </Link>
         </div>

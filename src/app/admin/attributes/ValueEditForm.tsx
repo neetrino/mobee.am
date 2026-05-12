@@ -50,7 +50,7 @@ export function ValueEditForm({
           type="text"
           value={editingLabel}
           onChange={(e) => onLabelChange(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:ring-2 focus:ring-admin focus:border-transparent"
           placeholder={t('admin.attributes.valueModal.labelPlaceholder')}
         />
       </div>
@@ -76,7 +76,7 @@ export function ValueEditForm({
                 <img
                   src={editingImageUrl}
                   alt={t('admin.attributes.valueModal.imagePreview')}
-                  className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                  className="w-32 h-32 object-cover rounded-supersudo border border-gray-300"
                 />
                 <button
                   type="button"
@@ -93,7 +93,7 @@ export function ValueEditForm({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={imageUploading}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-supersudo hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {imageUploading ? t('admin.attributes.valueModal.uploading') : t('admin.attributes.valueModal.changeImage')}
               </button>
@@ -104,7 +104,7 @@ export function ValueEditForm({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={imageUploading}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-supersudo hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {imageUploading ? (
                   <>
@@ -138,7 +138,7 @@ export function ValueEditForm({
           type="button"
           onClick={onCancel}
           disabled={savingValue}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-supersudo hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {t('admin.attributes.valueModal.cancel')}
         </button>
@@ -146,7 +146,7 @@ export function ValueEditForm({
           type="button"
           onClick={onSave}
           disabled={savingValue || !editingLabel.trim()}
-          className="px-4 py-2 bg-admin text-white rounded-lg hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-4 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {savingValue ? (
             <>

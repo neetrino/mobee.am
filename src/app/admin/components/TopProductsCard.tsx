@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Button } from '@shop/ui';
+import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatCurrency } from '../utils/dashboardUtils';
@@ -42,7 +42,7 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-16 bg-gray-200 rounded"></div>
+                <div className="h-16 bg-gray-200 rounded-supersudo"></div>
               </div>
             ))}
           </div>
@@ -54,11 +54,11 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
           topProducts.map((product, index) => (
             <div
               key={product.variantId}
-              className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+              className="flex items-center gap-4 p-3 border border-gray-200 rounded-supersudo hover:bg-gray-50 cursor-pointer transition-colors"
               onClick={() => router.push(`/supersudo/products/${product.productId}`)}
             >
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-xs font-bold text-gray-500">
+                <div className="w-10 h-10 bg-gray-200 rounded-supersudo flex items-center justify-center text-xs font-bold text-gray-500">
                   {index + 1}
                 </div>
               </div>
@@ -67,7 +67,7 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
                   <img
                     src={product.image}
                     alt={product.title}
-                    className="w-12 h-12 object-cover rounded"
+                    className="w-12 h-12 object-cover rounded-supersudo"
                   />
                 </div>
               )}
