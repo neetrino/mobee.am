@@ -210,11 +210,11 @@ export default function UsersPage() {
             </div>
 
             {/* Admin / Customer filter */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
                 {t('admin.users.adminCustomer')}
               </span>
-              <div className="inline-flex rounded-full bg-gray-100 p-1 text-xs">
+              <div className="inline-flex rounded-full bg-gray-100 p-1 text-sm font-medium">
                 <button
                   type="button"
                   onClick={() => {
@@ -222,10 +222,10 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: all');
                   }}
-                  className={`px-3 py-1 rounded-full transition-all ${
+                  className={`rounded-full px-4 py-1.5 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'all'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-admin-500 font-semibold text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
                   }`}
                 >
                   {t('admin.users.all')}
@@ -237,10 +237,10 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: admin');
                   }}
-                  className={`px-3 py-1 rounded-full transition-all ${
+                  className={`rounded-full px-4 py-1.5 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'admin'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-admin-500 font-semibold text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
                   }`}
                 >
                   {t('admin.users.admins')}
@@ -252,10 +252,10 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: customer');
                   }}
-                  className={`px-3 py-1 rounded-full transition-all ${
+                  className={`rounded-full px-4 py-1.5 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'customer'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-admin-500 font-semibold text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
                   }`}
                 >
                   {t('admin.users.customers')}
@@ -296,10 +296,10 @@ export default function UsersPage() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.contact')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.orders')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="pl-[calc(1.5rem-5px)] pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.roles')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -333,15 +333,17 @@ export default function UsersPage() {
                             <div className="text-sm text-gray-500">{user.phone}</div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-16 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                           {user.ordersCount ?? 0}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="pl-[calc(1.5rem-18px)] pr-6 py-4 whitespace-nowrap">
                           <div className="flex gap-2">
                             {user.roles?.map((role) => (
                               <span
                                 key={role}
-                                className="px-2 py-1 text-xs font-medium bg-admin-100 text-admin-800 rounded-full"
+                                className={`px-2 py-1 text-xs font-medium bg-admin-100 text-admin-800 rounded-full ${
+                                  roleFilter === 'admin' && role === 'admin' ? 'ml-[10px]' : ''
+                                }`}
                               >
                                 {role}
                               </span>
@@ -358,7 +360,7 @@ export default function UsersPage() {
                                 `${user.firstName} ${user.lastName}`,
                               )
                             }
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            className={`ml-[25px] relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                               user.blocked
                                 ? 'bg-gray-300 focus:ring-gray-400'
                                 : 'bg-green-500 focus:ring-green-500'
