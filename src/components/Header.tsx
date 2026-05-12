@@ -646,6 +646,8 @@ export function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [, setCartTotal] = useState(0);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const showSearchModalRef = useRef(false);
+  showSearchModalRef.current = showSearchModal;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
   const { categories, loadingCategories } = useCategoriesTree();
@@ -666,6 +668,9 @@ export function Header() {
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+  /** Desktop secondary row: search input + instant listbox (outside-click target). */
+  const desktopSecondarySearchWrapRef = useRef<HTMLDivElement | null>(null);
+  const searchDropdownOpenRef = useRef(false);
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
   const mobileStrip1WrapRef = useRef<HTMLDivElement>(null);
@@ -677,6 +682,8 @@ export function Header() {
   const mobilePrimaryLangRef = useRef<HTMLDivElement>(null);
   const primaryStripRef = useRef<HTMLElement | null>(null);
   const secondaryBarOuterRef = useRef<HTMLDivElement | null>(null);
+  /** Latest header search text for scroll-dock logic (refs avoid stale closures in scroll handlers). */
+  const searchQueryForDockRef = useRef('');
   const [secondaryDocked, setSecondaryDocked] = useState(false);
   const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
   const [mobileSearchDocked, setMobileSearchDocked] = useState(false);
@@ -712,7 +719,10 @@ export function Header() {
     if (!primaryEl) {
       return;
     }
-    setSecondaryDocked(primaryEl.getBoundingClientRect().bottom <= 0);
+    const primaryScrolledPast = primaryEl.getBoundingClientRect().bottom <= 0;
+    const blockDockForSearchUi =
+      searchQueryForDockRef.current.trim().length > 0 || searchDropdownOpenRef.current;
+    setSecondaryDocked(primaryScrolledPast && !blockDockForSearchUi);
   }, []);
 
   const syncMobileSearchDock = useCallback(() => {
@@ -735,7 +745,10 @@ export function Header() {
     if (!strip1Wrap) {
       return;
     }
-    setMobileSearchDocked(strip1Wrap.getBoundingClientRect().bottom <= 0);
+    const stripScrolledPast = strip1Wrap.getBoundingClientRect().bottom <= 0;
+    const blockDockForSearchUi =
+      searchQueryForDockRef.current.trim().length > 0 || searchDropdownOpenRef.current;
+    setMobileSearchDocked(stripScrolledPast && !blockDockForSearchUi);
   }, []);
 
   useLayoutEffect(() => {
@@ -826,11 +839,19 @@ export function Header() {
       } else if (delta > PRIMARY_STRIP_SCROLL_DOWN_HIDE_THRESHOLD_PX) {
         setPrimaryBarPeekFromScrollUp(false);
       }
-      syncSecondaryDock();
-      syncMobileSearchDock();
       const isDesktopLayout =
         typeof window !== 'undefined' &&
         window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY).matches;
+      if (
+        isDesktopLayout &&
+        searchDropdownOpenRef.current &&
+        delta > PRIMARY_STRIP_SCROLL_DOWN_HIDE_THRESHOLD_PX
+      ) {
+        searchDropdownOpenRef.current = false;
+        setSearchDropdownOpen(false);
+      }
+      syncSecondaryDock();
+      syncMobileSearchDock();
       if (isDesktopLayout) {
         const primaryEl = primaryStripRef.current;
         if (primaryEl && primaryEl.getBoundingClientRect().bottom > 0) {
@@ -921,9 +942,13 @@ export function Header() {
     lang: getStoredLanguage(),
   });
 
+  searchDropdownOpenRef.current = searchDropdownOpen;
+
   useLayoutEffect(() => {
+    searchQueryForDockRef.current = searchQuery;
+    syncSecondaryDock();
     syncMobileSearchDock();
-  }, [searchDropdownOpen, syncMobileSearchDock]);
+  }, [searchQuery, searchDropdownOpen, syncSecondaryDock, syncMobileSearchDock]);
 
   const fetchCart = async () => {
     if (!isLoggedIn) {
@@ -1101,6 +1126,21 @@ export function Header() {
       }
       if (searchModalRef.current && !searchModalRef.current.contains(event.target as Node)) {
         setShowSearchModal(false);
+      }
+
+      const isDesktopLayout =
+        typeof window !== 'undefined' &&
+        window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY).matches;
+      if (
+        isDesktopLayout &&
+        !showSearchModalRef.current &&
+        desktopSecondarySearchWrapRef.current &&
+        !desktopSecondarySearchWrapRef.current.contains(clickTarget)
+      ) {
+        if (searchDropdownOpenRef.current) {
+          searchDropdownOpenRef.current = false;
+          setSearchDropdownOpen(false);
+        }
       }
     };
 
@@ -1597,6 +1637,7 @@ export function Header() {
           setSearchDropdownOpen(false);
         }}
         onSearchDropdownClose={() => setSearchDropdownOpen(false)}
+        secondarySearchBoundaryRef={desktopSecondarySearchWrapRef}
         suppressSearchDropdown={showSearchModal}
         compareCount={compareCount}
         wishlistCount={wishlistCount}

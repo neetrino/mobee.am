@@ -51,10 +51,6 @@ export function useCheckout() {
       cardExpiry: '',
       cardCvv: '',
       cardHolderName: '',
-      acceptDeliverySupplyTerms: false,
-      acceptInspectionAtDelivery: false,
-      acceptOrderVerification: false,
-      acceptReturnsPolicy: false,
     },
   });
 
@@ -194,7 +190,6 @@ export function useCheckout() {
     errors,
     isSubmitting,
     setValue,
-    watch,
     paymentMethod,
     shippingMethod,
     shippingCity,

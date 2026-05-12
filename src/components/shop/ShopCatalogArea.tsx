@@ -55,6 +55,8 @@ export function ShopCatalogArea({
         id: p.id,
         slug: p.slug,
         title: p.title,
+        subtitle:
+          typeof p.subtitle === 'string' && p.subtitle.trim().length > 0 ? p.subtitle.trim() : null,
         price: p.price,
         compareAtPrice: p.compareAtPrice ?? p.originalPrice ?? null,
         discountPercent: p.discountPercent ?? null,

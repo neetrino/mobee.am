@@ -44,8 +44,10 @@ export interface Order {
     postalCode?: string;
     countryCode?: string;
     phone?: string;
+    deliverySpeed?: 'standard' | 'express';
   };
   shippingMethod: string;
+  deliverySpeed?: 'standard' | 'express';
   trackingNumber?: string;
   timeline?: Array<{
     status: string;

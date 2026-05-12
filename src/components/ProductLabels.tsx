@@ -1,4 +1,5 @@
 import React from 'react';
+import { shouldHideOutOfStockProductLabel } from '../lib/product-label-display.constants';
 
 export type ProductLabelPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
@@ -23,13 +24,8 @@ interface ProductLabelsProps {
  * դրանք իրար վրա չեն նստում, այլ ունեն հստակ вертикալ հեռավորություն։
  */
 export const ProductLabels: React.FC<ProductLabelsProps> = ({ labels }) => {
-  if (!labels || labels.length === 0) return null;
-
-  // Փոքր logging, որ հեշտ լինի debug անել label-ների խնդիրները
-  console.info('[UI][ProductLabels] Rendering labels', {
-    total: labels.length,
-    positions: labels.map((l) => l.position),
-  });
+  const visibleLabels = labels.filter((label) => !shouldHideOutOfStockProductLabel(label));
+  if (visibleLabels.length === 0) return null;
 
   const positions: ProductLabelPosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 
@@ -74,7 +70,7 @@ export const ProductLabels: React.FC<ProductLabelsProps> = ({ labels }) => {
   return (
     <div className="absolute inset-0 pointer-events-none z-20">
       {positions.map((position) => {
-        const labelsForPosition = labels.filter((label) => label.position === position);
+        const labelsForPosition = visibleLabels.filter((label) => label.position === position);
         if (labelsForPosition.length === 0) return null;
 
         return (

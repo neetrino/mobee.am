@@ -89,6 +89,8 @@ class UsersService {
         firstName: data.firstName,
         lastName: data.lastName,
         locale: data.locale,
+        email: data.email,
+        phone: data.phone,
       },
       select: {
         id: true,

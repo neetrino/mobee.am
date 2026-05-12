@@ -16,10 +16,34 @@ describe("users.schema", () => {
     expect(parsed.success).toBe(true);
   });
 
+  it("parses profile update with email and phone", () => {
+    const parsed = safeParseProfileUpdate({
+      firstName: "Jane",
+      lastName: "Doe",
+      email: "jane@example.com",
+      phone: "+37499123456",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.email).toBe("jane@example.com");
+      expect(parsed.data.phone).toBe("+37499123456");
+    }
+  });
+
   it("rejects unknown profile fields", () => {
     const parsed = safeParseProfileUpdate({
       firstName: "John",
-      email: "user@example.com",
+      nickname: "JD",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+
+  it("rejects invalid profile email", () => {
+    const parsed = safeParseProfileUpdate({
+      firstName: "John",
+      email: "not-an-email",
     });
 
     expect(parsed.success).toBe(false);

@@ -177,6 +177,9 @@ export function ShippingAddressModal({
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
               requiresRegionalQuote={requiresRegionalQuote}
+              register={register}
+              promoCodeError={errors.promoCode?.message}
+              isSubmitting={isSubmitting}
             />
           </>
         ) : (
@@ -224,6 +227,9 @@ export function ShippingAddressModal({
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
               requiresRegionalQuote={requiresRegionalQuote}
+              register={register}
+              promoCodeError={errors.promoCode?.message}
+              isSubmitting={isSubmitting}
             />
           </div>
         )}

@@ -15,7 +15,10 @@
   },
   "shippingAddress": {
     "title": "Адрес доставки",
-    "phone": "Телефон: {phone}"
+    "phone": "Телефон: {phone}",
+    "deliveryType": "Тип доставки",
+    "deliveryTypeStandard": "Стандартная доставка",
+    "deliveryTypeExpress": "Срочная доставка"
   },
   "orderSummary": {
     "title": "Итоги заказа",

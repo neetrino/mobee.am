@@ -13,6 +13,8 @@ export interface ShopCatalogProduct {
   id: string;
   slug: string;
   title: string;
+  /** Short line under title (same as home / product API list). */
+  subtitle?: string | null;
   price: number;
   compareAtPrice: number | null;
   image: string | null;
