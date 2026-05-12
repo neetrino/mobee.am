@@ -1,6 +1,7 @@
 'use client';
 
-import { Card, Button } from '@shop/ui';
+import { UseFormRegister } from 'react-hook-form';
+import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../lib/currency';
 import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
@@ -9,7 +10,7 @@ import {
   CHECKOUT_FORM_CARD_RADIUS_CLASS,
 } from './constants';
 import { DeliveryPricingHint } from './components/DeliveryPricingHint';
-import type { Cart } from './types';
+import type { Cart, CheckoutFormData } from './types';
 
 interface OrderSummaryProps {
   cart: Cart | null;
@@ -29,6 +30,8 @@ interface OrderSummaryProps {
   requiresRegionalQuote: boolean;
   error: string | null;
   isSubmitting: boolean;
+  register: UseFormRegister<CheckoutFormData>;
+  promoCodeError?: string;
   onPlaceOrder: (e?: React.FormEvent) => void;
 }
 
@@ -44,6 +47,8 @@ export function OrderSummary({
   requiresRegionalQuote,
   error,
   isSubmitting,
+  register,
+  promoCodeError,
   onPlaceOrder,
 }: OrderSummaryProps) {
   const { t } = useTranslation();
@@ -79,7 +84,17 @@ export function OrderSummary({
       <Card
         className={`p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS} ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}
       >
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.orderSummary')}</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('checkout.orderSummary')}</h2>
+        <div className="mb-6">
+          <Input
+            label={t('checkout.form.promoCode')}
+            type="text"
+            placeholder={t('checkout.placeholders.promoCode')}
+            {...register('promoCode')}
+            error={promoCodeError}
+            disabled={isSubmitting}
+          />
+        </div>
         <div className="space-y-4 mb-6">
           <div className="flex justify-between text-gray-600">
             <span>{t('checkout.summary.subtotal')}</span>
@@ -99,11 +114,12 @@ export function OrderSummary({
               {t('checkout.summary.totalPendingShippingNote')}
             </p>
           )}
-          <div className="border-t border-gray-200 pt-4">
-            <div className="flex justify-between text-lg font-bold text-gray-900">
-              <span>{t('checkout.summary.total')}</span>
-              <span>{formatPriceInCurrency(orderSummary.totalDisplay, currency)}</span>
-            </div>
+        </div>
+
+        <div className="border-t border-gray-200 pt-4 mb-6">
+          <div className="flex justify-between text-lg font-bold text-gray-900">
+            <span>{t('checkout.summary.total')}</span>
+            <span>{formatPriceInCurrency(orderSummary.totalDisplay, currency)}</span>
           </div>
         </div>
 

@@ -94,18 +94,6 @@ export function CheckoutForm({
       </Card>
 
       <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.promoCode.title')}</h2>
-        <Input
-          label={t('checkout.form.promoCode')}
-          type="text"
-          placeholder={t('checkout.placeholders.promoCode')}
-          {...register('promoCode')}
-          error={errors.promoCode?.message}
-          disabled={isSubmitting}
-        />
-      </Card>
-
-      <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingMethod')}</h2>
         {errors.shippingMethod && (
           <div

@@ -117,6 +117,8 @@ export default function CheckoutPage() {
             requiresRegionalQuote={requiresRegionalQuote}
             error={error}
             isSubmitting={isSubmitting}
+            register={register}
+            promoCodeError={errors.promoCode?.message}
             onPlaceOrder={(e) => {
               if (e) {
                 handlePlaceOrder(e);
