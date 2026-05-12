@@ -153,7 +153,7 @@ export default function SettingsPage() {
 
   return (
     <AdminPageShell currentPath={pathname || '/supersudo/settings'} router={router} t={t}>
-      <div className="max-w-4xl">
+      <div className="mx-auto w-full max-w-4xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.settings.title')}</h1>
         </div>

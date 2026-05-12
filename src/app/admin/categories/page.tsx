@@ -61,7 +61,7 @@ export default function CategoriesPage() {
 
   return (
     <AdminPageShell currentPath="/supersudo/categories" router={router} t={t}>
-      <div className="max-w-7xl">
+      <div className="mx-auto w-full max-w-7xl">
         <CategoriesHeader />
         <Card className="p-6">
           <div

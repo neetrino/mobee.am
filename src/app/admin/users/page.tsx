@@ -188,7 +188,7 @@ export default function UsersPage() {
 
   return (
     <AdminPageShell currentPath={pathname || '/supersudo/users'} router={router} t={t}>
-      <div className="w-full min-w-0">
+      <div className="mx-auto w-full min-w-0 max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.users.title')}</h1>
         </div>

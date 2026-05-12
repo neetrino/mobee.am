@@ -60,7 +60,7 @@ export function AdminPageShell({
           onDesktopCollapsedChange={setDesktopSidebarCollapsed}
         />
         <div
-          className={`flex-1 min-w-0 ${ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS} ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
+          className={`flex-1 min-w-0 w-full mx-auto ${ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS} ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
             desktopSidebarCollapsed ? '' : (mainClassName ?? '')
           }`.trim()}
         >

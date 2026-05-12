@@ -100,7 +100,7 @@ export default function AdminInventoryPage() {
 
   return (
     <AdminPageShell currentPath={pathname || '/supersudo/inventory'} router={router} t={t}>
-      <div className="max-w-7xl">
+      <div className="mx-auto w-full max-w-7xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.inventory.title')}</h1>
           <p className="text-gray-600 mt-2">{t('admin.inventory.subtitle')}</p>

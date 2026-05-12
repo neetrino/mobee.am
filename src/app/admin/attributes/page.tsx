@@ -37,7 +37,7 @@ export default function AttributesPage() {
 
   return (
     <AdminPageShell currentPath={pathname || '/supersudo/attributes'} router={router} t={t}>
-      <div className="max-w-7xl">
+      <div className="mx-auto w-full max-w-7xl">
         <AttributesPageContent />
       </div>
     </AdminPageShell>
