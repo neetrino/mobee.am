@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Check } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
@@ -149,7 +150,7 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
                   {color.label}
                 </span>
                 <div
-                  className="h-8 w-8 overflow-hidden rounded-full border border-[#CAD5E2]"
+                  className="relative h-8 w-8 overflow-hidden rounded-full border border-[#CAD5E2]"
                   style={hasImage ? {} : { backgroundColor: colorHex }}
                   aria-hidden
                 >
@@ -163,6 +164,13 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
+                  ) : null}
+                  {isSelected ? (
+                    <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#2CA1E2] bg-white shadow-sm">
+                        <Check className="h-3.5 w-3.5 text-[#2CA1E2]" strokeWidth={2.5} aria-hidden />
+                      </span>
+                    </span>
                   ) : null}
                 </div>
               </button>

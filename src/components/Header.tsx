@@ -24,6 +24,9 @@ import {
   HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS,
   HEADER_STRIP_PADDING_Y,
   MOBILE_PRIMARY_MENU_BAR_CLASS,
+  MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS,
+  MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS,
+  MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
@@ -32,7 +35,6 @@ import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
 import { HeaderSecondaryBar } from './HeaderSecondaryBar';
 import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.constants';
-import { DEFAULT_USER_AVATAR_SRC } from './user-avatar.constants';
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 import {
@@ -41,6 +43,15 @@ import {
   MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
   MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS,
 } from './mobile-drawer-nav.constants';
+import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
+
+/** Desktop navbar strip only; drawer + contact + footer keep `contact.phone` i18n. */
+const NAVBAR_SUPPORT_PHONE_DISPLAY = '055-81-11-81';
+
+/** Handset glyph — horizontal nudge next to numbers (navbar + mobile drawer). */
+const HEADER_SUPPORT_PHONE_ICON_OFFSET_CLASS = 'translate-x-[2px]';
+/** Phone digits — slight right nudge relative to icon (navbar + mobile drawer). */
+const HEADER_SUPPORT_PHONE_NUMBER_OFFSET_CLASS = 'translate-x-[3px]';
 
 /** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
 const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
@@ -183,139 +194,31 @@ const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
 const mobilePrimaryLangButtonClassName =
   'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
 
-const MOBILE_DRAWER_MIN_WIDTH_REM = 17;
-const MOBILE_DRAWER_DEFAULT_MAX_WIDTH_REM = 24;
-const MOBILE_DRAWER_WIDE_MAX_VIEWPORT_PERCENT = 95;
-/** Rough advance per character when email uses `text-xs` under the name (px). */
-const MOBILE_DRAWER_EMAIL_CHAR_WIDTH_XS_PX = 7;
-/** Rough advance when email is the main `text-sm` line (px). */
-const MOBILE_DRAWER_EMAIL_CHAR_WIDTH_SM_PX = 8;
-/** Avatar, gaps, horizontal padding, and chevron in the profile row (px). */
-const MOBILE_DRAWER_PROFILE_ROW_CHROME_PX = 152;
-/** Subtract from computed email-aware drawer width (px). */
-const MOBILE_DRAWER_EMAIL_PANEL_WIDTH_TRIM_PX = 50;
+/** Mobile locale flyout — white card (no outer gray frame). */
+const MOBILE_LOCALE_MENU_PANEL_CLASS =
+  'absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),8rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white py-0 shadow-xl ring-1 ring-black/5';
 
-function getMobileDrawerEmailLayout(user: MobileNavProfileUser | null | undefined): {
-  charCount: number;
-  emailLineScale: 'sm' | 'xs';
-} {
-  if (!user?.email?.trim()) {
-    return { charCount: 0, emailLineScale: 'xs' };
+const MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS =
+  'border-b border-gray-100 bg-gray-50/80 px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500';
+
+const MOBILE_LOCALE_MENU_ROW_LANG =
+  'w-full px-3 py-2.5 text-center text-sm transition-colors duration-150';
+
+const MOBILE_LOCALE_MENU_ROW_CURRENCY =
+  'flex w-full items-center justify-center gap-2 px-3 py-2.5 text-sm transition-colors duration-150';
+
+function mobileLocaleMenuLangRowClass(active: boolean): string {
+  if (active) {
+    return `${MOBILE_LOCALE_MENU_ROW_LANG} bg-admin-50 font-semibold text-admin-800`;
   }
-  const email = user.email.trim();
-  const parts = [user.firstName?.trim(), user.lastName?.trim()].filter(Boolean);
-  const fullName = parts.join(' ');
-  if (fullName) {
-    return { charCount: email.length, emailLineScale: 'xs' };
-  }
-  return { charCount: email.length, emailLineScale: 'sm' };
+  return `${MOBILE_LOCALE_MENU_ROW_LANG} font-normal text-gray-800 hover:bg-admin-50/40`;
 }
 
-function getMobileDrawerPanelWidthStyle(layout: {
-  charCount: number;
-  emailLineScale: 'sm' | 'xs';
-}): CSSProperties | undefined {
-  if (layout.charCount === 0) {
-    return undefined;
+function mobileLocaleMenuCurrencyRowClass(active: boolean): string {
+  if (active) {
+    return `${MOBILE_LOCALE_MENU_ROW_CURRENCY} bg-admin-50 font-semibold text-admin-800`;
   }
-  const minPx = MOBILE_DRAWER_MIN_WIDTH_REM * 16;
-  const baseCapPx = MOBILE_DRAWER_DEFAULT_MAX_WIDTH_REM * 16;
-  const perChar =
-    layout.emailLineScale === 'sm'
-      ? MOBILE_DRAWER_EMAIL_CHAR_WIDTH_SM_PX
-      : MOBILE_DRAWER_EMAIL_CHAR_WIDTH_XS_PX;
-  const contentPx = Math.ceil(layout.charCount * perChar + MOBILE_DRAWER_PROFILE_ROW_CHROME_PX);
-  const targetPx = Math.max(
-    minPx,
-    Math.max(baseCapPx, contentPx) - MOBILE_DRAWER_EMAIL_PANEL_WIDTH_TRIM_PX,
-  );
-  return {
-    width: `min(${MOBILE_DRAWER_WIDE_MAX_VIEWPORT_PERCENT}vw, ${targetPx}px)`,
-    minWidth: `${MOBILE_DRAWER_MIN_WIDTH_REM}rem`,
-    maxWidth: '100%',
-  };
-}
-
-interface MobileNavProfileUser {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-}
-
-function getMobileNavProfileCardLines(user: MobileNavProfileUser): {
-  title: string;
-  subtitle?: string;
-} {
-  const parts = [user.firstName?.trim(), user.lastName?.trim()].filter(Boolean);
-  const fullName = parts.join(' ');
-  const email = user.email?.trim() ?? '';
-  const phone = user.phone?.trim() ?? '';
-  if (fullName) {
-    return { title: fullName, subtitle: email || undefined };
-  }
-  if (email) {
-    return { title: email, subtitle: undefined };
-  }
-  if (phone) {
-    return { title: phone, subtitle: undefined };
-  }
-  return { title: '', subtitle: undefined };
-}
-
-function MobileDrawerProfileCard({
-  user,
-  profileFallbackLabel,
-  onNavigate,
-}: {
-  user: MobileNavProfileUser;
-  profileFallbackLabel: string;
-  onNavigate: () => void;
-}) {
-  const { title, subtitle } = getMobileNavProfileCardLines(user);
-  const heading = title || profileFallbackLabel;
-  const headingIsEmail = heading.includes('@');
-
-  return (
-    <Link
-      href="/profile"
-      onClick={onNavigate}
-      className="flex w-full min-w-0 items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100"
-      aria-label={profileFallbackLabel}
-    >
-      <span className="flex min-w-0 flex-1 items-center gap-3">
-        <img
-          src={DEFAULT_USER_AVATAR_SRC}
-          alt=""
-          className="h-12 w-12 shrink-0 rounded-full object-cover"
-          aria-hidden
-        />
-        <span className="flex min-w-0 flex-1 flex-col gap-0.5 text-left">
-          <span
-            className={`max-w-full min-w-0 text-sm font-bold leading-tight text-gray-900 break-words ${
-              headingIsEmail ? '' : 'text-pretty'
-            }`}
-          >
-            {heading}
-          </span>
-          {subtitle ? (
-            <span className="max-w-full min-w-0 text-xs font-normal leading-snug text-gray-500 break-words [overflow-wrap:anywhere]">
-              {subtitle}
-            </span>
-          ) : null}
-        </span>
-      </span>
-      <svg
-        className="h-4 w-4 shrink-0 text-gray-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        aria-hidden
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
-    </Link>
-  );
+  return `${MOBILE_LOCALE_MENU_ROW_CURRENCY} font-normal text-gray-800 hover:bg-admin-50/40`;
 }
 
 /**
@@ -351,7 +254,11 @@ function HeaderSearchSync({
         return result;
       };
       const allCategories = flattenCategories(categories);
-      const foundCategory = allCategories.find((cat) => cat.slug === categoryParam);
+      const slugs = categoryParam.split(',').map((s) => s.trim()).filter(Boolean);
+      const firstSlug = slugs[0];
+      const foundCategory = firstSlug
+        ? allCategories.find((cat) => cat.slug === firstSlug)
+        : null;
       setSelectedCategory(foundCategory || null);
     } else {
       setSelectedCategory(null);
@@ -551,18 +458,21 @@ function HeaderPhoneLangCluster({
   showLanguageSwitcher?: boolean;
 }) {
   const { t } = useTranslation();
-  const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
-  const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
+  const phoneLines = splitContactPhoneDisplay(NAVBAR_SUPPORT_PHONE_DISPLAY);
 
-  const numberClass =
+  const numberWrapperClass =
     phoneNumberVisibility === 'smUp'
-      ? 'hidden truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151] sm:inline'
-      : 'truncate text-[14px] font-semibold leading-7 tracking-[0.2px] text-[#374151]';
+      ? 'hidden min-w-0 flex-col gap-0.5 sm:flex'
+      : 'flex min-w-0 flex-col gap-0.5';
 
   return (
     <div className="flex min-w-0 shrink-0 items-center gap-3 lg:gap-4 xl:gap-8 2xl:gap-[50px]">
-      <a href={telHref} className="flex min-w-0 items-center gap-2" aria-label={t('common.header.supportPhoneAria')}>
-        <span className="relative size-6 shrink-0">
+      <div
+        className="flex min-w-0 items-center gap-2"
+        role="group"
+        aria-label={t('common.header.supportPhoneAria')}
+      >
+        <span className={`relative size-6 shrink-0 ${HEADER_SUPPORT_PHONE_ICON_OFFSET_CLASS}`}>
           <img
             src={HEADER_FIGMA_ASSETS.phoneIcon}
             alt=""
@@ -571,50 +481,61 @@ function HeaderPhoneLangCluster({
             className="absolute inset-0 block size-6 max-w-none"
           />
         </span>
-        <span className={numberClass}>{t('common.header.supportPhoneNumber')}</span>
-      </a>
+        <span
+          className={`${numberWrapperClass} ${HEADER_SUPPORT_PHONE_NUMBER_OFFSET_CLASS} text-[14px] font-semibold leading-6 tracking-[0.2px] text-[#374151] tabular-nums`}
+        >
+          {phoneLines.map((line, index) => (
+            <a key={`${line}-${index}`} href={phoneDisplayToTelHref(line)} className="block hover:underline">
+              {line}
+            </a>
+          ))}
+        </span>
+      </div>
       {showLanguageSwitcher ? <LanguageSwitcherPill /> : null}
     </div>
   );
 }
 
-/** Support call-to-action for mobile drawer — same chrome as `MOBILE_DRAWER_NAV_BUTTON_CLASS`. */
-function MobileDrawerSupportPhoneButton() {
+/** Support numbers in mobile drawer — one tappable row per line from `contact.phone`, each with its own handset icon. */
+function MobileDrawerSupportPhoneButtons() {
   const { t } = useTranslation();
-  const telRaw = t('common.header.supportPhoneTel').replace(/[^\d+]/g, '');
-  const telHref = telRaw.startsWith('+') ? `tel:${telRaw}` : `tel:+${telRaw}`;
+  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
 
   return (
-    <a
-      href={telHref}
-      className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
-      aria-label={t('common.header.supportPhoneAria')}
-    >
-      <span className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="relative size-6 shrink-0">
-          <img
-            src={HEADER_FIGMA_ASSETS.phoneIcon}
-            alt=""
-            width={24}
-            height={24}
-            className="absolute inset-0 block size-6 max-w-none"
-          />
-        </span>
-        <span className="min-w-0 truncate text-sm font-semibold text-[#374151]">
-          {t('common.header.supportPhoneNumber')}
-        </span>
-      </span>
-      <svg className="h-4 w-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
-    </a>
+    <>
+      {phoneLines.map((line) => (
+        <a
+          key={line}
+          href={phoneDisplayToTelHref(line)}
+          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
+          aria-label={`${t('common.header.supportPhoneAria')}: ${line}`}
+        >
+          <span className="flex min-w-0 flex-1 items-center gap-2">
+            <span className={`relative size-6 shrink-0 ${HEADER_SUPPORT_PHONE_ICON_OFFSET_CLASS}`}>
+              <img
+                src={HEADER_FIGMA_ASSETS.phoneIcon}
+                alt=""
+                width={24}
+                height={24}
+                className="absolute inset-0 block size-6 max-w-none"
+              />
+            </span>
+            <span
+              className={`min-w-0 text-sm font-semibold tabular-nums text-[#374151] ${HEADER_SUPPORT_PHONE_NUMBER_OFFSET_CLASS}`}
+            >
+              {line}
+            </span>
+          </span>
+        </a>
+      ))}
+    </>
   );
 }
 
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isLoggedIn, logout, isAdmin, user } = useAuth();
+  const { isLoggedIn, logout, isAdmin } = useAuth();
   const { t } = useTranslation();
   const [compareCount, setCompareCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -1234,10 +1155,6 @@ export function Header() {
     ? { top: mobileSearchPeekTopPx, ...getDockedBarTopMotionStyle(mobileSearchPeekTopPx) }
     : undefined;
 
-  const mobileDrawerEmailLayout = isLoggedIn && user ? getMobileDrawerEmailLayout(user) : { charCount: 0, emailLineScale: 'xs' as const };
-  const mobileDrawerPanelWidthStyle = getMobileDrawerPanelWidthStyle(mobileDrawerEmailLayout);
-  const mobileDrawerUseWideEmailPanel = mobileDrawerPanelWidthStyle !== undefined;
-
   return (
     <div className={`relative z-50 ${montserrat.className}`}>
     <header
@@ -1326,17 +1243,14 @@ export function Header() {
               {showMobilePrimaryLangMenu ? (
                 <div
                   id="header-mobile-locale-menu"
-                  className="absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),14rem)] overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-2xl"
+                  className={MOBILE_LOCALE_MENU_PANEL_CLASS}
                   role="dialog"
                   aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
                 >
-                  <div
-                    className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400"
-                    id="header-mobile-locale-lang-heading"
-                  >
+                  <div className={MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} id="header-mobile-locale-lang-heading">
                     {t('common.localeMenu.languageSection')}
                   </div>
-                  <div role="group" aria-labelledby="header-mobile-locale-lang-heading">
+                  <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-lang-heading">
                     {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
                       const active = getStoredLanguage() === code;
                       const label = LANGUAGES[code].nativeName;
@@ -1348,25 +1262,20 @@ export function Header() {
                             setShowMobilePrimaryLangMenu(false);
                             if (!active) setStoredLanguage(code);
                           }}
-                          className={`w-full px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
-                            active
-                              ? 'bg-gray-100 font-bold text-gray-900'
-                              : 'font-normal text-gray-800 hover:bg-gray-50'
-                          }`}
+                          className={mobileLocaleMenuLangRowClass(active)}
                         >
                           {label}
                         </button>
                       );
                     })}
                   </div>
-                  <div className="my-1 border-t border-gray-100" role="separator" />
                   <div
-                    className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400"
+                    className={`${MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} border-t border-gray-200`}
                     id="header-mobile-locale-currency-heading"
                   >
                     {t('common.localeMenu.currencySection')}
                   </div>
-                  <div role="group" aria-labelledby="header-mobile-locale-currency-heading">
+                  <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-currency-heading">
                     {Object.values(CURRENCIES).map((currency) => {
                       const active = selectedCurrency === currency.code;
                       return (
@@ -1377,14 +1286,10 @@ export function Header() {
                             setShowMobilePrimaryLangMenu(false);
                             if (!active) handleCurrencyChange(currency.code);
                           }}
-                          className={`flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
-                            active
-                              ? 'bg-gray-100 font-bold text-gray-900'
-                              : 'font-normal text-gray-800 hover:bg-gray-50'
-                          }`}
+                          className={mobileLocaleMenuCurrencyRowClass(active)}
                         >
                           <span>{currency.code}</span>
-                          <span className={active ? 'text-gray-900' : 'text-gray-500'}>{currency.symbol}</span>
+                          <span className={active ? 'text-admin-700' : 'text-gray-500'}>{currency.symbol}</span>
                         </button>
                       );
                     })}
@@ -1642,50 +1547,34 @@ export function Header() {
           onClick={() => setMobileMenuOpen(false)}
         >
           <div
-            className={`flex h-full min-h-screen min-w-[17rem] max-w-full flex-col bg-white shadow-2xl ${
-              mobileDrawerUseWideEmailPanel ? '' : 'w-[min(83vw,24rem)]'
-            }`}
-            style={mobileDrawerPanelWidthStyle}
+            className="flex h-full min-h-screen min-w-[17rem] w-[min(83vw,24rem)] max-w-full flex-col bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  aria-label={t('common.navigation.home')}
-                  className="flex min-w-0 max-w-[min(200px,55%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
-                >
-                  <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
-                </Link>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <p className="min-w-0 flex-1 text-pretty text-base font-semibold text-gray-900">
-                  {t('common.navigation.menuTitle')}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-admin-300 hover:bg-admin-50 hover:text-admin-600"
-                  aria-label={t('common.ariaLabels.closeMenu')}
-                >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label={t('common.navigation.home')}
+                className="flex min-w-0 max-w-[min(200px,70%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
+              >
+                <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
+                aria-label={t('common.ariaLabels.closeMenu')}
+              >
+                <span className={MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS} aria-hidden>
+                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS} />
+                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS} />
+                </span>
+              </button>
             </div>
 
             <div className="flex-1 overflow-hidden min-h-0">
               <nav className="flex h-full flex-col bg-white">
                 <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
-                  {isLoggedIn && user ? (
-                    <MobileDrawerProfileCard
-                      user={user}
-                      profileFallbackLabel={t('common.navigation.profile')}
-                      onNavigate={() => setMobileMenuOpen(false)}
-                    />
-                  ) : null}
                   {primaryNavLinks.map((link) => (
                     <Link
                       key={link.href}
@@ -1729,43 +1618,27 @@ export function Header() {
 
                   {isLoggedIn ? (
                     <>
-                      <MobileDrawerSupportPhoneButton />
-                      {isAdmin && (
-                        <Link
-                          href="/supersudo"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS}
-                        >
-                          <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.adminPanel')}</span>
-                          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </Link>
-                      )}
+                      <MobileDrawerSupportPhoneButtons />
                     </>
                   ) : (
                     <>
-                      <MobileDrawerSupportPhoneButton />
-                      <Link
-                        href="/login"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
-                      >
-                        <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.login')}</span>
-                        <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </Link>
-                      <Link
-                        href="/register"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS}
-                      >
-                        <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t('common.navigation.register')}</span>
-                        <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </Link>
+                      <MobileDrawerSupportPhoneButtons />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Link
+                          href="/login"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} !justify-center px-2 py-3 text-center text-xs font-semibold normal-case text-gray-800`}
+                        >
+                          {t('common.navigation.login')}
+                        </Link>
+                        <Link
+                          href="/register"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`${MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS} !justify-center px-2 py-3 text-center text-xs font-semibold`}
+                        >
+                          {t('common.navigation.register')}
+                        </Link>
+                      </div>
                     </>
                   )}
                 </div>

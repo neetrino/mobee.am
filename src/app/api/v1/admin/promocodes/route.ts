@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
     const result = await adminService.getPromoCodes();
     return NextResponse.json(result);
   } catch (error: unknown) {
+    console.error("❌ [ADMIN PROMOCODES GET]", error);
     const typedError = error as {
       type?: string;
       title?: string;
@@ -38,7 +39,10 @@ export async function GET(req: NextRequest) {
         type: typedError.type || "https://api.shop.am/problems/internal-error",
         title: typedError.title || "Internal Server Error",
         status: typedError.status || 500,
-        detail: typedError.detail || typedError.message || "An error occurred",
+        detail:
+          typedError.detail ||
+          typedError.message ||
+          (error instanceof Error ? error.message : "An error occurred"),
         instance: req.url,
       },
       { status: typedError.status || 500 },
@@ -65,6 +69,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result, { status: 201 });
   } catch (error: unknown) {
+    console.error("❌ [ADMIN PROMOCODES POST]", error);
     const typedError = error as {
       type?: string;
       title?: string;
@@ -78,7 +83,10 @@ export async function POST(req: NextRequest) {
         type: typedError.type || "https://api.shop.am/problems/internal-error",
         title: typedError.title || "Internal Server Error",
         status: typedError.status || 500,
-        detail: typedError.detail || typedError.message || "An error occurred",
+        detail:
+          typedError.detail ||
+          typedError.message ||
+          (error instanceof Error ? error.message : "An error occurred"),
         instance: req.url,
       },
       { status: typedError.status || 500 },

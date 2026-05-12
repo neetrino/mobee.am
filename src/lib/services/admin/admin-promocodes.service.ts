@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { logger } from "../../utils/logger";
 
 interface PromoCodeInput {
   code: string;
@@ -9,13 +10,56 @@ interface PromoCodeStatusInput {
   isActive: boolean;
 }
 
+const MIGRATION_HINT_DETAIL =
+  "Table `promo_codes` is missing or inaccessible. Apply Prisma migrations: `pnpm db:migrate` locally, or `pnpm db:migrate:deploy` in production (migration `20260423120000_add_promo_codes`).";
+
+/**
+ * Maps Prisma "table does not exist" (and similar) to a structured API error for clearer admin UI / logs.
+ */
+function throwIfMissingPromoCodesTable(error: unknown): void {
+  if (typeof error !== "object" || error === null) {
+    return;
+  }
+  const prismaCode =
+    "code" in error ? String((error as { code: unknown }).code) : "";
+  const message = error instanceof Error ? error.message : String(error);
+  const mentionsPromoCodes = /promo_codes/i.test(message);
+  const missingRelation =
+    prismaCode === "P2021" ||
+    (mentionsPromoCodes &&
+      /does not exist|existiert nicht|n\x27existe pas|не существует/i.test(message));
+  if (!missingRelation) {
+    return;
+  }
+  throw {
+    status: 503,
+    type: "https://api.shop.am/problems/database-migration-required",
+    title: "Database migration required",
+    detail: MIGRATION_HINT_DETAIL,
+  };
+}
+
+async function runPromoQuery<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    logger.error(`[admin-promocodes] ${label} failed`, {
+      message: e instanceof Error ? e.message : String(e),
+    });
+    throwIfMissingPromoCodesTable(e);
+    throw e;
+  }
+}
+
 class AdminPromoCodesService {
   async getPromoCodes() {
-    const promoCodes = await db.promoCode.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const promoCodes = await runPromoQuery("getPromoCodes", () =>
+      db.promoCode.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+    );
 
     return {
       data: promoCodes,
@@ -45,9 +89,11 @@ class AdminPromoCodesService {
       };
     }
 
-    const existingPromoCode = await db.promoCode.findUnique({
-      where: { code: normalizedCode },
-    });
+    const existingPromoCode = await runPromoQuery("createPromoCode.findUnique", () =>
+      db.promoCode.findUnique({
+        where: { code: normalizedCode },
+      }),
+    );
 
     if (existingPromoCode) {
       throw {
@@ -58,21 +104,25 @@ class AdminPromoCodesService {
       };
     }
 
-    const promoCode = await db.promoCode.create({
-      data: {
-        code: normalizedCode,
-        discountPercent: data.discountPercent,
-        isActive: true,
-      },
-    });
+    const promoCode = await runPromoQuery("createPromoCode.create", () =>
+      db.promoCode.create({
+        data: {
+          code: normalizedCode,
+          discountPercent: data.discountPercent,
+          isActive: true,
+        },
+      }),
+    );
 
     return { data: promoCode };
   }
 
   async updatePromoCodeStatus(promoCodeId: string, data: PromoCodeStatusInput) {
-    const promoCode = await db.promoCode.findUnique({
-      where: { id: promoCodeId },
-    });
+    const promoCode = await runPromoQuery("updatePromoCodeStatus.findUnique", () =>
+      db.promoCode.findUnique({
+        where: { id: promoCodeId },
+      }),
+    );
 
     if (!promoCode) {
       throw {
@@ -83,18 +133,22 @@ class AdminPromoCodesService {
       };
     }
 
-    const updatedPromoCode = await db.promoCode.update({
-      where: { id: promoCodeId },
-      data: { isActive: data.isActive },
-    });
+    const updatedPromoCode = await runPromoQuery("updatePromoCodeStatus.update", () =>
+      db.promoCode.update({
+        where: { id: promoCodeId },
+        data: { isActive: data.isActive },
+      }),
+    );
 
     return { data: updatedPromoCode };
   }
 
   async deletePromoCode(promoCodeId: string) {
-    const promoCode = await db.promoCode.findUnique({
-      where: { id: promoCodeId },
-    });
+    const promoCode = await runPromoQuery("deletePromoCode.findUnique", () =>
+      db.promoCode.findUnique({
+        where: { id: promoCodeId },
+      }),
+    );
 
     if (!promoCode) {
       throw {
@@ -105,9 +159,11 @@ class AdminPromoCodesService {
       };
     }
 
-    await db.promoCode.delete({
-      where: { id: promoCodeId },
-    });
+    await runPromoQuery("deletePromoCode.delete", () =>
+      db.promoCode.delete({
+        where: { id: promoCodeId },
+      }),
+    );
 
     return { success: true };
   }

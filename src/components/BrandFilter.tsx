@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Check } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
@@ -118,13 +119,16 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
                 className="group -mx-2 flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[#EFF6FF]"
               >
                 <span
-                  className={`h-5 w-5 shrink-0 rounded border-2 transition-colors ${
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded border-2 transition-colors ${
                     isSelected
-                      ? 'border-[#2CA1E2] bg-[#2CA1E2]'
+                      ? 'border-[#2CA1E2] bg-white'
                       : 'border-[#CAD5E2] bg-white group-hover:border-[#2CA1E2]'
                   }`}
                   aria-hidden
                 >
+                  {isSelected ? (
+                    <Check className="h-4 w-4 text-[#2CA1E2]" strokeWidth={2.5} aria-hidden />
+                  ) : null}
                 </span>
                 <span className="flex-1 truncate text-base leading-6 tracking-[-0.02em] text-[#314158] transition-colors group-hover:text-[#0F172B]">
                   {brand.name}

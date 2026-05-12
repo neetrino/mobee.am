@@ -124,7 +124,7 @@ export function ProfileHeader({
                 key={tab.id}
                 type="button"
                 onClick={() => onTabChange(tab.id)}
-                className={`flex w-full items-center gap-3 rounded-full px-4 py-3 text-sm font-medium transition-all ${
+                className={`flex w-full items-center gap-3 rounded-[15px] px-4 py-3 text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? 'bg-admin text-white'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'

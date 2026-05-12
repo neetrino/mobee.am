@@ -3,8 +3,56 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Site-wide scrollbars — Mobee admin accent (`tailwind` admin.DEFAULT) */
+    --app-scrollbar-thumb: #2db2ff;
+    --app-scrollbar-thumb-hover: #1a9fe6;
+    --app-scrollbar-track: #f3f4f6;
+    /* WebKit scrollbar chrome; desktop — align with prior 10px / 2px border */
+    --app-scrollbar-size: 10px;
+    --app-scrollbar-thumb-border: 2px;
+  }
+
+  /*
+   * Narrow viewports — smaller scrollbar (matches `lg` floor 834px in tailwind.config).
+   */
+  @media (max-width: 833px) {
+    :root {
+      --app-scrollbar-size: 6px;
+      --app-scrollbar-thumb-border: 1px;
+    }
+  }
+
   html {
     scrollbar-gutter: stable;
+  }
+
+  /*
+   * Firefox / standard track: apply to every scroll container so inner panels match the main page
+   * (previously only `html` was styled, so overflow areas looked different from the home viewport).
+   */
+  * {
+    scrollbar-color: var(--app-scrollbar-thumb) var(--app-scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar {
+    width: var(--app-scrollbar-size);
+    height: var(--app-scrollbar-size);
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--app-scrollbar-track);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--app-scrollbar-thumb);
+    border-radius: 9999px;
+    border: var(--app-scrollbar-thumb-border) solid var(--app-scrollbar-track);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--app-scrollbar-thumb-hover);
   }
 
   body {
@@ -155,6 +203,19 @@
       transform: translateX(-50%) scale(min(1, calc(100cqi / 197px)));
     }
   }
+
+  /*
+   * Admin `/supersudo/products` stock filter (`Բոլոր ապրանքները` / in stock / out): custom chevron.
+   * Larger `right` = chevron sits more to the left (more air from the right edge).
+   */
+  .admin-products-stock-filter-select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+    background-position: right 15px center;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  }
 }
 
 /* Policy pages typography & spacing */
@@ -225,5 +286,20 @@
 
 .policy-page-inner li + li {
   margin-top: 0.25rem;
+}
+
+/* `/supersudo/settings` — online payments checkbox (white tick; no blue focus ring) */
+@layer components {
+  .admin-settings-online-payments-checkbox {
+    @apply h-5 w-5 shrink-0 cursor-pointer appearance-none rounded border-2 border-gray-400 bg-white;
+    @apply focus:outline-none focus:ring-0 focus:ring-offset-0;
+    @apply focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1;
+  }
+
+  .admin-settings-online-payments-checkbox:checked {
+    @apply border-admin-600 bg-admin-600 bg-center bg-no-repeat;
+    background-size: 0.875rem;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M4%208l2.5%202.5L12%205%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E");
+  }
 }
 

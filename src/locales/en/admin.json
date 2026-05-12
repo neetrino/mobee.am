@@ -119,7 +119,7 @@
     "createAttribute": "Create Attribute",
     "noAttributes": "No attributes yet",
     "searchLabel": "Search attributes",
-    "searchPlaceholder": "Search by name, key, or value label...",
+    "searchPlaceholder": "Search...",
     "clearSearch": "Clear",
     "noSearchResults": "No attributes match your search",
     "getStarted": "Get started by creating your first attribute",
@@ -191,7 +191,7 @@
     "loadingCategories": "Loading categories...",
     "noCategories": "No categories found",
     "searchLabel": "Search categories",
-    "searchPlaceholder": "Search by title or slug...",
+    "searchPlaceholder": "Search...",
     "clearSearch": "Clear",
     "noSearchResults": "No categories match your search",
     "addCategory": "Add Category",
@@ -603,7 +603,7 @@
     "title": "Brands",
     "loading": "Loading brands...",
     "searchLabel": "Search brands",
-    "searchPlaceholder": "Search by name or slug...",
+    "searchPlaceholder": "Search...",
     "clearSearch": "Clear",
     "noSearchResults": "No brands match your search",
     "noBrands": "No brands found",
@@ -634,7 +634,11 @@
     "loading": "Loading...",
     "loadingOrders": "Loading orders...",
     "noOrders": "No orders found",
-    "searchPlaceholder": "Search by order number, customer, email, phone...",
+    "searchPlaceholder": "#, email, phone...",
+    "search": "Search",
+    "filterStatusAria": "Filter orders by status",
+    "filterPaymentAria": "Filter orders by payment status",
+    "filterFulfillmentAria": "Filter orders by fulfillment status",
     "allStatuses": "All Statuses",
     "allPaymentStatuses": "All Payment Statuses",
     "allFulfillmentStatuses": "All Fulfillment Statuses",
@@ -747,7 +751,8 @@
     "update": "Update",
     "saving": "Saving...",
     "back": "Back",
-    "backToAdmin": "Back to Admin Dashboard"
+    "backToAdmin": "Back to Admin Dashboard",
+    "unknownErrorFallback": "Unknown error"
   }
 }
 

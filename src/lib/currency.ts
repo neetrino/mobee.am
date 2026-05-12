@@ -73,8 +73,11 @@ export function clearCurrencyRatesCache(): void {
 
 const CURRENCY_STORAGE_KEY = 'shop_currency';
 
+/** Currency used for SSR / first paint when `localStorage` is unavailable (must match `useCurrency` initial state). */
+export const SSR_DEFAULT_DISPLAY_CURRENCY: CurrencyCode = 'AMD';
+
 export function getStoredCurrency(): CurrencyCode {
-  if (typeof window === 'undefined') return 'AMD';
+  if (typeof window === 'undefined') return SSR_DEFAULT_DISPLAY_CURRENCY;
   try {
     const stored = localStorage.getItem(CURRENCY_STORAGE_KEY);
     if (stored && stored in CURRENCIES) {
@@ -83,7 +86,7 @@ export function getStoredCurrency(): CurrencyCode {
   } catch {
     // Ignore errors
   }
-  return 'AMD';
+  return SSR_DEFAULT_DISPLAY_CURRENCY;
 }
 
 export function setStoredCurrency(currency: CurrencyCode): void {

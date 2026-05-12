@@ -7,6 +7,8 @@ import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
+import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
+import { ADMIN_SETTINGS_ONLINE_PAYMENTS_CHECKBOX_CLASS } from './online-payments-checkbox.constants';
 import { AdminPageShell } from '../components/AdminPageShell';
 interface Settings {
   defaultCurrency?: string;
@@ -15,6 +17,12 @@ interface Settings {
   brandDiscounts?: Record<string, number>;
   currencyRates?: Record<string, number>;
 }
+
+const SETTINGS_DEFAULT_CURRENCY_OPTIONS = [
+  { value: 'AMD', i18nKey: 'admin.settings.amd' },
+  { value: 'USD', i18nKey: 'admin.settings.usd' },
+  { value: 'EUR', i18nKey: 'admin.settings.eur' },
+] as const;
 
 export default function SettingsPage() {
   const { t } = useTranslation();
@@ -145,17 +153,8 @@ export default function SettingsPage() {
 
   return (
     <AdminPageShell currentPath={pathname || '/supersudo/settings'} router={router} t={t}>
-      <div className="max-w-4xl">
+      <div className="mx-auto w-full max-w-4xl">
         <div className="mb-8">
-          <button
-            onClick={() => router.push('/supersudo')}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.settings.backToAdmin')}
-          </button>
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.settings.title')}</h1>
         </div>
 
@@ -191,25 +190,44 @@ export default function SettingsPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.settings.paymentSettings')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                id="settings-default-currency-label"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 {t('admin.settings.defaultCurrency')}
               </label>
-              <select 
-                value={settings.defaultCurrency || 'AMD'}
-                onChange={(e) => setSettings({ ...settings, defaultCurrency: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
+              <div
+                className="flex flex-wrap gap-2"
+                role="group"
+                aria-labelledby="settings-default-currency-label"
               >
-                <option value="AMD">{t('admin.settings.amd')}</option>
-                <option value="USD">{t('admin.settings.usd')}</option>
-                <option value="EUR">{t('admin.settings.eur')}</option>
-              </select>
+                {SETTINGS_DEFAULT_CURRENCY_OPTIONS.map((opt) => {
+                  const isSelected = (settings.defaultCurrency || 'AMD') === opt.value;
+                  const focusRingClass = isSelected
+                    ? 'outline-none focus:outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-white/90'
+                    : 'outline-none focus:outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-gray-400';
+
+                  return (
+                    <Button
+                      key={opt.value}
+                      type="button"
+                      size="sm"
+                      variant={isSelected ? 'admin' : 'outline'}
+                      className={focusRingClass}
+                      onClick={() => setSettings({ ...settings, defaultCurrency: opt.value })}
+                    >
+                      {t(opt.i18nKey)}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
             <div>
-              <label className="flex items-center">
+              <label className="flex cursor-pointer items-center gap-3">
                 <input
                   type="checkbox"
                   defaultChecked
-                  className="mr-2"
+                  className={ADMIN_SETTINGS_ONLINE_PAYMENTS_CHECKBOX_CLASS}
                 />
                 <span className="text-sm font-medium text-gray-700">{t('admin.settings.enableOnlinePayments')}</span>
               </label>
@@ -436,7 +454,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Actions */}
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <Button
             variant="admin"
             onClick={handleSave}
@@ -445,7 +463,9 @@ export default function SettingsPage() {
             {saving ? t('admin.settings.saving') : t('admin.settings.saveSettings')}
           </Button>
           <Button
-            variant="ghost"
+            type="button"
+            variant="outline"
+            className={ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS}
             onClick={() => router.push('/supersudo')}
             disabled={saving}
           >

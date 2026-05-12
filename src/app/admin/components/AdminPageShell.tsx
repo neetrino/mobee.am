@@ -1,7 +1,17 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import type { ReactNode, SetStateAction } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS,
+  ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS,
+  ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS,
+} from '../admin-sidebar-layout.constants';
+import {
+  readAdminSidebarDesktopCollapsedFromSession,
+  writeAdminSidebarDesktopCollapsedToSession,
+} from '../admin-sidebar-session';
 import { AdminSidebar } from './AdminSidebar';
 
 interface AdminPageShellProps {
@@ -19,14 +29,48 @@ export function AdminPageShell({
   children,
   mainClassName,
 }: AdminPageShellProps) {
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsedState] = useState(false);
+
+  useLayoutEffect(() => {
+    setDesktopSidebarCollapsedState(readAdminSidebarDesktopCollapsedFromSession());
+  }, []);
+
+  const setDesktopSidebarCollapsed = useCallback((update: SetStateAction<boolean>) => {
+    setDesktopSidebarCollapsedState((prev) => {
+      const next = typeof update === 'function' ? (update as (p: boolean) => boolean)(prev) : update;
+      writeAdminSidebarDesktopCollapsedToSession(next);
+      return next;
+    });
+  }, []);
+
+  const mainHorizontalPaddingClass = desktopSidebarCollapsed
+    ? 'px-4 pt-2 sm:px-6 sm:pt-4 lg:px-0 lg:pt-[30px]'
+    : 'px-4 pt-2 sm:px-6 sm:pt-4 lg:px-8 lg:pt-[30px]';
+
+  const mainExpandedShiftClass = desktopSidebarCollapsed ? '' : ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS;
+
   return (
     <div className="min-h-screen bg-[#F2F5F8]">
-      <div className="flex flex-col gap-2 lg:flex-row lg:gap-8">
-        <AdminSidebar currentPath={currentPath} router={router} t={t} />
+      <div className="flex flex-col gap-4 lg:flex-row lg:gap-8">
+        <AdminSidebar
+          currentPath={currentPath}
+          router={router}
+          t={t}
+          desktopCollapsed={desktopSidebarCollapsed}
+          onDesktopCollapsedChange={setDesktopSidebarCollapsed}
+        />
         <div
-          className={`flex-1 min-w-0 px-4 pt-2 sm:px-6 sm:pt-4 lg:px-8 lg:pt-[30px] ${mainClassName ?? ''}`.trim()}
+          className={`flex-1 min-w-0 w-full mx-auto ${ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS} ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
+            desktopSidebarCollapsed ? '' : (mainClassName ?? '')
+          }`.trim()}
         >
-          {children}
+          {desktopSidebarCollapsed ? (
+            <div className={`${ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS} ${mainClassName ?? ''}`.trim()}>
+              {children}
+            </div>
+          ) : (
+            children
+          )}
         </div>
       </div>
     </div>

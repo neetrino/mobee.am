@@ -16,6 +16,7 @@ import {
   MOBILE_BOTTOM_NAV_INNER_PB_CLASS,
   MOBILE_BOTTOM_NAV_INNER_PT_CLASS,
   MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS,
+  MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH,
 } from './mobile-bottom-nav.constants';
 
 const montserratNav = Montserrat({
@@ -32,14 +33,14 @@ type MobileNavDef =
   | { key: Exclude<NavKey, 'cart' | 'shop'>; labelKey: string; href: string; icon: LucideIcon };
 
 const INACTIVE_ICON_BOX: Record<NavKey, string> = {
-  home: 'h-5 w-5',
-  shop: 'h-5 w-5',
-  cart: 'h-5 w-5',
+  home: 'h-6 w-6',
+  shop: 'h-6 w-6',
+  cart: 'h-6 w-6',
   wishlist: 'h-6 w-6',
-  profile: 'h-[22px] w-[22px]',
+  profile: 'h-6 w-6',
 };
 
-const ACTIVE_ICON_BOX = 'h-5 w-5';
+const ACTIVE_ICON_BOX = 'h-6 w-6';
 
 const INACTIVE_ICON_COLOR = 'text-[#9e9e9e]';
 const ACTIVE_ICON_COLOR = 'text-[#2db2ff]';
@@ -64,8 +65,8 @@ function MobileBottomNavIcon({ item, active }: NavIconProps) {
     return (
       <MobileNavBagIcon
         size={24}
-        strokeWidth={1.5}
-        className={`h-6 w-6 shrink-0 ${iconColor}`}
+        strokeWidth={MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH}
+        className={`shrink-0 ${iconBox} ${iconColor}`}
       />
     );
   }
@@ -73,7 +74,8 @@ function MobileBottomNavIcon({ item, active }: NavIconProps) {
   if (item.key === 'shop') {
     return (
       <CartIcon
-        size={20}
+        size={24}
+        strokeWidth={MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH}
         className={`shrink-0 ${iconBox} ${iconColor}`}
       />
     );
@@ -86,7 +88,7 @@ function MobileBottomNavIcon({ item, active }: NavIconProps) {
   return (
     <Icon
       className={`shrink-0 ${iconBox} ${iconColor}`}
-      strokeWidth={active ? 2.5 : 1.5}
+      strokeWidth={MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH}
       fill={useFill ? 'currentColor' : 'none'}
       aria-hidden
     />

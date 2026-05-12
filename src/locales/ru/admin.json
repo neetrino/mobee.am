@@ -119,7 +119,7 @@
     "createAttribute": "Создать атрибут",
     "noAttributes": "Пока нет атрибутов",
     "searchLabel": "Поиск атрибутов",
-    "searchPlaceholder": "Поиск по названию, ключу или подписи значения...",
+    "searchPlaceholder": "Поиск...",
     "clearSearch": "Сбросить",
     "noSearchResults": "Нет атрибутов по вашему запросу",
     "getStarted": "Начните с создания вашего первого атрибута",
@@ -191,7 +191,7 @@
     "loadingCategories": "Загрузка категорий...",
     "noCategories": "Категории не найдены",
     "searchLabel": "Поиск категорий",
-    "searchPlaceholder": "Поиск по названию или slug...",
+    "searchPlaceholder": "Поиск...",
     "clearSearch": "Сбросить",
     "noSearchResults": "Нет категорий по вашему запросу",
     "addCategory": "Добавить категорию",
@@ -605,7 +605,7 @@
     "title": "Бренды",
     "loading": "Загрузка брендов...",
     "searchLabel": "Поиск брендов",
-    "searchPlaceholder": "Поиск по названию или slug...",
+    "searchPlaceholder": "Поиск...",
     "clearSearch": "Сбросить",
     "noSearchResults": "Нет брендов по вашему запросу",
     "noBrands": "Бренды не найдены",
@@ -636,7 +636,11 @@
     "loading": "Загрузка...",
     "loadingOrders": "Загрузка заказов...",
     "noOrders": "Заказы не найдены",
-    "searchPlaceholder": "Поиск по номеру заказа, клиенту, email, телефону...",
+    "searchPlaceholder": "№, email, тел...",
+    "search": "Поиск",
+    "filterStatusAria": "Фильтр заказов по статусу",
+    "filterPaymentAria": "Фильтр заказов по статусу оплаты",
+    "filterFulfillmentAria": "Фильтр заказов по статусу выполнения",
     "allStatuses": "Все статусы",
     "allPaymentStatuses": "Все статусы оплаты",
     "allFulfillmentStatuses": "Все статусы выполнения",
@@ -749,6 +753,7 @@
     "update": "Обновить",
     "saving": "Сохранение...",
     "back": "Назад",
-    "backToAdmin": "Вернуться в панель администратора"
+    "backToAdmin": "Вернуться в панель администратора",
+    "unknownErrorFallback": "Неизвестная ошибка"
   }
 }

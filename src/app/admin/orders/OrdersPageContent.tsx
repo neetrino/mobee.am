@@ -3,6 +3,7 @@
 import { useTranslation } from '../../../lib/i18n-client';
 import { useOrders } from './useOrders';
 import { OrdersFilters } from './components/OrdersFilters';
+import { BulkDeleteConfirmSheet } from './components/BulkDeleteConfirmSheet';
 import { BulkSelectionControls } from './components/BulkSelectionControls';
 import { OrdersTable } from './components/OrdersTable';
 import { OrderDetailsModal } from './components/OrderDetailsModal';
@@ -28,6 +29,7 @@ export function OrdersPageContent() {
     updateMessage,
     selectedIds,
     bulkDeleting,
+    bulkDeleteConfirmOpen,
     selectedOrderId,
     orderDetails,
     loadingOrderDetails,
@@ -42,7 +44,9 @@ export function OrdersPageContent() {
     toggleSelect,
     toggleSelectAll,
     handleSort,
-    handleBulkDelete,
+    openBulkDeleteConfirm,
+    closeBulkDeleteConfirm,
+    executeBulkDelete,
     handleStatusChange,
     handlePaymentStatusChange,
     handleFulfillmentStatusChange,
@@ -52,17 +56,8 @@ export function OrdersPageContent() {
 
   return (
     <AdminPageShell currentPath="/supersudo/orders" router={router} t={t}>
-      <div className="max-w-7xl">
+      <div className="mx-auto w-full max-w-7xl">
         <div className="mb-8">
-          <button
-            onClick={() => router.push('/supersudo')}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.orders.backToAdmin')}
-          </button>
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.orders.title')}</h1>
         </div>
 
@@ -83,8 +78,20 @@ export function OrdersPageContent() {
 
         <BulkSelectionControls
           selectedCount={selectedIds.size}
-          onBulkDelete={handleBulkDelete}
+          onBulkDelete={openBulkDeleteConfirm}
           bulkDeleting={bulkDeleting}
+        />
+
+        <BulkDeleteConfirmSheet
+          isOpen={bulkDeleteConfirmOpen}
+          title={t('admin.orders.deleteSelected')}
+          closeLabel={t('admin.common.close')}
+          selectedCount={selectedIds.size}
+          bulkDeleting={bulkDeleting}
+          onCancel={closeBulkDeleteConfirm}
+          onConfirm={() => {
+            void executeBulkDelete();
+          }}
         />
 
         <OrdersTable

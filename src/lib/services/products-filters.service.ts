@@ -6,32 +6,9 @@ import {
 } from "@/lib/database/productVariantDb.constants";
 import { adminService } from "./admin.service";
 import { ProductWithRelations } from "./products-find-query.service";
+import { buildCategoryTreesOrWhere } from "./products-find-query/category-utils";
 
 class ProductsFiltersService {
-  /**
-   * Get all child category IDs recursively
-   */
-  private async getAllChildCategoryIds(parentId: string): Promise<string[]> {
-    const children = await db.category.findMany({
-      where: {
-        parentId: parentId,
-        published: true,
-        deletedAt: null,
-      },
-      select: { id: true },
-    });
-    
-    let allChildIds = children.map((c: { id: string }) => c.id);
-    
-    // Recursively get children of children
-    for (const child of children) {
-      const grandChildren = await this.getAllChildCategoryIds(child.id);
-      allChildIds = [...allChildIds, ...grandChildren];
-    }
-    
-    return allChildIds;
-  }
-
   /**
    * Get available filters (colors and sizes)
    */
@@ -84,48 +61,23 @@ class ProductsFiltersService {
         ];
       }
 
-      // Add category filter
+      // Add category filter (comma-separated slugs: union of category trees)
       if (filters.category) {
         try {
-          const categoryDoc = await db.category.findFirst({
-            where: {
-              translations: {
-                some: {
-                  slug: filters.category,
-                  locale: filters.lang || "en",
-                },
-              },
-              published: true,
-              deletedAt: null,
-            },
-          });
-
-          if (categoryDoc && categoryDoc.id) {
-            // Get all child categories (subcategories) recursively
-            const childCategoryIds = await this.getAllChildCategoryIds(categoryDoc.id);
-            const allCategoryIds = [categoryDoc.id, ...childCategoryIds];
-
-            // Build OR conditions
-            const categoryConditions = allCategoryIds.flatMap((catId: string) => [
-              { primaryCategoryId: catId },
-              { categoryIds: { has: catId } },
-            ]);
-            
+          const catWhere = await buildCategoryTreesOrWhere(
+            filters.category,
+            filters.lang || "en",
+          );
+          if (catWhere) {
             if (where.OR) {
-              where.AND = [
-                { OR: where.OR },
-                {
-                  OR: categoryConditions,
-                },
-              ];
+              where.AND = [{ OR: where.OR }, catWhere];
               delete where.OR;
             } else {
-              where.OR = categoryConditions;
+              Object.assign(where, catWhere);
             }
           }
         } catch (categoryError) {
-          console.error('❌ [PRODUCTS FILTERS SERVICE] Error fetching category:', categoryError);
-          // Continue without category filter if there's an error
+          console.error("❌ [PRODUCTS FILTERS SERVICE] Error fetching category:", categoryError);
         }
       }
 
@@ -417,22 +369,12 @@ class ProductsFiltersService {
     };
 
     if (filters.category) {
-      const categoryDoc = await db.category.findFirst({
-        where: {
-          translations: {
-            some: {
-              slug: filters.category,
-              locale: filters.lang || "en",
-            },
-          },
-        },
-      });
-
-      if (categoryDoc) {
-        where.OR = [
-          { primaryCategoryId: categoryDoc.id },
-          { categoryIds: { has: categoryDoc.id } },
-        ];
+      const catWhere = await buildCategoryTreesOrWhere(
+        filters.category,
+        filters.lang || "en",
+      );
+      if (catWhere) {
+        Object.assign(where, catWhere);
       }
     }
 

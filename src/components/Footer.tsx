@@ -16,15 +16,13 @@ import {
   FooterSocialWhatsAppGlyph,
 } from './footer/footerSocialGlyphs';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
 
 const inter = Inter({
   subsets: ['latin', 'cyrillic'],
   weight: ['400', '700', '900'],
   display: 'swap',
 });
-
-/** Figma mobee-new footer (582:740) — brand line start year in copyright. */
-const FOOTER_BRAND_START_YEAR = 2017;
 
 /** Footer credit company name links to Neetrino site. */
 const FOOTER_CREDIT_COMPANY_HREF = 'https://neetrino.com/';
@@ -35,8 +33,22 @@ const FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS = 'pt-[8px]';
 /** Phone / mail / address text columns — same left nudge next to icons. */
 const FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS = 'lg:-translate-x-[13px]';
 
+/** Phone + email body only — shift text right (px); icons unchanged. */
+const FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS = 'pl-[5px]';
+
+/** Address row (location icon + text) — shift whole block left (px). */
+const FOOTER_ADDRESS_ROW_NUDGE_LEFT_CLASS = '-translate-x-[20px]';
+
 /** Space under location title block before phone / mail / address (Figma-tuned). */
 const FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS = 'gap-20 lg:gap-24';
+
+/** Location block title — default (en/ru), Figma mobee-new. */
+const FOOTER_LOCATION_HEADING_SIZE_DEFAULT_CLASS =
+  'text-3xl font-black uppercase leading-none text-black md:text-4xl lg:text-[52px]';
+
+/** HY: smaller type + tighter tracking + 5px left nudge so «Մեր գտնվելու վայրը» fits one line. */
+const FOOTER_LOCATION_HEADING_SIZE_HY_CLASS =
+  '-translate-x-[5px] text-[1.375rem] font-black uppercase leading-none tracking-[-0.025em] text-black sm:text-2xl md:text-[1.875rem] lg:text-[38px] xl:text-[42px]';
 
 /** Location card + map shell — light gray (Figma mobee-new footer reference). */
 const FOOTER_LOCATION_SURFACE_BG_CLASS = 'bg-[#f9f9f9]';
@@ -66,14 +78,15 @@ const FOOTER_POLICY_LINK_CLASS =
 const FOOTER_POLICIES_NAV_ROW_CLASS =
   'flex flex-wrap items-center gap-x-8 gap-y-3 lg:justify-end';
 
-/** RU: 2×2 grid; start-aligned so left column lines up (refund + terms share one x). */
-const FOOTER_POLICIES_NAV_RU_GRID_CLASS =
+/** RU: 2×2 grid; row-major — row1: delivery | refund, row2: terms | privacy; cells start-aligned. */
+const FOOTER_POLICIES_NAV_GRID_RU_CLASS =
   'grid grid-cols-2 gap-x-8 gap-y-3 lg:ml-auto lg:justify-items-start';
 
-const FOOTER_REFUND_POLICY_HREF = '/refund-policy';
+/** HY: same 2×2 grid; block and cell content right-aligned. */
+const FOOTER_POLICIES_NAV_GRID_HY_CLASS =
+  'grid grid-cols-2 gap-x-8 gap-y-3 ml-auto justify-items-end';
 
-/** Armenian-only: nudge “Վերադարձի քաղաքականություն” left in the policies row. */
-const FOOTER_HY_REFUND_POLICY_NUDGE_CLASS = 'lg:-translate-x-[39px]';
+const FOOTER_REFUND_POLICY_HREF = '/refund-policy';
 
 /** 24px tap target; glyph draws at 22px inside (see footerSocialGlyphs GLYPH_CLASS). */
 const FOOTER_SOCIAL_ICON_SLOT_CLASS =
@@ -156,19 +169,22 @@ function FooterMapEmbed({ addressText }: { readonly addressText: string }) {
 
 function FooterLocationCard(props: {
   readonly addressText: string;
-  readonly phoneText: string;
-  readonly telHref: string;
+  readonly phoneLines: readonly string[];
   readonly email: string;
 }) {
-  const { t } = useTranslation();
-  const { addressText, phoneText, telHref, email } = props;
+  const { t, lang } = useTranslation();
+  const { addressText, phoneLines, email } = props;
   const mailHref = `mailto:${email}`;
 
   return (
     <div className={FOOTER_CARD_CLASS}>
       <div className={`flex min-w-0 flex-1 flex-col lg:py-4 ${FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS}`}>
         <div>
-          <h2 className="text-3xl font-black uppercase leading-none text-black md:text-4xl lg:text-[52px]">
+          <h2
+            className={
+              lang === 'hy' ? FOOTER_LOCATION_HEADING_SIZE_HY_CLASS : FOOTER_LOCATION_HEADING_SIZE_DEFAULT_CLASS
+            }
+          >
             {t('common.footer.locationHeading')}
           </h2>
           <p className="mt-2 text-[14px] leading-5 text-black">{t('common.footer.locationSubtitle')}</p>
@@ -178,24 +194,32 @@ function FooterLocationCard(props: {
         <div className="grid grid-cols-1 gap-y-3.5 lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_auto] lg:gap-x-10 lg:gap-y-3.5 lg:-translate-x-2.5 xl:gap-x-14">
           <ContactIconBlock
             className="lg:col-start-1 lg:row-start-1"
-            bodyClassName={FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS}
+            bodyClassName={`${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS} ${FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS}`}
             icon={<FooterContactPhoneGlyph />}
           >
-            <Link href={telHref} className="hover:underline">
-              {phoneText}
-            </Link>
+            <div className="flex flex-col gap-0.5 tabular-nums">
+              {phoneLines.map((line) => (
+                <Link
+                  key={line}
+                  href={phoneDisplayToTelHref(line)}
+                  className="block text-[16px] leading-6 tracking-[-0.3125px] hover:underline"
+                >
+                  {line}
+                </Link>
+              ))}
+            </div>
           </ContactIconBlock>
           <ContactIconBlock
             alignIconTop
             bodyClassName={`${FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS} ${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS}`}
-            className="lg:col-start-2 lg:row-span-2 lg:row-start-1"
+            className={`lg:col-start-2 lg:row-span-2 lg:row-start-1 ${FOOTER_ADDRESS_ROW_NUDGE_LEFT_CLASS}`}
             icon={<FooterContactLocationGlyph className="size-6" />}
           >
             <p className="whitespace-pre-line">{addressText}</p>
           </ContactIconBlock>
           <ContactIconBlock
             className="lg:col-start-1 lg:row-start-2"
-            bodyClassName={FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS}
+            bodyClassName={`${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS} ${FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS}`}
             icon={<FooterContactMailGlyph />}
           >
             <Link href={mailHref} className="hover:underline">
@@ -253,16 +277,14 @@ function FooterCopyrightPoliciesRow() {
   const { t, lang } = useTranslation();
 
   const policyLinks = [
-    { href: FOOTER_REFUND_POLICY_HREF, label: t('common.footer.policiesRow.refund') },
     { href: '/delivery-terms', label: t('common.footer.policiesRow.delivery') },
+    { href: FOOTER_REFUND_POLICY_HREF, label: t('common.footer.policiesRow.refund') },
     { href: '/terms', label: t('common.footer.policiesRow.terms') },
     { href: '/privacy', label: t('common.footer.policiesRow.privacy') },
   ];
 
   const year = new Date().getFullYear();
-  const copyrightLead = t('common.footer.copyrightIntro')
-    .replace('{startYear}', String(FOOTER_BRAND_START_YEAR))
-    .replace('{year}', String(year));
+  const copyrightLead = t('common.footer.copyrightIntro').replace('{year}', String(year));
 
   return (
     <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
@@ -280,17 +302,19 @@ function FooterCopyrightPoliciesRow() {
         <span>{t('common.footer.allRightsReserved')}</span>
       </p>
       <nav
-        className={lang === 'ru' ? FOOTER_POLICIES_NAV_RU_GRID_CLASS : FOOTER_POLICIES_NAV_ROW_CLASS}
+        className={
+          lang === 'ru' ? FOOTER_POLICIES_NAV_GRID_RU_CLASS : lang === 'hy' ? FOOTER_POLICIES_NAV_GRID_HY_CLASS : FOOTER_POLICIES_NAV_ROW_CLASS
+        }
         aria-label={t('common.footer.legalBar.policiesNavLabel')}
       >
         {policyLinks.map((link) => {
-          const hyRefundNudge = lang === 'hy' && link.href === FOOTER_REFUND_POLICY_HREF;
-          const ruGridLinkClass = lang === 'ru' ? ' !whitespace-normal text-left' : '';
+          const gridPolicyLinkClass =
+            lang === 'ru' ? ' !whitespace-normal text-left' : lang === 'hy' ? ' !whitespace-normal text-right' : '';
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={`${FOOTER_POLICY_LINK_CLASS}${ruGridLinkClass}${hyRefundNudge ? ` ${FOOTER_HY_REFUND_POLICY_NUDGE_CLASS}` : ''}`}
+              className={`${FOOTER_POLICY_LINK_CLASS}${gridPolicyLinkClass}`}
             >
               {link.label}
             </Link>
@@ -315,8 +339,7 @@ export function Footer() {
   const { t } = useTranslation();
 
   const addressText = t('contact.address');
-  const phoneText = t('contact.phone');
-  const telHref = `tel:${phoneText.replace(/\s+/g, '')}`;
+  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
   const email = t('contact.email');
 
   return (
@@ -326,8 +349,7 @@ export function Footer() {
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-12 lg:gap-16`}>
         <FooterLocationCard
           addressText={addressText}
-          phoneText={phoneText}
-          telHref={telHref}
+          phoneLines={phoneLines}
           email={email}
         />
         <FooterMetaSection />

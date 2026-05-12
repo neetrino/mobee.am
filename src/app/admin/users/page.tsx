@@ -188,17 +188,8 @@ export default function UsersPage() {
 
   return (
     <AdminPageShell currentPath={pathname || '/supersudo/users'} router={router} t={t}>
-      <div className="max-w-7xl">
+      <div className="mx-auto w-full min-w-0 max-w-7xl">
         <div className="mb-8">
-          <button
-            onClick={() => router.push('/supersudo')}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.users.backToAdmin')}
-          </button>
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.users.title')}</h1>
         </div>
 
@@ -219,11 +210,11 @@ export default function UsersPage() {
             </div>
 
             {/* Admin / Customer filter */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
                 {t('admin.users.adminCustomer')}
               </span>
-              <div className="inline-flex rounded-full bg-gray-100 p-1 text-xs">
+              <div className="inline-flex rounded-full bg-gray-100 p-1.5 text-sm font-medium">
                 <button
                   type="button"
                   onClick={() => {
@@ -231,10 +222,10 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: all');
                   }}
-                  className={`px-3 py-1 rounded-full transition-all ${
+                  className={`rounded-full px-4 py-2 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'all'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-admin-500 font-semibold text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
                   }`}
                 >
                   {t('admin.users.all')}
@@ -246,10 +237,10 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: admin');
                   }}
-                  className={`px-3 py-1 rounded-full transition-all ${
+                  className={`rounded-full px-4 py-2 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'admin'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-admin-500 font-semibold text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
                   }`}
                 >
                   {t('admin.users.admins')}
@@ -261,10 +252,10 @@ export default function UsersPage() {
                     setPage(1);
                     console.log('👥 [ADMIN] Role filter changed to: customer');
                   }}
-                  className={`px-3 py-1 rounded-full transition-all ${
+                  className={`rounded-full px-4 py-2 transition-all focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-400 focus-visible:ring-offset-2 ${
                     roleFilter === 'customer'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-admin-500 font-semibold text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-white/70 hover:text-gray-900'
                   }`}
                 >
                   {t('admin.users.customers')}
@@ -305,16 +296,16 @@ export default function UsersPage() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.contact')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.orders')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="pl-[calc(1.5rem-5px)] pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.roles')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.status')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="min-w-[7.5rem] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-normal">
                         {t('admin.users.created')}
                       </th>
                     </tr>
@@ -342,15 +333,17 @@ export default function UsersPage() {
                             <div className="text-sm text-gray-500">{user.phone}</div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-16 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                           {user.ordersCount ?? 0}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="pl-[calc(1.5rem-18px)] pr-6 py-4 whitespace-nowrap">
                           <div className="flex gap-2">
                             {user.roles?.map((role) => (
                               <span
                                 key={role}
-                                className="px-2 py-1 text-xs font-medium bg-admin-100 text-admin-800 rounded-full"
+                                className={`px-2 py-1 text-xs font-medium bg-admin-100 text-admin-800 rounded-full ${
+                                  roleFilter === 'admin' && role === 'admin' ? 'ml-[10px]' : ''
+                                }`}
                               >
                                 {role}
                               </span>
@@ -367,7 +360,7 @@ export default function UsersPage() {
                                 `${user.firstName} ${user.lastName}`,
                               )
                             }
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            className={`ml-[25px] relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                               user.blocked
                                 ? 'bg-gray-300 focus:ring-gray-400'
                                 : 'bg-green-500 focus:ring-green-500'
@@ -383,7 +376,7 @@ export default function UsersPage() {
                             />
                           </button>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="min-w-[7.5rem] px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                       </tr>
@@ -418,13 +411,24 @@ export default function UsersPage() {
               )}
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm text-gray-700">{t('admin.users.selectedUsers').replace('{count}', selectedIds.size.toString())}</div>
-                <Button
-                  variant="outline"
+                <button
+                  type="button"
                   onClick={handleBulkDelete}
                   disabled={selectedIds.size === 0 || bulkDeleting}
+                  className="flex shrink-0 items-center gap-3 rounded-[15px] border border-red-200 bg-white px-4 py-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {bulkDeleting ? t('admin.users.deleting') : t('admin.users.deleteSelected')}
-                </Button>
+                  <span className="flex-shrink-0 text-red-500" aria-hidden>
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </span>
+                  <span>{bulkDeleting ? t('admin.users.deleting') : t('admin.users.deleteSelected')}</span>
+                </button>
               </div>
             </>
           )}

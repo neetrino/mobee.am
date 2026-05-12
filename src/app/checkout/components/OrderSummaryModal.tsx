@@ -98,10 +98,6 @@ export function OrderSummaryModal({
         <span className="font-medium text-right max-w-[55%]">{shippingDisplay}</span>
       </div>
       <DeliveryPricingHint currency={currency} visible={shippingMethod === 'delivery'} />
-      <div className="flex justify-between text-sm">
-        <span className="text-gray-600">{t('checkout.summary.tax')}:</span>
-        <span className="font-medium">{formatPriceInCurrency(orderSummary.taxDisplay, currency)}</span>
-      </div>
       {orderSummary.totalExcludesPendingShipping && (
         <p className="text-xs text-amber-800">{t('checkout.summary.totalPendingShippingNote')}</p>
       )}

@@ -3,6 +3,10 @@
 import { Card, Button } from '@shop/ui';
 import Link from 'next/link';
 import { useTranslation } from '../../lib/i18n-client';
+import { phoneDisplayToTelHref } from '../../lib/contactPhoneDisplay';
+
+const STOREFRONT_ADDRESS = '19/1 Sayat-Nova St., Nova Plaza 104, Yerevan, Armenia';
+const STOREFRONT_PHONES = ['093-44-44-94', '055-81-11-81'] as const;
 
 export default function StoresPage() {
   const { t } = useTranslation();
@@ -10,8 +14,8 @@ export default function StoresPage() {
     {
       id: 1,
       name: 'Main Store',
-      address: '123 Main Street, Yerevan, Armenia',
-      phone: '+374 10 123456',
+      address: STOREFRONT_ADDRESS,
+      phones: [...STOREFRONT_PHONES],
       email: 'main@whiteshop.com',
       hours: 'Mon-Sat: 9:00 AM - 8:00 PM',
       image: 'https://via.placeholder.com/400x300?text=Main+Store',
@@ -19,8 +23,8 @@ export default function StoresPage() {
     {
       id: 2,
       name: 'Shopping Mall Branch',
-      address: '456 Mall Avenue, Yerevan, Armenia',
-      phone: '+374 10 234567',
+      address: STOREFRONT_ADDRESS,
+      phones: [...STOREFRONT_PHONES],
       email: 'mall@whiteshop.com',
       hours: 'Mon-Sun: 10:00 AM - 10:00 PM',
       image: 'https://via.placeholder.com/400x300?text=Mall+Branch',
@@ -28,8 +32,8 @@ export default function StoresPage() {
     {
       id: 3,
       name: 'Downtown Location',
-      address: '789 Downtown Plaza, Yerevan, Armenia',
-      phone: '+374 10 345678',
+      address: STOREFRONT_ADDRESS,
+      phones: [...STOREFRONT_PHONES],
       email: 'downtown@whiteshop.com',
       hours: 'Mon-Fri: 8:00 AM - 7:00 PM',
       image: 'https://via.placeholder.com/400x300?text=Downtown',
@@ -80,9 +84,9 @@ export default function StoresPage() {
                   <p className="text-gray-600 text-sm">{store.address}</p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <svg
-                    className="w-5 h-5 text-gray-500 flex-shrink-0"
+                    className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -94,12 +98,17 @@ export default function StoresPage() {
                       d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                     />
                   </svg>
-                  <a
-                    href={`tel:${store.phone}`}
-                    className="text-gray-600 text-sm hover:text-gray-900 transition-colors"
-                  >
-                    {store.phone}
-                  </a>
+                  <div className="flex min-w-0 flex-col gap-1 text-sm text-gray-600">
+                    {store.phones.map((phone) => (
+                      <a
+                        key={phone}
+                        href={phoneDisplayToTelHref(phone)}
+                        className="hover:text-gray-900 transition-colors"
+                      >
+                        {phone}
+                      </a>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3">

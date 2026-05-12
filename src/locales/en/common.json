@@ -55,9 +55,7 @@
     "accessoriesLink": "Accessories"
   },
   "header": {
-    "supportPhoneAria": "Call customer support",
-    "supportPhoneNumber": "+374 10 000000",
-    "supportPhoneTel": "+37410000000"
+    "supportPhoneAria": "Call customer support"
   },
   "stock": {
     "inStock": "In Stock",
@@ -220,7 +218,7 @@
     "mapEmbedTitle": "Map of store location",
     "footerNavAriaLabel": "Footer primary links",
     "socialNavAriaLabel": "Social links",
-    "copyrightIntro": "Copyright © {startYear} - {year}",
+    "copyrightIntro": "Copyright © {year}",
     "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Products",
     "sectionsHeading": "Sections",

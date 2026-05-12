@@ -216,7 +216,7 @@ export const translations = {
       product: 'товар',
     },
     product: {
-      addToCart: 'Добавить в корзину',
+      addToCart: 'Добавить',
       addToWishlist: 'Добавить в список желаний',
       viewProduct: 'Просмотреть товар',
       viewDetails: 'Просмотреть детали',

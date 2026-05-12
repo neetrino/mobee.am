@@ -39,22 +39,22 @@ export function StatsCards({ analytics, totalUsers }: StatsCardsProps) {
       </Card>
 
       <Card 
-        className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg hover:scale-105 hover:border-green-400 transition-all duration-200 group cursor-pointer relative"
+        className="p-6 bg-gradient-to-br from-admin-50 to-admin-100 border-admin-200 hover:shadow-lg hover:scale-105 hover:border-admin-400 transition-all duration-200 group cursor-pointer relative"
         onClick={() => router.push('/supersudo/orders?paymentStatus=paid')}
         title={t('admin.analytics.clickToViewPaidOrders')}
       >
         <div className="flex items-center justify-between mb-3">
-          <div className="w-12 h-12 bg-green-500 rounded-supersudo flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 bg-admin-500 rounded-supersudo flex items-center justify-center group-hover:scale-110 transition-transform">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <svg className="w-4 h-4 text-green-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-admin-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>
-        <p className="text-sm font-medium text-green-700 mb-1">{t('admin.analytics.totalRevenue')}</p>
-        <p className="text-2xl font-bold text-green-900">
+        <p className="text-sm font-medium text-admin-700 mb-1">{t('admin.analytics.totalRevenue')}</p>
+        <p className="text-2xl font-bold text-admin-900">
           {formatCurrency(analytics.orders.totalRevenue, analytics.orders.currency)}
         </p>
       </Card>

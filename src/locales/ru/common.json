@@ -1,6 +1,6 @@
 {
   "buttons": {
-    "addToCart": "Добавить в корзину",
+    "addToCart": "Добавить",
     "addToWishlist": "Добавить в избранное",
     "viewProduct": "Посмотреть товар",
     "viewDetails": "Посмотреть детали",
@@ -55,9 +55,7 @@
     "accessoriesLink": "Аксессуары"
   },
   "header": {
-    "supportPhoneAria": "Позвонить в поддержку",
-    "supportPhoneNumber": "+374 10 000000",
-    "supportPhoneTel": "+37410000000"
+    "supportPhoneAria": "Позвонить в поддержку"
   },
   "stock": {
     "inStock": "В наличии",
@@ -175,7 +173,7 @@
     "currencySection": "Валюта"
   },
   "ariaLabels": {
-    "addToCart": "Добавить в корзину",
+    "addToCart": "Добавить",
     "removeFromCart": "Удалить из корзины",
     "addToWishlist": "Добавить в избранное",
     "removeFromWishlist": "Удалить из избранного",
@@ -217,14 +215,14 @@
     "mapEmbedTitle": "Карта с адресом магазина",
     "footerNavAriaLabel": "Основные ссылки в подвале",
     "socialNavAriaLabel": "Соцсети",
-    "copyrightIntro": "Авторское право © {startYear} - {year}",
-    "allRightsReserved": "Все права защищены.",
+    "copyrightIntro": "Copyright © {year}",
+    "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Товары",
     "sectionsHeading": "Разделы",
     "termsHeading": "Условия",
     "connectHeading": "Связь",
     "shop": "Магазин",
-    "copyright": "© {year} Mobee. Все права защищены.",
+    "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
       "refund": "Политика возврата средств",
       "delivery": "Политика доставки",
@@ -233,7 +231,7 @@
     },
     "legalBar": {
       "brand": "MOBEE",
-      "copyrightLead": "Авторское право © {year} | Все права защищены,",
+      "copyrightLead": "Copyright © {year} | All Rights Reserved,",
       "createdBy": "Создано",
       "creditCompany": "Neetrino IT Company",
       "privacyPolicy": "Политика конфиденциальности",

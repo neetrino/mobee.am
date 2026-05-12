@@ -9,12 +9,14 @@ export function DeliveryPolicyInfoCard() {
   const { t } = useTranslation();
 
   return (
-    <Card className={`p-6 border border-purple-100 bg-purple-50/40 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}>
+    <Card
+      className={`p-6 border border-admin-200 bg-admin-50/60 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+    >
       <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
-        <Link href="/returns" className="text-purple-700 underline hover:text-purple-900">
+        <Link href="/returns" className="text-admin-700 underline hover:text-admin-900">
           {t('checkout.deliveryPolicy.returnsLinkText')}
         </Link>
-        <Link href="/delivery" className="text-purple-700 underline hover:text-purple-900">
+        <Link href="/delivery" className="text-admin-700 underline hover:text-admin-900">
           {t('checkout.deliveryPolicy.fullTermsLink')}
         </Link>
       </nav>

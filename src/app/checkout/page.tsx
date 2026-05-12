@@ -55,11 +55,11 @@ export default function CheckoutPage() {
       <div className={CHECKOUT_PAGE_SHELL_CLASS}>
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <div className="space-y-4 lg:col-span-2">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="space-y-4 lg:col-span-7">
               <div className={`h-96 bg-gray-200 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`} />
             </div>
-            <div className={`h-64 bg-gray-200 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`} />
+            <div className={`h-64 bg-gray-200 lg:col-span-5 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`} />
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function CheckoutPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('checkout.title')}</h1>
 
       <form onSubmit={handlePlaceOrder}>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <CheckoutForm
             register={register}
             setValue={setValue}

@@ -50,13 +50,27 @@ export const MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS =
 
 export const MOBILE_PRIMARY_MENU_BAR_CLASS = 'h-[2px] w-full rounded-full bg-black';
 
+/**
+ * Mobile drawer close — compact X (smaller than strip burger glyph), Mobee brand blue
+ * (`admin` / #2DB2FF in tailwind.config).
+ */
+export const MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS =
+  'relative flex h-[14px] w-[14px] shrink-0 items-center justify-center';
+
+/** ~14px × √2 — diagonal arms span the 14×14 close icon box. */
+export const MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS =
+  'absolute left-1/2 top-1/2 h-[2px] w-[20px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-full bg-admin-500';
+
+export const MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS =
+  'absolute left-1/2 top-1/2 h-[2px] w-[20px] -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-full bg-admin-500';
+
 /** Mobile strip — open main menu (same chrome as storefront header burger). */
 export const MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS =
-  'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
 
 /** Same chrome as {@link MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS} with horizontal padding for a text label (e.g. `/supersudo` drawer trigger). */
 export const MOBILE_PRIMARY_MENU_OPEN_BUTTON_WITH_LABEL_CLASS =
-  'flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
+  'flex h-10 shrink-0 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
 
 /** Primary strip peek (scroll-up) and docked bar offset — duration (ms). */
 export const HEADER_PRIMARY_PEEK_TRANSITION_MS = 280;

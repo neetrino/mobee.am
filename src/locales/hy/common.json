@@ -50,14 +50,12 @@
     "phonesLink": "Հեռախոսներ",
     "tabletsLink": "Պլանշետներ",
     "computersLink": "Համակարգիչներ",
-    "watchesLink": "Ժամացույցեր",
+    "watchesLink": "Ժամացույցներ",
     "headphonesLink": "Ականջակալներ",
     "accessoriesLink": "Աքսեսուարներ"
   },
   "header": {
-    "supportPhoneAria": "Զանգել աջակցությանը",
-    "supportPhoneNumber": "+374 10 000000",
-    "supportPhoneTel": "+37410000000"
+    "supportPhoneAria": "Զանգել աջակցությանը"
   },
   "stock": {
     "inStock": "Առկա է",
@@ -218,14 +216,14 @@
     "mapEmbedTitle": "Խանութի հասցեն քարտեզի վրա",
     "footerNavAriaLabel": "Հիմնական հղումներ (վերջնամաս)",
     "socialNavAriaLabel": "Սոցիալական ցանցեր",
-    "copyrightIntro": "Հեղինակային իրավունք © {startYear} - {year}",
-    "allRightsReserved": "Բոլոր իրավունքները պաշտպանված են:",
+    "copyrightIntro": "Copyright © {year}",
+    "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Ապրանք",
     "sectionsHeading": "Բաժիններ",
     "termsHeading": "Պայմաններ",
     "connectHeading": "Կապ",
     "shop": "Խանութ",
-    "copyright": "© {year} Mobee: Բոլոր իրավունքները պաշտպանված են:",
+    "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
       "refund": "Վերադարձի քաղաքականություն",
       "delivery": "Առաքման քաղաքականություն",

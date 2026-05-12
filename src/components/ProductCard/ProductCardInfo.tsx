@@ -41,7 +41,7 @@ export function ProductCardInfo({
   omitBrandRow = false,
   titleSizeMobileFigma = false,
 }: ProductCardInfoProps) {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
 
   const paddingClass = (() => {
     if (hidePrice) {
@@ -66,13 +66,7 @@ export function ProductCardInfo({
     }
     return `text-[18px] leading-7 font-bold text-gray-900 line-clamp-2 ${subtitle ? 'mb-1' : 'mb-2'}`;
   })();
-  const priceClass = (() => {
-    if (lang === 'ru') {
-      return isCompact ? 'text-[0.98rem]' : 'text-[1.25rem]';
-    }
-
-    return isCompact ? 'text-[1.06875rem]' : 'text-[1.425rem]';
-  })();
+  const priceClass = isCompact ? 'text-[1.06875rem]' : 'text-[1.425rem]';
 
   return (
     <div className={paddingClass}>

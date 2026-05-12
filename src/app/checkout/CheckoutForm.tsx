@@ -5,11 +5,14 @@ import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
 import {
+  CHECKOUT_CONTACT_FIELDS_GRID_CLASS,
   CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_TOP_CLASS,
   CHECKOUT_OPTION_SELECTED_CHROME_CLASS,
+  CHECKOUT_PAYMENT_LOGO_IMG_CLASS,
+  CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA,
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
 import { DeliveryPolicyInfoCard } from './components/DeliveryPolicyInfoCard';
@@ -54,10 +57,10 @@ export function CheckoutForm({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-6 lg:col-span-2">
+    <div className="space-y-6 lg:col-span-7">
       <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.contactInformation')}</h2>
-        <div className="flex flex-col gap-4">
+        <div className={CHECKOUT_CONTACT_FIELDS_GRID_CLASS}>
           <Input
             label={t('checkout.form.firstName')}
             type="text"
@@ -185,7 +188,7 @@ export function CheckoutForm({
                           shouldDirty: true,
                         })
                       }
-                      className={`mt-0.5 h-4 w-4 shrink-0 ${CHECKOUT_RADIO_ACCENT_CLASS} focus:ring-2 focus:ring-admin-500 focus:ring-offset-0`}
+                      className={`mt-0.5 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
                       disabled={isSubmitting}
                     />
                     <div className="min-w-0 flex-1">
@@ -215,7 +218,7 @@ export function CheckoutForm({
                           shouldDirty: true,
                         })
                       }
-                      className={`mt-0.5 h-4 w-4 shrink-0 ${CHECKOUT_RADIO_ACCENT_CLASS} focus:ring-2 focus:ring-admin-500 focus:ring-offset-0`}
+                      className={`mt-0.5 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
                       disabled={isSubmitting}
                     />
                     <div className="min-w-0 flex-1">
@@ -329,7 +332,11 @@ export function CheckoutForm({
                     <img
                       src={method.logo}
                       alt={method.name}
-                      className="w-full h-full object-contain p-1.5"
+                      className={
+                        method.id === 'arca'
+                          ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA
+                          : CHECKOUT_PAYMENT_LOGO_IMG_CLASS
+                      }
                       loading="lazy"
                       onError={() => {
                         setLogoErrors((prev) => ({ ...prev, [method.id]: true }));
