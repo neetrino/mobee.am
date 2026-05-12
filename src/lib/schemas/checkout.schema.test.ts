@@ -84,25 +84,22 @@ describe("checkout.schema", () => {
     expect(safeParseCheckout(payload).success).toBe(false);
   });
 
-  it("rejects delivery without delivery acknowledgements", () => {
+  it("applies default acknowledgements when omitted", () => {
     const payload = {
       cartId: "cart-123",
       email: "user@example.com",
       phone: "+37499123456",
       shippingMethod: "delivery",
+      deliverySpeed: "standard" as const,
       shippingAddress: {
         address: "Main street 10",
         city: "Yerevan",
       },
-      paymentMethod: "arca",
-      acknowledgements: {
-        ...pickupAck,
-        deliverySupplyTerms: false,
-        inspectionAtDelivery: false,
-      },
+      paymentMethod: "cash_on_delivery",
     };
 
-    expect(safeParseCheckout(payload).success).toBe(false);
+    const parsed = parseCheckoutBody(payload);
+    expect(parsed.acknowledgements).toEqual(baseAck);
   });
 
   it("rejects unsupported locale", () => {

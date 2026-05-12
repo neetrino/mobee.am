@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, Input } from '@shop/ui';
-import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
+import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutFormData } from './types';
 import {
@@ -13,7 +13,6 @@ import {
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
 import { DeliveryPolicyInfoCard } from './components/DeliveryPolicyInfoCard';
-import { CheckoutLegalAcknowledgements } from './components/CheckoutLegalAcknowledgements';
 import { ShippingCitySelect } from './components/ShippingCitySelect';
 
 const CHECKOUT_FORM_SECTION_CARD_CLASS = `p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS}`;
@@ -21,7 +20,6 @@ const CHECKOUT_FORM_SECTION_CARD_CLASS = `p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}
 interface CheckoutFormProps {
   register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
-  watch: UseFormWatch<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
@@ -42,7 +40,6 @@ interface CheckoutFormProps {
 export function CheckoutForm({
   register,
   setValue,
-  watch,
   errors,
   isSubmitting,
   shippingMethod,
@@ -351,15 +348,6 @@ export function CheckoutForm({
       </Card>
 
       <DeliveryPolicyInfoCard />
-
-      <CheckoutLegalAcknowledgements
-        register={register}
-        setValue={setValue}
-        watch={watch}
-        errors={errors}
-        shippingMethod={shippingMethod}
-        isSubmitting={isSubmitting}
-      />
     </div>
   );
 }
