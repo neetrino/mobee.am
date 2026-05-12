@@ -202,8 +202,8 @@ export default function SettingsPage() {
                 {SETTINGS_DEFAULT_CURRENCY_OPTIONS.map((opt) => {
                   const isSelected = (settings.defaultCurrency || 'AMD') === opt.value;
                   const focusRingClass = isSelected
-                    ? 'focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-2'
-                    : 'focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2';
+                    ? 'outline-none focus:outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-white/90'
+                    : 'outline-none focus:outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-gray-400';
 
                   return (
                     <Button
@@ -452,7 +452,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Actions */}
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4 pb-10">
           <Button
             variant="admin"
             onClick={handleSave}

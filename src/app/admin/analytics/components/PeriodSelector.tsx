@@ -48,8 +48,8 @@ function AnalyticsPeriodButtonGroup({
         {ANALYTICS_PERIOD_OPTIONS.map((opt) => {
           const isSelected = period === opt.value;
           const focusRingClass = isSelected
-            ? 'focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-2'
-            : 'focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2';
+            ? 'outline-none focus:outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-white/90'
+            : 'outline-none focus:outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-gray-400';
 
           return (
             <Button

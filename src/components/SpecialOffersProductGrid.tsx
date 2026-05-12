@@ -64,7 +64,6 @@ export function SpecialOffersProductGrid({
         productsPerPage={productsPerPage}
         mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.special_offers_heading.carouselAriaLabel')}
-        specialOffersHomeCard
         onMobileCarouselViewChange={onMobileCarouselViewChange}
       />
     );

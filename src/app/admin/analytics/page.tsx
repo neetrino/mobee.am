@@ -57,7 +57,7 @@ export default function AnalyticsPage() {
 
   return (
     <AdminPageShell currentPath={pathname || '/supersudo/analytics'} router={router} t={t}>
-      <div className="max-w-7xl">
+      <div className="max-w-7xl pb-10">
         <AnalyticsHeader />
 
         <PeriodSelector

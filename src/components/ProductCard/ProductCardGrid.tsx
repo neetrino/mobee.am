@@ -36,8 +36,6 @@ interface ProductCardGridProps {
   squareImageFrame?: boolean;
   /** Smaller footer price (home “best choice”; ~23% under default grid-2). */
   smallerFooterPrice?: boolean;
-  /** Home special-offers cards — RU `lg` add-to-cart pill 155.99×36.94px. */
-  specialOffersHomeCard?: boolean;
   /** Home curated grids — mobile Figma card (grouped background, compact footer). */
   homeProductGridCard?: boolean;
   onImageError: () => void;
@@ -60,29 +58,14 @@ export function ProductCardGrid({
   shiftImageInFrame = false,
   squareImageFrame = true,
   smallerFooterPrice = false,
-  specialOffersHomeCard = false,
   homeProductGridCard = false,
   onImageError,
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
 }: ProductCardGridProps) {
-  const { t, lang } = useTranslation();
-  const ruDesktopAddToCart = lang === 'ru';
-  const ruSpecialOffersDesktopCart =
-    ruDesktopAddToCart && specialOffersHomeCard && !isCompact;
+  const { t } = useTranslation();
   const footerPriceClass = (() => {
-    if (lang === 'ru') {
-      if (smallerFooterPrice) {
-        return isCompact
-          ? 'text-[0.78rem] leading-[1.28284734375rem] max-lg:text-[13px]'
-          : 'text-[0.86rem] leading-[1.28284734375rem] max-lg:text-[13px] max-lg:leading-tight';
-      }
-      return isCompact
-        ? 'text-[0.98rem] leading-[1.6625rem] max-lg:text-[13px]'
-        : 'text-[1.05rem] leading-[1.6625rem] max-lg:text-[13px]';
-    }
-
     if (smallerFooterPrice) {
       return isCompact
         ? 'text-[0.824687578125rem] leading-[1.28284734375rem]'
@@ -248,31 +231,15 @@ export function ProductCardGrid({
                 : ''
             } ${
               isCompact
-                ? `h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide${
-                    ruDesktopAddToCart
-                      ? ' lg:h-[38px] lg:min-w-[104.5px] lg:gap-[7.6px] lg:rounded-[19px] lg:px-[11.4px] lg:text-[11.4px]'
-                      : ''
-                  }`
-                : `h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]${
-                    ruSpecialOffersDesktopCart
-                      ? ' lg:h-[36.94px] lg:w-[155.99px] lg:min-w-[155.99px] lg:max-w-[155.99px] lg:gap-[9.19px] lg:rounded-[15.39px] lg:px-[18.91px] lg:text-[10.77px] lg:leading-[20.52px] lg:tracking-[0.154px]'
-                      : ruDesktopAddToCart
-                        ? ' lg:h-[36.94px] lg:min-w-[101.57px] lg:gap-[5.99px] lg:rounded-[15.39px] lg:px-[12.31px] lg:text-[10.77px] lg:leading-[20.52px] lg:tracking-[0.154px]'
-                        : ''
-                  }`
+                ? 'h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide'
+                : 'h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]'
             }`}
             title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
             aria-label={product.inStock ? t('common.ariaLabels.addToCart') : t('common.ariaLabels.outOfStock')}
           >
             {isAddingToCart ? (
               <svg
-                className={`animate-spin ${isCompact ? 'h-4 w-4' : 'h-[16.2px] w-[16.2px]'}${
-                  ruDesktopAddToCart
-                    ? isCompact
-                      ? ' lg:h-[15.2px] lg:w-[15.2px]'
-                      : ' lg:h-[15.39px] lg:w-[15.39px]'
-                    : ''
-                }`}
+                className={`animate-spin ${isCompact ? 'h-4 w-4' : 'h-[16.2px] w-[16.2px]'}`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -287,17 +254,7 @@ export function ProductCardGrid({
               </svg>
             ) : (
               <>
-                {ruDesktopAddToCart ? (
-                  <>
-                    <CartIcon className="shrink-0 lg:hidden" size={isCompact ? 18 : 16.2} />
-                    <CartIcon
-                      className="hidden shrink-0 lg:block"
-                      size={isCompact ? 17.1 : 15.39}
-                    />
-                  </>
-                ) : (
-                  <CartIcon className="shrink-0" size={isCompact ? 18 : 16.2} />
-                )}
+                <CartIcon className="shrink-0" size={isCompact ? 18 : 16.2} />
                 <span
                   className={`whitespace-nowrap ${homeProductGridCard ? 'max-lg:sr-only' : ''}`}
                 >

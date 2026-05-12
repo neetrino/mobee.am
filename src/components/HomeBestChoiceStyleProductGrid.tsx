@@ -42,20 +42,16 @@ type HomeBestChoiceStyleProductGridProps = {
   mobileCardsPerView: number;
   /** Accessible name for the horizontal product strip on small screens. */
   mobileCarouselAriaLabel: string;
-  /** Home “Специальные предложения” row — RU desktop add-to-cart pill sizing. */
-  specialOffersHomeCard?: boolean;
   /** Reports visible snap page for {@link HomeMobileSectionTitle} indicators. */
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
 };
 
 function BestChoiceProductCell({
   product,
-  specialOffersHomeCard,
   viewMode,
   homeStyle,
 }: {
   product: FeaturedHomeProduct;
-  specialOffersHomeCard: boolean;
   viewMode: 'grid-2' | 'grid-3';
   /** Mobile / iPad carousel styling; desktop uses default product card chrome. */
   homeStyle: boolean;
@@ -67,7 +63,6 @@ function BestChoiceProductCell({
         viewMode={viewMode}
         shiftImageInFrame={homeStyle}
         smallerFooterPrice={homeStyle}
-        specialOffersHomeCard={specialOffersHomeCard}
         homeProductGridCard={homeStyle}
       />
     </div>
@@ -79,7 +74,6 @@ export function HomeBestChoiceStyleProductGrid({
   productsPerPage,
   mobileCardsPerView,
   mobileCarouselAriaLabel,
-  specialOffersHomeCard = false,
   onMobileCarouselViewChange,
 }: HomeBestChoiceStyleProductGridProps) {
   const isIpadProDesktopGrid = useIpadProHomeDesktopGrid();
@@ -113,7 +107,6 @@ export function HomeBestChoiceStyleProductGrid({
                 <BestChoiceProductCell
                   key={product.id}
                   product={product}
-                  specialOffersHomeCard={specialOffersHomeCard}
                   viewMode={cardViewMode}
                   homeStyle
                 />
@@ -127,7 +120,6 @@ export function HomeBestChoiceStyleProductGrid({
           <BestChoiceProductCell
             key={product.id}
             product={product}
-            specialOffersHomeCard={specialOffersHomeCard}
             viewMode="grid-2"
             homeStyle={false}
           />

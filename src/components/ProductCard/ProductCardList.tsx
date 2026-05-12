@@ -55,12 +55,9 @@ export function ProductCardList({
   onCompareToggle,
   onAddToCart,
 }: ProductCardListProps) {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const imageSrc = resolveProductCardImageSrc(product.image);
-  const listPriceClass =
-    lang === 'ru'
-      ? 'text-[1.08rem] sm:text-[1.25rem]'
-      : 'text-[1.1875rem] sm:text-[1.425rem]';
+  const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>

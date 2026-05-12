@@ -3,8 +3,36 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Site-wide scrollbars — Mobee admin accent (`tailwind` admin.DEFAULT) */
+    --app-scrollbar-thumb: #2db2ff;
+    --app-scrollbar-thumb-hover: #1a9fe6;
+    --app-scrollbar-track: #f3f4f6;
+  }
+
   html {
     scrollbar-gutter: stable;
+    scrollbar-color: var(--app-scrollbar-thumb) var(--app-scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--app-scrollbar-track);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--app-scrollbar-thumb);
+    border-radius: 9999px;
+    border: 2px solid var(--app-scrollbar-track);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--app-scrollbar-thumb-hover);
   }
 
   body {

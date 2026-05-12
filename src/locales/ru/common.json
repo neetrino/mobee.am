@@ -1,6 +1,6 @@
 {
   "buttons": {
-    "addToCart": "Добавить в корзину",
+    "addToCart": "Добавить",
     "addToWishlist": "Добавить в избранное",
     "viewProduct": "Посмотреть товар",
     "viewDetails": "Посмотреть детали",
@@ -173,7 +173,7 @@
     "currencySection": "Валюта"
   },
   "ariaLabels": {
-    "addToCart": "Добавить в корзину",
+    "addToCart": "Добавить",
     "removeFromCart": "Удалить из корзины",
     "addToWishlist": "Добавить в избранное",
     "removeFromWishlist": "Удалить из избранного",

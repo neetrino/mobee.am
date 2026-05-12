@@ -102,7 +102,7 @@ export function QuickSettingsContent({
 }: QuickSettingsContentProps) {
   return (
     <AdminPageShell currentPath={currentPath} router={router} t={t}>
-      <div className="max-w-7xl">
+      <div className="max-w-7xl pb-10">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.quickSettings.title')}</h1>
