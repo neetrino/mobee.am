@@ -301,15 +301,6 @@ export default function ProductsPage() {
     <AdminPageShell currentPath={currentPath} router={router} t={t}>
       <div className="max-w-7xl">
         <div className="mb-6">
-          <button
-            onClick={() => router.push('/supersudo')}
-            className="text-gray-600 hover:text-gray-900 mb-2 flex items-center text-sm"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.products.backToAdmin')}
-          </button>
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('admin.products.title')}</h1>
             {(search || selectedCategories.size > 0 || skuSearch || stockFilter !== 'all') && (
