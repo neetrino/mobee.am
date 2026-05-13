@@ -30,6 +30,7 @@ class CategoriesService {
     categories.forEach((category: {
       id: string;
       parentId: string | null;
+      media: unknown;
       translations: Array<{ locale: string; slug: string; title: string; fullPath: string }>;
     }) => {
       const translation =
@@ -42,6 +43,7 @@ class CategoriesService {
         slug: translation.slug,
         title: translation.title,
         fullPath: translation.fullPath,
+        media: category.media ?? [],
         children: [] as any[],
       };
 

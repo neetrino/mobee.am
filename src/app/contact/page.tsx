@@ -18,6 +18,9 @@ const CONTACT_FORM_FIELD_CLASS =
 
 const CONTACT_FORM_LABEL_CLASS = 'sr-only';
 
+/** Contact info row icons — slightly smaller than heading line height for balance. */
+const CONTACT_INFO_ICON_PX = 40;
+
 export default function ContactPage() {
   const { t } = useTranslation();
   const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
@@ -77,14 +80,14 @@ export default function ContactPage() {
             {/* Call to Us */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
                   <Image
                     src={CONTACT_ICON_PHONE_SRC}
                     alt=""
-                    width={48}
-                    height={48}
+                    width={CONTACT_INFO_ICON_PX}
+                    height={CONTACT_INFO_ICON_PX}
                     className="h-full w-full object-cover"
-                    sizes="48px"
+                    sizes={`${CONTACT_INFO_ICON_PX}px`}
                   />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.callToUs.title')}</h3>
@@ -106,14 +109,14 @@ export default function ContactPage() {
             {/* Write to Us */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
                   <Image
                     src={CONTACT_ICON_EMAIL_SRC}
                     alt=""
-                    width={48}
-                    height={48}
+                    width={CONTACT_INFO_ICON_PX}
+                    height={CONTACT_INFO_ICON_PX}
                     className="h-full w-full object-cover"
-                    sizes="48px"
+                    sizes={`${CONTACT_INFO_ICON_PX}px`}
                   />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.writeToUs.title')}</h3>
@@ -133,14 +136,14 @@ export default function ContactPage() {
             {/* Headquarter */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
                   <Image
                     src={CONTACT_ICON_LOCATION_SRC}
                     alt=""
-                    width={48}
-                    height={48}
+                    width={CONTACT_INFO_ICON_PX}
+                    height={CONTACT_INFO_ICON_PX}
                     className="h-full w-full object-cover"
-                    sizes="48px"
+                    sizes={`${CONTACT_INFO_ICON_PX}px`}
                   />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.headquarter.title')}</h3>
