@@ -155,7 +155,7 @@ export function ProductImageGallery({
                   }
                 }}
                 disabled={thumbnailStartIndex <= 0}
-                className="w-9 h-9 rounded border transition-all duration-200 flex items-center justify-center border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-gray-100 disabled:hover:border-gray-300 disabled:hover:shadow-none bg-gray-100"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded border border-gray-300 bg-gray-100 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:cursor-default disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:bg-gray-100 disabled:hover:shadow-none"
                 aria-label={t(language, 'common.ariaLabels.previousThumbnail')}
               >
                 <svg 
@@ -188,7 +188,7 @@ export function ProductImageGallery({
                   }
                 }}
                 disabled={thumbnailStartIndex >= images.length - THUMBNAILS_PER_VIEW}
-                className="w-9 h-9 rounded border transition-all duration-200 flex items-center justify-center border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-gray-100 disabled:hover:border-gray-300 disabled:hover:shadow-none bg-gray-100"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded border border-gray-300 bg-gray-100 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:cursor-default disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:bg-gray-100 disabled:hover:shadow-none"
                 aria-label={t(language, 'common.ariaLabels.nextThumbnail')}
               >
                 <svg 

@@ -60,7 +60,7 @@ export const ADMIN_SIDEBAR_COLLAPSED_RAIL_NAV_SCROLL_PADDING_X_CLASS = 'px-1';
 /** Bottom padding for `/supersudo` main column on every admin page (scroll / safe area). */
 export const ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS = 'pb-10';
 
-/** Nudge main column slightly left when desktop sidebar is expanded (lg+). */
+/** Nudge main column slightly left when desktop sidebar is expanded (lg+; same as site desktop floor). */
 export const ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS = 'lg:-translate-x-[15px]';
 
 /** Nudge collapsed-rail main column content left (1.25rem = 20px at 16px root). */

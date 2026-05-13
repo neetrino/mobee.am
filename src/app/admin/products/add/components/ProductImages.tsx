@@ -42,7 +42,7 @@ export function ProductImages({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={imageUploadLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-admin-500 border border-admin-500 rounded-supersudo shadow-sm hover:bg-admin-600 hover:border-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="flex cursor-pointer items-center gap-2 rounded-supersudo border border-admin-500 bg-admin-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:border-admin-600 hover:bg-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-2 disabled:cursor-default disabled:opacity-50"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

@@ -1,9 +1,10 @@
-import type { Config } from 'tailwindcss';
+import type { Config, PluginAPI } from 'tailwindcss/types/config';
 import {
   ADMIN_MOBILE_MENU_OFFSET_LEFT_PX,
   ADMIN_MOBILE_MENU_OFFSET_TOP_PX,
 } from './src/app/admin/admin-mobile-menu-layout.constants';
 import { CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX } from './src/app/checkout/constants';
+import { LAYOUT_TABLET_IPAD_AIR_LIKE_HTML_CLASS } from './src/lib/tablet-ipad-air-like-layout.constants';
 import {
   LAYOUT_DESKTOP_MIN_WIDTH_PX,
   SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX,
@@ -63,7 +64,11 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    ({ addVariant }: PluginAPI) => {
+      addVariant('ipad-air-band', `html.${LAYOUT_TABLET_IPAD_AIR_LIKE_HTML_CLASS} &`);
+    },
+  ],
 };
 
 export default config;

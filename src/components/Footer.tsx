@@ -36,8 +36,11 @@ const FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS = 'lg:-translate-x-[13px]';
 /** Phone + email body only — shift text right (px); icons unchanged. */
 const FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS = 'pl-[5px]';
 
-/** Address row (location icon + text) — shift whole block left (px). */
-const FOOTER_ADDRESS_ROW_NUDGE_LEFT_CLASS = '-translate-x-[20px]';
+/** At `xl+` only — address column sits beside phone+mail (Figma); nudge toward map. */
+const FOOTER_ADDRESS_ROW_NUDGE_XL_CLASS = 'xl:-translate-x-[20px]';
+
+/** Desktop (`xl+`): raise address block 10px (margin avoids transform conflicts with nested nudges). */
+const FOOTER_ADDRESS_COLUMN_OFFSET_UP_XL_CLASS = 'xl:-mt-[6px]';
 
 /** Space under location title block before phone / mail / address (Figma-tuned). */
 const FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS = 'gap-20 lg:gap-24';
@@ -46,9 +49,9 @@ const FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS = 'gap-20 lg:gap-24';
 const FOOTER_LOCATION_HEADING_SIZE_DEFAULT_CLASS =
   'text-3xl font-black uppercase leading-none text-black md:text-4xl lg:text-[52px]';
 
-/** HY: smaller type + tighter tracking + 5px left nudge so «Մեր գտնվելու վայրը» fits one line. */
+/** HY: smaller on tablet / iPad Pro (`lg`–`max-xl`); full size from `xl` (Figma). */
 const FOOTER_LOCATION_HEADING_SIZE_HY_CLASS =
-  '-translate-x-[5px] text-[1.375rem] font-black uppercase leading-none tracking-[-0.025em] text-black sm:text-2xl md:text-[1.875rem] lg:text-[38px] xl:text-[42px]';
+  '-translate-x-[5px] text-[1.375rem] font-black uppercase leading-none tracking-[-0.025em] text-black sm:text-2xl md:text-[1.875rem] lg:text-[2rem] xl:text-[42px]';
 
 /** Location card + map shell — light gray (Figma mobee-new footer reference). */
 const FOOTER_LOCATION_SURFACE_BG_CLASS = 'bg-[#f9f9f9]';
@@ -56,12 +59,10 @@ const FOOTER_LOCATION_SURFACE_BG_CLASS = 'bg-[#f9f9f9]';
 /** Outer border matches product grid cards (`border-[#f3f4f6]`); no shadow per design. */
 const FOOTER_CARD_CLASS = `rounded-[40px] border border-[#f3f4f6] ${FOOTER_LOCATION_SURFACE_BG_CLASS} p-6 md:p-8 lg:flex lg:items-stretch lg:gap-10 lg:p-4 lg:pl-14 xl:pl-16`;
 
-const FOOTER_MAP_EMBED_SHELL_BASE_CLASS = `relative mt-8 block h-[220px] w-full min-w-0 shrink-0 overflow-hidden rounded-[26px] ${FOOTER_LOCATION_SURFACE_BG_CLASS} lg:h-[262px] lg:w-[min(100%,707px)] lg:max-w-[52%] lg:-translate-x-[45px]`;
+const FOOTER_MAP_EMBED_SHELL_BASE_CLASS = `relative mt-8 block h-[220px] w-full min-w-0 shrink-0 overflow-hidden rounded-[26px] ${FOOTER_LOCATION_SURFACE_BG_CLASS} lg:h-[262px] lg:w-[min(100%,707px)] lg:max-w-[52%] lg:max-xl:-translate-x-[39px] xl:-translate-x-[45px]`;
 
-const FOOTER_MAP_LG_MARGIN_TOP_DEFAULT_CLASS = 'lg:mt-3.5';
-
-/** HY: map sits a bit lower under longer location block. */
-const FOOTER_MAP_LG_MARGIN_TOP_HY_CLASS = 'lg:mt-6';
+/** Map top spacing — same for all locales (previously HY-only tune). */
+const FOOTER_MAP_MARGIN_TOP_CLASS = 'lg:max-xl:mt-[calc(1.5rem+10px)] xl:mt-[19px]';
 
 /** Google Maps embed from address (no API key). */
 function footerGoogleMapsEmbedSrc(addressQuery: string): string {
@@ -149,12 +150,11 @@ function ContactIconBlock({ icon, children, className, alignIconTop = false, bod
 }
 
 function FooterMapEmbed({ addressText }: { readonly addressText: string }) {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const embedSrc = footerGoogleMapsEmbedSrc(addressText);
-  const mapLgTopClass = lang === 'hy' ? FOOTER_MAP_LG_MARGIN_TOP_HY_CLASS : FOOTER_MAP_LG_MARGIN_TOP_DEFAULT_CLASS;
 
   return (
-    <div className={`${FOOTER_MAP_EMBED_SHELL_BASE_CLASS} ${mapLgTopClass}`}>
+    <div className={`${FOOTER_MAP_EMBED_SHELL_BASE_CLASS} ${FOOTER_MAP_MARGIN_TOP_CLASS}`}>
       <iframe
         title={t('common.footer.mapEmbedTitle')}
         src={embedSrc}
@@ -190,10 +190,13 @@ function FooterLocationCard(props: {
           <p className="mt-2 text-[14px] leading-5 text-black">{t('common.footer.locationSubtitle')}</p>
         </div>
 
-        {/* Figma 582:746 + 582:764 — phone + mail column; address row-span beside (not under phone). */}
-        <div className="grid grid-cols-1 gap-y-3.5 lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_auto] lg:gap-x-10 lg:gap-y-3.5 lg:-translate-x-2.5 xl:gap-x-14">
+        {/*
+          Below `xl`: single column — phone, email, address (iPad Pro gets address under email).
+          `xl+`: Figma 582 — phone + mail column; address row-span beside.
+        */}
+        <div className="grid grid-cols-1 gap-y-3.5 xl:grid-cols-[auto_1fr] xl:grid-rows-[auto_auto] xl:gap-x-14 xl:gap-y-3.5 xl:-translate-x-2.5">
           <ContactIconBlock
-            className="lg:col-start-1 lg:row-start-1"
+            className="xl:col-start-1 xl:row-start-1"
             bodyClassName={`${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS} ${FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS}`}
             icon={<FooterContactPhoneGlyph />}
           >
@@ -210,21 +213,21 @@ function FooterLocationCard(props: {
             </div>
           </ContactIconBlock>
           <ContactIconBlock
-            alignIconTop
-            bodyClassName={`${FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS} ${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS}`}
-            className={`lg:col-start-2 lg:row-span-2 lg:row-start-1 ${FOOTER_ADDRESS_ROW_NUDGE_LEFT_CLASS}`}
-            icon={<FooterContactLocationGlyph className="size-6" />}
-          >
-            <p className="whitespace-pre-line">{addressText}</p>
-          </ContactIconBlock>
-          <ContactIconBlock
-            className="lg:col-start-1 lg:row-start-2"
+            className="xl:col-start-1 xl:row-start-2"
             bodyClassName={`${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS} ${FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS}`}
             icon={<FooterContactMailGlyph />}
           >
             <Link href={mailHref} className="hover:underline">
               {email}
             </Link>
+          </ContactIconBlock>
+          <ContactIconBlock
+            alignIconTop
+            bodyClassName={`${FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS} ${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS} max-xl:pl-[5px]`}
+            className={`xl:col-start-2 xl:row-span-2 xl:row-start-1 ${FOOTER_ADDRESS_COLUMN_OFFSET_UP_XL_CLASS} ${FOOTER_ADDRESS_ROW_NUDGE_XL_CLASS}`}
+            icon={<FooterContactLocationGlyph className="size-6" />}
+          >
+            <p className="whitespace-pre-line">{addressText}</p>
           </ContactIconBlock>
         </div>
       </div>

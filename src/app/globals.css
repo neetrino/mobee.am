@@ -14,9 +14,9 @@
   }
 
   /*
-   * Narrow viewports — smaller scrollbar (matches `lg` floor 834px in tailwind.config).
+   * Narrow viewports — smaller scrollbar (matches `lg` floor in `layout-breakpoints.constants` / tailwind.config).
    */
-  @media (max-width: 833px) {
+  @media (max-width: 899px) {
     :root {
       --app-scrollbar-size: 6px;
       --app-scrollbar-thumb-border: 1px;
@@ -168,7 +168,7 @@
   }
 
   /* Admin desktop sidebar nav: scroll without visible scrollbar (Tailwind `lg` — see layout-breakpoints.constants). */
-  @media (min-width: 834px) {
+  @media (min-width: 900px) {
     .admin-sidebar-nav-scroll-desktop {
       -ms-overflow-style: none;
       scrollbar-width: none;
@@ -192,7 +192,7 @@
    * iPad / sub-xl: WebKit often ignores container units inside `transform` — use a plain scale so it always applies.
    * Tune scale (iPad band).
    */
-  @media (min-width: 834px) and (max-width: 1279.98px) {
+  @media (min-width: 900px) and (max-width: 1279.98px) {
     .category-strip-tile-art {
       transform: translateX(-50%) scale(0.8);
     }
@@ -202,19 +202,6 @@
     .category-strip-tile-art {
       transform: translateX(-50%) scale(min(1, calc(100cqi / 197px)));
     }
-  }
-
-  /*
-   * Admin `/supersudo/products` stock filter (`Բոլոր ապրանքները` / in stock / out): custom chevron.
-   * Larger `right` = chevron sits more to the left (more air from the right edge).
-   */
-  .admin-products-stock-filter-select {
-    -webkit-appearance: none;
-    appearance: none;
-    background-repeat: no-repeat;
-    background-size: 1rem 1rem;
-    background-position: right 15px center;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   }
 }
 
@@ -234,7 +221,7 @@
   }
 }
 
-@media (min-width: 834px) {
+@media (min-width: 900px) {
   .policy-page {
     padding-left: 2rem; /* lg:px-8 */
     padding-right: 2rem;

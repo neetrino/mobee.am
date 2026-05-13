@@ -3,6 +3,8 @@ export interface CategoryTreeNode {
   slug: string;
   title: string;
   fullPath: string;
+  /** First entry is used for strip/card image URL (same shape as product `media`). */
+  media?: unknown;
   children: CategoryTreeNode[];
 }
 

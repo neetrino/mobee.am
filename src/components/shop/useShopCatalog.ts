@@ -8,6 +8,7 @@ import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-p
 import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
+import { usePrefetchNextProductListPage } from './usePrefetchNextProductListPage';
 
 export interface ShopCatalogProduct {
   id: string;
@@ -139,6 +140,8 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
     }
     void fetchList();
   }, [fetchList, filtersKey, filters.limit, initialFiltersKey, initialPayload]);
+
+  usePrefetchNextProductListPage(filters, productsData?.meta);
 
   return { productsData, loading, error, refetch: fetchList, filters };
 }

@@ -235,7 +235,7 @@ export function AttributesPageContent() {
                             <button
                               onClick={() => handleUpdateAttributeName(attribute.id)}
                               disabled={!editingAttributeName.trim() || savingAttribute}
-                              className="px-3 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                              className="flex cursor-pointer items-center gap-2 rounded-supersudo bg-admin px-3 py-2 text-white transition-colors hover:bg-admin-600 disabled:cursor-default disabled:opacity-50"
                             >
                               {savingAttribute ? (
                                 <>
@@ -254,7 +254,7 @@ export function AttributesPageContent() {
                             <button
                               onClick={() => toggleAttributeEdit(attribute)}
                               disabled={savingAttribute}
-                              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-supersudo hover:bg-gray-300 transition-colors disabled:opacity-50"
+                              className="cursor-pointer rounded-supersudo bg-gray-200 px-3 py-2 text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-default disabled:opacity-50"
                             >
                               {t('admin.attributes.cancel')}
                             </button>
@@ -349,7 +349,7 @@ export function AttributesPageContent() {
                           <button
                             onClick={() => handleAddValue(attribute.id)}
                             disabled={!newValue.trim() || addingValueTo === attribute.id}
-                            className="px-4 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="flex cursor-pointer items-center gap-2 rounded-supersudo bg-admin px-4 py-2 text-white transition-colors hover:bg-admin-600 disabled:cursor-default disabled:opacity-50"
                           >
                             {addingValueTo === attribute.id ? (
                               <>
@@ -417,7 +417,7 @@ export function AttributesPageContent() {
                                     <button
                                       onClick={() => handleDeleteValue(attribute.id, value.id, value.label)}
                                       disabled={deletingValue === value.id}
-                                      className="text-admin-600 transition-colors hover:bg-admin-50 hover:text-admin-800 disabled:opacity-50"
+                                      className="cursor-pointer text-admin-600 transition-colors hover:bg-admin-50 hover:text-admin-800 disabled:cursor-default disabled:opacity-50"
                                       title={t('admin.attributes.deleteValue')}
                                     >
                                       {deletingValue === value.id ? (

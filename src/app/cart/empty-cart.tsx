@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@shop/ui';
+import { CartCtaResponsiveLabel } from './cart-cta-responsive-label';
 import {
   EMPTY_CART_EMPTY_STATE_CTA_LOWER_PX,
   EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX,
@@ -11,6 +12,7 @@ import {
   EMPTY_CART_IMAGE_HEIGHT,
   EMPTY_CART_IMAGE_SRC,
   EMPTY_CART_IMAGE_WIDTH,
+  EMPTY_CART_PRIMARY_CTA_TEXT_CLASS,
 } from './constants';
 import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
 
@@ -62,9 +64,13 @@ export function EmptyCart({ t }: EmptyCartProps) {
               <Button
                 variant="primary"
                 size="lg"
-                className="h-14 w-full !rounded-full !bg-admin-500 px-[10px] text-[14px] font-semibold leading-normal !text-white hover:!bg-admin-500 focus:!ring-admin-500"
+                aria-label={t('common.cart.exploreCategories')}
+                className={`h-14 w-full !rounded-full !bg-admin-500 px-[10px] font-semibold !text-white hover:!bg-admin-500 focus:!ring-admin-500 ${EMPTY_CART_PRIMARY_CTA_TEXT_CLASS}`}
               >
-                {t('common.cart.exploreCategories')}
+                <CartCtaResponsiveLabel
+                  narrowLabel={t('common.cart.narrowExploreCategories')}
+                  fullLabel={t('common.cart.exploreCategories')}
+                />
               </Button>
             </Link>
           </div>

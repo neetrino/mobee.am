@@ -100,7 +100,6 @@ export function RelatedProductCard({
                 fill
                 className="object-contain transition-transform duration-300 group-hover:scale-105"
                 sizes={`(max-width: 640px) 100vw, (max-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) 50vw, 25vw`}
-                unoptimized
                 onError={() => onImageError(product.id)}
               />
             ) : (
@@ -143,8 +142,8 @@ export function RelatedProductCard({
             disabled={!product.inStock || isAddingToCart}
             className={`relative z-10 inline-flex size-10 shrink-0 items-center justify-center rounded-full font-medium text-white transition-opacity ${
               product.inStock && !isAddingToCart
-                ? 'bg-[#2db2ff] hover:opacity-90'
-                : 'cursor-not-allowed bg-[#2db2ff] opacity-50'
+                ? 'cursor-pointer bg-[#2db2ff] hover:opacity-90'
+                : 'cursor-default bg-[#2db2ff] opacity-50'
             }`}
             title={
               product.inStock

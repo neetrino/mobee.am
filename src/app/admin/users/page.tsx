@@ -415,7 +415,7 @@ export default function UsersPage() {
                   type="button"
                   onClick={handleBulkDelete}
                   disabled={selectedIds.size === 0 || bulkDeleting}
-                  className="flex shrink-0 items-center gap-3 rounded-[15px] border border-red-200 bg-white px-4 py-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex shrink-0 cursor-pointer items-center gap-3 rounded-[15px] border border-red-200 bg-white px-4 py-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-default disabled:opacity-50"
                 >
                   <span className="flex-shrink-0 text-red-500" aria-hidden>
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

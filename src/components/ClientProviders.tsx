@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { LanguageCode } from '../lib/language';
 import { AuthProvider } from '../lib/auth/AuthContext';
 import { CategoriesTreeProvider } from './CategoriesTreeContext';
+import { TabletIpadAirLikeLayoutProvider } from './TabletIpadAirLikeLayoutProvider';
 import { ToastContainer } from './Toast';
 import { UiLanguageProvider } from './UiLanguageProvider';
 
@@ -19,11 +20,13 @@ export function ClientProviders({
   initialLanguage: LanguageCode;
 }) {
   return (
-    <UiLanguageProvider initialLanguage={initialLanguage}>
-      <AuthProvider>
-        <CategoriesTreeProvider>{children}</CategoriesTreeProvider>
-        <ToastContainer />
-      </AuthProvider>
-    </UiLanguageProvider>
+    <TabletIpadAirLikeLayoutProvider>
+      <UiLanguageProvider initialLanguage={initialLanguage}>
+        <AuthProvider>
+          <CategoriesTreeProvider>{children}</CategoriesTreeProvider>
+          <ToastContainer />
+        </AuthProvider>
+      </UiLanguageProvider>
+    </TabletIpadAirLikeLayoutProvider>
   );
 }

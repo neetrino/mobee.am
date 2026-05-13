@@ -325,7 +325,6 @@ export function CategoryGrid() {
                         width={80}
                         height={80}
                         className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-300"
-                        unoptimized
                       />
                     </div>
                   ) : (

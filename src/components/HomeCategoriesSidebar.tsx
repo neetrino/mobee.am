@@ -332,7 +332,6 @@ export function HomeCategoriesSidebar() {
               fill
               className="object-cover"
               sizes="192px"
-              unoptimized
             />
           </div>
           <p className="text-xs text-gray-700 font-medium truncate">{hoveredProduct.title}</p>

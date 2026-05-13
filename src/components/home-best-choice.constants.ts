@@ -36,6 +36,19 @@ export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_DEFAULT = 'lg:grid-cols-4';
 export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_IPAD_PRO = 'lg:grid-cols-3';
 
 /**
+ * Default desktop carousel page shape for the “best choice” featured row:
+ * 2 rows × 4 columns = 8 cards visible per page.
+ */
+export const HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT = 2;
+export const HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT = 4;
+
+/**
+ * Special-offers desktop carousel page shape: single row of 4 cards per page.
+ */
+export const HOME_SPECIAL_OFFERS_DESKTOP_PAGE_ROWS = 1;
+export const HOME_SPECIAL_OFFERS_DESKTOP_PAGE_COLS = 4;
+
+/**
  * Cart page: same track as home desktop rows; three `lg` columns for wider cards
  * (home uses four columns on standard desktop — cart keeps three).
  */

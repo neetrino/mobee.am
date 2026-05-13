@@ -1390,7 +1390,7 @@ export function Header() {
           </div>
         </div>
 
-        {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
+        {/* Desktop — Figma spacing at 2xl; nav link gaps scale lg → xl (iPad Pro uses lg gap-4). */}
         <div
           ref={desktopPrimaryWrapRef}
           className="hidden motion-reduce:transition-none lg:block"
@@ -1402,7 +1402,7 @@ export function Header() {
         >
         <div
           ref={desktopPrimaryRowRef}
-          className={`hidden min-w-0 w-full items-center justify-between gap-2 lg:gap-2 xl:gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
+          className={`hidden min-w-0 w-full items-center justify-between gap-2 lg:gap-2 ipad-air-band:gap-3 xl:gap-4 lg:flex ${HEADER_STRIP_PADDING_Y} ${HEADER_STRIP_MIN_HEIGHT_LG} ${
             desktopPrimaryPeekActive
               ? `fixed left-0 right-0 top-0 z-[55] border-b border-gray-200 bg-white will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
                   desktopPrimaryPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
@@ -1411,7 +1411,7 @@ export function Header() {
           }`}
           style={desktopPrimaryPeekActive ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE } : undefined}
         >
-          <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-3 xl:gap-6 2xl:gap-[76px]">
+          <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-3 ipad-air-band:gap-5 xl:gap-6 2xl:gap-[76px]">
             <Link
               href="/"
               aria-label={t('common.navigation.home')}
@@ -1425,7 +1425,7 @@ export function Header() {
               />
             </Link>
             <nav
-              className="ml-[calc(1.5rem-10px)] flex min-w-0 items-center gap-2 lg:ml-[calc(1.75rem-10px)] lg:gap-2 xl:ml-[calc(2.75rem-24.5px)] xl:gap-5 2xl:gap-[60px]"
+              className="ml-[calc(1.5rem-10px)] flex min-w-0 items-center gap-2 lg:ml-[calc(1.75rem-10px)] lg:gap-4 ipad-air-band:gap-5 xl:ml-[calc(2.75rem-24.5px)] xl:gap-5 2xl:gap-[60px]"
               aria-label="Primary"
             >
               <Link
@@ -1592,7 +1592,7 @@ export function Header() {
                   <Link
                     href="/compare"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700`}
+                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700 md:hidden`}
                   >
                     <span className="flex min-w-0 flex-1 items-center gap-2 normal-case font-medium text-gray-700">
                       <CompareIcon size={18} className="shrink-0" />

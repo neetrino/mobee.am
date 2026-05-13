@@ -45,4 +45,4 @@ export const CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA =
  * when combining `accent-color` with fixed control size.
  */
 export const CHECKOUT_RADIO_ACCENT_CLASS =
-  'appearance-none size-4 shrink-0 rounded-full border-2 border-gray-300 bg-white outline-none transition-[border-color,box-shadow] focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 checked:border-admin-500 checked:bg-[radial-gradient(circle_at_center,theme(colors.admin.500)_42%,theme(colors.white)_43%)]';
+  'appearance-none size-4 shrink-0 rounded-full border-2 border-gray-300 bg-white outline-none transition-[border-color,box-shadow] focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-500 focus-visible:ring-offset-2 disabled:cursor-default disabled:opacity-50 checked:border-admin-500 checked:bg-[radial-gradient(circle_at_center,theme(colors.admin.500)_42%,theme(colors.white)_43%)]';

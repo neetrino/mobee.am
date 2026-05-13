@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { Search } from 'lucide-react';
 import { Card } from '@/app/admin/lib/adminShopUi';
 import type { useOrders } from '../useOrders';
 import { OrdersFilterDropdown } from './OrdersFilterDropdown';
+
+/** Delay before updating URL / refetch while typing in the orders search field. */
+const ORDERS_SEARCH_DEBOUNCE_MS = 350;
 
 interface OrdersFiltersProps {
   statusFilter: string;
@@ -46,6 +48,27 @@ export function OrdersFilters({
   useEffect(() => {
     setSearchDraft(searchQuery);
   }, [searchQuery]);
+
+  useEffect(() => {
+    const draftTrimmed = searchDraft.trim();
+    const appliedTrimmed = (searchQuery || '').trim();
+    if (draftTrimmed === appliedTrimmed) {
+      return;
+    }
+    const timerId = window.setTimeout(() => {
+      setSearchQuery(searchDraft);
+      setPage(1);
+      const params = new URLSearchParams(searchParams?.toString() || '');
+      if (draftTrimmed) {
+        params.set('search', draftTrimmed);
+      } else {
+        params.delete('search');
+      }
+      const newUrl = params.toString() ? `/supersudo/orders?${params.toString()}` : '/supersudo/orders';
+      router.push(newUrl, { scroll: false });
+    }, ORDERS_SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(timerId);
+  }, [searchDraft, searchQuery, setSearchQuery, setPage, router, searchParams]);
 
   const statusOptions = useMemo(
     () =>
@@ -122,24 +145,6 @@ export function OrdersFilters({
     router.push(newUrl, { scroll: false });
   };
 
-  const handleSearchChange = (newSearch: string) => {
-    setSearchQuery(newSearch);
-    setPage(1);
-    const params = new URLSearchParams(searchParams?.toString() || '');
-    if (newSearch.trim()) {
-      params.set('search', newSearch.trim());
-    } else {
-      params.delete('search');
-    }
-    const newUrl = params.toString() ? `/supersudo/orders?${params.toString()}` : '/supersudo/orders';
-    router.push(newUrl, { scroll: false });
-  };
-
-  const handleSearchSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    handleSearchChange(searchDraft);
-  };
-
   const handleFulfillmentStatusChange = (newFulfillmentStatus: string) => {
     setFulfillmentStatusFilter(newFulfillmentStatus);
     setPage(1);
@@ -184,27 +189,21 @@ export function OrdersFilters({
             options={fulfillmentOptions}
             ariaLabel={t('admin.orders.filterFulfillmentAria')}
           />
-          <form
-            onSubmit={handleSearchSubmit}
-            className="flex min-w-0 w-full flex-1 basis-full gap-1.5 sm:min-w-[12rem] sm:basis-[min(100%,18rem)] sm:flex-1 md:max-w-sm"
+          <div
+            role="search"
+            className="min-w-0 w-full flex-1 basis-full sm:min-w-[12rem] sm:basis-[min(100%,18rem)] sm:flex-1 md:max-w-sm"
           >
             <input
               type="search"
               name="orders-search"
               autoComplete="off"
               placeholder={t('admin.orders.searchPlaceholder')}
-              className="h-10 min-h-10 min-w-0 flex-1 rounded-supersudo border border-gray-300 px-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-admin"
+              aria-label={t('admin.orders.searchPlaceholder')}
+              className="h-10 min-h-10 w-full rounded-supersudo border border-gray-300 px-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-admin"
               value={searchDraft}
               onChange={(e) => setSearchDraft(e.target.value)}
             />
-            <button
-              type="submit"
-              aria-label={t('admin.orders.search')}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-supersudo bg-admin-500 text-white shadow-sm transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-admin-600 active:opacity-90"
-            >
-              <Search className="h-5 w-5" aria-hidden strokeWidth={2} />
-            </button>
-          </form>
+          </div>
         </div>
         {updateMessage ? (
           <div

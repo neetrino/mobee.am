@@ -93,7 +93,7 @@ export function ValueEditForm({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={imageUploading}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-supersudo hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer rounded-supersudo bg-gray-100 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-default disabled:opacity-50"
               >
                 {imageUploading ? t('admin.attributes.valueModal.uploading') : t('admin.attributes.valueModal.changeImage')}
               </button>
@@ -104,7 +104,7 @@ export function ValueEditForm({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={imageUploading}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-supersudo hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="flex cursor-pointer items-center gap-2 rounded-supersudo bg-gray-100 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-default disabled:opacity-50"
               >
                 {imageUploading ? (
                   <>
@@ -138,7 +138,7 @@ export function ValueEditForm({
           type="button"
           onClick={onCancel}
           disabled={savingValue}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-supersudo hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="cursor-pointer rounded-supersudo bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-default disabled:opacity-50"
         >
           {t('admin.attributes.valueModal.cancel')}
         </button>
@@ -146,7 +146,7 @@ export function ValueEditForm({
           type="button"
           onClick={onSave}
           disabled={savingValue || !editingLabel.trim()}
-          className="px-4 py-2 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="flex cursor-pointer items-center gap-2 rounded-supersudo bg-admin px-4 py-2 text-white transition-colors hover:bg-admin-600 disabled:cursor-default disabled:opacity-50"
         >
           {savingValue ? (
             <>

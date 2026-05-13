@@ -35,6 +35,7 @@ interface ProductCardListProps {
   isAddingToCart: boolean;
   imageError: boolean;
   onImageError: () => void;
+  imageLoadPriority?: boolean;
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
@@ -51,6 +52,7 @@ export function ProductCardList({
   isAddingToCart,
   imageError,
   onImageError,
+  imageLoadPriority = false,
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
@@ -75,7 +77,7 @@ export function ProductCardList({
               fill
               className="object-contain"
               sizes="(max-width: 639px) 80px, 112px"
-              unoptimized
+              priority={imageLoadPriority}
               onError={onImageError}
             />
           ) : (
@@ -163,8 +165,8 @@ export function ProductCardList({
               disabled={!product.inStock || isAddingToCart}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
                 product.inStock && !isAddingToCart
-                  ? 'bg-gray-100 text-gray-700 hover:bg-admin-500 hover:text-white'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  ? 'cursor-pointer bg-gray-100 text-gray-700 hover:bg-admin-500 hover:text-white'
+                  : 'cursor-default bg-gray-100 text-gray-400'
               }`}
               title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
               aria-label={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}

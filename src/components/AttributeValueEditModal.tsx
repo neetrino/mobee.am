@@ -194,7 +194,7 @@ export function AttributeValueEditModal({
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={imageUploading}
-                    className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-default disabled:opacity-50"
                   >
                     {imageUploading ? t('admin.attributes.valueModal.uploading') : t('admin.attributes.valueModal.changeImage')}
                   </button>
@@ -205,7 +205,7 @@ export function AttributeValueEditModal({
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={imageUploading}
-                    className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="flex cursor-pointer items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-default disabled:opacity-50"
                   >
                     {imageUploading ? (
                       <>
@@ -240,7 +240,7 @@ export function AttributeValueEditModal({
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-pointer rounded-lg bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-default disabled:opacity-50"
           >
             {t('admin.attributes.valueModal.cancel')}
           </button>
@@ -248,7 +248,7 @@ export function AttributeValueEditModal({
             type="button"
             onClick={handleSave}
             disabled={saving || !label.trim()}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="flex cursor-pointer items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-white transition-colors hover:bg-gray-800 disabled:cursor-default disabled:opacity-50"
           >
             {saving ? (
               <>

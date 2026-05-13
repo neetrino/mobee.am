@@ -16,6 +16,7 @@ import {
   WATCHES_SLUG_PARTS,
 } from '../lib/category-nav';
 import { useTranslation } from '../lib/i18n-client';
+import { extractMediaUrl } from '../lib/utils/extractMediaUrl';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
 const montserrat = Montserrat({
@@ -140,6 +141,11 @@ function categoryHref(resolved: CategoryTreeNode | null, fallbackSlug: string): 
   return `/products?category=${encodeURIComponent(fallbackSlug)}`;
 }
 
+function stripTileImageSrc(resolved: CategoryTreeNode | null, fallbackSrc: string): string {
+  const fromDb = resolved?.media != null ? extractMediaUrl(resolved.media) : null;
+  return fromDb ?? fallbackSrc;
+}
+
 export function TopCategories() {
   const { t } = useTranslation();
   const { categories, loadingCategories: loading } = useCategoriesTree();
@@ -208,6 +214,7 @@ export function TopCategories() {
             const resolved = resolvedBySlot[slot.key];
             const href = categoryHref(resolved, slot.fallbackSlug);
             const innerH = categoryStripInnerHeightClass(slot);
+            const imageSrc = stripTileImageSrc(resolved, slot.imageSrc);
 
             return (
               <Link
@@ -225,7 +232,7 @@ export function TopCategories() {
                           <div className="flex-none -rotate-[5.85deg]">
                             <div className="relative size-[140px]">
                               <Image
-                                src={slot.imageSrc}
+                                src={imageSrc}
                                 alt=""
                                 width={slot.imageWidth}
                                 height={slot.imageHeight}
@@ -243,7 +250,7 @@ export function TopCategories() {
                           }
                         >
                           <Image
-                            src={slot.imageSrc}
+                            src={imageSrc}
                             alt=""
                             fill
                             sizes="(max-width: 1279px) 17vw, 197px"

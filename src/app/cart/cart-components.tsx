@@ -16,11 +16,18 @@ import {
   CART_ITEM_ROW_DESKTOP_MIN_HEIGHT_CLASS,
   CART_LINE_ITEM_CARD_FOOTER_CLASS,
   CART_LINE_ITEM_CARD_FRAME_CLASS,
+  CART_ORDER_SUMMARY_OUTLINE_CTA_TEXT_CLASS,
+  CART_ORDER_SUMMARY_PRIMARY_CTA_TEXT_CLASS,
   ORDER_SUMMARY_PANEL_RADIUS_CLASS,
 } from './constants';
 import { CART_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
 import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
 import { DISMISS_ROUND_BUTTON_HOVER_CLASS } from '../../lib/dismiss-icon-button.constants';
+import {
+  LAYOUT_DESKTOP_MAX_MOBILE_WIDTH_PX,
+  SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX,
+} from '../../lib/layout-breakpoints.constants';
+import { CartCtaResponsiveLabel } from './cart-cta-responsive-label';
 
 /**
  * Cart item row component
@@ -55,7 +62,7 @@ export function CartItemRow({
         type="button"
         onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
         disabled={updatingItems.has(item.id)}
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-50"
         aria-label={t('common.ariaLabels.decreaseQuantity')}
       >
         <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,7 +86,7 @@ export function CartItemRow({
         type="button"
         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
         disabled={updatingItems.has(item.id) || (item.variant.stock !== undefined && item.quantity >= item.variant.stock)}
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-50"
         aria-label={t('common.ariaLabels.increaseQuantity')}
         title={item.variant.stock !== undefined && item.quantity >= item.variant.stock ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : t('common.messages.addQuantity')}
       >
@@ -146,8 +153,7 @@ export function CartItemRow({
                   alt={item.variant.product.title}
                   fill
                   className="object-contain p-2"
-                  sizes="(max-width: 833px) 45vw, (max-width: 1279px) 30vw, 22vw"
-                  unoptimized
+                  sizes={`(max-width: ${LAYOUT_DESKTOP_MAX_MOBILE_WIDTH_PX}px) 45vw, (max-width: ${SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX - 1}px) 30vw, 22vw`}
                   onError={() => setImageError(true)}
                 />
               )}
@@ -267,24 +273,32 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
         </div>
         <Button
           variant="primary"
-          className="w-full !rounded-full !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500"
+          className={`w-full !rounded-full !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500 ${CART_ORDER_SUMMARY_PRIMARY_CTA_TEXT_CLASS}`}
           size="lg"
+          aria-label={t('common.buttons.proceedToCheckout')}
           onClick={() => {
             // Allow guest checkout - no redirect to login
             window.location.href = '/checkout';
           }}
         >
-          {t('common.buttons.proceedToCheckout')}
+          <CartCtaResponsiveLabel
+            narrowLabel={t('common.cart.narrowProceedToCheckout')}
+            fullLabel={t('common.buttons.proceedToCheckout')}
+          />
         </Button>
         <Button
           variant="outline"
-          className="mt-3 w-full !rounded-full"
+          className={`mt-3 w-full !rounded-full ${CART_ORDER_SUMMARY_OUTLINE_CTA_TEXT_CLASS}`}
           size="md"
+          aria-label={t('common.buttons.browseProducts')}
           onClick={() => {
             window.location.href = '/products';
           }}
         >
-          {t('common.buttons.browseProducts')}
+          <CartCtaResponsiveLabel
+            narrowLabel={t('common.cart.narrowBrowseProducts')}
+            fullLabel={t('common.buttons.browseProducts')}
+          />
         </Button>
       </div>
     </div>

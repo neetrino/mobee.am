@@ -226,7 +226,7 @@ export function ProductsTable({
                     {t('admin.products.featured')}
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pl-6">
-                    {t('admin.products.actions')}
+                    <span className="ml-6 inline-block">{t('admin.products.actions')}</span>
                   </th>
                 </tr>
               </thead>
@@ -347,7 +347,7 @@ export function ProductsTable({
                         <button
                           type="button"
                           onClick={() => handleTogglePublished(product.id, product.published, product.title)}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-2 ${
+                          className={`relative ml-[10px] inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-2 ${
                             product.published
                               ? 'bg-green-500'
                               : 'bg-gray-300'
@@ -377,15 +377,15 @@ export function ProductsTable({
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant="ghost"
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  variant="admin"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                 >
                   {t('admin.products.previous')}
                 </Button>
                 <Button
-                  variant="ghost"
-                  onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+                  variant="admin"
+                  onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                   disabled={page === meta.totalPages}
                 >
                   {t('admin.products.next')}

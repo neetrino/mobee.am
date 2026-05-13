@@ -50,6 +50,7 @@ interface ProductCardProps {
   specialOffersHomeCard?: boolean;
   /** Home featured / special-offer grids — mobile Figma card chrome. */
   homeProductGridCard?: boolean;
+  imageLoadPriority?: boolean;
 }
 
 /**
@@ -64,6 +65,7 @@ export function ProductCard({
   smallerFooterPrice = false,
   specialOffersHomeCard = false,
   homeProductGridCard = false,
+  imageLoadPriority = false,
 }: ProductCardProps) {
   const isCompact = viewMode === 'grid-3';
   const currency = useCurrency();
@@ -114,6 +116,7 @@ export function ProductCard({
         isInCompare={isInCompare}
         isAddingToCart={isAddingToCart}
         imageError={imageError}
+        imageLoadPriority={imageLoadPriority}
         onImageError={() => setImageError(true)}
         onWishlistToggle={handleWishlistToggle}
         onCompareToggle={handleCompareToggle}
@@ -137,6 +140,7 @@ export function ProductCard({
       smallerFooterPrice={smallerFooterPrice}
       specialOffersHomeCard={specialOffersHomeCard}
       homeProductGridCard={homeProductGridCard}
+      imageLoadPriority={imageLoadPriority}
       onImageError={() => setImageError(true)}
       onWishlistToggle={handleWishlistToggle}
       onCompareToggle={handleCompareToggle}

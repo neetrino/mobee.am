@@ -34,7 +34,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           ref={ref}
-          className={`w-full px-4 py-2 border ${adminChrome ? 'rounded-supersudo' : 'rounded-md'} focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
+          className={`w-full px-4 py-2 border ${adminChrome ? 'rounded-supersudo' : 'rounded-md'} focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:cursor-default ${
             error ? 'border-error focus:ring-error' : 'border-gray-300'
           } ${className}`}
           onKeyDown={handleKeyDown}
