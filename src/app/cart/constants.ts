@@ -48,3 +48,16 @@ export const CART_LINE_ITEM_CARD_FOOTER_CLASS =
 /** Order summary sidebar card — `border-radius` 15px. */
 export const ORDER_SUMMARY_PANEL_RADIUS_CLASS = 'rounded-[15px]';
 
+/**
+ * Narrow phones (e.g. ~344px wide): smaller CTA labels; `lg` restores desktop cart column layout.
+ */
+export const CART_ORDER_SUMMARY_PRIMARY_CTA_TEXT_CLASS =
+  '!text-sm !leading-snug lg:!text-lg lg:!leading-normal';
+
+export const CART_ORDER_SUMMARY_OUTLINE_CTA_TEXT_CLASS =
+  '!text-sm !leading-snug lg:!text-base lg:!leading-normal';
+
+/** Empty-cart primary CTA — readable on narrow phones; full size at `lg`. */
+export const EMPTY_CART_PRIMARY_CTA_TEXT_CLASS =
+  '!text-sm !leading-snug lg:!text-sm lg:!leading-normal';
+

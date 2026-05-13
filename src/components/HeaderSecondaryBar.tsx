@@ -6,7 +6,10 @@ import type { CSSProperties, FormEvent, KeyboardEvent, ReactNode, Ref, RefObject
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
 import { getDockedBarTopMotionStyle, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
-import { HEADER_SECONDARY_CATEGORIES_PILL_MAX_WIDTH_CLASS } from './header-secondary-bar.constants';
+import {
+  HEADER_SECONDARY_CATEGORIES_PILL_MAX_WIDTH_CLASS,
+  HEADER_SECONDARY_SEARCH_IPAD_AIR_BAND_MAX_WIDTH_CLASS,
+} from './header-secondary-bar.constants';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
@@ -481,7 +484,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
             {/* lg–xl (e.g. iPad Pro): search max-width 300px (was 273px); xl+ unchanged */}
             <div
               ref={secondarySearchBoundaryRef}
-              className="relative min-w-0 max-w-[203px] flex-1 lg:max-w-[290px] xl:max-w-[312px] 2xl:max-w-[387px]"
+              className={`relative min-w-0 max-w-[203px] flex-1 lg:max-w-[290px] ${HEADER_SECONDARY_SEARCH_IPAD_AIR_BAND_MAX_WIDTH_CLASS} xl:max-w-[312px] 2xl:max-w-[387px]`}
             >
               <form onSubmit={onSearchSubmit} className="relative w-full">
                 <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">

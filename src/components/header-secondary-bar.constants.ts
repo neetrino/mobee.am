@@ -11,3 +11,11 @@ export const HEADER_SECONDARY_CATEGORIES_PILL_VIEWPORT_RESERVE_REM = 18;
  */
 export const HEADER_SECONDARY_CATEGORIES_PILL_MAX_WIDTH_CLASS =
   "max-w-[calc(100vw-18rem)]" as const;
+
+/**
+ * Secondary search row: extra `max-w` when `ipad-air-band:` applies (large tablet chrome on `<html>`;
+ * see `TabletIpadAirLikeLayoutProvider` / `tablet-ipad-air-like-layout`).
+ * Literal for Tailwind JIT.
+ */
+export const HEADER_SECONDARY_SEARCH_IPAD_AIR_BAND_MAX_WIDTH_CLASS =
+  'ipad-air-band:max-w-[320px]' as const;

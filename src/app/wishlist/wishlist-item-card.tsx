@@ -14,6 +14,10 @@ import {
   CART_LINE_ITEM_CARD_FRAME_CLASS,
 } from '../cart/constants';
 import { DISMISS_ROUND_BUTTON_HOVER_CLASS } from '../../lib/dismiss-icon-button.constants';
+import {
+  LAYOUT_DESKTOP_MAX_MOBILE_WIDTH_PX,
+  SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX,
+} from '../../lib/layout-breakpoints.constants';
 import { WISHLIST_SAVED_HEART_ICON_CLASS } from './wishlist.constants';
 
 export interface WishlistItemCardProduct {
@@ -87,7 +91,7 @@ export function WishlistItemCard({
                   alt={product.title}
                   fill
                   className="object-contain p-2"
-                  sizes="(max-width: 833px) 45vw, (max-width: 1279px) 30vw, 22vw"
+                  sizes={`(max-width: ${LAYOUT_DESKTOP_MAX_MOBILE_WIDTH_PX}px) 45vw, (max-width: ${SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX - 1}px) 30vw, 22vw`}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
