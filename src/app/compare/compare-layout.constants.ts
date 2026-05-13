@@ -29,15 +29,13 @@ export const COMPARE_PRODUCT_THUMB_BOX_CLASS = 'w-[14.4rem] h-[14.4rem]';
 /** `px-6 py-6` (1.5rem) × one +20% step */
 export const COMPARE_TABLE_CELL_PADDING_CLASS = 'px-[1.8rem] py-[1.8rem]';
 
-/** Empty-state illustration exported from Figma (node 442:721, mobee-new) */
+/** Empty-state illustration with transparent background. */
 export const COMPARE_EMPTY_STATE_IMAGE_SRC =
   '/images/compare/compare-empty-state.png';
 
-/** Intrinsic width/height for `next/image` (330×267 asset scaled to ~1.36× for display) */
-export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_WIDTH_PX = 448;
-export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX = Math.round(
-  (267 * COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_WIDTH_PX) / 330,
-);
+/** Intrinsic width/height for `next/image` source asset. */
+export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_WIDTH_PX = 947;
+export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX = 836;
 
 /** Responsive `sizes` for empty-state image to avoid blurry rendering */
 export const COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR =
