@@ -12,7 +12,7 @@
     "prebuild": "node scripts/prisma-generate-with-retry.cjs && node scripts/verify-prisma-engine.cjs",
     "prebuild:migrate": "node src/scripts/run-migrations.js",
     "build": "pnpm run prebuild && next build",
-    "build:with-migrate": "pnpm run prebuild:migrate && next build",
+    "build:with-migrate": "pnpm run prebuild && pnpm run prebuild:migrate && next build",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
     "lint:next": "next lint",
