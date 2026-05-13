@@ -16,6 +16,8 @@ interface ProductCardImageProps {
   shiftImageInFrame?: boolean;
   /** Square image frame; false uses portrait 3:4. */
   squareImageFrame?: boolean;
+  /** Eager load for above-the-fold grid cells (LCP on shop / home). */
+  imageLoadPriority?: boolean;
 }
 
 /**
@@ -30,6 +32,7 @@ export function ProductCardImage({
   isCompact = false,
   shiftImageInFrame = false,
   squareImageFrame = true,
+  imageLoadPriority = false,
 }: ProductCardImageProps) {
   const showPlaceholder = imageError;
   const imageSrc = resolveProductCardImageSrc(image);
@@ -62,7 +65,7 @@ export function ProductCardImage({
                 : 'object-contain'
             }
             sizes="(max-width: 768px) 78vw, (max-width: 1200px) 35vw, 212px"
-            unoptimized
+            priority={imageLoadPriority}
             onError={onImageError}
           />
         )}

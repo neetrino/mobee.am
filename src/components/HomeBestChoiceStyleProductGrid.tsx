@@ -14,6 +14,7 @@ import {
 } from './useHomeBestChoiceCarouselPageSync';
 import { useHomeDesktopCarouselPager } from './useHomeDesktopCarouselPager';
 import { HomeDesktopCarouselArrows } from './HomeDesktopCarouselArrows';
+import { useHomeDesktopCarouselHomeStyle } from './useHomeDesktopCarouselHomeStyle';
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
@@ -101,6 +102,7 @@ export function HomeBestChoiceStyleProductGrid({
   desktopPrevAriaLabel,
   desktopNextAriaLabel,
 }: HomeBestChoiceStyleProductGridProps) {
+  const desktopHomeStyle = useHomeDesktopCarouselHomeStyle();
   const visible = products.slice(0, productsPerPage);
   const mobilePages = chunkArray(visible, mobileCardsPerView);
   const mobilePageCount = mobilePages.length;
@@ -164,7 +166,7 @@ export function HomeBestChoiceStyleProductGrid({
                     key={product.id}
                     product={product}
                     viewMode="grid-2"
-                    homeStyle={false}
+                    homeStyle={desktopHomeStyle}
                   />
                 ))}
               </div>

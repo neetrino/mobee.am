@@ -28,3 +28,11 @@ export const SHOP_LEGACY_DESKTOP_MEDIA_QUERY = `(min-width: ${SHOP_LEGACY_DESKTO
 export const SHOP_COMPACT_THREE_COLUMN_MAX_WIDTH_PX = LAYOUT_DESKTOP_MIN_WIDTH_PX - 1;
 
 export const SHOP_COMPACT_THREE_COLUMN_MEDIA_QUERY = `(min-width: ${TAILWIND_MD_MIN_WIDTH_PX}px) and (max-width: ${SHOP_COMPACT_THREE_COLUMN_MAX_WIDTH_PX}px)`;
+
+/**
+ * Home desktop product carousel (`lg+`): use the same Figma card chrome as mobile (round cart, etc.)
+ * for iPad Pro through 12.9″ landscape (~1366px). Wider viewports use the default footer CTA pill.
+ */
+export const HOME_DESKTOP_CAROUSEL_HOMESTYLE_MAX_WIDTH_PX = 1366;
+
+export const HOME_DESKTOP_CAROUSEL_HOMESTYLE_MEDIA_QUERY = `(min-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) and (max-width: ${HOME_DESKTOP_CAROUSEL_HOMESTYLE_MAX_WIDTH_PX}px)`;

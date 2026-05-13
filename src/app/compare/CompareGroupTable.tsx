@@ -247,7 +247,6 @@ export function CompareGroupTable({
                           fill
                           className="object-cover"
                           sizes="128px"
-                          unoptimized
                         />
                       </div>
                     </Link>

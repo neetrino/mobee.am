@@ -100,7 +100,6 @@ export function RelatedProductCard({
                 fill
                 className="object-contain transition-transform duration-300 group-hover:scale-105"
                 sizes={`(max-width: 640px) 100vw, (max-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) 50vw, 25vw`}
-                unoptimized
                 onError={() => onImageError(product.id)}
               />
             ) : (

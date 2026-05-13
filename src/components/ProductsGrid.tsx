@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { useTranslation } from '../lib/i18n-client';
+import { SHOP_LISTING_EAGER_IMAGE_CARD_COUNT } from '@/lib/performance/shop-listing-image-priority.constants';
 import type { ProductSortOption } from '@/lib/products/sort';
 import {
   SHOP_COMPACT_THREE_COLUMN_MEDIA_QUERY,
@@ -139,7 +140,7 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
 
   return (
     <div className={gridClass}>
-      {sortedProducts.map((product) => (
+      {sortedProducts.map((product, index) => (
         <div key={product.id} className="h-full min-h-0">
           <ProductCard
             product={{
@@ -151,6 +152,7 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
             homeProductGridCard={useHomeCardChrome}
             shiftImageInFrame={useHomeCardChrome}
             smallerFooterPrice={useHomeCardChrome}
+            imageLoadPriority={index < SHOP_LISTING_EAGER_IMAGE_CARD_COUNT}
           />
         </div>
       ))}

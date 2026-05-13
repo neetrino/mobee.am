@@ -86,7 +86,6 @@ export function SearchDropdown({
                       fill
                       className="object-cover"
                       sizes="48px"
-                      unoptimized
                     />
                   </div>
                   <div className="flex-1 min-w-0">

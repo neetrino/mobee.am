@@ -40,6 +40,8 @@ interface ProductCardGridProps {
   specialOffersHomeCard?: boolean;
   /** Home curated grids — mobile Figma card (grouped background, compact footer). */
   homeProductGridCard?: boolean;
+  /** Eager image for first viewport rows (LCP). */
+  imageLoadPriority?: boolean;
   onImageError: () => void;
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
@@ -62,6 +64,7 @@ export function ProductCardGrid({
   smallerFooterPrice = false,
   specialOffersHomeCard: _specialOffersHomeCard = false,
   homeProductGridCard = false,
+  imageLoadPriority = false,
   onImageError,
   onWishlistToggle,
   onCompareToggle,
@@ -137,6 +140,7 @@ export function ProductCardGrid({
               isCompact={isCompact}
               shiftImageInFrame={shiftImageInFrame}
               squareImageFrame={squareImageFrame}
+              imageLoadPriority={imageLoadPriority}
             />
           </div>
         </div>
@@ -230,19 +234,17 @@ export function ProductCardGrid({
                 : 'cursor-default opacity-50'
             } ${
               homeProductGridCard
-                ? 'max-lg:size-9 max-lg:min-w-0 max-lg:rounded-full max-lg:p-0 max-lg:gap-0'
-                : ''
-            } ${
-              isCompact
-                ? 'h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide'
-                : 'h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]'
+                ? 'size-9 min-h-9 min-w-9 gap-0 rounded-full p-0'
+                : isCompact
+                  ? 'h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide'
+                  : 'h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]'
             }`}
             title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
             aria-label={product.inStock ? t('common.ariaLabels.addToCart') : t('common.ariaLabels.outOfStock')}
           >
             {isAddingToCart ? (
               <svg
-                className={`animate-spin ${isCompact ? 'h-4 w-4' : 'h-[16.2px] w-[16.2px]'}`}
+                className={`animate-spin ${homeProductGridCard || isCompact ? 'h-4 w-4' : 'h-[16.2px] w-[16.2px]'}`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -257,9 +259,9 @@ export function ProductCardGrid({
               </svg>
             ) : (
               <>
-                <CartIcon className="shrink-0" size={isCompact ? 18 : 16.2} />
+                <CartIcon className="shrink-0" size={homeProductGridCard || isCompact ? 18 : 16.2} />
                 <span
-                  className={`whitespace-nowrap ${homeProductGridCard ? 'max-lg:sr-only' : ''}`}
+                  className={`whitespace-nowrap ${homeProductGridCard ? 'sr-only' : ''}`}
                 >
                   {t('common.buttons.addToCart')}
                 </span>

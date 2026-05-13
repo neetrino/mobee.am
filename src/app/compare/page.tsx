@@ -222,7 +222,6 @@ export default function ComparePage() {
             height={COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX}
             sizes={COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR}
             className={COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS}
-            unoptimized
           />
           <div className={COMPARE_EMPTY_STATE_TEXT_BLOCK_CLASS}>
             <div className={COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS}>

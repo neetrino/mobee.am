@@ -147,7 +147,6 @@ export function CartItemRow({
                   fill
                   className="object-contain p-2"
                   sizes="(max-width: 833px) 45vw, (max-width: 1279px) 30vw, 22vw"
-                  unoptimized
                   onError={() => setImageError(true)}
                 />
               )}

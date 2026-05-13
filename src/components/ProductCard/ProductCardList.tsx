@@ -35,6 +35,7 @@ interface ProductCardListProps {
   isAddingToCart: boolean;
   imageError: boolean;
   onImageError: () => void;
+  imageLoadPriority?: boolean;
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
@@ -51,6 +52,7 @@ export function ProductCardList({
   isAddingToCart,
   imageError,
   onImageError,
+  imageLoadPriority = false,
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
@@ -75,7 +77,7 @@ export function ProductCardList({
               fill
               className="object-contain"
               sizes="(max-width: 639px) 80px, 112px"
-              unoptimized
+              priority={imageLoadPriority}
               onError={onImageError}
             />
           ) : (
