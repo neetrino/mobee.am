@@ -3,8 +3,8 @@
 /**
  * Cross-platform migration runner
  * Loads .env from project root so Prisma can see DATABASE_URL/DIRECT_URL.
- * Tries to run migrations, falls back to db:push if migrations fail.
- * Always exits with success to allow build to continue.
+ * Runs `prisma migrate deploy`; on failure falls back to `db:push` when DATABASE_URL is set.
+ * Exits 0 when DATABASE_URL is missing (local/CI without DB). Fails the build when URL is set but both steps fail.
  */
 
 const { execSync } = require('child_process');
@@ -34,23 +34,30 @@ const dbPath = path.join(__dirname, '../../shared/db');
 
 process.chdir(dbPath);
 
+const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
+
 try {
   console.log('🔄 Attempting to deploy migrations...');
   execSync('pnpm run db:migrate:deploy', { stdio: 'inherit' });
   console.log('✅ Migrations deployed successfully');
+  process.exit(0);
 } catch (_error) {
+  if (!hasDatabaseUrl) {
+    console.log('⚠️  Migration deploy skipped or failed (no DATABASE_URL); continuing build.');
+    process.exit(0);
+  }
   console.log('⚠️  Migration deploy failed, trying db:push...');
   try {
     execSync('pnpm run db:push', { stdio: 'inherit' });
     console.log('✅ Database schema pushed successfully');
+    process.exit(0);
   } catch (_pushErr) {
-    console.log('⚠️  Database operations failed, but continuing build...');
-    console.log('   (This is expected if DATABASE_URL is not set)');
+    console.error(
+      '❌ DATABASE_URL is set but migrations and db:push both failed; failing the build.',
+    );
+    process.exit(1);
   }
 }
-
-// Always exit with success to allow build to continue
-process.exit(0);
 
 
 
