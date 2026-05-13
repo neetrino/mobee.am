@@ -104,30 +104,31 @@ export function ProductImageGallery({
 
   return (
     <>
-      <div className="flex gap-6 items-start">
+      <div className="flex gap-5 items-start">
         {/* Left Column - Thumbnails (Vertical) - Show 3 at a time, scrollable */}
-        <div className="flex flex-col gap-4 w-28 flex-shrink-0">
-          <div className="flex flex-col gap-4 flex-1 overflow-hidden">
+        <div className="group/thumbs flex w-24 shrink-0 flex-col gap-3">
+          <div className="flex flex-1 flex-col gap-3 overflow-hidden">
             {visibleThumbnails.map((image, index) => {
               const actualIndex = thumbnailStartIndex + index;
               const isActive = actualIndex === currentImageIndex;
               return (
-                <button 
+                <button
+                  type="button"
                   key={actualIndex}
                   onClick={() => onImageIndexChange(actualIndex)}
-                  className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border bg-white transition-all duration-300 flex-shrink-0 ${
-                    isActive 
-                      ? "border-gray-400 shadow-[0_2px_8px_rgba(0,0,0,0.12)] ring-2 ring-gray-300" 
-                      : "border-gray-200 hover:border-gray-300 hover:shadow-[0_2px_6px_rgba(0,0,0,0.08)]"
+                  className={`relative box-border aspect-[3/4] w-full flex-shrink-0 overflow-hidden rounded-lg border-2 bg-white transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-500 ${
+                    isActive
+                      ? "border-admin-500"
+                      : "border-gray-200 hover:border-admin-300"
                   }`}
                 >
                   {failedIndices.has(actualIndex) ? (
                     <ProductImagePlaceholder className="w-full h-full" aria-label="" />
                   ) : (
-                    <img 
-                      src={image} 
-                      alt="" 
-                      className="w-full h-full object-cover transition-transform duration-300" 
+                    <img
+                      src={image}
+                      alt=""
+                      className="h-full w-full object-cover"
                       onError={() => markFailed(actualIndex)}
                     />
                   )}
@@ -138,7 +139,7 @@ export function ProductImageGallery({
           
           {/* Navigation Arrows - Scroll thumbnails */}
           {images.length > THUMBNAILS_PER_VIEW && (
-            <div className="flex flex-row gap-1.5 justify-center">
+            <div className="flex flex-row justify-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover/thumbs:opacity-100">
               <button 
                 type="button"
                 onClick={(e) => {
@@ -155,7 +156,7 @@ export function ProductImageGallery({
                   }
                 }}
                 disabled={thumbnailStartIndex <= 0}
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded border border-gray-300 bg-gray-100 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:cursor-default disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:bg-gray-100 disabled:hover:shadow-none"
+                className="pointer-events-none flex h-8 w-8 cursor-pointer items-center justify-center rounded border border-gray-300 bg-gray-100 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:cursor-default disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:bg-gray-100 disabled:hover:shadow-none group-hover/thumbs:pointer-events-auto"
                 aria-label={t(language, 'common.ariaLabels.previousThumbnail')}
               >
                 <svg 
@@ -188,7 +189,7 @@ export function ProductImageGallery({
                   }
                 }}
                 disabled={thumbnailStartIndex >= images.length - THUMBNAILS_PER_VIEW}
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded border border-gray-300 bg-gray-100 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:cursor-default disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:bg-gray-100 disabled:hover:shadow-none"
+                className="pointer-events-none flex h-8 w-8 cursor-pointer items-center justify-center rounded border border-gray-300 bg-gray-100 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:cursor-default disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:bg-gray-100 disabled:hover:shadow-none group-hover/thumbs:pointer-events-auto"
                 aria-label={t(language, 'common.ariaLabels.nextThumbnail')}
               >
                 <svg 
@@ -212,14 +213,14 @@ export function ProductImageGallery({
         {/* Right Column - Main Image */}
         <div className="flex-1">
           <div
-            className="relative aspect-square bg-white rounded-lg overflow-hidden group shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+            className="group relative aspect-square overflow-hidden rounded-lg bg-white shadow-sm"
             data-pdp-cart-fly-source
           >
           {images.length > 0 && !mainImageFailed ? (
-            <img 
-              src={currentSrc} 
-              alt={product.title} 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+            <img
+              src={currentSrc}
+              alt={product.title}
+              className="h-full w-full object-cover"
               onError={() => markFailed(currentImageIndex)}
             />
           ) : (
@@ -231,12 +232,39 @@ export function ProductImageGallery({
           
           {/* Discount Badge on Image - Blue circle in top-right */}
           {discountPercent && (
-            <div className="absolute top-4 right-4 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
+            <div className="absolute top-4 right-4 w-14 h-14 bg-admin-500 text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-[0_2px_8px_rgba(45,178,255,0.35)]">
               -{discountPercent}%
             </div>
           )}
 
           {product.labels && <ProductLabels labels={product.labels} />}
+
+          {hasMultipleImages && (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  goToPreviousImage();
+                }}
+                className="pointer-events-none flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/85 text-gray-800 shadow-md backdrop-blur-sm transition-colors hover:bg-white group-hover:pointer-events-auto"
+                aria-label={t(language, 'common.ariaLabels.previousImage')}
+              >
+                <ChevronLeft className="h-5 w-5" strokeWidth={2} />
+              </button>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  goToNextImage();
+                }}
+                className="pointer-events-none flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/85 text-gray-800 shadow-md backdrop-blur-sm transition-colors hover:bg-white group-hover:pointer-events-auto"
+                aria-label={t(language, 'common.ariaLabels.nextImage')}
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={2} />
+              </button>
+            </div>
+          )}
           
           {/* Control Buttons - Bottom left */}
           <div className="absolute bottom-4 left-4 flex flex-col gap-3 z-10">
