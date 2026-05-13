@@ -38,7 +38,6 @@ import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.co
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 import {
-  MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS,
   MOBILE_DRAWER_NAV_BUTTON_CLASS,
   MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
   MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS,
@@ -73,7 +72,6 @@ const MOBILE_HOME_SEARCH_SUBMIT_CLASS =
 // Navigation links will be translated dynamically using useTranslation hook
 const primaryNavLinks = [
   { href: '/', translationKey: 'common.navigation.home' },
-  { href: '/shop', translationKey: 'common.navigation.products' },
   { href: '/about', translationKey: 'common.navigation.about' },
   { href: '/contact', translationKey: 'common.navigation.contact' },
 ];
@@ -1616,31 +1614,7 @@ export function Header() {
                     </span>
                   </Link>
 
-                  {isLoggedIn ? (
-                    <>
-                      <MobileDrawerSupportPhoneButtons />
-                    </>
-                  ) : (
-                    <>
-                      <MobileDrawerSupportPhoneButtons />
-                      <div className="grid grid-cols-2 gap-2">
-                        <Link
-                          href="/login"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} !justify-center px-2 py-3 text-center text-xs font-semibold normal-case text-gray-800`}
-                        >
-                          {t('common.navigation.login')}
-                        </Link>
-                        <Link
-                          href="/register"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`${MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS} !justify-center px-2 py-3 text-center text-xs font-semibold`}
-                        >
-                          {t('common.navigation.register')}
-                        </Link>
-                      </div>
-                    </>
-                  )}
+                  <MobileDrawerSupportPhoneButtons />
                 </div>
 
                 <div className="border-t border-gray-100 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">

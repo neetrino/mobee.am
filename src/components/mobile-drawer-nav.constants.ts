@@ -13,7 +13,7 @@ export const MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS = `${MOBILE_DRAWER_NAV_BUTTON_L
 export const MOBILE_DRAWER_CTA_SOLID_ADMIN_CLASS =
   'flex w-full min-w-0 items-center justify-between rounded-2xl border border-admin-500 bg-admin-500 px-4 py-3 text-sm font-semibold normal-case text-white shadow-sm transition-colors hover:border-admin-600 hover:bg-admin-600 active:opacity-95 text-pretty';
 
-/** Home / Shop / About / Contact — blue hover. */
+/** Primary drawer links (e.g. Home / About / Contact) — blue hover. */
 export const MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS = `${MOBILE_DRAWER_NAV_BUTTON_CLASS} hover:!border-admin-300 hover:!bg-admin-50 hover:!text-[#00a1ff]`;
 
 /** Admin mobile menu row — inactive (sentence-case labels). */
