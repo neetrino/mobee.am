@@ -3,8 +3,8 @@
 /**
  * Cross-platform migration runner
  * Loads .env from project root so Prisma can see DATABASE_URL/DIRECT_URL.
- * Runs `prisma migrate deploy`; on failure falls back to `db:push` when DATABASE_URL is set.
- * Exits 0 when DATABASE_URL is missing (local/CI without DB). Fails the build when URL is set but both steps fail.
+ * Runs `prisma migrate deploy`. On local dev only (not Vercel/CI), may fall back to `db:push` when DATABASE_URL is set.
+ * Exits 0 when DATABASE_URL is missing. On Vercel/CI with DATABASE_URL set, never runs interactive `db:push`.
  */
 
 const { execSync } = require('child_process');
@@ -35,6 +35,8 @@ const dbPath = path.join(__dirname, '../../shared/db');
 process.chdir(dbPath);
 
 const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
+const isNonInteractiveHost =
+  process.env.VERCEL === '1' || process.env.CI === 'true';
 
 try {
   console.log('🔄 Attempting to deploy migrations...');
@@ -46,7 +48,16 @@ try {
     console.log('⚠️  Migration deploy skipped or failed (no DATABASE_URL); continuing build.');
     process.exit(0);
   }
-  console.log('⚠️  Migration deploy failed, trying db:push...');
+  if (isNonInteractiveHost) {
+    console.error(
+      '❌ prisma migrate deploy failed on Vercel/CI. db:push is skipped here (non-interactive / unsafe).',
+    );
+    console.error(
+      '   Fix DATABASE_URL, DIRECT_URL (Neon), network, or migration state; check Vercel build logs above.',
+    );
+    process.exit(1);
+  }
+  console.log('⚠️  Migration deploy failed, trying db:push (local dev only)...');
   try {
     execSync('pnpm run db:push', { stdio: 'inherit' });
     console.log('✅ Database schema pushed successfully');
