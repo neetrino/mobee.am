@@ -6,6 +6,7 @@ import type { CSSProperties, FormEvent, KeyboardEvent, ReactNode, Ref, RefObject
 import { SearchDropdown } from './SearchDropdown';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
 import { getDockedBarTopMotionStyle, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { HEADER_SECONDARY_CATEGORIES_PILL_MAX_WIDTH_CLASS } from './header-secondary-bar.constants';
 import { CompareIcon } from './icons/CompareIcon';
 import { CartIcon } from './icons/CartIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
@@ -449,13 +450,13 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               <button
                 type="button"
                 onClick={onCategoriesButtonClick}
-                className="flex h-9 w-full min-w-[132px] max-w-[180px] items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-3 pr-2.5 text-left text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/90 active:opacity-90 xl:min-w-[156px] xl:max-w-[210px] xl:pl-4 xl:pr-3"
+                className={`inline-flex h-9 shrink-0 items-center justify-between gap-1.5 rounded-[70px] bg-[#2db2ff] pl-3.5 pr-2.5 text-left text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/90 active:opacity-90 xl:pl-4 xl:pr-3 ${HEADER_SECONDARY_CATEGORIES_PILL_MAX_WIDTH_CLASS}`}
                 aria-expanded={isCategoriesMenuOpen}
                 aria-haspopup="true"
               >
-                <span className="flex min-w-0 flex-1 items-center gap-2">
+                <span className="flex shrink-0 items-center gap-2">
                   <CategoriesMenuLinesIcon className="shrink-0 text-white" />
-                  <span className="truncate text-[13px] font-bold leading-7">{categoriesLabel}</span>
+                  <span className="whitespace-nowrap text-[13px] font-bold leading-7">{categoriesLabel}</span>
                 </span>
                 <span
                   className={`flex h-6 w-6 shrink-0 items-center justify-center text-white transition-transform duration-200 ease-out motion-reduce:transition-none ${
@@ -477,9 +478,10 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               {categoriesMenu}
             </div>
 
+            {/* lg–xl (e.g. iPad Pro): search max-width 300px (was 273px); xl+ unchanged */}
             <div
               ref={secondarySearchBoundaryRef}
-              className="relative min-w-0 max-w-[203px] flex-1 lg:max-w-[273px] xl:max-w-[312px] 2xl:max-w-[387px]"
+              className="relative min-w-0 max-w-[203px] flex-1 lg:max-w-[290px] xl:max-w-[312px] 2xl:max-w-[387px]"
             >
               <form onSubmit={onSearchSubmit} className="relative w-full">
                 <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">

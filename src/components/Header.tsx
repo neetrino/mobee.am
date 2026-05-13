@@ -1390,7 +1390,7 @@ export function Header() {
           </div>
         </div>
 
-        {/* Desktop — Figma spacing at 2xl; tighter gaps below xl so the bar fits at lg */}
+        {/* Desktop — Figma spacing at 2xl; nav link gaps scale lg → xl (iPad Pro uses lg gap-4). */}
         <div
           ref={desktopPrimaryWrapRef}
           className="hidden motion-reduce:transition-none lg:block"
@@ -1425,7 +1425,7 @@ export function Header() {
               />
             </Link>
             <nav
-              className="ml-[calc(1.5rem-10px)] flex min-w-0 items-center gap-2 lg:ml-[calc(1.75rem-10px)] lg:gap-2 xl:ml-[calc(2.75rem-24.5px)] xl:gap-5 2xl:gap-[60px]"
+              className="ml-[calc(1.5rem-10px)] flex min-w-0 items-center gap-2 lg:ml-[calc(1.75rem-10px)] lg:gap-4 xl:ml-[calc(2.75rem-24.5px)] xl:gap-5 2xl:gap-[60px]"
               aria-label="Primary"
             >
               <Link
