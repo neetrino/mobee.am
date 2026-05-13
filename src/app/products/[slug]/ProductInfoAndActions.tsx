@@ -2,7 +2,7 @@
 
 import type { MouseEvent } from 'react';
 import Link from 'next/link';
-import { FileText, Heart, Info, Store } from 'lucide-react';
+import { FileText, Heart, Store } from 'lucide-react';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
@@ -98,48 +98,41 @@ export function ProductInfoAndActions({
       <hr className="my-5 border-0 border-t border-gray-200" />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div
+          className="flex h-11 min-w-[8.5rem] select-none items-stretch overflow-hidden rounded-[15px] border border-gray-200 bg-white px-0.5"
+          role="group"
+          aria-label={t(language, 'product.quantity')}
+        >
           <button
             type="button"
             onClick={() => onQuantityAdjust(-1)}
             disabled={quantity <= 1}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-300 text-lg text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
-            aria-label={t(language, 'product.quantity')}
+            className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
+            aria-label={t(language, 'common.ariaLabels.decreaseQuantity')}
           >
             −
           </button>
-          <span className="min-w-[1.5rem] text-center text-base font-medium tabular-nums">{quantity}</span>
+          <span className="flex min-w-[2rem] items-center justify-center px-2 text-base font-bold tabular-nums leading-none text-gray-900">
+            {quantity}
+          </span>
           <button
             type="button"
             onClick={() => onQuantityAdjust(1)}
-            disabled={quantity >= maxQuantity}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-300 text-lg text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
-            aria-label={t(language, 'product.quantity')}
+            disabled={quantity >= maxQuantity || maxQuantity <= 0}
+            className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
+            aria-label={t(language, 'common.ariaLabels.increaseQuantity')}
           >
             +
           </button>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-2 text-right">
-          <button
-            type="button"
-            className="rounded-full p-1 text-gray-500 outline-none ring-offset-2 hover:text-gray-700 focus-visible:ring-2 focus-visible:ring-admin"
-            title={t(language, 'product.priceInfoTitle')}
-            aria-label={t(language, 'product.priceInfoAria')}
-          >
-            <Info className="h-5 w-5" strokeWidth={2} />
-          </button>
-          <div>
-            <p className="text-sm text-gray-600">{t(language, 'product.pricePrefix')}</p>
-            <div className="flex flex-wrap items-baseline justify-end gap-2">
-              <span className="text-xl font-bold text-gray-900 sm:text-2xl">
-                {formatPrice(price, currency as CurrencyCode)}
-              </span>
-              {discountPercent != null && discountPercent > 0 && (
-                <span className="text-sm font-semibold text-admin">-{discountPercent}%</span>
-              )}
-            </div>
-          </div>
+        <div className="flex flex-wrap items-baseline justify-end gap-2 text-right">
+          <span className="text-xl font-bold text-gray-900 sm:text-2xl">
+            {formatPrice(price, currency as CurrencyCode)}
+          </span>
+          {discountPercent != null && discountPercent > 0 && (
+            <span className="text-sm font-semibold text-admin">-{discountPercent}%</span>
+          )}
         </div>
       </div>
 
@@ -220,18 +213,22 @@ export function ProductInfoAndActions({
         <button
           type="button"
           onClick={onCompareToggle}
-          className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 transition-all duration-200 ${
-            isInCompare ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+          className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 bg-white transition-colors duration-200 ${
+            isInCompare
+              ? 'border-admin text-admin'
+              : 'border-gray-200 text-gray-600 hover:border-gray-300'
           }`}
           aria-label={t(language, 'common.navigation.compare')}
         >
-          <CompareIcon isActive={isInCompare} />
+          <CompareIcon size={20} strokeWidth={1.75} className="shrink-0" />
         </button>
         <button
           type="button"
           onClick={onAddToWishlist}
-          className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 ${
-            isInWishlist ? 'border-gray-900 bg-gray-50' : 'border-gray-200'
+          className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 bg-white transition-colors duration-200 ${
+            isInWishlist
+              ? 'border-admin text-admin'
+              : 'border-gray-200 text-gray-600 hover:border-gray-300'
           }`}
           aria-label={t(language, 'common.buttons.addToWishlist')}
         >

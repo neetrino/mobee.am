@@ -37,13 +37,13 @@ export const COMPARE_EMPTY_STATE_IMAGE_SRC =
 export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_WIDTH_PX = 947;
 export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX = 836;
 
-/** Responsive `sizes` for empty-state image to avoid blurry rendering */
+/** Responsive `sizes` for empty-state image; max column matches `COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS` cap */
 export const COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR =
-  '(max-width: 640px) 90vw, 448px';
+  '(max-width: 640px) 85vw, 320px';
 
-/** Display width cap `28rem` (448px); matches wishlist empty-state visual weight */
+/** Display width cap `20rem` (~320px); lighter than former 28rem wishlist parity */
 export const COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS =
-  'mx-auto h-auto w-[min(90vw,28rem)] max-w-full';
+  'mx-auto h-auto w-[min(90vw,20rem)] max-w-full';
 
 /**
  * Empty compare panel — same vertical rhythm as wishlist (`empty-wishlist.tsx`): top-weighted, not pinned to viewport bottom.

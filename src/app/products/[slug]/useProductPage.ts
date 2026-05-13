@@ -97,8 +97,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     isInWishlist,
     setIsInWishlist,
     setIsInCompare,
-    setShowMessage,
-    language,
   });
 
   useEffect(() => {
