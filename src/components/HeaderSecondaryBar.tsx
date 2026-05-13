@@ -543,16 +543,14 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   </span>
                 ) : null}
               </Link>
-              {isLoggedIn ? (
-                <Link href="/wishlist" className={`${iconLinkClass} relative`} aria-label={wishlistAria}>
-                  <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
-                  {wishlistCount > 0 ? (
-                    <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
-                      {wishlistCount > 99 ? '99+' : wishlistCount}
-                    </span>
-                  ) : null}
-                </Link>
-              ) : null}
+              <Link href="/wishlist" className={`${iconLinkClass} relative`} aria-label={wishlistAria}>
+                <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
+                {wishlistCount > 0 ? (
+                  <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
+                    {wishlistCount > 99 ? '99+' : wishlistCount}
+                  </span>
+                ) : null}
+              </Link>
               <Link
                 href="/cart"
                 className={`${iconLinkClass} relative`}

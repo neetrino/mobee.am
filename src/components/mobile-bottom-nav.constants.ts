@@ -13,6 +13,11 @@ export const MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS = 'h-[34.2px]' as const;
 /** Thin outline stroke for bottom-tab Lucide icons, bag, and CartIcon (h-6 w-6 tiles). */
 export const MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH = 1.5;
 
+/** Compare tab glyph; slightly smaller when route is `/compare`. */
+export const MOBILE_BOTTOM_NAV_COMPARE_ICON_SIZE_PX = 22;
+
+export const MOBILE_BOTTOM_NAV_COMPARE_ICON_ON_COMPARE_PAGE_SIZE_PX = 20;
+
 /**
  * Main column bottom padding so content clears fixed `MobileBottomNav`
  * (20.52 + 34.2 + 20.52 px content stack) including iOS safe area.
