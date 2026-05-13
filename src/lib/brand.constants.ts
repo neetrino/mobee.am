@@ -1,3 +1,6 @@
+/** Brand name shown in browser tab titles, OG/Twitter metadata, and any user-facing site name slot. Single source of truth. */
+export const SITE_BRAND_NAME = 'Mobee';
+
 /** Wide MOBEE wordmark PNG (cyan on black) — header, auth, admin chrome, 404. Not used in the storefront footer. */
 export const SITE_WORDMARK_PATH = '/images/brand/mobee-wordmark.png';
 

@@ -5,13 +5,16 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
 import { SiteChrome } from '../components/SiteChrome';
-import { SITE_APP_ICON_PATH } from '../lib/brand.constants';
+import { SITE_APP_ICON_PATH, SITE_BRAND_NAME } from '../lib/brand.constants';
 import { readLanguageFromCookies } from '../lib/language';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Shop - Professional E-commerce',
+  title: {
+    default: SITE_BRAND_NAME,
+    template: `%s | ${SITE_BRAND_NAME}`,
+  },
   description: 'Modern e-commerce platform',
   icons: {
     icon: SITE_APP_ICON_PATH,
