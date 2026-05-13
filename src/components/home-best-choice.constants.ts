@@ -55,11 +55,11 @@ export const HOME_SPECIAL_OFFERS_DESKTOP_PAGE_COLS = 4;
 export const CART_LINE_ITEMS_GRID_CLASS =
   'grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 md:gap-6 lg:grid-cols-3 lg:gap-6';
 
-/** Wishlist desktop: five columns so each card is a bit narrower than home’s four-up row. */
-export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_WISHLIST = 'lg:grid-cols-5';
+/** Wishlist desktop: four columns from `lg` (incl. iPad Pro); wider cards than the old five-up row. */
+export const HOME_BEST_CHOICE_DESKTOP_GRID_COLS_WISHLIST = 'lg:grid-cols-4';
 
 /**
- * Wishlist page: same track/gaps as home; `lg` uses five columns for slightly narrower cards.
+ * Wishlist page: same track/gaps as home; `lg+` uses four columns per row.
  */
 export const WISHLIST_LINE_ITEMS_GRID_CLASS = `grid ${HOME_BEST_CHOICE_DESKTOP_GRID_TRACK} ${HOME_BEST_CHOICE_DESKTOP_GRID_COLS_WISHLIST}`;
 
