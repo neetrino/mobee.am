@@ -32,6 +32,9 @@ export interface ShopCatalogProduct {
     position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
     color: string | null;
   }>;
+  primaryCategoryId?: string | null;
+  categoryIds?: string[];
+  categories?: Array<{ id: string; slug?: string; title?: string }>;
 }
 
 interface ProductsResponse {

@@ -9,13 +9,15 @@ import { ProductLabels } from '../ProductLabels';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
+import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
 
 interface ProductCardGridProps {
   product: {
     id: string;
     slug: string;
     title: string;
-    subtitle?: string | null;
+    primaryCategoryId?: string | null;
+    categories?: Array<{ id: string; slug?: string; title?: string }>;
     price: number;
     image: string | null;
     inStock: boolean;
@@ -71,6 +73,7 @@ export function ProductCardGrid({
   onAddToCart,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
+  const categoryLine = getProductCardCategoryLineLabel(product);
   const footerPriceClass = (() => {
     if (smallerFooterPrice) {
       return isCompact
@@ -167,7 +170,7 @@ export function ProductCardGrid({
         <ProductCardInfo
           slug={product.slug}
           title={product.title}
-          subtitle={product.subtitle}
+          categoryLine={categoryLine}
           brandName={product.brand?.name}
           price={product.price}
           discountPercent={product.discountPercent}
