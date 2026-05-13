@@ -32,9 +32,9 @@ export function TopCategories({ categories, currency }: TopCategoriesProps) {
           categories.map((category, index) => (
             <div
               key={category.categoryId}
-              className="flex items-center justify-between p-4 border border-gray-200 rounded-supersudo hover:border-admin-300 hover:shadow-md transition-all duration-200 bg-gray-50 hover:bg-white group"
+              className="flex flex-col gap-3 p-4 border border-gray-200 rounded-supersudo hover:border-admin-300 hover:shadow-md transition-all duration-200 bg-gray-50 hover:bg-white group xl:flex-row xl:items-center xl:justify-between xl:gap-0"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex min-w-0 items-center gap-4">
                 <div className={`w-10 h-10 rounded-supersudo flex items-center justify-center text-sm font-bold transition-colors ${
                   index === 0 ? 'bg-admin-500 text-white' :
                   index === 1 ? 'bg-gray-300 text-gray-700' :
@@ -61,7 +61,7 @@ export function TopCategories({ categories, currency }: TopCategoriesProps) {
                   </div>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="w-full shrink-0 text-right xl:w-auto">
                 <p className="text-base font-bold text-gray-900">
                   {formatCurrency(category.totalRevenue, currency)}
                 </p>

@@ -85,12 +85,12 @@ export function GlobalDiscountCard({
             </div>
           )}
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2 xl:flex-nowrap">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setGlobalDiscount(10)}
-              className="flex-1"
+              className="min-w-0 flex-1"
             >
               10%
             </Button>
@@ -98,7 +98,7 @@ export function GlobalDiscountCard({
               variant="outline"
               size="sm"
               onClick={() => setGlobalDiscount(20)}
-              className="flex-1"
+              className="min-w-0 flex-1"
             >
               20%
             </Button>
@@ -106,7 +106,7 @@ export function GlobalDiscountCard({
               variant="outline"
               size="sm"
               onClick={() => setGlobalDiscount(30)}
-              className="flex-1"
+              className="min-w-0 flex-1"
             >
               30%
             </Button>
@@ -114,7 +114,7 @@ export function GlobalDiscountCard({
               variant="outline"
               size="sm"
               onClick={() => setGlobalDiscount(50)}
-              className="flex-1"
+              className="min-w-0 flex-1"
             >
               50%
             </Button>
@@ -122,7 +122,7 @@ export function GlobalDiscountCard({
               variant="ghost"
               size="sm"
               onClick={() => setGlobalDiscount(0)}
-              className="px-3"
+              className="flex shrink-0 justify-center px-3 lg:basis-full lg:justify-end xl:basis-auto xl:justify-center"
             >
               {t('admin.quickSettings.cancel')}
             </Button>
