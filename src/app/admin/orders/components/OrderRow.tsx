@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import { useMemo } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
 import {
@@ -8,6 +9,7 @@ import {
   getStatusColor,
 } from '../utils/orderUtils';
 import type { Order } from '../useOrders';
+import { OrderRowSelectDropdown } from './OrderRowSelectDropdown';
 
 interface OrderRowProps {
   order: Order;
@@ -37,6 +39,38 @@ export function OrderRow({
   formatCurrency,
 }: OrderRowProps) {
   const { t } = useTranslation();
+
+  const statusOptions = useMemo(
+    () =>
+      [
+        { value: 'pending', label: t('admin.orders.pending') },
+        { value: 'processing', label: t('admin.orders.processing') },
+        { value: 'completed', label: t('admin.orders.completed') },
+        { value: 'cancelled', label: t('admin.orders.cancelled') },
+      ] as const,
+    [t],
+  );
+
+  const paymentOptions = useMemo(
+    () =>
+      [
+        { value: 'paid', label: t('admin.orders.paid') },
+        { value: 'pending', label: t('admin.orders.pendingPayment') },
+        { value: 'failed', label: t('admin.orders.failed') },
+      ] as const,
+    [t],
+  );
+
+  const fulfillmentOptions = useMemo(
+    () =>
+      [
+        { value: 'unfulfilled', label: t('admin.orders.unfulfilled') },
+        { value: 'fulfilled', label: t('admin.orders.fulfilled') },
+        { value: 'shipped', label: t('admin.orders.shipped') },
+        { value: 'delivered', label: t('admin.orders.delivered') },
+      ] as const,
+    [t],
+  );
 
   const calculateTotalWithoutShipping = () => {
     if (order.subtotal !== undefined && order.discountAmount !== undefined && order.taxAmount !== undefined) {
@@ -85,67 +119,62 @@ export function OrderRow({
         {calculateTotalWithoutShipping()}
       </td>
       <td className="px-2 py-3 align-top text-sm text-gray-500 sm:px-3">
-        {order.itemsCount}
+        <span className="inline-block translate-x-[35px]">{order.itemsCount}</span>
       </td>
       <td className="px-2 py-3 align-top sm:px-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2 translate-x-[19px]">
           {updatingStatus ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
               <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
             </div>
           ) : (
-            <select
+            <OrderRowSelectDropdown
+              id={`order-${order.id}-status`}
               value={order.status}
-              onChange={(e) => onStatusChange(e.target.value)}
-              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-supersudo border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getStatusColor(order.status)}`}
-            >
-              <option value="pending">{t('admin.orders.pending')}</option>
-              <option value="processing">{t('admin.orders.processing')}</option>
-              <option value="completed">{t('admin.orders.completed')}</option>
-              <option value="cancelled">{t('admin.orders.cancelled')}</option>
-            </select>
+              options={statusOptions}
+              onValueChange={onStatusChange}
+              triggerTintClassName={getStatusColor(order.status)}
+              ariaLabel={t('admin.orders.orderRowChangeStatusAria')}
+            />
           )}
         </div>
       </td>
       <td className="px-2 py-3 align-top sm:px-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2 translate-x-[15px]">
           {updatingPaymentStatus ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
               <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
             </div>
           ) : (
-            <select
+            <OrderRowSelectDropdown
+              id={`order-${order.id}-payment`}
               value={order.paymentStatus}
-              onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-supersudo border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
-            >
-              <option value="paid">{t('admin.orders.paid')}</option>
-              <option value="pending">{t('admin.orders.pendingPayment')}</option>
-              <option value="failed">{t('admin.orders.failed')}</option>
-            </select>
+              options={paymentOptions}
+              onValueChange={onPaymentStatusChange}
+              triggerTintClassName={getPaymentStatusColor(order.paymentStatus)}
+              ariaLabel={t('admin.orders.orderRowChangePaymentAria')}
+            />
           )}
         </div>
       </td>
       <td className="px-2 py-3 align-top sm:px-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
           {updatingFulfillmentStatus ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
               <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
             </div>
           ) : (
-            <select
+            <OrderRowSelectDropdown
+              id={`order-${order.id}-fulfillment`}
               value={order.fulfillmentStatus}
-              onChange={(e) => onFulfillmentStatusChange(e.target.value)}
-              className={`w-full min-w-0 px-2 py-1 text-xs font-medium rounded-supersudo border-0 focus:outline-none focus:ring-2 focus:ring-admin cursor-pointer ${getFulfillmentStatusColor(order.fulfillmentStatus)}`}
-            >
-              <option value="unfulfilled">{t('admin.orders.unfulfilled')}</option>
-              <option value="fulfilled">{t('admin.orders.fulfilled')}</option>
-              <option value="shipped">{t('admin.orders.shipped')}</option>
-              <option value="delivered">{t('admin.orders.delivered')}</option>
-            </select>
+              options={fulfillmentOptions}
+              onValueChange={onFulfillmentStatusChange}
+              triggerTintClassName={getFulfillmentStatusColor(order.fulfillmentStatus)}
+              ariaLabel={t('admin.orders.orderRowChangeFulfillmentAria')}
+            />
           )}
         </div>
       </td>
