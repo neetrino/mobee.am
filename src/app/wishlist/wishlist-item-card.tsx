@@ -150,7 +150,7 @@ export function WishlistItemCard({
             type="button"
             onClick={() => onAddToCart(product)}
             disabled={!product.inStock}
-            className="w-full !rounded-full !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full !cursor-pointer !rounded-full !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500 disabled:!cursor-default disabled:opacity-50"
             size="md"
           >
             {t('common.buttons.addToCart')}

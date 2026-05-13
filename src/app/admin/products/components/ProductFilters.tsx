@@ -1,10 +1,11 @@
 ﻿'use client';
 
 import type { FormEvent } from 'react';
+import { useMemo } from 'react';
 import { Button } from '@/app/admin/lib/adminShopUi';
-import { ADMIN_PRODUCTS_STOCK_FILTER_SELECT_CLASS } from '../product-filters.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category } from '../types';
+import { ProductStockFilterDropdown } from './ProductStockFilterDropdown';
 
 interface ProductFiltersProps {
   search: string;
@@ -56,6 +57,16 @@ export function ProductFilters({
   setPage,
 }: ProductFiltersProps) {
   const { t } = useTranslation();
+
+  const stockFilterOptions = useMemo(
+    () =>
+      [
+        { value: 'all' as const, label: t('admin.products.allProducts') },
+        { value: 'inStock' as const, label: t('admin.products.inStock') },
+        { value: 'outOfStock' as const, label: t('admin.products.outOfStock') },
+      ] as const,
+    [t],
+  );
 
   return (
     <div className="space-y-4 mb-6">
@@ -170,21 +181,19 @@ export function ProductFilters({
         
         {/* Stock Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5" htmlFor="product-stock-filter-trigger">
             {t('admin.products.filterByStock')}
           </label>
-          <select
+          <ProductStockFilterDropdown
+            id="product-stock-filter"
             value={stockFilter}
-            onChange={(e) => {
-              setStockFilter(e.target.value as 'all' | 'inStock' | 'outOfStock');
+            options={stockFilterOptions}
+            onChange={(next) => {
+              setStockFilter(next);
               setPage(1);
             }}
-            className={ADMIN_PRODUCTS_STOCK_FILTER_SELECT_CLASS}
-          >
-            <option value="all">{t('admin.products.allProducts')}</option>
-            <option value="inStock">{t('admin.products.inStock')}</option>
-            <option value="outOfStock">{t('admin.products.outOfStock')}</option>
-          </select>
+            ariaLabel={t('admin.products.filterByStock')}
+          />
         </div>
       </div>
 

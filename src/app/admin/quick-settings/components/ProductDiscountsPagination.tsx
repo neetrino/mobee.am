@@ -27,11 +27,11 @@ function getPaginationPages(totalPages: number, current: number): (number | 'ell
 const PAGINATION_ACTIVE_CLASS =
   'inline-flex h-10 min-w-10 items-center justify-center rounded-[9999px] bg-[#2DB2FF] px-3 text-sm font-semibold text-white';
 const PAGINATION_PAGE_CLASS =
-  'inline-flex h-10 min-w-10 items-center justify-center rounded-[9999px] border border-transparent px-3 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9]';
+  'inline-flex h-10 min-w-10 cursor-pointer items-center justify-center rounded-[9999px] border border-transparent px-3 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9]';
 const PAGINATION_NAV_CLASS =
   'inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium transition-colors';
-const PAGINATION_NAV_ENABLED_CLASS = `${PAGINATION_NAV_CLASS} text-[#0F172B] hover:border-[#d8dbe1] hover:bg-[#f6f7f9]`;
-const PAGINATION_NAV_DISABLED_CLASS = `${PAGINATION_NAV_CLASS} cursor-not-allowed text-[#9AA4B2]`;
+const PAGINATION_NAV_ENABLED_CLASS = `${PAGINATION_NAV_CLASS} cursor-pointer text-[#0F172B] hover:border-[#d8dbe1] hover:bg-[#f6f7f9]`;
+const PAGINATION_NAV_DISABLED_CLASS = `${PAGINATION_NAV_CLASS} cursor-default text-[#9AA4B2]`;
 
 /**
  * Mobee shop-style pill pagination (matches public catalog / Figma mobee-new).

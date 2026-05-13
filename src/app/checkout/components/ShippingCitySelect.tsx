@@ -11,7 +11,7 @@ import { useDeliveryCities } from '../hooks/useDeliveryCities';
 import type { CheckoutFormData } from '../types';
 
 const SELECT_CLASS =
-  'w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed appearance-none bg-[length:1.25rem] bg-[right_0.75rem_center] bg-no-repeat pr-10';
+  'w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:cursor-default appearance-none bg-[length:1.25rem] bg-[right_0.75rem_center] bg-no-repeat pr-10';
 
 interface ShippingCitySelectProps {
   register: UseFormRegister<CheckoutFormData>;

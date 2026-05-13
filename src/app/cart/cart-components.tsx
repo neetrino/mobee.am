@@ -55,7 +55,7 @@ export function CartItemRow({
         type="button"
         onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
         disabled={updatingItems.has(item.id)}
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-50"
         aria-label={t('common.ariaLabels.decreaseQuantity')}
       >
         <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,7 +79,7 @@ export function CartItemRow({
         type="button"
         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
         disabled={updatingItems.has(item.id) || (item.variant.stock !== undefined && item.quantity >= item.variant.stock)}
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-50"
         aria-label={t('common.ariaLabels.increaseQuantity')}
         title={item.variant.stock !== undefined && item.quantity >= item.variant.stock ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : t('common.messages.addQuantity')}
       >

@@ -226,8 +226,8 @@ export function ProductCardGrid({
             disabled={!product.inStock || isAddingToCart}
             className={`inline-flex shrink-0 items-center justify-center bg-[#2db2ff] font-medium text-white transition-opacity ${
               product.inStock && !isAddingToCart
-                ? 'hover:opacity-90'
-                : 'cursor-not-allowed opacity-50'
+                ? 'cursor-pointer hover:opacity-90'
+                : 'cursor-default opacity-50'
             } ${
               homeProductGridCard
                 ? 'max-lg:size-9 max-lg:min-w-0 max-lg:rounded-full max-lg:p-0 max-lg:gap-0'

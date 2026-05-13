@@ -103,7 +103,7 @@ export function ProductInfoAndActions({
             type="button"
             onClick={() => onQuantityAdjust(-1)}
             disabled={quantity <= 1}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-lg text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-300 text-lg text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
             aria-label={t(language, 'product.quantity')}
           >
             −
@@ -113,7 +113,7 @@ export function ProductInfoAndActions({
             type="button"
             onClick={() => onQuantityAdjust(1)}
             disabled={quantity >= maxQuantity}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-lg text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-300 text-lg text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
             aria-label={t(language, 'product.quantity')}
           >
             +
@@ -206,7 +206,7 @@ export function ProductInfoAndActions({
         <button
           type="button"
           disabled={!canAddToCart}
-          className="h-12 min-w-[12rem] flex-1 rounded-xl bg-admin px-4 font-bold uppercase tracking-wide text-white transition-colors hover:bg-admin-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+          className="h-12 min-w-[12rem] flex-1 cursor-pointer rounded-xl bg-admin px-4 font-bold uppercase tracking-wide text-white transition-colors hover:bg-admin-600 disabled:cursor-default disabled:bg-gray-300"
           onClick={onAddToCart}
         >
           {isOutOfStock

@@ -129,7 +129,7 @@ export function ColorPaletteSelector({ colors, onColorsChange }: ColorPaletteSel
             type="button"
             onClick={handleAddColor}
             disabled={activeHexSet.has(normalizeHexToSixDigits(customColor).toLowerCase())}
-            className="rounded-lg bg-gray-900 px-4 py-2 text-sm text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="cursor-pointer rounded-lg bg-gray-900 px-4 py-2 text-sm text-white transition-colors hover:bg-gray-800 disabled:cursor-default disabled:opacity-50"
           >
             {t('admin.attributes.valueModal.add')}
           </button>

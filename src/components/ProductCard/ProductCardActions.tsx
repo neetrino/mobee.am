@@ -142,8 +142,8 @@ export function ProductCardActions({
         disabled={!inStock || isAddingToCart}
         className={`${buttonSize} rounded-full flex items-center justify-center transition-all duration-200 ${
           inStock && !isAddingToCart
-            ? 'bg-transparent text-gray-600 hover:bg-green-600 hover:text-white hover:shadow-md'
-            : 'bg-transparent text-gray-400 cursor-not-allowed'
+            ? 'cursor-pointer bg-transparent text-gray-600 hover:bg-green-600 hover:text-white hover:shadow-md'
+            : 'cursor-default bg-transparent text-gray-400'
         }`}
         title={inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
         aria-label={inStock ? t('common.ariaLabels.addToCart') : t('common.ariaLabels.outOfStock')}

@@ -16,7 +16,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ): ReactElement {
     const radiusClass = adminChrome ? 'rounded-supersudo' : 'rounded-md';
-    const baseStyles = `font-medium ${radiusClass} transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed`;
+    const baseStyles = `font-medium ${radiusClass} cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-default`;
 
     const variantStyles = {
       primary: 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-900',
