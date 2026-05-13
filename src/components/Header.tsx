@@ -1592,7 +1592,7 @@ export function Header() {
                   <Link
                     href="/compare"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700`}
+                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700 md:hidden`}
                   >
                     <span className="flex min-w-0 flex-1 items-center gap-2 normal-case font-medium text-gray-700">
                       <CompareIcon size={18} className="shrink-0" />

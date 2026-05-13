@@ -15,6 +15,9 @@ export const LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY = `(min-width: ${LAYOUT_DESKTO
 /** Tailwind `theme.screens.md` — must match `tailwind.config.ts`. */
 export const TAILWIND_MD_MIN_WIDTH_PX = 768;
 
+/** For `window.matchMedia` — keep in sync with Tailwind `md`. */
+export const TAILWIND_MD_MIN_WIDTH_MEDIA_QUERY = `(min-width: ${TAILWIND_MD_MIN_WIDTH_PX}px)`;
+
 /**
  * Tailwind `xl` — wide desktop: legacy shop (list/grid toggle, three-column grid).
  * Keep in sync with `theme.screens.xl` in `tailwind.config.ts`.
