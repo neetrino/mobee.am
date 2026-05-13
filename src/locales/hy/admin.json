@@ -653,7 +653,7 @@
     "completed": "Ավարտված",
     "cancelled": "Չեղարկված",
     "paid": "Վճարված",
-    "pendingPayment": "սպասվում է",
+    "pendingPayment": "Սպասվում է վճարման",
     "failed": "Ձախողված",
     "unfulfilled": "Չմշակված",
     "fulfilled": "Մշակված",

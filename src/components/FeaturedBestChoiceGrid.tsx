@@ -4,6 +4,10 @@ import {
   HomeBestChoiceStyleProductGrid,
   HomeBestChoiceStyleProductGridSkeleton,
 } from './HomeBestChoiceStyleProductGrid';
+import {
+  HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT,
+  HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT,
+} from './home-best-choice.constants';
 import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSync';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import type { LanguageCode } from '../lib/language';
@@ -37,6 +41,8 @@ export function FeaturedBestChoiceGrid({
         mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
+        desktopPageRows={HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT}
+        desktopPageCols={HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT}
       />
     );
   }
@@ -62,6 +68,10 @@ export function FeaturedBestChoiceGrid({
         mobileCardsPerView={mobileCardsPerView}
         mobileCarouselAriaLabel={t(language, 'home.featured_products.carouselAriaLabel')}
         onMobileCarouselViewChange={onMobileCarouselViewChange}
+        desktopPageRows={HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT}
+        desktopPageCols={HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT}
+        desktopPrevAriaLabel={t(language, 'home.featured_products.scrollPrevious')}
+        desktopNextAriaLabel={t(language, 'home.featured_products.scrollNext')}
       />
     );
   }
