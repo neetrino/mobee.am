@@ -8,7 +8,6 @@ import type { LanguageCode } from '../../../lib/language';
 import { CompareIcon } from '../../../components/icons/CompareIcon';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
 import type { AttributeGroupValue, Product, ProductVariant, VariantOption } from './types';
-import { formatProductVariantIdsForDisplay } from './productDisplayIds';
 
 interface ProductInfoAndActionsProps {
   product: Product;
@@ -80,19 +79,19 @@ export function ProductInfoAndActions({
   getRequiredAttributesMessage,
 }: ProductInfoAndActionsProps) {
   const title = getProductText(language, product.id, 'title') || product.title;
-  const listingIds = formatProductVariantIdsForDisplay(product);
 
   return (
     <div className="flex flex-col">
       {product.brand && <p className="mb-1 text-sm text-gray-500">{product.brand.name}</p>}
       <h1 className="text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">{title}</h1>
 
-      <div className="mt-3">
-        <p className="text-sm text-gray-600">
-          ID: {listingIds}
-          {currentVariant?.sku ? ` · SKU: ${currentVariant.sku}` : ''}
-        </p>
-      </div>
+      {currentVariant?.sku && (
+        <div className="mt-3">
+          <p className="text-sm text-gray-600">
+            SKU: {currentVariant.sku}
+          </p>
+        </div>
+      )}
 
       <hr className="my-5 border-0 border-t border-gray-200" />
 
