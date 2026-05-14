@@ -83,9 +83,9 @@ const FOOTER_POLICIES_NAV_ROW_CLASS =
 const FOOTER_POLICIES_NAV_GRID_RU_CLASS =
   'grid grid-cols-2 gap-x-8 gap-y-3 lg:ml-auto lg:justify-items-start';
 
-/** HY: same 2×2 grid; block and cell content right-aligned. */
+/** HY: same 2x2 grid; policy labels in each column share the same start edge. */
 const FOOTER_POLICIES_NAV_GRID_HY_CLASS =
-  'grid grid-cols-2 gap-x-8 gap-y-3 ml-auto justify-items-end';
+  'grid grid-cols-2 gap-x-[17px] gap-y-3 ml-auto justify-items-start';
 
 const FOOTER_REFUND_POLICY_HREF = '/refund-policy';
 
@@ -312,7 +312,7 @@ function FooterCopyrightPoliciesRow() {
       >
         {policyLinks.map((link) => {
           const gridPolicyLinkClass =
-            lang === 'ru' ? ' !whitespace-normal text-left' : lang === 'hy' ? ' !whitespace-normal text-right' : '';
+            lang === 'ru' || lang === 'hy' ? ' !whitespace-normal text-left' : '';
           return (
             <Link
               key={link.href}
