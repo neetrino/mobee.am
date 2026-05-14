@@ -71,7 +71,6 @@ const MOBILE_HOME_SEARCH_SUBMIT_CLASS =
 
 // Navigation links will be translated dynamically using useTranslation hook
 const primaryNavLinks = [
-  { href: '/', translationKey: 'common.navigation.home' },
   { href: '/about', translationKey: 'common.navigation.about' },
   { href: '/contact', translationKey: 'common.navigation.contact' },
 ];
@@ -477,6 +476,9 @@ function HeaderPhoneLangCluster({
             width={24}
             height={24}
             className="absolute inset-0 block size-6 max-w-none"
+            decoding="async"
+            loading="eager"
+            fetchPriority="high"
           />
         </span>
         <span
@@ -516,6 +518,9 @@ function MobileDrawerSupportPhoneButtons() {
                 width={24}
                 height={24}
                 className="absolute inset-0 block size-6 max-w-none"
+                decoding="async"
+                loading="eager"
+                fetchPriority="high"
               />
             </span>
             <span
@@ -546,7 +551,6 @@ export function Header() {
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
   const { categories, loadingCategories } = useCategoriesTree();
   const [, setSelectedCategory] = useState<Category | null>(null);
-  const currentYear = new Date().getFullYear();
 
   const isNavActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -1615,10 +1619,6 @@ export function Header() {
                   </Link>
 
                   <MobileDrawerSupportPhoneButtons />
-                </div>
-
-                <div className="border-t border-gray-100 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
-                  {t('common.footer.copyright').replace('{year}', String(currentYear))}
                 </div>
               </nav>
             </div>

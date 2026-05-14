@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { Button, Input } from '@shop/ui';
 import { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
@@ -20,6 +19,8 @@ const CONTACT_FORM_LABEL_CLASS = 'sr-only';
 
 /** Contact info row icons — slightly smaller than heading line height for balance. */
 const CONTACT_INFO_ICON_PX = 40;
+
+const CONTACT_INFO_ICON_IMG_CLASS = 'h-full w-full object-cover';
 
 export default function ContactPage() {
   const { t } = useTranslation();
@@ -81,13 +82,15 @@ export default function ContactPage() {
             <div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
-                  <Image
+                  <img
                     src={CONTACT_ICON_PHONE_SRC}
                     alt=""
                     width={CONTACT_INFO_ICON_PX}
                     height={CONTACT_INFO_ICON_PX}
-                    className="h-full w-full object-cover"
-                    sizes={`${CONTACT_INFO_ICON_PX}px`}
+                    className={CONTACT_INFO_ICON_IMG_CLASS}
+                    decoding="async"
+                    loading="eager"
+                    fetchPriority="high"
                   />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.callToUs.title')}</h3>
@@ -110,13 +113,14 @@ export default function ContactPage() {
             <div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
-                  <Image
+                  <img
                     src={CONTACT_ICON_EMAIL_SRC}
                     alt=""
                     width={CONTACT_INFO_ICON_PX}
                     height={CONTACT_INFO_ICON_PX}
-                    className="h-full w-full object-cover"
-                    sizes={`${CONTACT_INFO_ICON_PX}px`}
+                    className={CONTACT_INFO_ICON_IMG_CLASS}
+                    decoding="async"
+                    loading="eager"
                   />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.writeToUs.title')}</h3>
@@ -137,24 +141,20 @@ export default function ContactPage() {
             <div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
-                  <Image
+                  <img
                     src={CONTACT_ICON_LOCATION_SRC}
                     alt=""
                     width={CONTACT_INFO_ICON_PX}
                     height={CONTACT_INFO_ICON_PX}
-                    className="h-full w-full object-cover"
-                    sizes={`${CONTACT_INFO_ICON_PX}px`}
+                    className={CONTACT_INFO_ICON_IMG_CLASS}
+                    decoding="async"
+                    loading="eager"
                   />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.headquarter.title')}</h3>
               </div>
-              <div className="text-gray-600 mb-2 space-y-1">
-                <p>{t('contact.headquarter.hours.weekdays')}</p>
-                <p>{t('contact.headquarter.hours.saturday')}</p>
-              </div>
-              <p className="font-medium text-[#2DB2FF]">
-                {t('contact.address')}
-              </p>
+              <p className="mb-2 text-gray-600">{t('contact.headquarter.hours.schedule')}</p>
+              <p className="font-bold text-[#2DB2FF]">{t('contact.address')}</p>
             </div>
           </div>
 
