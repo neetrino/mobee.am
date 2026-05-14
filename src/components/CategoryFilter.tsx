@@ -26,6 +26,8 @@ interface CategoriesResponse {
   data: CategoryOption[];
 }
 
+const SHOP_CATEGORY_FILTER_LIMIT = '100';
+
 export function CategoryFilter({
   selectedCategories = [],
   search,
@@ -58,7 +60,7 @@ export function CategoryFilter({
       try {
         const lang = getStoredLanguage();
         const response = await apiClient.get<CategoriesResponse>('/api/v1/categories/top', {
-          params: { lang, limit: '6' },
+          params: { lang, limit: SHOP_CATEGORY_FILTER_LIMIT },
         });
         if (!cancelled) {
           setCategories(response.data ?? []);

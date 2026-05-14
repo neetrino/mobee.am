@@ -70,6 +70,7 @@ const DEFAULT_FILTERS: ProductsFiltersData = {
   brands: [],
   priceRange: { min: 0, max: 100000, stepSize: null, stepSizePerCurrency: null },
 };
+const SHOP_CATEGORY_FILTER_LIMIT = '100';
 
 interface ProductsFiltersProviderProps {
   category?: string;
@@ -105,7 +106,7 @@ export function ProductsFiltersProvider({
       const [filtersRes, topRes] = await Promise.all([
         apiClient.get<ProductsFiltersData>('/api/v1/products/filters', { params }),
         apiClient.get<{ data: ShopTopCategoryOption[] }>('/api/v1/categories/top', {
-          params: { lang, limit: '6' },
+          params: { lang, limit: SHOP_CATEGORY_FILTER_LIMIT },
         }),
       ]);
 
