@@ -1,50 +1,65 @@
 {
-  "title": "Delivery Terms",
+  "title": "Delivery and Shipping Terms",
   "lastUpdated": "Last Updated:",
-  "overview": {
-    "title": "Overview",
-    "description": "These Delivery Terms explain how we process, ship and deliver your orders, including expected timelines, fees and responsibilities."
-  },
-  "shippingOptions": {
-    "title": "Shipping Options",
-    "description": "Available options are displayed at checkout and may include:",
-    "options": {
-      "standard": "Standard shipping with estimated timelines by region.",
-      "express": "Express shipping where supported.",
-      "pickup": "Store pickup or local courier (if available in your area)."
+  "intro": "We are committed to delivering your order quickly, safely, and conveniently. Below are the main delivery terms.",
+  "sections": {
+    "deliveryTimeframes": {
+      "title": "Delivery Timeframes",
+      "description": "Delivery timeframes depend on the type of order, delivery location, and selected delivery method.",
+      "typical": "Orders are usually delivered within 1-3 business days, depending on product availability and the delivery address.",
+      "delayNotice": "In case of possible delays, our team will contact you in advance and inform you about the new delivery timeframe."
+    },
+    "deliveryOptions": {
+      "title": "Delivery Options",
+      "description": "We offer the following delivery options:",
+      "items": {
+        "standard": "Standard delivery, carried out by us or through partner delivery services.",
+        "express": "Express delivery, available for an additional fee depending on the address and order type.",
+        "pickup": "Self-pickup, available if this option is applicable to your order."
+      }
+    },
+    "deliveryFees": {
+      "title": "Delivery Fees",
+      "description": "The delivery fee may depend on the order amount, delivery location, and selected delivery method.",
+      "items": {
+        "freeThreshold": "For purchases of 8000 AMD or more, delivery may be free of charge.",
+        "yerevanFee": "For purchases below 8000 AMD, delivery within Yerevan costs 1000 AMD.",
+        "regionalFee": "Delivery fees to regions are calculated separately depending on the delivery address and service terms."
+      },
+      "checkoutNotice": "The final delivery fee is displayed during the order checkout process."
+    },
+    "orderConfirmation": {
+      "title": "Order Confirmation",
+      "description": "After placing an order, our team may contact you to confirm the order details, delivery address, payment method, and product availability.",
+      "electronicsNotice": "For phones and electronic devices, some orders may require additional confirmation to avoid incorrect orders or inaccurate information."
+    },
+    "productInspection": {
+      "title": "Product Inspection Upon Delivery",
+      "description": "Please check the following when receiving the product:",
+      "items": {
+        "packaging": "packaging integrity,",
+        "appearance": "external appearance of the product,",
+        "model": "model, color, and memory capacity,",
+        "completeSet": "availability of the complete set,",
+        "serialNumber": "IMEI or serial number compliance with the documents, if applicable."
+      }
+    },
+    "possibleDelays": {
+      "title": "Possible Delays",
+      "description": "Despite our efforts, delivery may be delayed in some cases due to the following reasons:",
+      "items": {
+        "weather": "weather conditions,",
+        "transport": "transportation issues,",
+        "holidays": "holidays or high workload periods,",
+        "availability": "product availability or warehouse-related processes,",
+        "address": "incorrect delivery address or contact details."
+      }
+    },
+    "specialNote": {
+      "title": "Special Note",
+      "description": "Please make sure to correctly fill in your phone number, delivery address, and other required information when placing an order. Incorrect or incomplete information may extend the delivery timeframe.",
+      "returnNotice": "After receiving the product, the return or exchange process is regulated by the terms of our “Return and Exchange Policy” section."
     }
-  },
-  "processingTimes": {
-    "title": "Processing Times",
-    "items": {
-      "typical": "Orders are typically processed within 1–2 business days after payment confirmation.",
-      "weekends": "Orders placed on weekends or holidays are processed on the next business day.",
-      "preorder": "Pre-order items ship based on estimated availability shown at purchase."
-    }
-  },
-  "deliveryTimeframes": {
-    "title": "Delivery Timeframes",
-    "description": "Estimated delivery times vary by destination and selected method. Tracking details are provided when the order ships. Actual delivery times may vary due to carrier capacity or local customs procedures."
-  },
-  "shippingFees": {
-    "title": "Shipping Fees and Duties",
-    "items": {
-      "costs": "Shipping costs are calculated at checkout based on destination and service level.",
-      "duties": "Import duties, taxes or brokerage fees may apply for international shipments and are the recipient's responsibility.",
-      "promotional": "Promotional free shipping offers apply only as stated in the promotion."
-    }
-  },
-  "delaysDamageLoss": {
-    "title": "Delays, Damage or Loss",
-    "items": {
-      "delays": "We are not responsible for delays caused by carriers, weather conditions or customs inspections.",
-      "damage": "Please inspect packages upon delivery and report visible damage to the carrier and our support team within 48 hours.",
-      "loss": "If a shipment is lost, contact us with your order number; we will coordinate with the carrier to resolve the issue."
-    }
-  },
-  "contact": {
-    "title": "Contact Us",
-    "description": "For shipping questions or special handling requests, contact us at"
   }
 }
 
