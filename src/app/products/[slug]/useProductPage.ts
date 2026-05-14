@@ -2,7 +2,8 @@
 
 import { useState, useEffect, use } from 'react';
 import { getStoredCurrency } from '../../../lib/currency';
-import { getStoredLanguage, type LanguageCode } from '../../../lib/language';
+import { type LanguageCode } from '../../../lib/language';
+import { useUiLanguage } from '../../../components/UiLanguageProvider';
 import { t } from '../../../lib/i18n';
 import { useAttributeGroups } from './useAttributeGroups';
 import { useProductImages } from './hooks/useProductImages';
@@ -17,7 +18,7 @@ import { resolveCompareCategoryId } from '../../../lib/shop/compare-storage';
 export function useProductPage(params: Promise<{ slug?: string }>) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
+  const language: LanguageCode = useUiLanguage();
   const [showMessage, setShowMessage] = useState<string | null>(null);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
 
@@ -98,10 +99,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     setIsInWishlist,
     setIsInCompare,
   });
-
-  useEffect(() => {
-    setLanguage(getStoredLanguage());
-  }, []);
 
   useEffect(() => {
     const handleCurrencyUpdate = () => setCurrency(getStoredCurrency());

@@ -19,10 +19,10 @@ import { useHomeDesktopCarouselHomeStyle } from './useHomeDesktopCarouselHomeSty
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
 /** Horizontal snap carousel below `lg`. */
-const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
+export const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
   'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
 
-const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
+export const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
 
 /** Horizontal snap carousel for `lg+` (desktop). Each page is one container width. */
 const HOME_BEST_CHOICE_DESKTOP_CAROUSEL =
@@ -30,7 +30,7 @@ const HOME_BEST_CHOICE_DESKTOP_CAROUSEL =
 
 const HOME_BEST_CHOICE_DESKTOP_PAGE = 'w-full min-w-full shrink-0 snap-start';
 
-function homeBestChoiceMobileInnerGridClass(cardsPerView: number): string {
+export function homeBestChoiceMobileInnerGridClass(cardsPerView: number): string {
   return cardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET
     ? 'grid grid-cols-3 gap-5'
     : 'grid grid-cols-2 gap-4';

@@ -41,7 +41,8 @@ interface RelatedProductCardProps {
   onAddToCart: (e: MouseEvent, product: RelatedProduct) => void;
   onImageError: (productId: string) => void;
   imageError: boolean;
-  width: string;
+  /** Carousel strip: percentage width. Omit for 2-column grid (fills cell). */
+  width?: string;
 }
 
 function stopCarouselCapture(
@@ -64,6 +65,7 @@ export function RelatedProductCard({
   imageError,
   width,
 }: RelatedProductCardProps) {
+  const isCarouselCell = typeof width === 'string' && width.length > 0;
   const hasImage = !imageError;
   const imageSrc = resolveProductCardImageSrc(product.image);
   const categoryName =
@@ -78,8 +80,12 @@ export function RelatedProductCard({
     }
   };
 
+  const cardShellClass = isCarouselCell
+    ? 'h-full flex-shrink-0 px-3'
+    : 'h-full min-w-0 w-full';
+
   return (
-    <div className="flex-shrink-0 px-3 h-full" style={{ width }}>
+    <div className={cardShellClass} style={isCarouselCell ? { width } : undefined}>
       <div
         className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
         data-related-product-card
@@ -99,7 +105,11 @@ export function RelatedProductCard({
                 alt={product.title}
                 fill
                 className="object-contain transition-transform duration-300 group-hover:scale-105"
-                sizes={`(max-width: 640px) 100vw, (max-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) 50vw, 25vw`}
+                sizes={
+                  isCarouselCell
+                    ? `(max-width: 640px) 100vw, (max-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) 50vw, 25vw`
+                    : `(max-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX - 1}px) 48vw, 22vw`
+                }
                 onError={() => onImageError(product.id)}
               />
             ) : (

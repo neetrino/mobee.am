@@ -7,6 +7,7 @@ import { CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX } from './src/app/checkout/constan
 import { LAYOUT_TABLET_IPAD_AIR_LIKE_HTML_CLASS } from './src/lib/tablet-ipad-air-like-layout.constants';
 import {
   LAYOUT_DESKTOP_MIN_WIDTH_PX,
+  PRODUCT_PDP_TWO_COLUMN_MIN_WIDTH_PX,
   SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX,
   WISHLIST_GRID_FIVE_COLUMNS_MIN_WIDTH_PX,
 } from './src/lib/layout-breakpoints.constants';
@@ -23,6 +24,8 @@ const config: Config = {
       sm: '640px',
       md: '768px',
       lg: `${LAYOUT_DESKTOP_MIN_WIDTH_PX}px`,
+      /** PDP image column + info — only at true tablet/desktop width (see layout-breakpoints). */
+      'product-2col': `${PRODUCT_PDP_TWO_COLUMN_MIN_WIDTH_PX}px`,
       xl: `${SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX}px`,
       '2xl': '1536px',
       /** Wishlist 5-column row — above iPad Pro 12.9″ landscape; sync with layout-breakpoints. */
