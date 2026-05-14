@@ -3,8 +3,6 @@
 import type { MouseEvent } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { WISHLIST_KEY } from '../types';
-import { t } from '../../../../lib/i18n';
-import type { LanguageCode } from '../../../../lib/language';
 import { toggleCompareProduct } from '../../../../lib/shop/compare-storage';
 import { useAuth } from '../../../../lib/auth/AuthContext';
 import { getLoginUrlWithRedirect } from '../../../../lib/auth/loginRedirectUrl';
@@ -16,8 +14,6 @@ interface UseProductActionsProps {
   isInWishlist: boolean;
   setIsInWishlist: (value: boolean) => void;
   setIsInCompare: (value: boolean) => void;
-  setShowMessage: (message: string | null) => void;
-  language: LanguageCode;
 }
 
 export function useProductActions({
@@ -26,8 +22,6 @@ export function useProductActions({
   isInWishlist,
   setIsInWishlist,
   setIsInCompare,
-  setShowMessage,
-  language,
 }: UseProductActionsProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -54,15 +48,12 @@ export function useProductActions({
       if (isInWishlist) {
         localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist.filter(id => id !== productId)));
         setIsInWishlist(false);
-        setShowMessage(t(language, 'product.removedFromWishlist'));
       } else {
         wishlist.push(productId);
         localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
         setIsInWishlist(true);
-        setShowMessage(t(language, 'product.addedToWishlist'));
       }
-      
-      setTimeout(() => setShowMessage(null), 2000);
+
       window.dispatchEvent(new Event('wishlist-updated'));
     } catch {
       // Silently fail
@@ -77,16 +68,14 @@ export function useProductActions({
     try {
       const { outcome } = toggleCompareProduct(productId, compareCategoryId);
       if (outcome === 'group_full') {
-        setShowMessage(t(language, 'product.compareListFull'));
-      } else if (outcome === 'removed') {
+        return;
+      }
+      if (outcome === 'removed') {
         setIsInCompare(false);
-        setShowMessage(t(language, 'product.removedFromCompare'));
       } else {
         setIsInCompare(true);
-        setShowMessage(t(language, 'product.addedToCompare'));
       }
 
-      setTimeout(() => setShowMessage(null), 2000);
       window.dispatchEvent(new Event('compare-updated'));
     } catch {
       // Silently fail

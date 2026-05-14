@@ -41,3 +41,10 @@ export const SHOP_COMPACT_THREE_COLUMN_MEDIA_QUERY = `(min-width: ${TAILWIND_MD_
 export const HOME_DESKTOP_CAROUSEL_HOMESTYLE_MAX_WIDTH_PX = 1366;
 
 export const HOME_DESKTOP_CAROUSEL_HOMESTYLE_MEDIA_QUERY = `(min-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) and (max-width: ${HOME_DESKTOP_CAROUSEL_HOMESTYLE_MAX_WIDTH_PX}px)`;
+
+/**
+ * Wishlist product grid: five columns from this min-width (Tailwind `wishlist-five:`).
+ * One pixel above {@link HOME_DESKTOP_CAROUSEL_HOMESTYLE_MAX_WIDTH_PX} so iPad Pro 12.9″ landscape stays four-up.
+ */
+export const WISHLIST_GRID_FIVE_COLUMNS_MIN_WIDTH_PX =
+  HOME_DESKTOP_CAROUSEL_HOMESTYLE_MAX_WIDTH_PX + 1;

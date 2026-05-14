@@ -13,8 +13,11 @@ import { CompareIcon } from './icons/CompareIcon';
 import { MobileNavBagIcon } from './icons/MobileNavBagIcon';
 import { useMdUpViewport } from './hooks/useMdUpViewport';
 import { useMobileBottomNavCartCount } from './hooks/useMobileBottomNavCartCount';
+import { isCompareAppRoute } from '../lib/compareAppRoute';
 import {
   MOBILE_BOTTOM_NAV_BADGE_CLASS,
+  MOBILE_BOTTOM_NAV_COMPARE_ICON_ON_COMPARE_PAGE_SIZE_PX,
+  MOBILE_BOTTOM_NAV_COMPARE_ICON_SIZE_PX,
   MOBILE_BOTTOM_NAV_INNER_PB_CLASS,
   MOBILE_BOTTOM_NAV_INNER_PT_CLASS,
   MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS,
@@ -59,9 +62,10 @@ function pathIsActive(pathname: string, item: MobileNavDef): boolean {
 interface NavIconProps {
   item: MobileNavDef;
   active: boolean;
+  compareNavIconSizePx: number;
 }
 
-function MobileBottomNavIcon({ item, active }: NavIconProps) {
+function MobileBottomNavIcon({ item, active, compareNavIconSizePx }: NavIconProps) {
   const iconBox = active ? ACTIVE_ICON_BOX : INACTIVE_ICON_BOX[item.key];
   const iconColor = active ? ACTIVE_ICON_COLOR : INACTIVE_ICON_COLOR;
 
@@ -88,7 +92,7 @@ function MobileBottomNavIcon({ item, active }: NavIconProps) {
   if (item.key === 'compare') {
     return (
       <CompareIcon
-        size={24}
+        size={compareNavIconSizePx}
         strokeWidth={MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH}
         className={`shrink-0 ${iconBox} ${iconColor}`}
       />
@@ -116,6 +120,7 @@ interface MobileNavItemProps {
   wishlistCount: number;
   cartCount: number;
   compareCount: number;
+  compareNavIconSizePx: number;
 }
 
 function MobileNavItem({
@@ -125,6 +130,7 @@ function MobileNavItem({
   wishlistCount,
   cartCount,
   compareCount,
+  compareNavIconSizePx,
 }: MobileNavItemProps) {
   const showWishlistBadge = item.key === 'wishlist' && wishlistCount > 0;
   const showCartBadge = item.key === 'cart' && cartCount > 0;
@@ -141,7 +147,11 @@ function MobileNavItem({
 
   const iconWrap = (
     <div className="relative z-0 flex items-center justify-center overflow-visible">
-      <MobileBottomNavIcon item={item} active={active} />
+      <MobileBottomNavIcon
+        item={item}
+        active={active}
+        compareNavIconSizePx={compareNavIconSizePx}
+      />
       {showBadge ? (
         <span className={MOBILE_BOTTOM_NAV_BADGE_CLASS} aria-hidden>
           {badgeValue > 99 ? '99+' : badgeValue}
@@ -238,6 +248,10 @@ export function MobileBottomNav() {
     return base;
   }, [isMdUp]);
 
+  const compareNavIconSizePx = isCompareAppRoute(pathname)
+    ? MOBILE_BOTTOM_NAV_COMPARE_ICON_ON_COMPARE_PAGE_SIZE_PX
+    : MOBILE_BOTTOM_NAV_COMPARE_ICON_SIZE_PX;
+
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 overflow-visible bg-white drop-shadow-[0px_0px_20px_rgba(0,0,0,0.15)] lg:hidden">
       <div
@@ -252,6 +266,7 @@ export function MobileBottomNav() {
             wishlistCount={wishlistCount}
             cartCount={cartCount}
             compareCount={compareCount}
+            compareNavIconSizePx={compareNavIconSizePx}
           />
         ))}
       </div>
