@@ -1,4 +1,10 @@
 const AUTH_TOKEN_KEY = 'auth_token';
+const AUTH_USER_KEY = 'auth_user';
+const JWT_TOKEN_PATTERN = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+
+export function isValidStoredAuthToken(token: string): boolean {
+  return JWT_TOKEN_PATTERN.test(token.trim());
+}
 
 /**
  * Get auth token from localStorage
@@ -6,7 +12,16 @@ const AUTH_TOKEN_KEY = 'auth_token';
 export function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
   try {
-    return localStorage.getItem(AUTH_TOKEN_KEY);
+    const token = localStorage.getItem(AUTH_TOKEN_KEY)?.trim() ?? null;
+    if (!token) {
+      return null;
+    }
+    if (!isValidStoredAuthToken(token)) {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(AUTH_USER_KEY);
+      return null;
+    }
+    return token;
   } catch {
     return null;
   }
@@ -20,7 +35,7 @@ export function handleUnauthorized() {
   
   console.warn('⚠️ [API CLIENT] Unauthorized (401) - clearing auth data');
   localStorage.removeItem('auth_token');
-  localStorage.removeItem('auth_user');
+  localStorage.removeItem(AUTH_USER_KEY);
   
   // Trigger auth update event to notify AuthContext
   window.dispatchEvent(new Event('auth-updated'));

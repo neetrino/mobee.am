@@ -66,6 +66,9 @@ export function ShopCatalogArea({
         defaultVariantId: p.defaultVariantId ?? null,
         colors: p.colors ?? [],
         labels: p.labels ?? [],
+        primaryCategoryId: p.primaryCategoryId ?? null,
+        categoryIds: Array.isArray(p.categoryIds) ? [...p.categoryIds] : [],
+        categories: Array.isArray(p.categories) ? p.categories : [],
       }),
     );
   }, [productsData]);

@@ -12,13 +12,15 @@ import { ProductColors } from './ProductColors';
 import type { CurrencyCode } from '../../lib/currency';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import type { ProductLabel } from '../ProductLabels';
+import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
 
 interface ProductCardListProps {
   product: {
     id: string;
     slug: string;
     title: string;
-    subtitle?: string | null;
+    primaryCategoryId?: string | null;
+    categories?: Array<{ id: string; slug?: string; title?: string }>;
     price: number;
     image: string | null;
     inStock: boolean;
@@ -58,6 +60,7 @@ export function ProductCardList({
   onAddToCart,
 }: ProductCardListProps) {
   const { t } = useTranslation();
+  const categoryLine = getProductCardCategoryLineLabel(product);
   const imageSrc = resolveProductCardImageSrc(product.image);
   const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';
 
@@ -98,10 +101,10 @@ export function ProductCardList({
             <h3 className="text-lg sm:text-xl font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 mt-0.5">
               {product.title}
             </h3>
-            {product.subtitle ? (
+            {categoryLine ? (
               <p className="flex items-center gap-2 text-[11px] text-gray-500 mt-1">
                 <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
-                <span className="line-clamp-2">{product.subtitle}</span>
+                <span className="line-clamp-2">{categoryLine}</span>
               </p>
             ) : null}
           </Link>

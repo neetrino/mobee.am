@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
-import { apiClient } from '../../../lib/api-client';
+import { apiClient, ApiError } from '../../../lib/api-client';
 import { AdminPageShell } from '../components/AdminPageShell';
 
 interface PromoCode {
@@ -23,6 +23,30 @@ interface PromoCodesResponse {
 interface PromoCodeCreatePayload {
   code: string;
   discountPercent: number;
+}
+
+function getProblemDetail(data: unknown): string | null {
+  if (!data || typeof data !== 'object') {
+    return null;
+  }
+  const problem = data as { detail?: unknown; message?: unknown };
+  if (typeof problem.detail === 'string' && problem.detail.trim()) {
+    return problem.detail;
+  }
+  if (typeof problem.message === 'string' && problem.message.trim()) {
+    return problem.message;
+  }
+  return null;
+}
+
+function getErrorDetail(error: unknown, fallback: string): string {
+  if (error instanceof ApiError) {
+    return getProblemDetail(error.data) || error.message || fallback;
+  }
+  if (error instanceof Error) {
+    return error.message || fallback;
+  }
+  return fallback;
 }
 
 export default function PromoCodesPage() {
@@ -94,11 +118,7 @@ export default function PromoCodesPage() {
       await fetchPromoCodes();
       alert(t('admin.promocodes.createdSuccess'));
     } catch (error: unknown) {
-      const typedError = error as {
-        response?: { data?: { detail?: string } };
-        message?: string;
-      };
-      const details = typedError.response?.data?.detail || typedError.message || t('admin.promocodes.unknownError');
+      const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
       alert(t('admin.promocodes.errorCreate').replace('{message}', details));
     } finally {
       setSubmitting(false);
@@ -113,11 +133,7 @@ export default function PromoCodesPage() {
       });
       await fetchPromoCodes();
     } catch (error: unknown) {
-      const typedError = error as {
-        response?: { data?: { detail?: string } };
-        message?: string;
-      };
-      const details = typedError.response?.data?.detail || typedError.message || t('admin.promocodes.unknownError');
+      const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
       alert(t('admin.promocodes.errorUpdate').replace('{message}', details));
     } finally {
       setSubmitting(false);
@@ -136,11 +152,7 @@ export default function PromoCodesPage() {
       await fetchPromoCodes();
       alert(t('admin.promocodes.deletedSuccess'));
     } catch (error: unknown) {
-      const typedError = error as {
-        response?: { data?: { detail?: string } };
-        message?: string;
-      };
-      const details = typedError.response?.data?.detail || typedError.message || t('admin.promocodes.unknownError');
+      const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
       alert(t('admin.promocodes.errorDelete').replace('{message}', details));
     } finally {
       setSubmitting(false);

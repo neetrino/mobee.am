@@ -9,7 +9,8 @@ import type { CurrencyCode } from '../../lib/currency';
 interface ProductCardInfoProps {
   slug: string;
   title: string;
-  subtitle?: string | null;
+  /** Localized category line under the title (replaces product subtitle on cards). */
+  categoryLine?: string | null;
   brandName?: string | null;
   price: number;
   discountPercent?: number | null;
@@ -30,7 +31,7 @@ interface ProductCardInfoProps {
 export function ProductCardInfo({
   slug,
   title,
-  subtitle,
+  categoryLine,
   brandName,
   price,
   discountPercent,
@@ -58,13 +59,13 @@ export function ProductCardInfo({
   const titleClass = (() => {
     if (titleSizeMobileFigma) {
       return `line-clamp-2 text-gray-900 max-lg:text-xs max-lg:font-normal max-lg:leading-normal lg:text-[18px] lg:font-bold lg:leading-7 ${
-        subtitle ? 'mb-0.5 lg:mb-1' : 'mb-1 lg:mb-2'
+        categoryLine ? 'mb-0.5 lg:mb-1' : 'mb-1 lg:mb-2'
       }`;
     }
     if (isCompact) {
-      return `text-base font-bold text-gray-900 line-clamp-2 ${subtitle ? 'mb-0.5' : 'mb-1'}`;
+      return `text-base font-bold text-gray-900 line-clamp-2 ${categoryLine ? 'mb-0.5' : 'mb-1'}`;
     }
-    return `text-[18px] leading-7 font-bold text-gray-900 line-clamp-2 ${subtitle ? 'mb-1' : 'mb-2'}`;
+    return `text-[18px] leading-7 font-bold text-gray-900 line-clamp-2 ${categoryLine ? 'mb-1' : 'mb-2'}`;
   })();
   const priceClass = isCompact ? 'text-[1.06875rem]' : 'text-[1.425rem]';
 
@@ -79,10 +80,10 @@ export function ProductCardInfo({
           </p>
         ) : null}
         <h3 className={titleClass}>{title}</h3>
-        {subtitle ? (
+        {categoryLine ? (
           <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
             <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
-            <span className="line-clamp-2">{subtitle}</span>
+            <span className="line-clamp-2">{categoryLine}</span>
           </p>
         ) : null}
       </Link>

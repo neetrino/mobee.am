@@ -29,6 +29,9 @@ export interface FeaturedHomeProduct {
   originalPrice?: number | null;
   discountPercent?: number | null;
   labels?: ProductLabel[];
+  primaryCategoryId?: string | null;
+  categoryIds?: string[];
+  categories?: Array<{ id: string; slug?: string; title?: string }>;
 }
 
 interface ProductsResponse {
