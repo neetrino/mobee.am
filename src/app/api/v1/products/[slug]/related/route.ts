@@ -1,53 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@white-shop/db";
 import { productsService } from "@/lib/services/products.service";
+import { findRelatedProducts } from "@/lib/services/products-related.service";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 30;
 
 type ProductForRelated = Awaited<ReturnType<typeof productsService.findBySlug>>;
 
-/**
- * Admin create/update sets `primaryCategoryId` / `categoryIds` but does not connect the
- * Prisma `categories` many-to-many. Related products must fall back to those fields.
- */
-async function getCategorySlugByCategoryId(
-  categoryId: string,
-  lang: string,
-): Promise<string | null> {
-  const category = await db.category.findFirst({
-    where: { id: categoryId, deletedAt: null, published: true },
-    select: { translations: { select: { locale: true, slug: true } } },
-  });
-  const translations = category?.translations;
-  if (!translations?.length) {
-    return null;
-  }
-  const tr = translations.find((t) => t.locale === lang) ?? translations[0];
-  const slug = tr?.slug?.trim();
-  return slug && slug.length > 0 ? slug : null;
-}
-
-async function resolveCategorySlugForRelated(
-  product: ProductForRelated,
-  lang: string,
-): Promise<string | null> {
-  const fromRelation = product.categories?.[0]?.slug?.trim();
-  if (fromRelation) {
-    return fromRelation;
-  }
-  if (product.primaryCategoryId) {
-    const slug = await getCategorySlugByCategoryId(product.primaryCategoryId, lang);
-    if (slug) {
-      return slug;
-    }
-  }
-  const firstCategoryId = product.categoryIds?.[0];
-  if (firstCategoryId) {
-    return getCategorySlugByCategoryId(firstCategoryId, lang);
-  }
-  return null;
-}
+export const dynamic = "force-dynamic";
 
 function parseLimit(rawLimit: string | null): number {
   if (!rawLimit) {
@@ -83,22 +43,11 @@ export async function GET(
       throw loadError;
     }
 
-    const primaryCategorySlug = await resolveCategorySlugForRelated(currentProduct, lang);
-
-    if (!primaryCategorySlug) {
-      return NextResponse.json({ data: [] });
-    }
-
-    const relatedResponse = await productsService.findAll({
-      category: primaryCategorySlug,
-      limit: Math.min(limit + 1, MAX_LIMIT),
-      page: 1,
+    const data = await findRelatedProducts({
+      product: currentProduct,
       lang,
+      limit,
     });
-
-    const data = relatedResponse.data
-      .filter((product) => product.id !== currentProduct.id)
-      .slice(0, limit);
 
     return NextResponse.json({ data });
   } catch (error: unknown) {
