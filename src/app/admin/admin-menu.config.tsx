@@ -146,7 +146,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M9 14l6-6m-5.5.5h.01m4.99 4.99h.01M5 7l4-4 10 10-4 4L5 7zm0 0l-2 2a2.828 2.828 0 000 4l4 4a2.828 2.828 0 004 0l2-2"
+          d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18M7.5 12.75h5.25M7.5 15.75h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a3 3 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a3 3 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"
         />
       </svg>
     ),
