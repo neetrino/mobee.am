@@ -22,6 +22,32 @@ function parseLimit(rawLimit: string | null): number {
   return Math.min(parsed, MAX_LIMIT);
 }
 
+function isNotFoundError(error: unknown): boolean {
+  return (error as { status?: number }).status === 404;
+}
+
+async function findProductForRelated(
+  slug: string,
+  lang: string,
+): Promise<ProductForRelated | null> {
+  try {
+    return await productsService.findBySlug(slug, lang);
+  } catch (loadError: unknown) {
+    if (!isNotFoundError(loadError) || lang === "en") {
+      throw loadError;
+    }
+  }
+
+  try {
+    return await productsService.findBySlug(slug, "en");
+  } catch (fallbackError: unknown) {
+    if (isNotFoundError(fallbackError)) {
+      return null;
+    }
+    throw fallbackError;
+  }
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -32,15 +58,9 @@ export async function GET(
     const lang = searchParams.get("lang") || "en";
     const limit = parseLimit(searchParams.get("limit"));
 
-    let currentProduct: ProductForRelated;
-    try {
-      currentProduct = await productsService.findBySlug(slug, lang);
-    } catch (loadError: unknown) {
-      const status = (loadError as { status?: number }).status;
-      if (status === 404) {
-        return NextResponse.json({ data: [] });
-      }
-      throw loadError;
+    const currentProduct = await findProductForRelated(slug, lang);
+    if (!currentProduct) {
+      return NextResponse.json({ data: [] });
     }
 
     const data = await findRelatedProducts({
