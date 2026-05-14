@@ -54,10 +54,12 @@ export async function resolveCheckoutShippingAmount(
   const subtotalAfterDiscount = Math.max(0, params.subtotalAfterDiscountAmd);
   const qualifiesFreeShipping = subtotalAfterDiscount >= FREE_SHIPPING_THRESHOLD_AMD;
 
-  let baseShipping = 0;
   if (qualifiesFreeShipping) {
-    baseShipping = 0;
-  } else if (isYerevanArea(city)) {
+    return { amount: 0, requiresQuote: false };
+  }
+
+  let baseShipping = 0;
+  if (isYerevanArea(city)) {
     baseShipping = YEREVAN_FALLBACK_SHIPPING_BELOW_THRESHOLD_AMD;
   } else {
     const dbPrice = await adminDeliveryService.getDeliveryPrice(city, country);

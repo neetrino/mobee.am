@@ -1,5 +1,4 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { EXPRESS_DELIVERY_SURCHARGE_AMD } from "../../constants/checkout-shipping.constants";
 import { isYerevanArea, resolveCheckoutShippingAmount } from "./checkout-shipping";
 import { adminDeliveryService } from "../admin/admin-delivery.service";
 
@@ -85,7 +84,7 @@ describe("checkout-shipping", () => {
     expect(result.requiresQuote).toBe(true);
   });
 
-  it("adds express surcharge when base is free", async () => {
+  it("keeps express delivery free at threshold", async () => {
     vi.mocked(adminDeliveryService.getDeliveryPrice).mockResolvedValue(0);
     const result = await resolveCheckoutShippingAmount({
       shippingMethod: "delivery",
@@ -94,7 +93,7 @@ describe("checkout-shipping", () => {
       subtotalAfterDiscountAmd: 9000,
       deliverySpeed: "express",
     });
-    expect(result.amount).toBe(EXPRESS_DELIVERY_SURCHARGE_AMD);
+    expect(result.amount).toBe(0);
     expect(result.requiresQuote).toBe(false);
   });
 });
