@@ -11,12 +11,13 @@ import {
   HEADER_SECONDARY_SEARCH_IPAD_AIR_BAND_MAX_WIDTH_CLASS,
 } from './header-secondary-bar.constants';
 import { CompareIcon } from './icons/CompareIcon';
-import { CartIcon } from './icons/CartIcon';
+import { MobileNavBagIcon } from './icons/MobileNavBagIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
 import { HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS } from './header-nav-count-badge.constants';
+import { MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH } from './mobile-bottom-nav.constants';
 import type { CurrencyCode } from '../lib/currency';
 
-/** Trailing bar strokes — matches `CartIcon` (weight 2). */
+/** Trailing bar icon strokes — compare / wishlist use weight 2; cart uses bottom-nav bag (1.5). */
 const SECONDARY_BAR_ICON_STROKE_WIDTH = 2;
 
 /** Menu lines for categories pill; single SVG so stroke weight matches on every line. */
@@ -557,7 +558,11 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                 aria-label={cartAria}
                 data-cart-fly-target="desktop"
               >
-                <CartIcon size={18} className="shrink-0" />
+                <MobileNavBagIcon
+                  size={20}
+                  strokeWidth={MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH}
+                  className="shrink-0"
+                />
                 {cartCount > 0 ? (
                   <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
                     {cartCount > 99 ? '99+' : cartCount}
