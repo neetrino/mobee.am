@@ -242,7 +242,7 @@ async function executeWithoutAttributeValue(
   limit: number,
   skip: number = 0,
   sort: ProductSortOption = "default",
-  listingMode = false,
+  _listingMode = false,
 ): Promise<ProductWithRelations[]> {
   const baseIncludeWithoutAttributeValue = getBaseIncludeWithoutAttributeValue();
   const orderBy = getOrderBy(sort);
