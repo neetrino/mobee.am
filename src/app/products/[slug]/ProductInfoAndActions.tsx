@@ -1,8 +1,7 @@
 'use client';
 
 import type { MouseEvent } from 'react';
-import Link from 'next/link';
-import { FileText, Heart, Store } from 'lucide-react';
+import { FileText, Heart } from 'lucide-react';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
@@ -186,13 +185,6 @@ export function ProductInfoAndActions({
           <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
           {t(language, 'product.moreDetails')}
         </button>
-        <Link
-          href="/stores"
-          className="inline-flex w-fit items-center gap-2 font-medium text-admin hover:underline"
-        >
-          <Store className="h-4 w-4 shrink-0" strokeWidth={2} />
-          {t(language, 'product.availableInStores')}
-        </Link>
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">
