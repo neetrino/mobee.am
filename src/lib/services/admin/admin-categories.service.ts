@@ -1,5 +1,10 @@
 import { db } from "@white-shop/db";
+import { cacheService } from "@/lib/services/cache.service";
 import { toSlug } from "@/lib/utils/slug";
+
+async function clearCategoriesCache(): Promise<void> {
+  await cacheService.deletePattern("categories:*");
+}
 
 class AdminCategoriesService {
   /**
@@ -88,6 +93,7 @@ class AdminCategoriesService {
     // Безопасное получение translation с проверкой на существование массива
     const categoryTranslations = Array.isArray(category.translations) ? category.translations : [];
     const translation = categoryTranslations.find((t: { locale: string }) => t.locale === locale) || categoryTranslations[0] || null;
+    await clearCategoriesCache();
 
     return {
       data: {
@@ -309,6 +315,7 @@ class AdminCategoriesService {
 
     const categoryTranslations = Array.isArray(updatedCategory.translations) ? updatedCategory.translations : [];
     const translation = categoryTranslations.find((t: { locale: string }) => t.locale === locale) || categoryTranslations[0] || null;
+    await clearCategoriesCache();
 
     return {
       data: {
@@ -415,6 +422,7 @@ class AdminCategoriesService {
         published: false,
       },
     });
+    await clearCategoriesCache();
 
     console.log('✅ [ADMIN SERVICE] Category deleted:', categoryId);
     return { success: true };

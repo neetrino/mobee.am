@@ -4,13 +4,27 @@ import { cacheService } from "@/lib/services/cache.service";
 import { processImageUrl } from "@/lib/utils/image-utils";
 
 const CACHE_TTL = 300; // 5 minutes
+const DEFAULT_TOP_CATEGORY_LIMIT = 5;
+const MAX_TOP_CATEGORY_LIMIT = 100;
+
+function parseCategoryLimit(value: string | null): number {
+  const parsedLimit = Number.parseInt(value || String(DEFAULT_TOP_CATEGORY_LIMIT), 10);
+  if (!Number.isFinite(parsedLimit) || parsedLimit < 1) {
+    return DEFAULT_TOP_CATEGORY_LIMIT;
+  }
+
+  return Math.min(parsedLimit, MAX_TOP_CATEGORY_LIMIT);
+}
+
+function incrementCategoryCount(countMap: Map<string, number>, categoryId: string): void {
+  countMap.set(categoryId, (countMap.get(categoryId) || 0) + 1);
+}
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const lang = searchParams.get("lang") || "en";
-    const limitParam = parseInt(searchParams.get("limit") || "5", 10);
-    const limit = Math.min(limitParam, 20);
+    const limit = parseCategoryLimit(searchParams.get("limit"));
 
     const cacheKey = `categories:top:${lang}:${limit}`;
     const cached = await cacheService.get(cacheKey);
@@ -22,34 +36,59 @@ export async function GET(req: NextRequest) {
     }
 
     const categories = await db.category.findMany({
-      where: { parentId: null },
+      where: {
+        parentId: null,
+        published: true,
+        deletedAt: null,
+      },
       include: {
         translations: true,
         children: {
+          where: {
+            published: true,
+            deletedAt: null,
+          },
           include: { translations: true },
         },
       },
     });
 
-    const allCategoryIds = categories.flatMap((cat) => [
-      cat.id,
-      ...cat.children.map((child) => child.id),
-    ]);
+    const allCategoryIds = [
+      ...new Set(categories.flatMap((cat) => [
+        cat.id,
+        ...cat.children.map((child) => child.id),
+      ])),
+    ];
+    const allCategoryIdSet = new Set(allCategoryIds);
 
-    const counts = await db.product.groupBy({
-      by: ["primaryCategoryId"],
+    const productsWithCategories = await db.product.findMany({
       where: {
         published: true,
         deletedAt: null,
-        primaryCategoryId: { in: allCategoryIds },
+        OR: [
+          { primaryCategoryId: { in: allCategoryIds } },
+          { categoryIds: { hasSome: allCategoryIds } },
+        ],
       },
-      _count: { id: true },
+      select: {
+        primaryCategoryId: true,
+        categoryIds: true,
+      },
     });
 
     const countMap = new Map<string, number>();
-    for (const row of counts) {
-      if (row.primaryCategoryId) {
-        countMap.set(row.primaryCategoryId, row._count.id);
+    for (const product of productsWithCategories) {
+      const productCategoryIds = new Set<string>();
+      if (product.primaryCategoryId && allCategoryIdSet.has(product.primaryCategoryId)) {
+        productCategoryIds.add(product.primaryCategoryId);
+      }
+      for (const categoryId of product.categoryIds) {
+        if (allCategoryIdSet.has(categoryId)) {
+          productCategoryIds.add(categoryId);
+        }
+      }
+      for (const categoryId of productCategoryIds) {
+        incrementCategoryCount(countMap, categoryId);
       }
     }
 
@@ -93,22 +132,41 @@ export async function GET(req: NextRequest) {
       where: {
         published: true,
         deletedAt: null,
-        primaryCategoryId: { in: topCatIds },
+        OR: [
+          { primaryCategoryId: { in: topCatIds } },
+          { categoryIds: { hasSome: topCatIds } },
+        ],
       },
       select: {
         primaryCategoryId: true,
+        categoryIds: true,
         media: true,
       },
       take: topCatIds.length * 3,
     });
 
+    const topCatIdSet = new Set(topCatIds);
     const imageMap = new Map<string, string | null>();
     for (const p of sampleProducts) {
-      if (!p.primaryCategoryId || imageMap.has(p.primaryCategoryId)) continue;
       const img = Array.isArray(p.media) && p.media.length > 0
         ? processImageUrl(p.media[0] as string | null | undefined | { url?: string; src?: string; value?: string })
         : null;
-      if (img) imageMap.set(p.primaryCategoryId, img);
+      if (!img) continue;
+
+      const imageCategoryIds = new Set<string>();
+      if (p.primaryCategoryId && topCatIdSet.has(p.primaryCategoryId)) {
+        imageCategoryIds.add(p.primaryCategoryId);
+      }
+      for (const categoryId of p.categoryIds) {
+        if (topCatIdSet.has(categoryId)) {
+          imageCategoryIds.add(categoryId);
+        }
+      }
+      for (const categoryId of imageCategoryIds) {
+        if (!imageMap.has(categoryId)) {
+          imageMap.set(categoryId, img);
+        }
+      }
     }
 
     const result = {
