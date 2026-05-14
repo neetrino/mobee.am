@@ -31,6 +31,9 @@ interface Product {
     name: string;
   } | null;
   defaultVariantId?: string | null;
+  primaryCategoryId?: string | null;
+  categoryIds?: string[];
+  categories?: Array<{ id: string; slug?: string; title?: string }>;
 }
 
 interface ProductsGridProps {
