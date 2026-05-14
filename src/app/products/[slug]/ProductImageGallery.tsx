@@ -104,10 +104,10 @@ export function ProductImageGallery({
 
   return (
     <>
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-5">
+      <div className="flex flex-col gap-4 product-2col:flex-row product-2col:items-start product-2col:gap-5">
         {/* Thumbnails: below main on mobile, left column on desktop */}
-        <div className="group/thumbs order-2 flex w-full shrink-0 flex-col gap-2 lg:order-1 lg:w-24 lg:gap-3">
-          <div className="flex min-w-0 flex-row items-center gap-2 lg:flex-col lg:items-stretch">
+        <div className="group/thumbs order-2 flex w-full shrink-0 flex-col gap-2 product-2col:order-1 product-2col:w-24 product-2col:gap-3">
+          <div className="flex min-w-0 flex-row items-center gap-2 product-2col:flex-col product-2col:items-stretch">
             {images.length > THUMBNAILS_PER_VIEW && (
               <button
                 type="button"
@@ -123,13 +123,13 @@ export function ProductImageGallery({
                   }
                 }}
                 disabled={thumbnailStartIndex <= 0}
-                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-100 text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-200 disabled:cursor-default disabled:opacity-30 lg:hidden"
+                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-100 text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-200 disabled:cursor-default disabled:opacity-30 product-2col:hidden"
                 aria-label={t(language, "common.ariaLabels.previousThumbnail")}
               >
                 <ChevronLeft className="h-5 w-5" strokeWidth={2} />
               </button>
             )}
-            <div className="flex min-w-0 flex-1 flex-row justify-center gap-2 overflow-hidden lg:flex-col lg:gap-3">
+            <div className="flex min-w-0 flex-1 flex-row justify-center gap-2 overflow-hidden product-2col:flex-col product-2col:gap-3">
             {visibleThumbnails.map((image, index) => {
               const actualIndex = thumbnailStartIndex + index;
               const isActive = actualIndex === currentImageIndex;
@@ -138,7 +138,7 @@ export function ProductImageGallery({
                   type="button"
                   key={actualIndex}
                   onClick={() => onImageIndexChange(actualIndex)}
-                  className={`relative box-border aspect-[3/4] w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-white transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-500 lg:w-full ${
+                  className={`relative box-border aspect-[3/4] w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-white transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-500 product-2col:w-full ${
                     isActive
                       ? "border-admin-500"
                       : "border-gray-200 hover:border-admin-300"
@@ -176,7 +176,7 @@ export function ProductImageGallery({
                   }
                 }}
                 disabled={thumbnailStartIndex >= images.length - THUMBNAILS_PER_VIEW}
-                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-100 text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-200 disabled:cursor-default disabled:opacity-30 lg:hidden"
+                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-100 text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-200 disabled:cursor-default disabled:opacity-30 product-2col:hidden"
                 aria-label={t(language, "common.ariaLabels.nextThumbnail")}
               >
                 <ChevronRight className="h-5 w-5" strokeWidth={2} />
@@ -186,7 +186,7 @@ export function ProductImageGallery({
 
           {/* Navigation Arrows - Scroll thumbnails (desktop hover strip) */}
           {images.length > THUMBNAILS_PER_VIEW && (
-            <div className="hidden flex-row justify-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover/thumbs:opacity-100 lg:flex">
+            <div className="hidden flex-row justify-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover/thumbs:opacity-100 product-2col:flex">
               <button 
                 type="button"
                 onClick={(e) => {
@@ -257,17 +257,16 @@ export function ProductImageGallery({
           )}
         </div>
         
-        {/* Main image: centered on mobile, primary column on desktop */}
-        <div className="order-1 flex w-full flex-1 justify-center lg:order-2 lg:block">
+        <div className="order-1 flex w-full shrink-0 justify-center product-2col:order-2 product-2col:block product-2col:min-w-0 product-2col:flex-1">
           <div
-            className="group relative mx-auto flex aspect-square w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm lg:max-w-none"
+            className="group relative mx-auto flex aspect-square w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm product-2col:max-w-none"
             data-pdp-cart-fly-source
           >
           {images.length > 0 && !mainImageFailed ? (
             <img
               src={currentSrc}
               alt={product.title}
-              className="h-full w-full object-contain lg:object-cover"
+              className="h-full w-full object-contain product-2col:object-cover"
               onError={() => markFailed(currentImageIndex)}
             />
           ) : (

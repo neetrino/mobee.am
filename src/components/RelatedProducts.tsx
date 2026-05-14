@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, type MouseEvent } from 'react';
+import { useState, useRef, type MouseEvent } from 'react';
 import { apiClient } from '../lib/api-client';
 import { getStoredCurrency } from '../lib/currency';
-import { getStoredLanguage, type LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
 import { useAuth } from '../lib/auth/AuthContext';
 import { dispatchCartFlyAnimation } from '../lib/cart/dispatchCartFlyAnimation';
@@ -16,18 +15,28 @@ import { useVisibleCards } from './hooks/useVisibleCards';
 import { RelatedProductCard } from './RelatedProducts/RelatedProductCard';
 import { CarouselNavigation } from './RelatedProducts/CarouselNavigation';
 import { CarouselDots } from './RelatedProducts/CarouselDots';
+import { useUiLanguage } from './UiLanguageProvider';
+import { chunkArray } from '../lib/chunk-array';
+import {
+  HOME_BEST_CHOICE_MOBILE_CAROUSEL,
+  HOME_BEST_CHOICE_MOBILE_PAGE,
+  homeBestChoiceMobileInnerGridClass,
+} from './HomeBestChoiceStyleProductGrid';
+import { useHomeBestChoiceMobileCardsPerView } from './useHomeBestChoiceMobileCardsPerView';
+import { useHomeBestChoiceCarouselPageSync } from './useHomeBestChoiceCarouselPageSync';
 
 interface RelatedProductsProps {
   currentProductSlug: string;
 }
 
 /**
- * RelatedProducts component - displays products from the same category in a carousel
- * Shown at the bottom of the single product page
+ * Below `lg`: horizontal snap carousel (same shell as home best-choice).
+ * At `lg+`: draggable strip with arrows/dots.
  */
 export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   const { isLoggedIn } = useAuth();
-  const [language, setLanguage] = useState<LanguageCode>(() => getStoredLanguage());
+  const language = useUiLanguage();
+  const mobileCardsPerView = useHomeBestChoiceMobileCardsPerView();
   const addToCartInFlightRef = useRef<Set<string>>(new Set());
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
@@ -55,19 +64,16 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
     autoRotateInterval: 0,
   });
 
-  // Initialize language from localStorage after mount to prevent hydration mismatch
-  useEffect(() => {
-    setLanguage(getStoredLanguage());
-    
-    const handleLanguageUpdate = () => {
-      setLanguage(getStoredLanguage());
-    };
-    
-    window.addEventListener('language-updated', handleLanguageUpdate);
-    return () => {
-      window.removeEventListener('language-updated', handleLanguageUpdate);
-    };
-  }, []);
+  const mobileCarouselPageCount =
+    loading
+      ? Math.max(1, Math.ceil(8 / mobileCardsPerView))
+      : products.length > 0
+        ? Math.max(1, Math.ceil(products.length / mobileCardsPerView))
+        : 1;
+
+  const mobileCarouselRef = useHomeBestChoiceCarouselPageSync(mobileCarouselPageCount, undefined);
+
+  const mobileInnerGridClass = homeBestChoiceMobileInnerGridClass(mobileCardsPerView);
 
   /**
    * Handle adding product to cart
@@ -183,75 +189,124 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         <h2 className="text-3xl font-bold text-gray-900 mb-10">{t(language, 'product.related_products_title')}</h2>
         
         {loading ? (
-          // Loading state
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            ))}
-          </div>
+          <>
+            <div
+              ref={mobileCarouselRef}
+              className={HOME_BEST_CHOICE_MOBILE_CAROUSEL}
+              role="region"
+              aria-roledescription="carousel"
+              aria-label={t(language, 'product.related_products_title')}
+              aria-busy="true"
+            >
+              {chunkArray([1, 2, 3, 4, 5, 6, 7, 8], mobileCardsPerView).map((page, pageIndex) => (
+                <div key={`related-sk-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
+                  <div className={mobileInnerGridClass}>
+                    {page.map((i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="mb-4 aspect-square rounded-lg bg-gray-200" />
+                        <div className="mb-2 h-4 w-3/4 rounded bg-gray-200" />
+                        <div className="h-4 w-1/2 rounded bg-gray-200" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="hidden grid-cols-4 gap-6 lg:grid">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={`d-${i}`} className="animate-pulse">
+                  <div className="mb-4 aspect-square rounded-lg bg-gray-200" />
+                  <div className="mb-2 h-4 w-3/4 rounded bg-gray-200" />
+                  <div className="h-4 w-1/2 rounded bg-gray-200" />
+                </div>
+              ))}
+            </div>
+          </>
         ) : products.length === 0 ? (
           // Empty state
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">{t(language, 'product.noRelatedProducts')}</p>
           </div>
         ) : (
-          // Products Carousel
-          <div className="relative">
-            {/* Carousel Container */}
-            <div 
-              ref={carouselRef}
-              className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none touch-pan-y"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
+          <>
+            <div
+              ref={mobileCarouselRef}
+              className={HOME_BEST_CHOICE_MOBILE_CAROUSEL}
+              role="region"
+              aria-roledescription="carousel"
+              aria-label={t(language, 'product.related_products_title')}
             >
-              <div
-                className="flex items-stretch"
-                style={{
-                  transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
-                  transition: isDragging ? 'none' : 'transform 0.5s ease-in-out',
-                }}
-              >
-                {products.map((product) => (
-                  <RelatedProductCard
-                    key={product.id}
-                    product={product}
-                    currency={currency}
-                    language={language}
-                    isAddingToCart={addingProductId === product.id}
-                    hasMoved={hasMoved}
-                    onAddToCart={handleAddToCart}
-                    onImageError={handleImageError}
-                    imageError={imageErrors.has(product.id)}
-                    width={`${100 / visibleCards}%`}
-                  />
-                ))}
-              </div>
+              {chunkArray(products, mobileCardsPerView).map((page, pageIndex) => (
+                <div key={`related-page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
+                  <div className={mobileInnerGridClass}>
+                    {page.map((product) => (
+                      <RelatedProductCard
+                        key={product.id}
+                        product={product}
+                        currency={currency}
+                        language={language}
+                        isAddingToCart={addingProductId === product.id}
+                        hasMoved={false}
+                        onAddToCart={handleAddToCart}
+                        onImageError={handleImageError}
+                        imageError={imageErrors.has(product.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {/* Navigation Arrows - Only show if there are more products than visible */}
-            {products.length > visibleCards && (
-              <CarouselNavigation onPrevious={goToPrevious} onNext={goToNext} />
-            )}
+            <div className="relative hidden lg:block">
+              <div
+                ref={carouselRef}
+                className="relative cursor-grab touch-pan-y select-none overflow-hidden active:cursor-grabbing"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <div
+                  className="flex items-stretch"
+                  style={{
+                    transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
+                    transition: isDragging ? 'none' : 'transform 0.5s ease-in-out',
+                  }}
+                >
+                  {products.map((product) => (
+                    <RelatedProductCard
+                      key={product.id}
+                      product={product}
+                      currency={currency}
+                      language={language}
+                      isAddingToCart={addingProductId === product.id}
+                      hasMoved={hasMoved}
+                      onAddToCart={handleAddToCart}
+                      onImageError={handleImageError}
+                      imageError={imageErrors.has(product.id)}
+                      width={`${100 / visibleCards}%`}
+                    />
+                  ))}
+                </div>
+              </div>
 
-            {/* Dots Indicator - Only show if there are more products than visible */}
-            {products.length > visibleCards && (
-              <CarouselDots
-                totalItems={products.length}
-                visibleItems={visibleCards}
-                currentIndex={currentIndex}
-                onDotClick={goToIndex}
-              />
-            )}
-          </div>
+              {products.length > visibleCards ? (
+                <CarouselNavigation onPrevious={goToPrevious} onNext={goToNext} />
+              ) : null}
+
+              {products.length > visibleCards ? (
+                <CarouselDots
+                  totalItems={products.length}
+                  visibleItems={visibleCards}
+                  currentIndex={currentIndex}
+                  onDotClick={goToIndex}
+                />
+              ) : null}
+            </div>
+          </>
         )}
       </div>
     </section>

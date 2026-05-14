@@ -6,6 +6,15 @@
  */
 export const LAYOUT_DESKTOP_MIN_WIDTH_PX = 900;
 
+/**
+ * Product detail page: two-column grid + gallery (thumbnails beside main image).
+ * Above site `lg` (900px) so phones in landscape (~900–960px) keep the stacked mobile PDP.
+ */
+export const PRODUCT_PDP_TWO_COLUMN_MIN_WIDTH_PX = 1024;
+
+/** `matchMedia` / Tailwind `product-2col:` — keep in sync with {@link PRODUCT_PDP_TWO_COLUMN_MIN_WIDTH_PX}. */
+export const PRODUCT_PDP_TWO_COLUMN_MEDIA_QUERY = `(min-width: ${PRODUCT_PDP_TWO_COLUMN_MIN_WIDTH_PX}px)`;
+
 /** Widths below {@link LAYOUT_DESKTOP_MIN_WIDTH_PX} — for raw CSS / `sizes` (e.g. `max-width: …px`). */
 export const LAYOUT_DESKTOP_MAX_MOBILE_WIDTH_PX = LAYOUT_DESKTOP_MIN_WIDTH_PX - 1;
 

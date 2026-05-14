@@ -130,7 +130,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-12 items-start">
+      <div className="grid grid-cols-1 product-2col:grid-cols-[55%_45%] gap-12 items-start">
         <ProductImageGallery
           images={images}
           product={product}
