@@ -1,49 +1,79 @@
 {
-  "title": "Refund Policy",
+  "title": "Return and Exchange Policy",
   "lastUpdated": "Last Updated:",
-  "overview": {
-    "title": "Overview",
-    "description": "We want you to be satisfied with every purchase. This policy explains how returns and refunds work, including timelines and eligibility requirements."
-  },
-  "eligibility": {
-    "title": "Refund Eligibility",
-    "description": "To be eligible for a refund, please ensure that:",
-    "items": {
-      "condition": "The item is unused, in original condition and in original packaging.",
-      "timeline": "The return request is submitted within 14 days of delivery, unless otherwise stated.",
-      "proof": "Proof of purchase is provided (order number or receipt).",
-      "excluded": "Items marked as final sale or non-returnable are excluded."
-    }
-  },
-  "howToInitiate": {
-    "title": "How to Initiate a Return",
-    "steps": {
-      "contact": "Contact our support team with your order number and reason for return.",
-      "authorization": "Receive return authorization and instructions.",
-      "ship": "Ship the item via trackable method; include all original accessories and tags."
+  "intro": "We want you to be fully satisfied with your purchase. If, for any reason, your order does not meet your expectations, we are ready to assist you with the return or exchange process in accordance with the terms listed below.",
+  "sections": {
+    "exchange": {
+      "title": "Exchange",
+      "description": "Purchased products are eligible for exchange within 14 days if the following conditions are met:",
+      "items": {
+        "unused": "the product has not been used,",
+        "noDamage": "the product has no damage, scratches, or changes in appearance,",
+        "saleableCondition": "the product has retained its original saleable condition,",
+        "factoryPackaging": "the original factory packaging is preserved,",
+        "fullSet": "all accessories, charger, cables, documents, and other included items are present,",
+        "matchingIdentifier": "the product’s IMEI number or serial number matches the details stated in the purchase documents."
+      },
+      "extra": {
+        "proofRequired": "To process an exchange, it is necessary to provide the cash register receipt or electronic invoice confirming the purchase."
+      }
     },
-    "description": "After receiving and inspecting the item, we will confirm refund approval or denial."
-  },
-  "refundMethod": {
-    "title": "Refund Method and Timing",
-    "items": {
-      "method": "Approved refunds are issued to the original payment method.",
-      "timing": "Processing time is typically 5–10 business days after approval; bank times may vary.",
-      "shipping": "Shipping fees are not refunded unless the return is due to our error or a defective item."
+    "return": {
+      "title": "Return",
+      "description": "Purchased products may be returned within 14 days if the product is returned complete, unused, and undamaged. To be eligible for return, the product must:",
+      "items": {
+        "unused": "be unused,",
+        "noMechanicalDamage": "have no mechanical damage,",
+        "noExternalImpact": "have no signs of water, moisture, or other external impact,",
+        "completePackaging": "include complete packaging,",
+        "fullSet": "be returned with the full original set,",
+        "noPersonalData": "have no activated or modified accounts, passwords, Apple ID, Google Account, or other personal data,",
+        "matchingIdentifier": "match the IMEI or serial number registered at the time of purchase."
+      },
+      "extra": {
+        "wrongProduct": "If we delivered the wrong product, the customer may return the product or exchange it for the correct one without any additional charge."
+      }
+    },
+    "refund": {
+      "title": "Refund",
+      "description": "If the returned product meets the conditions mentioned above, the refund will be issued using the same payment method that was used for the purchase.",
+      "extra": {
+        "cardTiming": "For card payments, the refund may take up to 7 business days, depending on the bank’s procedures.",
+        "deliveryFee": "Delivery fees are non-refundable, except in cases where we delivered the wrong or damaged product."
+      }
+    },
+    "orderCancellation": {
+      "title": "Order Cancellation",
+      "description": "An order may be cancelled before the delivery process begins.",
+      "extra": {
+        "shippedOrder": "If the order has already been shipped or handed over to the delivery service, the possibility of cancellation depends on the current status of the order."
+      }
+    },
+    "nonReturnable": {
+      "title": "Products Not Eligible for Return or Exchange",
+      "description": "The following products are not eligible for return or exchange:",
+      "items": {
+        "usedPhones": "used phones,",
+        "damagedProducts": "damaged or scratched products,",
+        "withoutPackaging": "products without factory packaging,",
+        "incompleteSet": "products returned with incomplete sets,",
+        "accountLinked": "activated, opened, or personally account-linked devices,",
+        "waterOrImpactDamage": "products damaged by water, moisture, or impact,",
+        "identifierMismatch": "products whose IMEI or serial number does not match the purchase documents,",
+        "openedAccessories": "protective glasses, cases, headphones, and other accessories if they have been opened or used."
+      }
+    },
+    "damagedOrIncorrect": {
+      "title": "Damaged or Incorrectly Delivered Product",
+      "description": "If, upon receiving the product, you notice damage, an incorrect model, incorrect color, or any other issue, please contact us immediately and, if possible, send photos or a video.",
+      "extra": {
+        "resolution": "We will review the issue and offer the best possible solution, such as an exchange, return, or another option depending on the situation."
+      }
     }
   },
-  "nonRefundable": {
-    "title": "Non-Refundable Items",
-    "items": {
-      "giftCards": "Gift cards and digital items after delivery.",
-      "personalized": "Personalized or custom-made items, unless defective.",
-      "unauthorized": "Items returned without prior authorization.",
-      "condition": "Items not in original condition, damaged or with missing parts for reasons not due to our error."
-    }
-  },
-  "contact": {
-    "title": "Contact Us",
-    "description": "For questions about this Refund Policy or to initiate a return, write to us at"
+  "specialNote": {
+    "title": "Special Note",
+    "description": "Please check the packaging, complete set, and external appearance of the product upon receipt. The return or exchange process can only be carried out if the product meets the conditions stated above."
   }
 }
 

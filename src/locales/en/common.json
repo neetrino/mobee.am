@@ -230,7 +230,7 @@
     "shop": "Shop",
     "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
-      "refund": "Refund Policy",
+      "refund": "Return & Exchange Policy",
       "delivery": "Delivery Policy",
       "terms": "Terms of Service",
       "privacy": "Privacy Policy"
@@ -242,7 +242,7 @@
       "creditCompany": "Neetrino IT Company",
       "privacyPolicy": "Privacy policy",
       "shippingPolicy": "Shipping policy",
-      "returnPolicy": "Return policy",
+      "returnPolicy": "Return & Exchange policy",
       "termsOfUse": "Terms of use",
       "policiesNavLabel": "Legal and policies",
       "paymentMethodsLabel": "Accepted payment methods"

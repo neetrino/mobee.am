@@ -230,7 +230,7 @@
     "shop": "Магазин",
     "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
-      "refund": "Политика возврата средств",
+      "refund": "Политика возврата и обмена",
       "delivery": "Политика доставки",
       "terms": "Условия обслуживания",
       "privacy": "Политика конфиденциальности"
@@ -242,7 +242,7 @@
       "creditCompany": "Neetrino IT Company",
       "privacyPolicy": "Политика конфиденциальности",
       "shippingPolicy": "Политика доставки",
-      "returnPolicy": "Политика возврата",
+      "returnPolicy": "Политика возврата и обмена",
       "termsOfUse": "Условия использования",
       "policiesNavLabel": "Правовая информация",
       "paymentMethodsLabel": "Способы оплаты"

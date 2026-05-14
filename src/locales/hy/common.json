@@ -228,7 +228,7 @@
     "shop": "Խանութ",
     "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
-      "refund": "Վերադարձի քաղաքականություն",
+      "refund": "Վերադարձի և փոխանակման քաղաքականություն",
       "delivery": "Առաքման քաղաքականություն",
       "terms": "Ծառայությունների մասին պայմաններ",
       "privacy": "Գաղտնիության քաղաքականություն"
@@ -240,7 +240,7 @@
       "creditCompany": "Neetrino IT Company",
       "privacyPolicy": "Գաղտնիության քաղաքականություն",
       "shippingPolicy": "Առաքման քաղաքականություն",
-      "returnPolicy": "Վերադարձի քաղաքականություն",
+      "returnPolicy": "Վերադարձի և փոխանակման քաղաքականություն",
       "termsOfUse": "Օգտագործման պայմաններ",
       "policiesNavLabel": "Իրավական և քաղաքականություն",
       "paymentMethodsLabel": "Ընդունված վճարման եղանակներ"

@@ -13,6 +13,8 @@ import { ShopCatalogSection } from '@/components/shop/ShopCatalogSection';
 import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
 import {
   SHOP_FILTER_SECTIONS_STACK_CLASS,
+  SHOP_FILTER_SIDEBAR_SCROLL_CLASS,
+  SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
   SHOP_FILTER_SIDEBAR_WIDTH_CSS,
   SHOP_PAGE_FOOTER_GAP_CLASS,
 } from './shop-layout.constants';
@@ -62,10 +64,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           maxPrice={params?.maxPrice}
         >
           <aside
-            className="hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-[4.25rem] lg:border-r lg:border-[#e7e7e7] lg:pr-0"
+            className={`hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-[var(--shop-filter-sidebar-top-offset)] lg:border-r lg:border-[#e7e7e7] lg:pr-0 ${SHOP_FILTER_SIDEBAR_SCROLL_CLASS}`}
             style={
               {
                 ['--shop-filter-aside-width']: SHOP_FILTER_SIDEBAR_WIDTH_CSS,
+                ['--shop-filter-sidebar-top-offset']: SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
               } as CSSProperties
             }
           >
