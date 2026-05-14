@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { useTranslation } from '../lib/i18n-client';
@@ -88,6 +89,10 @@ const FOOTER_POLICIES_NAV_GRID_HY_CLASS =
   'grid grid-cols-2 gap-x-[17px] gap-y-3 ml-auto justify-items-start';
 
 const FOOTER_REFUND_POLICY_HREF = '/refund-policy';
+
+const FOOTER_POLICY_LINKS_HIDDEN_ON_CART = new Set(['/delivery-terms', FOOTER_REFUND_POLICY_HREF]);
+
+const CART_ROUTE_PATH = '/cart';
 
 /** 24px tap target; glyph draws at 22px inside (see footerSocialGlyphs GLYPH_CLASS). */
 const FOOTER_SOCIAL_ICON_SLOT_CLASS =
@@ -278,13 +283,16 @@ function FooterNavAndSocialRow() {
 
 function FooterCopyrightPoliciesRow() {
   const { t, lang } = useTranslation();
+  const pathname = usePathname();
 
   const policyLinks = [
     { href: '/delivery-terms', label: t('common.footer.policiesRow.delivery') },
     { href: FOOTER_REFUND_POLICY_HREF, label: t('common.footer.policiesRow.refund') },
     { href: '/terms', label: t('common.footer.policiesRow.terms') },
     { href: '/privacy', label: t('common.footer.policiesRow.privacy') },
-  ];
+  ].filter((link) => (
+    pathname === CART_ROUTE_PATH ? !FOOTER_POLICY_LINKS_HIDDEN_ON_CART.has(link.href) : true
+  ));
 
   const year = new Date().getFullYear();
   const copyrightLead = t('common.footer.copyrightIntro').replace('{year}', String(year));
