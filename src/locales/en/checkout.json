@@ -46,7 +46,7 @@
     "enterCity": "Enter City",
     "loadingCities": "Loading cities…",
     "deliverySpeedTitle": "Delivery speed",
-    "deliverySpeedHint": "Express delivery adds a surcharge to the quoted shipping amount.",
+    "deliverySpeedHint": "Express delivery may add a surcharge below the free delivery threshold.",
     "deliveryTypesGroupLabel": "Delivery type options",
     "deliveryTypesTitle": "Delivery type",
     "deliveryTypesHint": "Standard and Express are types of the same “Delivery” option (speed and price differ)—not a separate shipping method next to pickup.",
@@ -107,7 +107,7 @@
     "totalPendingShippingNote": "Total excludes regional shipping until confirmed by our team.",
     "shippingStandard": "Standard",
     "shippingExpress": "Express",
-    "deliveryPricingHint": "Orders {threshold} or more: standard delivery may be free."
+    "deliveryPricingHint": "Orders {threshold} or more: delivery is free."
   },
   "buttons": {
     "placeOrder": "Place Order",

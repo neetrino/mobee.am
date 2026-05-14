@@ -9,9 +9,6 @@ interface DeliveryPricingHintProps {
   visible: boolean;
 }
 
-/**
- * Free standard-delivery threshold note in checkout summaries (delivery selected).
- */
 export function DeliveryPricingHint({ currency, visible }: DeliveryPricingHintProps) {
   const { t } = useTranslation();
 

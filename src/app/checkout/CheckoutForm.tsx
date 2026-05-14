@@ -15,7 +15,6 @@ import {
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA,
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
-import { DeliveryPolicyInfoCard } from './components/DeliveryPolicyInfoCard';
 import { ShippingCitySelect } from './components/ShippingCitySelect';
 
 const CHECKOUT_FORM_SECTION_CARD_CLASS = `p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS}`;
@@ -354,7 +353,6 @@ export function CheckoutForm({
         </div>
       </Card>
 
-      <DeliveryPolicyInfoCard />
     </div>
   );
 }

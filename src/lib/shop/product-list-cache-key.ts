@@ -2,6 +2,7 @@ import type { ProductFilters } from "@/lib/services/products-find-query/types";
 
 const PRODUCTS_CACHE_TTL = 120;
 const FEATURED_CACHE_TTL = 600;
+const PRODUCT_LIST_CACHE_PREFIX = "products:v2";
 
 /** Stable ordering for comma-separated URL params in cache keys (e.g. `category=a,b` vs `b,a`). */
 export function normalizeCommaListCacheValue(raw: string): string {
@@ -47,7 +48,7 @@ export function buildProductListCacheKey(filters: ProductFilters): string {
   const qs = pairs
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
     .join("&");
-  return `products:${qs}`;
+  return `${PRODUCT_LIST_CACHE_PREFIX}:${qs}`;
 }
 
 export function productListCacheTtlSeconds(filters: ProductFilters): number {

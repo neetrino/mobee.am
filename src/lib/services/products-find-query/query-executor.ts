@@ -11,9 +11,8 @@ import type { ProductSortOption } from "@/lib/products/sort";
 
 /**
  * Base include configuration for product queries.
- * When `listingMode` is true, omits `categories` (not needed for grid cards; avoids extra joins).
  */
-const getBaseInclude = (listingMode: boolean) => ({
+const getBaseInclude = () => ({
   translations: true,
   brand: {
     include: {
@@ -27,22 +26,18 @@ const getBaseInclude = (listingMode: boolean) => ({
     select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
   },
   labels: true,
-  ...(listingMode
-    ? {}
-    : {
-        categories: {
-          include: {
-            translations: true,
-          },
-        },
-      }),
+  categories: {
+    include: {
+      translations: true,
+    },
+  },
 });
 
 /**
  * Base include without attributeValue relation (fallback)
  */
-const getBaseIncludeWithoutAttributeValue = (listingMode: boolean) => ({
-  ...getBaseInclude(listingMode),
+const getBaseIncludeWithoutAttributeValue = () => ({
+  ...getBaseInclude(),
   variants: {
     where: {
       published: true,
@@ -112,7 +107,7 @@ export async function executeProductQuery(
   sort: ProductSortOption = "default",
   listingMode = false,
 ): Promise<ProductWithRelations[]> {
-  const baseInclude = getBaseInclude(listingMode);
+  const baseInclude = getBaseInclude();
   const orderBy = getOrderBy(sort);
 
   try {
@@ -176,7 +171,7 @@ async function executeWithoutProductAttributes(
   sort: ProductSortOption = "default",
   listingMode = false,
 ): Promise<ProductWithRelations[]> {
-  const baseInclude = getBaseInclude(listingMode);
+  const baseInclude = getBaseInclude();
   const orderBy = getOrderBy(sort);
 
   try {
@@ -247,9 +242,9 @@ async function executeWithoutAttributeValue(
   limit: number,
   skip: number = 0,
   sort: ProductSortOption = "default",
-  listingMode = false,
+  _listingMode = false,
 ): Promise<ProductWithRelations[]> {
-  const baseIncludeWithoutAttributeValue = getBaseIncludeWithoutAttributeValue(listingMode);
+  const baseIncludeWithoutAttributeValue = getBaseIncludeWithoutAttributeValue();
   const orderBy = getOrderBy(sort);
 
   // Try to include productAttributes even in fallback
