@@ -134,7 +134,7 @@ export function ProductInfoAndActions({
         </div>
       </div>
 
-      <hr className="my-5 border-0 border-t border-gray-200 max-lg:hidden" />
+      <hr className="my-5 border-0 border-t border-gray-200" />
 
       {isVariationRequired && (
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
@@ -186,7 +186,7 @@ export function ProductInfoAndActions({
         </button>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6 max-lg:border-t-0 max-lg:pt-0">
+      <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">
         <button
           type="button"
           disabled={!canAddToCart}

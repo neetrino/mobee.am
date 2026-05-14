@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect, type MouseEvent } from 'react';
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  type ComponentProps,
+  type MouseEvent,
+} from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { apiClient } from '../lib/api-client';
 import { getStoredCurrency } from '../lib/currency';
@@ -10,15 +17,17 @@ import { dispatchCartFlyAnimation } from '../lib/cart/dispatchCartFlyAnimation';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '../lib/cart/guest-cart';
 import { fetchProductBySlugWithLang } from '../lib/shop/fetchProductBySlugWithLang';
-import { useRelatedProducts } from './hooks/useRelatedProducts';
+import { useRelatedProducts, type RelatedProduct } from './hooks/useRelatedProducts';
 import { useCarousel } from './hooks/useCarousel';
 import { useVisibleCards } from './hooks/useVisibleCards';
+import { ProductCard } from './ProductCard';
 import { RelatedProductCard } from './RelatedProducts/RelatedProductCard';
 import { CarouselNavigation } from './RelatedProducts/CarouselNavigation';
 import { CarouselDots } from './RelatedProducts/CarouselDots';
 import { useUiLanguage } from './UiLanguageProvider';
 import { chunkArray } from '../lib/chunk-array';
 import {
+  HOME_BEST_CHOICE_CARD_WIDTH,
   HOME_BEST_CHOICE_MOBILE_CAROUSEL,
   HOME_BEST_CHOICE_MOBILE_PAGE,
 } from './HomeBestChoiceStyleProductGrid';
@@ -29,6 +38,7 @@ import {
 import { HomeMobileSectionTitle, HomeMobileCarouselPageIndicators } from './HomeMobileSectionTitle';
 import {
   RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE,
+  RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_GROUP_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_BUTTON_BASE_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_BUTTON_IDLE_CLASS,
@@ -49,6 +59,25 @@ function padChunkToGroupSize<T>(chunk: readonly T[], groupSize: number): (T | un
 }
 
 const RELATED_MOBILE_GRID_CHILD_MIN_WIDTH = '[&>*]:min-w-0';
+
+type HomeGridRelatedCardProduct = ComponentProps<typeof ProductCard>['product'];
+
+function mapRelatedProductToHomeGridCardProduct(product: RelatedProduct): HomeGridRelatedCardProduct {
+  return {
+    id: product.id,
+    slug: product.slug,
+    title: product.title,
+    price: product.price,
+    image: product.image,
+    inStock: product.inStock,
+    brand: product.brand ?? null,
+    compareAtPrice: product.compareAtPrice,
+    originalPrice: product.originalPrice ?? null,
+    discountPercent: product.discountPercent ?? null,
+    categories: product.categories,
+    defaultVariantId: product.defaultVariantId ?? undefined,
+  };
+}
 
 type RelatedMobileTitleNavLatch = 'prev' | 'next' | null;
 
@@ -343,14 +372,15 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
 
         {loading ? (
           <>
-            <div
-              ref={mobileCarouselRef}
-              className={`${HOME_BEST_CHOICE_MOBILE_CAROUSEL} lg:hidden`}
-              role="region"
-              aria-roledescription="carousel"
-              aria-label={t(language, 'product.related_products_title')}
-              aria-busy="true"
-            >
+            <div className={RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS}>
+              <div
+                ref={mobileCarouselRef}
+                className={`${HOME_BEST_CHOICE_MOBILE_CAROUSEL} lg:hidden`}
+                role="region"
+                aria-roledescription="carousel"
+                aria-label={t(language, 'product.related_products_title')}
+                aria-busy="true"
+              >
                 {chunkArray([1, 2, 3, 4, 5, 6, 7, 8], RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE).map(
                   (page, pageIndex) => (
                     <div key={`related-sk-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
@@ -375,10 +405,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
                     </div>
                   ))}
               </div>
+            </div>
             <HomeMobileCarouselPageIndicators
               pageIndex={relatedMobileCarousel.pageIndex}
               pageCount={relatedMobileCarousel.pageCount}
-              className="mt-2 mb-2 lg:mb-8 lg:hidden"
+              className="mt-5 mb-0 lg:mb-8 lg:hidden"
             />
             <div className="hidden grid-cols-4 gap-6 lg:grid">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -397,30 +428,29 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
           </div>
         ) : (
           <>
-            <div
-              ref={mobileCarouselRef}
-              className={`${HOME_BEST_CHOICE_MOBILE_CAROUSEL} lg:hidden`}
-              role="region"
-              aria-roledescription="carousel"
-              aria-label={t(language, 'product.related_products_title')}
-            >
+            <div className={RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS}>
+              <div
+                ref={mobileCarouselRef}
+                className={`${HOME_BEST_CHOICE_MOBILE_CAROUSEL} lg:hidden`}
+                role="region"
+                aria-roledescription="carousel"
+                aria-label={t(language, 'product.related_products_title')}
+              >
                 {chunkArray(products, RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE).map((page, pageIndex) => (
                   <div key={`related-page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
                     <div className={relatedMobileGridClass}>
                       {padChunkToGroupSize(page, RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE).map(
                         (product, slotIndex) =>
                           product ? (
-                            <RelatedProductCard
-                              key={product.id}
-                              product={product}
-                              currency={currency}
-                              language={language}
-                              isAddingToCart={addingProductId === product.id}
-                              hasMoved={false}
-                              onAddToCart={handleAddToCart}
-                              onImageError={handleImageError}
-                              imageError={imageErrors.has(product.id)}
-                            />
+                            <div key={product.id} className={HOME_BEST_CHOICE_CARD_WIDTH}>
+                              <ProductCard
+                                product={mapRelatedProductToHomeGridCardProduct(product)}
+                                viewMode="grid-2"
+                                shiftImageInFrame
+                                smallerFooterPrice
+                                homeProductGridCard
+                              />
+                            </div>
                           ) : (
                             <div
                               key={`related-empty-${pageIndex}-${slotIndex}`}
@@ -433,11 +463,12 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
                   </div>
                 ))}
               </div>
+            </div>
 
             <HomeMobileCarouselPageIndicators
               pageIndex={relatedMobileCarousel.pageIndex}
               pageCount={relatedMobileCarousel.pageCount}
-              className="mt-2 mb-0 lg:mb-8 lg:hidden"
+              className="mt-6 mb-0 lg:mb-8 lg:hidden"
             />
 
             <div className="relative hidden lg:block">

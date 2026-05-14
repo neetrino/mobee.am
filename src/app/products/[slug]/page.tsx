@@ -129,7 +129,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 pt-10 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pt-12 lg:pb-12">
+    <div className="max-w-7xl mx-auto px-4 py-12 max-lg:pb-4 sm:px-6 lg:px-8 lg:py-12">
       <div className="grid grid-cols-1 product-2col:grid-cols-[55%_45%] gap-12 items-start">
         <ProductImageGallery
           images={images}
@@ -180,7 +180,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
       <section
         id="product-long-description"
-        className="mt-12 max-w-3xl scroll-mt-24 border-t border-gray-200 pt-8 sm:mt-16 sm:pt-12"
+        className="mt-16 max-w-3xl scroll-mt-24 border-t border-gray-200 pt-12"
       >
         <h2 className="mb-4 text-xl font-semibold text-gray-900">{t(language, 'product.description_title')}</h2>
         <div
@@ -193,7 +193,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         />
       </section>
 
-      <div className="mt-12 sm:mt-16">
+      <div className="mt-16">
         <RelatedProducts currentProductSlug={product.slug} />
       </div>
     </div>

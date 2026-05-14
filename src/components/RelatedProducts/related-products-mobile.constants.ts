@@ -1,12 +1,16 @@
 /**
- * PDP related-products strip below `lg`: always two cards per horizontal page
- * (arrow scroll + dots stay in sync with {@link useHomeBestChoiceCarouselPageSync}).
+ * PDP related-products mobile strip: two cards per snap page (same row as home 2×2 cell width).
  */
 export const RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE = 2;
 
 /**
- * Wrapper for prev/next beside the mobile section title (5px right via `translate-x-[5px]`;
- * literal required for Tailwind JIT).
+ * Bleed mobile carousel into parent horizontal padding (`px-4` / `sm:px-6`) so cards are wider; grid gap unchanged.
+ */
+export const RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS =
+  'max-lg:-mx-4 sm:max-lg:-mx-6 lg:mx-0';
+
+/**
+ * PDP related-products mobile title-row controls (Tailwind class literals for JIT).
  */
 export const RELATED_PRODUCTS_MOBILE_TITLE_NAV_GROUP_CLASS =
   'inline-flex translate-x-[12px] items-center gap-1.5';
