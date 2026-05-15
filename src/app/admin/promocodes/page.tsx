@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { Check, Copy, Trash2 } from 'lucide-react';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
@@ -28,6 +29,9 @@ interface PromoCodeCreatePayload {
   code: string;
   discountPercent: number;
 }
+
+/** Duration to show the “copied” checkmark after a successful clipboard write. */
+const COPY_FEEDBACK_DURATION_MS = 2000;
 
 function getProblemDetail(data: unknown): string | null {
   if (!data || typeof data !== 'object') {
@@ -63,8 +67,10 @@ export default function PromoCodesPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const [code, setCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState('10');
+  const copyFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchPromoCodes = useCallback(async (options?: { showLoader?: boolean }) => {
     const showLoader = options?.showLoader ?? true;
@@ -94,6 +100,30 @@ export default function PromoCodesPage() {
       fetchPromoCodes();
     }
   }, [fetchPromoCodes, isAdmin, isLoading, isLoggedIn]);
+
+  useEffect(() => {
+    return () => {
+      if (copyFeedbackTimeoutRef.current !== null) {
+        clearTimeout(copyFeedbackTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleCopyPromoCode = async (promoCodeId: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      if (copyFeedbackTimeoutRef.current !== null) {
+        clearTimeout(copyFeedbackTimeoutRef.current);
+      }
+      setCopiedCodeId(promoCodeId);
+      copyFeedbackTimeoutRef.current = setTimeout(() => {
+        setCopiedCodeId(null);
+        copyFeedbackTimeoutRef.current = null;
+      }, COPY_FEEDBACK_DURATION_MS);
+    } catch {
+      alert(t('admin.promocodes.copyFailed'));
+    }
+  };
 
   const resetForm = () => {
     setCode('');
@@ -277,7 +307,26 @@ export default function PromoCodesPage() {
                 {promoCodes.map((promoCode) => (
                   <div key={promoCode.id} className="border border-gray-200 rounded-supersudo p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div>
-                      <p className="text-base font-semibold text-gray-900">{promoCode.code}</p>
+                      <div className="flex items-center gap-1">
+                        <p className="text-base font-semibold text-gray-900">{promoCode.code}</p>
+                        <button
+                          type="button"
+                          onClick={() => void handleCopyPromoCode(promoCode.id, promoCode.code)}
+                          className="inline-flex shrink-0 items-center justify-center rounded-supersudo p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-1"
+                          title={t('admin.promocodes.copyCode')}
+                          aria-label={
+                            copiedCodeId === promoCode.id
+                              ? t('admin.promocodes.copied')
+                              : t('admin.promocodes.copyCode')
+                          }
+                        >
+                          {copiedCodeId === promoCode.id ? (
+                            <Check className="h-4 w-4 text-green-600" aria-hidden />
+                          ) : (
+                            <Copy className="h-4 w-4" aria-hidden />
+                          )}
+                        </button>
+                      </div>
                       <p className="text-sm text-gray-600">
                         {promoCode.discountPercent}% {t('admin.promocodes.discountLabel')}
                       </p>
@@ -314,15 +363,16 @@ export default function PromoCodesPage() {
                           }`}
                         />
                       </button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
+                      <button
+                        type="button"
                         disabled={submitting || statusUpdatingId !== null}
                         onClick={() => handleDeletePromoCode(promoCode.id, promoCode.code)}
-                        className="text-red-600 hover:text-red-700"
+                        className="inline-flex shrink-0 items-center justify-center rounded-supersudo p-2 text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 disabled:pointer-events-none disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        title={t('admin.promocodes.delete')}
+                        aria-label={t('admin.promocodes.delete')}
                       >
-                        {t('admin.promocodes.delete')}
-                      </Button>
+                        <Trash2 className="h-4 w-4" aria-hidden />
+                      </button>
                     </div>
                   </div>
                 ))}
