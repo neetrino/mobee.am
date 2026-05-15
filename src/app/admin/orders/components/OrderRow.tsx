@@ -3,11 +3,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
-import {
-  getFulfillmentStatusColor,
-  getPaymentStatusColor,
-  getStatusColor,
-} from '../utils/orderUtils';
+import { getPaymentStatusColor, getStatusColor } from '../utils/orderUtils';
 import type { Order } from '../useOrders';
 import { OrderRowSelectDropdown } from './OrderRowSelectDropdown';
 
@@ -16,12 +12,10 @@ interface OrderRowProps {
   selected: boolean;
   updatingStatus: boolean;
   updatingPaymentStatus: boolean;
-  updatingFulfillmentStatus: boolean;
   onToggleSelect: () => void;
   onViewDetails: () => void;
   onStatusChange: (newStatus: string) => void;
   onPaymentStatusChange: (newPaymentStatus: string) => void;
-  onFulfillmentStatusChange: (newFulfillmentStatus: string) => void;
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
 }
 
@@ -30,12 +24,10 @@ export function OrderRow({
   selected,
   updatingStatus,
   updatingPaymentStatus,
-  updatingFulfillmentStatus,
   onToggleSelect,
   onViewDetails,
   onStatusChange,
   onPaymentStatusChange,
-  onFulfillmentStatusChange,
   formatCurrency,
 }: OrderRowProps) {
   const { t } = useTranslation();
@@ -57,17 +49,6 @@ export function OrderRow({
         { value: 'paid', label: t('admin.orders.paid') },
         { value: 'pending', label: t('admin.orders.pendingPayment') },
         { value: 'failed', label: t('admin.orders.failed') },
-      ] as const,
-    [t],
-  );
-
-  const fulfillmentOptions = useMemo(
-    () =>
-      [
-        { value: 'unfulfilled', label: t('admin.orders.unfulfilled') },
-        { value: 'fulfilled', label: t('admin.orders.fulfilled') },
-        { value: 'shipped', label: t('admin.orders.shipped') },
-        { value: 'delivered', label: t('admin.orders.delivered') },
       ] as const,
     [t],
   );
@@ -155,25 +136,6 @@ export function OrderRow({
               onValueChange={onPaymentStatusChange}
               triggerTintClassName={getPaymentStatusColor(order.paymentStatus)}
               ariaLabel={t('admin.orders.orderRowChangePaymentAria')}
-            />
-          )}
-        </div>
-      </td>
-      <td className="px-2 py-3 align-top sm:px-3">
-        <div className="flex items-center justify-end gap-2">
-          {updatingFulfillmentStatus ? (
-            <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
-              <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
-            </div>
-          ) : (
-            <OrderRowSelectDropdown
-              id={`order-${order.id}-fulfillment`}
-              value={order.fulfillmentStatus}
-              options={fulfillmentOptions}
-              onValueChange={onFulfillmentStatusChange}
-              triggerTintClassName={getFulfillmentStatusColor(order.fulfillmentStatus)}
-              ariaLabel={t('admin.orders.orderRowChangeFulfillmentAria')}
             />
           )}
         </div>
