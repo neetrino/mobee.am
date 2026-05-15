@@ -30,3 +30,14 @@ export const MOBILE_BOTTOM_NAV_BODY_PADDING_BOTTOM_CLASS =
  */
 export const MOBILE_BOTTOM_NAV_BADGE_CLASS =
   'pointer-events-none absolute -right-2 -top-1.5 z-20 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[#2db2ff] px-[2px] text-[8px] font-semibold leading-none text-white shadow-sm';
+
+/** Expanded “active” tab label (Montserrat applied on the span in `MobileBottomNav`). */
+export const MOBILE_BOTTOM_NAV_ACTIVE_ITEM_LABEL_CLASS =
+  'shrink-0 whitespace-nowrap text-sm font-normal leading-normal text-[#2db2ff]' as const;
+
+/**
+ * Active wishlist tab label — one step above `text-sm` / `text-base` so the change is visible
+ * (label only renders on `/wishlist` when the pill expands).
+ */
+export const MOBILE_BOTTOM_NAV_ACTIVE_WISHLIST_LABEL_CLASS =
+  'shrink-0 whitespace-nowrap text-lg font-normal leading-snug text-[#2db2ff]' as const;
