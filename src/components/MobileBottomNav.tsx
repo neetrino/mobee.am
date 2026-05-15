@@ -15,8 +15,6 @@ import { useMdUpViewport } from './hooks/useMdUpViewport';
 import { useMobileBottomNavCartCount } from './hooks/useMobileBottomNavCartCount';
 import { isCompareAppRoute } from '../lib/compareAppRoute';
 import {
-  MOBILE_BOTTOM_NAV_ACTIVE_ITEM_LABEL_CLASS,
-  MOBILE_BOTTOM_NAV_ACTIVE_WISHLIST_LABEL_CLASS,
   MOBILE_BOTTOM_NAV_BADGE_CLASS,
   MOBILE_BOTTOM_NAV_COMPARE_ICON_ON_COMPARE_PAGE_SIZE_PX,
   MOBILE_BOTTOM_NAV_COMPARE_ICON_SIZE_PX,
@@ -68,12 +66,7 @@ interface NavIconProps {
 }
 
 function MobileBottomNavIcon({ item, active, compareNavIconSizePx }: NavIconProps) {
-  const iconBox =
-    item.key === 'wishlist'
-      ? 'h-7 w-7'
-      : active
-        ? ACTIVE_ICON_BOX
-        : INACTIVE_ICON_BOX[item.key];
+  const iconBox = active ? ACTIVE_ICON_BOX : INACTIVE_ICON_BOX[item.key];
   const iconColor = active ? ACTIVE_ICON_COLOR : INACTIVE_ICON_COLOR;
 
   if (item.key === 'cart') {
@@ -183,11 +176,7 @@ function MobileNavItem({
         <>
           {iconWrap}
           <span
-            className={`${montserratNav.className} ${
-              item.key === 'wishlist'
-                ? MOBILE_BOTTOM_NAV_ACTIVE_WISHLIST_LABEL_CLASS
-                : MOBILE_BOTTOM_NAV_ACTIVE_ITEM_LABEL_CLASS
-            }`}
+            className={`${montserratNav.className} shrink-0 whitespace-nowrap text-sm font-normal leading-normal text-[#2db2ff]`}
           >
             {label}
           </span>
