@@ -333,9 +333,6 @@ export default function PromoCodesPage() {
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-sm text-gray-600">
-                        {t('admin.promocodes.statusLabel')}
-                      </span>
                       <button
                         type="button"
                         onClick={() => handleToggleStatus(promoCode.id, promoCode.isActive)}
