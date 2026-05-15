@@ -46,7 +46,7 @@ export function OrdersTable({
   onPageChange,
   formatCurrency,
 }: OrdersTableProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   if (loading) {
     return (
@@ -119,10 +119,18 @@ export function OrdersTable({
                 </div>
               </th>
               <th className="w-[7%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[80px]">{t('admin.orders.items')}</span>
+                <span
+                  className={`inline-block ${lang === 'en' || lang === 'ru' ? '-translate-x-[60px]' : '-translate-x-[80px]'}`}
+                >
+                  {t('admin.orders.items')}
+                </span>
               </th>
               <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[5px]">{t('admin.orders.status')}</span>
+                <span
+                  className={`inline-block ${lang === 'en' || lang === 'ru' ? 'translate-x-[5px]' : '-translate-x-[5px]'}`}
+                >
+                  {t('admin.orders.status')}
+                </span>
               </th>
               <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 <span className="inline-block translate-x-[20px]">{t('admin.orders.payment')}</span>

@@ -655,7 +655,7 @@
     "completed": "Завершен",
     "cancelled": "Отменен",
     "paid": "Оплачен",
-    "pendingPayment": "Ожидает оплаты",
+    "pendingPayment": "Ожидает",
     "failed": "Неудачно",
     "unfulfilled": "Не выполнен",
     "fulfilled": "Выполнен",
