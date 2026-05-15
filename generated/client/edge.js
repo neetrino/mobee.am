@@ -482,7 +482,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/lianayengoyan/Documents/mobee.am/shared/db/generated/client",
+      "value": "C:\\Users\\user\\Desktop\\mobee.am\\shared\\db\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -491,7 +491,7 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "darwin-arm64",
+        "value": "windows",
         "native": true
       },
       {
@@ -500,7 +500,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/lianayengoyan/Documents/mobee.am/shared/db/prisma/schema.prisma",
+    "sourceFilePath": "C:\\Users\\user\\Desktop\\mobee.am\\shared\\db\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
