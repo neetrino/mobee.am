@@ -21,7 +21,7 @@ import {
   ORDER_SUMMARY_PANEL_RADIUS_CLASS,
 } from './constants';
 import { CART_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
-import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
+import { ORDER_SUMMARY_SIDEBAR_STICKY_OUTER_CLASS } from '../../lib/order-summary-sticky.constants';
 import { DISMISS_ROUND_BUTTON_HOVER_CLASS } from '../../lib/dismiss-icon-button.constants';
 import {
   LAYOUT_DESKTOP_MAX_MOBILE_WIDTH_PX,
@@ -244,9 +244,9 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
   const currencyCode = currency as CurrencyCode;
   
   return (
-    <div className="lg:col-span-1">
+    <div className={`lg:col-span-1 ${ORDER_SUMMARY_SIDEBAR_STICKY_OUTER_CLASS}`}>
       <div
-        className={`${ORDER_SUMMARY_PANEL_RADIUS_CLASS} border border-gray-200 bg-white p-6 ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}
+        className={`${ORDER_SUMMARY_PANEL_RADIUS_CLASS} border border-gray-200 bg-white p-6`}
       >
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           {t('common.cart.orderSummary')}

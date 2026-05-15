@@ -11,6 +11,7 @@ import { ErrorState } from './components/ErrorState';
 import { OrderStatus } from './components/OrderStatus';
 import { OrderItems } from './components/OrderItems';
 import { ShippingAddress } from './components/ShippingAddress';
+import { ORDER_SUMMARY_SIDEBAR_STICKY_OUTER_CLASS } from '../../../lib/order-summary-sticky.constants';
 import { OrderSummary } from './components/OrderSummary';
 import type { Order } from './types';
 
@@ -87,7 +88,9 @@ export default function OrderPage() {
           )}
         </div>
 
-        <OrderSummary order={order} currency={currency} />
+        <div className={ORDER_SUMMARY_SIDEBAR_STICKY_OUTER_CLASS}>
+          <OrderSummary order={order} currency={currency} />
+        </div>
       </div>
     </div>
   );
