@@ -1,7 +1,18 @@
+import { HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA } from '../home-best-choice.constants';
+
 /**
- * PDP related-products mobile strip: two cards per snap page (same row as home 2×2 cell width).
+ * PDP related-products mobile strip: two cards per snap page on phones (same row as home 2×2 cell width).
  */
-export const RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE = 2;
+export const RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_PHONE = 2;
+
+/**
+ * Narrow tablet / iPad mini portrait band (744–899 CSS px): one row of three cards per snap page.
+ * Same `matchMedia` band as home best-choice tablet pages — see {@link HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA}.
+ */
+export const RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_MINI = 3;
+
+/** Keep in sync with home carousel tablet band. */
+export const RELATED_PRODUCTS_MOBILE_IPAD_MINI_BAND_MEDIA_QUERY = HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA;
 
 /**
  * Bleed mobile carousel into parent horizontal padding (`px-4` / `sm:px-6`) so cards are wider; grid gap unchanged.

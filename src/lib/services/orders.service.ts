@@ -14,6 +14,7 @@ import {
   resolveCheckoutShippingAmount,
   type DeliverySpeed,
 } from "./orders/checkout-shipping";
+import { removeOrphanCartItemsForCart } from "./cart-remove-orphan-items";
 
 const ORDER_NUMBER_START = 1000;
 
@@ -148,7 +149,8 @@ class OrdersService {
       }> = [];
       const isUserCartCheckout = Boolean(userId && cartId && cartId !== "guest-cart");
 
-      if (isUserCartCheckout) {
+      if (isUserCartCheckout && cartId) {
+        await removeOrphanCartItemsForCart(cartId);
         // Get items from user's cart
         const cart = await db.cart.findFirst({
           where: { id: cartId, userId },

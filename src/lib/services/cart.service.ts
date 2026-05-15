@@ -1,6 +1,7 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
 import { resolveCartLineProductImageUrl } from "../cart/resolveCartLineProductImage";
+import { removeOrphanCartItemsForUser } from "./cart-remove-orphan-items";
 import {
   calculateReservationDelta,
   releaseVariantStockReservation,
@@ -12,6 +13,8 @@ class CartService {
    * Get or create user's cart
    */
   async getCart(userId: string, locale: string = "en") {
+    await removeOrphanCartItemsForUser(userId);
+
     // Get discount settings
     const discountSettings = await db.settings.findMany({
       where: {

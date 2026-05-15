@@ -37,13 +37,14 @@ import {
 } from './useHomeBestChoiceCarouselPageSync';
 import { HomeMobileSectionTitle, HomeMobileCarouselPageIndicators } from './HomeMobileSectionTitle';
 import {
-  RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE,
+  RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_MINI,
   RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_GROUP_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_BUTTON_BASE_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_BUTTON_IDLE_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_BUTTON_LATCHED_CLASS,
 } from './RelatedProducts/related-products-mobile.constants';
+import { useRelatedProductsMobileCardsPerPage } from './hooks/useRelatedProductsMobileCardsPerPage';
 
 interface RelatedProductsProps {
   currentProductSlug: string;
@@ -83,11 +84,13 @@ type RelatedMobileTitleNavLatch = 'prev' | 'next' | null;
 
 /**
  * Below `lg`: horizontal snap carousel (same shell as home best-choice).
- * At `lg+`: draggable strip with arrows/dots.
+ * iPad mini / narrow tablet band: three cards per snap page; phones keep two.
+ * At `lg+`: draggable strip with arrows/dots (unchanged desktop).
  */
 export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   const { isLoggedIn } = useAuth();
   const language = useUiLanguage();
+  const relatedMobileCardsPerPage = useRelatedProductsMobileCardsPerPage();
   const addToCartInFlightRef = useRef<Set<string>>(new Set());
   const relatedMobileTitleNavGroupRef = useRef<HTMLSpanElement>(null);
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
@@ -120,9 +123,9 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
 
   const mobileCarouselPageCount =
     loading
-      ? Math.max(1, Math.ceil(8 / RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE))
+      ? Math.max(1, Math.ceil(8 / relatedMobileCardsPerPage))
       : products.length > 0
-        ? Math.max(1, Math.ceil(products.length / RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE))
+        ? Math.max(1, Math.ceil(products.length / relatedMobileCardsPerPage))
         : 1;
 
   const [relatedMobileCarousel, setRelatedMobileCarousel] = useState<MobileCarouselViewState>(() => ({
@@ -148,7 +151,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
     onRelatedMobileCarouselViewChange,
   );
 
-  const relatedMobileGridClass = `grid grid-cols-2 gap-4 ${RELATED_MOBILE_GRID_CHILD_MIN_WIDTH}`;
+  const relatedMobileGridColsClass =
+    relatedMobileCardsPerPage === RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_MINI
+      ? 'grid-cols-3'
+      : 'grid-cols-2';
+  const relatedMobileGridClass = `grid ${relatedMobileGridColsClass} gap-4 ${RELATED_MOBILE_GRID_CHILD_MIN_WIDTH}`;
 
   const scrollRelatedMobileByPage = useCallback((direction: -1 | 1) => {
     const el = mobileCarouselRef.current;
@@ -381,11 +388,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
                 aria-label={t(language, 'product.related_products_title')}
                 aria-busy="true"
               >
-                {chunkArray([1, 2, 3, 4, 5, 6, 7, 8], RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE).map(
+                {chunkArray([1, 2, 3, 4, 5, 6, 7, 8], relatedMobileCardsPerPage).map(
                   (page, pageIndex) => (
                     <div key={`related-sk-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
                       <div className={relatedMobileGridClass}>
-                        {padChunkToGroupSize(page, RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE).map(
+                        {padChunkToGroupSize(page, relatedMobileCardsPerPage).map(
                           (slot, slotIndex) =>
                             slot !== undefined ? (
                               <div key={slot} className="animate-pulse">
@@ -436,10 +443,10 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
                 aria-roledescription="carousel"
                 aria-label={t(language, 'product.related_products_title')}
               >
-                {chunkArray(products, RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE).map((page, pageIndex) => (
+                {chunkArray(products, relatedMobileCardsPerPage).map((page, pageIndex) => (
                   <div key={`related-page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
                     <div className={relatedMobileGridClass}>
-                      {padChunkToGroupSize(page, RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE).map(
+                      {padChunkToGroupSize(page, relatedMobileCardsPerPage).map(
                         (product, slotIndex) =>
                           product ? (
                             <div key={product.id} className={HOME_BEST_CHOICE_CARD_WIDTH}>
