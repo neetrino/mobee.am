@@ -32,6 +32,9 @@ export const ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS = 'bg-admin-50 font-semi
 /** Nudge order-row cell content down to align with status / payment controls (`1.5rem` ≈ 24px). */
 export const ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS = 'translate-y-6';
 
+/** Date column: 4px above `ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS` (`translate-y-5` vs `translate-y-6`). */
+export const ORDER_ROW_DATE_CELL_VERTICAL_NUDGE_CLASS = 'translate-y-5';
+
 /** Order # column: base `translate-y-7` (28px) + 5px. */
 export const ORDER_ROW_ORDER_NUMBER_VERTICAL_CLASS = 'translate-y-[33px]';
 

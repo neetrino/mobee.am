@@ -90,7 +90,7 @@ export function OrdersTable({
                 <span className="inline-block -translate-x-[110px]">{t('admin.orders.orderNumber')}</span>
               </th>
               <th className="w-[18%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[80px]">{t('admin.orders.customer')}</span>
+                <span className="inline-block -translate-x-[100px]">{t('admin.orders.customer')}</span>
               </th>
               <th
                 className="w-[12%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"

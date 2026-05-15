@@ -5,7 +5,7 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
 import { getPaymentStatusColor, getStatusColor } from '../utils/orderUtils';
 import type { Order } from '../useOrders';
-import { ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS, ORDER_ROW_ORDER_NUMBER_VERTICAL_CLASS, ORDER_ROW_TOTAL_PRICE_VERTICAL_CLASS } from '../orders-filters.constants';
+import { ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS, ORDER_ROW_DATE_CELL_VERTICAL_NUDGE_CLASS, ORDER_ROW_ORDER_NUMBER_VERTICAL_CLASS, ORDER_ROW_TOTAL_PRICE_VERTICAL_CLASS } from '../orders-filters.constants';
 import { OrderRowSelectDropdown } from './OrderRowSelectDropdown';
 
 interface OrderRowProps {
@@ -92,7 +92,7 @@ export function OrderRow({
         className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
         onClick={onViewDetails}
       >
-        <div className="-translate-x-[80px]">
+        <div className="-translate-x-[100px]">
           <div className="text-sm font-medium text-gray-900">
             {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
           </div>
@@ -155,7 +155,7 @@ export function OrderRow({
         </div>
       </td>
       <td className="px-2 py-5 align-top text-sm text-gray-500 break-words sm:px-3">
-        <span className={`inline-block ${ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS}`}>
+        <span className={`inline-block ${ORDER_ROW_DATE_CELL_VERTICAL_NUDGE_CLASS}`}>
           {new Date(order.createdAt).toLocaleDateString()}
         </span>
       </td>
