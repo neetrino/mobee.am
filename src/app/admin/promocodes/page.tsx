@@ -9,6 +9,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { apiClient, ApiError } from '../../../lib/api-client';
 import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '../../../components/Toast';
+import { confirmDialog } from '../../../components/ConfirmDialog';
 
 interface PromoCode {
   id: string;
@@ -29,6 +30,10 @@ interface PromoCodeCreatePayload {
 
 /** Duration to show the “copied” checkmark after a successful clipboard write. */
 const COPY_FEEDBACK_DURATION_MS = 2000;
+
+/** Create-form fields — Mobee cyan focus, not admin navy ring. */
+const PROMO_FORM_FIELD_CLASS =
+  'w-full rounded-supersudo border border-gray-300 px-3 py-2 text-gray-900 transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#2DB2FF]/35' as const;
 
 function getProblemDetail(data: unknown): string | null {
   if (!data || typeof data !== 'object') {
@@ -192,7 +197,10 @@ export default function PromoCodesPage() {
   };
 
   const handleDeletePromoCode = async (promoCodeId: string, promoCode: string) => {
-    const confirmed = confirm(t('admin.promocodes.deleteConfirm').replace('{code}', promoCode));
+    const confirmed = await confirmDialog({
+      message: t('admin.promocodes.deleteConfirm').replace('{code}', promoCode),
+      variant: 'danger',
+    });
     if (!confirmed) {
       return;
     }
@@ -247,7 +255,7 @@ export default function PromoCodesPage() {
                   maxLength={64}
                   onChange={(event) => setCode(event.target.value.toUpperCase())}
                   placeholder={t('admin.promocodes.codePlaceholder')}
-                  className="w-full rounded-supersudo border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
+                  className={PROMO_FORM_FIELD_CLASS}
                 />
               </div>
 
@@ -263,7 +271,7 @@ export default function PromoCodesPage() {
                   step="0.01"
                   value={discountPercent}
                   onChange={(event) => setDiscountPercent(event.target.value)}
-                  className="w-full rounded-supersudo border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-admin focus:border-transparent"
+                  className={PROMO_FORM_FIELD_CLASS}
                 />
               </div>
 
@@ -295,7 +303,7 @@ export default function PromoCodesPage() {
                         <button
                           type="button"
                           onClick={() => void handleCopyPromoCode(promoCode.id, promoCode.code)}
-                          className="inline-flex shrink-0 items-center justify-center rounded-supersudo p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-1"
+                          className="inline-flex shrink-0 items-center justify-center rounded-supersudo p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2DB2FF]/35 focus:ring-offset-1"
                           title={t('admin.promocodes.copyCode')}
                           aria-label={
                             copiedCodeId === promoCode.id

@@ -16,6 +16,9 @@
     "viewMore": "Դիտել ավելին",
     "close": "Փակել"
   },
+  "dialog": {
+    "confirm": "Հաստատել"
+  },
   "navigation": {
     "menuTitle": "Նավիգացիա",
     "home": "Գլխավոր",
