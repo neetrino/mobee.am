@@ -29,6 +29,13 @@ export const ORDERS_FILTER_DROPDOWN_OPTION_CLASS =
 
 export const ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS = 'bg-admin-50 font-semibold text-admin-800';
 
+/** Portaled order-row status/payment listbox — above table rows and typical admin chrome. */
+export const ORDER_ROW_SELECT_PORTAL_Z_INDEX_CLASS = 'z-[280]';
+
+/** Order-row listbox options: centered label (table cell dropdowns). */
+export const ORDER_ROW_SELECT_OPTION_CLASS =
+  'flex w-full justify-center break-words px-3 py-2.5 text-center text-sm leading-snug text-gray-800 transition-colors hover:bg-gray-50';
+
 /** Nudge order-row cell content down to align with status / payment controls (`1.5rem` ≈ 24px). */
 export const ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS = 'translate-y-6';
 

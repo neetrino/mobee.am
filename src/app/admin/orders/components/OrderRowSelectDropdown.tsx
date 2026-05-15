@@ -1,12 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MutableRefObject, type RefObject } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ORDERS_FILTER_DROPDOWN_FLYOUT_MAX_WIDTH_CLASS,
   ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS,
-  ORDERS_FILTER_DROPDOWN_OPTION_CLASS,
   ORDERS_FILTER_DROPDOWN_PANEL_CLASS,
   ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS,
+  ORDER_ROW_SELECT_OPTION_CLASS,
+  ORDER_ROW_SELECT_PORTAL_Z_INDEX_CLASS,
 } from '../orders-filters.constants';
 
 const ORDER_ROW_DROPDOWN_CHEVRON_WRAP_CLASS =
@@ -36,13 +38,28 @@ function useDismissOnOutsideAndEscape(
   isOpen: boolean,
   onDismiss: () => void,
   rootRef: RefObject<HTMLDivElement | null>,
+  extraRefs: ReadonlyArray<RefObject<HTMLElement | null>>,
 ) {
   useEffect(() => {
     if (!isOpen) {
       return;
     }
+    const containsAny = (node: Node | null) => {
+      if (!node) {
+        return false;
+      }
+      if (rootRef.current?.contains(node)) {
+        return true;
+      }
+      for (const r of extraRefs) {
+        if (r.current?.contains(node)) {
+          return true;
+        }
+      }
+      return false;
+    };
     const handlePointerDown = (event: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
+      if (!containsAny(event.target as Node)) {
         onDismiss();
       }
     };
@@ -57,51 +74,60 @@ function useDismissOnOutsideAndEscape(
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onDismiss, rootRef]);
+  }, [isOpen, onDismiss, rootRef, extraRefs]);
 }
 
-interface OrderRowSelectFlyoutProps {
+interface PortalListboxProps {
   id: string;
   value: string;
   options: readonly OrderRowSelectOption[];
   onPick: (next: string) => void;
+  portalRef: MutableRefObject<HTMLDivElement | null>;
+  position: { top: number; left: number; width: number };
 }
 
-function OrderRowSelectFlyout({ id, value, options, onPick }: OrderRowSelectFlyoutProps) {
+function PortalListbox({ id, value, options, onPick, portalRef, position }: PortalListboxProps) {
+  const setPortalEl = useCallback(
+    (el: HTMLDivElement | null) => {
+      portalRef.current = el;
+    },
+    [portalRef],
+  );
+
   return (
-    <>
-      <div className="pointer-events-none absolute right-0 top-full z-[60] h-1 w-full" aria-hidden />
-      <div
-        id={`${id}-listbox`}
-        role="listbox"
-        className={`absolute right-0 top-full z-[60] min-w-full w-max pt-1 ${ORDERS_FILTER_DROPDOWN_FLYOUT_MAX_WIDTH_CLASS}`}
-      >
-        <div className={ORDERS_FILTER_DROPDOWN_PANEL_CLASS}>
-          {options.map((opt) => {
-            const active = opt.value === value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                role="option"
-                aria-selected={active}
-                className={`${ORDERS_FILTER_DROPDOWN_OPTION_CLASS} ${
-                  active ? ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS : ''
-                }`}
-                onClick={() => onPick(opt.value)}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
+    <div
+      ref={setPortalEl}
+      className={`fixed ${ORDER_ROW_SELECT_PORTAL_Z_INDEX_CLASS} pt-1 ${ORDERS_FILTER_DROPDOWN_FLYOUT_MAX_WIDTH_CLASS}`}
+      style={{
+        top: position.top,
+        left: position.left,
+        minWidth: position.width,
+      }}
+    >
+      <div id={`${id}-listbox`} role="listbox" className={ORDERS_FILTER_DROPDOWN_PANEL_CLASS}>
+        {options.map((opt) => {
+          const active = opt.value === value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              role="option"
+              aria-selected={active}
+              className={`${ORDER_ROW_SELECT_OPTION_CLASS} ${active ? ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS : ''}`}
+              onClick={() => onPick(opt.value)}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
-    </>
+    </div>
   );
 }
 
 /**
- * Same flyout shell as `OrdersFilterDropdown` (blue pills row) — for table cell status controls.
+ * Table cell status/payment dropdown: listbox is portaled to `document.body` with `fixed` placement
+ * so it stacks above following rows and card overflow; options use centered labels.
  */
 export function OrderRowSelectDropdown({
   id,
@@ -114,9 +140,17 @@ export function OrderRowSelectDropdown({
   fixedPaymentTriggerWidth = false,
 }: OrderRowSelectDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [portalPosition, setPortalPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const dismiss = useCallback(() => setIsOpen(false), []);
-  useDismissOnOutsideAndEscape(isOpen, dismiss, rootRef);
+
+  const dismissExtraRefs = useMemo(
+    () => [portalRef as RefObject<HTMLElement | null>],
+    [],
+  );
+
+  useDismissOnOutsideAndEscape(isOpen, dismiss, rootRef, dismissExtraRefs);
 
   const displayLabel = options.find((o) => o.value === value)?.label ?? value;
 
@@ -134,15 +168,37 @@ export function OrderRowSelectDropdown({
     ? ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS
     : 'max-w-full min-w-0';
 
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      setPortalPosition(null);
+      return;
+    }
+    const updatePosition = () => {
+      const root = rootRef.current;
+      if (!root) {
+        return;
+      }
+      const rect = root.getBoundingClientRect();
+      setPortalPosition({ top: rect.bottom, left: rect.left, width: rect.width });
+    };
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    document.addEventListener('scroll', updatePosition, true);
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      document.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [isOpen]);
+
   return (
     <div ref={rootRef} className="relative w-max max-w-full min-w-0">
       <button
         type="button"
         id={`${id}-trigger`}
+        aria-controls={`${id}-listbox`}
         className={`relative flex h-auto min-h-5 items-center justify-center overflow-hidden rounded-supersudo px-2.5 py-1.5 text-center text-xs font-medium ring-1 ring-black/5 transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-admin active:opacity-90 ${triggerTintClassName} ${triggerSizingClassName}`}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-controls={`${id}-listbox`}
         aria-label={ariaLabel}
         onClick={() => setIsOpen((o) => !o)}
       >
@@ -164,7 +220,19 @@ export function OrderRowSelectDropdown({
           </svg>
         </span>
       </button>
-      {isOpen ? <OrderRowSelectFlyout id={id} value={value} options={options} onPick={handlePick} /> : null}
+      {isOpen && portalPosition
+        ? createPortal(
+            <PortalListbox
+              id={id}
+              value={value}
+              options={options}
+              onPick={handlePick}
+              portalRef={portalRef}
+              position={portalPosition}
+            />,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
