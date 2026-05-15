@@ -5,6 +5,7 @@ import type { FormEvent } from 'react';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { apiClient } from '../../../lib/api-client';
+import { showToast } from '../../Toast';
 import type { Review } from '../utils';
 
 interface UseReviewFormProps {
@@ -52,17 +53,17 @@ export function useReviewForm({
     e.preventDefault();
     
     if (!isLoggedIn) {
-      alert(t('common.reviews.loginRequired'));
+      showToast(t('common.reviews.loginRequired'), 'warning');
       return;
     }
 
     if (rating === 0) {
-      alert(t('common.reviews.ratingRequired'));
+      showToast(t('common.reviews.ratingRequired'), 'warning');
       return;
     }
 
     if (!comment.trim()) {
-      alert(t('common.reviews.commentRequired'));
+      showToast(t('common.reviews.commentRequired'), 'warning');
       return;
     }
 
@@ -72,7 +73,7 @@ export function useReviewForm({
       // Use slug if available, otherwise fall back to productId
       const identifier = productSlug || productId;
       if (!identifier) {
-        alert(t('common.reviews.submitError'));
+        showToast(t('common.reviews.submitError'), 'error');
         return;
       }
 
@@ -108,7 +109,7 @@ export function useReviewForm({
         try {
           const identifier = productSlug || productId;
           if (!identifier) {
-            alert(t('common.reviews.alreadyReviewed') || 'You have already reviewed this product');
+            showToast(t('common.reviews.alreadyReviewed') || 'You have already reviewed this product', 'info');
             return;
           }
 
@@ -124,9 +125,13 @@ export function useReviewForm({
             
             // Show in edit mode
             handleEditReview(existingReview);
-            alert(t('common.reviews.alreadyReviewed') || 'You have already reviewed this product. You can update your review below.');
+            showToast(
+              t('common.reviews.alreadyReviewed') ||
+                'You have already reviewed this product. You can update your review below.',
+              'info',
+            );
           } else {
-            alert(t('common.reviews.alreadyReviewed') || 'You have already reviewed this product');
+            showToast(t('common.reviews.alreadyReviewed') || 'You have already reviewed this product', 'info');
           }
         } catch (loadError: unknown) {
           console.error('❌ [PRODUCT REVIEWS] Error loading existing review:', loadError);
@@ -134,15 +139,19 @@ export function useReviewForm({
           const userReview = user ? reviews.find(r => r.userId === user.id) : null;
           if (userReview) {
             handleEditReview(userReview);
-            alert(t('common.reviews.alreadyReviewed') || 'You have already reviewed this product. You can update your review below.');
+            showToast(
+              t('common.reviews.alreadyReviewed') ||
+                'You have already reviewed this product. You can update your review below.',
+              'info',
+            );
           } else {
-            alert(t('common.reviews.alreadyReviewed') || 'You have already reviewed this product');
+            showToast(t('common.reviews.alreadyReviewed') || 'You have already reviewed this product', 'info');
           }
         }
       } else if (err.status === 401) {
-        alert(t('common.reviews.loginRequired'));
+        showToast(t('common.reviews.loginRequired'), 'warning');
       } else {
-        alert(t('common.reviews.submitError'));
+        showToast(t('common.reviews.submitError'), 'error');
       }
     } finally {
       setSubmitting(false);
@@ -157,12 +166,12 @@ export function useReviewForm({
     }
 
     if (rating === 0) {
-      alert(t('common.reviews.ratingRequired'));
+      showToast(t('common.reviews.ratingRequired'), 'warning');
       return;
     }
 
     if (!comment.trim()) {
-      alert(t('common.reviews.commentRequired'));
+      showToast(t('common.reviews.commentRequired'), 'warning');
       return;
     }
 
@@ -198,11 +207,11 @@ export function useReviewForm({
       
       // Handle specific error cases
       if (err.status === 401) {
-        alert(t('common.reviews.loginRequired'));
+        showToast(t('common.reviews.loginRequired'), 'warning');
       } else if (err.status === 403) {
-        alert('You can only update your own reviews');
+        showToast('You can only update your own reviews', 'error');
       } else {
-        alert(t('common.reviews.submitError'));
+        showToast(t('common.reviews.submitError'), 'error');
       }
     } finally {
       setSubmitting(false);

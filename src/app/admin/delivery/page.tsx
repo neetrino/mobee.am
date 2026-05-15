@@ -8,6 +8,7 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { showToast } from '@/components/Toast';
 import { ARMENIA_FALLBACK_DELIVERY_CITIES } from '../../../lib/constants/armenia-delivery-cities.constants';
 
 const SUPPORTED_COUNTRIES = ['Armenia'] as const;
@@ -73,13 +74,13 @@ export default function DeliveryPage() {
     try {
       console.log('[ADMIN] Saving delivery settings...', { locations });
       await apiClient.put('/api/v1/admin/delivery', { locations });
-      alert(t('admin.delivery.savedSuccess'));
+      showToast(t('admin.delivery.savedSuccess'), 'success');
       console.log('[ADMIN] Delivery settings saved');
       await fetchDeliverySettings();
     } catch (err: any) {
       console.error('[ADMIN] Error saving delivery settings:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save delivery settings';
-      alert(t('admin.delivery.errorSaving').replace('{message}', errorMessage));
+      showToast(t('admin.delivery.errorSaving').replace('{message}', errorMessage), 'error');
     } finally {
       setSaving(false);
     }

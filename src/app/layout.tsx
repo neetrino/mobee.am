@@ -23,6 +23,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  /** Stops iOS Safari from injecting tel links into text/DOM and breaking React hydration. */
+  formatDetection: {
+    telephone: false,
+  },
   title: {
     default: SITE_BRAND_NAME,
     template: `%s | ${SITE_BRAND_NAME}`,

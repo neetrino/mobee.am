@@ -8,6 +8,7 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
 import { MessageDetailDialog, type AdminContactMessage } from './components/MessageDetailDialog';
+import { showToast } from '@/components/Toast';
 
 type Message = AdminContactMessage;
 
@@ -112,11 +113,11 @@ export default function MessagesPage() {
       
       setSelectedIds(new Set());
       await fetchMessages();
-      alert(t('admin.messages.deletedSuccess'));
+      showToast(t('admin.messages.deletedSuccess'), 'success');
     } catch (err: unknown) {
       console.error('❌ [ADMIN] Bulk delete messages error:', err);
       const detail = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
-      alert(t('admin.messages.failedToDelete') + ': ' + detail);
+      showToast(t('admin.messages.failedToDelete') + ': ' + detail, 'error');
     } finally {
       setBulkDeleting(false);
     }

@@ -23,6 +23,7 @@ import { useVisibleCards } from './hooks/useVisibleCards';
 import { ProductCard } from './ProductCard';
 import { RelatedProductCard } from './RelatedProducts/RelatedProductCard';
 import { CarouselNavigation } from './RelatedProducts/CarouselNavigation';
+import { showToast } from './Toast';
 import { CarouselDots } from './RelatedProducts/CarouselDots';
 import { useUiLanguage } from './UiLanguageProvider';
 import { chunkArray } from '../lib/chunk-array';
@@ -305,7 +306,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
           const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
           if (!productDetails.variants || productDetails.variants.length === 0) {
-            alert('No variants available');
+            showToast(t(language, 'common.alerts.noVariantsAvailable'), 'warning');
             if (isLoggedIn) {
               window.dispatchEvent(new Event('cart-updated'));
             }
@@ -345,7 +346,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         if (isLoggedIn) {
           window.dispatchEvent(new Event('cart-updated'));
         }
-        alert('Failed to add product to cart. Please try again.');
+        showToast(t(language, 'common.alerts.failedToAddToCart'), 'error');
       } finally {
         addToCartInFlightRef.current.delete(product.id);
         setAddingProductId((current) => (current === product.id ? null : current));
