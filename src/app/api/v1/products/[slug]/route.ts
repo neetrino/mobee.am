@@ -13,17 +13,27 @@ export async function GET(
     const { slug } = await params;
     const result = await productsService.findBySlug(slug, lang);
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("❌ [PRODUCTS] Error:", error);
+  } catch (error: unknown) {
+    const err = error as { status?: number };
+    if (err.status !== 404) {
+      console.error("❌ [PRODUCTS] Error:", error);
+    }
+    const e = error as {
+      type?: string;
+      title?: string;
+      status?: number;
+      detail?: string;
+      message?: string;
+    };
     return NextResponse.json(
       {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
+        type: e.type || "https://api.shop.am/problems/internal-error",
+        title: e.title || "Internal Server Error",
+        status: e.status || 500,
+        detail: e.detail || e.message || "An error occurred",
         instance: req.url,
       },
-      { status: error.status || 500 }
+      { status: e.status || 500 }
     );
   }
 }

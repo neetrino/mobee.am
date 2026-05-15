@@ -287,7 +287,7 @@ export function CompareGroupTable({
                 </td>
                 {products.map((product) => (
                   <td key={product.id} className="px-4 py-4 text-center">
-                    <p className="select-none text-lg font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                       {formatPrice(product.price, currency)}
                     </p>
                   </td>
