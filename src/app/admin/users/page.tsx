@@ -8,6 +8,7 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '@/components/Toast';
+import { confirmDialog } from '@/components/ConfirmDialog';
 interface User {
   id: string;
   email: string;
@@ -120,7 +121,10 @@ export default function UsersPage() {
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(t('admin.users.deleteConfirm').replace('{count}', selectedIds.size.toString()))) return;
+    if (!(await confirmDialog({
+      message: t('admin.users.deleteConfirm').replace('{count}', selectedIds.size.toString()),
+      variant: 'danger',
+    }))) return;
     setBulkDeleting(true);
     try {
       const ids = Array.from(selectedIds);

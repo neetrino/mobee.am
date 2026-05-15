@@ -8,6 +8,7 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '@/components/Toast';
+import { confirmDialog } from '@/components/ConfirmDialog';
 
 interface Brand {
   id: string;
@@ -55,7 +56,10 @@ function BrandsSection() {
   }, [fetchBrands]);
 
   const handleDeleteBrand = async (brandId: string, brandName: string) => {
-    if (!confirm(t('admin.brands.deleteConfirm').replace('{name}', brandName))) {
+    if (!(await confirmDialog({
+      message: t('admin.brands.deleteConfirm').replace('{name}', brandName),
+      variant: 'danger',
+    }))) {
       return;
     }
 

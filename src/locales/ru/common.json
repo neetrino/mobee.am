@@ -16,6 +16,9 @@
     "viewMore": "Узнать больше",
     "close": "Закрыть"
   },
+  "dialog": {
+    "confirm": "Подтвердить"
+  },
   "navigation": {
     "menuTitle": "Навигация",
     "home": "Главная",

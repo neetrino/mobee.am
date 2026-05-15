@@ -9,6 +9,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
 import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '@/components/Toast';
+import { confirmDialog } from '@/components/ConfirmDialog';
 import { ARMENIA_FALLBACK_DELIVERY_CITIES } from '../../../lib/constants/armenia-delivery-cities.constants';
 
 const SUPPORTED_COUNTRIES = ['Armenia'] as const;
@@ -96,11 +97,12 @@ export default function DeliveryPage() {
     setLocations(updated);
   };
 
-  const handleDeleteLocation = (index: number) => {
-    if (confirm(t('admin.delivery.deleteLocation'))) {
-      const updated = locations.filter((_, i) => i !== index);
-      setLocations(updated);
+  const handleDeleteLocation = async (index: number) => {
+    if (!(await confirmDialog({ message: t('admin.delivery.deleteLocation'), variant: 'danger' }))) {
+      return;
     }
+    const updated = locations.filter((_, i) => i !== index);
+    setLocations(updated);
   };
 
   if (isLoading || loading) {

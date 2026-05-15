@@ -2,6 +2,7 @@ import type { FormEvent } from 'react';
 import { apiClient } from '../../../../lib/api-client';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { showToast } from '../../../../components/Toast';
+import { confirmDialog } from '../../../../components/ConfirmDialog';
 import type { Product } from '../types';
 
 interface UseProductHandlersProps {
@@ -52,7 +53,10 @@ export function useProductHandlers({
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(t('admin.products.bulkDeleteConfirm').replace('{count}', selectedIds.size.toString()))) return;
+    if (!(await confirmDialog({
+      message: t('admin.products.bulkDeleteConfirm').replace('{count}', selectedIds.size.toString()),
+      variant: 'danger',
+    }))) return;
     setBulkDeleting(true);
     try {
       const ids = Array.from(selectedIds);
@@ -75,7 +79,10 @@ export function useProductHandlers({
   };
 
   const handleDeleteProduct = async (productId: string, productTitle: string) => {
-    if (!confirm(t('admin.products.deleteConfirm').replace('{title}', productTitle))) {
+    if (!(await confirmDialog({
+      message: t('admin.products.deleteConfirm').replace('{title}', productTitle),
+      variant: 'danger',
+    }))) {
       return;
     }
 

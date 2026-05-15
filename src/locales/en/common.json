@@ -16,6 +16,9 @@
     "viewMore": "View More",
     "close": "Close"
   },
+  "dialog": {
+    "confirm": "Confirm"
+  },
   "navigation": {
     "menuTitle": "Navigation",
     "home": "Home",
