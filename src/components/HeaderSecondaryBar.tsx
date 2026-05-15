@@ -10,6 +10,7 @@ import {
   HEADER_SECONDARY_CATEGORIES_PILL_MAX_WIDTH_CLASS,
   HEADER_SECONDARY_SEARCH_IPAD_AIR_BAND_MAX_WIDTH_CLASS,
 } from './header-secondary-bar.constants';
+import { MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS } from '../lib/mobile-ios-input-font.constants';
 import { CompareIcon } from './icons/CompareIcon';
 import { MobileNavBagIcon } from './icons/MobileNavBagIcon';
 import { WishlistHeartIcon } from './icons/WishlistHeartIcon';
@@ -501,7 +502,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   onKeyDown={onSearchKeyDown}
                   placeholder={searchPlaceholder}
                   autoComplete="off"
-                  className="h-9 w-full rounded-full border border-[#e5e7eb] bg-white/50 py-1.5 pl-10 pr-3 text-[13px] leading-normal text-gray-900 placeholder:text-[#6b7280] shadow-sm transition-shadow focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2db2ff]/25"
+                  className={`h-9 w-full rounded-full border border-[#e5e7eb] bg-white/50 py-1.5 pl-10 pr-3 ${MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS} text-gray-900 placeholder:text-[#6b7280] shadow-sm transition-shadow focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2db2ff]/25`}
                   aria-controls={SECONDARY_SEARCH_LISTBOX_ID}
                   aria-expanded={searchDropdownOpen && searchResults.length > 0}
                   aria-autocomplete="list"
