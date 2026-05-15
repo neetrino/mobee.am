@@ -509,6 +509,9 @@
     "active": "Active",
     "inactive": "Inactive",
     "delete": "Delete",
+    "copyCode": "Copy promo code",
+    "copied": "Copied",
+    "copyFailed": "Could not copy to the clipboard.",
     "loading": "Loading promo codes...",
     "empty": "No promo codes found",
     "codeRequired": "Promo code is required",
@@ -739,7 +742,9 @@
     "failedToDelete": "Failed to delete messages",
     "showingPage": "Showing page {page} of {totalPages} ({total} total)",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "fullMessageTitle": "Full message",
+    "viewFullMessageHint": "Click to view the full message"
   },
   "common": {
     "loading": "Loading...",

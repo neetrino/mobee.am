@@ -70,6 +70,7 @@ function AddProductPageContent() {
     productId,
     attributes: formState.attributes,
     defaultCurrency: formState.defaultCurrency,
+    hasVariantsToLoad: formState.hasVariantsToLoad,
     setSelectedAttributesForVariants: formState.setSelectedAttributesForVariants,
     setSelectedAttributeValueIds: formState.setSelectedAttributeValueIds,
     setGeneratedVariants: formState.setGeneratedVariants,

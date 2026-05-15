@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { Card } from '@/app/admin/lib/adminShopUi';
+import { ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatCurrency } from '../utils';
 import type { AnalyticsData } from '../types';
@@ -44,15 +45,13 @@ export function TopProducts({ products, currency }: TopProductsProps) {
                   {index + 1}
                 </div>
               </div>
-              {product.image && (
-                <div className="flex-shrink-0">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-14 h-14 object-cover rounded-supersudo border border-gray-200 group-hover:scale-105 transition-transform"
-                  />
-                </div>
-              )}
+              <div className="flex-shrink-0">
+                <img
+                  src={ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC}
+                  alt={product.title}
+                  className="w-14 h-14 object-cover rounded-supersudo border border-gray-200 group-hover:scale-105 transition-transform"
+                />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate mb-1">{product.title}</p>
                 <p className="text-xs text-gray-500 mb-1">{t('admin.analytics.skuLabel')}: {product.sku}</p>

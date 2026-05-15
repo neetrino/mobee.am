@@ -87,7 +87,7 @@ export function RelatedProductCard({
   return (
     <div className={cardShellClass} style={isCarouselCell ? { width } : undefined}>
       <div
-        className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+        className="group relative flex h-full select-text flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
         data-related-product-card
       >
         <Link

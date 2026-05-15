@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { Check, Copy, Trash2 } from 'lucide-react';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
@@ -24,6 +25,9 @@ interface PromoCodeCreatePayload {
   code: string;
   discountPercent: number;
 }
+
+/** Duration to show the “copied” checkmark after a successful clipboard write. */
+const COPY_FEEDBACK_DURATION_MS = 2000;
 
 function getProblemDetail(data: unknown): string | null {
   if (!data || typeof data !== 'object') {
@@ -58,18 +62,27 @@ export default function PromoCodesPage() {
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const [code, setCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState('10');
+  const copyFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toggleFlightRef = useRef<Set<string>>(new Set());
 
-  const fetchPromoCodes = useCallback(async () => {
-    setLoading(true);
+  const fetchPromoCodes = useCallback(async (options?: { showLoader?: boolean }) => {
+    const showLoader = options?.showLoader ?? true;
+    if (showLoader) {
+      setLoading(true);
+    }
     try {
       const response = await apiClient.get<PromoCodesResponse>('/api/v1/admin/promocodes');
       setPromoCodes(response.data || []);
-    } catch (error) {
+    } catch {
       setPromoCodes([]);
     } finally {
-      setLoading(false);
+      if (showLoader) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -84,6 +97,30 @@ export default function PromoCodesPage() {
       fetchPromoCodes();
     }
   }, [fetchPromoCodes, isAdmin, isLoading, isLoggedIn]);
+
+  useEffect(() => {
+    return () => {
+      if (copyFeedbackTimeoutRef.current !== null) {
+        clearTimeout(copyFeedbackTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleCopyPromoCode = async (promoCodeId: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      if (copyFeedbackTimeoutRef.current !== null) {
+        clearTimeout(copyFeedbackTimeoutRef.current);
+      }
+      setCopiedCodeId(promoCodeId);
+      copyFeedbackTimeoutRef.current = setTimeout(() => {
+        setCopiedCodeId(null);
+        copyFeedbackTimeoutRef.current = null;
+      }, COPY_FEEDBACK_DURATION_MS);
+    } catch {
+      alert(t('admin.promocodes.copyFailed'));
+    }
+  };
 
   const resetForm = () => {
     setCode('');
@@ -115,7 +152,7 @@ export default function PromoCodesPage() {
 
       await apiClient.post('/api/v1/admin/promocodes', payload);
       resetForm();
-      await fetchPromoCodes();
+      await fetchPromoCodes({ showLoader: false });
       alert(t('admin.promocodes.createdSuccess'));
     } catch (error: unknown) {
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
@@ -126,17 +163,30 @@ export default function PromoCodesPage() {
   };
 
   const handleToggleStatus = async (promoCodeId: string, currentStatus: boolean) => {
-    setSubmitting(true);
+    if (toggleFlightRef.current.has(promoCodeId)) {
+      return;
+    }
+    const nextActive = !currentStatus;
+    toggleFlightRef.current.add(promoCodeId);
+    setStatusUpdatingId(promoCodeId);
+    setPromoCodes((prev) =>
+      prev.map((item) => (item.id === promoCodeId ? { ...item, isActive: nextActive } : item)),
+    );
     try {
       await apiClient.patch(`/api/v1/admin/promocodes/${promoCodeId}`, {
-        isActive: !currentStatus,
+        isActive: nextActive,
       });
-      await fetchPromoCodes();
     } catch (error: unknown) {
+      setPromoCodes((prev) =>
+        prev.map((item) =>
+          item.id === promoCodeId ? { ...item, isActive: currentStatus } : item,
+        ),
+      );
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
       alert(t('admin.promocodes.errorUpdate').replace('{message}', details));
     } finally {
-      setSubmitting(false);
+      toggleFlightRef.current.delete(promoCodeId);
+      setStatusUpdatingId(null);
     }
   };
 
@@ -149,7 +199,7 @@ export default function PromoCodesPage() {
     setSubmitting(true);
     try {
       await apiClient.delete(`/api/v1/admin/promocodes/${promoCodeId}`);
-      await fetchPromoCodes();
+      await fetchPromoCodes({ showLoader: false });
       alert(t('admin.promocodes.deletedSuccess'));
     } catch (error: unknown) {
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
@@ -239,33 +289,73 @@ export default function PromoCodesPage() {
                 {promoCodes.map((promoCode) => (
                   <div key={promoCode.id} className="border border-gray-200 rounded-supersudo p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div>
-                      <p className="text-base font-semibold text-gray-900">{promoCode.code}</p>
+                      <div className="flex items-center gap-1">
+                        <p className="text-base font-semibold text-gray-900">{promoCode.code}</p>
+                        <button
+                          type="button"
+                          onClick={() => void handleCopyPromoCode(promoCode.id, promoCode.code)}
+                          className="inline-flex shrink-0 items-center justify-center rounded-supersudo p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-1"
+                          title={t('admin.promocodes.copyCode')}
+                          aria-label={
+                            copiedCodeId === promoCode.id
+                              ? t('admin.promocodes.copied')
+                              : t('admin.promocodes.copyCode')
+                          }
+                        >
+                          {copiedCodeId === promoCode.id ? (
+                            <Check className="h-4 w-4 text-green-600" aria-hidden />
+                          ) : (
+                            <Copy className="h-4 w-4" aria-hidden />
+                          )}
+                        </button>
+                      </div>
                       <p className="text-sm text-gray-600">
                         {promoCode.discountPercent}% {t('admin.promocodes.discountLabel')}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        {promoCode.isActive ? t('admin.promocodes.active') : t('admin.promocodes.inactive')}
-                      </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={submitting}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button
+                        type="button"
                         onClick={() => handleToggleStatus(promoCode.id, promoCode.isActive)}
-                      >
-                        {promoCode.isActive ? t('admin.promocodes.deactivate') : t('admin.promocodes.activate')}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
                         disabled={submitting}
-                        onClick={() => handleDeletePromoCode(promoCode.id, promoCode.code)}
-                        className="text-red-600 hover:text-red-700"
+                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                          statusUpdatingId === promoCode.id
+                            ? 'pointer-events-none cursor-wait'
+                            : ''
+                        } ${
+                          promoCode.isActive
+                            ? 'bg-green-500 focus:ring-green-500'
+                            : 'bg-gray-300 focus:ring-gray-400'
+                        }`}
+                        title={
+                          promoCode.isActive
+                            ? t('admin.promocodes.deactivate')
+                            : t('admin.promocodes.activate')
+                        }
+                        role="switch"
+                        aria-checked={promoCode.isActive}
+                        aria-busy={statusUpdatingId === promoCode.id}
+                        aria-label={`${promoCode.code}: ${
+                          promoCode.isActive ? t('admin.promocodes.active') : t('admin.promocodes.inactive')
+                        }`}
                       >
-                        {t('admin.promocodes.delete')}
-                      </Button>
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-100 ease-out ${
+                            promoCode.isActive ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={submitting || statusUpdatingId !== null}
+                        onClick={() => handleDeletePromoCode(promoCode.id, promoCode.code)}
+                        className="inline-flex shrink-0 items-center justify-center rounded-supersudo p-2 text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 disabled:pointer-events-none disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        title={t('admin.promocodes.delete')}
+                        aria-label={t('admin.promocodes.delete')}
+                      >
+                        <Trash2 className="h-4 w-4" aria-hidden />
+                      </button>
                     </div>
                   </div>
                 ))}

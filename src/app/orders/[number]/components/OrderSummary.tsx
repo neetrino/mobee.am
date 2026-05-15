@@ -52,7 +52,7 @@ export function OrderSummary({ order, currency }: OrderSummaryProps) {
   })();
 
   return (
-    <Card className="p-6 sticky top-4">
+    <Card className="p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('orders.orderSummary.title')}</h2>
       <div className="space-y-4 mb-6">
         {order.totals ? (

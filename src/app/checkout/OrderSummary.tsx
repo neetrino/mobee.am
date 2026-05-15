@@ -4,7 +4,7 @@ import { UseFormRegister } from 'react-hook-form';
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../lib/currency';
-import { ORDER_SUMMARY_SIDEBAR_STICKY_CLASS } from '../../lib/order-summary-sticky.constants';
+import { ORDER_SUMMARY_SIDEBAR_STICKY_OUTER_CLASS } from '../../lib/order-summary-sticky.constants';
 import {
   CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_CLASS,
@@ -80,9 +80,9 @@ export function OrderSummary({
             : t('checkout.placeholders.selectCity');
 
   return (
-    <div className="lg:col-span-5">
+    <div className={`lg:col-span-5 ${ORDER_SUMMARY_SIDEBAR_STICKY_OUTER_CLASS}`}>
       <Card
-        className={`p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS} ${ORDER_SUMMARY_SIDEBAR_STICKY_CLASS}`}
+        className={`p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS}`}
       >
         <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('checkout.orderSummary')}</h2>
         <div className="mb-6">

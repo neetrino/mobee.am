@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
+import { ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../../../lib/currency';
 import type { Product, ProductsResponse } from '../types';
@@ -23,19 +24,6 @@ interface ProductsTableProps {
   page: number;
   setPage: (page: number | ((prev: number) => number)) => void;
 }
-
-/**
- * Helper function to process image URLs
- * Handles relative paths, absolute URLs and base64
- */
-const processImageUrl = (url: string | null) => {
-  if (!url) return '';
-  if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
-  }
-  // For relative paths, ensure they start with a slash
-  return url.startsWith('/') ? url : `/${url}`;
-};
 
 export function ProductsTable({
   loading,
@@ -243,13 +231,11 @@ export function ProductsTable({
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        {product.image && (
-                          <img
-                            src={processImageUrl(product.image)}
-                            alt={product.title}
-                            className="h-12 w-12 rounded-supersudo object-cover mr-3"
-                          />
-                        )}
+                        <img
+                          src={ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC}
+                          alt={product.title}
+                          className="h-12 w-12 rounded-supersudo object-cover mr-3"
+                        />
                         <div>
                           <div className="text-sm font-medium text-gray-900">{product.title}</div>
                           <div className="text-sm text-gray-500">{product.slug}</div>

@@ -18,7 +18,7 @@ export interface OrderRowSelectDropdownProps {
   value: string;
   options: readonly OrderRowSelectOption[];
   onValueChange: (next: string) => void;
-  /** Tint classes from `getStatusColor` / payment / fulfillment helpers. */
+  /** Tint classes from `getStatusColor` / payment helpers. */
   triggerTintClassName: string;
   ariaLabel: string;
 }

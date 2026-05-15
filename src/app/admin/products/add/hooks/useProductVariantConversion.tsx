@@ -8,6 +8,8 @@ interface UseProductVariantConversionProps {
   productId: string | null;
   attributes: any[];
   defaultCurrency: CurrencyCode;
+  /** When product edit load finishes with variants, re-run conversion (fixes race if catalog attributes loaded before product JSON). */
+  hasVariantsToLoad: boolean;
   setSelectedAttributesForVariants: (attrs: Set<string>) => void;
   setSelectedAttributeValueIds: (ids: Record<string, string[]>) => void;
   setGeneratedVariants: (variants: GeneratedVariant[]) => void;
@@ -18,6 +20,7 @@ export function useProductVariantConversion({
   productId,
   attributes,
   defaultCurrency,
+  hasVariantsToLoad,
   setSelectedAttributesForVariants,
   setSelectedAttributeValueIds,
   setGeneratedVariants,
@@ -293,6 +296,7 @@ export function useProductVariantConversion({
           })),
         });
         delete (window as any).__productVariantsToConvert;
+        delete (window as any).__productAttributeIds;
         setHasVariantsToLoad(false);
       } else {
         console.warn('⚠️ [ADMIN] No variants converted. Check variant options structure:', {
@@ -301,9 +305,28 @@ export function useProductVariantConversion({
         });
         setHasVariantsToLoad(false);
       }
+    } else if (
+      productId &&
+      attributes.length > 0 &&
+      Array.isArray((window as any).__productAttributeIds) &&
+      (window as any).__productAttributeIds.length > 0 &&
+      !(window as any).__productVariantsToConvert
+    ) {
+      const pendingIds = (window as any).__productAttributeIds as string[];
+      setSelectedAttributesForVariants(new Set(pendingIds));
+      delete (window as any).__productAttributeIds;
     } else if (productId && attributes.length > 0) {
       console.log('ℹ️ [ADMIN] Waiting for variants to convert. Attributes loaded:', attributes.length);
     }
-  }, [productId, attributes, defaultCurrency, setSelectedAttributesForVariants, setSelectedAttributeValueIds, setGeneratedVariants, setHasVariantsToLoad]);
+  }, [
+    productId,
+    attributes,
+    defaultCurrency,
+    hasVariantsToLoad,
+    setSelectedAttributesForVariants,
+    setSelectedAttributeValueIds,
+    setGeneratedVariants,
+    setHasVariantsToLoad,
+  ]);
 }
 
