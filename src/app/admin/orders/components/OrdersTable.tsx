@@ -75,13 +75,16 @@ export function OrdersTable({
         <table className="w-full table-fixed divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="w-10 px-2 py-3 sm:px-3">
-                <input
-                  type="checkbox"
-                  aria-label={t('admin.orders.selectAllOrders')}
-                  checked={orders.length > 0 && orders.every(o => selectedIds.has(o.id))}
-                  onChange={onToggleSelectAll}
-                />
+              <th className="w-10 min-w-10 px-2 py-3 align-middle sm:px-3">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="size-4 shrink-0 rounded border-gray-300 text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-1"
+                    aria-label={t('admin.orders.selectAllOrders')}
+                    checked={orders.length > 0 && orders.every((o) => selectedIds.has(o.id))}
+                    onChange={onToggleSelectAll}
+                  />
+                </div>
               </th>
               <th className="w-[11%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.orderNumber')}

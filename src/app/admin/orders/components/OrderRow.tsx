@@ -70,13 +70,16 @@ export function OrderRow({
 
   return (
     <tr className="hover:bg-gray-50">
-      <td className="px-2 py-3 align-top sm:px-3">
-        <input
-          type="checkbox"
-          aria-label={t('admin.orders.selectOrder').replace('{number}', order.number)}
-          checked={selected}
-          onChange={onToggleSelect}
-        />
+      <td className="w-10 min-w-10 px-2 py-3 align-middle sm:px-3">
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            className="size-4 shrink-0 rounded border-gray-300 text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-1"
+            aria-label={t('admin.orders.selectOrder').replace('{number}', order.number)}
+            checked={selected}
+            onChange={onToggleSelect}
+          />
+        </div>
       </td>
       <td
         className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
