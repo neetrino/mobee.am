@@ -30,21 +30,6 @@ export function getPaymentStatusColor(paymentStatus: string): string {
   }
 }
 
-export function getFulfillmentStatusColor(fulfillmentStatus: string): string {
-  switch (fulfillmentStatus.toLowerCase()) {
-    case 'unfulfilled':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'fulfilled':
-      return 'bg-admin-100 text-admin-800';
-    case 'shipped':
-      return 'bg-purple-100 text-purple-800';
-    case 'delivered':
-      return 'bg-green-100 text-green-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-}
-
 /**
  * Helper function to get color hex/rgb from color name
  */

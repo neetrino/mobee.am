@@ -7,15 +7,9 @@ import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { MessageDetailDialog, type AdminContactMessage } from './components/MessageDetailDialog';
 
-interface Message {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  createdAt: string;
-}
+type Message = AdminContactMessage;
 
 interface MessagesResponse {
   data: Message[];
@@ -38,6 +32,7 @@ export default function MessagesPage() {
   const [meta, setMeta] = useState<MessagesResponse['meta'] | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [detailMessage, setDetailMessage] = useState<Message | null>(null);
 
   useEffect(() => {
     if (!isLoading) {
@@ -118,9 +113,10 @@ export default function MessagesPage() {
       setSelectedIds(new Set());
       await fetchMessages();
       alert(t('admin.messages.deletedSuccess'));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [ADMIN] Bulk delete messages error:', err);
-      alert(t('admin.messages.failedToDelete') + ': ' + (err.message || 'Unknown error'));
+      const detail = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
+      alert(t('admin.messages.failedToDelete') + ': ' + detail);
     } finally {
       setBulkDeleting(false);
     }
@@ -213,7 +209,14 @@ export default function MessagesPage() {
                           <div className="text-sm text-gray-900">{message.subject}</div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 max-w-md truncate">{message.message}</div>
+                          <button
+                            type="button"
+                            className="max-w-md cursor-pointer text-left text-sm text-admin-700 underline-offset-2 hover:text-admin-800 hover:underline focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-1 rounded-sm"
+                            title={t('admin.messages.viewFullMessageHint')}
+                            onClick={() => setDetailMessage(message)}
+                          >
+                            <span className="block truncate">{message.message}</span>
+                          </button>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(message.createdAt).toLocaleDateString()}
@@ -262,6 +265,7 @@ export default function MessagesPage() {
           )}
         </Card>
       </div>
+      <MessageDetailDialog message={detailMessage} onClose={() => setDetailMessage(null)} />
     </AdminPageShell>
   );
 }

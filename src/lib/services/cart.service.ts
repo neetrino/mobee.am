@@ -12,14 +12,42 @@ class CartService {
    * Get or create user's cart
    */
   async getCart(userId: string, locale: string = "en") {
-    // Get discount settings
-    const discountSettings = await db.settings.findMany({
-      where: {
-        key: {
-          in: ["globalDiscount", "categoryDiscounts", "brandDiscounts"],
+    const cartInclude = {
+      items: {
+        include: {
+          variant: {
+            include: {
+              product: {
+                include: {
+                  translations: true,
+                },
+              },
+            },
+          },
+          product: {
+            include: {
+              translations: true,
+            },
+          },
         },
       },
-    });
+    } as const;
+
+    const [discountSettings, cartFound] = await Promise.all([
+      db.settings.findMany({
+        where: {
+          key: {
+            in: ["globalDiscount", "categoryDiscounts", "brandDiscounts"],
+          },
+        },
+      }),
+      db.cart.findFirst({
+        where: {
+          userId,
+        },
+        include: cartInclude,
+      }),
+    ]);
 
     const globalDiscount =
       Number(
@@ -31,31 +59,7 @@ class CartService {
     
     const brandDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "brandDiscounts");
     const brandDiscounts = brandDiscountsSetting ? (brandDiscountsSetting.value as Record<string, number>) || {} : {};
-    let cart = await db.cart.findFirst({
-      where: {
-        userId,
-      },
-      include: {
-        items: {
-          include: {
-            variant: {
-              include: {
-                product: {
-                  include: {
-                    translations: true,
-                  },
-                },
-              },
-            },
-            product: {
-              include: {
-                translations: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    let cart = cartFound;
 
     if (!cart) {
       cart = await db.cart.create({
@@ -67,26 +71,7 @@ class CartService {
             create: [],
           },
         },
-        include: {
-          items: {
-            include: {
-              variant: {
-                include: {
-                  product: {
-                    include: {
-                      translations: true,
-                    },
-                  },
-                },
-              },
-              product: {
-                include: {
-                  translations: true,
-                },
-              },
-            },
-          },
-        },
+        include: cartInclude,
       });
     }
 

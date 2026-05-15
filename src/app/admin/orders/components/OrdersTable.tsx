@@ -13,7 +13,6 @@ interface OrdersTableProps {
   selectedIds: Set<string>;
   updatingStatuses: Set<string>;
   updatingPaymentStatuses: Set<string>;
-  updatingFulfillmentStatuses: Set<string>;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
   page: number;
@@ -24,7 +23,6 @@ interface OrdersTableProps {
   onViewDetails: (orderId: string) => void;
   onStatusChange: (orderId: string, newStatus: string) => void;
   onPaymentStatusChange: (orderId: string, newPaymentStatus: string) => void;
-  onFulfillmentStatusChange: (orderId: string, newFulfillmentStatus: string) => void;
   onPageChange: (newPage: number) => void;
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
 }
@@ -35,7 +33,6 @@ export function OrdersTable({
   selectedIds,
   updatingStatuses,
   updatingPaymentStatuses,
-  updatingFulfillmentStatuses,
   sortBy,
   sortOrder,
   page,
@@ -46,7 +43,6 @@ export function OrdersTable({
   onViewDetails,
   onStatusChange,
   onPaymentStatusChange,
-  onFulfillmentStatusChange,
   onPageChange,
   formatCurrency,
 }: OrdersTableProps) {
@@ -79,13 +75,16 @@ export function OrdersTable({
         <table className="w-full table-fixed divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="w-10 px-2 py-3 sm:px-3">
-                <input
-                  type="checkbox"
-                  aria-label={t('admin.orders.selectAllOrders')}
-                  checked={orders.length > 0 && orders.every(o => selectedIds.has(o.id))}
-                  onChange={onToggleSelectAll}
-                />
+              <th className="w-10 min-w-10 px-2 py-3 align-middle sm:px-3">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="size-4 shrink-0 rounded border-gray-300 text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-1"
+                    aria-label={t('admin.orders.selectAllOrders')}
+                    checked={orders.length > 0 && orders.every((o) => selectedIds.has(o.id))}
+                    onChange={onToggleSelectAll}
+                  />
+                </div>
               </th>
               <th className="w-[11%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
                 {t('admin.orders.orderNumber')}
@@ -124,10 +123,7 @@ export function OrdersTable({
                 <span className="inline-block translate-x-[6px]">{t('admin.orders.status')}</span>
               </th>
               <th className="w-[14%] px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[15px]">{t('admin.orders.payment')}</span>
-              </th>
-              <th className="w-[14%] px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[24px]">{t('admin.orders.fulfillment')}</span>
+                <span className="inline-block -translate-x-[22px]">{t('admin.orders.payment')}</span>
               </th>
               <th
                 className="w-[10%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"
@@ -163,14 +159,10 @@ export function OrdersTable({
                 selected={selectedIds.has(order.id)}
                 updatingStatus={updatingStatuses.has(order.id)}
                 updatingPaymentStatus={updatingPaymentStatuses.has(order.id)}
-                updatingFulfillmentStatus={updatingFulfillmentStatuses.has(order.id)}
                 onToggleSelect={() => onToggleSelect(order.id)}
                 onViewDetails={() => onViewDetails(order.id)}
                 onStatusChange={(newStatus) => onStatusChange(order.id, newStatus)}
                 onPaymentStatusChange={(newPaymentStatus) => onPaymentStatusChange(order.id, newPaymentStatus)}
-                onFulfillmentStatusChange={(newFulfillmentStatus) =>
-                  onFulfillmentStatusChange(order.id, newFulfillmentStatus)
-                }
                 formatCurrency={formatCurrency}
               />
             ))}

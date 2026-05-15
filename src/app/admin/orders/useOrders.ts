@@ -113,7 +113,6 @@ export function useOrders() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [updatingStatuses, setUpdatingStatuses] = useState<Set<string>>(new Set());
   const [updatingPaymentStatuses, setUpdatingPaymentStatuses] = useState<Set<string>>(new Set());
-  const [updatingFulfillmentStatuses, setUpdatingFulfillmentStatuses] = useState<Set<string>>(new Set());
   const [updateMessage, setUpdateMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
@@ -457,51 +456,6 @@ export function useOrders() {
     }
   };
 
-  const handleFulfillmentStatusChange = async (
-    orderId: string,
-    newFulfillmentStatus: string
-  ) => {
-    try {
-      console.log('📝 [ADMIN] Changing order fulfillment status:', {
-        orderId,
-        newFulfillmentStatus,
-      });
-      setUpdatingFulfillmentStatuses((prev) => new Set(prev).add(orderId));
-      setUpdateMessage(null);
-
-      await apiClient.put(`/api/v1/admin/orders/${orderId}`, {
-        fulfillmentStatus: newFulfillmentStatus,
-      });
-
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.id === orderId
-            ? { ...order, fulfillmentStatus: newFulfillmentStatus }
-            : order
-        )
-      );
-
-      setUpdateMessage({
-        type: 'success',
-        text: t('admin.orders.fulfillmentStatusUpdated'),
-      });
-      setTimeout(() => setUpdateMessage(null), 3000);
-    } catch (err) {
-      console.error('❌ [ADMIN] Error updating order fulfillment status:', err);
-      setUpdateMessage({
-        type: 'error',
-        text: t('admin.orders.failedToUpdateFulfillmentStatus'),
-      });
-      setTimeout(() => setUpdateMessage(null), 5000);
-    } finally {
-      setUpdatingFulfillmentStatuses((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(orderId);
-        return newSet;
-      });
-    }
-  };
-
   return {
     // State
     orders,
@@ -517,7 +471,6 @@ export function useOrders() {
     sortOrder,
     updatingStatuses,
     updatingPaymentStatuses,
-    updatingFulfillmentStatuses,
     updateMessage,
     selectedIds,
     bulkDeleting,
@@ -543,7 +496,6 @@ export function useOrders() {
     executeBulkDelete,
     handleStatusChange,
     handlePaymentStatusChange,
-    handleFulfillmentStatusChange,
     router,
     searchParams,
   };

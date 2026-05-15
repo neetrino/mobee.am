@@ -30,12 +30,9 @@ export function OrderDetailsSummary({
             <div>
               <span className="font-medium">{t('admin.orders.orderDetails.total')}</span>{' '}
               {orderDetails.totals ? (() => {
-                const subtotalAMD = convertPrice(orderDetails.totals.subtotal, 'USD', 'AMD');
-                const discountAMD = convertPrice(orderDetails.totals.discount, 'USD', 'AMD');
-                const shippingAMD = orderDetails.totals.shipping;
-                const taxAMD = convertPrice(orderDetails.totals.tax, 'USD', 'AMD');
-                const totalAMD = subtotalAMD - discountAMD + shippingAMD + taxAMD;
-                const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency as CurrencyCode);
+                const totalAMD = orderDetails.totals.total;
+                const totalDisplay =
+                  currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency as CurrencyCode);
                 return formatPriceInCurrency(totalDisplay, currency as CurrencyCode);
               })() : formatCurrency(orderDetails.total, (orderDetails.currency || 'AMD') as CurrencyCode, 'USD')}
             </div>

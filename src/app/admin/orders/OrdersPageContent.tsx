@@ -25,7 +25,6 @@ export function OrdersPageContent() {
     sortOrder,
     updatingStatuses,
     updatingPaymentStatuses,
-    updatingFulfillmentStatuses,
     updateMessage,
     selectedIds,
     bulkDeleting,
@@ -49,7 +48,6 @@ export function OrdersPageContent() {
     executeBulkDelete,
     handleStatusChange,
     handlePaymentStatusChange,
-    handleFulfillmentStatusChange,
     router,
     searchParams,
   } = useOrders();
@@ -100,7 +98,6 @@ export function OrdersPageContent() {
           selectedIds={selectedIds}
           updatingStatuses={updatingStatuses}
           updatingPaymentStatuses={updatingPaymentStatuses}
-          updatingFulfillmentStatuses={updatingFulfillmentStatuses}
           sortBy={sortBy}
           sortOrder={sortOrder}
           page={page}
@@ -111,7 +108,6 @@ export function OrdersPageContent() {
           onViewDetails={handleViewOrderDetails}
           onStatusChange={handleStatusChange}
           onPaymentStatusChange={handlePaymentStatusChange}
-          onFulfillmentStatusChange={handleFulfillmentStatusChange}
           onPageChange={(newPage) => setPage(newPage)}
           formatCurrency={formatCurrency}
         />

@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
+import { ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatCurrency } from '../utils/dashboardUtils';
@@ -62,15 +63,13 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
                   {index + 1}
                 </div>
               </div>
-              {product.image && (
-                <div className="flex-shrink-0">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-12 h-12 object-cover rounded-supersudo"
-                  />
-                </div>
-              )}
+              <div className="flex-shrink-0">
+                <img
+                  src={ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC}
+                  alt={product.title}
+                  className="w-12 h-12 object-cover rounded-supersudo"
+                />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{product.title}</p>
                 <p className="text-xs text-gray-600">SKU: {product.sku}</p>
