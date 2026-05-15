@@ -44,21 +44,14 @@ export function OrderDetailsTotals({
               : formatCurrency(orderDetails.totals.shipping, orderDetails.totals.currency || 'AMD', 'AMD') + (orderDetails.shippingAddress?.city ? ` (${orderDetails.shippingAddress.city})` : '')}
           </span>
         </div>
-        <div className="flex justify-between text-sm text-gray-700">
-          <span>{t('orders.orderSummary.tax')}</span>
-          <span>{formatCurrency(orderDetails.totals.tax, (orderDetails.totals.currency || 'AMD') as CurrencyCode, 'USD')}</span>
-        </div>
         <div className="border-t border-gray-200 pt-3 mt-3">
           <div className="flex justify-between text-base font-bold text-gray-900">
             <span>{t('orders.orderSummary.total')}</span>
             <span>
               {(() => {
-                const subtotalAMD = convertPrice(orderDetails.totals.subtotal, 'USD', 'AMD');
-                const discountAMD = convertPrice(orderDetails.totals.discount, 'USD', 'AMD');
-                const shippingAMD = orderDetails.totals.shipping;
-                const taxAMD = convertPrice(orderDetails.totals.tax, 'USD', 'AMD');
-                const totalAMD = subtotalAMD - discountAMD + shippingAMD + taxAMD;
-                const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency as CurrencyCode);
+                const totalAMD = orderDetails.totals.total;
+                const totalDisplay =
+                  currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency as CurrencyCode);
                 return formatPriceInCurrency(totalDisplay, currency as CurrencyCode);
               })()}
             </span>
