@@ -21,10 +21,6 @@ interface PromoCodesResponse {
   data: PromoCode[];
 }
 
-interface PromoCodePatchResponse {
-  data: PromoCode;
-}
-
 interface PromoCodeCreatePayload {
   code: string;
   discountPercent: number;
@@ -71,6 +67,7 @@ export default function PromoCodesPage() {
   const [code, setCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState('10');
   const copyFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toggleFlightRef = useRef<Set<string>>(new Set());
 
   const fetchPromoCodes = useCallback(async (options?: { showLoader?: boolean }) => {
     const showLoader = options?.showLoader ?? true;
@@ -166,35 +163,19 @@ export default function PromoCodesPage() {
   };
 
   const handleToggleStatus = async (promoCodeId: string, currentStatus: boolean) => {
+    if (toggleFlightRef.current.has(promoCodeId)) {
+      return;
+    }
     const nextActive = !currentStatus;
+    toggleFlightRef.current.add(promoCodeId);
     setStatusUpdatingId(promoCodeId);
     setPromoCodes((prev) =>
       prev.map((item) => (item.id === promoCodeId ? { ...item, isActive: nextActive } : item)),
     );
     try {
-      const response = await apiClient.patch<PromoCodePatchResponse>(
-        `/api/v1/admin/promocodes/${promoCodeId}`,
-        { isActive: nextActive },
-      );
-      const serverRow = response.data;
-      if (serverRow) {
-        setPromoCodes((prev) =>
-          prev.map((item) =>
-            item.id === promoCodeId
-              ? {
-                  id: serverRow.id,
-                  code: serverRow.code,
-                  discountPercent: serverRow.discountPercent,
-                  isActive: serverRow.isActive,
-                  createdAt:
-                    typeof serverRow.createdAt === 'string'
-                      ? serverRow.createdAt
-                      : new Date(serverRow.createdAt).toISOString(),
-                }
-              : item,
-          ),
-        );
-      }
+      await apiClient.patch(`/api/v1/admin/promocodes/${promoCodeId}`, {
+        isActive: nextActive,
+      });
     } catch (error: unknown) {
       setPromoCodes((prev) =>
         prev.map((item) =>
@@ -204,6 +185,7 @@ export default function PromoCodesPage() {
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
       alert(t('admin.promocodes.errorUpdate').replace('{message}', details));
     } finally {
+      toggleFlightRef.current.delete(promoCodeId);
       setStatusUpdatingId(null);
     }
   };
@@ -336,8 +318,12 @@ export default function PromoCodesPage() {
                       <button
                         type="button"
                         onClick={() => handleToggleStatus(promoCode.id, promoCode.isActive)}
-                        disabled={submitting || statusUpdatingId === promoCode.id}
-                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ${
+                        disabled={submitting}
+                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                          statusUpdatingId === promoCode.id
+                            ? 'pointer-events-none cursor-wait'
+                            : ''
+                        } ${
                           promoCode.isActive
                             ? 'bg-green-500 focus:ring-green-500'
                             : 'bg-gray-300 focus:ring-gray-400'
@@ -355,7 +341,7 @@ export default function PromoCodesPage() {
                         }`}
                       >
                         <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-100 ease-out ${
                             promoCode.isActive ? 'translate-x-6' : 'translate-x-1'
                           }`}
                         />
