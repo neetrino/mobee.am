@@ -13,6 +13,7 @@ import type { ProductPageProps } from './types';
 import { dispatchCartFlyAnimation } from '@/lib/cart/dispatchCartFlyAnimation';
 import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '@/lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
+import { PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS, PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS } from './product-pdp-ipad-pro-band.constants';
 
 export default function ProductPage({ params }: ProductPageProps) {
   const { isLoggedIn } = useAuth();
@@ -129,7 +130,9 @@ export default function ProductPage({ params }: ProductPageProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 max-lg:pb-4 sm:px-6 lg:px-8 lg:py-12">
+    <div
+      className={`max-w-7xl mx-auto px-4 py-12 max-lg:pb-4 sm:px-6 lg:py-12 ${PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS} ${PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS}`}
+    >
       <div className="grid grid-cols-1 product-2col:grid-cols-[55%_45%] gap-12 items-start">
         <ProductImageGallery
           images={images}

@@ -1,3 +1,7 @@
+import {
+  LAYOUT_DESKTOP_MIN_WIDTH_PX,
+  SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX,
+} from '@/lib/layout-breakpoints.constants';
 import { HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA } from '../home-best-choice.constants';
 
 /**
@@ -15,10 +19,28 @@ export const RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_MINI = 3;
 export const RELATED_PRODUCTS_MOBILE_IPAD_MINI_BAND_MEDIA_QUERY = HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA;
 
 /**
+ * Large tablet / iPad Pro class viewports (900–1279 CSS px): one row of four cards per snap page.
+ * Upper bound matches Tailwind `xl` minus 1 — keep in sync with {@link SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX}.
+ */
+export const RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_PRO = 4;
+
+const RELATED_PRODUCTS_IPAD_PRO_BAND_MAX_WIDTH_PX = SHOP_LEGACY_DESKTOP_MIN_WIDTH_PX - 1;
+
+export const RELATED_PRODUCTS_IPAD_PRO_BAND_MEDIA_QUERY = `(min-width: ${LAYOUT_DESKTOP_MIN_WIDTH_PX}px) and (max-width: ${RELATED_PRODUCTS_IPAD_PRO_BAND_MAX_WIDTH_PX}px)`;
+
+/**
  * Bleed mobile carousel into parent horizontal padding (`px-4` / `sm:px-6`) so cards are wider; grid gap unchanged.
+ * Uses `xl` so iPad Pro (below legacy desktop) still bleeds like the home PDP mobile strip.
  */
 export const RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS =
-  'max-lg:-mx-4 sm:max-lg:-mx-6 lg:mx-0';
+  'max-xl:-mx-4 sm:max-xl:-mx-6 xl:mx-0';
+
+/**
+ * iPad Pro band (900–1279 CSS px): right gutter inside bleed so cards are not flush to the edge;
+ * works with PDP `overflow-x-hidden` (no horizontal page scroll).
+ */
+export const RELATED_PRODUCTS_IPAD_PRO_CAROUSEL_RIGHT_INSET_CLASS =
+  'min-[900px]:max-xl:pr-6' as const;
 
 /**
  * PDP related-products mobile title-row controls (Tailwind class literals for JIT).

@@ -18,9 +18,13 @@ import { useHomeDesktopCarouselHomeStyle } from './useHomeDesktopCarouselHomeSty
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
-/** Horizontal snap carousel below `lg`. */
+/** Horizontal snap scroll shell only — add breakpoint visibility in the caller (`lg:hidden`, `xl:hidden`, …). */
+export const HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL =
+  'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory';
+
+/** Horizontal snap carousel below `lg` (home PDP rows: mobile strip hides when desktop grid appears). */
 export const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
-  'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
+  `${HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL} lg:hidden`;
 
 export const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
 

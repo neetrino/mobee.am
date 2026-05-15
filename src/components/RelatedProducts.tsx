@@ -28,7 +28,7 @@ import { useUiLanguage } from './UiLanguageProvider';
 import { chunkArray } from '../lib/chunk-array';
 import {
   HOME_BEST_CHOICE_CARD_WIDTH,
-  HOME_BEST_CHOICE_MOBILE_CAROUSEL,
+  HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL,
   HOME_BEST_CHOICE_MOBILE_PAGE,
 } from './HomeBestChoiceStyleProductGrid';
 import {
@@ -37,7 +37,9 @@ import {
 } from './useHomeBestChoiceCarouselPageSync';
 import { HomeMobileSectionTitle, HomeMobileCarouselPageIndicators } from './HomeMobileSectionTitle';
 import {
+  RELATED_PRODUCTS_IPAD_PRO_CAROUSEL_RIGHT_INSET_CLASS,
   RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_MINI,
+  RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_PRO,
   RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_GROUP_CLASS,
   RELATED_PRODUCTS_MOBILE_TITLE_NAV_BUTTON_BASE_CLASS,
@@ -83,9 +85,9 @@ function mapRelatedProductToHomeGridCardProduct(product: RelatedProduct): HomeGr
 type RelatedMobileTitleNavLatch = 'prev' | 'next' | null;
 
 /**
- * Below `lg`: horizontal snap carousel (same shell as home best-choice).
- * iPad mini / narrow tablet band: three cards per snap page; phones keep two.
- * At `lg+`: draggable strip with arrows/dots (unchanged desktop).
+ * Below `xl`: horizontal snap carousel (same shell as home best-choice) with title-row nav + dot indicators.
+ * iPad mini band: 3 cards per page; iPad Pro band (900–1279px): 4 cards per page; phones: 2.
+ * At `xl+`: draggable strip with arrows/dots (unchanged wide desktop).
  */
 export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   const { isLoggedIn } = useAuth();
@@ -152,9 +154,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
   );
 
   const relatedMobileGridColsClass =
-    relatedMobileCardsPerPage === RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_MINI
-      ? 'grid-cols-3'
-      : 'grid-cols-2';
+    relatedMobileCardsPerPage === RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_PRO
+      ? 'grid-cols-4'
+      : relatedMobileCardsPerPage === RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_MINI
+        ? 'grid-cols-3'
+        : 'grid-cols-2';
   const relatedMobileGridClass = `grid ${relatedMobileGridColsClass} gap-4 ${RELATED_MOBILE_GRID_CHILD_MIN_WIDTH}`;
 
   const scrollRelatedMobileByPage = useCallback((direction: -1 | 1) => {
@@ -363,11 +367,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
             <HomeMobileSectionTitle
               title={t(language, 'product.related_products_title')}
               titleClassName="text-2xl font-bold leading-snug text-gray-900"
-              rootClassName="-ml-1.5 flex items-center justify-between gap-2 pl-2 pr-3 pt-4 sm:-ml-2 sm:pl-3 sm:pr-4 lg:hidden"
+              rootClassName="-ml-1.5 flex items-center justify-between gap-2 pl-2 pr-3 pt-4 sm:-ml-2 sm:pl-3 sm:pr-4 xl:hidden"
               hideIndicators
               trailing={relatedMobileTitleTrailing}
             />
-            <h2 className="-ml-1 hidden text-4xl font-bold text-gray-900 sm:-ml-2 lg:block">
+            <h2 className="-ml-1 hidden text-4xl font-bold text-gray-900 sm:-ml-2 xl:block">
               {t(language, 'product.related_products_title')}
             </h2>
           </div>
@@ -379,10 +383,12 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
 
         {loading ? (
           <>
-            <div className={RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS}>
+            <div
+              className={`${RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS} ${RELATED_PRODUCTS_IPAD_PRO_CAROUSEL_RIGHT_INSET_CLASS}`}
+            >
               <div
                 ref={mobileCarouselRef}
-                className={`${HOME_BEST_CHOICE_MOBILE_CAROUSEL} lg:hidden`}
+                className={`${HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL} xl:hidden`}
                 role="region"
                 aria-roledescription="carousel"
                 aria-label={t(language, 'product.related_products_title')}
@@ -416,9 +422,9 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
             <HomeMobileCarouselPageIndicators
               pageIndex={relatedMobileCarousel.pageIndex}
               pageCount={relatedMobileCarousel.pageCount}
-              className="mt-5 mb-0 lg:mb-8 lg:hidden"
+              className="mt-5 mb-0 xl:mb-8 xl:hidden"
             />
-            <div className="hidden grid-cols-4 gap-6 lg:grid">
+            <div className="hidden grid-cols-4 gap-6 xl:grid">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div key={`d-${i}`} className="animate-pulse">
                   <div className="mb-4 aspect-square rounded-lg bg-gray-200" />
@@ -435,10 +441,12 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
           </div>
         ) : (
           <>
-            <div className={RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS}>
+            <div
+              className={`${RELATED_PRODUCTS_MOBILE_CAROUSEL_BLEED_CLASS} ${RELATED_PRODUCTS_IPAD_PRO_CAROUSEL_RIGHT_INSET_CLASS}`}
+            >
               <div
                 ref={mobileCarouselRef}
-                className={`${HOME_BEST_CHOICE_MOBILE_CAROUSEL} lg:hidden`}
+                className={`${HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL} xl:hidden`}
                 role="region"
                 aria-roledescription="carousel"
                 aria-label={t(language, 'product.related_products_title')}
@@ -475,10 +483,10 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
             <HomeMobileCarouselPageIndicators
               pageIndex={relatedMobileCarousel.pageIndex}
               pageCount={relatedMobileCarousel.pageCount}
-              className="mt-6 mb-0 lg:mb-8 lg:hidden"
+              className="mt-6 mb-0 xl:mb-8 xl:hidden"
             />
 
-            <div className="relative hidden lg:block">
+            <div className="relative hidden xl:block">
               <div
                 ref={carouselRef}
                 className="relative cursor-grab touch-pan-y select-none overflow-hidden active:cursor-grabbing"
