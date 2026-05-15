@@ -20,6 +20,10 @@ interface PromoCodesResponse {
   data: PromoCode[];
 }
 
+interface PromoCodePatchResponse {
+  data: PromoCode;
+}
+
 interface PromoCodeCreatePayload {
   code: string;
   discountPercent: number;
@@ -62,15 +66,20 @@ export default function PromoCodesPage() {
   const [code, setCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState('10');
 
-  const fetchPromoCodes = useCallback(async () => {
-    setLoading(true);
+  const fetchPromoCodes = useCallback(async (options?: { showLoader?: boolean }) => {
+    const showLoader = options?.showLoader ?? true;
+    if (showLoader) {
+      setLoading(true);
+    }
     try {
       const response = await apiClient.get<PromoCodesResponse>('/api/v1/admin/promocodes');
       setPromoCodes(response.data || []);
-    } catch (error) {
+    } catch {
       setPromoCodes([]);
     } finally {
-      setLoading(false);
+      if (showLoader) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -116,7 +125,7 @@ export default function PromoCodesPage() {
 
       await apiClient.post('/api/v1/admin/promocodes', payload);
       resetForm();
-      await fetchPromoCodes();
+      await fetchPromoCodes({ showLoader: false });
       alert(t('admin.promocodes.createdSuccess'));
     } catch (error: unknown) {
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
@@ -127,13 +136,41 @@ export default function PromoCodesPage() {
   };
 
   const handleToggleStatus = async (promoCodeId: string, currentStatus: boolean) => {
+    const nextActive = !currentStatus;
     setStatusUpdatingId(promoCodeId);
+    setPromoCodes((prev) =>
+      prev.map((item) => (item.id === promoCodeId ? { ...item, isActive: nextActive } : item)),
+    );
     try {
-      await apiClient.patch(`/api/v1/admin/promocodes/${promoCodeId}`, {
-        isActive: !currentStatus,
-      });
-      await fetchPromoCodes();
+      const response = await apiClient.patch<PromoCodePatchResponse>(
+        `/api/v1/admin/promocodes/${promoCodeId}`,
+        { isActive: nextActive },
+      );
+      const serverRow = response.data;
+      if (serverRow) {
+        setPromoCodes((prev) =>
+          prev.map((item) =>
+            item.id === promoCodeId
+              ? {
+                  id: serverRow.id,
+                  code: serverRow.code,
+                  discountPercent: serverRow.discountPercent,
+                  isActive: serverRow.isActive,
+                  createdAt:
+                    typeof serverRow.createdAt === 'string'
+                      ? serverRow.createdAt
+                      : new Date(serverRow.createdAt).toISOString(),
+                }
+              : item,
+          ),
+        );
+      }
     } catch (error: unknown) {
+      setPromoCodes((prev) =>
+        prev.map((item) =>
+          item.id === promoCodeId ? { ...item, isActive: currentStatus } : item,
+        ),
+      );
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
       alert(t('admin.promocodes.errorUpdate').replace('{message}', details));
     } finally {
@@ -150,7 +187,7 @@ export default function PromoCodesPage() {
     setSubmitting(true);
     try {
       await apiClient.delete(`/api/v1/admin/promocodes/${promoCodeId}`);
-      await fetchPromoCodes();
+      await fetchPromoCodes({ showLoader: false });
       alert(t('admin.promocodes.deletedSuccess'));
     } catch (error: unknown) {
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
