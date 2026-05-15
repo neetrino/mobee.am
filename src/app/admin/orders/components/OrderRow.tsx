@@ -30,7 +30,7 @@ export function OrderRow({
   onPaymentStatusChange,
   formatCurrency,
 }: OrderRowProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   const statusOptions = useMemo(
     () =>
@@ -106,7 +106,9 @@ export function OrderRow({
         <span className="inline-block translate-x-[35px]">{order.itemsCount}</span>
       </td>
       <td className="px-2 py-3 align-top sm:px-3">
-        <div className="flex items-center justify-end gap-2 translate-x-[19px]">
+        <div
+          className={`flex items-center justify-end gap-2 ${lang === 'en' ? 'translate-x-[30px]' : 'translate-x-[19px]'}`}
+        >
           {updatingStatus ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
@@ -124,8 +126,10 @@ export function OrderRow({
           )}
         </div>
       </td>
-      <td className="px-2 py-3 align-top sm:px-3">
-        <div className="flex items-center justify-end gap-2 translate-x-[7px]">
+      <td className="px-2 py-3 align-top sm:px-5">
+        <div
+          className={`flex items-center justify-end gap-2 ${lang === 'en' ? '-translate-x-[9px]' : 'translate-x-[7px]'}`}
+        >
           {updatingPaymentStatus ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
@@ -143,7 +147,7 @@ export function OrderRow({
           )}
         </div>
       </td>
-      <td className="px-2 py-3 align-top text-sm text-gray-500 break-words sm:px-3">
+      <td className="px-2 py-5 align-top text-sm text-gray-500 break-words sm:px-3">
         {new Date(order.createdAt).toLocaleDateString()}
       </td>
     </tr>
