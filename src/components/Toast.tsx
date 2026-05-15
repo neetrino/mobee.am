@@ -16,6 +16,16 @@ interface ToastProps {
   onClose: (id: string) => void;
 }
 
+/** Mobee storefront toast — aligns with contact / primary CTA (#2DB2FF). */
+const TOAST_PANEL_SUCCESS_CLASS =
+  'border-[#2DB2FF]/35 bg-[#EAF6FF] text-gray-900 ring-1 ring-[#2DB2FF]/15' as const;
+const TOAST_PANEL_ERROR_CLASS =
+  'border-red-200/90 bg-[#FFF5F5] text-gray-900 ring-1 ring-red-500/10' as const;
+const TOAST_PANEL_WARNING_CLASS =
+  'border-amber-200/90 bg-[#FFFBEB] text-gray-900 ring-1 ring-amber-500/10' as const;
+const TOAST_PANEL_INFO_CLASS =
+  'border-[#2DB2FF]/35 bg-[#EAF6FF] text-gray-900 ring-1 ring-[#2DB2FF]/15' as const;
+
 function ToastItem({ toast, onClose }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -26,17 +36,17 @@ function ToastItem({ toast, onClose }: ToastProps) {
   }, [toast.id, toast.duration, onClose]);
 
   const bgColors = {
-    success: 'bg-green-50 border-green-200 text-green-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
-    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
+    success: TOAST_PANEL_SUCCESS_CLASS,
+    error: TOAST_PANEL_ERROR_CLASS,
+    warning: TOAST_PANEL_WARNING_CLASS,
+    info: TOAST_PANEL_INFO_CLASS,
   };
 
   const iconColors = {
-    success: 'text-green-600',
-    error: 'text-red-600',
-    warning: 'text-yellow-600',
-    info: 'text-blue-600',
+    success: 'text-[#2DB2FF]',
+    error: 'text-red-500',
+    warning: 'text-amber-500',
+    info: 'text-[#2DB2FF]',
   };
 
   const icons = {
@@ -66,19 +76,19 @@ function ToastItem({ toast, onClose }: ToastProps) {
     <div
       className={`
         ${bgColors[toast.type]}
-        border rounded-lg shadow-lg p-4 mb-3 flex items-start gap-3
-        max-w-md w-full
-        animate-fade-in
+        pointer-events-auto mb-3 flex w-full max-w-md items-start gap-3 rounded-[14px]
+        border p-4 shadow-md animate-fade-in
       `}
       role="alert"
     >
       <div className={`flex-shrink-0 ${iconColors[toast.type]}`}>
         {icons[toast.type]}
       </div>
-      <div className="flex-1 text-sm font-medium">{toast.message}</div>
+      <div className="min-w-0 flex-1 text-sm font-medium leading-snug">{toast.message}</div>
       <button
+        type="button"
         onClick={() => onClose(toast.id)}
-        className="flex-shrink-0 text-gray-500 transition-colors hover:text-admin-600"
+        className="flex-shrink-0 rounded-md text-gray-500 transition-colors hover:text-[#2DB2FF] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2DB2FF]/40"
         aria-label="Close"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,10 +129,16 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col items-end">
-      {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onClose={handleClose} />
-      ))}
+    <div
+      className="pointer-events-none fixed inset-x-0 top-0 z-[100] flex justify-center px-4 pt-4"
+      aria-live="polite"
+      aria-relevant="additions text"
+    >
+      <div className="flex w-full max-w-md flex-col items-center">
+        {toasts.map((toastItem) => (
+          <ToastItem key={toastItem.id} toast={toastItem} onClose={handleClose} />
+        ))}
+      </div>
     </div>
   );
 }

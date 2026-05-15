@@ -1,5 +1,6 @@
 import { apiClient } from '../../lib/api-client';
 import { logger } from '../../lib/utils/logger';
+import { showToast } from '@/components/Toast';
 import type { Cart, CartItem } from './types';
 import { removeGuestCartItem, updateGuestCartItemQuantity } from '../../lib/cart/guest-cart';
 
@@ -110,7 +111,10 @@ export async function handleUpdateQuantity(
 
   if (cartItem.variant.stock !== undefined) {
     if (quantity > cartItem.variant.stock) {
-      alert(`Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`);
+      showToast(
+        `Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`,
+        'warning',
+      );
       return;
     }
   }
@@ -140,7 +144,10 @@ export async function handleUpdateQuantity(
 
       // Check stock for guest cart
       if (cartItem.variant.stock !== undefined && quantity > cartItem.variant.stock) {
-        alert(`Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`);
+        showToast(
+          `Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`,
+          'warning',
+        );
         // Revert optimistic update
         await fetchCart();
         setUpdatingItems(prev => {
@@ -176,9 +183,9 @@ export async function handleUpdateQuantity(
     // Show user-friendly error message
     const errorMessage = errorObj?.detail || errorObj?.message || t('common.messages.failedToUpdateQuantity');
     if (errorMessage.includes('stock') || errorMessage.includes('exceeds')) {
-      alert(t('common.alerts.stockInsufficient').replace('{message}', errorMessage));
+      showToast(t('common.alerts.stockInsufficient').replace('{message}', errorMessage), 'warning');
     } else {
-      alert(errorMessage);
+      showToast(errorMessage, 'error');
     }
   } finally {
     setUpdatingItems(prev => {

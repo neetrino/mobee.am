@@ -10,6 +10,7 @@ import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
 import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
 import { useAuth } from '../../lib/auth/AuthContext';
+import { showToast } from '../../components/Toast';
 
 export interface CompareTableProduct {
   id: string;
@@ -93,7 +94,7 @@ export function CompareGroupTable({
             const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
             if (!productDetails.variants || productDetails.variants.length === 0) {
-              alert(t('common.alerts.noVariantsAvailable'));
+              showToast(t('common.alerts.noVariantsAvailable'), 'warning');
               return;
             }
 
@@ -111,7 +112,7 @@ export function CompareGroupTable({
           dispatchCartFlyAnimation(flyUrl, flySource);
         } catch (error: unknown) {
           console.error('Error adding to guest cart:', error);
-          alert(t('common.alerts.failedToAddToCart'));
+          showToast(t('common.alerts.failedToAddToCart'), 'error');
         } finally {
           addToCartInFlightRef.current.delete(product.id);
         }
@@ -151,7 +152,7 @@ export function CompareGroupTable({
           const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
           if (!productDetails.variants || productDetails.variants.length === 0) {
-            alert(t('common.alerts.noVariantsAvailable'));
+            showToast(t('common.alerts.noVariantsAvailable'), 'warning');
             window.dispatchEvent(new Event('cart-updated'));
             return;
           }
@@ -177,7 +178,7 @@ export function CompareGroupTable({
       } catch (error: unknown) {
         console.error('Error adding to cart:', error);
         window.dispatchEvent(new Event('cart-updated'));
-        alert(t('common.alerts.failedToAddToCart'));
+        showToast(t('common.alerts.failedToAddToCart'), 'error');
       } finally {
         addToCartInFlightRef.current.delete(product.id);
       }

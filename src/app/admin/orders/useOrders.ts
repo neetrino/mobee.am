@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { showToast } from '../../../components/Toast';
 import { formatPriceInCurrency, convertPrice, getStoredCurrency, initializeCurrencyRates, CurrencyCode } from '../../../lib/currency';
 
 export interface Order {
@@ -248,9 +249,13 @@ export function useOrders() {
     try {
       const response = await apiClient.get<OrderDetails>(`/api/v1/admin/orders/${orderId}`);
       setOrderDetails(response);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [ADMIN] Failed to load order details:', err);
-      alert(err?.message || t('admin.orders.orderDetails.failedToLoad'));
+      const message =
+        err instanceof Error && err.message.trim()
+          ? err.message
+          : t('admin.orders.orderDetails.failedToLoad');
+      showToast(message, 'error');
       setSelectedOrderId(null);
     } finally {
       setLoadingOrderDetails(false);

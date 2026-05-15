@@ -14,6 +14,7 @@ import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWit
 import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
 import { WISHLIST_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
 import { WishlistItemCard, type WishlistItemCardProduct } from './wishlist-item-card';
+import { showToast } from '../../components/Toast';
 
 const WISHLIST_KEY = 'shop_wishlist';
 
@@ -168,7 +169,7 @@ export default function WishlistPage() {
             const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
             if (!productDetails.variants || productDetails.variants.length === 0) {
-              alert(t('common.alerts.noVariantsAvailable'));
+              showToast(t('common.alerts.noVariantsAvailable'), 'warning');
               return;
             }
 
@@ -186,7 +187,7 @@ export default function WishlistPage() {
           dispatchCartFlyAnimation(flyUrl, flySource);
         } catch (error: unknown) {
           console.error('Error adding to guest cart:', error);
-          alert(t('common.alerts.failedToAddToCart'));
+          showToast(t('common.alerts.failedToAddToCart'), 'error');
         } finally {
           addToCartInFlightRef.current.delete(product.id);
         }
@@ -226,7 +227,7 @@ export default function WishlistPage() {
           const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
           if (!productDetails.variants || productDetails.variants.length === 0) {
-            alert(t('common.alerts.noVariantsAvailable'));
+            showToast(t('common.alerts.noVariantsAvailable'), 'warning');
             window.dispatchEvent(new Event('cart-updated'));
             return;
           }
@@ -252,7 +253,7 @@ export default function WishlistPage() {
       } catch (error: unknown) {
         console.error('Error adding to cart:', error);
         window.dispatchEvent(new Event('cart-updated'));
-        alert(t('common.alerts.failedToAddToCart'));
+        showToast(t('common.alerts.failedToAddToCart'), 'error');
       } finally {
         addToCartInFlightRef.current.delete(product.id);
       }

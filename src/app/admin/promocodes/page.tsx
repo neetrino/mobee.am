@@ -8,6 +8,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { apiClient, ApiError } from '../../../lib/api-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { showToast } from '../../../components/Toast';
 
 interface PromoCode {
   id: string;
@@ -118,7 +119,7 @@ export default function PromoCodesPage() {
         copyFeedbackTimeoutRef.current = null;
       }, COPY_FEEDBACK_DURATION_MS);
     } catch {
-      alert(t('admin.promocodes.copyFailed'));
+      showToast(t('admin.promocodes.copyFailed'), 'error');
     }
   };
 
@@ -134,12 +135,12 @@ export default function PromoCodesPage() {
     const isDiscountValid = parsedDiscount > 0 && parsedDiscount <= 100;
 
     if (!normalizedCode) {
-      alert(t('admin.promocodes.codeRequired'));
+      showToast(t('admin.promocodes.codeRequired'), 'warning');
       return;
     }
 
     if (!isDiscountValid) {
-      alert(t('admin.promocodes.invalidDiscount'));
+      showToast(t('admin.promocodes.invalidDiscount'), 'warning');
       return;
     }
 
@@ -153,10 +154,10 @@ export default function PromoCodesPage() {
       await apiClient.post('/api/v1/admin/promocodes', payload);
       resetForm();
       await fetchPromoCodes({ showLoader: false });
-      alert(t('admin.promocodes.createdSuccess'));
+      showToast(t('admin.promocodes.createdSuccess'), 'success');
     } catch (error: unknown) {
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
-      alert(t('admin.promocodes.errorCreate').replace('{message}', details));
+      showToast(t('admin.promocodes.errorCreate').replace('{message}', details), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -183,7 +184,7 @@ export default function PromoCodesPage() {
         ),
       );
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
-      alert(t('admin.promocodes.errorUpdate').replace('{message}', details));
+      showToast(t('admin.promocodes.errorUpdate').replace('{message}', details), 'error');
     } finally {
       toggleFlightRef.current.delete(promoCodeId);
       setStatusUpdatingId(null);
@@ -200,10 +201,10 @@ export default function PromoCodesPage() {
     try {
       await apiClient.delete(`/api/v1/admin/promocodes/${promoCodeId}`);
       await fetchPromoCodes({ showLoader: false });
-      alert(t('admin.promocodes.deletedSuccess'));
+      showToast(t('admin.promocodes.deletedSuccess'), 'success');
     } catch (error: unknown) {
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
-      alert(t('admin.promocodes.errorDelete').replace('{message}', details));
+      showToast(t('admin.promocodes.errorDelete').replace('{message}', details), 'error');
     } finally {
       setSubmitting(false);
     }
