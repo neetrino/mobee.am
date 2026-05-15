@@ -8,6 +8,33 @@ import { useVariantValidation } from './useVariantValidation';
 import { processImagesForSubmit } from './useImageProcessingForSubmit';
 import { createAndSubmitPayload } from './useProductPayloadCreation';
 
+/**
+ * Build product-level attributeIds for product_attributes junction:
+ * selected checkboxes, catalog color/size fallbacks, and any attribute keys present on variant options.
+ */
+function mergeAttributeIdsForProductSubmit(
+  selectedIds: Set<string>,
+  catalogAttributes: Attribute[],
+  variantList: Array<{ options?: Array<{ attributeKey?: string }> }>,
+  colorAttrId: string | undefined,
+  sizeAttrId: string | undefined
+): string[] {
+  const out = new Set<string>(selectedIds);
+  if (colorAttrId) out.add(colorAttrId);
+  if (sizeAttrId) out.add(sizeAttrId);
+  for (const v of variantList) {
+    const opts = v.options;
+    if (!opts) continue;
+    for (const opt of opts) {
+      const key = opt.attributeKey;
+      if (!key) continue;
+      const attr = catalogAttributes.find((a) => a.key === key);
+      if (attr) out.add(attr.id);
+    }
+  }
+  return Array.from(out);
+}
+
 interface UseProductFormHandlersProps {
   formData: {
     title: string;
@@ -355,14 +382,6 @@ export function useProductFormHandlers({
         finalSkuSet.add(finalSku);
       }
 
-      // Collect attribute IDs
-      const attributeIdsSet = new Set<string>();
-      const colorAttribute = getColorAttribute();
-      const sizeAttribute = getSizeAttribute();
-      if (colorAttribute) attributeIdsSet.add(colorAttribute.id);
-      if (sizeAttribute) attributeIdsSet.add(sizeAttribute.id);
-      const attributeIds = Array.from(attributeIdsSet);
-
       // Process images
       const { finalMedia, mainImage, processedVariants } = processImagesForSubmit({
         imageUrls: currentFormData.imageUrls,
@@ -371,6 +390,16 @@ export function useProductFormHandlers({
         variants: variants,
       });
       const finalVariants = processedVariants.length > 0 ? processedVariants : variants;
+
+      const colorAttribute = getColorAttribute();
+      const sizeAttribute = getSizeAttribute();
+      const attributeIds = mergeAttributeIdsForProductSubmit(
+        selectedAttributesForVariants,
+        attributes,
+        finalVariants,
+        colorAttribute?.id,
+        sizeAttribute?.id
+      );
 
       // Create and submit payload
       await createAndSubmitPayload({
