@@ -25,6 +25,9 @@
 
   html {
     scrollbar-gutter: stable;
+    /* iOS Safari: avoid automatic text scaling that feels like a page zoom after load. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   /*

@@ -100,9 +100,7 @@ export function ProductInfoAndActions({
 
       <hr className="my-5 border-0 border-t border-gray-200" />
 
-      <div
-        className={`flex flex-wrap items-center gap-4 ${PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS}`}
-      >
+      <div className={`flex flex-wrap items-center gap-4 ${PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS}`}>
         <div
           className="flex h-11 min-w-[8.5rem] select-none items-stretch overflow-hidden rounded-[15px] border border-gray-200 bg-white px-0.5"
           role="group"
@@ -131,9 +129,7 @@ export function ProductInfoAndActions({
           </button>
         </div>
 
-        <div
-          className={`flex flex-wrap items-baseline justify-end gap-2 text-right ${PDP_IPAD_PRO_BAND_PRICE_TEXT_CLASS}`}
-        >
+        <div className={`flex flex-wrap items-baseline justify-end gap-2 text-right ${PDP_IPAD_PRO_BAND_PRICE_TEXT_CLASS}`}>
           <span className="text-xl font-bold text-gray-900 sm:text-2xl">
             {formatPrice(price, currency as CurrencyCode)}
           </span>

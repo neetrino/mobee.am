@@ -20,9 +20,8 @@ export const PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS =
 export const PDP_IPAD_PRO_BAND_PRICE_TEXT_CLASS =
   'min-[900px]:max-xl:justify-start min-[900px]:max-xl:text-left xl:justify-end xl:text-right' as const;
 
-/** Main PDP shell: left/right padding from `lg`; iPad Pro band removes right gutter only. */
-export const PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS =
-  'lg:pl-8 lg:pr-8 min-[900px]:max-xl:pr-0' as const;
+/** Main PDP shell: symmetric horizontal padding from `lg` (incl. iPad Pro band). */
+export const PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS = 'lg:pl-8 lg:pr-8' as const;
 
 /** Prevent horizontal page scroll from carousel bleed / wide rows (iPad Pro band). */
 export const PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS =
