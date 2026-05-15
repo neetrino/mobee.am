@@ -41,7 +41,7 @@ export function EmptyWishlist({ t }: EmptyWishlistProps) {
           <Button
             variant="primary"
             size="lg"
-            className="h-14 w-full !rounded-full !bg-admin-500 px-2.5 text-sm font-semibold leading-normal !text-white hover:!bg-admin-500 active:!bg-admin-500 focus:!ring-admin-500 focus:!ring-offset-2"
+            className="h-14 w-full !rounded-full !bg-admin-500 px-2.5 text-base font-semibold leading-normal !text-white hover:!bg-admin-500 active:!bg-admin-500 focus:!ring-admin-500 focus:!ring-offset-2"
           >
             {t('common.wishlist.emptyBrowseCta')}
           </Button>

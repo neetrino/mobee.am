@@ -5,7 +5,7 @@ import { apiClient } from '../../lib/api-client';
 import { ApiError } from '../../lib/api-client/types';
 import type { LanguageCode } from '../../lib/language';
 
-interface RelatedProduct {
+export interface RelatedProduct {
   id: string;
   slug: string;
   title: string;

@@ -5,6 +5,11 @@ import { Montserrat } from 'next/font/google';
 import { useTranslation } from '../lib/i18n-client';
 import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
+import {
+  HOME_CURATED_SECTION_DESKTOP_TITLE_CLASS,
+  HOME_CURATED_SECTION_MOBILE_TITLE_CLASS,
+  HOME_SPECIAL_OFFERS_SECTION_OUTER_MARGIN_CLASS,
+} from './home-best-choice.constants';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -31,15 +36,12 @@ export function SpecialOffersSectionHeading({
 
   return (
     <div
-      className={`mt-6 lg:mt-[9rem] ${montserrat.className}`}
+      className={`${HOME_SPECIAL_OFFERS_SECTION_OUTER_MARGIN_CLASS} ${montserrat.className}`}
       aria-label={t('home.special_offers_heading.title')}
     >
       <div className="hidden flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 lg:flex">
         <div className="flex min-w-0 flex-col gap-2">
-          <h2
-            id="special-offers-heading"
-            className="text-[30px] font-bold leading-9 text-[#111827]"
-          >
+          <h2 id="special-offers-heading" className={HOME_CURATED_SECTION_DESKTOP_TITLE_CLASS}>
             {t('home.special_offers_heading.title')}
           </h2>
           <p className="max-w-[486px] text-base font-normal leading-6 text-[#6b7280]">
@@ -53,6 +55,7 @@ export function SpecialOffersSectionHeading({
       <HomeMobileSectionTitle
         sectionHeadingId="special-offers-heading-mobile"
         title={t('home.mobile_home.specialOffersSectionTitle')}
+        titleClassName={HOME_CURATED_SECTION_MOBILE_TITLE_CLASS}
         syncedCarouselPageIndex={syncedCarouselPageIndex}
         syncedCarouselPageCount={syncedCarouselPageCount}
       />

@@ -19,11 +19,17 @@ export const MOBILE_BOTTOM_NAV_COMPARE_ICON_SIZE_PX = 22;
 export const MOBILE_BOTTOM_NAV_COMPARE_ICON_ON_COMPARE_PAGE_SIZE_PX = 20;
 
 /**
- * Main column bottom padding so content clears fixed `MobileBottomNav`
- * (20.52 + 34.2 + 20.52 px content stack) including iOS safe area.
+ * Sum of nav vertical stack: inner top padding + tab row + inner base bottom padding (px).
+ * Matches `MOBILE_BOTTOM_NAV_INNER_PT_CLASS` + `MOBILE_BOTTOM_NAV_LINK_HEIGHT_CLASS` + base part of `MOBILE_BOTTOM_NAV_INNER_PB_CLASS`.
+ */
+export const MOBILE_BOTTOM_NAV_STACK_HEIGHT_PX = 20.52 + 34.2 + 20.52;
+
+/**
+ * Main column bottom padding below `lg` so content clears fixed `MobileBottomNav`.
+ * Slightly under {@link MOBILE_BOTTOM_NAV_STACK_HEIGHT_PX} so the end-of-page scroll strip is not oversized (+ same `safe-area` term as before).
  */
 export const MOBILE_BOTTOM_NAV_BODY_PADDING_BOTTOM_CLASS =
-  'max-lg:pb-[calc(75.24px+env(safe-area-inset-bottom,0px))]' as const;
+  'max-lg:pb-[calc(69px+env(safe-area-inset-bottom,0px))]' as const;
 
 /**
  * Wishlist / cart count on icons — cyan pill, high z-index so slots don’t clip it.
