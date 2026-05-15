@@ -506,6 +506,7 @@
     "creating": "Creating...",
     "activate": "Activate",
     "deactivate": "Deactivate",
+    "statusLabel": "Status",
     "active": "Active",
     "inactive": "Inactive",
     "delete": "Delete",

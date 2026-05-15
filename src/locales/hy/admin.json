@@ -508,6 +508,7 @@
     "creating": "Ստեղծվում է...",
     "activate": "Ակտիվացնել",
     "deactivate": "Ապաակտիվացնել",
+    "statusLabel": "Կարգավիճակ",
     "active": "Ակտիվ",
     "inactive": "Ոչ ակտիվ",
     "delete": "Ջնջել",

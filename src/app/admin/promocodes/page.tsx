@@ -58,6 +58,7 @@ export default function PromoCodesPage() {
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
   const [code, setCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState('10');
 
@@ -126,7 +127,7 @@ export default function PromoCodesPage() {
   };
 
   const handleToggleStatus = async (promoCodeId: string, currentStatus: boolean) => {
-    setSubmitting(true);
+    setStatusUpdatingId(promoCodeId);
     try {
       await apiClient.patch(`/api/v1/admin/promocodes/${promoCodeId}`, {
         isActive: !currentStatus,
@@ -136,7 +137,7 @@ export default function PromoCodesPage() {
       const details = getErrorDetail(error, t('admin.promocodes.unknownError'));
       alert(t('admin.promocodes.errorUpdate').replace('{message}', details));
     } finally {
-      setSubmitting(false);
+      setStatusUpdatingId(null);
     }
   };
 
@@ -243,24 +244,43 @@ export default function PromoCodesPage() {
                       <p className="text-sm text-gray-600">
                         {promoCode.discountPercent}% {t('admin.promocodes.discountLabel')}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        {promoCode.isActive ? t('admin.promocodes.active') : t('admin.promocodes.inactive')}
-                      </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={submitting}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="text-sm text-gray-600">
+                        {t('admin.promocodes.statusLabel')}
+                      </span>
+                      <button
+                        type="button"
                         onClick={() => handleToggleStatus(promoCode.id, promoCode.isActive)}
+                        disabled={submitting || statusUpdatingId === promoCode.id}
+                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ${
+                          promoCode.isActive
+                            ? 'bg-green-500 focus:ring-green-500'
+                            : 'bg-gray-300 focus:ring-gray-400'
+                        }`}
+                        title={
+                          promoCode.isActive
+                            ? t('admin.promocodes.deactivate')
+                            : t('admin.promocodes.activate')
+                        }
+                        role="switch"
+                        aria-checked={promoCode.isActive}
+                        aria-busy={statusUpdatingId === promoCode.id}
+                        aria-label={`${promoCode.code}: ${
+                          promoCode.isActive ? t('admin.promocodes.active') : t('admin.promocodes.inactive')
+                        }`}
                       >
-                        {promoCode.isActive ? t('admin.promocodes.deactivate') : t('admin.promocodes.activate')}
-                      </Button>
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                            promoCode.isActive ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        disabled={submitting}
+                        disabled={submitting || statusUpdatingId !== null}
                         onClick={() => handleDeletePromoCode(promoCode.id, promoCode.code)}
                         className="text-red-600 hover:text-red-700"
                       >
