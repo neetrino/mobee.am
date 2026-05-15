@@ -123,7 +123,7 @@ export function OrdersTable({
                 <span className="inline-block translate-x-[6px]">{t('admin.orders.status')}</span>
               </th>
               <th className="w-[14%] px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[15px]">{t('admin.orders.payment')}</span>
+                <span className="inline-block -translate-x-[22px]">{t('admin.orders.payment')}</span>
               </th>
               <th
                 className="w-[10%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"

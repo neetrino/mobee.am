@@ -125,7 +125,7 @@ export function OrderRow({
         </div>
       </td>
       <td className="px-2 py-3 align-top sm:px-3">
-        <div className="flex items-center justify-end gap-2 translate-x-[15px]">
+        <div className="flex items-center justify-end gap-2 translate-x-[7px]">
           {updatingPaymentStatus ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
