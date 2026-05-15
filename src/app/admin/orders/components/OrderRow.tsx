@@ -103,7 +103,7 @@ export function OrderRow({
         </div>
       </td>
       <td className="px-2 py-3 align-top text-sm font-medium text-gray-900 break-words sm:px-3">
-        <span className={`inline-block -translate-x-[75px] ${ORDER_ROW_TOTAL_PRICE_VERTICAL_CLASS}`}>
+        <span className={`inline-block -translate-x-[84px] ${ORDER_ROW_TOTAL_PRICE_VERTICAL_CLASS}`}>
           {calculateTotalWithoutShipping()}
         </span>
       </td>
