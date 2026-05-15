@@ -741,7 +741,9 @@
     "failedToDelete": "Не удалось удалить сообщения",
     "showingPage": "Показана страница {page} из {totalPages} ({total} всего)",
     "previous": "Предыдущая",
-    "next": "Следующая"
+    "next": "Следующая",
+    "fullMessageTitle": "Полное сообщение",
+    "viewFullMessageHint": "Нажмите, чтобы прочитать сообщение целиком"
   },
   "common": {
     "loading": "Загрузка...",

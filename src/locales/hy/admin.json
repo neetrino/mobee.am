@@ -742,7 +742,9 @@
     "failedToDelete": "Չհաջողվեց ջնջել հաղորդագրությունները",
     "showingPage": "Ցուցադրվում է {page} էջը {totalPages}-ից ({total} ընդամենը)",
     "previous": "Նախորդ",
-    "next": "Հաջորդ"
+    "next": "Հաջորդ",
+    "fullMessageTitle": "Ամբողջական հաղորդագրություն",
+    "viewFullMessageHint": "Սեղմե՛ք՝ ամբողջական տեքստը դիտելու համար"
   },
   "common": {
     "loading": "Բեռնվում է...",
