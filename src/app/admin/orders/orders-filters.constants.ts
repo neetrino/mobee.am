@@ -28,3 +28,27 @@ export const ORDERS_FILTER_DROPDOWN_OPTION_CLASS =
   'flex w-full break-words px-3 py-2.5 text-left text-sm leading-snug text-gray-800 transition-colors hover:bg-gray-50';
 
 export const ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS = 'bg-admin-50 font-semibold text-admin-800';
+
+/** Nudge order-row cell content down to align with status / payment controls (`1.5rem` ≈ 24px). */
+export const ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS = 'translate-y-6';
+
+/** Order # column: base `translate-y-7` (28px) + 5px. */
+export const ORDER_ROW_ORDER_NUMBER_VERTICAL_CLASS = 'translate-y-[33px]';
+
+/** Total price column: `ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS` + 5px (≈29px). */
+export const ORDER_ROW_TOTAL_PRICE_VERTICAL_CLASS = 'translate-y-[29px]';
+
+/**
+ * Shared sizing for order-row status & payment pill triggers: same minimum width, grow with content
+ * up to the table cell (`max-w-full`); labels use `break-words` so text stays fully visible.
+ */
+export const ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS =
+  'min-w-[8rem] w-max max-w-full shrink-0';
+
+/** @see ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS */
+export const ORDER_ROW_STATUS_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS =
+  ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS;
+
+/** @see ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS */
+export const ORDER_ROW_PAYMENT_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS =
+  ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS;

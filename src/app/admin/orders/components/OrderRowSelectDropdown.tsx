@@ -6,6 +6,7 @@ import {
   ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS,
   ORDERS_FILTER_DROPDOWN_OPTION_CLASS,
   ORDERS_FILTER_DROPDOWN_PANEL_CLASS,
+  ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS,
 } from '../orders-filters.constants';
 
 const ORDER_ROW_DROPDOWN_CHEVRON_WRAP_CLASS =
@@ -21,6 +22,14 @@ export interface OrderRowSelectDropdownProps {
   /** Tint classes from `getStatusColor` / payment helpers. */
   triggerTintClassName: string;
   ariaLabel: string;
+  /**
+   * When true, status trigger uses shared cell sizing (`ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS`).
+   */
+  fixedStatusTriggerWidth?: boolean;
+  /**
+   * When true, payment trigger uses the same cell sizing as status.
+   */
+  fixedPaymentTriggerWidth?: boolean;
 }
 
 function useDismissOnOutsideAndEscape(
@@ -101,6 +110,8 @@ export function OrderRowSelectDropdown({
   onValueChange,
   triggerTintClassName,
   ariaLabel,
+  fixedStatusTriggerWidth = false,
+  fixedPaymentTriggerWidth = false,
 }: OrderRowSelectDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -117,21 +128,29 @@ export function OrderRowSelectDropdown({
     [onValueChange],
   );
 
+  const useFixedTriggerWidth = fixedStatusTriggerWidth || fixedPaymentTriggerWidth;
+
+  const triggerSizingClassName = useFixedTriggerWidth
+    ? ORDER_ROW_CELL_DROPDOWN_TRIGGER_FIXED_WIDTH_CLASS
+    : 'max-w-full min-w-0';
+
   return (
-    <div ref={rootRef} className="relative ml-auto w-max max-w-full min-w-0">
+    <div ref={rootRef} className="relative w-max max-w-full min-w-0">
       <button
         type="button"
         id={`${id}-trigger`}
-        className={`flex max-w-full min-w-0 flex-nowrap items-center justify-between gap-1.5 overflow-hidden rounded-supersudo px-2.5 py-1.5 text-left text-xs font-medium ring-1 ring-black/5 transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-admin active:opacity-90 ${triggerTintClassName}`}
+        className={`relative flex h-auto min-h-5 items-center justify-center overflow-hidden rounded-supersudo px-2.5 py-1.5 text-center text-xs font-medium ring-1 ring-black/5 transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-admin active:opacity-90 ${triggerTintClassName} ${triggerSizingClassName}`}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={`${id}-listbox`}
         aria-label={ariaLabel}
         onClick={() => setIsOpen((o) => !o)}
       >
-        <span className="min-w-0 flex-1 translate-x-[3px] break-words leading-snug">{displayLabel}</span>
+        <span className="block w-full min-w-0 max-w-full whitespace-normal break-words px-6 text-center leading-snug">
+          {displayLabel}
+        </span>
         <span
-          className={`${ORDER_ROW_DROPDOWN_CHEVRON_WRAP_CLASS} ml-[3px] ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+          className={`${ORDER_ROW_DROPDOWN_CHEVRON_WRAP_CLASS} absolute right-1.5 top-1/2 z-[1] -translate-y-1/2 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
           aria-hidden
         >
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">

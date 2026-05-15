@@ -5,6 +5,7 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
 import { getPaymentStatusColor, getStatusColor } from '../utils/orderUtils';
 import type { Order } from '../useOrders';
+import { ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS, ORDER_ROW_ORDER_NUMBER_VERTICAL_CLASS, ORDER_ROW_TOTAL_PRICE_VERTICAL_CLASS } from '../orders-filters.constants';
 import { OrderRowSelectDropdown } from './OrderRowSelectDropdown';
 
 interface OrderRowProps {
@@ -30,7 +31,7 @@ export function OrderRow({
   onPaymentStatusChange,
   formatCurrency,
 }: OrderRowProps) {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
 
   const statusOptions = useMemo(
     () =>
@@ -85,70 +86,78 @@ export function OrderRow({
         className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
         onClick={onViewDetails}
       >
-        <div className="text-sm font-medium text-gray-900">{order.number}</div>
+        <div className={`inline-block -translate-x-[93px] ${ORDER_ROW_ORDER_NUMBER_VERTICAL_CLASS} text-sm font-medium text-gray-900`}>{order.number}</div>
       </td>
       <td
         className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
         onClick={onViewDetails}
       >
-        <div className="text-sm font-medium text-gray-900">
-          {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
+        <div className="-translate-x-[80px]">
+          <div className="text-sm font-medium text-gray-900">
+            {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
+          </div>
+          {order.customerPhone && (
+            <div className="text-xs text-gray-500 break-all">{order.customerPhone}</div>
+          )}
+          <div className="mt-2 text-xs text-admin-600">{t('admin.orders.viewOrderDetails')}</div>
         </div>
-        {order.customerPhone && (
-          <div className="text-xs text-gray-500 break-all">{order.customerPhone}</div>
-        )}
-        <div className="mt-1 text-xs text-admin-600">{t('admin.orders.viewOrderDetails')}</div>
       </td>
       <td className="px-2 py-3 align-top text-sm font-medium text-gray-900 break-words sm:px-3">
-        {calculateTotalWithoutShipping()}
+        <span className={`inline-block -translate-x-[75px] ${ORDER_ROW_TOTAL_PRICE_VERTICAL_CLASS}`}>
+          {calculateTotalWithoutShipping()}
+        </span>
       </td>
       <td className="px-2 py-3 align-top text-sm text-gray-500 sm:px-3">
-        <span className="inline-block translate-x-[35px]">{order.itemsCount}</span>
+        <span className={`inline-block -translate-x-[45px] ${ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS}`}>{order.itemsCount}</span>
       </td>
       <td className="px-2 py-3 align-top sm:px-3">
-        <div
-          className={`flex items-center justify-end gap-2 ${lang === 'en' ? 'translate-x-[30px]' : 'translate-x-[19px]'}`}
-        >
+        <div className={`flex ${ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS} items-center justify-start gap-2`}>
           {updatingStatus ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
               <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
             </div>
           ) : (
-            <OrderRowSelectDropdown
-              id={`order-${order.id}-status`}
-              value={order.status}
-              options={statusOptions}
-              onValueChange={onStatusChange}
-              triggerTintClassName={getStatusColor(order.status)}
-              ariaLabel={t('admin.orders.orderRowChangeStatusAria')}
-            />
+            <div className="-translate-x-[29px]">
+              <OrderRowSelectDropdown
+                id={`order-${order.id}-status`}
+                value={order.status}
+                options={statusOptions}
+                onValueChange={onStatusChange}
+                triggerTintClassName={getStatusColor(order.status)}
+                ariaLabel={t('admin.orders.orderRowChangeStatusAria')}
+                fixedStatusTriggerWidth
+              />
+            </div>
           )}
         </div>
       </td>
-      <td className="px-2 py-3 align-top sm:px-5">
-        <div
-          className={`flex items-center justify-end gap-2 ${lang === 'en' ? '-translate-x-[9px]' : 'translate-x-[7px]'}`}
-        >
+      <td className="px-2 py-3 align-top sm:px-3">
+        <div className={`flex ${ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS} items-center justify-start gap-2`}>
           {updatingPaymentStatus ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-admin"></div>
               <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
             </div>
           ) : (
-            <OrderRowSelectDropdown
-              id={`order-${order.id}-payment`}
-              value={order.paymentStatus}
-              options={paymentOptions}
-              onValueChange={onPaymentStatusChange}
-              triggerTintClassName={getPaymentStatusColor(order.paymentStatus)}
-              ariaLabel={t('admin.orders.orderRowChangePaymentAria')}
-            />
+            <div className="-translate-x-[15px]">
+              <OrderRowSelectDropdown
+                id={`order-${order.id}-payment`}
+                value={order.paymentStatus}
+                options={paymentOptions}
+                onValueChange={onPaymentStatusChange}
+                triggerTintClassName={getPaymentStatusColor(order.paymentStatus)}
+                ariaLabel={t('admin.orders.orderRowChangePaymentAria')}
+                fixedPaymentTriggerWidth
+              />
+            </div>
           )}
         </div>
       </td>
       <td className="px-2 py-5 align-top text-sm text-gray-500 break-words sm:px-3">
-        {new Date(order.createdAt).toLocaleDateString()}
+        <span className={`inline-block ${ORDER_ROW_CELL_VERTICAL_NUDGE_CLASS}`}>
+          {new Date(order.createdAt).toLocaleDateString()}
+        </span>
       </td>
     </tr>
   );
