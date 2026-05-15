@@ -103,7 +103,7 @@ export function ShopCatalogArea({
   const totalPages = meta?.totalPages ?? 0;
 
   return (
-    <div className="min-w-0 w-full flex-1 py-4">
+    <div className="min-w-0 w-full flex-1 pt-4 pb-0 lg:py-4">
       <div className="w-full">
         <ProductsHeader total={total} isCountPending={loading} />
       </div>
@@ -134,30 +134,32 @@ export function ShopCatalogArea({
 
             {totalPages > 1 && (
               <nav
-                className="mt-12 flex w-full items-center justify-center"
+                className="mt-6 flex w-full items-center justify-center sm:mt-10 md:mt-12"
                 aria-label="Pagination"
               >
-                <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-[9999px] px-2 py-2 sm:px-3">
+                <div className="w-full overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide">
+                  <div className="flex w-max min-w-full justify-center px-1 sm:px-0">
+                    <div className="inline-flex flex-nowrap items-center gap-1 rounded-[9999px] py-1 sm:gap-2 sm:py-2 sm:px-3">
                   {page > 1 ? (
                     <Link
                       href={buildPaginationUrl(page - 1)}
-                      className="inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9]"
+                      className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:px-4"
                     >
                       {t('common.pagination.previous')}
                     </Link>
                   ) : (
-                    <span className="inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium text-[#9AA4B2]">
+                    <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#9AA4B2] sm:px-4">
                       {t('common.pagination.previous')}
                     </span>
                   )}
 
-                  <div className="mx-1 h-6 w-px bg-[#E2E8F0]" aria-hidden />
+                  <div className="mx-0.5 h-6 w-px shrink-0 bg-[#E2E8F0] sm:mx-1" aria-hidden />
 
                   {getPaginationPages(totalPages, page).map((item, idx) =>
                     item === 'ellipsis' ? (
                       <span
                         key={`ellipsis-${idx}`}
-                        className="inline-flex h-10 min-w-10 items-center justify-center text-sm font-medium text-[#9AA4B2]"
+                        className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center px-1 text-sm font-medium text-[#9AA4B2] sm:min-w-10 sm:px-0"
                         aria-hidden
                       >
                         ...
@@ -165,7 +167,7 @@ export function ShopCatalogArea({
                     ) : item === page ? (
                       <span
                         key={item}
-                        className="inline-flex h-10 min-w-10 items-center justify-center rounded-[9999px] bg-[#2DB2FF] px-3 text-sm font-semibold text-white"
+                        className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center rounded-[9999px] bg-[#2DB2FF] px-2 text-sm font-semibold text-white sm:min-w-10 sm:px-3"
                         aria-current="page"
                       >
                         {item}
@@ -174,27 +176,29 @@ export function ShopCatalogArea({
                       <Link
                         key={item}
                         href={buildPaginationUrl(item)}
-                        className="inline-flex h-10 min-w-10 items-center justify-center rounded-[9999px] border border-transparent px-3 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9]"
+                        className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:min-w-10 sm:px-3"
                       >
                         {item}
                       </Link>
                     ),
                   )}
 
-                  <div className="mx-1 h-6 w-px bg-[#E2E8F0]" aria-hidden />
+                  <div className="mx-0.5 h-6 w-px shrink-0 bg-[#E2E8F0] sm:mx-1" aria-hidden />
 
                   {page < totalPages ? (
                     <Link
                       href={buildPaginationUrl(page + 1)}
-                      className="inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9]"
+                      className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:px-4"
                     >
                       {t('common.pagination.next')}
                     </Link>
                   ) : (
-                    <span className="inline-flex h-10 items-center justify-center rounded-[9999px] border border-transparent px-4 text-sm font-medium text-[#9AA4B2]">
+                    <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#9AA4B2] sm:px-4">
                       {t('common.pagination.next')}
                     </span>
                   )}
+                    </div>
+                  </div>
                 </div>
               </nav>
             )}

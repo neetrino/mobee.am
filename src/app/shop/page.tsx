@@ -25,7 +25,7 @@ interface ProductsPageProps {
 
 function ShopCatalogFallback() {
   return (
-    <div className="min-w-0 w-full flex-1 py-4">
+    <div className="min-w-0 w-full flex-1 pt-4 pb-0 lg:py-4">
       <div className="mb-6 h-8 w-48 animate-pulse rounded bg-gray-200" />
       <div className="mb-6 h-10 w-full max-w-md animate-pulse rounded bg-gray-200" />
       <div className="grid grid-cols-2 gap-x-2 gap-y-5 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-5 xl:grid-cols-3 xl:gap-6">
