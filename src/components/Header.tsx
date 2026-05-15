@@ -1146,11 +1146,9 @@ export function Header() {
     window.dispatchEvent(new Event('currency-updated'));
   };
 
+  /** In-flow placeholder for the fixed search row only; peeking strip1 height is reserved on its wrap. */
   const mobileDockedHeaderSpacerPx =
-    mobileSearchDocked && mobileSearchFlowSpacerPx > 0
-      ? mobileSearchFlowSpacerPx +
-        (mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0)
-      : 0;
+    mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? mobileSearchFlowSpacerPx : 0;
 
   const mobileSearchPeekTopPx =
     mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0;
