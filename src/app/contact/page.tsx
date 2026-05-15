@@ -22,6 +22,13 @@ const CONTACT_INFO_ICON_PX = 40;
 
 const CONTACT_INFO_ICON_IMG_CLASS = 'h-full w-full object-cover';
 
+/**
+ * iPad mini band (744–899 CSS px): shift contact + form block right. Literal for Tailwind JIT;
+ * sync 744 with `HOME_BEST_CHOICE_MOBILE_TABLET_MIN_WIDTH_PX`.
+ */
+const CONTACT_PAGE_IPAD_MINI_SHIFT_RIGHT_CLASS =
+  'min-[744px]:max-lg:ml-[150px] lg:ml-0' as const;
+
 export default function ContactPage() {
   const { t } = useTranslation();
   const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
@@ -75,7 +82,8 @@ export default function ContactPage() {
     <div className="bg-white">
       {/* Top Section: Contact Info and Form */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className={CONTACT_PAGE_IPAD_MINI_SHIFT_RIGHT_CLASS}>
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {/* Left Side: Contact Information */}
           <div className="space-y-8">
             {/* Call to Us */}
@@ -235,6 +243,7 @@ export default function ContactPage() {
               </div>
             </form>
           </div>
+        </div>
         </div>
       </div>
     </div>
