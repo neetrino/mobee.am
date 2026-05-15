@@ -8,7 +8,10 @@ import { WhyChooseUsSection } from './WhyChooseUsSection';
 import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
 import { HomeMobileSaleBanner } from './HomeMobileSaleBanner';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
-import { HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS } from './home-best-choice.constants';
+import {
+  HOME_CURATED_SECTION_MOBILE_TITLE_CLASS,
+  HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS,
+} from './home-best-choice.constants';
 import { t } from '../lib/i18n';
 import { FEATURED_HOME_FILTER_DEFAULT, useFeaturedHomeProducts } from './useFeaturedHomeProducts';
 import {
@@ -49,6 +52,7 @@ function HomeFeaturedCarouselSection({
       <HomeMobileSectionTitle
         sectionHeadingId="home-featured-heading-mobile"
         title={t(language, 'home.mobile_home.featuredSectionTitle')}
+        titleClassName={HOME_CURATED_SECTION_MOBILE_TITLE_CLASS}
         syncedCarouselPageIndex={featuredCarousel.pageIndex}
         syncedCarouselPageCount={featuredCarousel.pageCount}
       />

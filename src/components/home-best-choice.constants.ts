@@ -71,3 +71,23 @@ export const WISHLIST_LINE_ITEMS_GRID_CLASS = `grid ${HOME_BEST_CHOICE_DESKTOP_G
  * Desktop (`lg`): space between the home heading row (e.g. “best choice”, special offers) and the product grid under it.
  */
 export const HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS = 'lg:mt-[42px]' as const;
+
+/**
+ * Home curated rows: section h2 on `lg+` (featured intro uses the same rhythm in Figma).
+ * Slightly above legacy 30px for clearer hierarchy above product cards.
+ */
+export const HOME_CURATED_SECTION_DESKTOP_TITLE_CLASS =
+  'text-[34px] font-bold leading-[2.5rem] text-[#111827]' as const;
+
+/**
+ * Home curated rows: visible section title below `lg` (synced with carousel indicators).
+ */
+export const HOME_CURATED_SECTION_MOBILE_TITLE_CLASS =
+  'text-xl font-bold leading-snug text-[#303030]' as const;
+
+/**
+ * Home special-offers block: vertical offset from the featured (“Առաջարկված”) row above.
+ * Mobile-only bump; `lg` keeps the large gap under the desktop intro layout.
+ */
+export const HOME_SPECIAL_OFFERS_SECTION_OUTER_MARGIN_CLASS =
+  'mt-8 lg:mt-[9rem]' as const;
