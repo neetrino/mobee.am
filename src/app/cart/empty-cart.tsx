@@ -7,9 +7,11 @@ import { CartCtaResponsiveLabel } from './cart-cta-responsive-label';
 import {
   EMPTY_CART_EMPTY_STATE_CTA_LOWER_PX,
   EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX,
-  EMPTY_CART_EMPTY_STATE_LIFT_PX,
+  EMPTY_CART_EMPTY_STATE_WRAPPER_CLASS,
   EMPTY_CART_EMPTY_STATE_TITLE_DESCRIPTION_GAP_PX,
+  EMPTY_CART_IMAGE_DISPLAY_CLASS,
   EMPTY_CART_IMAGE_HEIGHT,
+  EMPTY_CART_IMAGE_SIZES,
   EMPTY_CART_IMAGE_SRC,
   EMPTY_CART_IMAGE_WIDTH,
   EMPTY_CART_PRIMARY_CTA_TEXT_CLASS,
@@ -29,17 +31,16 @@ export function EmptyCart({ t }: EmptyCartProps) {
       <h1 className="mb-0 text-3xl font-bold text-gray-900">{t('common.cart.title')}</h1>
 
       <div className="flex justify-center">
-        <div
-          className="flex w-full max-w-[338px] flex-col items-center gap-0.5"
-          style={{ transform: `translateY(-${EMPTY_CART_EMPTY_STATE_LIFT_PX}px)` }}
-        >
+        <div className={EMPTY_CART_EMPTY_STATE_WRAPPER_CLASS}>
           <Image
             src={EMPTY_CART_IMAGE_SRC}
             alt={t('common.cart.empty')}
             width={EMPTY_CART_IMAGE_WIDTH}
             height={EMPTY_CART_IMAGE_HEIGHT}
-            className="h-auto w-full max-w-[285px]"
+            sizes={EMPTY_CART_IMAGE_SIZES}
+            className={EMPTY_CART_IMAGE_DISPLAY_CLASS}
             priority
+            fetchPriority="high"
           />
           <div
             className="flex w-full flex-col gap-2"

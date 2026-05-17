@@ -100,7 +100,7 @@ function HomeSpecialOffersCarouselSection({
       syncedCarouselPageIndex={specialOffersCarousel.pageIndex}
       syncedCarouselPageCount={specialOffersCarousel.pageCount}
     >
-      <div className={`mt-4 ${HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS}`}>
+      <div className={`mt-5 ${HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS}`}>
         <SpecialOffersProductGrid
           language={specialOffersLanguage}
           loading={specialOffersLoading}

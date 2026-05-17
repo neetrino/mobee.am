@@ -259,6 +259,8 @@
     "ariaLabel": "Pagination",
     "previous": "Previous",
     "next": "Next",
+    "first": "First",
+    "last": "Last",
     "pageOf": "Page {page} of {totalPages}"
   },
   "notFound": {

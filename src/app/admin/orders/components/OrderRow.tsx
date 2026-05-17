@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useMemo } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';

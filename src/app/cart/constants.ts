@@ -10,8 +10,15 @@ export const EMPTY_CART_IMAGE_WIDTH = 285;
 
 export const EMPTY_CART_IMAGE_HEIGHT = 256;
 
-/** Lifts the whole empty-state block (illustration + copy + CTA) together (px). */
-export const EMPTY_CART_EMPTY_STATE_LIFT_PX = 40;
+/** Phones keep Figma width; slightly larger from site desktop `lg` up. */
+export const EMPTY_CART_IMAGE_DISPLAY_CLASS =
+  'h-auto w-full max-w-[285px] lg:max-w-[320px]';
+
+export const EMPTY_CART_IMAGE_SIZES = '(max-width: 899px) 85vw, 320px';
+
+/** Lifts the whole empty-state block (illustration + copy + CTA); extra lift on desktop `lg+`. */
+export const EMPTY_CART_EMPTY_STATE_WRAPPER_CLASS =
+  'flex w-full max-w-[338px] flex-col items-center gap-0.5 -translate-y-10 lg:-translate-y-14';
 
 /** Pulls copy + CTA toward the illustration (negative margin under the image, px). */
 export const EMPTY_CART_EMPTY_STATE_IMAGE_TEXT_OVERLAP_PX = 80;

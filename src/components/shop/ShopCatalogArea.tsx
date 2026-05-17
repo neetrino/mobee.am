@@ -10,7 +10,60 @@ import type { LanguageCode } from '@/lib/language';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
 import { useTranslation } from '@/lib/i18n-client';
 import { parseProductSortOption } from '@/lib/products/sort';
+import {
+  getPaginationPages,
+  getPaginationPagesPhoneWindow,
+  type PaginationPageItem,
+} from '@/lib/pagination/get-pagination-pages';
 import { useShopCatalog, type ShopCatalogProduct } from './useShopCatalog';
+
+type ShopPaginationPageItemsProps = {
+  items: PaginationPageItem[];
+  currentPage: number;
+  buildUrl: (pageNum: number) => string;
+  keyPrefix: string;
+  className: string;
+};
+
+function ShopPaginationPageItems({
+  items,
+  currentPage,
+  buildUrl,
+  keyPrefix,
+  className,
+}: ShopPaginationPageItemsProps) {
+  return (
+    <div className={`inline-flex flex-nowrap items-center gap-1 ${className}`.trim()}>
+      {items.map((item, idx) =>
+        item === 'ellipsis' ? (
+          <span
+            key={`${keyPrefix}-ellipsis-${idx}`}
+            className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center px-1 text-sm font-medium text-[#9AA4B2] sm:min-w-10 sm:px-0"
+            aria-hidden
+          >
+            ...
+          </span>
+        ) : item === currentPage ? (
+          <span
+            key={`${keyPrefix}-page-${item}`}
+            className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center rounded-[9999px] bg-[#2DB2FF] px-2 text-sm font-semibold text-white sm:min-w-10 sm:px-3"
+            aria-current="page"
+          >
+            {item}
+          </span>
+        ) : (
+          <Link
+            key={`${keyPrefix}-page-${item}`}
+            href={buildUrl(item)}
+            className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:min-w-10 sm:px-3"
+          >
+            {item}
+          </Link>
+        ),
+      )}
+    </div>
+  );
+}
 
 export type ShopCatalogAreaProps = {
   initialPayload?: ProductListPayload;
@@ -84,20 +137,6 @@ export function ShopCatalogArea({
     return `/shop?${q.toString()}`;
   };
 
-  const getPaginationPages = (totalPages: number, current: number): (number | 'ellipsis')[] => {
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-    const set = new Set<number>([1, totalPages, current - 1, current, current + 1]);
-    const sorted = Array.from(set).filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
-    const out: (number | 'ellipsis')[] = [];
-    for (let i = 0; i < sorted.length; i++) {
-      if (i > 0 && sorted[i]! - sorted[i - 1]! > 1) out.push('ellipsis');
-      out.push(sorted[i]!);
-    }
-    return out;
-  };
-
   const meta = productsData?.meta;
   const total = meta?.total ?? 0;
   const totalPages = meta?.totalPages ?? 0;
@@ -142,59 +181,46 @@ export function ShopCatalogArea({
                     <div className="inline-flex flex-nowrap items-center gap-1 rounded-[9999px] py-1 sm:gap-2 sm:py-2 sm:px-3">
                   {page > 1 ? (
                     <Link
-                      href={buildPaginationUrl(page - 1)}
+                      href={buildPaginationUrl(1)}
                       className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:px-4"
                     >
-                      {t('common.pagination.previous')}
+                      {t('common.pagination.first')}
                     </Link>
                   ) : (
                     <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#9AA4B2] sm:px-4">
-                      {t('common.pagination.previous')}
+                      {t('common.pagination.first')}
                     </span>
                   )}
 
                   <div className="mx-0.5 h-6 w-px shrink-0 bg-[#E2E8F0] sm:mx-1" aria-hidden />
 
-                  {getPaginationPages(totalPages, page).map((item, idx) =>
-                    item === 'ellipsis' ? (
-                      <span
-                        key={`ellipsis-${idx}`}
-                        className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center px-1 text-sm font-medium text-[#9AA4B2] sm:min-w-10 sm:px-0"
-                        aria-hidden
-                      >
-                        ...
-                      </span>
-                    ) : item === page ? (
-                      <span
-                        key={item}
-                        className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center rounded-[9999px] bg-[#2DB2FF] px-2 text-sm font-semibold text-white sm:min-w-10 sm:px-3"
-                        aria-current="page"
-                      >
-                        {item}
-                      </span>
-                    ) : (
-                      <Link
-                        key={item}
-                        href={buildPaginationUrl(item)}
-                        className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:min-w-10 sm:px-3"
-                      >
-                        {item}
-                      </Link>
-                    ),
-                  )}
+                  <ShopPaginationPageItems
+                    items={getPaginationPagesPhoneWindow(totalPages, page)}
+                    currentPage={page}
+                    buildUrl={buildPaginationUrl}
+                    keyPrefix="phone"
+                    className="md:hidden"
+                  />
+                  <ShopPaginationPageItems
+                    items={getPaginationPages(totalPages, page)}
+                    currentPage={page}
+                    buildUrl={buildPaginationUrl}
+                    keyPrefix="tablet"
+                    className="hidden md:inline-flex"
+                  />
 
                   <div className="mx-0.5 h-6 w-px shrink-0 bg-[#E2E8F0] sm:mx-1" aria-hidden />
 
                   {page < totalPages ? (
                     <Link
-                      href={buildPaginationUrl(page + 1)}
+                      href={buildPaginationUrl(totalPages)}
                       className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:px-4"
                     >
-                      {t('common.pagination.next')}
+                      {t('common.pagination.last')}
                     </Link>
                   ) : (
                     <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#9AA4B2] sm:px-4">
-                      {t('common.pagination.next')}
+                      {t('common.pagination.last')}
                     </span>
                   )}
                     </div>

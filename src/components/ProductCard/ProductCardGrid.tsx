@@ -77,8 +77,8 @@ export function ProductCardGrid({
   const footerPriceClass = (() => {
     if (smallerFooterPrice) {
       return isCompact
-        ? 'text-[0.824687578125rem] leading-[1.28284734375rem]'
-        : 'text-[0.91631953125rem] leading-[1.28284734375rem] max-lg:text-sm max-lg:leading-tight';
+        ? 'text-[0.824687578125rem] leading-[1.28284734375rem] lg:text-[1.06875rem] lg:leading-[1.6625rem]'
+        : 'text-[0.91631953125rem] leading-[1.28284734375rem] max-lg:text-sm max-lg:leading-tight lg:text-[1.1875rem] lg:leading-[1.6625rem]';
     }
 
     return isCompact
@@ -204,8 +204,8 @@ export function ProductCardGrid({
                   } ${
                     smallerFooterPrice
                       ? isCompact
-                        ? 'text-[0.54979171875rem]'
-                        : 'text-[0.641423671875rem]'
+                        ? 'text-[0.54979171875rem] lg:text-[0.7125rem]'
+                        : 'text-[0.641423671875rem] lg:text-[0.83125rem]'
                       : isCompact
                         ? 'text-[0.7125rem]'
                         : 'text-[0.83125rem]'
@@ -237,7 +237,9 @@ export function ProductCardGrid({
                 : 'cursor-default opacity-50'
             } ${
               homeProductGridCard
-                ? 'size-9 min-h-9 min-w-9 gap-0 rounded-full p-0'
+                ? isCompact
+                  ? 'max-lg:size-9 max-lg:min-h-9 max-lg:min-w-9 max-lg:gap-0 max-lg:rounded-full max-lg:p-0 lg:h-10 lg:min-w-[110px] lg:gap-2 lg:rounded-[20px] lg:px-3 lg:text-xs lg:tracking-wide'
+                  : 'max-lg:size-9 max-lg:min-h-9 max-lg:min-w-9 max-lg:gap-0 max-lg:rounded-full max-lg:p-0 lg:h-[38.88px] lg:min-w-[106.92px] lg:gap-[6.3px] lg:rounded-[16.2px] lg:px-[12.96px] lg:text-[11.34px] lg:leading-[21.6px] lg:tracking-[0.162px]'
                 : isCompact
                   ? 'h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide'
                   : 'h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]'
@@ -262,9 +264,12 @@ export function ProductCardGrid({
               </svg>
             ) : (
               <>
-                <CartIcon className="shrink-0" size={homeProductGridCard || isCompact ? 18 : 16.2} />
+                <CartIcon
+                  className="shrink-0"
+                  size={homeProductGridCard || isCompact ? 18 : 16.2}
+                />
                 <span
-                  className={`whitespace-nowrap ${homeProductGridCard ? 'sr-only' : ''}`}
+                  className={`whitespace-nowrap ${homeProductGridCard ? 'max-lg:sr-only' : ''}`}
                 >
                   {t('common.buttons.addToCart')}
                 </span>

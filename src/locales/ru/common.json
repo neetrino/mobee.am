@@ -259,6 +259,8 @@
     "ariaLabel": "Пагинация",
     "previous": "Предыдущая",
     "next": "Следующая",
+    "first": "Первая",
+    "last": "Последняя",
     "pageOf": "Страница {page} из {totalPages}"
   },
   "notFound": {

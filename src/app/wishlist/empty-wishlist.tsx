@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@shop/ui';
 
-import { EMPTY_WISHLIST_ILLUSTRATION_PATH } from './empty-wishlist.constants';
+import {
+  EMPTY_WISHLIST_FRAME_CLASS,
+  EMPTY_WISHLIST_ILLUSTRATION_HEIGHT_PX,
+  EMPTY_WISHLIST_ILLUSTRATION_PATH,
+  EMPTY_WISHLIST_ILLUSTRATION_WIDTH_PX,
+  EMPTY_WISHLIST_IMAGE_SIZES,
+} from './empty-wishlist.constants';
 
 export interface EmptyWishlistProps {
   t: (key: string) => string;
@@ -16,14 +23,17 @@ export interface EmptyWishlistProps {
 export function EmptyWishlist({ t }: EmptyWishlistProps) {
   return (
     <div className="flex w-full flex-col items-center gap-7 pb-8 pt-4">
-      <div className="relative h-[247px] w-[256px] shrink-0">
+      <div className={EMPTY_WISHLIST_FRAME_CLASS}>
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <img
+          <Image
             src={EMPTY_WISHLIST_ILLUSTRATION_PATH}
             alt={t('common.wishlist.empty')}
+            width={EMPTY_WISHLIST_ILLUSTRATION_WIDTH_PX}
+            height={EMPTY_WISHLIST_ILLUSTRATION_HEIGHT_PX}
+            sizes={EMPTY_WISHLIST_IMAGE_SIZES}
+            priority
+            fetchPriority="high"
             className="absolute left-[-50.18%] top-[-93.23%] h-[293.01%] max-w-none w-[189.72%]"
-            loading="eager"
-            decoding="async"
           />
         </div>
       </div>

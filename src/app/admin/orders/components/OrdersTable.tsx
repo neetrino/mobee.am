@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@/app/admin/lib/adminShopUi';
