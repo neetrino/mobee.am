@@ -257,6 +257,8 @@
     "ariaLabel": "Էջավորում",
     "previous": "Նախորդ",
     "next": "Հաջորդ",
+    "first": "Առաջին",
+    "last": "Վերջին",
     "pageOf": "Էջ {page} {totalPages}-ից"
   },
   "notFound": {

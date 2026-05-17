@@ -1,4 +1,3 @@
-import Script from 'next/script';
 import React, { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
@@ -60,12 +59,12 @@ export default async function RootLayout({
 
   return (
     <html lang={initialLanguage} className="h-full" suppressHydrationWarning>
-      <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-full`}>
-        <Script
-          id="tablet-ipad-air-like-html-init"
-          strategy="beforeInteractive"
+      <head>
+        <script
           dangerouslySetInnerHTML={{ __html: TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT }}
         />
+      </head>
+      <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
           <ClientProviders initialLanguage={initialLanguage}>
             <SiteChrome>{children}</SiteChrome>

@@ -41,17 +41,29 @@ export function useHomeBestChoiceCarouselPageSync(
       return;
     }
 
-    emit();
+    let cancelled = false;
+    const scheduleEmit = () => {
+      requestAnimationFrame(() => {
+        if (!cancelled) {
+          emit();
+        }
+      });
+    };
+
+    scheduleEmit();
 
     const onScroll = () => {
-      requestAnimationFrame(emit);
+      scheduleEmit();
     };
 
     el.addEventListener('scroll', onScroll, { passive: true });
-    const ro = new ResizeObserver(() => emit());
+    const ro = new ResizeObserver(() => {
+      scheduleEmit();
+    });
     ro.observe(el);
 
     return () => {
+      cancelled = true;
       el.removeEventListener('scroll', onScroll);
       ro.disconnect();
     };
