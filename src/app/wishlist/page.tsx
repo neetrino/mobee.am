@@ -15,6 +15,8 @@ import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout
 import { WISHLIST_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
 import { WishlistItemCard, type WishlistItemCardProduct } from './wishlist-item-card';
 import { showToast } from '../../components/Toast';
+import { EMPTY_WISHLIST_ILLUSTRATION_SRC } from '../../lib/empty-state/empty-state-images.constants';
+import { usePreloadEmptyStateImage } from '../../lib/empty-state/usePreloadEmptyStateImage';
 
 const WISHLIST_KEY = 'shop_wishlist';
 
@@ -34,6 +36,7 @@ function getWishlist(): string[] {
 export default function WishlistPage() {
   const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
+  usePreloadEmptyStateImage(EMPTY_WISHLIST_ILLUSTRATION_SRC);
   const [products, setProducts] = useState<WishlistItemCardProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);

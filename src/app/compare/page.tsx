@@ -34,6 +34,8 @@ import {
   COMPARE_EMPTY_STATE_TITLE_CLASS,
   COMPARE_EMPTY_STATE_WRAPPER_CLASS,
 } from './compare-layout.constants';
+import { EMPTY_COMPARE_ILLUSTRATION_SRC } from '../../lib/empty-state/empty-state-images.constants';
+import { usePreloadEmptyStateImage } from '../../lib/empty-state/usePreloadEmptyStateImage';
 
 interface Product extends CompareTableProduct {
   primaryCategoryId?: string | null;
@@ -60,6 +62,7 @@ function resolveCategorySectionTitle(
  */
 export default function ComparePage() {
   const { t } = useTranslation();
+  usePreloadEmptyStateImage(EMPTY_COMPARE_ILLUSTRATION_SRC);
   const [products, setProducts] = useState<Product[]>([]);
   const [compareEntries, setCompareEntries] = useState(() =>
     typeof window === 'undefined' ? [] : readCompareEntries(),
@@ -222,6 +225,8 @@ export default function ComparePage() {
             height={COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX}
             sizes={COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR}
             className={COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS}
+            priority
+            fetchPriority="high"
           />
           <div className={COMPARE_EMPTY_STATE_TEXT_BLOCK_CLASS}>
             <div className={COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS}>
