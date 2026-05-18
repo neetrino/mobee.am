@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { WISHLIST_KEY } from '../types';
 import { isProductIdInCompare } from '../../../../lib/shop/compare-storage';
+import { isProductInWishlist } from '../../../../lib/wishlist/wishlist-storage';
 
 interface UseWishlistCompareProps {
   productId: string | null;
@@ -15,13 +15,7 @@ export function useWishlistCompare({ productId }: UseWishlistCompareProps) {
     
     const checkWishlist = () => {
       if (typeof window === 'undefined') return;
-      try {
-        const stored = localStorage.getItem(WISHLIST_KEY);
-        const wishlist = stored ? JSON.parse(stored) : [];
-        setIsInWishlist(wishlist.includes(productId));
-      } catch {
-        setIsInWishlist(false);
-      }
+      setIsInWishlist(isProductInWishlist(productId));
     };
     
     checkWishlist();

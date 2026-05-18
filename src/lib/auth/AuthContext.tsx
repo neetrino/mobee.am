@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient, ApiError } from '../api-client';
 import { mergeGuestCartIntoUserCart } from '../cart/guest-cart';
 import { applyPendingWishlistProductAfterAuth } from '../wishlist/pendingWishlistAfterLogin';
+import { reconcileWishlistWithCatalog } from '../wishlist/reconcileWishlistWithCatalog';
 
 /**
  * User interface
@@ -96,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           setToken(storedToken);
           setUser(parsedUser);
+          void reconcileWishlistWithCatalog();
         } else {
           console.log('ℹ️ [AUTH] No stored auth data found');
         }
@@ -165,6 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       persistAuthResponse(response);
       applyPendingWishlistProductAfterAuth();
       await mergeGuestCartAfterAuth();
+      await reconcileWishlistWithCatalog();
 
       // Don't redirect here - let the login page handle redirect based on query params
     } catch (error: unknown) {
@@ -227,6 +230,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       persistAuthResponse(response);
       applyPendingWishlistProductAfterAuth();
       await mergeGuestCartAfterAuth();
+      await reconcileWishlistWithCatalog();
       console.log('✅ [AUTH] Registration successful:', { userId: response.user.id });
 
       console.log('🔄 [AUTH] Redirecting to home page...');

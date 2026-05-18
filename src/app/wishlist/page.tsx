@@ -14,18 +14,11 @@ import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWit
 import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
 import { WISHLIST_LINE_ITEMS_GRID_CLASS } from '../../components/home-best-choice.constants';
 import { WishlistItemCard, type WishlistItemCardProduct } from './wishlist-item-card';
-
-const WISHLIST_KEY = 'shop_wishlist';
-
-function getWishlist(): string[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const stored = localStorage.getItem(WISHLIST_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-}
+import {
+  pruneWishlistToCatalogIds,
+  readWishlistProductIds,
+  writeWishlistProductIds,
+} from '../../lib/wishlist/wishlist-storage';
 
 /**
  * Wishlist page that shows saved products and supports lightweight CRUD actions.
@@ -69,8 +62,10 @@ export default function WishlistPage() {
         },
       });
 
+      const catalogIds = new Set(response.data.map((product) => product.id));
+      const validIds = pruneWishlistToCatalogIds(catalogIds);
       const wishlistProducts = response.data.filter((product) =>
-        idsToLoad.includes(product.id)
+        validIds.includes(product.id),
       );
       setProducts(wishlistProducts);
     } catch (error) {
@@ -82,7 +77,7 @@ export default function WishlistPage() {
 
   useEffect(() => {
     // Get wishlist IDs from localStorage
-    const ids = getWishlist();
+    const ids = readWishlistProductIds();
     setWishlistIds(ids);
     fetchWishlistProducts(ids);
 
@@ -96,7 +91,7 @@ export default function WishlistPage() {
       }
       
       // Only re-fetch if update came from external source (another component)
-      const updatedIds = getWishlist();
+      const updatedIds = readWishlistProductIds();
       setWishlistIds(updatedIds);
       fetchWishlistProducts(updatedIds);
     };
@@ -121,16 +116,12 @@ export default function WishlistPage() {
     const updatedIds = wishlistIds.filter((id) => id !== productId);
     const updatedProducts = products.filter((p) => p.id !== productId);
     
-    // Update localStorage first
-    localStorage.setItem(WISHLIST_KEY, JSON.stringify(updatedIds));
+    writeWishlistProductIds(updatedIds);
     
     // Update state immediately (no page reload, no loading spinner)
     setWishlistIds(updatedIds);
     setProducts(updatedProducts);
     
-    // Dispatch event for other components (header, etc.) - but our handler won't re-fetch
-    // because isLocalUpdateRef.current is true
-    window.dispatchEvent(new Event('wishlist-updated'));
   };
 
   const handleAddToCart = (product: WishlistItemCardProduct) => {

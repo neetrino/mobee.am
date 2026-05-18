@@ -1,12 +1,13 @@
 'use client';
 
 import { readCompareEntries, SHOP_COMPARE_STORAGE_KEY } from './shop/compare-storage';
+import { readWishlistProductIds, WISHLIST_STORAGE_KEY } from './wishlist/wishlist-storage';
 
 /**
  * Shared storage keys used to keep wishlist, compare and cart data in localStorage.
  */
 export const STORAGE_KEYS = {
-  wishlist: 'shop_wishlist',
+  wishlist: WISHLIST_STORAGE_KEY,
   compare: SHOP_COMPARE_STORAGE_KEY,
   cart: 'shop_cart_guest',
 } as const;
@@ -33,7 +34,7 @@ function getStoredArrayLength(key: string): number {
  * Retrieves wishlist items count from localStorage.
  */
 export function getWishlistCount(): number {
-  return getStoredArrayLength(WISHLIST_KEY);
+  return readWishlistProductIds().length;
 }
 
 /**

@@ -7,7 +7,8 @@ import { getStoredLanguage } from '../../../lib/language';
 import { apiClient } from '../../../lib/api-client';
 import { getStoredCurrency, type CurrencyCode } from '../../../lib/currency';
 import type { Product } from './types';
-import { RESERVED_ROUTES, WISHLIST_KEY } from './constants';
+import { RESERVED_ROUTES } from './constants';
+import { isProductInWishlist } from '../../../lib/wishlist/wishlist-storage';
 import { isProductIdInCompare } from '../../../lib/shop/compare-storage';
 import {
   processImageUrl,
@@ -220,13 +221,7 @@ export function useProductData({
     if (!product) return;
     const checkWishlist = () => {
       if (typeof window === 'undefined') return;
-      try {
-        const stored = localStorage.getItem(WISHLIST_KEY);
-        const wishlist = stored ? JSON.parse(stored) : [];
-        setIsInWishlist(wishlist.includes(product.id));
-      } catch {
-        setIsInWishlist(false);
-      }
+      setIsInWishlist(isProductInWishlist(product.id));
     };
     checkWishlist();
     window.addEventListener('wishlist-updated', checkWishlist);

@@ -2,8 +2,8 @@
 
 import type { MouseEvent } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { WISHLIST_KEY } from '../types';
 import { toggleCompareProduct } from '../../../../lib/shop/compare-storage';
+import { toggleWishlistProductId } from '../../../../lib/wishlist/wishlist-storage';
 import { useAuth } from '../../../../lib/auth/AuthContext';
 import { getLoginUrlWithRedirect } from '../../../../lib/auth/loginRedirectUrl';
 import { queueWishlistProductForAfterLogin } from '../../../../lib/wishlist/pendingWishlistAfterLogin';
@@ -42,19 +42,8 @@ export function useProductActions({
     }
 
     try {
-      const stored = localStorage.getItem(WISHLIST_KEY);
-      const wishlist: string[] = stored ? JSON.parse(stored) : [];
-      
-      if (isInWishlist) {
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist.filter(id => id !== productId)));
-        setIsInWishlist(false);
-      } else {
-        wishlist.push(productId);
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
-        setIsInWishlist(true);
-      }
-
-      window.dispatchEvent(new Event('wishlist-updated'));
+      const added = toggleWishlistProductId(productId);
+      setIsInWishlist(added);
     } catch {
       // Silently fail
     }

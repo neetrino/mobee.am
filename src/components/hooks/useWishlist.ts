@@ -5,8 +5,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { getLoginUrlWithRedirect } from '../../lib/auth/loginRedirectUrl';
 import { queueWishlistProductForAfterLogin } from '../../lib/wishlist/pendingWishlistAfterLogin';
-
-const WISHLIST_KEY = 'shop_wishlist';
+import {
+  isProductInWishlist,
+  toggleWishlistProductId,
+} from '../../lib/wishlist/wishlist-storage';
 
 /**
  * Hook for managing wishlist state for a product
@@ -22,13 +24,7 @@ export function useWishlist(productId: string) {
   useEffect(() => {
     const checkWishlist = () => {
       if (typeof window === 'undefined') return;
-      try {
-        const stored = localStorage.getItem(WISHLIST_KEY);
-        const wishlist = stored ? JSON.parse(stored) : [];
-        setIsInWishlist(wishlist.includes(productId));
-      } catch {
-        setIsInWishlist(false);
-      }
+      setIsInWishlist(isProductInWishlist(productId));
     };
 
     checkWishlist();
@@ -54,20 +50,8 @@ export function useWishlist(productId: string) {
     }
 
     try {
-      const stored = localStorage.getItem(WISHLIST_KEY);
-      const wishlist: string[] = stored ? JSON.parse(stored) : [];
-      
-      if (isInWishlist) {
-        const updated = wishlist.filter((id) => id !== productId);
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated));
-        setIsInWishlist(false);
-      } else {
-        wishlist.push(productId);
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
-        setIsInWishlist(true);
-      }
-      
-      window.dispatchEvent(new Event('wishlist-updated'));
+      const added = toggleWishlistProductId(productId);
+      setIsInWishlist(added);
     } catch (error) {
       console.error('Error updating wishlist:', error);
     }
@@ -75,7 +59,3 @@ export function useWishlist(productId: string) {
 
   return { isInWishlist, toggleWishlist };
 }
-
-
-
-
