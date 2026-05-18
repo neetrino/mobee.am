@@ -39,3 +39,27 @@ export function safeParseLogin(body: unknown): ReturnType<typeof loginSchema.saf
 export function safeParseRegister(body: unknown): ReturnType<typeof registerSchema.safeParse> {
   return registerSchema.safeParse(body);
 }
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Valid email is required"),
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+export function safeParseForgotPassword(
+  body: unknown
+): ReturnType<typeof forgotPasswordSchema.safeParse> {
+  return forgotPasswordSchema.safeParse(body);
+}
+
+export function safeParseResetPassword(
+  body: unknown
+): ReturnType<typeof resetPasswordSchema.safeParse> {
+  return resetPasswordSchema.safeParse(body);
+}
