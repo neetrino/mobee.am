@@ -21,8 +21,39 @@
   },
   "forgotPasswordPage": {
     "title": "Reset password",
-    "subtitle": "Password reset is not available online yet.",
-    "body": "Please contact support and we will help you regain access to your account.",
-    "backToLogin": "Back to sign in"
+    "subtitle": "Enter your email and we will send you a link to reset your password.",
+    "successMessage": "If an account exists for this email, you will receive password reset instructions shortly.",
+    "backToLogin": "Back to sign in",
+    "form": {
+      "email": "Email",
+      "submit": "Send reset link",
+      "submitting": "Sending..."
+    },
+    "errors": {
+      "emailRequired": "Please enter your email",
+      "requestFailed": "Could not send reset email. Please try again."
+    }
+  },
+  "resetPasswordPage": {
+    "title": "Choose a new password",
+    "subtitle": "Enter your new password below.",
+    "successMessage": "Your password has been reset successfully.",
+    "redirecting": "Redirecting to sign in...",
+    "linkExpiredTitle": "Link expired",
+    "linkExpiredMessage": "This reset link is invalid or has expired. Request a new one.",
+    "requestNewLink": "Request a new link",
+    "backToLogin": "Back to sign in",
+    "form": {
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Reset password",
+      "submitting": "Saving..."
+    },
+    "errors": {
+      "tokenRequired": "Reset link is missing or invalid",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "resetFailed": "Could not reset password. Please try again."
+    }
   }
 }
