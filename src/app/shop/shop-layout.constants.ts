@@ -15,8 +15,8 @@ export const SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS = `${SHOP_FILTER_SIDEBAR_TOP_OFF
 export const SHOP_FILTER_SIDEBAR_SCROLL_CLASS =
   'lg:max-h-[calc(100dvh-var(--shop-filter-sidebar-top-offset))] lg:overflow-y-auto lg:overscroll-contain lg:scrollbar-hide';
 
-/** Space between `/shop` content (filters + catalog) and the site footer; all breakpoints. */
-export const SHOP_PAGE_FOOTER_GAP_CLASS = 'pb-12';
+/** Bottom padding under `/shop` main column — desktop only; mobile relies on `MOBILE_BOTTOM_NAV_BODY_PADDING_BOTTOM_CLASS` (no extra stack under pagination). */
+export const SHOP_PAGE_FOOTER_GAP_CLASS = 'lg:pb-12' as const;
 
 /** Vertical gap between filter sections (each ends with `border-b`). Desktop sidebar + mobile drawer. */
 export const SHOP_FILTER_SECTIONS_STACK_CLASS = 'flex flex-col gap-6';

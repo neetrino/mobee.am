@@ -10,6 +10,7 @@ import {
   PRODUCT_DISCOUNTS_PAGE_SIZE,
   PRODUCT_DISCOUNTS_SEARCH_DEBOUNCE_MS,
 } from './product-discounts-pagination.constants';
+import { showToast } from '@/components/Toast';
 
 interface AdminSettingsResponse {
   globalDiscount: number;
@@ -262,7 +263,7 @@ export default function QuickSettingsPage() {
   const handleDiscountSave = async () => {
     const discountValue = parseFloat(globalDiscount.toString());
     if (isNaN(discountValue) || discountValue < 0 || discountValue > 100) {
-      alert(t('admin.quickSettings.discountMustBeValid'));
+      showToast(t('admin.quickSettings.discountMustBeValid'), 'warning');
       return;
     }
 
@@ -277,12 +278,12 @@ export default function QuickSettingsPage() {
       // Refresh products to get updated labels with new discount percentage
       await fetchProducts(productsPage);
       
-      alert(t('admin.quickSettings.savedSuccess'));
+      showToast(t('admin.quickSettings.savedSuccess'), 'success');
       console.log('✅ [QUICK SETTINGS] Global discount saved');
     } catch (err: any) {
       console.error('❌ [QUICK SETTINGS] Error saving discount:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save';
-      alert(t('admin.quickSettings.errorSaving').replace('{message}', errorMessage));
+      showToast(t('admin.quickSettings.errorSaving').replace('{message}', errorMessage), 'error');
     } finally {
       setDiscountSaving(false);
     }
@@ -297,12 +298,12 @@ export default function QuickSettingsPage() {
         ...buildDiscountPayload(),
       });
       await fetchProducts(productsPage);
-      alert(t('admin.quickSettings.savedSuccess'));
+      showToast(t('admin.quickSettings.savedSuccess'), 'success');
       console.log('✅ [QUICK SETTINGS] Category discounts saved');
     } catch (err: any) {
       console.error('❌ [QUICK SETTINGS] Error saving category discounts:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save';
-      alert(t('admin.quickSettings.errorSaving').replace('{message}', errorMessage));
+      showToast(t('admin.quickSettings.errorSaving').replace('{message}', errorMessage), 'error');
     } finally {
       setCategorySaving(false);
     }
@@ -317,12 +318,12 @@ export default function QuickSettingsPage() {
         ...buildDiscountPayload(),
       });
       await fetchProducts(productsPage);
-      alert(t('admin.quickSettings.savedSuccess'));
+      showToast(t('admin.quickSettings.savedSuccess'), 'success');
       console.log('✅ [QUICK SETTINGS] Brand discounts saved');
     } catch (err: any) {
       console.error('❌ [QUICK SETTINGS] Error saving brand discounts:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save';
-      alert(t('admin.quickSettings.errorSaving').replace('{message}', errorMessage));
+      showToast(t('admin.quickSettings.errorSaving').replace('{message}', errorMessage), 'error');
     } finally {
       setBrandSaving(false);
     }
@@ -331,7 +332,7 @@ export default function QuickSettingsPage() {
   const handleProductDiscountSave = async (productId: string) => {
     const discountValue = productDiscounts[productId] || 0;
     if (isNaN(discountValue) || discountValue < 0 || discountValue > 100) {
-      alert(t('admin.quickSettings.discountMustBeValid'));
+      showToast(t('admin.quickSettings.discountMustBeValid'), 'warning');
       return;
     }
 
@@ -352,12 +353,12 @@ export default function QuickSettingsPage() {
       // Refresh products to get updated labels with new discount percentage
       await fetchProducts(productsPage);
       
-      alert(t('admin.quickSettings.productDiscountSaved'));
+      showToast(t('admin.quickSettings.productDiscountSaved'), 'success');
       console.log('✅ [QUICK SETTINGS] Product discount saved');
     } catch (err: any) {
       console.error('❌ [QUICK SETTINGS] Error saving product discount:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save';
-      alert(t('admin.quickSettings.errorSavingProduct').replace('{message}', errorMessage));
+      showToast(t('admin.quickSettings.errorSavingProduct').replace('{message}', errorMessage), 'error');
     } finally {
       setSavingProductId(null);
     }

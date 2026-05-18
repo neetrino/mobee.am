@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@/app/admin/lib/adminShopUi';
@@ -46,7 +46,7 @@ export function OrdersTable({
   onPageChange,
   formatCurrency,
 }: OrdersTableProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   if (loading) {
     return (
@@ -87,43 +87,53 @@ export function OrdersTable({
                 </div>
               </th>
               <th className="w-[11%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                {t('admin.orders.orderNumber')}
+                <span className="inline-block -translate-x-[110px]">{t('admin.orders.orderNumber')}</span>
               </th>
               <th className="w-[18%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                {t('admin.orders.customer')}
+                <span className="inline-block -translate-x-[100px]">{t('admin.orders.customer')}</span>
               </th>
               <th
                 className="w-[12%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"
                 onClick={() => onSort('total')}
               >
-                <div className="flex items-center gap-1">
-                  {t('admin.orders.total')}
-                  <div className="flex flex-col">
-                    <svg
-                      className={`w-3 h-3 ${sortBy === 'total' && sortOrder === 'asc' ? 'text-admin-600' : 'text-gray-400'}`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
-                    </svg>
-                    <svg
-                      className={`w-3 h-3 -mt-1 ${sortBy === 'total' && sortOrder === 'desc' ? 'text-admin-600' : 'text-gray-400'}`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                <div className="-translate-x-[85px]">
+                  <div className="flex items-center gap-1">
+                    {t('admin.orders.total')}
+                    <div className="flex flex-col">
+                      <svg
+                        className={`w-3 h-3 ${sortBy === 'total' && sortOrder === 'asc' ? 'text-admin-600' : 'text-gray-400'}`}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                      </svg>
+                      <svg
+                        className={`w-3 h-3 -mt-1 ${sortBy === 'total' && sortOrder === 'desc' ? 'text-admin-600' : 'text-gray-400'}`}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </th>
               <th className="w-[7%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                {t('admin.orders.items')}
+                <span
+                  className={`inline-block ${lang === 'en' || lang === 'ru' ? '-translate-x-[60px]' : '-translate-x-[80px]'}`}
+                >
+                  {t('admin.orders.items')}
+                </span>
               </th>
-              <th className="w-[14%] px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block translate-x-[6px]">{t('admin.orders.status')}</span>
+              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
+                <span
+                  className={`inline-block ${lang === 'en' || lang === 'ru' ? 'translate-x-[5px]' : '-translate-x-[5px]'}`}
+                >
+                  {t('admin.orders.status')}
+                </span>
               </th>
-              <th className="w-[14%] px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[22px]">{t('admin.orders.payment')}</span>
+              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
+                <span className="inline-block translate-x-[20px]">{t('admin.orders.payment')}</span>
               </th>
               <th
                 className="w-[10%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"

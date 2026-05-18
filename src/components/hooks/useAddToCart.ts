@@ -8,6 +8,7 @@ import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimatio
 import type { CartFlyContext } from '../../lib/cart/cart-fly-animation.types';
 import { readGuestCart, upsertGuestCartItem } from '../../lib/cart/guest-cart';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
+import { showToast } from '../Toast';
 
 interface ProductDetails {
   id: string;
@@ -57,7 +58,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
     }
 
     if (!productSlug || productSlug.trim() === '' || productSlug.includes(' ')) {
-      alert(t('common.alerts.invalidProduct'));
+      showToast(t('common.alerts.invalidProduct'), 'warning');
       return;
     }
 
@@ -75,7 +76,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           } else {
             const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
             if (!productDetails.variants || productDetails.variants.length === 0) {
-              alert(t('common.alerts.noVariantsAvailable'));
+              showToast(t('common.alerts.noVariantsAvailable'), 'warning');
               return;
             }
             variantId = productDetails.variants[0].id;
@@ -87,7 +88,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           const nextQuantity = (existingGuestItem?.quantity ?? 0) + 1;
 
           if (variantStock !== undefined && nextQuantity > variantStock) {
-            alert(t('common.alerts.noMoreStockAvailable'));
+            showToast(t('common.alerts.noMoreStockAvailable'), 'warning');
             return;
           }
           upsertGuestCartItem({
@@ -102,9 +103,9 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           console.error('❌ [PRODUCT CARD] Error adding to guest cart:', error);
           const err = error as { message?: string; status?: number };
           if (err?.message?.includes('does not exist') || err?.message?.includes('404') || err?.status === 404) {
-            alert(t('common.alerts.productNotFound'));
+            showToast(t('common.alerts.productNotFound'), 'error');
           } else {
-            alert(t('common.alerts.failedToAddToCart'));
+            showToast(t('common.alerts.failedToAddToCart'), 'error');
           }
         } finally {
           inFlightRef.current = false;
@@ -132,7 +133,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
         } else {
           const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
           if (!productDetails.variants || productDetails.variants.length === 0) {
-            alert(t('common.alerts.noVariantsAvailable'));
+            showToast(t('common.alerts.noVariantsAvailable'), 'warning');
             window.dispatchEvent(new Event('cart-updated'));
             return;
           }
@@ -173,7 +174,7 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           err?.status === 404 ||
           err?.statusCode === 404
         ) {
-          alert(t('common.alerts.productNotFound'));
+          showToast(t('common.alerts.productNotFound'), 'error');
           return;
         }
 
@@ -182,11 +183,11 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           err.response?.data?.detail?.includes('exceeds available stock') ||
           err.response?.data?.title === 'Insufficient stock'
         ) {
-          alert(t('common.alerts.noMoreStockAvailable'));
+          showToast(t('common.alerts.noMoreStockAvailable'), 'warning');
           return;
         }
 
-        alert(t('common.alerts.failedToAddToCart'));
+        showToast(t('common.alerts.failedToAddToCart'), 'error');
         window.dispatchEvent(new Event('cart-updated'));
       } finally {
         inFlightRef.current = false;

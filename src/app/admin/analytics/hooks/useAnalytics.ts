@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '../../../../lib/api-client';
 import { logger } from '../../../../lib/utils/logger';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { showToast } from '../../../../components/Toast';
 import type { AnalyticsData, AdminStatsSummary } from '../types';
 
 interface UseAnalyticsParams {
@@ -81,7 +82,7 @@ export function useAnalytics({
         }
         
         setError(errorMessage);
-        alert(`${t('admin.common.error')}: ${errorMessage}`);
+        showToast(`${t('admin.common.error')}: ${errorMessage}`, 'error');
       } finally {
         setLoading(false);
       }

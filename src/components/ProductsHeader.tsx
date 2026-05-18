@@ -78,7 +78,7 @@ function ProductsHeaderContent({ total, isCountPending }: ProductsHeaderProps) {
 
       {/* Mobile */}
       <div className="sm:hidden">
-        <h1 className="text-lg font-bold text-gray-900">
+        <h1 className="text-2xl font-bold leading-snug text-gray-900">
           {t('products.header.allProducts').replace(
             '{total}',
             isCountPending ? '…' : total.toString(),

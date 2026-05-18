@@ -10,6 +10,7 @@ import { clearCurrencyRatesCache } from '../../../lib/currency';
 import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
 import { ADMIN_SETTINGS_ONLINE_PAYMENTS_CHECKBOX_CLASS } from './online-payments-checkbox.constants';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { showToast } from '@/components/Toast';
 interface Settings {
   defaultCurrency?: string;
   globalDiscount?: number;
@@ -125,12 +126,12 @@ export default function SettingsPage() {
         }
       }, 100);
       
-      alert(t('admin.settings.savedSuccess'));
+      showToast(t('admin.settings.savedSuccess'), 'success');
       console.log('✅ [ADMIN] Settings saved, currency rates:', currencyRatesToSave);
     } catch (err: any) {
       console.error('❌ [ADMIN] Error saving settings:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save settings';
-      alert(t('admin.settings.errorSaving').replace('{message}', errorMessage));
+      showToast(t('admin.settings.errorSaving').replace('{message}', errorMessage), 'error');
     } finally {
       setSaving(false);
     }

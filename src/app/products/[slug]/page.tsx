@@ -13,6 +13,10 @@ import type { ProductPageProps } from './types';
 import { dispatchCartFlyAnimation } from '@/lib/cart/dispatchCartFlyAnimation';
 import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '@/lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
+import {
+  PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS,
+  PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS,
+} from './product-pdp-ipad-pro-band.constants';
 
 export default function ProductPage({ params }: ProductPageProps) {
   const { isLoggedIn } = useAuth();
@@ -129,7 +133,9 @@ export default function ProductPage({ params }: ProductPageProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div
+      className={`max-w-7xl mx-auto px-4 py-12 max-lg:pb-4 sm:px-6 lg:py-12 ${PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS} ${PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS}`}
+    >
       <div className="grid grid-cols-1 product-2col:grid-cols-[55%_45%] gap-12 items-start">
         <ProductImageGallery
           images={images}
@@ -142,40 +148,40 @@ export default function ProductPage({ params }: ProductPageProps) {
           onThumbnailStartIndexChange={setThumbnailStartIndex}
         />
 
-          <ProductInfoAndActions
-            product={product}
-            price={price}
-            discountPercent={discountPercent}
-            currency={currency}
-            language={language}
-            quantity={quantity}
-            maxQuantity={maxQuantity}
-            isOutOfStock={isOutOfStock}
-            isVariationRequired={isVariationRequired}
-            hasUnavailableAttributes={hasUnavailableAttributes}
-            unavailableAttributes={unavailableAttributes}
-            canAddToCart={canAddToCart}
-            isInWishlist={isInWishlist}
-            isInCompare={isInCompare}
-            showMessage={showMessage}
-            currentVariant={currentVariant}
-            attributeGroups={attributeGroups}
-            selectedColor={selectedColor}
-            selectedSize={selectedSize}
-            selectedAttributeValues={selectedAttributeValues}
-            colorGroups={colorGroups}
-            sizeGroups={sizeGroups}
-            onQuantityAdjust={adjustQuantity}
-            onAddToCart={handleAddToCart}
-            onAddToWishlist={handleAddToWishlist}
-            onCompareToggle={handleCompareToggle}
-            onScrollToDetails={scrollToProductDetails}
-            onColorSelect={handleColorSelect}
-            onSizeSelect={handleSizeSelect}
-            onAttributeValueSelect={handleAttributeValueSelect}
-            getOptionValue={getOptionValue}
-            getRequiredAttributesMessage={getRequiredAttributesMessage}
-          />
+        <ProductInfoAndActions
+          product={product}
+          price={price}
+          discountPercent={discountPercent}
+          currency={currency}
+          language={language}
+          quantity={quantity}
+          maxQuantity={maxQuantity}
+          isOutOfStock={isOutOfStock}
+          isVariationRequired={isVariationRequired}
+          hasUnavailableAttributes={hasUnavailableAttributes}
+          unavailableAttributes={unavailableAttributes}
+          canAddToCart={canAddToCart}
+          isInWishlist={isInWishlist}
+          isInCompare={isInCompare}
+          showMessage={showMessage}
+          currentVariant={currentVariant}
+          attributeGroups={attributeGroups}
+          selectedColor={selectedColor}
+          selectedSize={selectedSize}
+          selectedAttributeValues={selectedAttributeValues}
+          colorGroups={colorGroups}
+          sizeGroups={sizeGroups}
+          onQuantityAdjust={adjustQuantity}
+          onAddToCart={handleAddToCart}
+          onAddToWishlist={handleAddToWishlist}
+          onCompareToggle={handleCompareToggle}
+          onScrollToDetails={scrollToProductDetails}
+          onColorSelect={handleColorSelect}
+          onSizeSelect={handleSizeSelect}
+          onAttributeValueSelect={handleAttributeValueSelect}
+          getOptionValue={getOptionValue}
+          getRequiredAttributesMessage={getRequiredAttributesMessage}
+        />
       </div>
 
       <section

@@ -16,6 +16,9 @@
     "viewMore": "View More",
     "close": "Close"
   },
+  "dialog": {
+    "confirm": "Confirm"
+  },
   "navigation": {
     "menuTitle": "Navigation",
     "home": "Home",
@@ -256,6 +259,8 @@
     "ariaLabel": "Pagination",
     "previous": "Previous",
     "next": "Next",
+    "first": "First",
+    "last": "Last",
     "pageOf": "Page {page} of {totalPages}"
   },
   "notFound": {

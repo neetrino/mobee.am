@@ -8,6 +8,8 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
 import { MessageDetailDialog, type AdminContactMessage } from './components/MessageDetailDialog';
+import { showToast } from '@/components/Toast';
+import { confirmDialog } from '@/components/ConfirmDialog';
 
 type Message = AdminContactMessage;
 
@@ -91,7 +93,10 @@ export default function MessagesPage() {
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(t('admin.messages.deleteConfirm').replace('{count}', selectedIds.size.toString()))) return;
+    if (!(await confirmDialog({
+      message: t('admin.messages.deleteConfirm').replace('{count}', selectedIds.size.toString()),
+      variant: 'danger',
+    }))) return;
     setBulkDeleting(true);
     try {
       const ids = Array.from(selectedIds);
@@ -112,11 +117,11 @@ export default function MessagesPage() {
       
       setSelectedIds(new Set());
       await fetchMessages();
-      alert(t('admin.messages.deletedSuccess'));
+      showToast(t('admin.messages.deletedSuccess'), 'success');
     } catch (err: unknown) {
       console.error('❌ [ADMIN] Bulk delete messages error:', err);
       const detail = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
-      alert(t('admin.messages.failedToDelete') + ': ' + detail);
+      showToast(t('admin.messages.failedToDelete') + ': ' + detail, 'error');
     } finally {
       setBulkDeleting(false);
     }

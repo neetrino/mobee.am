@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
+import { showToast } from '../Toast';
 import { isProductIdInCompare, toggleCompareProduct } from '../../lib/shop/compare-storage';
 
 /**
@@ -37,7 +38,7 @@ export function useCompare(productId: string, compareCategoryId: string) {
     try {
       const { outcome } = toggleCompareProduct(productId, compareCategoryId);
       if (outcome === 'group_full') {
-        alert(t('common.alerts.compareMaxReached'));
+        showToast(t('common.alerts.compareMaxReached'), 'warning');
         return;
       }
       setIsInCompare(isProductIdInCompare(productId));

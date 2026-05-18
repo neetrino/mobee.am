@@ -11,6 +11,7 @@ import { ProductsTable } from './components/ProductsTable';
 import { useProductHandlers } from './hooks/useProductHandlers';
 import type { Product, ProductsResponse, Category } from './types';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { showToast } from '@/components/Toast';
 
 export default function ProductsPage() {
   const { t } = useTranslation();
@@ -165,7 +166,13 @@ export default function ProductsPage() {
       setMeta(response.meta || null);
     } catch (err: any) {
       console.error('❌ [ADMIN] Error fetching products:', err);
-      alert(t('admin.products.errorLoading').replace('{message}', err.message || t('admin.common.unknownErrorFallback')));
+      showToast(
+        t('admin.products.errorLoading').replace(
+          '{message}',
+          err instanceof Error ? err.message : t('admin.common.unknownErrorFallback'),
+        ),
+        'error',
+      );
     } finally {
       setLoading(false);
     }

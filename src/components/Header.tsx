@@ -13,6 +13,7 @@ import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
 import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import { apiClient } from '../lib/api-client';
+import { MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS } from '../lib/mobile-ios-input-font.constants';
 import { CART_KEY, getCompareCount, getWishlistCount } from '../lib/storageCounts';
 import { LanguageSwitcherPill } from './LanguageSwitcherPill';
 import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
@@ -1145,11 +1146,9 @@ export function Header() {
     window.dispatchEvent(new Event('currency-updated'));
   };
 
+  /** In-flow placeholder for the fixed search row only; peeking strip1 height is reserved on its wrap. */
   const mobileDockedHeaderSpacerPx =
-    mobileSearchDocked && mobileSearchFlowSpacerPx > 0
-      ? mobileSearchFlowSpacerPx +
-        (mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0)
-      : 0;
+    mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? mobileSearchFlowSpacerPx : 0;
 
   const mobileSearchPeekTopPx =
     mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0;
@@ -1360,7 +1359,7 @@ export function Header() {
                     onKeyDown={searchHandleKeyDown}
                     placeholder={t('common.mainHeader.searchPlaceholder')}
                     autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent text-sm leading-normal text-gray-900 outline-none placeholder:text-[#6b7280]"
+                    className={`min-w-0 flex-1 bg-transparent ${MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS} text-gray-900 outline-none placeholder:text-[#6b7280]`}
                     aria-controls="header-mobile-search-results"
                     aria-expanded={searchDropdownOpen && searchResults.length > 0}
                     aria-autocomplete="list"
@@ -1646,7 +1645,7 @@ export function Header() {
                 onFocus={() => { if (searchQuery.trim().length >= 1) setSearchDropdownOpen(true); }}
                 onKeyDown={searchHandleKeyDown}
                 placeholder={t('common.placeholders.search')}
-                className="flex-1 h-11 px-4 border-2 border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm placeholder:text-gray-400"
+                className={`flex-1 h-11 px-4 border-2 border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent ${MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS} placeholder:text-gray-400`}
                 aria-controls="search-results"
                 aria-expanded={searchDropdownOpen && searchResults.length > 0}
                 aria-autocomplete="list"

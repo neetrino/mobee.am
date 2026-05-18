@@ -5,15 +5,17 @@ import { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../../lib/contactPhoneDisplay';
-import { apiClient } from '../../lib/api-client';
+import { showToast } from '../../components/Toast';
+import { apiClient, ApiError } from '../../lib/api-client';
 import {
   CONTACT_ICON_EMAIL_SRC,
   CONTACT_ICON_LOCATION_SRC,
   CONTACT_ICON_PHONE_SRC,
 } from '../../lib/constants/contact-icons.constants';
 
+/** 16px+ on small viewports prevents iOS Safari auto-zoom on input focus. */
 const CONTACT_FORM_FIELD_CLASS =
-  '!h-12 !rounded-[14px] !border-[#e5e7eb] !bg-[#f2f2f4] !px-5 !text-sm !text-gray-900 placeholder:!text-[#767987] focus:!border-transparent focus:!ring-2 focus:!ring-[#2DB2FF]';
+  '!h-12 !rounded-[14px] !border-[#e5e7eb] !bg-[#f2f2f4] !px-5 !text-base md:!text-sm !text-gray-900 placeholder:!text-[#767987] focus:!border-transparent focus:!ring-2 focus:!ring-[#2DB2FF]';
 
 const CONTACT_FORM_LABEL_CLASS = 'sr-only';
 
@@ -21,6 +23,26 @@ const CONTACT_FORM_LABEL_CLASS = 'sr-only';
 const CONTACT_INFO_ICON_PX = 40;
 
 const CONTACT_INFO_ICON_IMG_CLASS = 'h-full w-full object-cover';
+
+/**
+ * iPad mini band (744–899 CSS px): shift contact + form block right. Literal for Tailwind JIT;
+ * sync 744 with `HOME_BEST_CHOICE_MOBILE_TABLET_MIN_WIDTH_PX`.
+ */
+const CONTACT_PAGE_IPAD_MINI_SHIFT_RIGHT_CLASS =
+  'min-[744px]:max-lg:ml-[150px] lg:ml-0' as const;
+
+const CONTACT_TOAST_SUCCESS_MS = 4500;
+const CONTACT_TOAST_ERROR_MS = 6000;
+
+function getContactSubmitErrorMessage(error: unknown, genericMessage: string): string {
+  if (error instanceof ApiError && error.message.trim()) {
+    return error.message;
+  }
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+  return genericMessage;
+}
 
 export default function ContactPage() {
   const { t } = useTranslation();
@@ -55,10 +77,18 @@ export default function ContactPage() {
         message: '',
       });
       
-      alert(t('contact.form.submitSuccess') || 'Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց');
-    } catch (error: any) {
+      showToast(
+        t('contact.form.submitSuccess') || 'Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց',
+        'success',
+        CONTACT_TOAST_SUCCESS_MS,
+      );
+    } catch (error: unknown) {
       console.error('Error submitting contact form:', error);
-      alert(t('contact.form.submitError') || 'Սխալ: ' + (error.message || 'Չհաջողվեց ուղարկել հաղորդագրությունը'));
+      showToast(
+        getContactSubmitErrorMessage(error, t('contact.form.submitError')),
+        'error',
+        CONTACT_TOAST_ERROR_MS,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -75,7 +105,8 @@ export default function ContactPage() {
     <div className="bg-white">
       {/* Top Section: Contact Info and Form */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className={CONTACT_PAGE_IPAD_MINI_SHIFT_RIGHT_CLASS}>
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {/* Left Side: Contact Information */}
           <div className="space-y-8">
             {/* Call to Us */}
@@ -90,7 +121,6 @@ export default function ContactPage() {
                     className={CONTACT_INFO_ICON_IMG_CLASS}
                     decoding="async"
                     loading="eager"
-                    fetchPriority="high"
                   />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">{t('contact.callToUs.title')}</h3>
@@ -220,7 +250,7 @@ export default function ContactPage() {
                     rows={6}
                     value={formData.message}
                     onChange={handleChange}
-                    className="min-h-[140px] w-full resize-y rounded-[14px] border border-[#e5e7eb] bg-[#f2f2f4] px-5 py-4 text-sm text-gray-900 placeholder:text-[#767987] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#2DB2FF]"
+                    className="min-h-[140px] w-full resize-y rounded-[14px] border border-[#e5e7eb] bg-[#f2f2f4] px-5 py-4 text-base text-gray-900 placeholder:text-[#767987] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#2DB2FF] md:text-sm"
                     placeholder={t('contact.form.messagePlaceholder')}
                   />
                 </div>
@@ -235,6 +265,7 @@ export default function ContactPage() {
               </div>
             </form>
           </div>
+        </div>
         </div>
       </div>
     </div>

@@ -11,10 +11,13 @@ import { CartTable, OrderSummary } from './cart-components';
 import { EmptyCart } from './empty-cart';
 import { LoadingState } from './loading-state';
 import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
+import { EMPTY_CART_ILLUSTRATION_SRC } from '../../lib/empty-state/empty-state-images.constants';
+import { usePreloadEmptyStateImage } from '../../lib/empty-state/usePreloadEmptyStateImage';
 
 export default function CartPage() {
   const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
+  usePreloadEmptyStateImage(EMPTY_CART_ILLUSTRATION_SRC);
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState(getStoredCurrency());
