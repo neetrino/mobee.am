@@ -7,6 +7,8 @@ import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminPageShell } from '../components/AdminPageShell';
+import { showToast } from '@/components/Toast';
+import { confirmDialog } from '@/components/ConfirmDialog';
 interface User {
   id: string;
   email: string;
@@ -119,7 +121,10 @@ export default function UsersPage() {
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(t('admin.users.deleteConfirm').replace('{count}', selectedIds.size.toString()))) return;
+    if (!(await confirmDialog({
+      message: t('admin.users.deleteConfirm').replace('{count}', selectedIds.size.toString()),
+      variant: 'danger',
+    }))) return;
     setBulkDeleting(true);
     try {
       const ids = Array.from(selectedIds);
@@ -129,10 +134,13 @@ export default function UsersPage() {
       const failed = results.filter(r => r.status === 'rejected');
       setSelectedIds(new Set());
       await fetchUsers();
-      alert(t('admin.users.bulkDeleteFinished').replace('{success}', (ids.length - failed.length).toString()).replace('{total}', ids.length.toString()));
+      showToast(
+        t('admin.users.bulkDeleteFinished').replace('{success}', (ids.length - failed.length).toString()).replace('{total}', ids.length.toString()),
+        failed.length > 0 ? 'warning' : 'success',
+      );
     } catch (err) {
       console.error('❌ [ADMIN] Bulk delete users error:', err);
-      alert(t('admin.users.failedToDelete'));
+      showToast(t('admin.users.failedToDelete'), 'error');
     } finally {
       setBulkDeleting(false);
     }
@@ -151,13 +159,13 @@ export default function UsersPage() {
       fetchUsers();
       
       if (newStatus) {
-        alert(t('admin.users.userBlocked').replace('{name}', userName));
+        showToast(t('admin.users.userBlocked').replace('{name}', userName), 'success');
       } else {
-        alert(t('admin.users.userActive').replace('{name}', userName));
+        showToast(t('admin.users.userActive').replace('{name}', userName), 'success');
       }
     } catch (err: any) {
       console.error('❌ [ADMIN] Error updating user status:', err);
-      alert(t('admin.users.errorUpdatingStatus').replace('{message}', err.message || t('admin.common.unknownErrorFallback')));
+      showToast(t('admin.users.errorUpdatingStatus').replace('{message}', err.message || t('admin.common.unknownErrorFallback')), 'error');
     }
   };
 

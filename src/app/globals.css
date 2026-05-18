@@ -25,6 +25,9 @@
 
   html {
     scrollbar-gutter: stable;
+    /* iOS Safari: avoid automatic text scaling that feels like a page zoom after load. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   /*
@@ -76,6 +79,21 @@
     animation: fade-in 0.3s ease-out;
   }
 
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.3s ease-in forwards;
+  }
+
   /* Special offers CTA (“more”): double nudge on hover in, mirrored nudge on hover out */
   @keyframes cta-arrow-nudge-in {
     0%,
@@ -121,6 +139,12 @@
     .animate-cta-arrow-nudge-in,
     .animate-cta-arrow-nudge-out {
       animation: none;
+    }
+
+    .animate-fade-in,
+    .animate-fade-out {
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
     }
   }
 

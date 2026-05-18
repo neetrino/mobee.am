@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/api-client';
+import { showToast } from '@/components/Toast';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 interface CreateAndSubmitPayloadProps {
   formData: {
@@ -25,6 +26,9 @@ interface CreateAndSubmitPayloadProps {
   setLoading: (loading: boolean) => void;
   router: AppRouterInstance;
 }
+
+/** Toast duration when post-save `creationMessages` are shown (longer copy). */
+const PRODUCT_SAVE_TOAST_WITH_EXTRA_LINES_MS = 5500;
 
 export async function createAndSubmitPayload({
   formData,
@@ -79,13 +83,13 @@ export async function createAndSubmitPayload({
         console.log('✅ [ADMIN] Product updated:', product);
         const baseMessage = 'Ապրանքը հաջողությամբ թարմացվեց!';
         const extra = creationMessages.length ? `\n\n${creationMessages.join('\n')}` : '';
-        alert(`${baseMessage}${extra}`);
+        showToast(`${baseMessage}${extra}`, 'success', creationMessages.length ? PRODUCT_SAVE_TOAST_WITH_EXTRA_LINES_MS : undefined);
       } else {
         const product = await apiClient.post('/api/v1/admin/products', payload);
         console.log('✅ [ADMIN] Product created:', product);
         const baseMessage = 'Ապրանքը հաջողությամբ ստեղծվեց!';
         const extra = creationMessages.length ? `\n\n${creationMessages.join('\n')}` : '';
-        alert(`${baseMessage}${extra}`);
+        showToast(`${baseMessage}${extra}`, 'success', creationMessages.length ? PRODUCT_SAVE_TOAST_WITH_EXTRA_LINES_MS : undefined);
       }
       
       router.push('/supersudo/products');

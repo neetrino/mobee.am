@@ -33,17 +33,19 @@ export const COMPARE_TABLE_CELL_PADDING_CLASS = 'px-[1.8rem] py-[1.8rem]';
 export const COMPARE_EMPTY_STATE_IMAGE_SRC =
   '/images/compare/compare-empty-state.png';
 
-/** Intrinsic width/height for `next/image` source asset. */
-export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_WIDTH_PX = 947;
-export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX = 836;
+/** Intrinsic width/height for `next/image` source asset (optimized PNG in `/public`). */
+export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_WIDTH_PX = 512;
+export const COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX = 452;
 
 /** Responsive `sizes` for empty-state image; max column matches `COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS` cap */
 export const COMPARE_EMPTY_STATE_IMAGE_SIZES_ATTR =
-  '(max-width: 640px) 85vw, 320px';
+  '(max-width: 767px) 240px, 320px';
 
-/** Display width cap `20rem` (~320px); lighter than former 28rem wishlist parity */
+/**
+ * Empty compare illustration — slightly smaller on phones than `md+` (up to 20rem / ~320px).
+ */
 export const COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS =
-  'mx-auto h-auto w-[min(90vw,20rem)] max-w-full';
+  'mx-auto h-auto w-[min(88vw,15rem)] max-w-full md:w-[min(90vw,20rem)]';
 
 /**
  * Empty compare panel — same vertical rhythm as wishlist (`empty-wishlist.tsx`): top-weighted, not pinned to viewport bottom.

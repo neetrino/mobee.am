@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef, ChangeEvent } from 'react';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { showToast } from '../../../components/Toast';
+import { confirmDialog } from '../../../components/ConfirmDialog';
 
 export interface AttributeValue {
   id: string;
@@ -125,7 +126,10 @@ export function useAttributes() {
   };
 
   const handleDeleteAttribute = async (attributeId: string, attributeName: string) => {
-    if (!confirm(t('admin.attributes.deleteConfirm').replace('{name}', attributeName))) {
+    if (!(await confirmDialog({
+      message: t('admin.attributes.deleteConfirm').replace('{name}', attributeName),
+      variant: 'danger',
+    }))) {
       return;
     }
 
@@ -248,7 +252,10 @@ export function useAttributes() {
   };
 
   const handleDeleteValue = async (attributeId: string, valueId: string, valueLabel: string) => {
-    if (!confirm(t('admin.attributes.deleteValueConfirm').replace('{label}', valueLabel))) {
+    if (!(await confirmDialog({
+      message: t('admin.attributes.deleteValueConfirm').replace('{label}', valueLabel),
+      variant: 'danger',
+    }))) {
       return;
     }
 

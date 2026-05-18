@@ -7,6 +7,11 @@ import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { CompareIcon } from '../../../components/icons/CompareIcon';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
+import {
+  PDP_IPAD_PRO_BAND_ADD_TO_CART_NARROW_CLASS,
+  PDP_IPAD_PRO_BAND_PRICE_TEXT_CLASS,
+  PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS,
+} from './product-pdp-ipad-pro-band.constants';
 import type { AttributeGroupValue, Product, ProductVariant, VariantOption } from './types';
 
 interface ProductInfoAndActionsProps {
@@ -95,7 +100,7 @@ export function ProductInfoAndActions({
 
       <hr className="my-5 border-0 border-t border-gray-200" />
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className={`flex flex-wrap items-center gap-4 ${PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS}`}>
         <div
           className="flex h-11 min-w-[8.5rem] select-none items-stretch overflow-hidden rounded-[15px] border border-gray-200 bg-white px-0.5"
           role="group"
@@ -124,7 +129,7 @@ export function ProductInfoAndActions({
           </button>
         </div>
 
-        <div className="flex flex-wrap items-baseline justify-end gap-2 text-right">
+        <div className={`flex flex-wrap items-baseline justify-end gap-2 text-right ${PDP_IPAD_PRO_BAND_PRICE_TEXT_CLASS}`}>
           <span className="text-xl font-bold text-gray-900 sm:text-2xl">
             {formatPrice(price, currency as CurrencyCode)}
           </span>
@@ -190,7 +195,7 @@ export function ProductInfoAndActions({
         <button
           type="button"
           disabled={!canAddToCart}
-          className="h-12 min-w-[12rem] flex-1 cursor-pointer rounded-xl bg-admin px-4 font-bold uppercase tracking-wide text-white transition-colors hover:bg-admin-600 disabled:cursor-default disabled:bg-gray-300"
+          className={`h-12 min-w-[12rem] flex-1 cursor-pointer rounded-xl bg-admin px-4 font-bold uppercase tracking-wide text-white transition-colors hover:bg-admin-600 disabled:cursor-default disabled:bg-gray-300 ${PDP_IPAD_PRO_BAND_ADD_TO_CART_NARROW_CLASS}`}
           onClick={onAddToCart}
         >
           {isOutOfStock

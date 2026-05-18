@@ -19,6 +19,21 @@ import {
   readWishlistProductIds,
   writeWishlistProductIds,
 } from '../../lib/wishlist/wishlist-storage';
+import { showToast } from '../../components/Toast';
+import { EMPTY_WISHLIST_ILLUSTRATION_SRC } from '../../lib/empty-state/empty-state-images.constants';
+import { usePreloadEmptyStateImage } from '../../lib/empty-state/usePreloadEmptyStateImage';
+
+const WISHLIST_KEY = 'shop_wishlist';
+
+function getWishlist(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem(WISHLIST_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
 
 /**
  * Wishlist page that shows saved products and supports lightweight CRUD actions.
@@ -26,6 +41,7 @@ import {
 export default function WishlistPage() {
   const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
+  usePreloadEmptyStateImage(EMPTY_WISHLIST_ILLUSTRATION_SRC);
   const [products, setProducts] = useState<WishlistItemCardProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
@@ -159,7 +175,7 @@ export default function WishlistPage() {
             const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
             if (!productDetails.variants || productDetails.variants.length === 0) {
-              alert(t('common.alerts.noVariantsAvailable'));
+              showToast(t('common.alerts.noVariantsAvailable'), 'warning');
               return;
             }
 
@@ -177,7 +193,7 @@ export default function WishlistPage() {
           dispatchCartFlyAnimation(flyUrl, flySource);
         } catch (error: unknown) {
           console.error('Error adding to guest cart:', error);
-          alert(t('common.alerts.failedToAddToCart'));
+          showToast(t('common.alerts.failedToAddToCart'), 'error');
         } finally {
           addToCartInFlightRef.current.delete(product.id);
         }
@@ -217,7 +233,7 @@ export default function WishlistPage() {
           const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
 
           if (!productDetails.variants || productDetails.variants.length === 0) {
-            alert(t('common.alerts.noVariantsAvailable'));
+            showToast(t('common.alerts.noVariantsAvailable'), 'warning');
             window.dispatchEvent(new Event('cart-updated'));
             return;
           }
@@ -243,7 +259,7 @@ export default function WishlistPage() {
       } catch (error: unknown) {
         console.error('Error adding to cart:', error);
         window.dispatchEvent(new Event('cart-updated'));
-        alert(t('common.alerts.failedToAddToCart'));
+        showToast(t('common.alerts.failedToAddToCart'), 'error');
       } finally {
         addToCartInFlightRef.current.delete(product.id);
       }

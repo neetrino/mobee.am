@@ -18,9 +18,34 @@ import { useHomeDesktopCarouselHomeStyle } from './useHomeDesktopCarouselHomeSty
 
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
-/** Horizontal snap carousel below `lg`. */
+/** Mobile carousel — Figma footer (compact price, round cart). */
+export function getHomeCuratedProductCardProps(homeStyle: boolean) {
+  return {
+    shiftImageInFrame: homeStyle,
+    smallerFooterPrice: homeStyle,
+    homeProductGridCard: homeStyle,
+  } as const;
+}
+
+/**
+ * Desktop carousel (`lg+`) — same price + add-to-cart pill as “Լավագույն ընտրություն”;
+ * optional shifted art on iPad-width desktop only.
+ */
+export function getHomeCuratedDesktopProductCardProps(homeStyle: boolean) {
+  return {
+    shiftImageInFrame: homeStyle,
+    smallerFooterPrice: false,
+    homeProductGridCard: false,
+  } as const;
+}
+
+/** Horizontal snap scroll shell only — add breakpoint visibility in the caller (`lg:hidden`, `xl:hidden`, …). */
+export const HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL =
+  'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory';
+
+/** Horizontal snap carousel below `lg` (home PDP rows: mobile strip hides when desktop grid appears). */
 export const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
-  'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
+  `${HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL} lg:hidden`;
 
 export const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
 
@@ -68,25 +93,20 @@ type HomeBestChoiceStyleProductGridProps = {
   desktopNextAriaLabel: string;
 };
 
+type HomeCuratedProductCardProps = ReturnType<typeof getHomeCuratedProductCardProps>;
+
 function BestChoiceProductCell({
   product,
   viewMode,
-  homeStyle,
+  cardProps,
 }: {
   product: FeaturedHomeProduct;
   viewMode: 'grid-2' | 'grid-3';
-  /** Mobile / iPad carousel styling; desktop uses default product card chrome. */
-  homeStyle: boolean;
+  cardProps: HomeCuratedProductCardProps;
 }) {
   return (
     <div className={HOME_BEST_CHOICE_CARD_WIDTH}>
-      <ProductCard
-        product={product}
-        viewMode={viewMode}
-        shiftImageInFrame={homeStyle}
-        smallerFooterPrice={homeStyle}
-        homeProductGridCard={homeStyle}
-      />
+      <ProductCard product={product} viewMode={viewMode} {...cardProps} />
     </div>
   );
 }
@@ -142,7 +162,7 @@ export function HomeBestChoiceStyleProductGrid({
                   key={product.id}
                   product={product}
                   viewMode={cardViewMode}
-                  homeStyle
+                  cardProps={getHomeCuratedProductCardProps(true)}
                 />
               ))}
             </div>
@@ -166,7 +186,7 @@ export function HomeBestChoiceStyleProductGrid({
                     key={product.id}
                     product={product}
                     viewMode="grid-2"
-                    homeStyle={desktopHomeStyle}
+                    cardProps={getHomeCuratedDesktopProductCardProps(desktopHomeStyle)}
                   />
                 ))}
               </div>

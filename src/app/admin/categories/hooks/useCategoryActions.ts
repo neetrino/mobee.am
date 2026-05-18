@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { apiClient } from '../../../../lib/api-client';
 import { logger } from '../../../../lib/utils/logger';
 import { showToast } from '../../../../components/Toast';
+import { confirmDialog } from '../../../../components/ConfirmDialog';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
 
@@ -138,7 +139,10 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     categoryTitle: string,
     fetchCategories: () => Promise<void>
   ) => {
-    if (!confirm(t('admin.categories.deleteConfirm').replace('{name}', categoryTitle))) {
+    if (!(await confirmDialog({
+      message: t('admin.categories.deleteConfirm').replace('{name}', categoryTitle),
+      variant: 'danger',
+    }))) {
       return;
     }
 

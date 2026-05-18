@@ -5,6 +5,7 @@ import type { LanguageCode } from '../lib/language';
 import { AuthProvider } from '../lib/auth/AuthContext';
 import { CategoriesTreeProvider } from './CategoriesTreeContext';
 import { TabletIpadAirLikeLayoutProvider } from './TabletIpadAirLikeLayoutProvider';
+import { ConfirmDialogContainer } from './ConfirmDialog';
 import { ToastContainer } from './Toast';
 import { UiLanguageProvider } from './UiLanguageProvider';
 
@@ -25,6 +26,7 @@ export function ClientProviders({
         <AuthProvider>
           <CategoriesTreeProvider>{children}</CategoriesTreeProvider>
           <ToastContainer />
+          <ConfirmDialogContainer />
         </AuthProvider>
       </UiLanguageProvider>
     </TabletIpadAirLikeLayoutProvider>

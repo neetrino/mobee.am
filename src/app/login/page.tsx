@@ -78,8 +78,10 @@ function LoginPageContent() {
 
   return (
     <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <AuthPageBrandMark homeAriaLabel={t('common.navigation.home')} siteLogoAlt={t('common.ariaLabels.siteLogo')} />
-      <Card className={LOGIN_PAGE_CARD_CLASS}>
+      <div className="hidden sm:block">
+        <AuthPageBrandMark homeAriaLabel={t('common.navigation.home')} siteLogoAlt={t('common.ariaLabels.siteLogo')} />
+      </div>
+      <Card className={`${LOGIN_PAGE_CARD_CLASS} mt-8 sm:mt-0`}>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('login.title')}</h1>
         <p className="text-gray-600 mb-8">{t('login.subtitle')}</p>
 
@@ -180,7 +182,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Card className={LOGIN_PAGE_CARD_CLASS}>
+        <Card className={`${LOGIN_PAGE_CARD_CLASS} mt-8 sm:mt-0`}>
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
