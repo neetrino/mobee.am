@@ -3,9 +3,15 @@
   "email": "mobeeonlineshop@gmail.com",
   "address": "ул. Саят-Нова 19/1, Nova Plaza 104, Ереван",
   "workingHours": "Пн-Пт 10:00-19:00",
-  "social": { "instagram": "", "facebook": "", "linkedin": "", "telegram": "", "whatsapp": "" },
-  "callToUs": {"title":"Позвоните нам","description":"Мы доступны 24/7, 7 дней в неделю."},
-  "writeToUs": {"title":"Напишите нам","description":"Заполните нашу форму, и мы свяжемся с вами в течение 24 часов.","emailLabel":"Электронная почта"},
-  "headquarter": {"title":"Главный офис","hours":{"schedule":"Вторник - Воскресенье: 10:00 - 22:00"}},
+  "social": {
+    "instagram": "https://www.instagram.com/mobee.am?igsh=MWVibml1NDl2dHd5&utm_source=qr",
+    "facebook": "https://www.facebook.com/share/1HK4MmCHVh/?mibextid=wwXIfr",
+    "linkedin": "",
+    "telegram": "https://t.me/+37455811181",
+    "whatsapp": "https://wa.me/37455811181"
+  },
+  "callToUs": {"title":"Позвоните нам","description":"Мы доступны каждый день с 10:00 до 22:00."},
+  "writeToUs": {"title":"Напишите нам","description":"Заполните форму, и мы скоро свяжемся с вами.","emailLabel":"Электронная почта"},
+  "headquarter": {"title":"Главный офис","hours":{"schedule":"Понедельник–воскресенье: с 10:00 до 22:00."}},
   "form": {"name":"Имя *","namePlaceholder":"Ваше имя","email":"E-mail *","emailPlaceholder":"your@email.com","subject":"Тема *","subjectPlaceholder":"О чем это?","message":"Сообщение","messagePlaceholder":"Ваше сообщение...","submit":"Отправить","submitting":"Отправка...","submitSuccess":"Ваше сообщение успешно отправлено","submitError":"Ошибка: Не удалось отправить сообщение"}
 }
