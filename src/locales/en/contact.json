@@ -3,9 +3,15 @@
   "email": "mobeeonlineshop@gmail.com",
   "address": "19/1 Sayat-Nova St., Nova Plaza 104, Yerevan",
   "workingHours": "Mon-Fri 10:00-19:00",
-  "social": { "instagram": "", "facebook": "", "linkedin": "", "telegram": "", "whatsapp": "" },
-  "callToUs": {"title":"Call Us","description":"We are available 24/7, 7 days a week."},
-  "writeToUs": {"title":"Write to Us","description":"Fill out our form and we will contact you within 24 hours.","emailLabel":"Email"},
-  "headquarter": {"title":"Headquarters","hours":{"schedule":"Tuesday - Sunday: 10:00 - 22:00"}},
+  "social": {
+    "instagram": "https://www.instagram.com/mobee.am?igsh=MWVibml1NDl2dHd5&utm_source=qr",
+    "facebook": "https://www.facebook.com/share/1HK4MmCHVh/?mibextid=wwXIfr",
+    "linkedin": "",
+    "telegram": "https://t.me/+37455811181",
+    "whatsapp": "https://wa.me/37455811181"
+  },
+  "callToUs": {"title":"Call Us","description":"We are available every day from 10AM to 10PM."},
+  "writeToUs": {"title":"Write to Us","description":"Fill out the form and we will contact you soon.","emailLabel":"Email"},
+  "headquarter": {"title":"Headquarters","hours":{"schedule":"Monday–Sunday, from 10AM to 10PM."}},
   "form": {"name":"Name *","namePlaceholder":"Your name","email":"E-mail *","emailPlaceholder":"your@email.com","subject":"Subject *","subjectPlaceholder":"What is this about?","message":"Message","messagePlaceholder":"Your message...","submit":"Submit","submitting":"Submitting...","submitSuccess":"Your message has been sent successfully","submitError":"Error: Failed to send message"}
 }

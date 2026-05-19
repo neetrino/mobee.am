@@ -3,9 +3,15 @@
   "email": "mobeeonlineshop@gmail.com",
   "address": "Սայաթ-Նովա 19/1 Nova Plaza 104",
   "workingHours": "Երկ-Ուրբ 10:00-19:00",
-  "social": { "instagram": "", "facebook": "", "linkedin": "", "telegram": "", "whatsapp": "" },
-  "callToUs": {"title":"Զանգահարեք մեզ","description":"Մենք հասանելի ենք շաբաթվա 7 օր, օրվա 24 ժամ:"},
+  "social": {
+    "instagram": "https://www.instagram.com/mobee.am?igsh=MWVibml1NDl2dHd5&utm_source=qr",
+    "facebook": "https://www.facebook.com/share/1HK4MmCHVh/?mibextid=wwXIfr",
+    "linkedin": "",
+    "telegram": "https://t.me/+37455811181",
+    "whatsapp": "https://wa.me/37455811181"
+  },
+  "callToUs": {"title":"Զանգահարեք մեզ","description":"Մենք հասանելի ենք ամեն օր՝ 10:00–22:00:"},
   "writeToUs": {"title":"Գրեք մեզ","description":"Լրացրեք ֆոռման և մենք շուտով կկապնվենք ձեզ հետ:","emailLabel":"Էլ. փոստ"},
-  "headquarter": {"title":"Գլխավոր գրասենյակ","hours":{"schedule":"Երկուշաբթի - Կիրակի: 10:00 - 22:00"}},
+  "headquarter": {"title":"Գլխավոր գրասենյակ","hours":{"schedule":"Երկուշաբթի–կիրակի՝ 10:00–22:00։"}},
   "form": {"name":"Անուն *","namePlaceholder":"Ձեր անունը","email":"Էլ. փոստ *","emailPlaceholder":"your@email.com","subject":"Թեմա *","subjectPlaceholder":"Ինչի՞ մասին է","message":"Հաղորդագրություն","messagePlaceholder":"Ձեր հաղորդագրությունը...","submit":"Ուղարկել","submitting":"Ուղարկվում է...","submitSuccess":"Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց","submitError":"Սխալ: Չհաջողվեց ուղարկել հաղորդագրությունը"}
 }
