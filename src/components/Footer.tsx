@@ -167,6 +167,7 @@ function FooterMapEmbed({ addressText }: { readonly addressText: string }) {
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
         allowFullScreen
+        suppressHydrationWarning
       />
     </div>
   );

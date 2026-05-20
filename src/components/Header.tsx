@@ -1327,6 +1327,7 @@ export function Header() {
               ref={mobileHomeSearchFormRef}
               onSubmit={handleSearch}
               className="relative min-w-0 w-full"
+              suppressHydrationWarning
             >
               <div className="relative w-full min-w-0">
                 <div
@@ -1342,6 +1343,7 @@ export function Header() {
                     ref={mobileHomeSearchInputRef}
                     type="search"
                     name="header-mobile-home-search"
+                    suppressHydrationWarning
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);

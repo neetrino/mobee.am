@@ -488,7 +488,11 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               ref={secondarySearchBoundaryRef}
               className={`relative min-w-0 max-w-[203px] flex-1 lg:max-w-[290px] ${HEADER_SECONDARY_SEARCH_IPAD_AIR_BAND_MAX_WIDTH_CLASS} xl:max-w-[312px] 2xl:max-w-[387px]`}
             >
-              <form onSubmit={onSearchSubmit} className="relative w-full">
+              <form
+                onSubmit={onSearchSubmit}
+                className="relative w-full"
+                suppressHydrationWarning
+              >
                 <div className="pointer-events-none absolute inset-y-0 left-2.5 z-[1] flex items-center">
                   <SecondarySearchGlyph className="text-gray-400" />
                 </div>
@@ -496,6 +500,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   ref={searchInputRef}
                   type="search"
                   name="header-secondary-search"
+                  suppressHydrationWarning
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
                   onFocus={onSearchFocus}

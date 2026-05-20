@@ -17,6 +17,7 @@ import {
 } from '../lib/category-nav';
 import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { TopCategoriesMobileIcon } from './TopCategoriesMobileIcon';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -158,13 +159,13 @@ export function TopCategories() {
   if (loading) {
     return (
       <section className={`bg-white ${montserrat.className}`} aria-hidden>
-        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-6 xl:pt-8`}>
+        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-40 lg:pt-6 xl:pt-8`}>
           <div className="flex gap-2 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:hidden">
             {MOBILE_CATEGORY_PILL_KEYS.map((key) => (
-              <div
-                key={key}
-                className="h-9 w-20 shrink-0 animate-pulse rounded-full bg-[#eceff2]"
-              />
+              <div key={key} className="flex shrink-0 flex-col items-center gap-2">
+                <div className="size-[65px] animate-pulse rounded-lg bg-[#eceff2]" />
+                <div className="h-9 w-20 animate-pulse rounded-full bg-[#eceff2]" />
+              </div>
             ))}
           </div>
           <div className="hidden lg:grid lg:grid-cols-6 lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3">
@@ -182,7 +183,7 @@ export function TopCategories() {
 
   return (
     <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
-      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-3 lg:pb-40 lg:pt-6 xl:pt-8`}>
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-40 lg:pt-6 xl:pt-8`}>
         <div className="flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide lg:hidden">
           {MOBILE_CATEGORY_PILL_KEYS.map((key) => {
             const slot = CATEGORY_STRIP_SLOTS.find((s) => s.key === key);
@@ -196,9 +197,12 @@ export function TopCategories() {
               <Link
                 key={slot.key}
                 href={href}
-                className="shrink-0 rounded-full bg-[#f7f7f7] px-4 py-2 text-sm font-medium leading-normal text-[#303030] transition-opacity active:opacity-90"
+                className="flex shrink-0 flex-col items-center gap-2 transition-opacity active:opacity-90"
               >
-                {pillLabel}
+                <TopCategoriesMobileIcon slot={slot} />
+                <span className="shrink-0 rounded-full bg-[#f7f7f7] px-4 py-2 text-sm font-medium leading-normal text-[#303030]">
+                  {pillLabel}
+                </span>
               </Link>
             );
           })}
