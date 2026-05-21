@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Maximize2, Minus, Plus, X } from "lucide-react";
 import { ProductLabels } from "../../../components/ProductLabels";
 import { ProductImagePlaceholder } from "../../../components/ProductImagePlaceholder";
@@ -9,11 +9,17 @@ import type { LanguageCode } from "../../../lib/language";
 import type { Product } from "./types";
 import {
   detectSwipeDirection,
+  getCarouselIndexFromScrollLeft,
   getNextImageIndex,
   getPreviousImageIndex,
   zoomIn,
   zoomOut,
 } from "./product-image-gallery.utils";
+
+const PDP_MOBILE_GALLERY_SCROLL_CLASS =
+  "flex h-full w-full overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory [touch-action:pan-x_pan-y]";
+const PDP_MOBILE_GALLERY_SLIDE_CLASS =
+  "relative h-full w-full shrink-0 snap-center snap-always";
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -42,6 +48,8 @@ export function ProductImageGallery({
   const [failedIndices, setFailedIndices] = useState<Set<number>>(new Set());
   const [zoomScale, setZoomScale] = useState(1);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const mobileCarouselRef = useRef<HTMLDivElement>(null);
+  const ignoreMobileScrollRef = useRef(false);
 
   const markFailed = (index: number) => {
     setFailedIndices((prev) => new Set(prev).add(index));
@@ -58,6 +66,57 @@ export function ProductImageGallery({
   const goToNextImage = () => {
     onImageIndexChange(getNextImageIndex(currentImageIndex, images.length));
   };
+
+  const scrollMobileCarouselToIndex = useCallback(
+    (index: number, behavior: ScrollBehavior = "auto") => {
+      const el = mobileCarouselRef.current;
+      if (!el || el.clientWidth <= 0) {
+        return;
+      }
+
+      ignoreMobileScrollRef.current = true;
+      el.scrollTo({ left: index * el.clientWidth, behavior });
+      requestAnimationFrame(() => {
+        ignoreMobileScrollRef.current = false;
+      });
+    },
+    [],
+  );
+
+  const handleMobileCarouselScroll = useCallback(() => {
+    if (ignoreMobileScrollRef.current) {
+      return;
+    }
+
+    const el = mobileCarouselRef.current;
+    if (!el || el.clientWidth <= 0) {
+      return;
+    }
+
+    const index = getCarouselIndexFromScrollLeft(
+      el.scrollLeft,
+      el.clientWidth,
+      images.length,
+    );
+    if (index !== currentImageIndex) {
+      onImageIndexChange(index);
+    }
+  }, [currentImageIndex, images.length, onImageIndexChange]);
+
+  useEffect(() => {
+    scrollMobileCarouselToIndex(currentImageIndex);
+  }, [currentImageIndex, images.length, scrollMobileCarouselToIndex]);
+
+  useEffect(() => {
+    const el = mobileCarouselRef.current;
+    if (!el) {
+      return;
+    }
+
+    const onResize = () => scrollMobileCarouselToIndex(currentImageIndex);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [currentImageIndex, scrollMobileCarouselToIndex]);
 
   // Auto-scroll thumbnails to show selected image
   useEffect(() => {
@@ -262,70 +321,106 @@ export function ProductImageGallery({
             className="group relative mx-auto flex aspect-square w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm product-2col:max-w-none"
             data-pdp-cart-fly-source
           >
-          {images.length > 0 && !mainImageFailed ? (
-            <img
-              src={currentSrc}
-              alt={product.title}
-              className="h-full w-full object-contain product-2col:object-cover"
-              onError={() => markFailed(currentImageIndex)}
-            />
-          ) : (
-            <ProductImagePlaceholder
-              className="w-full h-full"
-              aria-label={t(language, "common.messages.noImage")}
-            />
-          )}
-          
-          {/* Discount Badge on Image - Blue circle in top-right */}
-          {discountPercent && (
-            <div className="absolute top-4 right-4 w-14 h-14 bg-admin-500 text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-[0_2px_8px_rgba(45,178,255,0.35)]">
-              -{discountPercent}%
-            </div>
-          )}
+            {images.length > 0 ? (
+              <>
+                <div
+                  ref={mobileCarouselRef}
+                  className={`product-2col:hidden ${PDP_MOBILE_GALLERY_SCROLL_CLASS}`}
+                  onScroll={handleMobileCarouselScroll}
+                  aria-label={product.title}
+                  role="region"
+                >
+                  {images.map((image, index) => (
+                    <div key={index} className={PDP_MOBILE_GALLERY_SLIDE_CLASS}>
+                      {failedIndices.has(index) ? (
+                        <ProductImagePlaceholder
+                          className="h-full w-full"
+                          aria-label={t(language, "common.messages.noImage")}
+                        />
+                      ) : (
+                        <img
+                          src={image}
+                          alt={index === currentImageIndex ? product.title : ""}
+                          className="h-full w-full object-contain"
+                          draggable={false}
+                          onError={() => markFailed(index)}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
 
-          {product.labels && <ProductLabels labels={product.labels} />}
+                <div className="hidden h-full w-full product-2col:block">
+                  {!mainImageFailed ? (
+                    <img
+                      src={currentSrc}
+                      alt={product.title}
+                      className="h-full w-full object-cover"
+                      onError={() => markFailed(currentImageIndex)}
+                    />
+                  ) : (
+                    <ProductImagePlaceholder
+                      className="h-full w-full"
+                      aria-label={t(language, "common.messages.noImage")}
+                    />
+                  )}
+                </div>
+              </>
+            ) : (
+              <ProductImagePlaceholder
+                className="h-full w-full"
+                aria-label={t(language, "common.messages.noImage")}
+              />
+            )}
 
-          {hasMultipleImages && (
-            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            {discountPercent != null && discountPercent > 0 && (
+              <div className="absolute top-4 right-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-admin-500 text-sm font-bold text-white shadow-[0_2px_8px_rgba(45,178,255,0.35)]">
+                -{discountPercent}%
+              </div>
+            )}
+
+            {product.labels && <ProductLabels labels={product.labels} />}
+
+            {hasMultipleImages && (
+                <div className="pointer-events-none absolute inset-0 z-10 hidden items-center justify-between px-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 product-2col:flex">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      goToPreviousImage();
+                    }}
+                    className="pointer-events-none flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/85 text-gray-800 shadow-md backdrop-blur-sm transition-colors hover:bg-white group-hover:pointer-events-auto"
+                    aria-label={t(language, "common.ariaLabels.previousImage")}
+                  >
+                    <ChevronLeft className="h-5 w-5" strokeWidth={2} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      goToNextImage();
+                    }}
+                    className="pointer-events-none flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/85 text-gray-800 shadow-md backdrop-blur-sm transition-colors hover:bg-white group-hover:pointer-events-auto"
+                    aria-label={t(language, "common.ariaLabels.nextImage")}
+                  >
+                    <ChevronRight className="h-5 w-5" strokeWidth={2} />
+                  </button>
+                </div>
+            )}
+
+            <div className="absolute bottom-4 left-4 z-10 flex flex-col gap-3">
               <button
                 type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  goToPreviousImage();
+                onClick={() => {
+                  setZoomScale(1);
+                  setShowZoom(true);
                 }}
-                className="pointer-events-none flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/85 text-gray-800 shadow-md backdrop-blur-sm transition-colors hover:bg-white group-hover:pointer-events-auto"
-                aria-label={t(language, 'common.ariaLabels.previousImage')}
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all duration-300 hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                aria-label={t(language, "common.ariaLabels.fullscreenImage")}
               >
-                <ChevronLeft className="h-5 w-5" strokeWidth={2} />
-              </button>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  goToNextImage();
-                }}
-                className="pointer-events-none flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/85 text-gray-800 shadow-md backdrop-blur-sm transition-colors hover:bg-white group-hover:pointer-events-auto"
-                aria-label={t(language, 'common.ariaLabels.nextImage')}
-              >
-                <ChevronRight className="h-5 w-5" strokeWidth={2} />
+                <Maximize2 className="h-5 w-5 text-gray-800" />
               </button>
             </div>
-          )}
-          
-          {/* Control Buttons - Bottom left */}
-          <div className="absolute bottom-4 left-4 flex flex-col gap-3 z-10">
-            {/* Fullscreen Button */}
-            <button 
-              onClick={() => {
-                setZoomScale(1);
-                setShowZoom(true);
-              }}
-              className="w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50 shadow-[0_2px_8px_rgba(0,0,0,0.15)] hover:bg-white/90 transition-all duration-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
-              aria-label={t(language, 'common.ariaLabels.fullscreenImage')}
-            >
-              <Maximize2 className="w-5 h-5 text-gray-800" />
-            </button>
-          </div>
           </div>
         </div>
       </div>

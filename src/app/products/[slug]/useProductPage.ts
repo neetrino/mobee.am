@@ -19,7 +19,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currency, setCurrency] = useState(getStoredCurrency());
   const language: LanguageCode = useUiLanguage();
-  const [showMessage, setShowMessage] = useState<string | null>(null);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
 
   const resolvedParams = use(params);
@@ -154,8 +153,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     selectedColor,
     selectedSize,
     selectedAttributeValues,
-    showMessage,
-    setShowMessage,
     isInWishlist,
     isInCompare,
     quantity,

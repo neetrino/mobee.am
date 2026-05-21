@@ -29,7 +29,6 @@ interface ProductInfoAndActionsProps {
   canAddToCart: boolean;
   isInWishlist: boolean;
   isInCompare: boolean;
-  showMessage: string | null;
   currentVariant: ProductVariant | null;
   attributeGroups: Map<string, AttributeGroupValue[]>;
   selectedColor: string | null;
@@ -64,7 +63,6 @@ export function ProductInfoAndActions({
   canAddToCart,
   isInWishlist,
   isInCompare,
-  showMessage,
   currentVariant,
   attributeGroups,
   selectedColor,
@@ -231,10 +229,6 @@ export function ProductInfoAndActions({
           <Heart className="h-5 w-5" fill={isInWishlist ? 'currentColor' : 'none'} strokeWidth={2} />
         </button>
       </div>
-
-      {showMessage && (
-        <div className="mt-4 rounded-md bg-gray-900 p-4 text-white shadow-lg">{showMessage}</div>
-      )}
     </div>
   );
 }

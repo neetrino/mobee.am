@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   detectSwipeDirection,
+  getCarouselIndexFromScrollLeft,
   getNextImageIndex,
   getPreviousImageIndex,
   zoomIn,
@@ -30,5 +31,12 @@ describe("product-image-gallery.utils", () => {
     expect(detectSwipeDirection(20)).toBeNull();
     expect(detectSwipeDirection(50)).toBe("previous");
     expect(detectSwipeDirection(-50)).toBe("next");
+  });
+
+  it("maps scroll offset to carousel slide index", () => {
+    expect(getCarouselIndexFromScrollLeft(0, 320, 3)).toBe(0);
+    expect(getCarouselIndexFromScrollLeft(310, 320, 3)).toBe(1);
+    expect(getCarouselIndexFromScrollLeft(640, 320, 3)).toBe(2);
+    expect(getCarouselIndexFromScrollLeft(9999, 320, 3)).toBe(2);
   });
 });
