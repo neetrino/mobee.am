@@ -6,6 +6,7 @@ import { t, getProductText } from '../../../lib/i18n';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { RelatedProducts } from '../../../components/RelatedProducts';
+import { showToast } from '../../../components/Toast';
 import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
 import { useProductPage } from './useProductPage';
@@ -39,8 +40,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     selectedColor,
     selectedSize,
     selectedAttributeValues,
-    showMessage,
-    setShowMessage,
     isInWishlist,
     isInCompare,
     quantity,
@@ -83,10 +82,8 @@ export default function ProductPage({ params }: ProductPageProps) {
         variantId: currentVariant.id,
         quantity,
       });
-      setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
       window.dispatchEvent(new Event('cart-updated'));
       dispatchCartFlyAnimation(flyUrl, flyEl);
-      setTimeout(() => setShowMessage(null), 2000);
       return;
     }
 
@@ -96,9 +93,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         detail: { optimisticAdd: { quantity, price } },
       }),
     );
-    setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
     dispatchCartFlyAnimation(flyUrl, flyEl);
-    setTimeout(() => setShowMessage(null), 2000);
 
     void (async () => {
       try {
@@ -116,8 +111,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         );
       } catch {
         window.dispatchEvent(new Event('cart-updated'));
-        setShowMessage(t(language, 'product.errorAddingToCart'));
-        setTimeout(() => setShowMessage(null), 2000);
+        showToast(t(language, 'product.errorAddingToCart'), 'error');
       } finally {
         addToCartInFlightRef.current = false;
       }
@@ -163,7 +157,6 @@ export default function ProductPage({ params }: ProductPageProps) {
           canAddToCart={canAddToCart}
           isInWishlist={isInWishlist}
           isInCompare={isInCompare}
-          showMessage={showMessage}
           currentVariant={currentVariant}
           attributeGroups={attributeGroups}
           selectedColor={selectedColor}

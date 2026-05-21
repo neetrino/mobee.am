@@ -34,3 +34,17 @@ export function detectSwipeDirection(deltaX: number): "next" | "previous" | null
 
   return deltaX > 0 ? "previous" : "next";
 }
+
+/** Active slide index from horizontal scroll position (full-width snap slides). */
+export function getCarouselIndexFromScrollLeft(
+  scrollLeft: number,
+  slideWidth: number,
+  totalImages: number,
+): number {
+  if (totalImages <= 0 || slideWidth <= 0) {
+    return 0;
+  }
+
+  const index = Math.round(scrollLeft / slideWidth);
+  return Math.min(Math.max(index, 0), totalImages - 1);
+}
