@@ -1,6 +1,6 @@
 import * as bcrypt from "bcryptjs";
-import * as jwt from "jsonwebtoken";
 import { db } from "@white-shop/db";
+import { signAccessToken } from "@/lib/security/sign-access-token";
 import { logger } from "../utils/logger";
 
 export interface RegisterData {
@@ -132,11 +132,7 @@ class AuthService {
       };
     }
 
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET as string,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" } as jwt.SignOptions
-    );
+    const token = signAccessToken(user.id, user.roles);
     logger.info("Auth registration success", { userId: user.id });
 
     return {
@@ -240,11 +236,7 @@ class AuthService {
       };
     }
 
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET as string,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" } as jwt.SignOptions
-    );
+    const token = signAccessToken(user.id, user.roles);
 
     logger.info("Auth login success", { userId: user.id });
 

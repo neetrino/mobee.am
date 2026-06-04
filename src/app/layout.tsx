@@ -12,6 +12,7 @@ import {
   SITE_SHARE_TITLE,
 } from '../lib/brand.constants';
 import { readLanguageFromCookies } from '../lib/language';
+import { getCachedCategoriesTree } from '../lib/services/categories-tree-cached';
 import { TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT } from '../lib/tablet-ipad-air-like-layout';
 
 const inter = Inter({ subsets: ['latin'], adjustFontFallback: true });
@@ -56,6 +57,7 @@ export default async function RootLayout({
 }) {
   const cookieStore = await cookies();
   const initialLanguage = readLanguageFromCookies(cookieStore);
+  const { result: categoriesTree } = await getCachedCategoriesTree(initialLanguage);
 
   return (
     <html lang={initialLanguage} className="h-full" suppressHydrationWarning>
@@ -66,7 +68,10 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
-          <ClientProviders initialLanguage={initialLanguage}>
+          <ClientProviders
+            initialLanguage={initialLanguage}
+            initialCategories={categoriesTree.data}
+          >
             <SiteChrome>{children}</SiteChrome>
           </ClientProviders>
         </Suspense>

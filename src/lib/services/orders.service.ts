@@ -2,7 +2,6 @@ import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
 import type { CheckoutData } from "../types/checkout";
 import { logger } from "../utils/logger";
-import { extractMediaUrl } from "../utils/extractMediaUrl";
 import {
   calculateDiscountAmount,
   calculateTotals,
@@ -19,6 +18,13 @@ import { CART_MONEY_BASE_CURRENCY } from "../checkout/cart-money";
 import { MIN_ORDER_SUBTOTAL_FOR_DELIVERY_AMD } from "../constants/checkout-shipping.constants";
 import { convertPrice } from "../currency";
 import { removeOrphanCartItemsForCart } from "./cart-remove-orphan-items";
+import { sendAparikCheckoutEmail } from "../email/send-aparik-checkout-email";
+import {
+  buildCheckoutCartItemDetails,
+  type CheckoutCartItemDetails,
+} from "./orders/checkout-cart-item-details";
+import { normalizeCheckoutDisplayCurrency } from "../checkout/checkout-email-money";
+import { adminService } from "./admin.service";
 
 const ORDER_NUMBER_START = 1000;
 
@@ -48,10 +54,19 @@ type CartItemWithRelations = Prisma.CartItemGetPayload<{
     };
     variant: {
       include: {
-        options: true;
-      };
-    };
-  };
+        options: {
+          include: {
+            attributeValue: {
+              include: {
+                translations: true,
+                attribute: true,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 }>;
 
 type OrderItemWithVariant = Prisma.OrderItemGetPayload<{
@@ -271,6 +286,8 @@ class OrdersService {
       const {
         cartId,
         items: guestItems,
+        firstName,
+        lastName,
         email,
         phone,
         shippingMethod = 'pickup',
@@ -279,8 +296,11 @@ class OrdersService {
         paymentMethod = 'idram',
         promoCode,
         locale,
+        currency,
         acknowledgements,
       } = data;
+      const customerLocale = normalizeCheckoutLocale(locale);
+      const displayCurrency = normalizeCheckoutDisplayCurrency(currency);
       // shippingAmount is ignored — computed server-side from shippingMethod and address
 
       // Validate required fields
@@ -294,16 +314,7 @@ class OrdersService {
       }
 
       // Get cart items - either from user cart or guest items
-      let cartItems: Array<{
-        variantId: string;
-        productId: string;
-        quantity: number;
-        price: number;
-        productTitle: string;
-        variantTitle?: string;
-        sku: string;
-        imageUrl?: string;
-      }> = [];
+      let cartItems: CheckoutCartItemDetails[] = [];
       const isUserCartCheckout = Boolean(userId && cartId && cartId !== "guest-cart");
 
       if (isUserCartCheckout && cartId) {
@@ -321,7 +332,16 @@ class OrdersService {
                         translations: true,
                       },
                     },
-                    options: true,
+                    options: {
+                      include: {
+                        attributeValue: {
+                          include: {
+                            translations: true,
+                            attribute: true,
+                          },
+                        },
+                      },
+                    },
                   },
                 },
                 product: {
@@ -374,15 +394,12 @@ class OrdersService {
               variantSku: variant.sku,
             });
             
-            const translation = product.translations?.[0] || product.translations?.[0];
-
-            // Get variant title from options
-            const variantTitle = variant.options
-              ?.map((opt) => `${opt.attributeKey || ''}: ${opt.value || ''}`)
-              .join(', ') || undefined;
-
-            // Get image URL
-            const imageUrl = extractMediaUrl(product.media) ?? undefined;
+            const cartItemDetails = buildCheckoutCartItemDetails({
+              variant,
+              product,
+              quantity: item.quantity,
+              locale: customerLocale,
+            });
 
             // Check stock availability for reserved cart item quantity
             if (variant.stock < item.quantity) {
@@ -390,22 +407,11 @@ class OrdersService {
                 status: 422,
                 type: "https://api.shop.am/problems/validation-error",
                 title: "Insufficient stock",
-                detail: `Product "${translation?.title || 'Unknown'}" - insufficient stock. Available: ${variant.stock}, Requested: ${item.quantity}`,
+                detail: `Product "${cartItemDetails.productTitle || "Unknown"}" - insufficient stock. Available: ${variant.stock}, Requested: ${item.quantity}`,
               };
             }
 
-            // Use current variant price from DB (ignore priceSnapshot to prevent outdated/abused prices)
-            const currentPrice = Number(variant.price);
-            const cartItem = {
-              variantId: variant.id,
-              productId: product.id,
-              quantity: item.quantity,
-              price: currentPrice,
-              productTitle: translation?.title || 'Unknown Product',
-              variantTitle,
-              sku: variant.sku || '',
-              imageUrl,
-            };
+            const cartItem = cartItemDetails;
             
             logger.debug('Cart item formatted', {
               variantId: cartItem.variantId,
@@ -440,7 +446,16 @@ class OrdersService {
           where: { id: { in: uniqueVariantIds } },
           include: {
             product: { include: { translations: true } },
-            options: true,
+            options: {
+              include: {
+                attributeValue: {
+                  include: {
+                    translations: true,
+                    attribute: true,
+                  },
+                },
+              },
+            },
           },
         });
         const variantMap = new Map(variants.map((v) => [v.id, v]));
@@ -463,21 +478,13 @@ class OrdersService {
               detail: `Insufficient stock. Available: ${variant.stock}, Requested: ${item.quantity}`,
             };
           }
-          const translation = variant.product.translations?.[0] || variant.product.translations?.[0];
-          const variantTitle = variant.options
-            ?.map((opt: { attributeKey?: string | null; value?: string | null }) => `${opt.attributeKey ?? ""}: ${opt.value ?? ""}`)
-            .join(", ") ?? undefined;
-          const imageUrl = extractMediaUrl(variant.product.media) ?? undefined;
-          return {
-            variantId: variant.id,
-            productId: variant.product.id,
+          const cartItemDetails = buildCheckoutCartItemDetails({
+            variant,
+            product: variant.product,
             quantity: item.quantity,
-            price: Number(variant.price),
-            productTitle: translation?.title ?? "Unknown Product",
-            variantTitle,
-            sku: variant.sku ?? "",
-            imageUrl,
-          };
+            locale: customerLocale,
+          });
+          return cartItemDetails;
         });
       } else {
         throw {
@@ -550,8 +557,6 @@ class OrdersService {
           applyOnShipping: applyTaxOnShipping,
         },
       });
-      const customerLocale = normalizeCheckoutLocale(locale);
-
       const persistedShippingAddress =
         shippingMethod === "delivery" && shippingAddress
           ? { ...shippingAddress, deliverySpeed: speed }
@@ -719,6 +724,47 @@ class OrdersService {
         provider: paymentMethod as "idram" | "arca" | "cash_on_delivery" | "aparik",
         baseUrl: baseUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
       });
+
+      if (paymentMethod === "aparik") {
+        try {
+          const { currencyRates } = await adminService.getSettings();
+          await sendAparikCheckoutEmail({
+            orderNumber: order.order.number,
+            customerEmail: email,
+            customerPhone: phone,
+            firstName,
+            lastName,
+            shippingMethod,
+            deliverySpeed: shippingMethod === "delivery" ? speed : undefined,
+            shippingAddress: persistedShippingAddress ?? null,
+            locale: customerLocale,
+            displayCurrency,
+            currencyRates,
+            promoCode,
+            items: cartItems.map((item) => ({
+              productTitle: item.productTitle,
+              variantTitle: item.variantTitle,
+              sku: item.sku,
+              quantity: item.quantity,
+              price: item.price,
+              lineTotal: item.price * item.quantity,
+              imageUrl: item.imageUrl,
+              color: item.color,
+              colorHex: item.colorHex,
+            })),
+            subtotal: totals.subtotal,
+            discountAmount: totals.discountAmount,
+            shippingAmount: totals.shippingAmount,
+            taxAmount: totals.taxAmount,
+            total: totals.total,
+          });
+        } catch (emailError: unknown) {
+          logger.error("Aparik checkout notification email failed", {
+            orderNumber: order.order.number,
+            error: emailError,
+          });
+        }
+      }
 
       return {
         order: {

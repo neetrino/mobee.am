@@ -1,11 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { apiClient } from '../lib/api-client';
 import { type LanguageCode } from '../lib/language';
 import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
 import { t } from '../lib/i18n';
 import type { ProductLabel } from './ProductLabels';
+import {
+  buildHomeFeaturedProductFilters,
+  HOME_FEATURED_FILTER,
+  HOME_PRODUCTS_PER_PAGE,
+} from '@/lib/home/home-product-filters';
+import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
+import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
 
 export interface FeaturedHomeProduct {
   id: string;
@@ -44,22 +51,25 @@ interface ProductsResponse {
   };
 }
 
-const PRODUCTS_PER_PAGE = 10;
-export const FEATURED_HOME_FILTER_DEFAULT = 'new' as const;
+export const FEATURED_HOME_FILTER_DEFAULT = HOME_FEATURED_FILTER;
+
+export type UseFeaturedHomeProductsOptions = {
+  initialProducts?: FeaturedHomeProduct[];
+  initialFiltersKey?: string;
+  serverLanguage?: LanguageCode;
+};
 
 async function fetchFeaturedHomePage(
   language: LanguageCode,
   filter: string | null,
 ): Promise<FeaturedHomeProduct[]> {
   const fetchByLanguage = async (requestedLanguage: LanguageCode): Promise<FeaturedHomeProduct[]> => {
-    const params: Record<string, string> = {
-      page: '1',
-      limit: PRODUCTS_PER_PAGE.toString(),
-      lang: requestedLanguage,
-    };
-    if (filter) params.filter = filter;
+    const params = productFiltersToApiParams({
+      ...buildHomeFeaturedProductFilters(requestedLanguage),
+      filter: filter ?? HOME_FEATURED_FILTER,
+    });
     const response = await apiClient.get<ProductsResponse>('/api/v1/products', { params });
-    return (response.data || []).slice(0, PRODUCTS_PER_PAGE);
+    return (response.data || []).slice(0, HOME_PRODUCTS_PER_PAGE);
   };
 
   const localizedProducts = await fetchByLanguage(language);
@@ -70,39 +80,53 @@ async function fetchFeaturedHomePage(
   return fetchByLanguage('en');
 }
 
-export function useFeaturedHomeProducts() {
+export function useFeaturedHomeProducts(options: UseFeaturedHomeProductsOptions = {}) {
+  const { initialProducts, initialFiltersKey, serverLanguage } = options;
   const language = useClientSyncedLanguage();
-  const [products, setProducts] = useState<FeaturedHomeProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<FeaturedHomeProduct[]>(() => initialProducts ?? []);
+  const [loading, setLoading] = useState(
+    () => !(initialProducts && initialFiltersKey),
+  );
   const [error, setError] = useState<string | null>(null);
+
+  const filtersKey = useMemo(
+    () => buildProductListCacheKey(buildHomeFeaturedProductFilters(serverLanguage ?? language)),
+    [language, serverLanguage],
+  );
 
   const fetchProducts = useCallback(
     async (filter: string | null) => {
       try {
         setLoading(true);
         setError(null);
-        setProducts(await fetchFeaturedHomePage(language, filter));
+        setProducts(await fetchFeaturedHomePage(serverLanguage ?? language, filter));
       } catch (err) {
-        console.error("[HomeProductSections] Error:", err);
-        setError(t(language, 'home.featured_products.errorLoading'));
+        console.error('[HomeProductSections] Error:', err);
+        setError(t(serverLanguage ?? language, 'home.featured_products.errorLoading'));
         setProducts([]);
       } finally {
         setLoading(false);
       }
     },
-    [language],
+    [language, serverLanguage],
   );
 
   useEffect(() => {
-    fetchProducts(FEATURED_HOME_FILTER_DEFAULT);
-  }, [fetchProducts]);
+    if (initialFiltersKey && filtersKey === initialFiltersKey && initialProducts) {
+      setProducts(initialProducts);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    void fetchProducts(FEATURED_HOME_FILTER_DEFAULT);
+  }, [fetchProducts, filtersKey, initialFiltersKey, initialProducts]);
 
   return {
-    language,
+    language: serverLanguage ?? language,
     products,
     loading,
     error,
     fetchProducts,
-    productsPerPage: PRODUCTS_PER_PAGE,
+    productsPerPage: HOME_PRODUCTS_PER_PAGE,
   };
 }

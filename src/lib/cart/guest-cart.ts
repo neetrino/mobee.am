@@ -1,14 +1,24 @@
 import { apiClient } from "../api-client";
 import { CART_MONEY_BASE_CURRENCY } from "../checkout/cart-money";
-import { fetchProductBySlugWithLang } from "../shop/fetchProductBySlugWithLang";
+import { getStoredLanguage } from "../language";
+import type { GuestCartHydrateLine } from "../services/guest-cart-hydrate.service";
 import { logger } from "../utils/logger";
-import { resolveCartLineProductImageUrl } from "./resolveCartLineProductImage";
+
+export interface GuestCartItemSnapshot {
+  title: string;
+  image?: string | null;
+  price: number;
+  originalPrice?: number | null;
+  sku?: string;
+  stock?: number;
+}
 
 export interface GuestCartItem {
   productId: string;
   productSlug?: string;
   variantId: string;
   quantity: number;
+  snapshot?: GuestCartItemSnapshot;
 }
 
 export interface GuestCartHydratedItem {
@@ -42,22 +52,6 @@ export interface GuestCartHydrated {
     currency: typeof CART_MONEY_BASE_CURRENCY;
   };
   itemsCount: number;
-}
-
-interface ProductData {
-  id: string;
-  slug: string;
-  translations?: Array<{ title: string; locale: string }>;
-  media?: Array<{ url?: string; src?: string } | string>;
-  variants?: Array<{
-    _id?: string;
-    id: string;
-    sku: string;
-    price: number;
-    originalPrice?: number | null;
-    stock?: number;
-    imageUrl?: string | null;
-  }>;
 }
 
 interface MergeResult {
@@ -117,6 +111,9 @@ export function upsertGuestCartItem(item: GuestCartItem): void {
 
   if (existingItem) {
     existingItem.quantity += item.quantity;
+    if (item.snapshot) {
+      existingItem.snapshot = { ...existingItem.snapshot, ...item.snapshot };
+    }
   } else {
     cart.push(item);
   }
@@ -184,61 +181,150 @@ function buildGuestCart(items: GuestCartHydratedItem[]): GuestCartHydrated {
   };
 }
 
-async function fetchGuestCartItemDetails(
-  item: GuestCartItem,
-  index: number,
-  t: (key: string) => string
-): Promise<{ item: GuestCartHydratedItem | null; shouldRemove: boolean }> {
-  try {
-    if (!item.productSlug) {
-      return { item: null, shouldRemove: true };
-    }
+function hasCompleteSnapshot(item: GuestCartItem): item is GuestCartItem & {
+  snapshot: GuestCartItemSnapshot;
+  productSlug: string;
+} {
+  return (
+    typeof item.productSlug === "string" &&
+    item.productSlug.length > 0 &&
+    typeof item.snapshot?.title === "string" &&
+    item.snapshot.title.length > 0 &&
+    typeof item.snapshot.price === "number"
+  );
+}
 
-    const encodedSlug = encodeURIComponent(item.productSlug.trim());
-    const productData = await fetchProductBySlugWithLang<ProductData>(encodedSlug);
-    const variant =
-      productData.variants?.find((entry) => (entry._id?.toString() || entry.id) === item.variantId) ||
-      productData.variants?.[0];
-
-    if (!variant) {
-      return { item: null, shouldRemove: true };
-    }
-
-    const translation = productData.translations?.[0];
-    const imageUrl = resolveCartLineProductImageUrl(
-      { media: productData.media },
-      { imageUrl: variant.imageUrl ?? null },
-    );
-
-    return {
-      item: {
-        id: `${item.productId}-${item.variantId}-${index}`,
-        variant: {
-          id: variant._id?.toString() || variant.id,
-          sku: variant.sku || "",
-          stock: variant.stock,
-          product: {
-            id: productData.id,
-            title: translation?.title || t("common.messages.product"),
-            slug: productData.slug,
-            image: imageUrl,
-          },
-        },
-        quantity: item.quantity,
-        price: variant.price,
-        originalPrice: variant.originalPrice || null,
-        total: variant.price * item.quantity,
+function mapStoredItemToHydrated(item: GuestCartItem, index: number): GuestCartHydratedItem {
+  const snapshot = item.snapshot!;
+  return {
+    id: `${item.productId}-${item.variantId}-${index}`,
+    variant: {
+      id: item.variantId,
+      sku: snapshot.sku ?? "",
+      stock: snapshot.stock,
+      product: {
+        id: item.productId,
+        title: snapshot.title,
+        slug: item.productSlug!,
+        image: snapshot.image ?? null,
       },
-      shouldRemove: false,
-    };
-  } catch (error: unknown) {
-    const errorObj = error as { status?: number; statusCode?: number };
-    if (errorObj?.status === 404 || errorObj?.statusCode === 404) {
-      return { item: null, shouldRemove: true };
-    }
-    logger.error("Failed to fetch guest cart item details", { error, item });
-    return { item: null, shouldRemove: false };
+    },
+    quantity: item.quantity,
+    price: snapshot.price,
+    originalPrice: snapshot.originalPrice ?? null,
+    total: snapshot.price * item.quantity,
+  };
+}
+
+/** Instant guest cart from localStorage snapshots (no network). */
+export function buildGuestCartFromStoredSnapshots(): GuestCartHydrated | null {
+  if (typeof window === "undefined") {
+    return null;
   }
+
+  const guestItems = readGuestCart();
+  if (guestItems.length === 0) {
+    return null;
+  }
+
+  if (!guestItems.every(hasCompleteSnapshot)) {
+    return null;
+  }
+
+  return buildGuestCart(guestItems.map(mapStoredItemToHydrated));
+}
+
+function snapshotFromHydrateLine(line: GuestCartHydrateLine): GuestCartItemSnapshot {
+  return {
+    title: line.title,
+    image: line.image,
+    price: line.price,
+    originalPrice: line.originalPrice,
+    sku: line.sku,
+    stock: line.stock,
+  };
+}
+
+function mapHydrateLineToCartItem(
+  guestItem: GuestCartItem,
+  line: GuestCartHydrateLine,
+  index: number,
+): GuestCartHydratedItem {
+  return {
+    id: `${guestItem.productId}-${guestItem.variantId}-${index}`,
+    variant: {
+      id: line.variantId,
+      sku: line.sku,
+      stock: line.stock,
+      product: {
+        id: line.productId,
+        title: line.title,
+        slug: line.productSlug,
+        image: line.image,
+      },
+    },
+    quantity: guestItem.quantity,
+    price: line.price,
+    originalPrice: line.originalPrice,
+    total: line.price * guestItem.quantity,
+  };
+}
+
+async function fetchGuestCartHydratedBatch(
+  guestItems: GuestCartItem[],
+  t: (key: string) => string,
+): Promise<{ items: GuestCartHydratedItem[]; indexesToRemove: number[] }> {
+  const requestItems = guestItems
+    .filter((item) => item.productSlug && item.productSlug.trim().length > 0)
+    .map((item) => ({
+      productSlug: item.productSlug!.trim(),
+      variantId: item.variantId,
+      quantity: item.quantity,
+    }));
+
+  if (requestItems.length === 0) {
+    return { items: [], indexesToRemove: guestItems.map((_, index) => index) };
+  }
+
+  const lang = getStoredLanguage();
+  const response = await apiClient.post<{ lines: GuestCartHydrateLine[]; missingSlugs: string[] }>(
+    "/api/v1/cart/guest/hydrate",
+    { items: requestItems, lang },
+  );
+
+  const lineByVariantId = new Map(response.lines.map((line) => [line.variantId, line]));
+  const hydratedItems: GuestCartHydratedItem[] = [];
+  const indexesToRemove: number[] = [];
+  const persistedItems: GuestCartItem[] = [];
+
+  for (let index = 0; index < guestItems.length; index += 1) {
+    const guestItem = guestItems[index];
+    const line = lineByVariantId.get(guestItem.variantId);
+    if (!line) {
+      indexesToRemove.push(index);
+      continue;
+    }
+
+    persistedItems.push({
+      ...guestItem,
+      productSlug: line.productSlug,
+      snapshot: snapshotFromHydrateLine(line),
+    });
+    hydratedItems.push(mapHydrateLineToCartItem(guestItem, line, index));
+  }
+
+  if (indexesToRemove.length > 0 || persistedItems.length > 0) {
+    localStorage.setItem(GUEST_CART_STORAGE_KEY, JSON.stringify(persistedItems));
+  }
+
+  if (hydratedItems.length === 0) {
+    logger.warn("Guest cart hydrate returned no valid lines", {
+      missingSlugs: response.missingSlugs,
+      fallbackTitle: t("common.messages.product"),
+    });
+  }
+
+  return { items: hydratedItems, indexesToRemove };
 }
 
 export async function fetchGuestCartHydrated(
@@ -253,22 +339,7 @@ export async function fetchGuestCartHydrated(
     return null;
   }
 
-  const resolvedItems = await Promise.all(
-    guestItems.map((item, index) => fetchGuestCartItemDetails(item, index, t))
-  );
-
-  const indexesToRemove = resolvedItems
-    .map((result, index) => (result.shouldRemove ? index : -1))
-    .filter((index) => index !== -1);
-
-  if (indexesToRemove.length > 0) {
-    const filtered = guestItems.filter((_, index) => !indexesToRemove.includes(index));
-    localStorage.setItem(GUEST_CART_STORAGE_KEY, JSON.stringify(filtered));
-  }
-
-  const validItems = resolvedItems
-    .map((result) => result.item)
-    .filter((item): item is GuestCartHydratedItem => item !== null);
+  const { items: validItems } = await fetchGuestCartHydratedBatch(guestItems, t);
 
   if (validItems.length === 0) {
     return null;

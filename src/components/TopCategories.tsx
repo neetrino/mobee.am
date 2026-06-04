@@ -136,9 +136,9 @@ function categoryStripInnerHeightClass(slot: CategorySlot): string {
 
 function categoryHref(resolved: CategoryTreeNode | null, fallbackSlug: string): string {
   if (resolved) {
-    return `/products?category=${encodeURIComponent(resolved.slug)}`;
+    return `/shop?category=${encodeURIComponent(resolved.slug)}`;
   }
-  return `/products?category=${encodeURIComponent(fallbackSlug)}`;
+  return `/shop?category=${encodeURIComponent(fallbackSlug)}`;
 }
 
 export function TopCategories() {

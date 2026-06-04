@@ -12,17 +12,28 @@ import {
   HOME_CURATED_SECTION_MOBILE_TITLE_CLASS,
   HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS,
 } from './home-best-choice.constants';
+import type { LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
-import { FEATURED_HOME_FILTER_DEFAULT, useFeaturedHomeProducts } from './useFeaturedHomeProducts';
+import {
+  FEATURED_HOME_FILTER_DEFAULT,
+  useFeaturedHomeProducts,
+  type FeaturedHomeProduct,
+} from './useFeaturedHomeProducts';
 import {
   SPECIAL_OFFERS_HOME_FILTER_DEFAULT,
   useSpecialOffersHomeProducts,
 } from './useSpecialOffersHomeProducts';
 import { useHomeProductSectionsCarousels } from './useHomeProductSectionsCarousels';
 import { useHomeBestChoiceMobileCardsPerView } from './useHomeBestChoiceMobileCardsPerView';
-import type { LanguageCode } from '../lib/language';
-import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import type { MobileCarouselViewState } from './useHomeBestChoiceCarouselPageSync';
+
+export type HomeProductSectionsProps = {
+  serverLanguage?: LanguageCode;
+  initialFeaturedProducts?: FeaturedHomeProduct[];
+  initialFeaturedFiltersKey?: string;
+  initialSpecialOffersProducts?: FeaturedHomeProduct[];
+  initialSpecialOffersFiltersKey?: string;
+};
 
 type HomeFeaturedCarouselSectionProps = {
   language: LanguageCode;
@@ -172,9 +183,19 @@ function HomeProductSectionsBody(props: HomeProductSectionsBodyProps) {
 /**
  * Product sections for the home page (stacked curated lists).
  */
-export function HomeProductSections() {
+export function HomeProductSections({
+  serverLanguage,
+  initialFeaturedProducts,
+  initialFeaturedFiltersKey,
+  initialSpecialOffersProducts,
+  initialSpecialOffersFiltersKey,
+}: HomeProductSectionsProps = {}) {
   const { language, products, loading, error, fetchProducts, productsPerPage } =
-    useFeaturedHomeProducts();
+    useFeaturedHomeProducts({
+      serverLanguage,
+      initialProducts: initialFeaturedProducts,
+      initialFiltersKey: initialFeaturedFiltersKey,
+    });
 
   const {
     language: specialOffersLanguage,
@@ -183,7 +204,11 @@ export function HomeProductSections() {
     error: specialOffersError,
     fetchProducts: fetchSpecialOffersProducts,
     productsPerPage: specialOffersProductsPerPage,
-  } = useSpecialOffersHomeProducts();
+  } = useSpecialOffersHomeProducts({
+    serverLanguage,
+    initialProducts: initialSpecialOffersProducts,
+    initialFiltersKey: initialSpecialOffersFiltersKey,
+  });
 
   const onRetry = useCallback(() => {
     fetchProducts(FEATURED_HOME_FILTER_DEFAULT);

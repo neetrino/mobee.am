@@ -100,21 +100,10 @@ export default function MessagesPage() {
     setBulkDeleting(true);
     try {
       const ids = Array.from(selectedIds);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-      const response = await fetch('/api/v1/admin/messages', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+      await apiClient.delete('/api/v1/admin/messages', {
         body: JSON.stringify({ ids }),
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || errorData.message || 'Failed to delete messages');
-      }
-      
+
       setSelectedIds(new Set());
       await fetchMessages();
       showToast(t('admin.messages.deletedSuccess'), 'success');

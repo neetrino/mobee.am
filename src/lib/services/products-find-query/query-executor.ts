@@ -1,6 +1,7 @@
 import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 import {
+  PRODUCT_VARIANT_DB_SELECT,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
 } from "@/lib/database/productVariantDb.constants";
@@ -8,6 +9,53 @@ import { ensureProductVariantAttributesColumn } from "../../utils/db-ensure";
 import { logger } from "../../utils/logger";
 import type { ProductWithRelations } from "./types";
 import type { ProductSortOption } from "@/lib/products/sort";
+
+type QueryExecutionContext = {
+  listingMode: boolean;
+  lang: string;
+};
+
+function localeTranslationScope(lang: string) {
+  return { where: { locale: lang } };
+}
+
+/**
+ * Lightweight include for shop grid — skips productAttributes and deep attributeValue joins.
+ */
+function getListingInclude(lang: string) {
+  const locale = localeTranslationScope(lang);
+  return {
+    translations: locale,
+    brand: {
+      include: {
+        translations: locale,
+      },
+    },
+    variants: {
+      where: { published: true },
+      select: {
+        ...PRODUCT_VARIANT_DB_SELECT,
+        options: true,
+      },
+    },
+    labels: true,
+    categories: {
+      include: {
+        translations: locale,
+      },
+    },
+  };
+}
+
+function resolveQueryInclude(ctx: QueryExecutionContext) {
+  if (ctx.listingMode) {
+    return getListingInclude(ctx.lang);
+  }
+  return {
+    ...getBaseInclude(),
+    ...getProductAttributesInclude(),
+  };
+}
 
 /**
  * Base include configuration for product queries.
@@ -106,17 +154,36 @@ export async function executeProductQuery(
   skip: number = 0,
   sort: ProductSortOption = "default",
   listingMode = false,
+  lang = "en",
 ): Promise<ProductWithRelations[]> {
-  const baseInclude = getBaseInclude();
+  const ctx: QueryExecutionContext = { listingMode, lang };
   const orderBy = getOrderBy(sort);
+
+  if (listingMode) {
+    try {
+      const products = await db.product.findMany({
+        where,
+        include: resolveQueryInclude(ctx),
+        orderBy,
+        skip,
+        take: limit,
+      });
+      logger.info(`Found ${products.length} products from database (listing mode)`);
+      return products as unknown as ProductWithRelations[];
+    } catch (error: unknown) {
+      if (isVariantAttributesError(error)) {
+        return executeWithoutAttributeValue(where, limit, skip, sort, ctx);
+      }
+      throw error;
+    }
+  }
+
+  const baseInclude = getBaseInclude();
 
   try {
     const products = await db.product.findMany({
       where,
-      include: {
-        ...baseInclude,
-        ...getProductAttributesInclude(),
-      },
+      include: resolveQueryInclude(ctx),
       orderBy,
       skip,
       take: limit,
@@ -129,7 +196,7 @@ export async function executeProductQuery(
       logger.warn('product_attributes table not found, fetching without it', { 
         error: error instanceof Error ? error.message : String(error) 
       });
-      return executeWithoutProductAttributes(where, limit, skip, sort, listingMode);
+      return executeWithoutProductAttributes(where, limit, skip, sort, ctx);
     }
 
     if (isVariantAttributesError(error)) {
@@ -146,7 +213,7 @@ export async function executeProductQuery(
         logger.info(`Found ${products.length} products from database (after creating attributes column)`);
         return products as unknown as ProductWithRelations[];
       } catch (attributesError: unknown) {
-        return handleAttributesError(attributesError, where, limit, skip, sort, listingMode);
+        return handleAttributesError(attributesError, where, limit, skip, sort, ctx);
       }
     }
 
@@ -154,7 +221,7 @@ export async function executeProductQuery(
       logger.warn('attribute_values.colors column not found, fetching without attributeValue', { 
         error: error instanceof Error ? error.message : String(error) 
       });
-      return executeWithoutAttributeValue(where, limit, skip, sort, listingMode);
+      return executeWithoutAttributeValue(where, limit, skip, sort, ctx);
     }
 
     throw error;
@@ -169,7 +236,7 @@ async function executeWithoutProductAttributes(
   limit: number,
   skip: number = 0,
   sort: ProductSortOption = "default",
-  listingMode = false,
+  ctx: QueryExecutionContext = { listingMode: false, lang: "en" },
 ): Promise<ProductWithRelations[]> {
   const baseInclude = getBaseInclude();
   const orderBy = getOrderBy(sort);
@@ -199,7 +266,7 @@ async function executeWithoutProductAttributes(
         logger.info(`Found ${products.length} products from database (after creating attributes column)`);
         return products as unknown as ProductWithRelations[];
       } catch (attributesError: unknown) {
-        return handleAttributesError(attributesError, where, limit, skip, sort, listingMode);
+        return handleAttributesError(attributesError, where, limit, skip, sort, ctx);
       }
     }
 
@@ -207,7 +274,7 @@ async function executeWithoutProductAttributes(
       logger.warn('attribute_values.colors column not found, fetching without attributeValue', { 
         error: retryError instanceof Error ? retryError.message : String(retryError) 
       });
-      return executeWithoutAttributeValue(where, limit, skip, sort, listingMode);
+      return executeWithoutAttributeValue(where, limit, skip, sort, ctx);
     }
 
     throw retryError;
@@ -223,13 +290,13 @@ async function handleAttributesError(
   limit: number,
   skip: number = 0,
   sort: ProductSortOption = "default",
-  listingMode = false,
+  ctx: QueryExecutionContext = { listingMode: false, lang: "en" },
 ): Promise<ProductWithRelations[]> {
   if (isAttributeValuesColorsError(error)) {
     logger.warn('attribute_values.colors column not found, fetching without attributeValue', { 
       error: error instanceof Error ? error.message : String(error) 
     });
-    return executeWithoutAttributeValue(where, limit, skip, sort, listingMode);
+    return executeWithoutAttributeValue(where, limit, skip, sort, ctx);
   }
   throw error;
 }
@@ -242,10 +309,26 @@ async function executeWithoutAttributeValue(
   limit: number,
   skip: number = 0,
   sort: ProductSortOption = "default",
-  _listingMode = false,
+  ctx: QueryExecutionContext = { listingMode: false, lang: "en" },
 ): Promise<ProductWithRelations[]> {
-  const baseIncludeWithoutAttributeValue = getBaseIncludeWithoutAttributeValue();
   const orderBy = getOrderBy(sort);
+  const include = ctx.listingMode
+    ? getListingInclude(ctx.lang)
+    : getBaseIncludeWithoutAttributeValue();
+
+  if (ctx.listingMode) {
+    const products = await db.product.findMany({
+      where,
+      include,
+      orderBy,
+      skip,
+      take: limit,
+    });
+    logger.info(`Found ${products.length} products from database (listing fallback)`);
+    return products as unknown as ProductWithRelations[];
+  }
+
+  const baseIncludeWithoutAttributeValue = getBaseIncludeWithoutAttributeValue();
 
   // Try to include productAttributes even in fallback
   try {
@@ -309,7 +392,8 @@ export async function fetchProductsPageForPriceSort(
   limit: number,
   skip: number,
   sort: "price-asc" | "price-desc",
-  listingMode: boolean
+  listingMode: boolean,
+  lang = "en",
 ): Promise<ProductWithRelations[]> {
   const lightRows = await db.product.findMany({
     where,
@@ -355,7 +439,8 @@ export async function fetchProductsPageForPriceSort(
     pageIds.length,
     0,
     "default",
-    listingMode
+    listingMode,
+    lang,
   );
 
   const orderMap = new Map(pageIds.map((id, index) => [id, index]));

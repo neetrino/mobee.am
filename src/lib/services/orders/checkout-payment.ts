@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { getPaymentCallbackSecret } from "@/lib/security/payment-callback-secret";
 import { logger } from "@/lib/utils/logger";
 
 type PaymentProvider = "idram" | "arca" | "cash_on_delivery" | "aparik";
@@ -22,7 +23,7 @@ interface CreatePaymentUrlInput {
 const MAX_CLOCK_SKEW_MS = 10 * 60 * 1000;
 
 function getSigningSecret(): string {
-  return process.env.PAYMENT_CALLBACK_SECRET || process.env.JWT_SECRET || "";
+  return getPaymentCallbackSecret();
 }
 
 function safeBuildUrl(pathOrUrl: string, baseUrl: string): URL {

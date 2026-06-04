@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { ProductCard } from './ProductCard';
+import { ProductCardListingProvider } from './ProductCardListingContext';
 import { useTranslation } from '../lib/i18n-client';
 import { SHOP_LISTING_EAGER_IMAGE_CARD_COUNT } from '@/lib/performance/shop-listing-image-priority.constants';
 import type { ProductSortOption } from '@/lib/products/sort';
@@ -57,13 +58,12 @@ function desktopShopGridClass(viewMode: ProductListingViewMode): string {
 
 export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
   const { t } = useTranslation();
-  const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
   const [isCompactThreeColumn, setIsCompactThreeColumn] = useState(false);
   const [isLegacyDesktopShop, setIsLegacyDesktopShop] = useState(false);
   const [listingViewMode, setListingViewMode] =
     useState<ProductListingViewMode>('grid-2');
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const mqCompactThree = window.matchMedia(SHOP_COMPACT_THREE_COLUMN_MEDIA_QUERY);
     const mqLegacyDesktop = window.matchMedia(SHOP_LEGACY_DESKTOP_MEDIA_QUERY);
     const apply = () => {
@@ -97,9 +97,11 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
     return () => window.removeEventListener(PRODUCTS_VIEW_MODE_CHANGED_EVENT, onChange);
   }, []);
 
-  useEffect(() => {
+  const sortedProducts = useMemo(() => {
+    if (sortBy === 'default') {
+      return products;
+    }
     const sorted = [...products];
-
     switch (sortBy) {
       case 'price-asc':
         sorted.sort((a, b) => a.price - b.price);
@@ -116,8 +118,7 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
       default:
         break;
     }
-
-    setSortedProducts(sorted);
+    return sorted;
   }, [products, sortBy]);
 
   if (sortedProducts.length === 0) {
@@ -142,23 +143,25 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
   const useHomeCardChrome = !isLegacyDesktopShop;
 
   return (
-    <div className={gridClass}>
-      {sortedProducts.map((product, index) => (
-        <div key={product.id} className="h-full min-h-0">
-          <ProductCard
-            product={{
-              ...product,
-              compareAtPrice: product.compareAtPrice ?? undefined,
-              discountPercent: product.discountPercent ?? undefined,
-            }}
-            viewMode={cardViewMode}
-            homeProductGridCard={useHomeCardChrome}
-            shiftImageInFrame={useHomeCardChrome}
-            smallerFooterPrice={useHomeCardChrome}
-            imageLoadPriority={index < SHOP_LISTING_EAGER_IMAGE_CARD_COUNT}
-          />
-        </div>
-      ))}
-    </div>
+    <ProductCardListingProvider>
+      <div className={gridClass}>
+        {sortedProducts.map((product, index) => (
+          <div key={product.id} className="h-full min-h-0">
+            <ProductCard
+              product={{
+                ...product,
+                compareAtPrice: product.compareAtPrice ?? undefined,
+                discountPercent: product.discountPercent ?? undefined,
+              }}
+              viewMode={cardViewMode}
+              homeProductGridCard={useHomeCardChrome}
+              shiftImageInFrame={useHomeCardChrome}
+              smallerFooterPrice={useHomeCardChrome}
+              imageLoadPriority={index < SHOP_LISTING_EAGER_IMAGE_CARD_COUNT}
+            />
+          </div>
+        ))}
+      </div>
+    </ProductCardListingProvider>
   );
 }

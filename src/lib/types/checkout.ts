@@ -16,6 +16,8 @@ export interface CheckoutData {
     productId: string;
     quantity: number;
   }>;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
   shippingMethod?: string;
@@ -38,6 +40,7 @@ export interface CheckoutData {
   paymentMethod?: string;
   promoCode?: string;
   locale?: "en" | "hy" | "ru";
+  currency?: "USD" | "AMD" | "EUR" | "RUB" | "GEL";
   billingAddress?: {
     firstName?: string;
     lastName?: string;

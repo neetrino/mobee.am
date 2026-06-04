@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Button } from '@shop/ui';
 import { formatPrice } from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
@@ -35,16 +35,16 @@ import { CartCtaResponsiveLabel } from './cart-cta-responsive-label';
 interface CartItemRowProps {
   item: CartItem;
   currency: string;
-  updatingItems: Set<string>;
+  isUpdating: boolean;
   onRemove: (itemId: string) => void;
   onUpdateQuantity: (itemId: string, quantity: number) => void;
   t: (key: string) => string;
 }
 
-export function CartItemRow({
+export const CartItemRow = memo(function CartItemRow({
   item,
   currency,
-  updatingItems,
+  isUpdating,
   onRemove,
   onUpdateQuantity,
   t,
@@ -61,7 +61,7 @@ export function CartItemRow({
       <button
         type="button"
         onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-        disabled={updatingItems.has(item.id)}
+        disabled={isUpdating}
         className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-50"
         aria-label={t('common.ariaLabels.decreaseQuantity')}
       >
@@ -78,14 +78,14 @@ export function CartItemRow({
           const newQuantity = parseInt(e.target.value) || 1;
           onUpdateQuantity(item.id, newQuantity);
         }}
-        disabled={updatingItems.has(item.id)}
+        disabled={isUpdating}
         className="h-8 min-w-0 w-12 shrink rounded-lg border border-gray-300 bg-white px-1 py-0 text-center text-sm font-medium tabular-nums leading-8 [-moz-appearance:textfield] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         title={item.variant.stock !== undefined ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : ''}
       />
       <button
         type="button"
         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-        disabled={updatingItems.has(item.id) || (item.variant.stock !== undefined && item.quantity >= item.variant.stock)}
+        disabled={isUpdating || (item.variant.stock !== undefined && item.quantity >= item.variant.stock)}
         className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-50"
         aria-label={t('common.ariaLabels.increaseQuantity')}
         title={item.variant.stock !== undefined && item.quantity >= item.variant.stock ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : t('common.messages.addQuantity')}
@@ -190,7 +190,7 @@ export function CartItemRow({
       </div>
     </div>
   );
-}
+});
 
 /**
  * Cart table component
@@ -204,7 +204,7 @@ interface CartTableProps {
   t: (key: string) => string;
 }
 
-export function CartTable({
+export const CartTable = memo(function CartTable({
   cart,
   currency,
   updatingItems,
@@ -220,7 +220,7 @@ export function CartTable({
             key={item.id}
             item={item}
             currency={currency}
-            updatingItems={updatingItems}
+            isUpdating={updatingItems.has(item.id)}
             onRemove={onRemove}
             onUpdateQuantity={onUpdateQuantity}
             t={t}
@@ -229,7 +229,7 @@ export function CartTable({
       </div>
     </div>
   );
-}
+});
 
 /**
  * Order summary component
@@ -240,7 +240,7 @@ interface OrderSummaryProps {
   t: (key: string) => string;
 }
 
-export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
+export const OrderSummary = memo(function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
   const currencyCode = currency as CurrencyCode;
   
   return (
@@ -299,5 +299,4 @@ export function OrderSummary({ cart, currency, t }: OrderSummaryProps) {
       </div>
     </div>
   );
-}
-
+});

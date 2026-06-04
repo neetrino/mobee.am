@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { jsonAuthSession } from "@/lib/security/auth-session-response";
 import { authService } from "@/lib/services/auth.service";
 import { toApiError } from "@/lib/types/errors";
 import { logger } from "@/lib/utils/logger";
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
     const result = await authService.register(parsed.data);
-    return NextResponse.json(result);
+    return jsonAuthSession(result, { status: 201 });
   } catch (error: unknown) {
     logger.error("Registration error", { error });
     const apiError = toApiError(error, req.url);

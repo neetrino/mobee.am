@@ -83,6 +83,7 @@ export function useCheckout() {
     deliveryPrice,
     requiresRegionalQuote,
     deliveryAvailable,
+    currency,
     setError,
   });
 

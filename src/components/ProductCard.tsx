@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { useWishlist } from './hooks/useWishlist';
 import { useCompare } from './hooks/useCompare';
@@ -10,6 +10,10 @@ import { useCurrency } from './hooks/useCurrency';
 import { resolveCompareCategoryId } from '../lib/shop/compare-storage';
 import { ProductCardList } from './ProductCard/ProductCardList';
 import { ProductCardGrid } from './ProductCard/ProductCardGrid';
+import {
+  useProductCardListingInteractions,
+  type ProductCardListingInteractions,
+} from './ProductCardListingContext';
 
 interface Product {
   id: string;
@@ -40,24 +44,25 @@ type ViewMode = 'list' | 'grid-2' | 'grid-3';
 interface ProductCardProps {
   product: Product;
   viewMode?: ViewMode;
-  /** Nudge product art in the frame (e.g. home “best choice” grid). */
   shiftImageInFrame?: boolean;
-  /** Use a square image frame; set false for portrait 3:4. */
   squareImageFrame?: boolean;
-  /** Smaller footer price (e.g. home “best choice” grid). */
   smallerFooterPrice?: boolean;
-  /** Home special-offers grid — RU desktop footer CTA uses Figma 155.99×36.94px. */
   specialOffersHomeCard?: boolean;
-  /** Home featured / special-offer grids — mobile Figma card chrome. */
   homeProductGridCard?: boolean;
   imageLoadPriority?: boolean;
 }
 
-/**
- * Product card component with Compare, Wishlist and Cart icons
- * Displays product image, title, category, price and action buttons
- */
-export function ProductCard({
+interface ProductCardBodyProps extends ProductCardProps {
+  currency: ReturnType<typeof useCurrency>;
+  isInWishlist: boolean;
+  isInCompare: boolean;
+  isAddingToCart: boolean;
+  onWishlistToggle: (event: MouseEvent) => void;
+  onCompareToggle: (event: MouseEvent) => void;
+  onAddToCart: (event: MouseEvent) => void;
+}
+
+function ProductCardBody({
   product,
   viewMode = 'grid-3',
   shiftImageInFrame = false,
@@ -66,47 +71,17 @@ export function ProductCard({
   specialOffersHomeCard = false,
   homeProductGridCard = false,
   imageLoadPriority = false,
-}: ProductCardProps) {
-  const isCompact = viewMode === 'grid-3';
-  const currency = useCurrency();
-  const { isInWishlist, toggleWishlist } = useWishlist(product.id);
-  const compareCategoryId = resolveCompareCategoryId(product);
-  const { isInCompare, toggleCompare } = useCompare(product.id, compareCategoryId);
-  const { isAddingToCart, addToCart } = useAddToCart({
-    productId: product.id,
-    productSlug: product.slug,
-    inStock: product.inStock,
-    defaultVariantId: product.defaultVariantId ?? undefined,
-    price: product.price,
-  });
+  currency,
+  isInWishlist,
+  isInCompare,
+  isAddingToCart,
+  onWishlistToggle,
+  onCompareToggle,
+  onAddToCart,
+}: ProductCardBodyProps) {
   const [imageError, setImageError] = useState(false);
+  const isCompact = viewMode === 'grid-3';
 
-  const handleWishlistToggle = (e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleWishlist();
-  };
-
-  // Handle compare toggle
-  const handleCompareToggle = (e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleCompare();
-  };
-
-  // Handle add to cart
-  const handleAddToCart = (e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const root = (e.currentTarget as HTMLElement).closest('[data-product-card-root]');
-    const flySourceEl = root?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
-    void addToCart({
-      imageUrl: resolveProductCardImageSrc(product.image),
-      flySourceEl,
-    });
-  };
-
-  // List view layout
   if (viewMode === 'list') {
     return (
       <ProductCardList
@@ -118,14 +93,13 @@ export function ProductCard({
         imageError={imageError}
         imageLoadPriority={imageLoadPriority}
         onImageError={() => setImageError(true)}
-        onWishlistToggle={handleWishlistToggle}
-        onCompareToggle={handleCompareToggle}
-        onAddToCart={handleAddToCart}
+        onWishlistToggle={onWishlistToggle}
+        onCompareToggle={onCompareToggle}
+        onAddToCart={onAddToCart}
       />
     );
   }
 
-  // Grid view layout
   return (
     <ProductCardGrid
       product={product}
@@ -142,6 +116,85 @@ export function ProductCard({
       homeProductGridCard={homeProductGridCard}
       imageLoadPriority={imageLoadPriority}
       onImageError={() => setImageError(true)}
+      onWishlistToggle={onWishlistToggle}
+      onCompareToggle={onCompareToggle}
+      onAddToCart={onAddToCart}
+    />
+  );
+}
+
+function useProductCardAddToCartHandler(product: Product) {
+  const { isAddingToCart, addToCart } = useAddToCart({
+    productId: product.id,
+    productSlug: product.slug,
+    inStock: product.inStock,
+    defaultVariantId: product.defaultVariantId ?? undefined,
+    price: product.price,
+    title: product.title,
+    image: product.image,
+    compareAtPrice: product.compareAtPrice ?? product.originalPrice ?? null,
+  });
+
+  const handleAddToCart = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const root = (event.currentTarget as HTMLElement).closest('[data-product-card-root]');
+    const flySourceEl = root?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
+    void addToCart({
+      imageUrl: resolveProductCardImageSrc(product.image),
+      flySourceEl,
+    });
+  };
+
+  return { isAddingToCart, handleAddToCart };
+}
+
+function ProductCardFromListing({
+  listing,
+  ...props
+}: ProductCardProps & { listing: ProductCardListingInteractions }) {
+  const { isAddingToCart, handleAddToCart } = useProductCardAddToCartHandler(props.product);
+
+  return (
+    <ProductCardBody
+      {...props}
+      currency={listing.currency}
+      isInWishlist={listing.isInWishlist}
+      isInCompare={listing.isInCompare}
+      isAddingToCart={isAddingToCart}
+      onWishlistToggle={listing.onWishlistToggle}
+      onCompareToggle={listing.onCompareToggle}
+      onAddToCart={handleAddToCart}
+    />
+  );
+}
+
+function ProductCardWithHooks(props: ProductCardProps) {
+  const currency = useCurrency();
+  const { isInWishlist, toggleWishlist } = useWishlist(props.product.id);
+  const compareCategoryId = resolveCompareCategoryId(props.product);
+  const { isInCompare, toggleCompare } = useCompare(props.product.id, compareCategoryId);
+  const { isAddingToCart, handleAddToCart } = useProductCardAddToCartHandler(props.product);
+
+  const handleWishlistToggle = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleWishlist();
+  };
+
+  const handleCompareToggle = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleCompare();
+  };
+
+  return (
+    <ProductCardBody
+      {...props}
+      currency={currency}
+      isInWishlist={isInWishlist}
+      isInCompare={isInCompare}
+      isAddingToCart={isAddingToCart}
       onWishlistToggle={handleWishlistToggle}
       onCompareToggle={handleCompareToggle}
       onAddToCart={handleAddToCart}
@@ -149,3 +202,13 @@ export function ProductCard({
   );
 }
 
+export const ProductCard = memo(function ProductCard(props: ProductCardProps) {
+  const compareCategoryId = resolveCompareCategoryId(props.product);
+  const listing = useProductCardListingInteractions(props.product.id, compareCategoryId);
+
+  if (listing) {
+    return <ProductCardFromListing {...props} listing={listing} />;
+  }
+
+  return <ProductCardWithHooks {...props} />;
+});

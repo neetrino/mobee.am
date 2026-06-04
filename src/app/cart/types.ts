@@ -40,11 +40,21 @@ export interface Cart {
 /**
  * Guest cart item interface
  */
+export interface GuestCartItemSnapshot {
+  title: string;
+  image?: string | null;
+  price: number;
+  originalPrice?: number | null;
+  sku?: string;
+  stock?: number;
+}
+
 export interface GuestCartItem {
   productId: string;
   productSlug?: string;
   variantId: string;
   quantity: number;
+  snapshot?: GuestCartItemSnapshot;
 }
 
 

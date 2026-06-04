@@ -1,7 +1,7 @@
 import { db } from "@white-shop/db";
 import { PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE } from "@/lib/database/productVariantDb.constants";
 import { cacheService } from "@/lib/services/cache.service";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateProductCache } from "./admin-products-update/cache-revalidator";
 import { findOrCreateAttributeValue } from "../../utils/variant-generator";
 import { ensureProductAttributesTable } from "../../utils/db-ensure";
 import {
@@ -405,12 +405,7 @@ class AdminProductsCreateService {
       // Revalidate cache
       try {
         console.log('🧹 [ADMIN PRODUCTS CREATE SERVICE] Revalidating paths for new product');
-        revalidatePath('/');
-        revalidatePath('/products');
-        // @ts-expect-error - revalidateTag type issue in Next.js
-        revalidateTag('products');
-        await cacheService.deletePattern('products:*');
-        await cacheService.deletePattern('categories:*');
+        await revalidateProductCache(result.id, result.translations?.[0]?.slug);
       } catch (e) {
         console.warn('⚠️ [ADMIN PRODUCTS CREATE SERVICE] Revalidation failed:', e);
       }

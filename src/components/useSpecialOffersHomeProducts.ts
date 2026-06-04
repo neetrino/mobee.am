@@ -1,10 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { apiClient } from '../lib/api-client';
 import { type LanguageCode } from '../lib/language';
 import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
 import { t } from '../lib/i18n';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
+import {
+  buildHomeSpecialOffersProductFilters,
+  HOME_PRODUCTS_PER_PAGE,
+  HOME_SPECIAL_OFFERS_FILTER,
+} from '@/lib/home/home-product-filters';
+import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
+import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
 
 interface ProductsResponse {
   data: FeaturedHomeProduct[];
@@ -16,54 +24,26 @@ interface ProductsResponse {
   };
 }
 
-function isProductsResponse(value: unknown): value is ProductsResponse {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  const rawData = (value as { data?: unknown }).data;
-  const rawMeta = (value as { meta?: unknown }).meta;
-  return Array.isArray(rawData) && !!rawMeta && typeof rawMeta === 'object';
-}
-
-const PRODUCTS_PER_PAGE = 10;
 /** Store “featured” products for the home special-offers row (distinct from best-choice `new`). */
-export const SPECIAL_OFFERS_HOME_FILTER_DEFAULT = 'featured' as const;
+export const SPECIAL_OFFERS_HOME_FILTER_DEFAULT = HOME_SPECIAL_OFFERS_FILTER;
+
+export type UseSpecialOffersHomeProductsOptions = {
+  initialProducts?: FeaturedHomeProduct[];
+  initialFiltersKey?: string;
+  serverLanguage?: LanguageCode;
+};
 
 async function fetchSpecialOffersHomePage(
   language: LanguageCode,
   filter: string | null,
 ): Promise<FeaturedHomeProduct[]> {
   const fetchByLanguage = async (requestedLanguage: LanguageCode): Promise<FeaturedHomeProduct[]> => {
-    const searchParams = new URLSearchParams({
-      page: '1',
-      limit: PRODUCTS_PER_PAGE.toString(),
-      lang: requestedLanguage,
+    const params = productFiltersToApiParams({
+      ...buildHomeSpecialOffersProductFilters(requestedLanguage),
+      filter: filter ?? HOME_SPECIAL_OFFERS_FILTER,
     });
-
-    if (filter) {
-      searchParams.set('filter', filter);
-    }
-
-    try {
-      const response = await fetch(`/api/v1/products?${searchParams.toString()}`, {
-        method: 'GET',
-        cache: 'no-store',
-      });
-
-      if (!response.ok) {
-        return [];
-      }
-
-      const rawData: unknown = await response.json();
-      if (!isProductsResponse(rawData)) {
-        return [];
-      }
-
-      return rawData.data.slice(0, PRODUCTS_PER_PAGE);
-    } catch {
-      return [];
-    }
+    const response = await apiClient.get<ProductsResponse>('/api/v1/products', { params });
+    return (response.data || []).slice(0, HOME_PRODUCTS_PER_PAGE);
   };
 
   const localizedProducts = await fetchByLanguage(language);
@@ -74,39 +54,54 @@ async function fetchSpecialOffersHomePage(
   return fetchByLanguage('en');
 }
 
-export function useSpecialOffersHomeProducts() {
+export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProductsOptions = {}) {
+  const { initialProducts, initialFiltersKey, serverLanguage } = options;
   const language = useClientSyncedLanguage();
-  const [products, setProducts] = useState<FeaturedHomeProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<FeaturedHomeProduct[]>(() => initialProducts ?? []);
+  const [loading, setLoading] = useState(
+    () => !(initialProducts && initialFiltersKey),
+  );
   const [error, setError] = useState<string | null>(null);
+
+  const filtersKey = useMemo(
+    () =>
+      buildProductListCacheKey(buildHomeSpecialOffersProductFilters(serverLanguage ?? language)),
+    [language, serverLanguage],
+  );
 
   const fetchProducts = useCallback(
     async (filter: string | null) => {
       try {
         setLoading(true);
         setError(null);
-        setProducts(await fetchSpecialOffersHomePage(language, filter));
+        setProducts(await fetchSpecialOffersHomePage(serverLanguage ?? language, filter));
       } catch (err) {
         console.error('[SpecialOffersHome] Error:', err);
-        setError(t(language, 'home.featured_products.errorLoading'));
+        setError(t(serverLanguage ?? language, 'home.featured_products.errorLoading'));
         setProducts([]);
       } finally {
         setLoading(false);
       }
     },
-    [language],
+    [language, serverLanguage],
   );
 
   useEffect(() => {
-    fetchProducts(SPECIAL_OFFERS_HOME_FILTER_DEFAULT);
-  }, [fetchProducts]);
+    if (initialFiltersKey && filtersKey === initialFiltersKey && initialProducts) {
+      setProducts(initialProducts);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    void fetchProducts(SPECIAL_OFFERS_HOME_FILTER_DEFAULT);
+  }, [fetchProducts, filtersKey, initialFiltersKey, initialProducts]);
 
   return {
-    language,
+    language: serverLanguage ?? language,
     products,
     loading,
     error,
     fetchProducts,
-    productsPerPage: PRODUCTS_PER_PAGE,
+    productsPerPage: HOME_PRODUCTS_PER_PAGE,
   };
 }

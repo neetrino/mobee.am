@@ -9,6 +9,7 @@ import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, in
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
 import { useInstantSearch } from './hooks/useInstantSearch';
+import { useHeaderRoutePrefetch, prefetchHeaderHref } from './hooks/useHeaderRoutePrefetch';
 import { SearchDropdown } from './SearchDropdown';
 import { useAuth } from '../lib/auth/AuthContext';
 import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
@@ -209,11 +210,13 @@ function CategoriesMenuFlyout({
   roots,
   onItemNavigate,
   loadingLabel,
+  onLinkHover,
 }: {
   loading: boolean;
   roots: Category[];
   onItemNavigate: () => void;
   loadingLabel: string;
+  onLinkHover: (href: string) => void;
 }) {
   const columnCount = Math.min(roots.length, CATEGORY_MEGA_MENU_MAX_COLUMNS);
 
@@ -238,6 +241,8 @@ function CategoriesMenuFlyout({
                       <Link
                         href={`/shop?category=${category.slug}`}
                         className="text-sm font-bold uppercase tracking-wide text-gray-900 hover:text-gray-700"
+                        prefetch
+                        onMouseEnter={() => onLinkHover(`/shop?category=${category.slug}`)}
                         onClick={onItemNavigate}
                       >
                         {category.title}
@@ -250,6 +255,8 @@ function CategoriesMenuFlyout({
                             key={subCategory.id}
                             href={`/shop?category=${subCategory.slug}`}
                             className="block py-1 text-sm text-gray-700 transition-colors duration-150 hover:text-gray-900"
+                            prefetch
+                            onMouseEnter={() => onLinkHover(`/shop?category=${subCategory.slug}`)}
                             onClick={onItemNavigate}
                           >
                             {subCategory.title}
@@ -368,9 +375,18 @@ export function Header() {
   const showSearchModalRef = useRef(false);
   showSearchModalRef.current = showSearchModal;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
+  const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
   const { categories, loadingCategories } = useCategoriesTree();
   const [, setSelectedCategory] = useState<Category | null>(null);
+
+  useHeaderRoutePrefetch(router, { boostKey: mobileMenuOpen || showCategoriesPillMenu });
+
+  const prefetchNavHref = useCallback(
+    (href: string) => prefetchHeaderHref(router, href),
+    [router],
+  );
 
   const isNavActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -414,8 +430,6 @@ export function Header() {
   const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
   const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
   const [headerLayoutReady, setHeaderLayoutReady] = useState(false);
-  const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
-  const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
 
   const syncSecondaryDock = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -696,15 +710,6 @@ export function Header() {
         setCartTotal(0);
       }
       return;
-    }
-
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
-        setCartCount(0);
-        setCartTotal(0);
-        return;
-      }
     }
 
     try {
@@ -1237,6 +1242,7 @@ export function Header() {
             <Link
               href="/"
               aria-label={t('common.navigation.home')}
+              prefetch
               className="flex max-w-[min(280px,28vw)] shrink-0 items-center rounded-xl transition-opacity hover:opacity-95 active:opacity-90"
             >
               <SiteBrandLogo
@@ -1252,20 +1258,22 @@ export function Header() {
             >
               <Link
                 href="/"
+                prefetch
                 className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/')}`}
               >
                 {t('common.navigation.home')}
               </Link>
               <Link
                 href="/shop"
+                prefetch
                 className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/shop')}`}
               >
                 {t('common.navigation.products')}
               </Link>
-              <Link href="/about" className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/about')}`}>
+              <Link href="/about" prefetch className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/about')}`}>
                 {t('common.navigation.about')}
               </Link>
-              <Link href="/contact" className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/contact')}`}>
+              <Link href="/contact" prefetch className={`flex items-center justify-center py-[0.15rem] ${navTextClass('/contact')}`}>
                 {t('common.navigation.contact')}
               </Link>
             </nav>
@@ -1307,6 +1315,7 @@ export function Header() {
               roots={getRootCategories(categories)}
               onItemNavigate={() => setShowCategoriesPillMenu(false)}
               loadingLabel={t('common.messages.loading')}
+              onLinkHover={prefetchNavHref}
             />
           ) : null
         }
@@ -1401,6 +1410,7 @@ export function Header() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      prefetch
                       onClick={() => setMobileMenuOpen(false)}
                       className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
                     >
@@ -1413,6 +1423,7 @@ export function Header() {
 
                   <Link
                     href="/compare"
+                    prefetch
                     onClick={() => setMobileMenuOpen(false)}
                     className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700 md:hidden`}
                   >

@@ -1,14 +1,38 @@
 import { apiClient } from '../../lib/api-client';
 import { logger } from '../../lib/utils/logger';
+import {
+  buildGuestCartFromStoredSnapshots,
+  fetchGuestCartHydrated,
+} from '../../lib/cart/guest-cart';
 import type { Cart } from './types';
-import { fetchGuestCartHydrated } from '../../lib/cart/guest-cart';
+import { readLoggedInCartCache, writeLoggedInCartCache } from './cart-cache';
 
 /**
- * Fetch guest cart
+ * Instant cart from local/session storage (no network).
  */
-export async function fetchGuestCart(t: (key: string) => string): Promise<Cart | null> {
+export function readInstantCart(isLoggedIn: boolean, userId?: string): Cart | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  if (!isLoggedIn) {
+    return buildGuestCartFromStoredSnapshots();
+  }
+
+  return readLoggedInCartCache(userId);
+}
+
+/**
+ * Fetch guest cart — uses local snapshots when complete, otherwise hydrates from API.
+ */
+export async function fetchGuestCartFresh(): Promise<Cart | null> {
+  const instant = buildGuestCartFromStoredSnapshots();
+  if (instant) {
+    return instant;
+  }
+
   try {
-    return await fetchGuestCartHydrated(t);
+    return await fetchGuestCartHydrated(() => 'Product');
   } catch (error: unknown) {
     logger.error('Error loading guest cart', { error });
     return null;
@@ -16,31 +40,43 @@ export async function fetchGuestCart(t: (key: string) => string): Promise<Cart |
 }
 
 /**
- * Fetch logged-in user cart
+ * Fetch logged-in user cart from API.
  */
-export async function fetchLoggedInCart(): Promise<Cart | null> {
+export async function fetchLoggedInCartFresh(userId?: string): Promise<Cart | null> {
   try {
     const response = await apiClient.get<{ cart: Cart }>('/api/v1/cart');
+    if (userId) {
+      writeLoggedInCartCache(userId, response.cart);
+    }
     return response.cart;
   } catch (error: unknown) {
     logger.error('Error fetching cart', { error });
-    return null;
+    return readLoggedInCartCache(userId) ?? null;
   }
 }
 
 /**
- * Fetch cart (guest or logged-in)
+ * Fetch fresh cart data from the server.
  */
-export async function fetchCart(
+export async function fetchCartFresh(
   isLoggedIn: boolean,
-  t: (key: string) => string
+  userId?: string,
 ): Promise<Cart | null> {
   if (!isLoggedIn) {
-    return fetchGuestCart(t);
+    return fetchGuestCartFresh();
   }
-  return fetchLoggedInCart();
+  return fetchLoggedInCartFresh(userId);
 }
 
-
-
-
+/** @deprecated Use readInstantCart + fetchCartFresh instead. */
+export async function fetchCart(
+  isLoggedIn: boolean,
+  _t: (key: string) => string,
+  userId?: string,
+): Promise<Cart | null> {
+  const instant = readInstantCart(isLoggedIn, userId);
+  if (instant) {
+    return instant;
+  }
+  return fetchCartFresh(isLoggedIn, userId);
+}

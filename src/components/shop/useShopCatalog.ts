@@ -89,10 +89,9 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const sync = () => setLanguage(getStoredLanguage());
-    sync();
-    window.addEventListener('language-updated', sync);
-    return () => window.removeEventListener('language-updated', sync);
+    const onLanguageUpdate = () => setLanguage(getStoredLanguage());
+    window.addEventListener('language-updated', onLanguageUpdate);
+    return () => window.removeEventListener('language-updated', onLanguageUpdate);
   }, []);
 
   const filters = useMemo(() => {

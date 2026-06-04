@@ -11,6 +11,7 @@ interface UseOrderSubmissionProps {
   deliveryPrice: number | null;
   requiresRegionalQuote: boolean;
   deliveryAvailable: boolean;
+  currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
   setError: (error: string | null) => void;
 }
 
@@ -20,6 +21,7 @@ export function useOrderSubmission({
   deliveryPrice,
   requiresRegionalQuote,
   deliveryAvailable,
+  currency,
   setError,
 }: UseOrderSubmissionProps) {
   const router = useRouter();
@@ -92,6 +94,7 @@ export function useOrderSubmission({
         paymentMethod: data.paymentMethod,
         promoCode: data.promoCode,
         locale: lang,
+        currency,
       });
 
       if (!isLoggedIn) {

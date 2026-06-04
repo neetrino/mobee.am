@@ -20,6 +20,7 @@ import { fetchProductBySlugWithLang } from '../lib/shop/fetchProductBySlugWithLa
 import { useRelatedProducts, type RelatedProduct } from './hooks/useRelatedProducts';
 import { useCarousel } from './hooks/useCarousel';
 import { useVisibleCards } from './hooks/useVisibleCards';
+import { ProductCardListingProvider } from './ProductCardListingContext';
 import { ProductCard } from './ProductCard';
 import { RelatedProductCard } from './RelatedProducts/RelatedProductCard';
 import { CarouselNavigation } from './RelatedProducts/CarouselNavigation';
@@ -361,6 +362,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
 
   // Always show the section, even if no products (will show loading or empty state)
   return (
+    <ProductCardListingProvider>
     <section className="mt-12 border-t border-gray-200 py-8 max-lg:py-6 sm:mt-16 lg:mt-20 lg:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {loading || products.length > 0 ? (
@@ -540,6 +542,7 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         )}
       </div>
     </section>
+    </ProductCardListingProvider>
   );
 }
 

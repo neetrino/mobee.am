@@ -4,7 +4,7 @@ import {
   PRODUCT_VARIANT_DB_SELECT,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
 } from "@/lib/database/productVariantDb.constants";
-import { adminService } from "./admin.service";
+import { adminSettingsService } from "./admin/admin-settings.service";
 import { ProductWithRelations } from "./products-find-query.service";
 import { buildCategoryTreesOrWhere } from "./products-find-query/category-utils";
 
@@ -328,7 +328,7 @@ class ProductsFiltersService {
       let stepSize: number | null = null;
       let stepSizePerCurrency: Record<string, number> | null = null;
       try {
-        const settings = await adminService.getPriceFilterSettings();
+        const settings = await adminSettingsService.getPriceFilterSettings();
         stepSize = settings.stepSize ?? null;
         if (settings.stepSizePerCurrency) {
           stepSizePerCurrency = {
@@ -416,7 +416,7 @@ class ProductsFiltersService {
     } | null = null;
 
     try {
-      const settings = await adminService.getPriceFilterSettings();
+      const settings = await adminSettingsService.getPriceFilterSettings();
       stepSize = settings.stepSize ?? null;
 
       if (settings.stepSizePerCurrency) {

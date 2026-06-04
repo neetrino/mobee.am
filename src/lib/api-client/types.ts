@@ -3,7 +3,10 @@
  */
 export interface RequestOptions extends globalThis.RequestInit {
   params?: Record<string, string>;
-  skipAuth?: boolean; // Skip automatic token injection
+  /** @deprecated Cookie session; kept for API compatibility. */
+  skipAuth?: boolean;
+  /** Do not redirect/clear session on 401 (e.g. initial session probe). */
+  silentAuth?: boolean;
 }
 
 /**
