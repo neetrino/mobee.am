@@ -36,7 +36,6 @@ interface CheckoutFormProps {
   }>;
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  error: string | null;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
@@ -51,7 +50,6 @@ export function CheckoutForm({
   paymentMethods,
   logoErrors,
   setLogoErrors,
-  error,
   setError,
 }: CheckoutFormProps) {
   const { t } = useTranslation();

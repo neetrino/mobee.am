@@ -97,7 +97,6 @@ export default function CheckoutPage() {
             paymentMethods={paymentMethods}
             logoErrors={logoErrors}
             setLogoErrors={setLogoErrors}
-            error={error}
             setError={setError}
           />
 
