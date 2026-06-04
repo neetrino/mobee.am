@@ -27,13 +27,20 @@ export function useCheckout() {
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
   const paymentMethods = usePaymentMethods();
-  const checkoutSchema = useCheckoutSchema();
+  const { cart, loading, fetchCart } = useCart(isLoggedIn);
+  const subtotalAfterDiscountAmd = useMemo(
+    () => (cart ? getCartSubtotalAfterDiscountAmd(cart.totals) : 0),
+    [cart]
+  );
+  const deliveryAvailable = isDeliveryAvailableForSubtotalAmd(subtotalAfterDiscountAmd);
+  const checkoutSchema = useCheckoutSchema(deliveryAvailable);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
+    clearErrors,
     watch,
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -62,12 +69,6 @@ export function useCheckout() {
   const shippingCity = watch('shippingCity');
   const deliverySpeed = watch('deliverySpeed');
 
-  const { cart, loading, fetchCart } = useCart(isLoggedIn);
-  const subtotalAfterDiscountAmd = useMemo(
-    () => (cart ? getCartSubtotalAfterDiscountAmd(cart.totals) : 0),
-    [cart]
-  );
-  const deliveryAvailable = isDeliveryAvailableForSubtotalAmd(subtotalAfterDiscountAmd);
   const { deliveryPrice, loadingDeliveryPrice, requiresRegionalQuote } = useDeliveryPrice(
     cart,
     shippingMethod,
@@ -100,11 +101,16 @@ export function useCheckout() {
   }, [shippingMethod, setValue]);
 
   useEffect(() => {
-    if (!deliveryAvailable && shippingMethod === 'delivery') {
-      setValue('shippingMethod', 'pickup', { shouldValidate: true, shouldDirty: true });
+    if (!deliveryAvailable) {
+      if (shippingMethod === 'delivery') {
+        setValue('shippingMethod', 'pickup', { shouldValidate: true, shouldDirty: true });
+      }
       setValue('deliverySpeed', 'standard');
+      setValue('shippingAddress', '');
+      setValue('shippingCity', '');
+      clearErrors(['shippingAddress', 'shippingCity']);
     }
-  }, [deliveryAvailable, shippingMethod, setValue]);
+  }, [deliveryAvailable, shippingMethod, setValue, clearErrors]);
 
   useEffect(() => {
     if (isLoading) {
@@ -147,15 +153,7 @@ export function useCheckout() {
 
     handleSubmit(
       (data) => {
-        if (shippingMethod === 'delivery' && !deliveryAvailable) {
-          setError(t('checkout.errors.deliveryMinimumNotMet'));
-          document
-            .querySelector('[data-shipping-section]')
-            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
-
-        if (shippingMethod === 'delivery' && requiresRegionalQuote) {
+        if (data.shippingMethod === 'delivery' && requiresRegionalQuote) {
           setError(t('checkout.errors.regionalQuoteRequired'));
           document
             .querySelector('[data-shipping-section]')

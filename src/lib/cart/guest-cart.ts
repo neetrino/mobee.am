@@ -177,7 +177,7 @@ function buildGuestCart(items: GuestCartHydratedItem[]): GuestCartHydrated {
       shipping: 0,
       tax: 0,
       total: subtotal,
-      currency: "AMD",
+      currency: "USD",
     },
     itemsCount,
   };

@@ -26,6 +26,7 @@ interface CheckoutFormProps {
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
+  shippingCity?: string;
   deliveryAvailable: boolean;
   deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
@@ -46,6 +47,7 @@ export function CheckoutForm({
   errors,
   isSubmitting,
   shippingMethod,
+  shippingCity = '',
   deliveryAvailable,
   deliverySpeed,
   paymentMethod,
@@ -93,7 +95,7 @@ export function CheckoutForm({
         </div>
       </Card>
 
-      <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
+      <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS} data-shipping-method-section>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingMethod')}</h2>
         {errors.shippingMethod && (
           <div
@@ -261,18 +263,20 @@ export function CheckoutForm({
           ) : null}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Input
-                label={t('checkout.form.address')}
-                type="text"
-                placeholder={t('checkout.placeholders.address')}
-                {...register('shippingAddress')}
-                error={errors.shippingAddress?.message}
-                disabled={isSubmitting}
-              />
+          <Input
+            label={t('checkout.form.address')}
+            type="text"
+            placeholder={t('checkout.placeholders.address')}
+            checkoutChrome
+            {...register('shippingAddress')}
+            error={errors.shippingAddress?.message}
+            disabled={isSubmitting}
+          />
             </div>
             <div>
               <ShippingCitySelect
                 register={register}
+                value={shippingCity}
                 error={errors.shippingCity?.message}
                 disabled={isSubmitting}
                 onAfterChange={() => setError(null)}

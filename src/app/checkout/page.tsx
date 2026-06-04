@@ -93,6 +93,7 @@ export default function CheckoutPage() {
             errors={errors}
             isSubmitting={isSubmitting}
             shippingMethod={shippingMethod}
+            shippingCity={shippingCity}
             deliveryAvailable={deliveryAvailable}
             deliverySpeed={deliverySpeed}
             paymentMethod={paymentMethod}

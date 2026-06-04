@@ -119,6 +119,7 @@ export function ShippingAddressModal({
                     label={t('checkout.form.address')}
                     type="text"
                     placeholder={t('checkout.placeholders.address')}
+                    checkoutChrome
                     {...register('shippingAddress')}
                     error={errors.shippingAddress?.message}
                     disabled={isSubmitting}
@@ -127,6 +128,7 @@ export function ShippingAddressModal({
                 <div>
                   <ShippingCitySelect
                     register={register}
+                    value={shippingCity ?? ''}
                     error={errors.shippingCity?.message}
                     disabled={isSubmitting}
                   />

@@ -33,11 +33,10 @@ export function useOrderSubmission({
         throw new Error(t('checkout.errors.cartEmpty'));
       }
 
-      if (data.shippingMethod === 'delivery' && !deliveryAvailable) {
-        throw new Error(t('checkout.errors.deliveryMinimumNotMet'));
-      }
+      const shippingMethod =
+        data.shippingMethod === 'delivery' && !deliveryAvailable ? 'pickup' : data.shippingMethod;
 
-      if (data.shippingMethod === 'delivery' && requiresRegionalQuote) {
+      if (shippingMethod === 'delivery' && requiresRegionalQuote) {
         throw new Error(t('checkout.errors.regionalQuoteRequired'));
       }
 
@@ -54,7 +53,7 @@ export function useOrderSubmission({
       }
 
       const shippingAddress =
-        data.shippingMethod === 'delivery' && data.shippingAddress && data.shippingCity
+        shippingMethod === 'delivery' && data.shippingAddress && data.shippingCity
           ? {
               address: data.shippingAddress,
               city: data.shippingCity,
@@ -62,7 +61,7 @@ export function useOrderSubmission({
           : undefined;
 
       const shippingAmount =
-        data.shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
+        shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
 
       const response = await apiClient.post<{
         order: {
@@ -86,10 +85,8 @@ export function useOrderSubmission({
         lastName: data.lastName,
         email: data.email,
         phone: data.phone,
-        shippingMethod: data.shippingMethod,
-        ...(data.shippingMethod === 'delivery'
-          ? { deliverySpeed: data.deliverySpeed }
-          : {}),
+        shippingMethod,
+        ...(shippingMethod === 'delivery' ? { deliverySpeed: data.deliverySpeed } : {}),
         ...(shippingAddress ? { shippingAddress } : {}),
         shippingAmount: shippingAmount,
         paymentMethod: data.paymentMethod,
