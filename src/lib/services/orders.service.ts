@@ -14,6 +14,8 @@ import {
   resolveCheckoutShippingAmount,
   type DeliverySpeed,
 } from "./orders/checkout-shipping";
+import { isDeliveryAvailableForSubtotalAmd } from "../checkout/delivery-eligibility";
+import { MIN_ORDER_SUBTOTAL_FOR_DELIVERY_AMD } from "../constants/checkout-shipping.constants";
 import { removeOrphanCartItemsForCart } from "./cart-remove-orphan-items";
 
 const ORDER_NUMBER_START = 1000;
@@ -498,6 +500,17 @@ class OrdersService {
       const discountPercent = await this.resolvePromoDiscountPercent(promoCode);
       const discountAmount = calculateDiscountAmount(subtotal, discountPercent);
       const subtotalAfterDiscountAmd = Math.max(0, subtotal - discountAmount);
+      if (
+        shippingMethod === "delivery" &&
+        !isDeliveryAvailableForSubtotalAmd(subtotalAfterDiscountAmd)
+      ) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Delivery not available",
+          detail: `Delivery is only available for orders of ${MIN_ORDER_SUBTOTAL_FOR_DELIVERY_AMD} AMD or more. Please choose store pickup.`,
+        };
+      }
       const speed: DeliverySpeed =
         requestedDeliverySpeed === "express" ? "express" : "standard";
       // Shipping: computed server-side only (never trust client-provided amount)

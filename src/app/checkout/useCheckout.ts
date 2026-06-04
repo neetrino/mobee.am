@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStoredCurrency } from '../../lib/currency';
@@ -14,6 +14,8 @@ import { useOrderSubmission } from './hooks/useOrderSubmission';
 import { useOrderSummary } from './hooks/useOrderSummary';
 import type { CheckoutFormData } from './types';
 import { scrollToFirstFieldError } from './utils/scroll-to-first-field-error';
+import { getCartSubtotalAfterDiscountAmd } from '../../lib/checkout/cart-subtotal-amd';
+import { isDeliveryAvailableForSubtotalAmd } from '../../lib/checkout/delivery-eligibility';
 
 export function useCheckout() {
   const { isLoggedIn, isLoading } = useAuth();
@@ -61,6 +63,11 @@ export function useCheckout() {
   const deliverySpeed = watch('deliverySpeed');
 
   const { cart, loading, fetchCart } = useCart(isLoggedIn);
+  const subtotalAfterDiscountAmd = useMemo(
+    () => (cart ? getCartSubtotalAfterDiscountAmd(cart.totals) : 0),
+    [cart]
+  );
+  const deliveryAvailable = isDeliveryAvailableForSubtotalAmd(subtotalAfterDiscountAmd);
   const { deliveryPrice, loadingDeliveryPrice, requiresRegionalQuote } = useDeliveryPrice(
     cart,
     shippingMethod,
@@ -74,6 +81,7 @@ export function useCheckout() {
     isLoggedIn,
     deliveryPrice,
     requiresRegionalQuote,
+    deliveryAvailable,
     setError,
   });
 
@@ -90,6 +98,13 @@ export function useCheckout() {
       setValue('deliverySpeed', 'standard');
     }
   }, [shippingMethod, setValue]);
+
+  useEffect(() => {
+    if (!deliveryAvailable && shippingMethod === 'delivery') {
+      setValue('shippingMethod', 'pickup', { shouldValidate: true, shouldDirty: true });
+      setValue('deliverySpeed', 'standard');
+    }
+  }, [deliveryAvailable, shippingMethod, setValue]);
 
   useEffect(() => {
     if (isLoading) {
@@ -132,6 +147,14 @@ export function useCheckout() {
 
     handleSubmit(
       (data) => {
+        if (shippingMethod === 'delivery' && !deliveryAvailable) {
+          setError(t('checkout.errors.deliveryMinimumNotMet'));
+          document
+            .querySelector('[data-shipping-section]')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
         if (shippingMethod === 'delivery' && requiresRegionalQuote) {
           setError(t('checkout.errors.regionalQuoteRequired'));
           document
@@ -172,6 +195,7 @@ export function useCheckout() {
     deliveryPrice,
     loadingDeliveryPrice,
     requiresRegionalQuote,
+    deliveryAvailable,
     register,
     handleSubmit,
     errors,

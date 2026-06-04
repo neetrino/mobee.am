@@ -4,6 +4,9 @@
  */
 export const FREE_SHIPPING_THRESHOLD_AMD = 8000;
 
+/** Orders below this subtotal (after discount, AMD) may only use store pickup. */
+export const MIN_ORDER_SUBTOTAL_FOR_DELIVERY_AMD = 50_000;
+
 /** When no admin price is configured and city matches Yerevan. */
 export const YEREVAN_FALLBACK_SHIPPING_BELOW_THRESHOLD_AMD = 1000;
 

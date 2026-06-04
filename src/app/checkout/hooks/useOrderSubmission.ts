@@ -10,6 +10,7 @@ interface UseOrderSubmissionProps {
   isLoggedIn: boolean;
   deliveryPrice: number | null;
   requiresRegionalQuote: boolean;
+  deliveryAvailable: boolean;
   setError: (error: string | null) => void;
 }
 
@@ -18,6 +19,7 @@ export function useOrderSubmission({
   isLoggedIn,
   deliveryPrice,
   requiresRegionalQuote,
+  deliveryAvailable,
   setError,
 }: UseOrderSubmissionProps) {
   const router = useRouter();
@@ -29,6 +31,10 @@ export function useOrderSubmission({
     try {
       if (!cart) {
         throw new Error(t('checkout.errors.cartEmpty'));
+      }
+
+      if (data.shippingMethod === 'delivery' && !deliveryAvailable) {
+        throw new Error(t('checkout.errors.deliveryMinimumNotMet'));
       }
 
       if (data.shippingMethod === 'delivery' && requiresRegionalQuote) {

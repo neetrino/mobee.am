@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { apiClient } from '../../../lib/api-client';
-import { convertPrice } from '../../../lib/currency';
+import { getCartSubtotalAfterDiscountAmd } from '../../../lib/checkout/cart-subtotal-amd';
 import type { Cart } from '../types';
 
 export function useDeliveryPrice(
@@ -13,14 +13,10 @@ export function useDeliveryPrice(
   const [loadingDeliveryPrice, setLoadingDeliveryPrice] = useState(false);
   const [requiresRegionalQuote, setRequiresRegionalQuote] = useState(false);
 
-  const subtotalAfterDiscountAmd = useMemo(() => {
-    if (!cart) {
-      return 0;
-    }
-    const sub = convertPrice(cart.totals.subtotal, 'USD', 'AMD');
-    const disc = convertPrice(cart.totals.discount, 'USD', 'AMD');
-    return Math.max(0, sub - disc);
-  }, [cart]);
+  const subtotalAfterDiscountAmd = useMemo(
+    () => (cart ? getCartSubtotalAfterDiscountAmd(cart.totals) : 0),
+    [cart]
+  );
 
   useEffect(() => {
     const fetchDeliveryPrice = async () => {
