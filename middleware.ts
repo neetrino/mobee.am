@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import * as jose from "jose";
+import { getAccessTokenFromRequest } from "@/lib/security/auth-cookie";
+import { getCorsHeaders } from "@/lib/security/cors";
+import { JWT_ALGORITHM } from "@/lib/security/jwt.constants";
+import { resolveAdminGateFromJwtPayload } from "@/lib/security/jwt-payload";
+import {
+  checkRateLimitByIp,
+  RATE_LIMIT_AUTH,
+  RATE_LIMIT_CONTACT,
+  RATE_LIMIT_GUEST_ORDER,
+  RATE_LIMIT_PASSWORD,
+} from "@/lib/security/rate-limit";
 
-/** Protect /api/v1/admin/* — require valid JWT (signature + expiry). DB check (blocked/deleted) remains in route. */
+/** Protect /api/v1/admin/* — valid JWT + admin role when roles claim is present. */
 async function requireAdminAuth(request: NextRequest): Promise<NextResponse | null> {
-  const authHeader = request.headers.get("authorization");
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const token = getAccessTokenFromRequest(request);
 
   if (!token) {
     return NextResponse.json(
@@ -14,7 +22,7 @@ async function requireAdminAuth(request: NextRequest): Promise<NextResponse | nu
         type: "https://api.shop.am/problems/unauthorized",
         title: "Unauthorized",
         status: 401,
-        detail: "Missing or invalid Authorization header",
+        detail: "Missing or invalid session",
       },
       { status: 401 }
     );
@@ -35,7 +43,23 @@ async function requireAdminAuth(request: NextRequest): Promise<NextResponse | nu
 
   try {
     const key = new TextEncoder().encode(secret);
-    await jose.jwtVerify(token, key);
+    const { payload } = await jose.jwtVerify(token, key, {
+      algorithms: [JWT_ALGORITHM],
+    });
+
+    const gate = resolveAdminGateFromJwtPayload(payload);
+    if (gate === "deny") {
+      return NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/forbidden",
+          title: "Forbidden",
+          status: 403,
+          detail: "Admin access required",
+        },
+        { status: 403 }
+      );
+    }
+
     return null;
   } catch {
     return NextResponse.json(
@@ -50,85 +74,81 @@ async function requireAdminAuth(request: NextRequest): Promise<NextResponse | nu
   }
 }
 
-/** Rate limit for auth endpoints (login/register) by IP */
-async function checkAuthRateLimit(request: NextRequest): Promise<NextResponse | null> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) {
-    return null;
+function isGuestOrderLookup(request: NextRequest): boolean {
+  if (request.method !== "GET") {
+    return false;
   }
 
-  const redis = new Redis({ url, token });
-  const ratelimit = new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(10, "60 s"),
-    prefix: "ratelimit:auth",
-  });
-
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown";
-  const { success } = await ratelimit.limit(ip);
-  if (!success) {
-    return NextResponse.json(
-      {
-        type: "https://api.shop.am/problems/too-many-requests",
-        title: "Too Many Requests",
-        status: 429,
-        detail: "Too many login/register attempts. Try again later.",
-      },
-      { status: 429 }
-    );
+  const match = request.nextUrl.pathname.match(/^\/api\/v1\/orders\/([^/]+)$/);
+  if (!match || match[1] === "checkout") {
+    return false;
   }
-  return null;
+
+  return Boolean(request.nextUrl.searchParams.get("email")?.trim());
 }
 
-/** CORS: allowed origin from env. For /api/* requests add CORS headers and handle preflight. */
-function getCorsHeaders(): Record<string, string> {
-  const origin =
-    process.env.CORS_ORIGIN ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.NODE_ENV === "development" ? "http://localhost:3000" : "");
-  return {
-    "Access-Control-Allow-Origin": origin || "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Max-Age": "86400",
-  };
+function isPasswordResetPath(pathname: string, method: string): boolean {
+  if (pathname === "/api/v1/auth/forgot-password" && method === "POST") {
+    return true;
+  }
+  if (pathname === "/api/v1/auth/reset-password" && method === "POST") {
+    return true;
+  }
+  if (pathname === "/api/v1/auth/validate-reset-token" && method === "GET") {
+    return true;
+  }
+  return false;
+}
+
+function applyCors(
+  response: NextResponse,
+  request: NextRequest
+): NextResponse {
+  const corsHeaders = getCorsHeaders(request);
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
+  return response;
 }
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  if (pathname.startsWith("/api/")) {
-    const corsHeaders = getCorsHeaders();
-    if (request.method === "OPTIONS") {
-      return new NextResponse(null, { status: 204, headers: corsHeaders });
-    }
-    const response = NextResponse.next();
-    Object.entries(corsHeaders).forEach(([key, value]) => response.headers.set(key, value));
-    // Run auth/rate-limit for protected paths, then return response with CORS
-    if (pathname.startsWith("/api/v1/admin/")) {
-      const authRes = await requireAdminAuth(request);
-      if (authRes) {
-        Object.entries(corsHeaders).forEach(([k, v]) => authRes.headers.set(k, v));
-        return authRes;
-      }
-    } else if (
-      (pathname === "/api/v1/auth/login" || pathname === "/api/v1/auth/register") &&
-      request.method === "POST"
-    ) {
-      const rateLimitResponse = await checkAuthRateLimit(request);
-      if (rateLimitResponse) {
-        Object.entries(corsHeaders).forEach(([k, v]) => rateLimitResponse.headers.set(k, v));
-        return rateLimitResponse;
-      }
-    }
-    return response;
+  if (!pathname.startsWith("/api/")) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  const corsHeaders = getCorsHeaders(request);
+  if (request.method === "OPTIONS") {
+    return new NextResponse(null, { status: 204, headers: corsHeaders });
+  }
+
+  let rateLimitResponse: NextResponse | null = null;
+
+  if (pathname.startsWith("/api/v1/admin/")) {
+    const authRes = await requireAdminAuth(request);
+    if (authRes) {
+      return applyCors(authRes, request);
+    }
+  } else if (
+    (pathname === "/api/v1/auth/login" || pathname === "/api/v1/auth/register") &&
+    request.method === "POST"
+  ) {
+    rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_AUTH);
+  } else if (isPasswordResetPath(pathname, request.method)) {
+    rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_PASSWORD);
+  } else if (pathname === "/api/v1/contact" && request.method === "POST") {
+    rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_CONTACT);
+  } else if (isGuestOrderLookup(request)) {
+    rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_GUEST_ORDER);
+  }
+
+  if (rateLimitResponse) {
+    return applyCors(rateLimitResponse, request);
+  }
+
+  const response = NextResponse.next();
+  return applyCors(response, request);
 }
 
 export const config = {

@@ -26,14 +26,14 @@ export async function GET() {
       },
       { status: 200 }
     );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        status: "error",
-        db: "unavailable",
-        detail: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 503 }
-    );
+  } catch {
+    const body: { status: string; db: string; detail?: string } = {
+      status: "error",
+      db: "unavailable",
+    };
+    if (process.env.NODE_ENV !== "production") {
+      body.detail = "Database health check failed";
+    }
+    return NextResponse.json(body, { status: 503 });
   }
 }

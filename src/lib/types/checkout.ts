@@ -16,6 +16,8 @@ export interface CheckoutData {
     productId: string;
     quantity: number;
   }>;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
   shippingMethod?: string;

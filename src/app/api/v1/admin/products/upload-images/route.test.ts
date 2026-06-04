@@ -21,7 +21,17 @@ describe("/api/v1/admin/products/upload-images", () => {
     vi.mocked(requireAdmin).mockReturnValue(true);
   });
 
-  it("returns storage health payload on GET", async () => {
+  it("returns 403 on GET when not admin", async () => {
+    vi.mocked(requireAdmin).mockReturnValue(false);
+    const req = new NextRequest("http://localhost:3000/api/v1/admin/products/upload-images", {
+      method: "GET",
+    });
+
+    const res = await GET(req);
+    expect(res.status).toBe(403);
+  });
+
+  it("returns storage health payload on GET for admin", async () => {
     vi.mocked(isR2Configured).mockReturnValue(false);
     const req = new NextRequest("http://localhost:3000/api/v1/admin/products/upload-images", {
       method: "GET",

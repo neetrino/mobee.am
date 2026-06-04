@@ -4,9 +4,16 @@ import { buildUrl } from "./url-builder";
 
 /** App-only fields must not be passed to native `fetch` (invalid RequestInit). */
 function fetchInitWithoutCustomOptions(options?: RequestOptions): RequestInit {
-  if (!options) return {};
-  const { skipAuth: _skipAuth, params: _params, ...init } = options;
-  return init;
+  if (!options) {
+    return { credentials: "include" };
+  }
+  const {
+    skipAuth: _skipAuth,
+    params: _params,
+    silentAuth: _silentAuth,
+    ...init
+  } = options;
+  return { credentials: "include", ...init };
 }
 import { getHeaders } from "./headers";
 import { handleUnauthorized } from "./auth-utils";
@@ -60,7 +67,8 @@ function handleNetworkError(error: unknown, baseUrl: string, url: string): never
 async function handleErrorResponse(
   response: Response,
   url: string,
-  _baseUrl: string
+  _baseUrl: string,
+  options?: RequestOptions
 ): Promise<never> {
   const isUnauthorized = response.status === 401;
   const isNotFound = response.status === 404;
@@ -79,8 +87,7 @@ async function handleErrorResponse(
     });
   }
   
-  // Handle 401 Unauthorized - clear token and redirect
-  if (isUnauthorized) {
+  if (isUnauthorized && !options?.silentAuth) {
     handleUnauthorized();
   }
   
@@ -155,7 +162,7 @@ export async function getRequest<T>(
       return getRequest<T>(baseUrl, endpoint, options, retryCount + 1);
     }
 
-    await handleErrorResponse(response, url, baseUrl);
+    await handleErrorResponse(response, url, baseUrl, options);
   }
 
   try {
@@ -222,12 +229,11 @@ export async function postRequest<T>(
     if (!response.ok) {
       const isUnauthorized = response.status === 401;
       
-      // Handle 401 Unauthorized - clear token and redirect
-      if (isUnauthorized) {
+      if (isUnauthorized && !options?.silentAuth) {
         handleUnauthorized();
       }
-      
-      await handleErrorResponse(response, url, baseUrl);
+
+      await handleErrorResponse(response, url, baseUrl, options);
     }
 
     try {
@@ -288,7 +294,7 @@ export async function putRequest<T>(
   console.log('📥 [API CLIENT] PUT response status:', response.status, response.statusText);
 
   if (!response.ok) {
-    await handleErrorResponse(response, url, baseUrl);
+    await handleErrorResponse(response, url, baseUrl, options);
   }
 
   try {
@@ -324,7 +330,7 @@ export async function patchRequest<T>(
   });
 
   if (!response.ok) {
-    await handleErrorResponse(response, url, baseUrl);
+    await handleErrorResponse(response, url, baseUrl, options);
   }
 
   try {
@@ -348,11 +354,12 @@ export async function deleteRequest<T>(
   const response = await fetch(url, {
     method: 'DELETE',
     headers: getHeaders(options),
+    body: options?.body,
     ...fetchInitWithoutCustomOptions(options),
   });
 
   if (!response.ok) {
-    await handleErrorResponse(response, url, baseUrl);
+    await handleErrorResponse(response, url, baseUrl, options);
   }
 
   // DELETE requests might not return a body

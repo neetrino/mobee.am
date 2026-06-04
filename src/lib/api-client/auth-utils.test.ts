@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getAuthToken, isValidStoredAuthToken } from "./auth-utils";
+import {
+  clearLegacyAuthStorage,
+  getAuthToken,
+  isValidStoredAuthToken,
+} from "./auth-utils";
 
 const VALID_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiIxIn0.signature";
 
@@ -34,22 +38,22 @@ describe("auth-utils", () => {
     vi.unstubAllGlobals();
   });
 
-  it("trims and returns a valid stored JWT", () => {
+  it("getAuthToken always returns null (cookie session)", () => {
     stubBrowserStorage({
-      auth_token: ` ${VALID_TOKEN} `,
-      auth_user: JSON.stringify({ id: "user-1" }),
-    });
-
-    expect(getAuthToken()).toBe(VALID_TOKEN);
-  });
-
-  it("clears invalid auth data before headers are built", () => {
-    const storage = stubBrowserStorage({
-      auth_token: "Bearer invalid\nvalue",
+      auth_token: VALID_TOKEN,
       auth_user: JSON.stringify({ id: "user-1" }),
     });
 
     expect(getAuthToken()).toBeNull();
+  });
+
+  it("clearLegacyAuthStorage removes legacy keys", () => {
+    const storage = stubBrowserStorage({
+      auth_token: VALID_TOKEN,
+      auth_user: JSON.stringify({ id: "user-1" }),
+    });
+
+    clearLegacyAuthStorage();
     expect(storage.getItem("auth_token")).toBeNull();
     expect(storage.getItem("auth_user")).toBeNull();
   });

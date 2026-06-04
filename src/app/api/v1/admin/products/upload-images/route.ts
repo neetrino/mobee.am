@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import {
+  authenticateToken,
+  requireAdmin,
+  type AuthUser,
+} from "@/lib/middleware/auth";
+import {
+  MAX_ADMIN_IMAGE_BYTES,
+  MAX_ADMIN_IMAGES_PER_REQUEST,
+} from "@/lib/security/image-upload.constants";
 import { uploadToR2, isR2Configured } from "@/lib/r2";
 import { logger } from "@/lib/utils/logger";
 
@@ -26,6 +34,28 @@ function parseDataUrl(dataUrl: string): { mime: string; buffer: Buffer } | null 
   return { mime, buffer };
 }
 
+function forbiddenAdminResponse(req: NextRequest, user: AuthUser | null) {
+  logger.warn("Admin upload images: unauthorized", { userId: user?.id });
+  return NextResponse.json(
+    {
+      type: "https://api.shop.am/problems/forbidden",
+      title: "Forbidden",
+      status: 403,
+      detail: "Admin access required",
+      instance: req.url,
+    },
+    { status: 403 }
+  );
+}
+
+async function requireAdminUser(req: NextRequest): Promise<AuthUser | NextResponse> {
+  const user = await authenticateToken(req);
+  if (!user || !requireAdmin(user)) {
+    return forbiddenAdminResponse(req, user);
+  }
+  return user;
+}
+
 function getR2HealthStatus(): R2HealthStatus {
   const requiredVars = [
     "R2_ACCOUNT_ID",
@@ -41,7 +71,12 @@ function getR2HealthStatus(): R2HealthStatus {
   };
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
+  const auth = await requireAdminUser(req);
+  if (auth instanceof NextResponse) {
+    return auth;
+  }
+
   const health = getR2HealthStatus();
   return NextResponse.json(
     {
@@ -66,19 +101,9 @@ export async function POST(req: NextRequest) {
   logger.debug("Admin upload images: POST received", { url: req.url });
 
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      logger.warn("Admin upload images: unauthorized", { userId: user?.id });
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const auth = await requireAdminUser(req);
+    if (auth instanceof NextResponse) {
+      return auth;
     }
 
     let body: { images?: unknown };
@@ -110,6 +135,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (body.images.length > MAX_ADMIN_IMAGES_PER_REQUEST) {
+      return NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Validation Error",
+          status: 400,
+          detail: `At most ${MAX_ADMIN_IMAGES_PER_REQUEST} images per request`,
+          instance: req.url,
+        },
+        { status: 400 }
+      );
+    }
+
     const validImages: string[] = [];
     for (let i = 0; i < body.images.length; i++) {
       const image = body.images[i];
@@ -125,6 +163,34 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
+
+      const parsed = parseDataUrl(image);
+      if (!parsed) {
+        return NextResponse.json(
+          {
+            type: "https://api.shop.am/problems/validation-error",
+            title: "Validation Error",
+            status: 400,
+            detail: `Invalid data URL at index ${i}`,
+            instance: req.url,
+          },
+          { status: 400 }
+        );
+      }
+
+      if (parsed.buffer.length > MAX_ADMIN_IMAGE_BYTES) {
+        return NextResponse.json(
+          {
+            type: "https://api.shop.am/problems/validation-error",
+            title: "Validation Error",
+            status: 400,
+            detail: `Image at index ${i} exceeds ${MAX_ADMIN_IMAGE_BYTES} bytes`,
+            instance: req.url,
+          },
+          { status: 400 }
+        );
+      }
+
       validImages.push(image);
     }
 

@@ -17,13 +17,7 @@ export function useMobileBottomNavCartCount(): number {
       setCartCount(getGuestCartItemsCount());
       return;
     }
-    if (typeof window === 'undefined') return;
     try {
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
-        setCartCount(0);
-        return;
-      }
       const response = await apiClient.get<{ cart: { itemsCount: number } }>('/api/v1/cart');
       setCartCount(response.cart?.itemsCount ?? 0);
     } catch {
