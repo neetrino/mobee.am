@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { CSSProperties, FormEvent, RefObject } from 'react';
+import type { CSSProperties, FormEvent } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
@@ -84,73 +84,10 @@ interface Category {
   children: Category[];
 }
 
-/** Root categories pill dropdown: scroll container marker for submenu position sync. */
-const CATEGORIES_ROOT_SCROLL_DATA_ATTR = 'data-categories-root-scroll';
-
-const CATEGORY_SUBMENU_VIEWPORT_TOP_OFFSET_PX = -12;
-const CATEGORY_SUBMENU_VIEWPORT_RIGHT_GUTTER_PX = 20;
-const CATEGORY_SUBMENU_MAX_WIDTH_PX = 600;
-
-function useCategoryMegaPanelPosition(
-  open: boolean,
-  menuItemRef: RefObject<HTMLDivElement | null>,
-  panelRef: RefObject<HTMLDivElement | null>,
-): CSSProperties {
-  const [style, setStyle] = useState<CSSProperties>({});
-
-  useLayoutEffect(() => {
-    const menuItemEl = menuItemRef.current;
-    const panelEl = panelRef.current;
-    if (!open || !menuItemEl || !panelEl) {
-      return;
-    }
-
-    const updatePosition = () => {
-      const menuItem = menuItemRef.current;
-      if (!menuItem) {
-        return;
-      }
-      const itemRect = menuItem.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const maxWidth = Math.min(
-        CATEGORY_SUBMENU_MAX_WIDTH_PX,
-        viewportWidth - itemRect.right - CATEGORY_SUBMENU_VIEWPORT_RIGHT_GUTTER_PX,
-      );
-      setStyle({
-        position: 'fixed',
-        left: `${itemRect.right}px`,
-        top: `${itemRect.top + CATEGORY_SUBMENU_VIEWPORT_TOP_OFFSET_PX}px`,
-        maxWidth: `${Math.max(0, maxWidth)}px`,
-        zIndex: 60,
-      });
-    };
-
-    updatePosition();
-
-    const scrollRoot = menuItemEl.closest(`[${CATEGORIES_ROOT_SCROLL_DATA_ATTR}]`) ?? undefined;
-
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition, true);
-    scrollRoot?.addEventListener('scroll', updatePosition);
-
-    return () => {
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition, true);
-      scrollRoot?.removeEventListener('scroll', updatePosition);
-    };
-  }, [open, menuItemRef, panelRef]);
-
-  return style;
-}
+const CATEGORY_MEGA_MENU_MAX_COLUMNS = 4;
+const CATEGORY_MEGA_MENU_MIN_COLUMN_WIDTH_PX = 150;
 
 // Icon Components
-// Arrow icon for categories with subcategories (▶)
-const ArrowRightIcon = () => (
-  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-auto">
-    <path d="M3 2L5 4L3 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
 const SearchIcon = () => (
   <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
@@ -266,151 +203,7 @@ function HeaderSearchSync({
   return null;
 }
 
-/**
- * Category Menu Item Component with nested submenu support
- * Displays subcategories in a multi-column layout; mega-panel uses fixed positioning
- * so it stays visible when the root categories list scrolls.
- */
-function CategoryMenuItem({ 
-  category, 
-  onClose 
-}: { 
-  category: Category; 
-  onClose: () => void;
-}) {
-  const [showSubmenu, setShowSubmenu] = useState(false);
-  const submenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const submenuRef = useRef<HTMLDivElement>(null);
-  const menuItemRef = useRef<HTMLDivElement>(null);
-  const submenuStyle = useCategoryMegaPanelPosition(showSubmenu, menuItemRef, submenuRef);
-  const hasChildren = category.children && category.children.length > 0;
-
-  const handleMouseEnter = () => {
-    if (hasChildren) {
-      if (submenuTimeoutRef.current) {
-        clearTimeout(submenuTimeoutRef.current);
-        submenuTimeoutRef.current = null;
-      }
-      setShowSubmenu(true);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (hasChildren) {
-      submenuTimeoutRef.current = setTimeout(() => {
-        setShowSubmenu(false);
-      }, 150);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (submenuTimeoutRef.current) {
-        clearTimeout(submenuTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Organize subcategories into columns (4 columns max)
-  // Distributes items evenly across columns
-  const organizeIntoColumns = (items: Category[], columnsCount: number = 4) => {
-    if (items.length === 0) return [];
-    
-    // Calculate optimal number of columns based on items count
-    const optimalColumns = Math.min(columnsCount, Math.ceil(items.length / 8));
-    const itemsPerColumn = Math.ceil(items.length / optimalColumns);
-    const columns: Category[][] = [];
-    
-    for (let i = 0; i < optimalColumns; i++) {
-      const start = i * itemsPerColumn;
-      const end = start + itemsPerColumn;
-      const column = items.slice(start, end);
-      if (column.length > 0) {
-        columns.push(column);
-      }
-    }
-    
-    return columns;
-  };
-
-  const subcategoryColumns = hasChildren 
-    ? organizeIntoColumns(category.children, 4)
-    : [];
-
-  return (
-    <div 
-      ref={menuItemRef}
-      className="relative group"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <Link
-        href={`/shop?category=${category.slug}`}
-        className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-all duration-150"
-        onClick={onClose}
-      >
-        <span>{category.title}</span>
-        {hasChildren && (
-          <ArrowRightIcon />
-        )}
-      </Link>
-      {hasChildren && showSubmenu && (
-        <div 
-          ref={submenuRef}
-          className="z-[60]"
-          style={submenuStyle}
-          onMouseEnter={() => {
-            if (submenuTimeoutRef.current) {
-              clearTimeout(submenuTimeoutRef.current);
-              submenuTimeoutRef.current = null;
-            }
-            setShowSubmenu(true);
-          }}
-          onMouseLeave={() => {
-            submenuTimeoutRef.current = setTimeout(() => {
-              setShowSubmenu(false);
-            }, 150);
-          }}
-        >
-          <div className="w-max max-w-[min(500px,calc(100vw-2rem))] rounded-xl border border-gray-200/80 bg-white p-6 shadow-2xl">
-            <div 
-              className="grid gap-6"
-              style={{ gridTemplateColumns: `repeat(${subcategoryColumns.length}, minmax(150px, 1fr))` }}
-            >
-              {subcategoryColumns.map((column, columnIndex) => (
-                <div key={columnIndex} className="flex flex-col">
-                  <div className="mb-4 pb-2 border-b border-gray-200">
-                    <Link
-                      href={`/shop?category=${category.slug}`}
-                      className="text-sm font-bold text-gray-900 hover:text-gray-700 uppercase tracking-wide"
-                      onClick={onClose}
-                    >
-                      {category.title}
-                    </Link>
-                  </div>
-                  <div className="space-y-2.5">
-                    {column.map((subCategory) => (
-                      <Link
-                        key={subCategory.id}
-                        href={`/shop?category=${subCategory.slug}`}
-                        className="block text-sm text-gray-700 hover:text-gray-900 transition-colors duration-150 py-1"
-                        onClick={onClose}
-                      >
-                        {subCategory.title}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** Root categories dropdown (desktop secondary bar). */
+/** Root categories mega menu (desktop secondary bar). */
 function CategoriesMenuFlyout({
   loading,
   roots,
@@ -422,24 +215,52 @@ function CategoriesMenuFlyout({
   onItemNavigate: () => void;
   loadingLabel: string;
 }) {
+  const columnCount = Math.min(roots.length, CATEGORY_MEGA_MENU_MAX_COLUMNS);
+
   return (
     <>
       <div className="absolute left-0 top-full z-[55] h-2 w-full" aria-hidden />
-      <div className="absolute left-0 top-full z-[55] w-64 max-w-[min(16rem,calc(100vw-2rem))] pt-2">
-        <div
-          {...{ [CATEGORIES_ROOT_SCROLL_DATA_ATTR]: true }}
-          className="max-h-96 overflow-y-auto overscroll-y-contain rounded-xl border border-gray-200/80 bg-white shadow-2xl [scrollbar-gutter:stable]"
-        >
+      <div className="absolute left-0 top-full z-[55] pt-2">
+        <div className="max-h-[min(24rem,calc(100vh-6rem))] w-max max-w-[min(calc(100vw-2rem),44rem)] overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-2xl">
           {loading ? (
             <div className="px-4 py-2 text-sm text-gray-500">{loadingLabel}</div>
           ) : (
-            roots.map((category) => (
-              <CategoryMenuItem
-                key={category.id}
-                category={category}
-                onClose={onItemNavigate}
-              />
-            ))
+            <div className="overflow-y-auto overscroll-y-contain p-6 [scrollbar-gutter:stable]">
+              <div
+                className="grid gap-6"
+                style={{
+                  gridTemplateColumns: `repeat(${columnCount}, minmax(${CATEGORY_MEGA_MENU_MIN_COLUMN_WIDTH_PX}px, 1fr))`,
+                }}
+              >
+                {roots.map((category) => (
+                  <div key={category.id} className="flex flex-col">
+                    <div className="mb-4 border-b border-gray-200 pb-2">
+                      <Link
+                        href={`/shop?category=${category.slug}`}
+                        className="text-sm font-bold uppercase tracking-wide text-gray-900 hover:text-gray-700"
+                        onClick={onItemNavigate}
+                      >
+                        {category.title}
+                      </Link>
+                    </div>
+                    {category.children.length > 0 ? (
+                      <div className="space-y-2.5">
+                        {category.children.map((subCategory) => (
+                          <Link
+                            key={subCategory.id}
+                            href={`/shop?category=${subCategory.slug}`}
+                            className="block py-1 text-sm text-gray-700 transition-colors duration-150 hover:text-gray-900"
+                            onClick={onItemNavigate}
+                          >
+                            {subCategory.title}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>
