@@ -240,14 +240,13 @@ export function CheckoutForm({
       {shippingMethod === 'delivery' && (
         <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS} data-shipping-section>
           <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingAddress')}</h2>
-          {(error && error.includes('shipping address')) || errors.shippingAddress || errors.shippingCity ? (
+          {errors.shippingAddress || errors.shippingCity ? (
             <div
               className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              role="alert"
             >
-              <p className="text-sm text-red-600">
-                {error && error.includes('shipping address')
-                  ? error
-                  : errors.shippingAddress?.message || errors.shippingCity?.message}
+              <p className="text-sm font-medium text-red-600">
+                {errors.shippingAddress?.message || errors.shippingCity?.message}
               </p>
             </div>
           ) : null}
@@ -257,13 +256,7 @@ export function CheckoutForm({
                 label={t('checkout.form.address')}
                 type="text"
                 placeholder={t('checkout.placeholders.address')}
-                {...register('shippingAddress', {
-                  onChange: () => {
-                    if (error && error.includes('shipping address')) {
-                      setError(null);
-                    }
-                  },
-                })}
+                {...register('shippingAddress')}
                 error={errors.shippingAddress?.message}
                 disabled={isSubmitting}
               />
@@ -273,11 +266,7 @@ export function CheckoutForm({
                 register={register}
                 error={errors.shippingCity?.message}
                 disabled={isSubmitting}
-                onAfterChange={() => {
-                  if (error && error.includes('shipping address')) {
-                    setError(null);
-                  }
-                }}
+                onAfterChange={() => setError(null)}
               />
             </div>
           </div>

@@ -12,6 +12,7 @@ import {
   CONTACT_ICON_LOCATION_SRC,
   CONTACT_ICON_PHONE_SRC,
 } from '../../lib/constants/contact-icons.constants';
+import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
 
 /** 16px+ on small viewports prevents iOS Safari auto-zoom on input focus. */
 const CONTACT_FORM_FIELD_CLASS =
@@ -192,6 +193,7 @@ export default function ContactPage() {
           <div>
             <form
               onSubmit={handleSubmit}
+              lang={FORM_INPUT_LATIN_LANG}
               className="w-full max-w-[480px] rounded-[18px] border border-gray-200 bg-white p-6 shadow-sm sm:p-8 lg:ml-auto"
             >
               <div className="space-y-4">
@@ -248,6 +250,10 @@ export default function ContactPage() {
                     id="message"
                     name="message"
                     rows={6}
+                    lang={FORM_INPUT_LATIN_LANG}
+                    spellCheck={false}
+                    autoCorrect="off"
+                    autoCapitalize="off"
                     value={formData.message}
                     onChange={handleChange}
                     className="min-h-[140px] w-full resize-y rounded-[14px] border border-[#e5e7eb] bg-[#f2f2f4] px-5 py-4 text-base text-gray-900 placeholder:text-[#767987] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#2DB2FF] md:text-sm"

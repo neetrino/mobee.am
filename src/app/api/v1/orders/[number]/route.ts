@@ -8,47 +8,62 @@ export async function GET(
 ) {
   let user: { id: string } | null = null;
   try {
+    const { number } = await params;
     user = await authenticateToken(req);
-    if (!user) {
+
+    if (user) {
+      const result = await ordersService.findByNumber(number, user.id);
+      return NextResponse.json(result);
+    }
+
+    const email = req.nextUrl.searchParams.get("email")?.trim();
+    if (!email) {
       return NextResponse.json(
         {
-          type: "https://api.shop.am/problems/unauthorized",
-          title: "Unauthorized",
-          status: 401,
-          detail: "Authentication token required",
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Validation Error",
+          status: 400,
+          detail: "Email is required to view a guest order",
           instance: req.url,
         },
-        { status: 401 }
+        { status: 400 }
       );
     }
 
-    const { number } = await params;
-    const result = await ordersService.findByNumber(number, user.id);
+    const result = await ordersService.findByNumberForGuest(number, email);
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     const { number } = await params;
+    const err = error as {
+      message?: string;
+      stack?: string;
+      name?: string;
+      type?: string;
+      title?: string;
+      status?: number;
+      detail?: string;
+    };
     console.error("❌ [ORDERS] Get order by number error:", {
       orderNumber: number,
       userId: user?.id,
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
-      type: error?.type,
-      title: error?.title,
-      status: error?.status,
-      detail: error?.detail,
+      message: err.message,
+      stack: err.stack,
+      name: err.name,
+      type: err.type,
+      title: err.title,
+      status: err.status,
+      detail: err.detail,
       fullError: error,
     });
     return NextResponse.json(
       {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
+        type: err.type || "https://api.shop.am/problems/internal-error",
+        title: err.title || "Internal Server Error",
+        status: err.status || 500,
+        detail: err.detail || err.message || "An error occurred",
         instance: req.url,
       },
-      { status: error.status || 500 }
+      { status: err.status || 500 }
     );
   }
 }
-

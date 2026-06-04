@@ -8,6 +8,8 @@ import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 import { CheckoutFormData, Cart } from '../types';
+import { scrollToFirstFieldError } from '../utils/scroll-to-first-field-error';
+import { FORM_INPUT_LATIN_LANG } from '../../../lib/form-input-os.constants';
 
 interface CardDetailsModalProps {
   isOpen: boolean;
@@ -35,8 +37,6 @@ interface CardDetailsModalProps {
   requiresRegionalQuote: boolean;
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  isLoggedIn: boolean;
-  onRequireLogin: () => void;
   onSubmit: (data: CheckoutFormData) => void;
 }
 
@@ -60,8 +60,6 @@ export function CardDetailsModal({
   requiresRegionalQuote,
   logoErrors,
   setLogoErrors,
-  isLoggedIn,
-  onRequireLogin,
   onSubmit,
 }: CardDetailsModalProps) {
   const { t } = useTranslation();
@@ -71,13 +69,7 @@ export function CardDetailsModal({
   }
 
   const handleValidationError = (validationErrors: FieldErrors<CheckoutFormData>) => {
-    const firstErrorField = Object.keys(validationErrors)[0];
-    if (firstErrorField) {
-      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-      if (errorElement) {
-        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
+    scrollToFirstFieldError(validationErrors);
   };
 
   const handleLogoError = () => {
@@ -89,7 +81,8 @@ export function CardDetailsModal({
       className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <div 
+      <div
+        lang={FORM_INPUT_LATIN_LANG}
         className={`max-h-[90vh] w-full max-w-lg overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
         onClick={(e) => e.stopPropagation()}
         style={{ zIndex: 10000 }}
@@ -185,11 +178,7 @@ export function CardDetailsModal({
             onClick={handleSubmit(
               (data) => {
                 onClose();
-                if (!isLoggedIn) {
-                  onRequireLogin();
-                } else {
-                  onSubmit(data);
-                }
+                onSubmit(data);
               },
               handleValidationError
             )}

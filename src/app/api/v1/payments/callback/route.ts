@@ -5,12 +5,20 @@ import {
   verifyPaymentCallbackSignature,
 } from "@/lib/services/orders/checkout-payment";
 import { logger } from "@/lib/utils/logger";
+import {
+  ORDER_PLACED_QUERY_PARAM,
+  ORDER_PLACED_QUERY_VALUE,
+} from "@/app/orders/order-placed.constants";
 
 const ALLOWED_PROVIDERS = new Set(["idram", "arca"]);
 const ALLOWED_STATUSES = new Set(["paid", "failed"]);
 
-function toOrderRedirect(req: NextRequest, orderNumber: string): URL {
-  return new URL(`/orders/${orderNumber}`, req.nextUrl.origin);
+function toOrderRedirect(req: NextRequest, orderNumber: string, showPlacedConfirmation = false): URL {
+  const url = new URL(`/orders/${orderNumber}`, req.nextUrl.origin);
+  if (showPlacedConfirmation) {
+    url.searchParams.set(ORDER_PLACED_QUERY_PARAM, ORDER_PLACED_QUERY_VALUE);
+  }
+  return url;
 }
 
 export async function GET(req: NextRequest) {
@@ -124,5 +132,5 @@ export async function GET(req: NextRequest) {
     status,
   });
 
-  return NextResponse.redirect(toOrderRedirect(req, orderNumber));
+  return NextResponse.redirect(toOrderRedirect(req, orderNumber, paid));
 }

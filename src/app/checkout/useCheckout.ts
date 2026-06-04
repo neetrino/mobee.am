@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
@@ -13,6 +13,7 @@ import { useUserProfile } from './hooks/useUserProfile';
 import { useOrderSubmission } from './hooks/useOrderSubmission';
 import { useOrderSummary } from './hooks/useOrderSummary';
 import type { CheckoutFormData } from './types';
+import { scrollToFirstFieldError } from './utils/scroll-to-first-field-error';
 
 export function useCheckout() {
   const { isLoggedIn, isLoading } = useAuth();
@@ -23,8 +24,6 @@ export function useCheckout() {
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
-  const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
-
   const paymentMethods = usePaymentMethods();
   const checkoutSchema = useCheckoutSchema();
 
@@ -36,6 +35,8 @@ export function useCheckout() {
     watch,
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -127,41 +128,29 @@ export function useCheckout() {
       return;
     }
 
-    if (shippingMethod === 'delivery') {
-      const formData = watch();
-      const hasShippingAddress = formData.shippingAddress && formData.shippingAddress.trim().length > 0;
-      const hasShippingCity = formData.shippingCity && formData.shippingCity.trim().length > 0;
+    setError(null);
 
-      if (!hasShippingAddress || !hasShippingCity) {
-        setError(t('checkout.errors.fillShippingAddress'));
-        const shippingSection = document.querySelector('[data-shipping-section]');
-        if (shippingSection) {
-          shippingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    handleSubmit(
+      (data) => {
+        if (shippingMethod === 'delivery' && requiresRegionalQuote) {
+          setError(t('checkout.errors.regionalQuoteRequired'));
+          document
+            .querySelector('[data-shipping-section]')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
         }
-        return;
-      }
 
-      if (requiresRegionalQuote) {
-        setError(t('checkout.errors.regionalQuoteRequired'));
-        const shippingSection = document.querySelector('[data-shipping-section]');
-        if (shippingSection) {
-          shippingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (paymentMethod === 'arca' || paymentMethod === 'idram') {
+          setShowCardModal(true);
+          return;
         }
-        return;
+
+        submitOrder(data);
+      },
+      (validationErrors: FieldErrors<CheckoutFormData>) => {
+        scrollToFirstFieldError(validationErrors);
       }
-    }
-
-    if (!isLoggedIn) {
-      setShowLoginRequiredModal(true);
-      return;
-    }
-
-    if (paymentMethod === 'arca' || paymentMethod === 'idram') {
-      setShowCardModal(true);
-      return;
-    }
-
-    handleSubmit(submitOrder)(e);
+    )(e);
   };
 
   const onSubmit = (data: CheckoutFormData) => {
@@ -180,8 +169,6 @@ export function useCheckout() {
     setShowShippingModal,
     showCardModal,
     setShowCardModal,
-    showLoginRequiredModal,
-    setShowLoginRequiredModal,
     deliveryPrice,
     loadingDeliveryPrice,
     requiresRegionalQuote,

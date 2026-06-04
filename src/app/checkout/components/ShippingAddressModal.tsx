@@ -9,6 +9,7 @@ import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 import { CheckoutFormData, Cart } from '../types';
+import { FORM_INPUT_LATIN_LANG } from '../../../lib/form-input-os.constants';
 
 interface ShippingAddressModalProps {
   isOpen: boolean;
@@ -78,7 +79,8 @@ export function ShippingAddressModal({
       className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <div 
+      <div
+        lang={FORM_INPUT_LATIN_LANG}
         className={`max-h-[90vh] w-full max-w-lg overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
         onClick={(e) => e.stopPropagation()}
         style={{ zIndex: 10000 }}

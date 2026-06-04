@@ -11,6 +11,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { z } from 'zod';
 import { LOGIN_PAGE_CARD_CLASS, authFormClasses } from '../../lib/auth/authFormTailwind';
 import { AuthPageBrandMark } from '../../components/AuthPageBrandMark';
+import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
 
 const loginFormEmailSchema = z.string().email();
 
@@ -91,7 +92,7 @@ function LoginPageContent() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} lang={FORM_INPUT_LATIN_LANG} className="space-y-4">
           <div>
             <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
               {t('login.form.email')}

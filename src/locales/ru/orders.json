@@ -3,6 +3,10 @@
     "title": "Заказ не найден",
     "description": "Заказ, который вы ищете, не существует."
   },
+  "guestEmailRequired": "Откройте ссылку из подтверждения заказа (с вашим email), чтобы просмотреть заказ.",
+  "placedSuccess": {
+    "message": "Заказ №{number} успешно создан."
+  },
   "title": "Заказ #{number}",
   "placedOn": "Размещен {date}",
   "orderStatus": {

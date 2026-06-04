@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearGuestCart } from '../checkoutUtils';
+import { buildOrderSuccessPath } from '../build-order-success-path';
 import type { CheckoutFormData, Cart, CartItem } from '../types';
 
 interface UseOrderSubmissionProps {
@@ -99,7 +100,12 @@ export function useOrderSubmission({
         return;
       }
 
-      router.push(`/orders/${response.order.number}`);
+      router.push(
+        buildOrderSuccessPath(response.order.number, {
+          email: data.email,
+          isLoggedIn,
+        })
+      );
     } catch (err: unknown) {
       const error = err as { message?: string };
       setError(error.message || t('checkout.errors.failedToCreateOrder'));

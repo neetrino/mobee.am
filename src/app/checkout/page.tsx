@@ -12,6 +12,7 @@ import {
   CHECKOUT_FORM_CARD_RADIUS_CLASS,
   CHECKOUT_PAGE_SHELL_CLASS,
 } from './constants';
+import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -29,8 +30,6 @@ export default function CheckoutPage() {
     setShowShippingModal,
     showCardModal,
     setShowCardModal,
-    showLoginRequiredModal,
-    setShowLoginRequiredModal,
     deliveryPrice,
     loadingDeliveryPrice,
     requiresRegionalQuote,
@@ -47,7 +46,6 @@ export default function CheckoutPage() {
     orderSummary,
     handlePlaceOrder,
     onSubmit,
-    isLoggedIn,
   } = useCheckout();
 
   if (loading) {
@@ -86,7 +84,7 @@ export default function CheckoutPage() {
     <div className={CHECKOUT_PAGE_SHELL_CLASS}>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('checkout.title')}</h1>
 
-      <form onSubmit={handlePlaceOrder}>
+      <form onSubmit={handlePlaceOrder} lang={FORM_INPUT_LATIN_LANG}>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <CheckoutForm
             register={register}
@@ -133,8 +131,6 @@ export default function CheckoutPage() {
         setShowShippingModal={setShowShippingModal}
         showCardModal={showCardModal}
         setShowCardModal={setShowCardModal}
-        showLoginRequiredModal={showLoginRequiredModal}
-        setShowLoginRequiredModal={setShowLoginRequiredModal}
         register={register}
         setValue={setValue}
         handleSubmit={handleSubmit}
@@ -152,7 +148,6 @@ export default function CheckoutPage() {
         requiresRegionalQuote={requiresRegionalQuote}
         logoErrors={logoErrors}
         setLogoErrors={setLogoErrors}
-        isLoggedIn={isLoggedIn}
         onSubmit={onSubmit}
       />
     </div>
