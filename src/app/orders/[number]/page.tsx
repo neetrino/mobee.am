@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
 import { getStoredCurrency } from '../../../lib/currency';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -13,10 +13,16 @@ import { OrderItems } from './components/OrderItems';
 import { ShippingAddress } from './components/ShippingAddress';
 import { ORDER_SUMMARY_SIDEBAR_STICKY_OUTER_CLASS } from '../../../lib/order-summary-sticky.constants';
 import { OrderSummary } from './components/OrderSummary';
+import {
+  ORDER_PLACED_QUERY_PARAM,
+  ORDER_PLACED_QUERY_VALUE,
+} from '../order-placed.constants';
+import { showToast } from '../../../components/Toast';
 import type { Order } from './types';
 
 export default function OrderPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
@@ -24,12 +30,43 @@ export default function OrderPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.push('/login');
+  const placedToastShownRef = useRef(false);
+
+  const orderNumber = typeof params.number === 'string' ? params.number : '';
+  const guestEmail = searchParams.get('email')?.trim() ?? '';
+  const justPlaced = searchParams.get(ORDER_PLACED_QUERY_PARAM) === ORDER_PLACED_QUERY_VALUE;
+
+  const fetchOrder = useCallback(async () => {
+    if (!orderNumber) {
+      setError(t('orders.notFound.description'));
+      setLoading(false);
       return;
     }
 
+    if (!isLoggedIn && !guestEmail) {
+      setError(t('orders.guestEmailRequired'));
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const path = isLoggedIn
+        ? `/api/v1/orders/${orderNumber}`
+        : `/api/v1/orders/${orderNumber}?email=${encodeURIComponent(guestEmail)}`;
+      const response = await apiClient.get<Order>(path);
+      setOrder(response);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : t('orders.notFound.description');
+      setError(errorMessage);
+      setOrder(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [guestEmail, isLoggedIn, orderNumber, t]);
+
+  useEffect(() => {
     fetchOrder();
 
     const handleCurrencyUpdate = () => {
@@ -41,20 +78,27 @@ export default function OrderPage() {
     return () => {
       window.removeEventListener('currency-updated', handleCurrencyUpdate);
     };
-  }, [isLoggedIn, params.number, router]);
+  }, [fetchOrder]);
 
-  async function fetchOrder() {
-    try {
-      setLoading(true);
-      const response = await apiClient.get<Order>(`/api/v1/orders/${params.number}`);
-      setOrder(response);
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : t('orders.notFound.description');
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (!order || !justPlaced || placedToastShownRef.current) {
+      return;
     }
-  }
+
+    placedToastShownRef.current = true;
+    showToast(
+      t('orders.placedSuccess.message').replace('{number}', order.number),
+      'success',
+      5000
+    );
+
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete(ORDER_PLACED_QUERY_PARAM);
+    const query = nextParams.toString();
+    router.replace(query ? `/orders/${order.number}?${query}` : `/orders/${order.number}`, {
+      scroll: false,
+    });
+  }, [justPlaced, order, router, searchParams, t]);
 
   if (loading) {
     return <LoadingState />;

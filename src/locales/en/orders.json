@@ -3,6 +3,10 @@
     "title": "Order Not Found",
     "description": "The order you are looking for does not exist."
   },
+  "guestEmailRequired": "Use the link from your order confirmation (with your email) to view this order.",
+  "placedSuccess": {
+    "message": "Order #{number} was placed successfully."
+  },
   "title": "Order #{number}",
   "placedOn": "Placed On {date}",
   "orderStatus": {

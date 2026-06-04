@@ -3,7 +3,6 @@
 import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
 import { ShippingAddressModal } from './components/ShippingAddressModal';
 import { CardDetailsModal } from './components/CardDetailsModal';
-import { LoginRequiredModal } from './components/LoginRequiredModal';
 import { CheckoutFormData, Cart } from './types';
 
 interface CheckoutModalsProps {
@@ -11,8 +10,6 @@ interface CheckoutModalsProps {
   setShowShippingModal: (show: boolean) => void;
   showCardModal: boolean;
   setShowCardModal: (show: boolean) => void;
-  showLoginRequiredModal: boolean;
-  setShowLoginRequiredModal: (show: boolean) => void;
   register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
   handleSubmit: UseFormHandleSubmit<CheckoutFormData>;
@@ -20,7 +17,7 @@ interface CheckoutModalsProps {
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
   deliverySpeed: 'standard' | 'express';
-  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
   shippingCity: string | undefined;
   cart: Cart | null;
   orderSummary: {
@@ -36,7 +33,6 @@ interface CheckoutModalsProps {
   requiresRegionalQuote: boolean;
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  isLoggedIn: boolean;
   onSubmit: (data: CheckoutFormData) => void;
 }
 
@@ -45,8 +41,6 @@ export function CheckoutModals({
   setShowShippingModal,
   showCardModal,
   setShowCardModal,
-  showLoginRequiredModal,
-  setShowLoginRequiredModal,
   register,
   setValue,
   handleSubmit,
@@ -64,16 +58,10 @@ export function CheckoutModals({
   requiresRegionalQuote,
   logoErrors,
   setLogoErrors,
-  isLoggedIn,
   onSubmit,
 }: CheckoutModalsProps) {
   return (
     <>
-      <LoginRequiredModal
-        isOpen={showLoginRequiredModal}
-        onClose={() => setShowLoginRequiredModal(false)}
-      />
-
       <ShippingAddressModal
         isOpen={showShippingModal}
         onClose={() => setShowShippingModal(false)}
@@ -115,11 +103,6 @@ export function CheckoutModals({
         requiresRegionalQuote={requiresRegionalQuote}
         logoErrors={logoErrors}
         setLogoErrors={setLogoErrors}
-        isLoggedIn={isLoggedIn}
-        onRequireLogin={() => {
-          setShowCardModal(false);
-          setShowLoginRequiredModal(true);
-        }}
         onSubmit={onSubmit}
       />
     </>

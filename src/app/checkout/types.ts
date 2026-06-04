@@ -5,7 +5,7 @@ export type CheckoutFormData = {
   phone: string;
   shippingMethod: 'pickup' | 'delivery';
   deliverySpeed: 'standard' | 'express';
-  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
   promoCode?: string;
   shippingAddress?: string;
   shippingCity?: string;

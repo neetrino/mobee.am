@@ -15,6 +15,7 @@ import {
   authFormClasses,
 } from '../../lib/auth/authFormTailwind';
 import { AuthPageBrandMark } from '../../components/AuthPageBrandMark';
+import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
 
 export default function RegisterPage() {
   const { t } = useTranslation();
@@ -147,7 +148,7 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} lang={FORM_INPUT_LATIN_LANG} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">

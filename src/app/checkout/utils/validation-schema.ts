@@ -17,7 +17,7 @@ export function useCheckoutSchema() {
         message: t('checkout.errors.selectShippingMethod'),
       }),
       deliverySpeed: z.enum(['standard', 'express']),
-      paymentMethod: z.enum(['idram', 'arca', 'cash_on_delivery'], {
+      paymentMethod: z.enum(['idram', 'arca', 'cash_on_delivery', 'aparik'], {
         message: t('checkout.errors.selectPaymentMethod'),
       }),
       promoCode: z

@@ -90,6 +90,8 @@
   "payment": {
     "cashOnDelivery": "Cash on Delivery",
     "cashOnDeliveryDescription": "Pay cash when you receive your order",
+    "aparik": "Installments",
+    "aparikDescription": "Pay in cash at the store when you pick up your order",
     "idram": "Idram",
     "idramDescription": "Pay with Idram wallet or card",
     "arca": "ArCa",
@@ -128,6 +130,8 @@
   "messages": {
     "cashOnDeliveryInfo": "Cash on Delivery: You will pay cash when you receive your order. Card details are not required.",
     "cashOnDeliveryPickup": "Cash on Delivery: You will pay cash when you pick up your order. Card details are not required.",
+    "aparikInfo": "Installments: You will pay cash at the store when you pick up your order. Card details are not required.",
+    "aparikPickup": "Installments: You will pay cash at the store when you pick up your order. Card details are not required.",
     "storePickupInfo": "Store Pickup: You will pick up your order from our store. Delivery is free."
   },
   "errors": {

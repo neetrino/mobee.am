@@ -83,7 +83,160 @@ interface ReorderAddedItem {
   quantity: number;
 }
 
+const ORDER_DETAIL_INCLUDE = {
+  items: {
+    include: {
+      variant: {
+        include: {
+          options: {
+            include: {
+              attributeValue: {
+                include: {
+                  attribute: true,
+                  translations: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  payments: true,
+  events: true,
+} as const;
+
 class OrdersService {
+  private mapOrderDetailResponse(order: {
+    id: string;
+    number: string;
+    status: string;
+    paymentStatus: string;
+    fulfillmentStatus: string;
+    subtotal: Prisma.Decimal | number;
+    discountAmount: Prisma.Decimal | number;
+    shippingAmount: Prisma.Decimal | number;
+    taxAmount: Prisma.Decimal | number;
+    total: Prisma.Decimal | number;
+    currency: string;
+    customerEmail: string | null;
+    customerPhone: string | null;
+    shippingAddress: Prisma.JsonValue;
+    shippingMethod: string | null;
+    trackingNumber: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    items: OrderItemWithVariant[];
+  }) {
+    let shippingAddress = order.shippingAddress;
+    if (typeof shippingAddress === "string") {
+      try {
+        shippingAddress = JSON.parse(shippingAddress);
+      } catch {
+        shippingAddress = null;
+      }
+    }
+
+    logger.info("Order found", {
+      orderNumber: order.number,
+      itemsCount: order.items.length,
+      items: order.items.map((item: OrderItemWithVariant) => ({
+        variantId: item.variantId,
+        productTitle: item.productTitle,
+        variant: item.variant
+          ? {
+              id: item.variant.id,
+              optionsCount: item.variant.options?.length || 0,
+              options: item.variant.options,
+            }
+          : null,
+      })),
+    });
+
+    return {
+      id: order.id,
+      number: order.number,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      fulfillmentStatus: order.fulfillmentStatus,
+      items: order.items.map((item: OrderItemWithVariant) => {
+        const variantOptions =
+          item.variant?.options?.map((opt) => {
+            logger.debug("Processing option", {
+              attributeKey: opt.attributeKey,
+              value: opt.value,
+              valueId: opt.valueId,
+              hasAttributeValue: !!opt.attributeValue,
+              attributeValueData: opt.attributeValue
+                ? {
+                    value: opt.attributeValue.value,
+                    attributeKey: opt.attributeValue.attribute.key,
+                    imageUrl: opt.attributeValue.imageUrl,
+                    hasTranslations: opt.attributeValue.translations?.length > 0,
+                  }
+                : null,
+            });
+
+            if (opt.attributeValue) {
+              const translations = opt.attributeValue.translations || [];
+              const label =
+                translations.length > 0 ? translations[0].label : opt.attributeValue.value;
+
+              return {
+                attributeKey: opt.attributeValue.attribute.key || undefined,
+                value: opt.attributeValue.value || undefined,
+                label: label || undefined,
+                imageUrl: opt.attributeValue.imageUrl || undefined,
+                colors: opt.attributeValue.colors || undefined,
+              };
+            }
+
+            return {
+              attributeKey: opt.attributeKey || undefined,
+              value: opt.value || undefined,
+            };
+          }) || [];
+
+        logger.debug("Item mapping", {
+          productTitle: item.productTitle,
+          variantId: item.variantId,
+          hasVariant: !!item.variant,
+          optionsCount: item.variant?.options?.length || 0,
+          variantOptions,
+        });
+
+        return {
+          variantId: item.variantId || "",
+          productTitle: item.productTitle,
+          variantTitle: item.variantTitle || "",
+          sku: item.sku,
+          quantity: item.quantity,
+          price: Number(item.price),
+          total: Number(item.total),
+          imageUrl: item.imageUrl || undefined,
+          variantOptions,
+        };
+      }),
+      totals: {
+        subtotal: Number(order.subtotal),
+        discount: Number(order.discountAmount),
+        shipping: Number(order.shippingAmount),
+        tax: Number(order.taxAmount),
+        total: Number(order.total),
+        currency: order.currency,
+      },
+      customer: {
+        email: order.customerEmail || undefined,
+        phone: order.customerPhone || undefined,
+      },
+      shippingAddress,
+      shippingMethod: order.shippingMethod || "pickup",
+      trackingNumber: order.trackingNumber || undefined,
+      createdAt: order.createdAt.toISOString(),
+      updatedAt: order.updatedAt.toISOString(),
+    };
+  }
+
   private async resolvePromoDiscountPercent(code?: string): Promise<number> {
     if (!code) return 0;
     const normalizedCode = code.trim().toUpperCase();
@@ -543,7 +696,7 @@ class OrdersService {
         paymentId: order.payment.id,
         orderNumber: order.order.number,
         amount: Number(order.order.total),
-        provider: paymentMethod as "idram" | "arca" | "cash_on_delivery",
+        provider: paymentMethod as "idram" | "arca" | "cash_on_delivery" | "aparik",
         baseUrl: baseUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
       });
 
@@ -667,7 +820,7 @@ class OrdersService {
   }
 
   /**
-   * Get order by number
+   * Get order by number (authenticated owner).
    */
   async findByNumber(orderNumber: string, userId: string) {
     const order = await db.order.findFirst({
@@ -675,28 +828,7 @@ class OrdersService {
         number: orderNumber,
         userId,
       },
-      include: {
-        items: {
-          include: {
-            variant: {
-              include: {
-                options: {
-                  include: {
-                    attributeValue: {
-                      include: {
-                        attribute: true,
-                        translations: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        payments: true,
-        events: true,
-      },
+      include: ORDER_DETAIL_INCLUDE,
     });
 
     if (!order) {
@@ -708,112 +840,35 @@ class OrdersService {
       };
     }
 
-    // Parse shipping address if it's a JSON string
-    let shippingAddress = order.shippingAddress;
-    if (typeof shippingAddress === 'string') {
-      try {
-        shippingAddress = JSON.parse(shippingAddress);
-      } catch {
-        shippingAddress = null;
-      }
-    }
+    return this.mapOrderDetailResponse(order);
+  }
 
-    // Debug logging
-    logger.info('Order found', {
-      orderNumber: order.number,
-      itemsCount: order.items.length,
-      items: order.items.map((item: OrderItemWithVariant) => ({
-        variantId: item.variantId,
-        productTitle: item.productTitle,
-        variant: item.variant ? {
-          id: item.variant.id,
-          optionsCount: item.variant.options?.length || 0,
-          options: item.variant.options,
-        } : null,
-      })),
+  /**
+   * Guest order lookup: order number + checkout email (guest orders have `userId` null).
+   */
+  async findByNumberForGuest(orderNumber: string, email: string) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const order = await db.order.findFirst({
+      where: {
+        number: orderNumber,
+        userId: null,
+      },
+      include: ORDER_DETAIL_INCLUDE,
     });
 
-    return {
-      id: order.id,
-      number: order.number,
-      status: order.status,
-      paymentStatus: order.paymentStatus,
-      fulfillmentStatus: order.fulfillmentStatus,
-      items: order.items.map((item: OrderItemWithVariant) => {
-        const variantOptions = item.variant?.options?.map((opt) => {
-          // Debug logging for each option
-          logger.debug('Processing option', {
-            attributeKey: opt.attributeKey,
-            value: opt.value,
-            valueId: opt.valueId,
-            hasAttributeValue: !!opt.attributeValue,
-            attributeValueData: opt.attributeValue ? {
-              value: opt.attributeValue.value,
-              attributeKey: opt.attributeValue.attribute.key,
-              imageUrl: opt.attributeValue.imageUrl,
-              hasTranslations: opt.attributeValue.translations?.length > 0,
-            } : null,
-          });
+    if (
+      !order ||
+      (order.customerEmail?.trim().toLowerCase() ?? "") !== normalizedEmail
+    ) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "Order not found",
+        detail: `Order with number '${orderNumber}' not found`,
+      };
+    }
 
-          // New format: Use AttributeValue if available
-          if (opt.attributeValue) {
-            // Get label from translations (prefer current locale, fallback to first available)
-            const translations = opt.attributeValue.translations || [];
-            const label = translations.length > 0 ? translations[0].label : opt.attributeValue.value;
-            
-            return {
-              attributeKey: opt.attributeValue.attribute.key || undefined,
-              value: opt.attributeValue.value || undefined,
-              label: label || undefined,
-              imageUrl: opt.attributeValue.imageUrl || undefined,
-              colors: opt.attributeValue.colors || undefined,
-            };
-          }
-          // Old format: Use attributeKey and value directly
-          return {
-            attributeKey: opt.attributeKey || undefined,
-            value: opt.value || undefined,
-          };
-        }) || [];
-
-        logger.debug('Item mapping', {
-          productTitle: item.productTitle,
-          variantId: item.variantId,
-          hasVariant: !!item.variant,
-          optionsCount: item.variant?.options?.length || 0,
-          variantOptions,
-        });
-
-        return {
-          variantId: item.variantId || '',
-          productTitle: item.productTitle,
-          variantTitle: item.variantTitle || '',
-          sku: item.sku,
-          quantity: item.quantity,
-          price: Number(item.price),
-          total: Number(item.total),
-          imageUrl: item.imageUrl || undefined,
-          variantOptions,
-        };
-      }),
-      totals: {
-        subtotal: Number(order.subtotal),
-        discount: Number(order.discountAmount),
-        shipping: Number(order.shippingAmount),
-        tax: Number(order.taxAmount),
-        total: Number(order.total),
-        currency: order.currency,
-      },
-      customer: {
-        email: order.customerEmail || undefined,
-        phone: order.customerPhone || undefined,
-      },
-      shippingAddress: shippingAddress,
-      shippingMethod: order.shippingMethod || 'pickup',
-      trackingNumber: order.trackingNumber || undefined,
-      createdAt: order.createdAt.toISOString(),
-      updatedAt: order.updatedAt.toISOString(),
-    };
+    return this.mapOrderDetailResponse(order);
   }
 
   /**

@@ -3,6 +3,10 @@
     "title": "Պատվերը չի գտնվել",
     "description": "Ձեր փնտրած պատվերը գոյություն չունի:"
   },
+  "guestEmailRequired": "Պատվերը դիտելու համար օգտագործեք հաստատման հղումը (ձեր email-ով) checkout-ից հետո:",
+  "placedSuccess": {
+    "message": "Պատվեր №{number} հաջողությամբ է գրանցված։"
+  },
   "title": "Պատվեր #{number}",
   "placedOn": "Տեղադրված է {date}",
   "orderStatus": {

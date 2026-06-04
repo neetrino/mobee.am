@@ -9,6 +9,7 @@ import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
 import { CheckoutFormData, Cart } from '../types';
+import { FORM_INPUT_LATIN_LANG } from '../../../lib/form-input-os.constants';
 
 interface ShippingAddressModalProps {
   isOpen: boolean;
@@ -20,7 +21,7 @@ interface ShippingAddressModalProps {
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
   deliverySpeed: 'standard' | 'express';
-  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
   cart: Cart | null;
   orderSummary: {
     subtotalDisplay: number;
@@ -78,7 +79,8 @@ export function ShippingAddressModal({
       className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <div 
+      <div
+        lang={FORM_INPUT_LATIN_LANG}
         className={`max-h-[90vh] w-full max-w-lg overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
         onClick={(e) => e.stopPropagation()}
         style={{ zIndex: 10000 }}
@@ -167,6 +169,16 @@ export function ShippingAddressModal({
               </div>
             )}
 
+            {paymentMethod === 'aparik' && (
+              <div
+                className={`mb-6 mt-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-green-800">
+                  <strong>{t('checkout.payment.aparik')}:</strong> {t('checkout.messages.aparikInfo')}
+                </p>
+              </div>
+            )}
+
             <OrderSummaryModal
               cart={cart}
               orderSummary={orderSummary}
@@ -213,6 +225,16 @@ export function ShippingAddressModal({
               >
                 <p className="text-sm text-green-800">
                   <strong>{t('checkout.payment.cashOnDelivery')}:</strong> {t('checkout.messages.cashOnDeliveryPickup')}
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === 'aparik' && (
+              <div
+                className={`mb-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-green-800">
+                  <strong>{t('checkout.payment.aparik')}:</strong> {t('checkout.messages.aparikPickup')}
                 </p>
               </div>
             )}

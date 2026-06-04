@@ -60,6 +60,28 @@ describe("checkout-payment", () => {
     expect(paymentUrl).toContain("successUrl=");
   });
 
+  it("returns null payment URL for offline providers", () => {
+    process.env.PAYMENT_CALLBACK_SECRET = "test-secret";
+    expect(
+      createPaymentUrl({
+        paymentId: "pay_offline_cod",
+        orderNumber: "250423-OFF0000001",
+        amount: 5000,
+        provider: "cash_on_delivery",
+        baseUrl: "https://shop.example",
+      })
+    ).toBeNull();
+    expect(
+      createPaymentUrl({
+        paymentId: "pay_offline_aparik",
+        orderNumber: "250423-OFF0000002",
+        amount: 5000,
+        provider: "aparik",
+        baseUrl: "https://shop.example",
+      })
+    ).toBeNull();
+  });
+
   it("returns null payment URL when provider is not configured", () => {
     process.env.PAYMENT_CALLBACK_SECRET = "test-secret";
     const paymentUrl = createPaymentUrl({
