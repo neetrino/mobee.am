@@ -7,6 +7,8 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   /** When true, use admin panel corner radius (`rounded-supersudo` / 15px). */
   adminChrome?: boolean;
+  /** Checkout form fields — 15px radius + Mobee blue focus (matches city select). */
+  checkoutChrome?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -17,6 +19,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       className = '',
       onKeyDown,
       adminChrome = false,
+      checkoutChrome = false,
       spellCheck = false,
       autoCorrect = 'off',
       autoCapitalize = 'off',
@@ -40,7 +43,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const borderAndFocusClasses = error
       ? 'border-red-500 bg-red-50/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/40 focus:outline-none'
-      : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent';
+      : checkoutChrome
+        ? 'border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-500 focus-visible:ring-offset-2'
+        : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent';
+
+    const radiusClass = checkoutChrome
+      ? 'rounded-[15px] min-h-[42px]'
+      : adminChrome
+        ? 'rounded-supersudo'
+        : 'rounded-md';
 
     return (
       <div className="w-full">
@@ -57,9 +68,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           spellCheck={spellCheck}
           autoCorrect={autoCorrect}
           autoCapitalize={autoCapitalize}
-          className={`w-full border px-4 py-2 disabled:cursor-default disabled:bg-gray-50 ${
-            adminChrome ? 'rounded-supersudo' : 'rounded-md'
-          } ${borderAndFocusClasses} ${className}`}
+          className={`w-full border px-4 py-2 disabled:cursor-default disabled:bg-gray-50 ${radiusClass} ${borderAndFocusClasses} ${className}`}
           onKeyDown={handleKeyDown}
           {...props}
         />

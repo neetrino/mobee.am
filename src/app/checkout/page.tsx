@@ -33,6 +33,7 @@ export default function CheckoutPage() {
     deliveryPrice,
     loadingDeliveryPrice,
     requiresRegionalQuote,
+    deliveryAvailable,
     register,
     handleSubmit,
     errors,
@@ -92,6 +93,8 @@ export default function CheckoutPage() {
             errors={errors}
             isSubmitting={isSubmitting}
             shippingMethod={shippingMethod}
+            shippingCity={shippingCity}
+            deliveryAvailable={deliveryAvailable}
             deliverySpeed={deliverySpeed}
             paymentMethod={paymentMethod}
             paymentMethods={paymentMethods}

@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
-import { convertPrice } from '../../../lib/currency';
+import { convertPrice, type CurrencyCode } from '../../../lib/currency';
+import {
+  cartAmountToDisplayCurrency,
+  cartTotalsToAmd,
+  cartTotalsToDisplayCurrency,
+} from '../../../lib/checkout/cart-money';
 import type { Cart } from '../types';
 
 interface UseOrderSummaryProps {
@@ -32,21 +37,24 @@ export function useOrderSummary({
       };
     }
 
-    const subtotalAMD = convertPrice(cart.totals.subtotal, 'USD', 'AMD');
-    const taxAMD = convertPrice(cart.totals.tax, 'USD', 'AMD');
+    const subtotalAMD = cartTotalsToAmd(cart.totals);
+    const taxAMD = cartAmountToDisplayCurrency(cart.totals.tax, 'AMD');
     const shippingBlocked = shippingMethod === 'delivery' && requiresRegionalQuote;
     const shippingAMD =
       shippingMethod === 'delivery' && deliveryPrice !== null && !shippingBlocked
         ? deliveryPrice
         : 0;
-    const totalAMD = subtotalAMD + taxAMD + shippingAMD;
     const totalExcludesPendingShipping = shippingBlocked;
 
-    const subtotalDisplay = currency === 'AMD' ? subtotalAMD : convertPrice(subtotalAMD, 'AMD', currency);
-    const taxDisplay = currency === 'AMD' ? taxAMD : convertPrice(taxAMD, 'AMD', currency);
+    const displayCurrency = currency as CurrencyCode;
+    const subtotalDisplay = cartTotalsToDisplayCurrency(cart.totals, displayCurrency);
+    const taxDisplay = cartAmountToDisplayCurrency(cart.totals.tax, displayCurrency);
     const shippingDisplay =
-      currency === 'AMD' ? shippingAMD : convertPrice(shippingAMD, 'AMD', currency);
-    const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency);
+      displayCurrency === 'AMD'
+        ? shippingAMD
+        : convertPrice(shippingAMD, 'AMD', displayCurrency);
+    const totalAMD = subtotalAMD + taxAMD + shippingAMD;
+    const totalDisplay = subtotalDisplay + taxDisplay + shippingDisplay;
 
     return {
       subtotalAMD,

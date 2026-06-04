@@ -1,4 +1,5 @@
 import { apiClient } from "../api-client";
+import { CART_MONEY_BASE_CURRENCY } from "../checkout/cart-money";
 import { fetchProductBySlugWithLang } from "../shop/fetchProductBySlugWithLang";
 import { logger } from "../utils/logger";
 import { resolveCartLineProductImageUrl } from "./resolveCartLineProductImage";
@@ -38,7 +39,7 @@ export interface GuestCartHydrated {
     shipping: number;
     tax: number;
     total: number;
-    currency: "AMD";
+    currency: typeof CART_MONEY_BASE_CURRENCY;
   };
   itemsCount: number;
 }
@@ -177,7 +178,7 @@ function buildGuestCart(items: GuestCartHydratedItem[]): GuestCartHydrated {
       shipping: 0,
       tax: 0,
       total: subtotal,
-      currency: "AMD",
+      currency: CART_MONEY_BASE_CURRENCY,
     },
     itemsCount,
   };

@@ -19,6 +19,8 @@
   },
   "shippingAddress": {
     "title": "Адрес доставки",
+    "country": "Страна: {value}",
+    "region": "Область: {value}",
     "phone": "Телефон: {phone}",
     "deliveryType": "Тип доставки",
     "deliveryTypeStandard": "Стандартная доставка",
@@ -41,7 +43,9 @@
     "color": "Цвет:",
     "size": "Размер:",
     "sku": "Артикул: {sku}",
-    "quantity": "Количество: {qty} × {price} = {total}"
+    "quantity": "Количество: {qty}",
+    "unitPrice": "Цена за единицу: {price}",
+    "lineTotal": "Итого по строке: {total}"
   }
 }
 

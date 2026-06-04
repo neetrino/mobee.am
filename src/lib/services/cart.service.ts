@@ -174,7 +174,7 @@ class CartService {
           shipping: 0,
           tax: 0,
           total: subtotal,
-          currency: "AMD",
+          currency: "USD",
         },
         itemsCount: itemsWithDetails.reduce((sum, item) => sum + item.quantity, 0),
       },

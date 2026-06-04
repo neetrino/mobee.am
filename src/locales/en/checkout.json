@@ -54,6 +54,7 @@
     "standardDeliveryDescription": "Via our service or partners (typically 1–3 business days).",
     "expressDelivery": "Express delivery",
     "expressDeliveryDescription": "Available for an additional fee depending on address and order.",
+    "deliveryUnavailableBelowMinimum": "Delivery is not available for orders under 50,000 AMD.",
     "suggestedCities": {
       "yerevan": "Yerevan",
       "aragatsotn": "Aragatsotn",
@@ -91,7 +92,7 @@
     "cashOnDelivery": "Cash on Delivery",
     "cashOnDeliveryDescription": "Pay cash when you receive your order",
     "aparik": "Installments",
-    "aparikDescription": "Pay in cash at the store when you pick up your order",
+    "aparikDescription": "Get an installment offer",
     "idram": "Idram",
     "idramDescription": "Pay with Idram wallet or card",
     "arca": "ArCa",
@@ -158,7 +159,8 @@
     "failedToCreateOrder": "Failed to create order. Please try again.",
     "invalidPromoCode": "Promo code can contain only letters, numbers, underscores, and hyphens",
     "promoCodeTooLong": "Promo code is too long",
-    "regionalQuoteRequired": "Shipping to this address is quoted separately. Please contact us to complete your order."
+    "regionalQuoteRequired": "Shipping to this address is quoted separately. Please contact us to complete your order.",
+    "deliveryMinimumNotMet": "Delivery is not available for orders under 50,000 AMD."
   }
 }
 

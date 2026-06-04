@@ -19,6 +19,8 @@
   },
   "shippingAddress": {
     "title": "Առաքման հասցե",
+    "country": "Երկիր: {value}",
+    "region": "Մարզ: {value}",
     "phone": "Հեռախոս: {phone}",
     "deliveryType": "Առաքման տեսակ",
     "deliveryTypeStandard": "Ստանդարտ առաքում",
@@ -41,7 +43,9 @@
     "color": "Գույն:",
     "size": "Չափ:",
     "sku": "SKU: {sku}",
-    "quantity": "Քանակ: {qty} × {price} = {total}"
+    "quantity": "Քանակ: {qty}",
+    "unitPrice": "Միավորի գին: {price}",
+    "lineTotal": "Ընդամենը տող: {total}"
   }
 }
 

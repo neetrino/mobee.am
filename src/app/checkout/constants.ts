@@ -50,3 +50,26 @@ export const CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK =
  */
 export const CHECKOUT_RADIO_ACCENT_CLASS =
   'appearance-none size-4 shrink-0 rounded-full border-2 border-gray-300 bg-white outline-none transition-[border-color,box-shadow] focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-500 focus-visible:ring-offset-2 disabled:cursor-default disabled:opacity-50 checked:border-admin-500 checked:bg-[radial-gradient(circle_at_center,theme(colors.admin.500)_42%,theme(colors.white)_43%)]';
+
+/** Checkout form custom select trigger (city, etc.) — aligns with {@link CHECKOUT_FORM_CARD_RADIUS_CLASS}. */
+export const CHECKOUT_SELECT_TRIGGER_CLASS = [
+  'flex w-full min-h-[42px] items-center justify-between gap-2 border px-4 py-2 text-left text-sm transition-[border-color,box-shadow]',
+  CHECKOUT_FORM_CARD_RADIUS_CLASS,
+  'bg-white disabled:cursor-default disabled:bg-gray-50',
+].join(' ');
+
+export const CHECKOUT_SELECT_TRIGGER_FOCUS_CLASS =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-500 focus-visible:ring-offset-2';
+
+export const CHECKOUT_SELECT_CHEVRON_CLASS =
+  'flex h-6 w-6 shrink-0 items-center justify-center text-gray-600 transition-transform duration-200 ease-out motion-reduce:transition-none';
+
+export const CHECKOUT_SELECT_PANEL_CLASS = [
+  'absolute left-0 right-0 top-[calc(100%+4px)] z-50 border border-gray-200/80 bg-white py-1.5 shadow-2xl',
+  CHECKOUT_FORM_CARD_RADIUS_CLASS,
+].join(' ');
+
+export const CHECKOUT_SELECT_OPTION_CLASS =
+  'flex w-full px-4 py-2 text-left text-sm leading-snug text-gray-800 transition-colors hover:bg-gray-50';
+
+export const CHECKOUT_SELECT_OPTION_ACTIVE_CLASS = 'bg-admin-50 font-semibold text-admin-800';

@@ -13,6 +13,8 @@ import { OrderItems } from './components/OrderItems';
 import { ShippingAddress } from './components/ShippingAddress';
 import { ORDER_SUMMARY_SIDEBAR_STICKY_OUTER_CLASS } from '../../../lib/order-summary-sticky.constants';
 import { OrderSummary } from './components/OrderSummary';
+import { ORDER_PAGE_SECTION_STACK_CLASS, ORDER_PAGE_SHELL_CLASS } from './constants';
+import { formatOrderPlacedDate } from './utils/format-order-date';
 import {
   ORDER_PLACED_QUERY_PARAM,
   ORDER_PLACED_QUERY_VALUE,
@@ -25,7 +27,7 @@ export default function OrderPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { isLoggedIn } = useAuth();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,24 +110,22 @@ export default function OrderPage() {
     return <ErrorState error={error} />;
   }
 
+  const placedDateLabel = formatOrderPlacedDate(order.createdAt, lang);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className={ORDER_PAGE_SHELL_CLASS}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">
           {t('orders.title').replace('{number}', order.number)}
         </h1>
         <p className="text-gray-600">
-          {t('orders.placedOn').replace('{date}', new Date(order.createdAt).toLocaleDateString())}
+          {t('orders.placedOn').replace('{date}', placedDateLabel)}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <OrderStatus
-            status={order.status}
-            paymentStatus={order.paymentStatus}
-            fulfillmentStatus={order.fulfillmentStatus}
-          />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className={`lg:col-span-2 ${ORDER_PAGE_SECTION_STACK_CLASS}`}>
+          <OrderStatus status={order.status} paymentStatus={order.paymentStatus} />
           <OrderItems items={order.items} currency={currency} />
           {order.shippingAddress && (
             <ShippingAddress shippingAddress={order.shippingAddress} />

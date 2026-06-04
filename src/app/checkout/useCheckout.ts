@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStoredCurrency } from '../../lib/currency';
@@ -14,6 +14,8 @@ import { useOrderSubmission } from './hooks/useOrderSubmission';
 import { useOrderSummary } from './hooks/useOrderSummary';
 import type { CheckoutFormData } from './types';
 import { scrollToFirstFieldError } from './utils/scroll-to-first-field-error';
+import { getCartSubtotalAfterDiscountAmd } from '../../lib/checkout/cart-subtotal-amd';
+import { isDeliveryAvailableForSubtotalAmd } from '../../lib/checkout/delivery-eligibility';
 
 export function useCheckout() {
   const { isLoggedIn, isLoading } = useAuth();
@@ -25,13 +27,20 @@ export function useCheckout() {
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
   const paymentMethods = usePaymentMethods();
-  const checkoutSchema = useCheckoutSchema();
+  const { cart, loading, fetchCart } = useCart(isLoggedIn);
+  const subtotalAfterDiscountAmd = useMemo(
+    () => (cart ? getCartSubtotalAfterDiscountAmd(cart.totals) : 0),
+    [cart]
+  );
+  const deliveryAvailable = isDeliveryAvailableForSubtotalAmd(subtotalAfterDiscountAmd);
+  const checkoutSchema = useCheckoutSchema(deliveryAvailable);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
+    clearErrors,
     watch,
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -60,7 +69,6 @@ export function useCheckout() {
   const shippingCity = watch('shippingCity');
   const deliverySpeed = watch('deliverySpeed');
 
-  const { cart, loading, fetchCart } = useCart(isLoggedIn);
   const { deliveryPrice, loadingDeliveryPrice, requiresRegionalQuote } = useDeliveryPrice(
     cart,
     shippingMethod,
@@ -74,6 +82,7 @@ export function useCheckout() {
     isLoggedIn,
     deliveryPrice,
     requiresRegionalQuote,
+    deliveryAvailable,
     setError,
   });
 
@@ -90,6 +99,18 @@ export function useCheckout() {
       setValue('deliverySpeed', 'standard');
     }
   }, [shippingMethod, setValue]);
+
+  useEffect(() => {
+    if (!deliveryAvailable) {
+      if (shippingMethod === 'delivery') {
+        setValue('shippingMethod', 'pickup', { shouldValidate: true, shouldDirty: true });
+      }
+      setValue('deliverySpeed', 'standard');
+      setValue('shippingAddress', '');
+      setValue('shippingCity', '');
+      clearErrors(['shippingAddress', 'shippingCity']);
+    }
+  }, [deliveryAvailable, shippingMethod, setValue, clearErrors]);
 
   useEffect(() => {
     if (isLoading) {
@@ -132,7 +153,7 @@ export function useCheckout() {
 
     handleSubmit(
       (data) => {
-        if (shippingMethod === 'delivery' && requiresRegionalQuote) {
+        if (data.shippingMethod === 'delivery' && requiresRegionalQuote) {
           setError(t('checkout.errors.regionalQuoteRequired'));
           document
             .querySelector('[data-shipping-section]')
@@ -172,6 +193,7 @@ export function useCheckout() {
     deliveryPrice,
     loadingDeliveryPrice,
     requiresRegionalQuote,
+    deliveryAvailable,
     register,
     handleSubmit,
     errors,

@@ -1,8 +1,8 @@
 'use client';
 
-import { Card } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { OrderItem } from './OrderItem';
+import { ORDER_PAGE_CARD_CLASS, ORDER_PAGE_CARD_TITLE_CLASS } from '../constants';
 import type { OrderItem as OrderItemType } from '../types';
 
 interface OrderItemsProps {
@@ -14,17 +14,13 @@ export function OrderItems({ items, currency }: OrderItemsProps) {
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('orders.orderItems.title')}</h2>
-      <div className="space-y-4">
+    <section className={ORDER_PAGE_CARD_CLASS}>
+      <h2 className={`${ORDER_PAGE_CARD_TITLE_CLASS} mb-6`}>{t('orders.orderItems.title')}</h2>
+      <div className="space-y-6">
         {items.map((item, index) => (
           <OrderItem key={index} item={item} currency={currency} />
         ))}
       </div>
-    </Card>
+    </section>
   );
 }
-
-
-
-

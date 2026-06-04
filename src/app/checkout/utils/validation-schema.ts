@@ -1,9 +1,9 @@
+import { useMemo } from 'react';
 import { z } from 'zod';
 import { useTranslation } from '../../../lib/i18n-client';
+import type { CheckoutFormData } from '../types';
 
-export function useCheckoutSchema() {
-  const { t } = useTranslation();
-
+function buildCheckoutSchema(t: (key: string) => string, deliveryAvailable: boolean) {
   return z
     .object({
       firstName: z.string().min(1, t('checkout.errors.firstNameRequired')),
@@ -34,9 +34,20 @@ export function useCheckoutSchema() {
       cardCvv: z.string().optional(),
       cardHolderName: z.string().optional(),
     })
+    .transform((data): CheckoutFormData => {
+      if (!deliveryAvailable && data.shippingMethod === 'delivery') {
+        return {
+          ...data,
+          shippingMethod: 'pickup',
+          shippingAddress: '',
+          shippingCity: '',
+        };
+      }
+      return data;
+    })
     .refine(
       (data) => {
-        if (data.shippingMethod === 'delivery') {
+        if (data.shippingMethod === 'delivery' && deliveryAvailable) {
           return Boolean(data.shippingAddress && data.shippingAddress.trim().length > 0);
         }
         return true;
@@ -48,7 +59,7 @@ export function useCheckoutSchema() {
     )
     .refine(
       (data) => {
-        if (data.shippingMethod === 'delivery') {
+        if (data.shippingMethod === 'delivery' && deliveryAvailable) {
           return Boolean(data.shippingCity && data.shippingCity.trim().length > 0);
         }
         return true;
@@ -106,4 +117,9 @@ export function useCheckoutSchema() {
         path: ['cardHolderName'],
       }
     );
+}
+
+export function useCheckoutSchema(deliveryAvailable: boolean) {
+  const { t } = useTranslation();
+  return useMemo(() => buildCheckoutSchema(t, deliveryAvailable), [t, deliveryAvailable]);
 }
