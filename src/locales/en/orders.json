@@ -19,6 +19,8 @@
   },
   "shippingAddress": {
     "title": "Shipping Address",
+    "country": "Country: {value}",
+    "region": "Region: {value}",
     "phone": "Phone: {phone}",
     "deliveryType": "Delivery type",
     "deliveryTypeStandard": "Standard delivery",
@@ -41,7 +43,9 @@
     "color": "Color:",
     "size": "Size:",
     "sku": "SKU: {sku}",
-    "quantity": "Quantity: {qty} × {price} = {total}"
+    "quantity": "Quantity: {qty}",
+    "unitPrice": "Unit price: {price}",
+    "lineTotal": "Line total: {total}"
   }
 }
 

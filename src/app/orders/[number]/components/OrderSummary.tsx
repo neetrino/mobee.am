@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, Button } from '@shop/ui';
+import { Button } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatPriceInCurrency, convertPrice } from '../../../../lib/currency';
+import { ORDER_PAGE_CARD_CLASS, ORDER_PAGE_CARD_TITLE_CLASS } from '../constants';
 import type { Order } from '../types';
 
 interface OrderSummaryProps {
@@ -37,43 +38,30 @@ export function OrderSummary({ order, currency }: OrderSummaryProps) {
           );
         })();
 
-  const taxDisplay = (() => {
-    const taxAMD = convertPrice(order.totals.tax, 'USD', 'AMD');
-    return currency === 'AMD' ? taxAMD : convertPrice(taxAMD, 'AMD', currency);
-  })();
-
   const totalDisplay = (() => {
-    const subtotalAMD = convertPrice(order.totals.subtotal, 'USD', 'AMD');
-    const discountAMD = convertPrice(order.totals.discount, 'USD', 'AMD');
-    const shippingAMD = order.totals.shipping;
-    const taxAMD = convertPrice(order.totals.tax, 'USD', 'AMD');
-    const totalAMD = subtotalAMD - discountAMD + shippingAMD + taxAMD;
+    const totalAMD = convertPrice(order.totals.total, 'USD', 'AMD');
     return currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency);
   })();
 
   return (
-    <Card className="p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('orders.orderSummary.title')}</h2>
-      <div className="space-y-4 mb-6">
+    <section className={ORDER_PAGE_CARD_CLASS}>
+      <h2 className={`${ORDER_PAGE_CARD_TITLE_CLASS} mb-6`}>{t('orders.orderSummary.title')}</h2>
+      <div className="mb-6 space-y-4">
         {order.totals ? (
           <>
             <div className="flex justify-between text-gray-600">
               <span>{t('orders.orderSummary.subtotal')}</span>
               <span>{formatPriceInCurrency(subtotalDisplay, currency)}</span>
             </div>
-            {order.totals.discount > 0 && (
+            {order.totals.discount > 0 && discountDisplay !== null ? (
               <div className="flex justify-between text-gray-600">
                 <span>{t('orders.orderSummary.discount')}</span>
-                <span>-{formatPriceInCurrency(discountDisplay!, currency)}</span>
+                <span>-{formatPriceInCurrency(discountDisplay, currency)}</span>
               </div>
-            )}
+            ) : null}
             <div className="flex justify-between text-gray-600">
               <span>{t('orders.orderSummary.shipping')}</span>
-              <span>{shippingDisplay}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>{t('orders.orderSummary.tax')}</span>
-              <span>{formatPriceInCurrency(taxDisplay, currency)}</span>
+              <span className="text-right">{shippingDisplay}</span>
             </div>
             <div className="border-t border-gray-200 pt-4">
               <div className="flex justify-between text-lg font-bold text-gray-900">
@@ -99,10 +87,6 @@ export function OrderSummary({ order, currency }: OrderSummaryProps) {
           </Button>
         </Link>
       </div>
-    </Card>
+    </section>
   );
 }
-
-
-
-

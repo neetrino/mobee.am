@@ -18,7 +18,7 @@ export function OrderItem({ item, currency }: OrderItemProps) {
   const getAttributeLabel = (key: string): string => {
     if (key === 'color' || key === 'colour') return t('orders.itemDetails.color');
     if (key === 'size') return t('orders.itemDetails.size');
-    return key.charAt(0).toUpperCase() + key.slice(1);
+    return `${key.charAt(0).toUpperCase()}${key.slice(1)}:`;
   };
 
   const getColorsArray = (colors: unknown): string[] => {
@@ -48,75 +48,71 @@ export function OrderItem({ item, currency }: OrderItemProps) {
   })();
 
   return (
-    <div className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
-      {item.imageUrl && (
-        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-          <img 
-            src={item.imageUrl} 
+    <div className="flex gap-4 border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+      {item.imageUrl ? (
+        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+          <img
+            src={item.imageUrl}
             alt={item.productTitle}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         </div>
-      )}
-      <div className="flex-1">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.productTitle}</h3>
-        
-        {allOptions.length > 0 && (
-          <div className="flex flex-wrap gap-3 mt-2 mb-2">
+      ) : null}
+      <div className="min-w-0 flex-1">
+        <h3 className="text-lg font-semibold text-gray-900">{item.productTitle}</h3>
+
+        {allOptions.length > 0 ? (
+          <div className="mt-2 space-y-1">
             {allOptions.map((opt, optIndex) => {
-              if (!opt.attributeKey || !opt.value) return null;
-              
+              if (!opt.attributeKey || !opt.value) {
+                return null;
+              }
+
               const attributeKey = opt.attributeKey.toLowerCase().trim();
               const isColor = attributeKey === 'color' || attributeKey === 'colour';
               const displayLabel = opt.label || opt.value;
-              const hasImage = opt.imageUrl && opt.imageUrl.trim() !== '';
+              const hasImage = Boolean(opt.imageUrl?.trim());
               const colors = getColorsArray(opt.colors);
-              const colorHex = colors.length > 0 ? colors[0] : (isColor ? getColorValue(opt.value) : null);
-              
+              const colorHex =
+                colors.length > 0 ? colors[0] : isColor ? getColorValue(opt.value) : null;
+
               return (
-                <div key={optIndex} className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {getAttributeLabel(opt.attributeKey)}:
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {hasImage ? (
-                      <img 
-                        src={opt.imageUrl!} 
-                        alt={displayLabel}
-                        className="w-6 h-6 rounded border border-gray-300 object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : isColor && colorHex ? (
-                      <div 
-                        className="w-5 h-5 rounded-full border border-gray-300"
-                        style={{ backgroundColor: colorHex }}
-                        title={displayLabel}
-                      />
-                    ) : null}
-                    <span className="text-sm text-gray-900 capitalize">
-                      {displayLabel}
-                    </span>
-                  </div>
+                <div key={optIndex} className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
+                  <span className="font-medium">{getAttributeLabel(opt.attributeKey)}</span>
+                  {hasImage ? (
+                    <img
+                      src={opt.imageUrl!}
+                      alt={displayLabel}
+                      className="h-5 w-5 rounded border border-gray-300 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : isColor && colorHex ? (
+                    <span
+                      className="inline-block h-5 w-5 shrink-0 rounded-full border border-gray-300"
+                      style={{ backgroundColor: colorHex }}
+                      title={displayLabel}
+                    />
+                  ) : null}
+                  <span className="text-gray-900 capitalize">{displayLabel}</span>
                 </div>
               );
             })}
           </div>
-        )}
-        
-        <p className="text-sm text-gray-600">{t('orders.itemDetails.sku').replace('{sku}', item.sku)}</p>
-        <p className="text-sm text-gray-600 mt-2">
-          {t('orders.itemDetails.quantity')
-            .replace('{qty}', item.quantity.toString())
-            .replace('{price}', itemPriceDisplay)
-            .replace('{total}', itemTotalDisplay)}
+        ) : null}
+
+        <p className="mt-2 text-sm text-gray-500">{t('orders.itemDetails.sku').replace('{sku}', item.sku)}</p>
+        <p className="mt-2 text-sm text-gray-600">
+          {t('orders.itemDetails.quantity').replace('{qty}', String(item.quantity))}
+        </p>
+        <p className="text-sm text-gray-600">
+          {t('orders.itemDetails.unitPrice').replace('{price}', itemPriceDisplay)}
+        </p>
+        <p className="text-sm font-semibold text-gray-900">
+          {t('orders.itemDetails.lineTotal').replace('{total}', itemTotalDisplay)}
         </p>
       </div>
     </div>
   );
 }
-
-
-
-

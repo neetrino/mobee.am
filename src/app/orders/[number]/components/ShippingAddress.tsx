@@ -1,11 +1,21 @@
 'use client';
 
-import { Card } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { ORDER_PAGE_CARD_CLASS, ORDER_PAGE_CARD_TITLE_CLASS } from '../constants';
 import type { Order } from '../types';
 
 interface ShippingAddressProps {
   shippingAddress: Order['shippingAddress'];
+}
+
+function resolveCountryLabel(countryCode: string | undefined): string {
+  if (!countryCode) {
+    return '';
+  }
+  if (countryCode === 'AM' || countryCode.toLowerCase() === 'armenia') {
+    return 'Armenia';
+  }
+  return countryCode;
 }
 
 export function ShippingAddress({ shippingAddress }: ShippingAddressProps) {
@@ -15,56 +25,33 @@ export function ShippingAddress({ shippingAddress }: ShippingAddressProps) {
     return null;
   }
 
-  const deliverySpeed = shippingAddress.deliverySpeed;
-  const deliveryTypeLabel =
-    deliverySpeed === 'express'
-      ? t('orders.shippingAddress.deliveryTypeExpress')
-      : deliverySpeed === 'standard'
-        ? t('orders.shippingAddress.deliveryTypeStandard')
-        : null;
+  const street =
+    shippingAddress.addressLine1?.trim() ||
+    (shippingAddress as { address?: string }).address?.trim() ||
+    '';
+  const region = shippingAddress.city?.trim() ?? '';
+  const country = resolveCountryLabel(shippingAddress.countryCode);
+  const phone =
+    shippingAddress.phone?.trim() ||
+    (shippingAddress as { shippingPhone?: string }).shippingPhone?.trim() ||
+    '';
 
   return (
-    <Card className="p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('orders.shippingAddress.title')}</h2>
-      <div className="text-gray-600">
-        {shippingAddress.firstName && shippingAddress.lastName && (
-          <p>{shippingAddress.firstName} {shippingAddress.lastName}</p>
-        )}
-        {shippingAddress.addressLine1 && <p>{shippingAddress.addressLine1}</p>}
-        {shippingAddress.addressLine2 && <p>{shippingAddress.addressLine2}</p>}
-        {shippingAddress.city && (
-          <p>
-            {shippingAddress.city}
-            {shippingAddress.postalCode && `, ${shippingAddress.postalCode}`}
+    <section className={ORDER_PAGE_CARD_CLASS}>
+      <h2 className={`${ORDER_PAGE_CARD_TITLE_CLASS} mb-4`}>{t('orders.shippingAddress.title')}</h2>
+      <div className="space-y-1 text-gray-600">
+        {shippingAddress.firstName && shippingAddress.lastName ? (
+          <p className="font-medium text-gray-900">
+            {shippingAddress.firstName} {shippingAddress.lastName}
           </p>
-        )}
-        {shippingAddress.countryCode && <p>{shippingAddress.countryCode}</p>}
-        {shippingAddress.phone && (
-          <p className="mt-2">
-            {t('orders.shippingAddress.phone').replace('{phone}', shippingAddress.phone)}
-          </p>
-        )}
-        {deliveryTypeLabel && (
-          <p className="mt-3 flex items-center gap-2">
-            <span className="font-medium text-gray-900">
-              {t('orders.shippingAddress.deliveryType')}:
-            </span>
-            <span
-              className={
-                deliverySpeed === 'express'
-                  ? 'inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-semibold text-orange-800'
-                  : 'inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-800'
-              }
-            >
-              {deliveryTypeLabel}
-            </span>
-          </p>
-        )}
+        ) : null}
+        {country ? <p>{t('orders.shippingAddress.country').replace('{value}', country)}</p> : null}
+        {region ? <p>{t('orders.shippingAddress.region').replace('{value}', region)}</p> : null}
+        {street ? <p>{street}</p> : null}
+        {shippingAddress.addressLine2 ? <p>{shippingAddress.addressLine2}</p> : null}
+        {shippingAddress.postalCode ? <p>{shippingAddress.postalCode}</p> : null}
+        {phone ? <p>{t('orders.shippingAddress.phone').replace('{phone}', phone)}</p> : null}
       </div>
-    </Card>
+    </section>
   );
 }
-
-
-
-
