@@ -12,6 +12,7 @@ import {
   CHECKOUT_FORM_CARD_RADIUS_TOP_CLASS,
   CHECKOUT_OPTION_SELECTED_CHROME_CLASS,
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS,
+  CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK,
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA,
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
@@ -26,9 +27,9 @@ interface CheckoutFormProps {
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
   deliverySpeed: 'standard' | 'express';
-  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
   paymentMethods: Array<{
-    id: 'idram' | 'arca' | 'cash_on_delivery';
+    id: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
     name: string;
     description: string;
     logo: string | null;
@@ -308,7 +309,7 @@ export function CheckoutForm({
                 value={method.id}
                 checked={paymentMethod === method.id}
                 onChange={(e) =>
-                  setValue('paymentMethod', e.target.value as 'idram' | 'arca' | 'cash_on_delivery', {
+                  setValue('paymentMethod', e.target.value as 'idram' | 'arca' | 'cash_on_delivery' | 'aparik', {
                     shouldValidate: true,
                     shouldDirty: true,
                   })
@@ -334,7 +335,9 @@ export function CheckoutForm({
                       className={
                         method.id === 'arca'
                           ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA
-                          : CHECKOUT_PAYMENT_LOGO_IMG_CLASS
+                          : method.id === 'aparik'
+                            ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK
+                            : CHECKOUT_PAYMENT_LOGO_IMG_CLASS
                       }
                       loading="lazy"
                       onError={() => {
@@ -345,7 +348,9 @@ export function CheckoutForm({
                 </div>
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">{method.name}</div>
-                  <div className="text-sm text-gray-600">{method.description}</div>
+                  {method.id !== 'aparik' && (
+                    <div className="text-sm text-gray-600">{method.description}</div>
+                  )}
                 </div>
               </div>
             </label>

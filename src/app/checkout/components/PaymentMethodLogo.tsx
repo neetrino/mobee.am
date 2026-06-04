@@ -3,6 +3,7 @@
 import type { PaymentMethodId } from '../utils/payment-methods';
 import {
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS,
+  CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK,
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA,
 } from '../constants';
 
@@ -24,6 +25,10 @@ const PAYMENT_LOGO: Record<PaymentMethodId, { src: string; alt: string }> = {
     src: '/assets/payments/cash-on-delivery.png',
     alt: 'Cash on delivery',
   },
+  aparik: {
+    src: '/assets/payments/aparik.png',
+    alt: 'Ապառիկ',
+  },
   arca: { src: '/assets/payments/arca.png', alt: 'ArCa' },
   idram: { src: '/assets/payments/idram.png', alt: 'Idram' },
 };
@@ -36,7 +41,11 @@ export function PaymentMethodLogo({
 }: PaymentMethodLogoProps) {
   const { src: logoPath, alt: altText } = PAYMENT_LOGO[paymentMethod];
   const imgClassName =
-    paymentMethod === 'arca' ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA : CHECKOUT_PAYMENT_LOGO_IMG_CLASS;
+    paymentMethod === 'arca'
+      ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA
+      : paymentMethod === 'aparik'
+        ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK
+        : CHECKOUT_PAYMENT_LOGO_IMG_CLASS;
 
   if (logoErrors[paymentMethod]) {
     return (

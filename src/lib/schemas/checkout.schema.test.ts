@@ -102,6 +102,19 @@ describe("checkout.schema", () => {
     expect(parsed.acknowledgements).toEqual(baseAck);
   });
 
+  it("parses checkout with aparik payment method", () => {
+    const payload = {
+      cartId: "cart-123",
+      email: "user@example.com",
+      phone: "+37499123456",
+      shippingMethod: "pickup",
+      paymentMethod: "aparik",
+      acknowledgements: pickupAck,
+    };
+
+    expect(safeParseCheckout(payload).success).toBe(true);
+  });
+
   it("rejects unsupported locale", () => {
     const payload = {
       cartId: "cart-123",

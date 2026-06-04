@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { logger } from "@/lib/utils/logger";
 
-type PaymentProvider = "idram" | "arca" | "cash_on_delivery";
+type PaymentProvider = "idram" | "arca" | "cash_on_delivery" | "aparik";
 
 interface SignedPaymentCallbackInput {
   paymentId: string;
@@ -82,7 +82,7 @@ export function isFreshCallbackTimestamp(timestamp: number, now = Date.now()): b
 }
 
 export function createPaymentUrl(input: CreatePaymentUrlInput): string | null {
-  if (input.provider === "cash_on_delivery") {
+  if (input.provider === "cash_on_delivery" || input.provider === "aparik") {
     return null;
   }
 

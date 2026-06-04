@@ -17,7 +17,7 @@ interface CardDetailsModalProps {
   handleSubmit: UseFormHandleSubmit<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
-  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
   shippingMethod: 'pickup' | 'delivery';
   deliverySpeed: 'standard' | 'express';
   shippingCity?: string;

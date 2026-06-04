@@ -543,7 +543,7 @@ class OrdersService {
         paymentId: order.payment.id,
         orderNumber: order.order.number,
         amount: Number(order.order.total),
-        provider: paymentMethod as "idram" | "arca" | "cash_on_delivery",
+        provider: paymentMethod as "idram" | "arca" | "cash_on_delivery" | "aparik",
         baseUrl: baseUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
       });
 

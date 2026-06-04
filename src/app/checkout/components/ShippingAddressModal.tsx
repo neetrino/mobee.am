@@ -20,7 +20,7 @@ interface ShippingAddressModalProps {
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
   deliverySpeed: 'standard' | 'express';
-  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
   cart: Cart | null;
   orderSummary: {
     subtotalDisplay: number;
@@ -167,6 +167,16 @@ export function ShippingAddressModal({
               </div>
             )}
 
+            {paymentMethod === 'aparik' && (
+              <div
+                className={`mb-6 mt-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-green-800">
+                  <strong>{t('checkout.payment.aparik')}:</strong> {t('checkout.messages.aparikInfo')}
+                </p>
+              </div>
+            )}
+
             <OrderSummaryModal
               cart={cart}
               orderSummary={orderSummary}
@@ -213,6 +223,16 @@ export function ShippingAddressModal({
               >
                 <p className="text-sm text-green-800">
                   <strong>{t('checkout.payment.cashOnDelivery')}:</strong> {t('checkout.messages.cashOnDeliveryPickup')}
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === 'aparik' && (
+              <div
+                className={`mb-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-green-800">
+                  <strong>{t('checkout.payment.aparik')}:</strong> {t('checkout.messages.aparikPickup')}
                 </p>
               </div>
             )}

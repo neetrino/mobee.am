@@ -20,7 +20,7 @@ interface CheckoutModalsProps {
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
   deliverySpeed: 'standard' | 'express';
-  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
   shippingCity: string | undefined;
   cart: Cart | null;
   orderSummary: {

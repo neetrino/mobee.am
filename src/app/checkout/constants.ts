@@ -40,6 +40,10 @@ export const CHECKOUT_PAYMENT_LOGO_IMG_CLASS =
 export const CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA =
   'w-full h-full object-contain p-0 scale-[1.18] origin-center';
 
+/** Aparik logo — max scale within the standard payment logo frame. */
+export const CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK =
+  'w-full h-full object-contain p-0 scale-[1.48] origin-center';
+
 /**
  * Checkout option radios: custom paint so WebKit/Safari does not show a black inner dot
  * when combining `accent-color` with fixed control size.
