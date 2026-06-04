@@ -9,7 +9,6 @@ import {
   CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_CLASS,
 } from './constants';
-import { DeliveryPricingHint } from './components/DeliveryPricingHint';
 import type { Cart, CheckoutFormData } from './types';
 
 interface OrderSummaryProps {
@@ -104,7 +103,6 @@ export function OrderSummary({
             <span>{t('checkout.summary.shipping')}</span>
             <span className="text-right max-w-[60%]">{shippingLabel}</span>
           </div>
-          <DeliveryPricingHint currency={currency} visible={shippingMethod === 'delivery'} />
           {orderSummary.totalExcludesPendingShipping && (
             <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">
               {t('checkout.summary.totalPendingShippingNote')}

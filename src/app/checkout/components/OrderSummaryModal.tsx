@@ -5,7 +5,6 @@ import { Input } from '@shop/ui';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../../lib/currency';
 import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
-import { DeliveryPricingHint } from './DeliveryPricingHint';
 import type { Cart, CheckoutFormData } from '../types';
 
 interface OrderSummaryModalProps {
@@ -97,7 +96,6 @@ export function OrderSummaryModal({
         <span className="text-gray-600">{t('checkout.summary.shipping')}:</span>
         <span className="font-medium text-right max-w-[55%]">{shippingDisplay}</span>
       </div>
-      <DeliveryPricingHint currency={currency} visible={shippingMethod === 'delivery'} />
       {orderSummary.totalExcludesPendingShipping && (
         <p className="text-xs text-amber-800">{t('checkout.summary.totalPendingShippingNote')}</p>
       )}
