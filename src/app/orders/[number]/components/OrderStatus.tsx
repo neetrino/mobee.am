@@ -10,10 +10,9 @@ import {
 interface OrderStatusProps {
   status: string;
   paymentStatus: string;
-  fulfillmentStatus: string;
 }
 
-export function OrderStatus({ status, paymentStatus, fulfillmentStatus: _fulfillmentStatus }: OrderStatusProps) {
+export function OrderStatus({ status, paymentStatus }: OrderStatusProps) {
   const { t } = useTranslation();
 
   return (

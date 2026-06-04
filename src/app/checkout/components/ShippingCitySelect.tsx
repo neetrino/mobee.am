@@ -49,6 +49,13 @@ export function ShippingCitySelect({
     },
   });
 
+  const hiddenInputRef = useCallback(
+    (element: HTMLInputElement | null) => {
+      registration.ref(element);
+    },
+    [registration]
+  );
+
   const labelForCity = (city: string): string => {
     const slug = ARMENIA_SUGGESTED_CITY_LABEL_SLUG[city];
     return slug ? t(`checkout.shipping.suggestedCities.${slug}`) : city;
@@ -114,7 +121,13 @@ export function ShippingCitySelect({
       >
         {t('checkout.form.city')}
       </label>
-      <input type="hidden" name={registration.name} ref={registration.ref} value={value} readOnly />
+      <input
+        type="hidden"
+        name="shippingCity"
+        ref={hiddenInputRef}
+        value={value}
+        readOnly
+      />
       <div className="relative">
         <button
           type="button"

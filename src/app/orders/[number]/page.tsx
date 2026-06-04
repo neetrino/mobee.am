@@ -125,11 +125,7 @@ export default function OrderPage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className={`lg:col-span-2 ${ORDER_PAGE_SECTION_STACK_CLASS}`}>
-          <OrderStatus
-            status={order.status}
-            paymentStatus={order.paymentStatus}
-            fulfillmentStatus={order.fulfillmentStatus}
-          />
+          <OrderStatus status={order.status} paymentStatus={order.paymentStatus} />
           <OrderItems items={order.items} currency={currency} />
           {order.shippingAddress && (
             <ShippingAddress shippingAddress={order.shippingAddress} />
