@@ -43,10 +43,12 @@ export function ProductColors({ colors, isCompact = false, maxVisible = 6 }: Pro
             aria-label={`Color: ${colorValue}`}
           >
             {imageUrl ? (
-              <img 
-                src={imageUrl} 
+              <img
+                src={imageUrl}
                 alt={colorValue}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
                 onError={(e) => {
                   // Fallback to color hex if image fails to load
                   const fallbackColor = colorHex || '#CCCCCC';
