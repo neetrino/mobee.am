@@ -18,7 +18,7 @@ class ProductsFindQueryService {
     bestsellerProductIds: string[];
     total?: number;
   }> {
-    const { limit = 12, page = 1 } = filters;
+    const { limit = 12, page = 1, lang = "en" } = filters;
 
     const { where, bestsellerProductIds } = await buildWhereClause(filters);
 
@@ -55,7 +55,8 @@ class ProductsFindQueryService {
           limit,
           (page - 1) * limit,
           priceSort,
-          listingMode
+          listingMode,
+          lang,
         ),
       ]);
       return {
@@ -68,7 +69,7 @@ class ProductsFindQueryService {
     if (!needOverFetch) {
       const [total, products] = await Promise.all([
         db.product.count({ where }),
-        executeProductQuery(where, limit, (page - 1) * limit, filters.sort, listingMode),
+        executeProductQuery(where, limit, (page - 1) * limit, filters.sort, listingMode, lang),
       ]);
       return {
         products,
@@ -78,7 +79,7 @@ class ProductsFindQueryService {
     }
 
     const fetchLimit = Math.min(limit * 10, 200);
-    const products = await executeProductQuery(where, fetchLimit, 0, filters.sort, listingMode);
+    const products = await executeProductQuery(where, fetchLimit, 0, filters.sort, listingMode, lang);
 
     return {
       products,

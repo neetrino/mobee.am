@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import type { LanguageCode } from '../lib/language';
+import type { CategoryTreeNode } from '../lib/category-nav';
 import { AuthProvider } from '../lib/auth/AuthContext';
 import { CategoriesTreeProvider } from './CategoriesTreeContext';
 import { TabletIpadAirLikeLayoutProvider } from './TabletIpadAirLikeLayoutProvider';
@@ -16,15 +17,22 @@ import { UiLanguageProvider } from './UiLanguageProvider';
 export function ClientProviders({
   children,
   initialLanguage,
+  initialCategories,
 }: {
   children: ReactNode;
   initialLanguage: LanguageCode;
+  initialCategories?: CategoryTreeNode[];
 }) {
   return (
     <TabletIpadAirLikeLayoutProvider>
       <UiLanguageProvider initialLanguage={initialLanguage}>
         <AuthProvider>
-          <CategoriesTreeProvider>{children}</CategoriesTreeProvider>
+          <CategoriesTreeProvider
+            initialCategories={initialCategories}
+            initialLanguage={initialLanguage}
+          >
+            {children}
+          </CategoriesTreeProvider>
           <ToastContainer />
           <ConfirmDialogContainer />
         </AuthProvider>

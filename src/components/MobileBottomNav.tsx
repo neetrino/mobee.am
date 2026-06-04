@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Montserrat } from 'next/font/google';
 import type { LucideIcon } from 'lucide-react';
 import { Heart, Home, UserRound } from 'lucide-react';
@@ -13,6 +13,7 @@ import { CompareIcon } from './icons/CompareIcon';
 import { MobileNavBagIcon } from './icons/MobileNavBagIcon';
 import { useMdUpViewport } from './hooks/useMdUpViewport';
 import { useMobileBottomNavCartCount } from './hooks/useMobileBottomNavCartCount';
+import { useHeaderRoutePrefetch } from './hooks/useHeaderRoutePrefetch';
 import { isCompareAppRoute } from '../lib/compareAppRoute';
 import {
   MOBILE_BOTTOM_NAV_BADGE_CLASS,
@@ -167,6 +168,7 @@ function MobileNavItem({
   return (
     <Link
       href={item.href}
+      prefetch
       className={linkClass}
       aria-label={label}
       aria-current={active ? 'page' : undefined}
@@ -193,11 +195,14 @@ function MobileNavItem({
  */
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useTranslation();
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
   const cartCount = useMobileBottomNavCartCount();
   const isMdUp = useMdUpViewport();
+
+  useHeaderRoutePrefetch(router);
 
   useEffect(() => {
     const updateWishlistCount = () => {

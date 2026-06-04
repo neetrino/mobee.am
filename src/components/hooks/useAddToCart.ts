@@ -35,13 +35,25 @@ interface UseAddToCartProps {
   defaultVariantId?: string | null;
   /** Unit price (AMD) — stored in guest cart so Header doesn't need extra API calls. */
   price?: number;
+  title?: string;
+  image?: string | null;
+  compareAtPrice?: number | null;
 }
 
 /**
  * Add-to-cart with instant UI: optimistic header + fly animation run synchronously; network work is backgrounded.
  * `isAddingToCart` stays false so buttons never show a loading state (in-flight guarded by ref).
  */
-export function useAddToCart({ productId, productSlug, inStock, defaultVariantId, price: propPrice }: UseAddToCartProps) {
+export function useAddToCart({
+  productId,
+  productSlug,
+  inStock,
+  defaultVariantId,
+  price: propPrice,
+  title: propTitle,
+  image: propImage,
+  compareAtPrice: propCompareAtPrice,
+}: UseAddToCartProps) {
   const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
   const inFlightRef = useRef(false);
@@ -96,6 +108,16 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
             productSlug,
             variantId,
             quantity: 1,
+            snapshot:
+              variantPrice !== undefined && propTitle
+                ? {
+                    title: propTitle,
+                    image: propImage ?? null,
+                    price: variantPrice,
+                    originalPrice: propCompareAtPrice ?? null,
+                    stock: variantStock,
+                  }
+                : undefined,
           });
           window.dispatchEvent(new Event('cart-updated'));
           triggerFly(fly);

@@ -304,11 +304,11 @@ function ProfileAccountMenu({
             className="absolute right-0 top-full z-[60] min-w-[100px] pt-2"
           >
             <div className="overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-2xl">
-              <Link href="/profile" role="menuitem" className={itemClass} onClick={close}>
+              <Link href="/profile" role="menuitem" prefetch className={itemClass} onClick={close}>
                 {profileLabel}
               </Link>
               {isAdmin ? (
-                <Link href="/supersudo" role="menuitem" className={`${itemClass} text-blue-700 hover:bg-blue-50`} onClick={close}>
+                <Link href="/supersudo" role="menuitem" prefetch className={`${itemClass} text-blue-700 hover:bg-blue-50`} onClick={close}>
                   {adminPanelLabel}
                 </Link>
               ) : null}
@@ -538,7 +538,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                 currencies={currencies}
                 onCurrencyChange={onCurrencyChange}
               />
-              <Link href="/compare" className={`${iconLinkClass} relative`} aria-label={compareAria}>
+              <Link href="/compare" prefetch className={`${iconLinkClass} relative`} aria-label={compareAria}>
                 <CompareIcon
                   size={20}
                   strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH}
@@ -550,7 +550,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   </span>
                 ) : null}
               </Link>
-              <Link href="/wishlist" className={`${iconLinkClass} relative`} aria-label={wishlistAria}>
+              <Link href="/wishlist" prefetch className={`${iconLinkClass} relative`} aria-label={wishlistAria}>
                 <WishlistHeartIcon size={20} strokeWidth={SECONDARY_BAR_ICON_STROKE_WIDTH} />
                 {wishlistCount > 0 ? (
                   <span className={HEADER_NAV_ICON_COUNT_OVERLAY_BADGE_CLASS} aria-hidden>
@@ -560,6 +560,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
               </Link>
               <Link
                 href="/cart"
+                prefetch
                 className={`${iconLinkClass} relative`}
                 aria-label={cartAria}
                 data-cart-fly-target="desktop"
@@ -589,6 +590,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
             ) : (
               <Link
                 href="/login"
+                prefetch
                 className="flex items-center gap-1.5 pr-0.5 text-[#4b5563] transition-colors hover:text-gray-900"
                 aria-label={loginLabel}
               >

@@ -7,9 +7,9 @@ import { ColorFilter } from '../../components/ColorFilter';
 import { BrandFilter } from '../../components/BrandFilter';
 import { CategoryFilter } from '../../components/CategoryFilter';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
-import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { ShopCatalogSection } from '@/components/shop/ShopCatalogSection';
+import { ShopFiltersShell } from '@/components/shop/ShopFiltersShell';
 import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
 import {
   SHOP_FILTER_SECTIONS_STACK_CLASS,
@@ -21,6 +21,26 @@ import {
 
 interface ProductsPageProps {
   searchParams?: Promise<Record<string, string | undefined>>;
+}
+
+function ShopFiltersAsideFallback() {
+  return (
+    <aside
+      className={`hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start ${SHOP_FILTER_SIDEBAR_SCROLL_CLASS}`}
+      style={
+        {
+          ['--shop-filter-aside-width']: SHOP_FILTER_SIDEBAR_WIDTH_CSS,
+        } as CSSProperties
+      }
+    >
+      <div className="animate-pulse space-y-6 bg-white px-6 pt-6">
+        <div className="h-12 rounded bg-gray-200" />
+        <div className="h-24 rounded bg-gray-200" />
+        <div className="h-32 rounded bg-gray-200" />
+        <div className="h-32 rounded bg-gray-200" />
+      </div>
+    </aside>
+  );
 }
 
 function ShopCatalogFallback() {
@@ -57,12 +77,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <div
         className={`flex w-full flex-col gap-6 pt-4 lg:flex-row lg:items-start ${SITE_CONTENT_GUTTERS_CLASS}`}
       >
-        <ProductsFiltersProvider
-          category={params?.category}
-          search={params?.search}
-          minPrice={params?.minPrice}
-          maxPrice={params?.maxPrice}
-        >
+        <Suspense fallback={<ShopFiltersAsideFallback />}>
+          <ShopFiltersShell language={language} searchParams={params}>
           <aside
             className={`hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-[var(--shop-filter-sidebar-top-offset)] lg:border-r lg:border-[#e7e7e7] lg:pr-0 ${SHOP_FILTER_SIDEBAR_SCROLL_CLASS}`}
             style={
@@ -112,10 +128,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             </div>
           </aside>
 
-          <Suspense fallback={<ShopCatalogFallback />}>
-            <ShopCatalogSection searchParams={params} />
-          </Suspense>
-
           <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
             <div className={`${SHOP_FILTER_SECTIONS_STACK_CLASS} p-4`}>
               <PriceFilter
@@ -146,7 +158,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               />
             </div>
           </MobileFiltersDrawer>
-        </ProductsFiltersProvider>
+          </ShopFiltersShell>
+        </Suspense>
+
+        <Suspense fallback={<ShopCatalogFallback />}>
+          <ShopCatalogSection searchParams={params} />
+        </Suspense>
       </div>
     </div>
   );

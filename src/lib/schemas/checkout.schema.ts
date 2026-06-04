@@ -53,6 +53,7 @@ const checkoutSchema = z
       z.string().trim().min(1).max(64).optional()
     ),
     locale: z.enum(["en", "hy", "ru"]).optional(),
+    currency: z.enum(["USD", "AMD", "EUR", "RUB", "GEL"]).optional(),
     billingAddress: shippingAddressSchema.optional(),
     acknowledgements: acknowledgementsSchema.default(DEFAULT_ACKNOWLEDGEMENTS),
   })

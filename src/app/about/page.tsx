@@ -3,9 +3,6 @@
 import Image from 'next/image';
 import { useTranslation } from '../../lib/i18n-client';
 
-export const dynamic = 'force-dynamic';
-export const dynamicParams = true;
-
 /**
  * About Us page — store story and hero content.
  */

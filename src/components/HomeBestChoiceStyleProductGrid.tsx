@@ -1,6 +1,7 @@
 'use client';
 
 import { ProductCard } from './ProductCard';
+import { ProductCardListingProvider } from './ProductCardListingContext';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import {
   HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT,
@@ -146,7 +147,8 @@ export function HomeBestChoiceStyleProductGrid({
   } = useHomeDesktopCarouselPager(desktopPageCount);
 
   return (
-    <>
+    <ProductCardListingProvider>
+      <>
       <div
         ref={carouselScrollRef}
         className={HOME_BEST_CHOICE_MOBILE_CAROUSEL}
@@ -204,7 +206,8 @@ export function HomeBestChoiceStyleProductGrid({
           />
         )}
       </div>
-    </>
+      </>
+    </ProductCardListingProvider>
   );
 }
 

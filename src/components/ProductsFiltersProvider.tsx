@@ -11,6 +11,10 @@ import {
 } from 'react';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
+import {
+  buildProductFiltersCacheKey,
+  type ProductFiltersCacheInput,
+} from '@/lib/shop/product-filters-cache-key';
 
 export interface ColorOption {
   value: string;
@@ -77,7 +81,27 @@ interface ProductsFiltersProviderProps {
   search?: string;
   minPrice?: string;
   maxPrice?: string;
+  initialFiltersData?: ProductsFiltersData;
+  initialTopCategories?: ShopTopCategoryOption[];
+  initialFiltersKey?: string;
   children: ReactNode;
+}
+
+function buildFiltersKeyFromProps(
+  category?: string,
+  search?: string,
+  minPrice?: string,
+  maxPrice?: string,
+  lang?: string,
+): string {
+  const input: ProductFiltersCacheInput = {
+    lang: lang || getStoredLanguage(),
+    category,
+    search,
+    minPrice: minPrice ? parseFloat(minPrice) : undefined,
+    maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+  };
+  return buildProductFiltersCacheKey(input);
 }
 
 export function ProductsFiltersProvider({
@@ -85,11 +109,16 @@ export function ProductsFiltersProvider({
   search,
   minPrice,
   maxPrice,
+  initialFiltersData,
+  initialTopCategories,
+  initialFiltersKey,
   children,
 }: ProductsFiltersProviderProps) {
-  const [data, setData] = useState<ProductsFiltersData | null>(null);
-  const [topCategories, setTopCategories] = useState<ShopTopCategoryOption[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<ProductsFiltersData | null>(() => initialFiltersData ?? null);
+  const [topCategories, setTopCategories] = useState<ShopTopCategoryOption[]>(
+    () => initialTopCategories ?? [],
+  );
+  const [loading, setLoading] = useState(() => !initialFiltersData);
   const [error, setError] = useState(false);
 
   const fetchFilters = useCallback(async () => {
@@ -106,7 +135,7 @@ export function ProductsFiltersProvider({
       const [filtersRes, topRes] = await Promise.all([
         apiClient.get<ProductsFiltersData>('/api/v1/products/filters', { params }),
         apiClient.get<{ data: ShopTopCategoryOption[] }>('/api/v1/categories/top', {
-          params: { lang, limit: SHOP_CATEGORY_FILTER_LIMIT },
+          params: { lang, limit: SHOP_CATEGORY_FILTER_LIMIT, includeImages: 'false' },
         }),
       ]);
 
@@ -127,8 +156,26 @@ export function ProductsFiltersProvider({
   }, [category, search, minPrice, maxPrice]);
 
   useEffect(() => {
-    fetchFilters();
-  }, [fetchFilters]);
+    const lang = getStoredLanguage();
+    const currentKey = buildFiltersKeyFromProps(category, search, minPrice, maxPrice, lang);
+    if (initialFiltersKey && currentKey === initialFiltersKey && initialFiltersData) {
+      setData(initialFiltersData);
+      setTopCategories(initialTopCategories ?? []);
+      setLoading(false);
+      setError(false);
+      return;
+    }
+    void fetchFilters();
+  }, [
+    category,
+    search,
+    minPrice,
+    maxPrice,
+    fetchFilters,
+    initialFiltersKey,
+    initialFiltersData,
+    initialTopCategories,
+  ]);
 
   const value = useMemo<ProductsFiltersContextValue>(
     () => ({

@@ -229,6 +229,12 @@ const nextConfig = {
   turbopack: {
     root: path.resolve(__dirname, '.'),
   },
+  experimental: {
+    staleTimes: {
+      dynamic: 60,
+      static: 300,
+    },
+  },
   allowedDevOrigins: [
     ...(IS_PRODUCTION_CONFIG ? [] : ['**']),
     ...DEFAULT_LAN_DEV_ORIGIN_PATTERNS,

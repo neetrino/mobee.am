@@ -12,7 +12,7 @@ import {
 import { usePathname } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import type { CategoryTreeNode } from '../lib/category-nav';
-import { getStoredLanguage, syncLanguageCookieFromStorage } from '../lib/language';
+import { getStoredLanguage, syncLanguageCookieFromStorage, type LanguageCode } from '../lib/language';
 
 type CategoriesTreeContextValue = {
   categories: CategoryTreeNode[];
@@ -26,13 +26,23 @@ interface CategoriesResponse {
   data: CategoryTreeNode[];
 }
 
+interface CategoriesTreeProviderProps {
+  children: ReactNode;
+  initialCategories?: CategoryTreeNode[];
+  initialLanguage?: LanguageCode;
+}
+
 /**
  * Single shared fetch for `/api/v1/categories/tree` (header + home strip).
  */
-export function CategoriesTreeProvider({ children }: { children: ReactNode }) {
+export function CategoriesTreeProvider({
+  children,
+  initialCategories,
+  initialLanguage,
+}: CategoriesTreeProviderProps) {
   const pathname = usePathname();
-  const [categories, setCategories] = useState<CategoryTreeNode[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categories, setCategories] = useState<CategoryTreeNode[]>(() => initialCategories ?? []);
+  const [loadingCategories, setLoadingCategories] = useState(() => !initialCategories);
 
   const refetchCategories = useCallback(async () => {
     if (typeof window === 'undefined') return;
@@ -60,8 +70,14 @@ export function CategoriesTreeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const lang = getStoredLanguage();
+    if (initialCategories && initialLanguage && lang === initialLanguage) {
+      setCategories(initialCategories);
+      setLoadingCategories(false);
+      return;
+    }
     void refetchCategories();
-  }, [refetchCategories]);
+  }, [refetchCategories, initialCategories, initialLanguage]);
 
   useEffect(() => {
     const onLang = () => void refetchCategories();
