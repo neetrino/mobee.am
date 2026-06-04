@@ -129,10 +129,12 @@ export function OrderDetailsModal({
                           <div key={index} className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
                             {item.imageUrl && (
                               <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded-[15px] bg-gray-100">
-                                <img 
-                                  src={item.imageUrl} 
+                                <img
+                                  src={item.imageUrl}
                                   alt={item.productTitle}
-                                  className="w-full h-full object-cover"
+                                  className="h-full w-full object-cover"
+                                  loading="lazy"
+                                  decoding="async"
                                 />
                               </div>
                             )}
@@ -159,10 +161,12 @@ export function OrderDetailsModal({
                                         </span>
                                         <div className="flex items-center gap-2">
                                           {hasImage ? (
-                                            <img 
-                                              src={opt.imageUrl!} 
+                                            <img
+                                              src={opt.imageUrl!}
                                               alt={displayLabel}
-                                              className="w-6 h-6 rounded border border-gray-300 object-cover"
+                                              className="h-6 w-6 rounded border border-gray-300 object-cover"
+                                              loading="lazy"
+                                              decoding="async"
                                               onError={(e) => {
                                                 (e.target as HTMLImageElement).style.display = 'none';
                                               }}

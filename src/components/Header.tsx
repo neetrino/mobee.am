@@ -299,8 +299,7 @@ function HeaderPhoneLangCluster({
             height={24}
             className="absolute inset-0 block size-6 max-w-none"
             decoding="async"
-            loading="eager"
-            fetchPriority="high"
+            loading="lazy"
           />
         </span>
         <span
@@ -341,8 +340,7 @@ function MobileDrawerSupportPhoneButtons() {
                 height={24}
                 className="absolute inset-0 block size-6 max-w-none"
                 decoding="async"
-                loading="eager"
-                fetchPriority="high"
+                loading="lazy"
               />
             </span>
             <span

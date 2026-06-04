@@ -164,7 +164,13 @@ export function ProductAttributesSelector({
                       >
                         {hasImage && processedImageUrl ? (
                            
-                          <img src={processedImageUrl} alt={g.label} className="h-full w-full object-cover" />
+                          <img
+                            src={processedImageUrl}
+                            alt={g.label}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
                         ) : null}
                       </button>
                     );
