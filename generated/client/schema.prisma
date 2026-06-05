@@ -68,16 +68,18 @@ model Address {
 // CATEGORY MODEL
 // ============================================
 model Category {
-  id            String                @id @default(cuid())
-  parentId      String?
-  position      Int                   @default(0)
-  published     Boolean               @default(false)
-  requiresSizes Boolean               @default(false)
-  media         Json[]                @default([])
-  translations  CategoryTranslation[]
-  deletedAt     DateTime?
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
+  id                String                @id @default(cuid())
+  parentId          String?
+  position          Int                   @default(0)
+  // 1–6 = home category strip slot; null = hidden from home strip
+  homeStripPosition Int?
+  published         Boolean               @default(false)
+  requiresSizes     Boolean               @default(false)
+  media             Json[]                @default([])
+  translations      CategoryTranslation[]
+  deletedAt         DateTime?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
 
   // Relations
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
@@ -87,6 +89,7 @@ model Category {
   @@index([parentId])
   @@index([published])
   @@index([deletedAt])
+  @@index([homeStripPosition])
   @@map("categories")
 }
 

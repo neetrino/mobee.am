@@ -50,26 +50,26 @@ export async function getCachedHomeCategoryStrip(
     },
   });
 
-  const data: HomeStripCategoryItem[] = categories
-    .map((category) => {
+  const data = categories.flatMap((category): HomeStripCategoryItem[] => {
       const translation =
         category.translations.find((tr) => tr.locale === lang) ||
         category.translations[0];
       if (!translation || category.homeStripPosition === null) {
-        return null;
+        return [];
       }
 
-      return {
-        id: category.id,
-        slug: translation.slug,
-        title: translation.title,
-        fullPath: translation.fullPath,
-        media: category.media ?? [],
-        children: [],
-        homeStripPosition: category.homeStripPosition,
-      };
-    })
-    .filter((item): item is HomeStripCategoryItem => item !== null);
+      return [
+        {
+          id: category.id,
+          slug: translation.slug,
+          title: translation.title,
+          fullPath: translation.fullPath,
+          media: category.media ?? [],
+          children: [],
+          homeStripPosition: category.homeStripPosition,
+        },
+      ];
+    });
 
   const result: HomeCategoryStripPayload = { data };
   await cacheService.setex(cacheKey, CACHE_TTL_SECONDS, JSON.stringify(result));

@@ -4,20 +4,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { useMemo } from 'react';
-import type { CategoryTreeNode } from '../lib/category-nav';
+import { extractCategoryImageUrl } from '../lib/categoryMedia';
 import {
   CATEGORY_STRIP_GRID_COLS,
-  CATEGORY_STRIP_SLOT_ORDER,
   categoryStripCardAspectClass,
   categoryStripHref,
-  categoryStripHrefForSlot,
   categoryStripInnerHeightClass,
   getCategoryStripVisual,
-  HOME_CATEGORY_STRIP_LIMIT,
-  mapHomeStripItemsByPosition,
-  resolveCategoryStripImageForItem,
+  resolveCategoryStripSlotKey,
   type CategoryStripSlotKey,
 } from '../lib/categoryStrip';
+import type { HomeStripCategoryItem } from '../lib/services/categories-home-strip-cached';
 import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { TopCategoriesMobileIcon } from './TopCategoriesMobileIcon';
@@ -29,24 +26,16 @@ const montserrat = Montserrat({
   display: 'swap',
 });
 
-const SLOT_LABEL_KEYS: Record<CategoryStripSlotKey, `common.mainHeader.${string}`> = {
-  computers: 'common.mainHeader.computersLink',
-  phones: 'common.mainHeader.phonesLink',
-  tablets: 'common.mainHeader.tabletsLink',
-  watches: 'common.mainHeader.watchesLink',
-  headphones: 'common.mainHeader.headphonesLink',
-  accessories: 'common.mainHeader.accessoriesLink',
-};
+const CATEGORY_STRIP_LOADING_SKELETON_COUNT = 3;
 
 function CategoryStripDesktopImage({
   slotKey,
-  media,
+  imageSrc,
 }: {
   slotKey: CategoryStripSlotKey;
-  media?: unknown;
+  imageSrc: string | null;
 }) {
   const visual = getCategoryStripVisual(slotKey);
-  const imageSrc = resolveCategoryStripImageForItem(media, slotKey);
   const innerH = categoryStripInnerHeightClass(visual);
 
   return (
@@ -54,7 +43,9 @@ function CategoryStripDesktopImage({
       className={`category-strip-tile-art absolute left-1/2 top-0 z-0 w-[197px] origin-top will-change-transform ${innerH}`}
     >
       <div className={`pointer-events-none z-[1] ${visual.imageWrapperClassName}`}>
-        {slotKey === 'watches' ? (
+        {!imageSrc ? (
+          <div className="size-full rounded-lg bg-[#e4e7eb]" />
+        ) : slotKey === 'watches' ? (
           <div className="flex size-full items-center justify-center">
             <div className="flex-none -rotate-[5.85deg]">
               <div className="relative size-[140px]">
@@ -88,44 +79,43 @@ function CategoryStripDesktopImage({
   );
 }
 
-function resolveStripLabel(
-  category: CategoryTreeNode | undefined,
-  slotKey: CategoryStripSlotKey,
-  t: (path: string) => string,
-): string {
-  if (category?.title?.trim()) {
-    return category.title;
-  }
-  return t(SLOT_LABEL_KEYS[slotKey]);
+function resolveStripSlotKey(
+  category: HomeStripCategoryItem,
+  index: number,
+): CategoryStripSlotKey {
+  return resolveCategoryStripSlotKey(category, index) ?? 'computers';
 }
 
 export function TopCategories() {
   const { t } = useTranslation();
   const { items, loadingHomeStrip: loading } = useHomeCategoryStrip();
 
-  const categoriesByPosition = useMemo(
-    () => mapHomeStripItemsByPosition(items),
+  const sortedItems = useMemo(
+    () => [...items].sort((a, b) => a.homeStripPosition - b.homeStripPosition),
     [items],
   );
+
+  const gridColsClass =
+    CATEGORY_STRIP_GRID_COLS[sortedItems.length] ?? CATEGORY_STRIP_GRID_COLS[1];
 
   if (loading) {
     return (
       <section className={`bg-white ${montserrat.className}`} aria-hidden>
         <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-40 lg:pt-6 xl:pt-8`}>
           <div className="flex gap-2 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:hidden">
-            {CATEGORY_STRIP_SLOT_ORDER.map((slotKey) => (
-              <div key={slotKey} className="flex shrink-0 flex-col items-center gap-2">
+            {Array.from({ length: CATEGORY_STRIP_LOADING_SKELETON_COUNT }, (_, index) => (
+              <div key={index} className="flex shrink-0 flex-col items-center gap-2">
                 <div className="size-[65px] animate-pulse rounded-lg bg-[#eceff2]" />
                 <div className="h-9 w-20 animate-pulse rounded-full bg-[#eceff2]" />
               </div>
             ))}
           </div>
           <div
-            className={`hidden lg:grid ${CATEGORY_STRIP_GRID_COLS[HOME_CATEGORY_STRIP_LIMIT]} lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3`}
+            className={`hidden lg:grid ${CATEGORY_STRIP_GRID_COLS[CATEGORY_STRIP_LOADING_SKELETON_COUNT]} lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3`}
           >
-            {CATEGORY_STRIP_SLOT_ORDER.map((slotKey) => (
+            {Array.from({ length: CATEGORY_STRIP_LOADING_SKELETON_COUNT }, (_, index) => (
               <div
-                key={slotKey}
+                key={index}
                 className="min-w-0 aspect-[197/201] animate-pulse rounded-[24px] bg-[#eceff2] xl:rounded-[30px]"
               />
             ))}
@@ -135,53 +125,48 @@ export function TopCategories() {
     );
   }
 
+  if (sortedItems.length === 0) {
+    return null;
+  }
+
   return (
     <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-40 lg:pt-6 xl:pt-8`}>
         <div className="flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide lg:hidden">
-          {CATEGORY_STRIP_SLOT_ORDER.map((slotKey, index) => {
-            const position = index + 1;
-            const category = categoriesByPosition.get(position);
-            const href = category
-              ? categoryStripHref(category)
-              : categoryStripHrefForSlot(null, slotKey);
-            const imageSrc = resolveCategoryStripImageForItem(category?.media, slotKey);
-            const label = resolveStripLabel(category, slotKey, t);
+          {sortedItems.map((category, index) => {
+            const slotKey = resolveStripSlotKey(category, index);
+            const imageSrc = extractCategoryImageUrl(category.media);
 
             return (
               <Link
-                key={slotKey}
-                href={href}
+                key={category.id}
+                href={categoryStripHref(category)}
                 className="flex shrink-0 flex-col items-center gap-2 transition-opacity active:opacity-90"
               >
                 <TopCategoriesMobileIcon imageSrc={imageSrc} slotKey={slotKey} />
                 <span className="shrink-0 rounded-full bg-[#f7f7f7] px-4 py-2 text-sm font-medium leading-normal text-[#303030]">
-                  {label}
+                  {category.title}
                 </span>
               </Link>
             );
           })}
         </div>
         <div
-          className={`hidden lg:grid ${CATEGORY_STRIP_GRID_COLS[HOME_CATEGORY_STRIP_LIMIT]} lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3`}
+          className={`hidden lg:grid ${gridColsClass} lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3`}
         >
-          {CATEGORY_STRIP_SLOT_ORDER.map((slotKey, index) => {
-            const position = index + 1;
-            const category = categoriesByPosition.get(position);
-            const href = category
-              ? categoryStripHref(category)
-              : categoryStripHrefForSlot(null, slotKey);
+          {sortedItems.map((category, index) => {
+            const slotKey = resolveStripSlotKey(category, index);
             const visual = getCategoryStripVisual(slotKey);
-            const label = resolveStripLabel(category, slotKey, t);
+            const imageSrc = extractCategoryImageUrl(category.media);
 
             return (
               <Link
-                key={slotKey}
-                href={href}
+                key={category.id}
+                href={categoryStripHref(category)}
                 className={`category-strip-card-cq group relative flex min-w-0 w-full flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(visual)}`}
               >
                 <div className="relative h-full w-full min-h-0 overflow-hidden">
-                  <CategoryStripDesktopImage slotKey={slotKey} media={category?.media} />
+                  <CategoryStripDesktopImage slotKey={slotKey} imageSrc={imageSrc} />
                 </div>
                 <div
                   className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex -translate-y-[8px] justify-center px-1.5 pb-2.5 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
@@ -189,7 +174,7 @@ export function TopCategories() {
                   }`}
                 >
                   <span className="line-clamp-2 max-w-full break-words text-[13px] font-bold leading-snug text-[#1c1c1c] [overflow-wrap:anywhere] xl:text-[16px] xl:leading-5">
-                    {label}
+                    {category.title}
                   </span>
                 </div>
               </Link>

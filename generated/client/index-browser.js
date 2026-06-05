@@ -161,6 +161,7 @@ exports.Prisma.CategoryScalarFieldEnum = {
   id: 'id',
   parentId: 'parentId',
   position: 'position',
+  homeStripPosition: 'homeStripPosition',
   published: 'published',
   requiresSizes: 'requiresSizes',
   media: 'media',
