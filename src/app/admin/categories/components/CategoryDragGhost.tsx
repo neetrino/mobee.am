@@ -15,7 +15,7 @@ interface CategoryDragGhostProps {
   category: CategoryWithLevel;
   subcategoryLabel: string;
   rect: CategoryDragGhostRect;
-  ghostRef: React.RefObject<HTMLDivElement | null>;
+  ghostRef: React.RefObject<HTMLDivElement>;
 }
 
 export function CategoryDragGhost({
