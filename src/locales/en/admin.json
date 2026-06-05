@@ -231,7 +231,15 @@
     "errorDeleting": "Error deleting category: {message}",
     "showingPage": "Showing page {page} of {totalPages} ({total} total)",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "tableImage": "Image",
+    "tableName": "Category name",
+    "tableSubcategory": "Subcategory",
+    "tableActions": "Actions",
+    "dragHandle": "Drag to reorder",
+    "reorderSuccess": "Category order updated",
+    "errorReordering": "Error reordering categories",
+    "reorderDisabledWhileSearching": "Reordering is disabled while searching"
   },
   "delivery": {
     "title": "Delivery",

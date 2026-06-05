@@ -50,9 +50,10 @@ class AdminCategoriesService {
     });
 
     return {
-      data: categories.map((category: {
+      data:       categories.map((category: {
         id: string;
         parentId: string | null;
+        position: number;
         requiresSizes: boolean | null;
         homeStripPosition: number | null;
         media: unknown;
@@ -65,6 +66,7 @@ class AdminCategoriesService {
           title: translation?.title || "",
           slug: translation?.slug || "",
           parentId: category.parentId,
+          position: category.position,
           requiresSizes: category.requiresSizes || false,
           homeStripPosition: category.homeStripPosition,
           imageUrl: extractCategoryImageUrl(category.media),
@@ -107,9 +109,12 @@ class AdminCategoriesService {
 
     const homeStripPosition = parseHomeStripPositionInput(data.homeStripPosition);
 
+    const nextPosition = await this.getNextSiblingPosition(data.parentId ?? null);
+
     const category = await db.category.create({
       data: {
         parentId: data.parentId || undefined,
+        position: nextPosition,
         requiresSizes: data.requiresSizes || false,
         published: true,
         media: buildCategoryMediaFromImageUrl(data.imageUrl ?? null),
@@ -546,6 +551,90 @@ class AdminCategoriesService {
     }
 
     return this.isCategoryDescendant(ancestorId, category.parent.id, visited);
+  }
+
+  /**
+   * Reorder sibling categories (same parentId)
+   */
+  async reorderCategories(data: {
+    parentId?: string | null;
+    categoryIds: string[];
+  }) {
+    const parentId = data.parentId ?? null;
+
+    if (!Array.isArray(data.categoryIds) || data.categoryIds.length === 0) {
+      throw {
+        status: 400,
+        type: 'https://api.shop.am/problems/bad-request',
+        title: 'Invalid reorder payload',
+        detail: 'categoryIds must be a non-empty array',
+      };
+    }
+
+    const uniqueIds = new Set(data.categoryIds);
+    if (uniqueIds.size !== data.categoryIds.length) {
+      throw {
+        status: 400,
+        type: 'https://api.shop.am/problems/bad-request',
+        title: 'Invalid reorder payload',
+        detail: 'categoryIds must not contain duplicates',
+      };
+    }
+
+    const siblings = await db.category.findMany({
+      where: {
+        deletedAt: null,
+        parentId,
+      },
+      select: { id: true },
+      orderBy: { position: 'asc' },
+    });
+
+    const siblingIds = siblings.map((item) => item.id);
+    if (siblingIds.length !== data.categoryIds.length) {
+      throw {
+        status: 400,
+        type: 'https://api.shop.am/problems/bad-request',
+        title: 'Invalid reorder payload',
+        detail: 'categoryIds must include all sibling categories for the given parent',
+      };
+    }
+
+    const siblingIdSet = new Set(siblingIds);
+    const hasInvalidId = data.categoryIds.some((id) => !siblingIdSet.has(id));
+    if (hasInvalidId) {
+      throw {
+        status: 400,
+        type: 'https://api.shop.am/problems/bad-request',
+        title: 'Invalid reorder payload',
+        detail: 'One or more categoryIds do not belong to the specified parent',
+      };
+    }
+
+    await db.$transaction(
+      data.categoryIds.map((id, index) =>
+        db.category.update({
+          where: { id },
+          data: { position: index },
+        }),
+      ),
+    );
+
+    await clearCategoriesCache();
+
+    return { success: true };
+  }
+
+  private async getNextSiblingPosition(parentId: string | null): Promise<number> {
+    const result = await db.category.aggregate({
+      where: {
+        deletedAt: null,
+        parentId,
+      },
+      _max: { position: true },
+    });
+
+    return (result._max.position ?? -1) + 1;
   }
 
   /**

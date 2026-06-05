@@ -20,6 +20,11 @@ interface UseCategoryActionsReturn {
   handleUpdateCategory: (fetchCategories: () => Promise<void>) => Promise<void>;
   handleDeleteCategory: (categoryId: string, categoryTitle: string, fetchCategories: () => Promise<void>) => Promise<void>;
   handleToggleHomeStrip: (categoryId: string, fetchCategories: () => Promise<void>) => Promise<void>;
+  handleReorderCategories: (
+    payload: { parentId: string | null; categoryIds: string[] },
+    fetchCategories: () => Promise<void>,
+  ) => Promise<void>;
+  reordering: boolean;
   resetForm: () => void;
 }
 
@@ -42,6 +47,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState<CategoryFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
+  const [reordering, setReordering] = useState(false);
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -164,6 +170,28 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     }
   };
 
+  const handleReorderCategories = async (
+    payload: { parentId: string | null; categoryIds: string[] },
+    fetchCategories: () => Promise<void>,
+  ) => {
+    setReordering(true);
+    try {
+      await apiClient.patch('/api/v1/admin/categories/reorder', payload);
+      await fetchCategories();
+      showToast(t('admin.categories.reorderSuccess'), 'success');
+    } catch (err: unknown) {
+      logger.error('Error reordering categories', { error: err });
+      const errorMessage = err && typeof err === 'object' && 'data' in err
+        ? (err as { data?: { detail?: string } }).data?.detail
+        : err && typeof err === 'object' && 'message' in err
+        ? (err as { message?: string }).message
+        : t('admin.categories.errorReordering');
+      showToast(errorMessage || t('admin.categories.errorReordering'), 'error');
+    } finally {
+      setReordering(false);
+    }
+  };
+
   const handleDeleteCategory = async (
     categoryId: string,
     categoryTitle: string,
@@ -217,6 +245,8 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     handleUpdateCategory,
     handleDeleteCategory,
     handleToggleHomeStrip,
+    handleReorderCategories,
+    reordering,
     resetForm,
   };
 }

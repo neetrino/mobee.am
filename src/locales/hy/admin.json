@@ -231,7 +231,15 @@
     "errorDeleting": "Սխալ կատեգորիան ջնջելիս: {message}",
     "showingPage": "Ցուցադրվում է {page} էջը {totalPages}-ից ({total} ընդամենը)",
     "previous": "Նախորդ",
-    "next": "Հաջորդ"
+    "next": "Հաջորդ",
+    "tableImage": "Նկար",
+    "tableName": "Կատեգորիայի անվանում",
+    "tableSubcategory": "Ենթակատեգորիա",
+    "tableActions": "Գործողություններ",
+    "dragHandle": "Քաշել և դասավորել",
+    "reorderSuccess": "Կատեգորիաների հերթականությունը թարմացվեց",
+    "errorReordering": "Սխալ կատեգորիաների դասավորելիս",
+    "reorderDisabledWhileSearching": "Որոնման ժամանակ դասավորումն անջատված է"
   },
   "delivery": {
     "title": "Առաքում",

@@ -32,7 +32,8 @@ export default function CategoriesPage() {
     handleEditCategory,
     handleUpdateCategory,
     handleDeleteCategory,
-    handleToggleHomeStrip,
+    handleReorderCategories,
+    reordering,
     resetForm,
   } = useCategoryActions();
 
@@ -118,13 +119,12 @@ export default function CategoriesPage() {
             <CategoriesList
               categories={categories}
               searchQuery={categorySearchQuery}
+              reordering={reordering}
               onEdit={handleEditCategory}
               onDelete={(categoryId, categoryTitle) =>
                 handleDeleteCategory(categoryId, categoryTitle, fetchCategories)
               }
-              onToggleHomeStrip={(categoryId) =>
-                handleToggleHomeStrip(categoryId, fetchCategories)
-              }
+              onReorder={(payload) => handleReorderCategories(payload, fetchCategories)}
             />
           )}
         </Card>
