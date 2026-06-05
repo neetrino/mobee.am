@@ -1,12 +1,18 @@
 'use client';
 
-import type { MouseEvent } from 'react';
+import { useMemo, useState, type MouseEvent } from 'react';
 import { FileText, Heart } from 'lucide-react';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { CompareIcon } from '../../../components/icons/CompareIcon';
+import { InstallmentPriceButton } from '../../../components/ProductCard/InstallmentPriceButton';
+import { InstallmentRequestModal } from '../../../components/ProductCard/InstallmentRequestModal';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
+import {
+  buildVariantTitleForInquiry,
+  resolveSelectedColorForInquiry,
+} from './utils/resolve-aparik-inquiry-details';
 import {
   PDP_IPAD_PRO_BAND_ADD_TO_CART_NARROW_CLASS,
   PDP_IPAD_PRO_BAND_PRICE_TEXT_CLASS,
@@ -81,7 +87,23 @@ export function ProductInfoAndActions({
   getOptionValue,
   getRequiredAttributesMessage,
 }: ProductInfoAndActionsProps) {
+  const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
   const title = getProductText(language, product.id, 'title') || product.title;
+  const productImageUrl = currentVariant?.imageUrl?.trim() || product.image || null;
+  const inquiryVariantDetails = useMemo(
+    () => ({
+      ...resolveSelectedColorForInquiry(selectedColor, attributeGroups, language),
+      variantTitle: buildVariantTitleForInquiry(currentVariant, selectedSize, language),
+      sku: currentVariant?.sku,
+    }),
+    [selectedColor, attributeGroups, language, currentVariant, selectedSize]
+  );
+
+  const handleInstallmentClick = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsInstallmentModalOpen(true);
+  };
 
   return (
     <div className="flex flex-col">
@@ -189,46 +211,67 @@ export function ProductInfoAndActions({
         </button>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">
-        <button
-          type="button"
-          disabled={!canAddToCart}
-          className={`h-12 min-w-[12rem] flex-1 cursor-pointer rounded-xl bg-admin px-4 font-bold uppercase tracking-wide text-white transition-colors hover:bg-admin-600 disabled:cursor-default disabled:bg-gray-300 ${PDP_IPAD_PRO_BAND_ADD_TO_CART_NARROW_CLASS}`}
-          onClick={onAddToCart}
-        >
-          {isOutOfStock
-            ? t(language, 'product.outOfStock')
-            : isVariationRequired
-              ? getRequiredAttributesMessage()
-              : hasUnavailableAttributes
-                ? t(language, 'product.outOfStock')
-                : t(language, 'product.addToCart')}
-        </button>
-        <button
-          type="button"
-          onClick={onCompareToggle}
-          className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 bg-white transition-colors duration-200 ${
-            isInCompare
-              ? 'border-admin text-admin'
-              : 'border-gray-200 text-gray-600 hover:border-gray-300'
-          }`}
-          aria-label={t(language, 'common.navigation.compare')}
-        >
-          <CompareIcon size={20} strokeWidth={1.75} className="shrink-0" />
-        </button>
-        <button
-          type="button"
-          onClick={onAddToWishlist}
-          className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 bg-white transition-colors duration-200 ${
-            isInWishlist
-              ? 'border-admin text-admin'
-              : 'border-gray-200 text-gray-600 hover:border-gray-300'
-          }`}
-          aria-label={t(language, 'common.buttons.addToWishlist')}
-        >
-          <Heart className="h-5 w-5" fill={isInWishlist ? 'currentColor' : 'none'} strokeWidth={2} />
-        </button>
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-6">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
+          <button
+            type="button"
+            disabled={!canAddToCart}
+            className={`h-12 min-w-[12rem] flex-1 cursor-pointer rounded-xl bg-admin px-4 font-bold uppercase tracking-wide text-white transition-colors hover:bg-admin-600 disabled:cursor-default disabled:bg-gray-300 ${PDP_IPAD_PRO_BAND_ADD_TO_CART_NARROW_CLASS}`}
+            onClick={onAddToCart}
+          >
+            {isOutOfStock
+              ? t(language, 'product.outOfStock')
+              : isVariationRequired
+                ? getRequiredAttributesMessage()
+                : hasUnavailableAttributes
+                  ? t(language, 'product.outOfStock')
+                  : t(language, 'product.addToCart')}
+          </button>
+          <button
+            type="button"
+            onClick={onCompareToggle}
+            className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 bg-white transition-colors duration-200 ${
+              isInCompare
+                ? 'border-admin text-admin'
+                : 'border-gray-200 text-gray-600 hover:border-gray-300'
+            }`}
+            aria-label={t(language, 'common.navigation.compare')}
+          >
+            <CompareIcon size={20} strokeWidth={1.75} className="shrink-0" />
+          </button>
+          <button
+            type="button"
+            onClick={onAddToWishlist}
+            className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 bg-white transition-colors duration-200 ${
+              isInWishlist
+                ? 'border-admin text-admin'
+                : 'border-gray-200 text-gray-600 hover:border-gray-300'
+            }`}
+            aria-label={t(language, 'common.buttons.addToWishlist')}
+          >
+            <Heart className="h-5 w-5" fill={isInWishlist ? 'currentColor' : 'none'} strokeWidth={2} />
+          </button>
+        </div>
+        <InstallmentPriceButton
+          onClick={handleInstallmentClick}
+          className="h-12 px-2"
+        />
       </div>
+
+      <InstallmentRequestModal
+        isOpen={isInstallmentModalOpen}
+        onClose={() => setIsInstallmentModalOpen(false)}
+        productId={product.id}
+        productSlug={product.slug}
+        productTitle={title}
+        productPrice={price}
+        currency="AMD"
+        productImageUrl={productImageUrl}
+        color={inquiryVariantDetails.color}
+        colorHex={inquiryVariantDetails.colorHex}
+        variantTitle={inquiryVariantDetails.variantTitle}
+        sku={inquiryVariantDetails.sku}
+      />
     </div>
   );
 }

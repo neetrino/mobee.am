@@ -1,13 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { ProductCardImage } from './ProductCardImage';
 import { ProductCardInfo } from './ProductCardInfo';
 import { ProductCardActions } from './ProductCardActions';
+import { ProductCardPriceBlock } from './ProductCardPriceBlock';
+import { InstallmentPriceButton } from './InstallmentPriceButton';
+import { InstallmentRequestModal } from './InstallmentRequestModal';
 import { CartIcon } from '../icons/CartIcon';
 import { ProductLabels } from '../ProductLabels';
 import { useTranslation } from '../../lib/i18n-client';
-import { formatPrice, type CurrencyCode } from '../../lib/currency';
+import type { CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
 import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
 
@@ -73,6 +77,7 @@ export function ProductCardGrid({
   onAddToCart,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
+  const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
   const categoryLine = getProductCardCategoryLineLabel(product);
   const footerPriceClass = (() => {
     if (smallerFooterPrice) {
@@ -129,6 +134,26 @@ export function ProductCardGrid({
       ? 'px-3 pb-3'
       : 'px-5 pb-5';
 
+  const discountClass = smallerFooterPrice
+    ? isCompact
+      ? 'text-[0.54979171875rem] lg:text-[0.7125rem]'
+      : 'text-[0.641423671875rem] lg:text-[0.83125rem]'
+    : isCompact
+      ? 'text-[0.7125rem]'
+      : 'text-[0.83125rem]';
+
+  const infoPricePad = homeProductGridCard
+    ? 'px-3 pb-2 max-lg:pt-1 lg:px-5 lg:pb-3'
+    : isCompact
+      ? 'px-3 pb-2'
+      : 'px-5 pb-3';
+
+  const handleInstallmentClick = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsInstallmentModalOpen(true);
+  };
+
   return (
     <div className={cardShellClass} data-product-card-root>
       <div className={imageStackClass}>
@@ -181,6 +206,18 @@ export function ProductCardGrid({
           omitBrandRow={homeProductGridCard}
           titleSizeMobileFigma={homeProductGridCard}
         />
+        <div className={infoPricePad}>
+          <ProductCardPriceBlock
+            price={product.price}
+            currency={currency}
+            discountPercent={product.discountPercent}
+            listPrice={listPrice}
+            priceClass={footerPriceClass}
+            discountClass={discountClass}
+            homeProductGridCard={homeProductGridCard}
+            showStrike={showStrike}
+          />
+        </div>
         <div className="min-h-0 flex-1" aria-hidden />
       </div>
 
@@ -190,43 +227,6 @@ export function ProductCardGrid({
         }`}
       >
         <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0 flex flex-col gap-0.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`whitespace-nowrap font-bold tabular-nums text-gray-900 ${footerPriceClass}`}
-              >
-                {formatPrice(product.price || 0, currency)}
-              </span>
-              {product.discountPercent && product.discountPercent > 0 ? (
-                <span
-                  className={`font-semibold text-blue-600 ${
-                    homeProductGridCard ? 'max-lg:hidden' : ''
-                  } ${
-                    smallerFooterPrice
-                      ? isCompact
-                        ? 'text-[0.54979171875rem] lg:text-[0.7125rem]'
-                        : 'text-[0.641423671875rem] lg:text-[0.83125rem]'
-                      : isCompact
-                        ? 'text-[0.7125rem]'
-                        : 'text-[0.83125rem]'
-                  }`}
-                >
-                  -{product.discountPercent}%
-                </span>
-              ) : null}
-            </div>
-            {homeProductGridCard ? (
-              <div className="hidden min-h-[14px] max-lg:block" aria-hidden={!showStrike}>
-                {showStrike && listPrice != null ? (
-                  <span className="text-[10px] font-normal italic leading-tight text-[#8e8e93] line-through">
-                    {formatPrice(listPrice, currency)}
-                  </span>
-                ) : (
-                  <span className="invisible block text-[10px] leading-tight">&nbsp;</span>
-                )}
-              </div>
-            ) : null}
-          </div>
           <button
             type="button"
             onClick={onAddToCart}
@@ -276,6 +276,7 @@ export function ProductCardGrid({
               </>
             )}
           </button>
+          <InstallmentPriceButton onClick={handleInstallmentClick} />
         </div>
         {homeProductGridCard ? (
           <div className="hidden min-h-[22px] max-lg:flex max-lg:items-center">
@@ -287,6 +288,17 @@ export function ProductCardGrid({
           </div>
         ) : null}
       </div>
+
+      <InstallmentRequestModal
+        isOpen={isInstallmentModalOpen}
+        onClose={() => setIsInstallmentModalOpen(false)}
+        productId={product.id}
+        productSlug={product.slug}
+        productTitle={product.title}
+        productPrice={product.price}
+        currency="AMD"
+        productImageUrl={product.image}
+      />
     </div>
   );
 }
