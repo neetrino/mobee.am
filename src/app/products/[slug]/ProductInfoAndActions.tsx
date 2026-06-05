@@ -200,7 +200,7 @@ export function ProductInfoAndActions({
         getOptionValue={getOptionValue}
       />
 
-      <div className="mt-8 flex flex-col gap-3 text-sm">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 text-sm">
         <button
           type="button"
           onClick={onScrollToDetails}
@@ -209,9 +209,10 @@ export function ProductInfoAndActions({
           <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
           {t(language, 'product.moreDetails')}
         </button>
+        <InstallmentPriceButton onClick={handleInstallmentClick} />
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-6">
+      <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
           <button
             type="button"
@@ -252,10 +253,6 @@ export function ProductInfoAndActions({
             <Heart className="h-5 w-5" fill={isInWishlist ? 'currentColor' : 'none'} strokeWidth={2} />
           </button>
         </div>
-        <InstallmentPriceButton
-          onClick={handleInstallmentClick}
-          className="h-12 px-2"
-        />
       </div>
 
       <InstallmentRequestModal
