@@ -28,7 +28,14 @@
   "priceInfoAria": "Price information",
   "priceInfoTitle": "Price includes VAT where applicable. Final price may depend on the selected variant.",
   "moreDetails": "More details",
-  "availableInStores": "Available in stores"
+  "availableInStores": "Available in stores",
+  "aparik": {
+    "buttonLabel": "Installment price",
+    "modalIntro": "Fill in the details below to send an installment request. Our specialist will review your application and contact you as soon as possible to present the terms and answer your questions.",
+    "submitting": "Sending...",
+    "submitSuccess": "Your request was sent successfully. Our specialist will contact you soon.",
+    "submitError": "Failed to send the request. Please try again."
+  }
 }
 
 
