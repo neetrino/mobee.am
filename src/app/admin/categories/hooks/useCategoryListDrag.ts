@@ -29,7 +29,7 @@ interface UseCategoryListDragResult {
   displayItems: CategoryWithLevel[];
   draggingId: string | null;
   dragGhost: CategoryDragGhostRect | null;
-  ghostElementRef: React.RefObject<HTMLDivElement | null>;
+  ghostElementRef: React.RefObject<HTMLDivElement>;
   placeholderHeight: number;
   startDrag: (categoryId: string, event: React.PointerEvent<HTMLDivElement>) => void;
 }
@@ -49,7 +49,7 @@ export function useCategoryListDrag({
   const initialSiblingOrderRef = useRef<string[]>([]);
   const displayItemsRef = useRef(items);
   const currentSiblingIndexRef = useRef<number>(-1);
-  const ghostElementRef = useRef<HTMLDivElement | null>(null);
+  const ghostElementRef = useRef<HTMLDivElement>(null);
   const ghostOffsetYRef = useRef(0);
   const ghostBaseTopRef = useRef(0);
   const pointerFrameRef = useRef<number | null>(null);
