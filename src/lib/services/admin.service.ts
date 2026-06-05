@@ -58,6 +58,7 @@ class AdminService {
   createCategory = adminCategoriesService.createCategory.bind(adminCategoriesService);
   getCategoryById = adminCategoriesService.getCategoryById.bind(adminCategoriesService);
   updateCategory = adminCategoriesService.updateCategory.bind(adminCategoriesService);
+  toggleHomeStrip = adminCategoriesService.toggleHomeStrip.bind(adminCategoriesService);
   deleteCategory = adminCategoriesService.deleteCategory.bind(adminCategoriesService);
 
   // Products methods

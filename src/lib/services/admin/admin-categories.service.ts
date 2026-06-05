@@ -1,9 +1,14 @@
 import { db } from "@white-shop/db";
 import {
+  buildCategoryMediaFromImageUrl,
+  extractCategoryImageUrl,
+} from "@/lib/categoryMedia";
+import {
   HOME_CATEGORY_STRIP_MAX_POSITION,
   HOME_CATEGORY_STRIP_MIN_POSITION,
   normalizeHomeStripPosition,
 } from "@/lib/constants/home-category-strip.constants";
+import { getDefaultStripImageByPosition } from "@/lib/categoryStrip";
 import { cacheService } from "@/lib/services/cache.service";
 import { toSlug } from "@/lib/utils/slug";
 
@@ -50,6 +55,7 @@ class AdminCategoriesService {
         parentId: string | null;
         requiresSizes: boolean | null;
         homeStripPosition: number | null;
+        media: unknown;
         translations?: Array<{ title: string; slug: string }>;
       }) => {
         const translations = Array.isArray(category.translations) ? category.translations : [];
@@ -61,6 +67,7 @@ class AdminCategoriesService {
           parentId: category.parentId,
           requiresSizes: category.requiresSizes || false,
           homeStripPosition: category.homeStripPosition,
+          imageUrl: extractCategoryImageUrl(category.media),
         };
       }),
     };
@@ -75,6 +82,7 @@ class AdminCategoriesService {
     parentId?: string;
     requiresSizes?: boolean;
     homeStripPosition?: number | null;
+    imageUrl?: string | null;
   }) {
     const locale = data.locale || "en";
     
@@ -104,6 +112,7 @@ class AdminCategoriesService {
         parentId: data.parentId || undefined,
         requiresSizes: data.requiresSizes || false,
         published: true,
+        media: buildCategoryMediaFromImageUrl(data.imageUrl ?? null),
         translations: {
           create: {
             locale,
@@ -144,6 +153,7 @@ class AdminCategoriesService {
         parentId: category.parentId,
         requiresSizes: category.requiresSizes || false,
         homeStripPosition: refreshedCategory?.homeStripPosition ?? null,
+        imageUrl: extractCategoryImageUrl(refreshedCategory?.media),
       },
     };
   }
@@ -184,6 +194,7 @@ class AdminCategoriesService {
       parentId: category.parentId,
       requiresSizes: category.requiresSizes || false,
       homeStripPosition: category.homeStripPosition,
+      imageUrl: extractCategoryImageUrl(category.media),
       children: category.children.map((child: { id: string; parentId: string | null; requiresSizes: boolean | null; translations?: Array<{ title: string; slug: string }> }) => {
         const childTranslations = Array.isArray(child.translations) ? child.translations : [];
         const childTranslation = childTranslations[0] || null;
@@ -208,6 +219,7 @@ class AdminCategoriesService {
     requiresSizes?: boolean;
     subcategoryIds?: string[];
     homeStripPosition?: number | null;
+    imageUrl?: string | null;
   }) {
     const locale = data.locale || "en";
     
@@ -311,6 +323,7 @@ class AdminCategoriesService {
     const updateData: {
       parentId?: string | null;
       requiresSizes?: boolean;
+      media?: { url: string }[];
     } = {};
 
     if (data.parentId !== undefined) {
@@ -319,6 +332,10 @@ class AdminCategoriesService {
 
     if (data.requiresSizes !== undefined) {
       updateData.requiresSizes = data.requiresSizes;
+    }
+
+    if (data.imageUrl !== undefined) {
+      updateData.media = buildCategoryMediaFromImageUrl(data.imageUrl);
     }
 
     if (data.homeStripPosition !== undefined) {
@@ -377,8 +394,49 @@ class AdminCategoriesService {
         parentId: updatedCategory.parentId,
         requiresSizes: updatedCategory.requiresSizes || false,
         homeStripPosition: updatedCategory.homeStripPosition,
+        imageUrl: extractCategoryImageUrl(updatedCategory.media),
       },
     };
+  }
+
+  /**
+   * Toggle category visibility on the home page strip (star control).
+   */
+  async toggleHomeStrip(categoryId: string) {
+    const category = await db.category.findUnique({
+      where: { id: categoryId },
+      select: { homeStripPosition: true },
+    });
+
+    if (!category) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "Category not found",
+        detail: `Category with id '${categoryId}' does not exist`,
+      };
+    }
+
+    if (category.homeStripPosition !== null) {
+      await this.assignHomeStripPosition(categoryId, null);
+      await clearCategoriesCache();
+      return { data: { homeStripPosition: null } };
+    }
+
+    const nextPosition = await this.findNextHomeStripPosition();
+    if (nextPosition === null) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/bad-request",
+        title: "Home strip full",
+        detail: `All ${HOME_CATEGORY_STRIP_MAX_POSITION} home page slots are already assigned`,
+      };
+    }
+
+    await this.assignHomeStripPosition(categoryId, nextPosition);
+    await clearCategoriesCache();
+
+    return { data: { homeStripPosition: nextPosition } };
   }
 
   /**
@@ -408,6 +466,57 @@ class AdminCategoriesService {
     await db.category.update({
       where: { id: categoryId },
       data: { homeStripPosition: position },
+    });
+
+    await this.ensureDefaultStripImage(categoryId, position);
+  }
+
+  private async findNextHomeStripPosition(): Promise<number | null> {
+    const used = await db.category.findMany({
+      where: {
+        deletedAt: null,
+        homeStripPosition: { not: null },
+      },
+      select: { homeStripPosition: true },
+    });
+
+    const usedPositions = new Set(
+      used
+        .map((item) => item.homeStripPosition)
+        .filter((value): value is number => value !== null),
+    );
+
+    for (
+      let position = HOME_CATEGORY_STRIP_MIN_POSITION;
+      position <= HOME_CATEGORY_STRIP_MAX_POSITION;
+      position += 1
+    ) {
+      if (!usedPositions.has(position)) {
+        return position;
+      }
+    }
+
+    return null;
+  }
+
+  private async ensureDefaultStripImage(
+    categoryId: string,
+    position: number,
+  ): Promise<void> {
+    const category = await db.category.findUnique({
+      where: { id: categoryId },
+      select: { media: true },
+    });
+
+    if (!category || extractCategoryImageUrl(category.media)) {
+      return;
+    }
+
+    await db.category.update({
+      where: { id: categoryId },
+      data: {
+        media: [{ url: getDefaultStripImageByPosition(position) }],
+      },
     });
   }
 

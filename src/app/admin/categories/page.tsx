@@ -32,6 +32,7 @@ export default function CategoriesPage() {
     handleEditCategory,
     handleUpdateCategory,
     handleDeleteCategory,
+    handleToggleHomeStrip,
     resetForm,
   } = useCategoryActions();
 
@@ -120,6 +121,9 @@ export default function CategoriesPage() {
               onEdit={handleEditCategory}
               onDelete={(categoryId, categoryTitle) =>
                 handleDeleteCategory(categoryId, categoryTitle, fetchCategories)
+              }
+              onToggleHomeStrip={(categoryId) =>
+                handleToggleHomeStrip(categoryId, fetchCategories)
               }
             />
           )}

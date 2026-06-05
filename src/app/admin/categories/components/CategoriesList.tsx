@@ -12,6 +12,7 @@ interface CategoriesListProps {
   searchQuery: string;
   onEdit: (category: Category) => void;
   onDelete: (categoryId: string, categoryTitle: string) => void;
+  onToggleHomeStrip: (categoryId: string) => Promise<void>;
 }
 
 const ITEMS_PER_PAGE = 20;
@@ -21,6 +22,7 @@ export function CategoriesList({
   searchQuery,
   onEdit,
   onDelete,
+  onToggleHomeStrip,
 }: CategoriesListProps) {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,6 +73,7 @@ export function CategoriesList({
                   parentCategory={parentCategory || null}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  onToggleHomeStrip={onToggleHomeStrip}
                 />
               );
             })}

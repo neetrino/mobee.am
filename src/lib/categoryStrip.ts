@@ -1,3 +1,4 @@
+import { extractCategoryImageUrl } from './categoryMedia';
 import type { CategoryTreeNode } from './category-nav';
 import {
   ACCESSORIES_SLUG_PARTS,
@@ -164,8 +165,35 @@ export function resolveCategoryForStripSlot(
   return findCategoryBySlugParts(categories, SLOT_SLUG_PARTS[slotKey]);
 }
 
+export function getCategoryStripSlotKeyByPosition(
+  position: number,
+): CategoryStripSlotKey | null {
+  const slotKey = CATEGORY_STRIP_SLOT_ORDER[position - 1];
+  return slotKey ?? null;
+}
+
+export function getDefaultStripImageByPosition(position: number): string {
+  const slotKey = getCategoryStripSlotKeyByPosition(position);
+  if (!slotKey) {
+    return FALLBACK_IMAGES.computers;
+  }
+  return FALLBACK_IMAGES[slotKey];
+}
+
 export function resolveCategoryStripImageSrc(slotKey: CategoryStripSlotKey): string {
   return FALLBACK_IMAGES[slotKey];
+}
+
+export function resolveCategoryStripImageForItem(
+  media: unknown,
+  slotKey: CategoryStripSlotKey,
+): string {
+  const fromMedia = extractCategoryImageUrl(media);
+  if (fromMedia) {
+    return fromMedia;
+  }
+
+  return resolveCategoryStripImageSrc(slotKey);
 }
 
 export function getCategoryStripVisual(slotKey: CategoryStripSlotKey): CategoryStripVisual {

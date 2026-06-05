@@ -15,7 +15,7 @@ import {
   getCategoryStripVisual,
   HOME_CATEGORY_STRIP_LIMIT,
   mapHomeStripItemsByPosition,
-  resolveCategoryStripImageSrc,
+  resolveCategoryStripImageForItem,
   type CategoryStripSlotKey,
 } from '../lib/categoryStrip';
 import { useTranslation } from '../lib/i18n-client';
@@ -38,9 +38,15 @@ const SLOT_LABEL_KEYS: Record<CategoryStripSlotKey, `common.mainHeader.${string}
   accessories: 'common.mainHeader.accessoriesLink',
 };
 
-function CategoryStripDesktopImage({ slotKey }: { slotKey: CategoryStripSlotKey }) {
+function CategoryStripDesktopImage({
+  slotKey,
+  media,
+}: {
+  slotKey: CategoryStripSlotKey;
+  media?: unknown;
+}) {
   const visual = getCategoryStripVisual(slotKey);
-  const imageSrc = resolveCategoryStripImageSrc(slotKey);
+  const imageSrc = resolveCategoryStripImageForItem(media, slotKey);
   const innerH = categoryStripInnerHeightClass(visual);
 
   return (
@@ -139,7 +145,7 @@ export function TopCategories() {
             const href = category
               ? categoryStripHref(category)
               : categoryStripHrefForSlot(null, slotKey);
-            const imageSrc = resolveCategoryStripImageSrc(slotKey);
+            const imageSrc = resolveCategoryStripImageForItem(category?.media, slotKey);
             const label = resolveStripLabel(category, slotKey, t);
 
             return (
@@ -175,7 +181,7 @@ export function TopCategories() {
                 className={`category-strip-card-cq group relative flex min-w-0 w-full flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(visual)}`}
               >
                 <div className="relative h-full w-full min-h-0 overflow-hidden">
-                  <CategoryStripDesktopImage slotKey={slotKey} />
+                  <CategoryStripDesktopImage slotKey={slotKey} media={category?.media} />
                 </div>
                 <div
                   className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex -translate-y-[8px] justify-center px-1.5 pb-2.5 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
