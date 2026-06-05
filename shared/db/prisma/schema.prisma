@@ -70,10 +70,12 @@ model Address {
 model Category {
   id            String                @id @default(cuid())
   parentId      String?
-  position      Int                   @default(0)
-  published     Boolean               @default(false)
-  requiresSizes Boolean               @default(false)
-  media         Json[]                @default([])
+  position           Int                   @default(0)
+  // 1–6 = home category strip slot; null = hidden from home strip
+  homeStripPosition  Int?
+  published          Boolean               @default(false)
+  requiresSizes      Boolean               @default(false)
+  media              Json[]                @default([])
   translations  CategoryTranslation[]
   deletedAt     DateTime?
   createdAt     DateTime              @default(now())
@@ -87,6 +89,7 @@ model Category {
   @@index([parentId])
   @@index([published])
   @@index([deletedAt])
+  @@index([homeStripPosition])
   @@map("categories")
 }
 

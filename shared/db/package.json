@@ -5,11 +5,11 @@
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio",
+    "db:generate": "node scripts/with-root-env.cjs generate",
+    "db:push": "node scripts/with-root-env.cjs db push",
+    "db:migrate": "node scripts/with-root-env.cjs migrate dev",
+    "db:migrate:deploy": "node scripts/with-root-env.cjs migrate deploy",
+    "db:studio": "node scripts/with-root-env.cjs studio",
     "db:seed": "prisma db seed",
     "postinstall": "prisma generate"
   },

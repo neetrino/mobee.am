@@ -1,32 +1,30 @@
 import Image from 'next/image';
+import type { CategoryStripSlotKey } from '../lib/categoryStrip';
 
-type CategoryStripSlotKey =
-  | 'computers'
-  | 'phones'
-  | 'tablets'
-  | 'watches'
-  | 'headphones'
-  | 'accessories';
-
-export interface TopCategoriesMobileIconSlot {
-  key: CategoryStripSlotKey;
-  imageSrc: string;
-}
-
-function mobileCategoryIconClassName(slot: TopCategoriesMobileIconSlot): string {
-  if (slot.key === 'computers' || slot.key === 'accessories') {
+function mobileCategoryIconClassName(slotKey: CategoryStripSlotKey): string {
+  if (slotKey === 'computers' || slotKey === 'accessories') {
     return 'object-contain';
   }
   return 'object-cover';
 }
 
-export function TopCategoriesMobileIcon({ slot }: { slot: TopCategoriesMobileIconSlot }) {
-  if (slot.key === 'watches') {
+export function TopCategoriesMobileIcon({
+  imageSrc,
+  slotKey,
+}: {
+  imageSrc: string | null;
+  slotKey: CategoryStripSlotKey;
+}) {
+  if (!imageSrc) {
+    return <span className="size-[65px] rounded-lg bg-[#e4e7eb]" />;
+  }
+
+  if (slotKey === 'watches') {
     return (
       <span className="flex size-[65px] items-center justify-center">
         <span className="flex-none -rotate-[5.85deg]">
           <Image
-            src={slot.imageSrc}
+            src={imageSrc}
             alt=""
             width={52}
             height={52}
@@ -37,16 +35,16 @@ export function TopCategoriesMobileIcon({ slot }: { slot: TopCategoriesMobileIco
     );
   }
 
-  const mirror = slot.key === 'computers';
+  const mirror = slotKey === 'computers';
 
   return (
     <span className={`relative size-[65px] ${mirror ? '-scale-x-100' : ''}`}>
       <Image
-        src={slot.imageSrc}
+        src={imageSrc}
         alt=""
         fill
         sizes="65px"
-        className={mobileCategoryIconClassName(slot)}
+        className={mobileCategoryIconClassName(slotKey)}
       />
     </span>
   );

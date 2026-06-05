@@ -6,25 +6,15 @@ import {
   useCallback,
   useEffect,
   type ComponentProps,
-  type MouseEvent,
 } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { apiClient } from '../lib/api-client';
-import { getStoredCurrency } from '../lib/currency';
 import { t } from '../lib/i18n';
-import { useAuth } from '../lib/auth/AuthContext';
-import { dispatchCartFlyAnimation } from '../lib/cart/dispatchCartFlyAnimation';
-import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
-import { upsertGuestCartItem } from '../lib/cart/guest-cart';
-import { fetchProductBySlugWithLang } from '../lib/shop/fetchProductBySlugWithLang';
 import { useRelatedProducts, type RelatedProduct } from './hooks/useRelatedProducts';
 import { useCarousel } from './hooks/useCarousel';
 import { useVisibleCards } from './hooks/useVisibleCards';
 import { ProductCardListingProvider } from './ProductCardListingContext';
 import { ProductCard } from './ProductCard';
-import { RelatedProductCard } from './RelatedProducts/RelatedProductCard';
 import { CarouselNavigation } from './RelatedProducts/CarouselNavigation';
-import { showToast } from './Toast';
 import { CarouselDots } from './RelatedProducts/CarouselDots';
 import { useUiLanguage } from './UiLanguageProvider';
 import { chunkArray } from '../lib/chunk-array';
@@ -32,7 +22,10 @@ import {
   HOME_BEST_CHOICE_CARD_WIDTH,
   HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL,
   HOME_BEST_CHOICE_MOBILE_PAGE,
+  getHomeCuratedProductCardProps,
+  getHomeCuratedDesktopProductCardProps,
 } from './HomeBestChoiceStyleProductGrid';
+import { useHomeDesktopCarouselHomeStyle } from './useHomeDesktopCarouselHomeStyle';
 import {
   useHomeBestChoiceCarouselPageSync,
   type MobileCarouselViewState,
@@ -92,13 +85,10 @@ type RelatedMobileTitleNavLatch = 'prev' | 'next' | null;
  * At `xl+`: draggable strip with arrows/dots (unchanged wide desktop).
  */
 export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
-  const { isLoggedIn } = useAuth();
   const language = useUiLanguage();
+  const desktopHomeStyle = useHomeDesktopCarouselHomeStyle();
   const relatedMobileCardsPerPage = useRelatedProductsMobileCardsPerPage();
-  const addToCartInFlightRef = useRef<Set<string>>(new Set());
   const relatedMobileTitleNavGroupRef = useRef<HTMLSpanElement>(null);
-  const [addingProductId, setAddingProductId] = useState<string | null>(null);
-  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [relatedMobileTitleNavLatch, setRelatedMobileTitleNavLatch] =
     useState<RelatedMobileTitleNavLatch>(null);
   
@@ -162,6 +152,13 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         ? 'grid-cols-3'
         : 'grid-cols-2';
   const relatedMobileGridClass = `grid ${relatedMobileGridColsClass} gap-4 ${RELATED_MOBILE_GRID_CHILD_MIN_WIDTH}`;
+  const relatedMobileViewMode: 'grid-2' | 'grid-3' =
+    relatedMobileCardsPerPage === RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_MINI ||
+    relatedMobileCardsPerPage === RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_IPAD_PRO
+      ? 'grid-3'
+      : 'grid-2';
+  const homeMobileCardProps = getHomeCuratedProductCardProps(true);
+  const homeDesktopCardProps = getHomeCuratedDesktopProductCardProps(desktopHomeStyle);
 
   const scrollRelatedMobileByPage = useCallback((direction: -1 | 1) => {
     const el = mobileCarouselRef.current;
@@ -252,113 +249,6 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         </button>
       </span>
     ) : null;
-
-  /**
-   * Handle adding product to cart
-   */
-  const handleAddToCart = (e: MouseEvent, product: (typeof products)[0]) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!product.inStock || addToCartInFlightRef.current.has(product.id)) {
-      return;
-    }
-
-    const cardRoot = (e.currentTarget as HTMLElement).closest('[data-related-product-card]');
-    const flySource = cardRoot?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
-    const runFly = () => {
-      dispatchCartFlyAnimation(resolveProductCardImageSrc(product.image), flySource);
-    };
-
-    if (isLoggedIn) {
-      window.dispatchEvent(
-        new CustomEvent('cart-updated', {
-          detail: { optimisticAdd: { quantity: 1, price: product.price } },
-        }),
-      );
-      runFly();
-    }
-
-    addToCartInFlightRef.current.add(product.id);
-    setAddingProductId(product.id);
-
-    void (async () => {
-      try {
-        interface ProductDetails {
-          id: string;
-          slug: string;
-          variants?: Array<{
-            id: string;
-            sku: string;
-            price: number;
-            stock: number;
-            available: boolean;
-          }>;
-        }
-
-        let variantId: string;
-        let bodyProductId = product.id;
-
-        const presetVariantId = product.defaultVariantId ?? null;
-        if (presetVariantId) {
-          variantId = presetVariantId;
-        } else {
-          const encodedSlug = encodeURIComponent(product.slug.trim());
-          const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
-
-          if (!productDetails.variants || productDetails.variants.length === 0) {
-            showToast(t(language, 'common.alerts.noVariantsAvailable'), 'warning');
-            if (isLoggedIn) {
-              window.dispatchEvent(new Event('cart-updated'));
-            }
-            return;
-          }
-
-          variantId = productDetails.variants[0].id;
-          bodyProductId = productDetails.id;
-        }
-
-        if (!isLoggedIn) {
-          upsertGuestCartItem({
-            productId: bodyProductId,
-            productSlug: product.slug,
-            variantId,
-            quantity: 1,
-          });
-          window.dispatchEvent(new Event('cart-updated'));
-          runFly();
-        } else {
-          const response = await apiClient.post<{ cartSummary?: { itemsCount: number; total: number } }>(
-            '/api/v1/cart/items',
-            {
-              productId: bodyProductId,
-              variantId,
-              quantity: 1,
-            },
-          );
-          window.dispatchEvent(
-            new CustomEvent('cart-updated', {
-              detail: response.cartSummary ?? null,
-            }),
-          );
-        }
-      } catch (error: unknown) {
-        console.error('[RelatedProducts] Error adding to cart:', error);
-        if (isLoggedIn) {
-          window.dispatchEvent(new Event('cart-updated'));
-        }
-        showToast(t(language, 'common.alerts.failedToAddToCart'), 'error');
-      } finally {
-        addToCartInFlightRef.current.delete(product.id);
-        setAddingProductId((current) => (current === product.id ? null : current));
-      }
-    })();
-  };
-
-  const currency = getStoredCurrency();
-  const handleImageError = (productId: string) => {
-    setImageErrors(prev => new Set(prev).add(productId));
-  };
 
   // Always show the section, even if no products (will show loading or empty state)
   return (
@@ -463,10 +353,8 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
                             <div key={product.id} className={HOME_BEST_CHOICE_CARD_WIDTH}>
                               <ProductCard
                                 product={mapRelatedProductToHomeGridCardProduct(product)}
-                                viewMode="grid-2"
-                                shiftImageInFrame
-                                smallerFooterPrice
-                                homeProductGridCard
+                                viewMode={relatedMobileViewMode}
+                                {...homeMobileCardProps}
                               />
                             </div>
                           ) : (
@@ -509,18 +397,25 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
                   }}
                 >
                   {products.map((product) => (
-                    <RelatedProductCard
+                    <div
                       key={product.id}
-                      product={product}
-                      currency={currency}
-                      language={language}
-                      isAddingToCart={addingProductId === product.id}
-                      hasMoved={hasMoved}
-                      onAddToCart={handleAddToCart}
-                      onImageError={handleImageError}
-                      imageError={imageErrors.has(product.id)}
-                      width={`${100 / visibleCards}%`}
-                    />
+                      className="h-full flex-shrink-0 px-3"
+                      style={{ width: `${100 / visibleCards}%` }}
+                      onClickCapture={(event) => {
+                        if (hasMoved) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                        }
+                      }}
+                    >
+                      <div className={HOME_BEST_CHOICE_CARD_WIDTH}>
+                        <ProductCard
+                          product={mapRelatedProductToHomeGridCardProduct(product)}
+                          viewMode="grid-2"
+                          {...homeDesktopCardProps}
+                        />
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>

@@ -5633,16 +5633,19 @@ export namespace Prisma {
 
   export type CategoryAvgAggregateOutputType = {
     position: number | null
+    homeStripPosition: number | null
   }
 
   export type CategorySumAggregateOutputType = {
     position: number | null
+    homeStripPosition: number | null
   }
 
   export type CategoryMinAggregateOutputType = {
     id: string | null
     parentId: string | null
     position: number | null
+    homeStripPosition: number | null
     published: boolean | null
     requiresSizes: boolean | null
     deletedAt: Date | null
@@ -5654,6 +5657,7 @@ export namespace Prisma {
     id: string | null
     parentId: string | null
     position: number | null
+    homeStripPosition: number | null
     published: boolean | null
     requiresSizes: boolean | null
     deletedAt: Date | null
@@ -5665,6 +5669,7 @@ export namespace Prisma {
     id: number
     parentId: number
     position: number
+    homeStripPosition: number
     published: number
     requiresSizes: number
     media: number
@@ -5677,16 +5682,19 @@ export namespace Prisma {
 
   export type CategoryAvgAggregateInputType = {
     position?: true
+    homeStripPosition?: true
   }
 
   export type CategorySumAggregateInputType = {
     position?: true
+    homeStripPosition?: true
   }
 
   export type CategoryMinAggregateInputType = {
     id?: true
     parentId?: true
     position?: true
+    homeStripPosition?: true
     published?: true
     requiresSizes?: true
     deletedAt?: true
@@ -5698,6 +5706,7 @@ export namespace Prisma {
     id?: true
     parentId?: true
     position?: true
+    homeStripPosition?: true
     published?: true
     requiresSizes?: true
     deletedAt?: true
@@ -5709,6 +5718,7 @@ export namespace Prisma {
     id?: true
     parentId?: true
     position?: true
+    homeStripPosition?: true
     published?: true
     requiresSizes?: true
     media?: true
@@ -5808,6 +5818,7 @@ export namespace Prisma {
     id: string
     parentId: string | null
     position: number
+    homeStripPosition: number | null
     published: boolean
     requiresSizes: boolean
     media: JsonValue[]
@@ -5839,6 +5850,7 @@ export namespace Prisma {
     id?: boolean
     parentId?: boolean
     position?: boolean
+    homeStripPosition?: boolean
     published?: boolean
     requiresSizes?: boolean
     media?: boolean
@@ -5856,6 +5868,7 @@ export namespace Prisma {
     id?: boolean
     parentId?: boolean
     position?: boolean
+    homeStripPosition?: boolean
     published?: boolean
     requiresSizes?: boolean
     media?: boolean
@@ -5869,6 +5882,7 @@ export namespace Prisma {
     id?: boolean
     parentId?: boolean
     position?: boolean
+    homeStripPosition?: boolean
     published?: boolean
     requiresSizes?: boolean
     media?: boolean
@@ -5900,6 +5914,7 @@ export namespace Prisma {
       id: string
       parentId: string | null
       position: number
+      homeStripPosition: number | null
       published: boolean
       requiresSizes: boolean
       media: Prisma.JsonValue[]
@@ -6306,6 +6321,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Category", 'String'>
     readonly parentId: FieldRef<"Category", 'String'>
     readonly position: FieldRef<"Category", 'Int'>
+    readonly homeStripPosition: FieldRef<"Category", 'Int'>
     readonly published: FieldRef<"Category", 'Boolean'>
     readonly requiresSizes: FieldRef<"Category", 'Boolean'>
     readonly media: FieldRef<"Category", 'Json[]'>
@@ -30123,6 +30139,7 @@ export namespace Prisma {
     id: 'id',
     parentId: 'parentId',
     position: 'position',
+    homeStripPosition: 'homeStripPosition',
     published: 'published',
     requiresSizes: 'requiresSizes',
     media: 'media',
@@ -30832,6 +30849,7 @@ export namespace Prisma {
     id?: StringFilter<"Category"> | string
     parentId?: StringNullableFilter<"Category"> | string | null
     position?: IntFilter<"Category"> | number
+    homeStripPosition?: IntNullableFilter<"Category"> | number | null
     published?: BoolFilter<"Category"> | boolean
     requiresSizes?: BoolFilter<"Category"> | boolean
     media?: JsonNullableListFilter<"Category">
@@ -30848,6 +30866,7 @@ export namespace Prisma {
     id?: SortOrder
     parentId?: SortOrderInput | SortOrder
     position?: SortOrder
+    homeStripPosition?: SortOrderInput | SortOrder
     published?: SortOrder
     requiresSizes?: SortOrder
     media?: SortOrder
@@ -30867,6 +30886,7 @@ export namespace Prisma {
     NOT?: CategoryWhereInput | CategoryWhereInput[]
     parentId?: StringNullableFilter<"Category"> | string | null
     position?: IntFilter<"Category"> | number
+    homeStripPosition?: IntNullableFilter<"Category"> | number | null
     published?: BoolFilter<"Category"> | boolean
     requiresSizes?: BoolFilter<"Category"> | boolean
     media?: JsonNullableListFilter<"Category">
@@ -30883,6 +30903,7 @@ export namespace Prisma {
     id?: SortOrder
     parentId?: SortOrderInput | SortOrder
     position?: SortOrder
+    homeStripPosition?: SortOrderInput | SortOrder
     published?: SortOrder
     requiresSizes?: SortOrder
     media?: SortOrder
@@ -30903,6 +30924,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Category"> | string
     parentId?: StringNullableWithAggregatesFilter<"Category"> | string | null
     position?: IntWithAggregatesFilter<"Category"> | number
+    homeStripPosition?: IntNullableWithAggregatesFilter<"Category"> | number | null
     published?: BoolWithAggregatesFilter<"Category"> | boolean
     requiresSizes?: BoolWithAggregatesFilter<"Category"> | boolean
     media?: JsonNullableListFilter<"Category">
@@ -32987,6 +33009,7 @@ export namespace Prisma {
   export type CategoryCreateInput = {
     id?: string
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -33003,6 +33026,7 @@ export namespace Prisma {
     id?: string
     parentId?: string | null
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -33017,6 +33041,7 @@ export namespace Prisma {
   export type CategoryUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -33033,6 +33058,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -33048,6 +33074,7 @@ export namespace Prisma {
     id?: string
     parentId?: string | null
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -33059,6 +33086,7 @@ export namespace Prisma {
   export type CategoryUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -33071,6 +33099,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -35364,6 +35393,17 @@ export namespace Prisma {
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
   }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
   export type JsonNullableListFilter<$PrismaModel = never> = 
     | PatchUndefined<
         Either<Required<JsonNullableListFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableListFilterBase<$PrismaModel>>, 'path'>>,
@@ -35418,6 +35458,7 @@ export namespace Prisma {
     id?: SortOrder
     parentId?: SortOrder
     position?: SortOrder
+    homeStripPosition?: SortOrder
     published?: SortOrder
     requiresSizes?: SortOrder
     media?: SortOrder
@@ -35428,12 +35469,14 @@ export namespace Prisma {
 
   export type CategoryAvgOrderByAggregateInput = {
     position?: SortOrder
+    homeStripPosition?: SortOrder
   }
 
   export type CategoryMaxOrderByAggregateInput = {
     id?: SortOrder
     parentId?: SortOrder
     position?: SortOrder
+    homeStripPosition?: SortOrder
     published?: SortOrder
     requiresSizes?: SortOrder
     deletedAt?: SortOrder
@@ -35445,6 +35488,7 @@ export namespace Prisma {
     id?: SortOrder
     parentId?: SortOrder
     position?: SortOrder
+    homeStripPosition?: SortOrder
     published?: SortOrder
     requiresSizes?: SortOrder
     deletedAt?: SortOrder
@@ -35454,6 +35498,7 @@ export namespace Prisma {
 
   export type CategorySumOrderByAggregateInput = {
     position?: SortOrder
+    homeStripPosition?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -35470,6 +35515,22 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type CategoryRelationFilter = {
@@ -35988,17 +36049,6 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type OrderItemListRelationFilter = {
     every?: OrderItemWhereInput
     some?: OrderItemWhereInput
@@ -36114,22 +36164,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type ProductVariantRelationFilter = {
@@ -37052,6 +37086,14 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type CategoryUpdatemediaInput = {
     set?: InputJsonValue[]
     push?: InputJsonValue | InputJsonValue[]
@@ -37924,14 +37966,6 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type ProductVariantOptionUpdateManyWithoutVariantNestedInput = {
     create?: XOR<ProductVariantOptionCreateWithoutVariantInput, ProductVariantOptionUncheckedCreateWithoutVariantInput> | ProductVariantOptionCreateWithoutVariantInput[] | ProductVariantOptionUncheckedCreateWithoutVariantInput[]
     connectOrCreate?: ProductVariantOptionCreateOrConnectWithoutVariantInput | ProductVariantOptionCreateOrConnectWithoutVariantInput[]
@@ -38597,6 +38631,33 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
   export type NestedJsonNullableFilter<$PrismaModel = never> = 
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -38618,17 +38679,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -38661,22 +38711,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
   }
   export type NestedJsonFilter<$PrismaModel = never> = 
     | PatchUndefined<
@@ -39169,6 +39203,7 @@ export namespace Prisma {
   export type CategoryCreateWithoutChildrenInput = {
     id?: string
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -39184,6 +39219,7 @@ export namespace Prisma {
     id?: string
     parentId?: string | null
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -39202,6 +39238,7 @@ export namespace Prisma {
   export type CategoryCreateWithoutParentInput = {
     id?: string
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -39216,6 +39253,7 @@ export namespace Prisma {
   export type CategoryUncheckedCreateWithoutParentInput = {
     id?: string
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -39333,6 +39371,7 @@ export namespace Prisma {
   export type CategoryUpdateWithoutChildrenInput = {
     id?: StringFieldUpdateOperationsInput | string
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -39348,6 +39387,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -39381,6 +39421,7 @@ export namespace Prisma {
     id?: StringFilter<"Category"> | string
     parentId?: StringNullableFilter<"Category"> | string | null
     position?: IntFilter<"Category"> | number
+    homeStripPosition?: IntNullableFilter<"Category"> | number | null
     published?: BoolFilter<"Category"> | boolean
     requiresSizes?: BoolFilter<"Category"> | boolean
     media?: JsonNullableListFilter<"Category">
@@ -39428,6 +39469,7 @@ export namespace Prisma {
   export type CategoryCreateWithoutTranslationsInput = {
     id?: string
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -39443,6 +39485,7 @@ export namespace Prisma {
     id?: string
     parentId?: string | null
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -39472,6 +39515,7 @@ export namespace Prisma {
   export type CategoryUpdateWithoutTranslationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -39487,6 +39531,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -40287,6 +40332,7 @@ export namespace Prisma {
   export type CategoryCreateWithoutProductsInput = {
     id?: string
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -40302,6 +40348,7 @@ export namespace Prisma {
     id?: string
     parentId?: string | null
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -43164,6 +43211,7 @@ export namespace Prisma {
   export type CategoryCreateManyParentInput = {
     id?: string
     position?: number
+    homeStripPosition?: number | null
     published?: boolean
     requiresSizes?: boolean
     media?: CategoryCreatemediaInput | InputJsonValue[]
@@ -43208,6 +43256,7 @@ export namespace Prisma {
   export type CategoryUpdateWithoutParentInput = {
     id?: StringFieldUpdateOperationsInput | string
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -43222,6 +43271,7 @@ export namespace Prisma {
   export type CategoryUncheckedUpdateWithoutParentInput = {
     id?: StringFieldUpdateOperationsInput | string
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -43236,6 +43286,7 @@ export namespace Prisma {
   export type CategoryUncheckedUpdateManyWithoutParentInput = {
     id?: StringFieldUpdateOperationsInput | string
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -43762,6 +43813,7 @@ export namespace Prisma {
   export type CategoryUpdateWithoutProductsInput = {
     id?: StringFieldUpdateOperationsInput | string
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -43777,6 +43829,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]
@@ -43791,6 +43844,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     position?: IntFieldUpdateOperationsInput | number
+    homeStripPosition?: NullableIntFieldUpdateOperationsInput | number | null
     published?: BoolFieldUpdateOperationsInput | boolean
     requiresSizes?: BoolFieldUpdateOperationsInput | boolean
     media?: CategoryUpdatemediaInput | InputJsonValue[]

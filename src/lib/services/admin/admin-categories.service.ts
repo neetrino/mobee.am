@@ -1,9 +1,32 @@
 import { db } from "@white-shop/db";
+import {
+  buildCategoryMediaFromImageUrl,
+  extractCategoryImageUrl,
+} from "@/lib/categoryMedia";
+import {
+  HOME_CATEGORY_STRIP_MAX_POSITION,
+  HOME_CATEGORY_STRIP_MIN_POSITION,
+  normalizeHomeStripPosition,
+} from "@/lib/constants/home-category-strip.constants";
+import { getDefaultStripImageByPosition } from "@/lib/categoryStrip";
 import { cacheService } from "@/lib/services/cache.service";
 import { toSlug } from "@/lib/utils/slug";
 
 async function clearCategoriesCache(): Promise<void> {
   await cacheService.deletePattern("categories:*");
+}
+
+function parseHomeStripPositionInput(value: unknown): number | null {
+  const normalized = normalizeHomeStripPosition(value);
+  if (value !== null && value !== undefined && value !== '' && normalized === null) {
+    throw {
+      status: 400,
+      type: "https://api.shop.am/problems/bad-request",
+      title: "Invalid home strip position",
+      detail: `Home strip position must be between ${HOME_CATEGORY_STRIP_MIN_POSITION} and ${HOME_CATEGORY_STRIP_MAX_POSITION}, or empty`,
+    };
+  }
+  return normalized;
 }
 
 class AdminCategoriesService {
@@ -27,7 +50,15 @@ class AdminCategoriesService {
     });
 
     return {
-      data: categories.map((category: { id: string; parentId: string | null; requiresSizes: boolean | null; translations?: Array<{ title: string; slug: string }> }) => {
+      data:       categories.map((category: {
+        id: string;
+        parentId: string | null;
+        position: number;
+        requiresSizes: boolean | null;
+        homeStripPosition: number | null;
+        media: unknown;
+        translations?: Array<{ title: string; slug: string }>;
+      }) => {
         const translations = Array.isArray(category.translations) ? category.translations : [];
         const translation = translations[0] || null;
         return {
@@ -35,7 +66,10 @@ class AdminCategoriesService {
           title: translation?.title || "",
           slug: translation?.slug || "",
           parentId: category.parentId,
+          position: category.position,
           requiresSizes: category.requiresSizes || false,
+          homeStripPosition: category.homeStripPosition,
+          imageUrl: extractCategoryImageUrl(category.media),
         };
       }),
     };
@@ -49,6 +83,8 @@ class AdminCategoriesService {
     locale?: string;
     parentId?: string;
     requiresSizes?: boolean;
+    homeStripPosition?: number | null;
+    imageUrl?: string | null;
   }) {
     const locale = data.locale || "en";
     
@@ -71,11 +107,17 @@ class AdminCategoriesService {
     // Generate slug from title (ReDoS-safe)
     const slug = toSlug(data.title);
 
+    const homeStripPosition = parseHomeStripPositionInput(data.homeStripPosition);
+
+    const nextPosition = await this.getNextSiblingPosition(data.parentId ?? null);
+
     const category = await db.category.create({
       data: {
         parentId: data.parentId || undefined,
+        position: nextPosition,
         requiresSizes: data.requiresSizes || false,
         published: true,
+        media: buildCategoryMediaFromImageUrl(data.imageUrl ?? null),
         translations: {
           create: {
             locale,
@@ -90,9 +132,22 @@ class AdminCategoriesService {
       },
     });
 
-    // Безопасное получение translation с проверкой на существование массива
-    const categoryTranslations = Array.isArray(category.translations) ? category.translations : [];
-    const translation = categoryTranslations.find((t: { locale: string }) => t.locale === locale) || categoryTranslations[0] || null;
+    if (homeStripPosition !== null) {
+      await this.assignHomeStripPosition(category.id, homeStripPosition);
+    }
+
+    const refreshedCategory = await db.category.findUnique({
+      where: { id: category.id },
+      include: { translations: true },
+    });
+
+    const categoryTranslations = Array.isArray(refreshedCategory?.translations)
+      ? refreshedCategory.translations
+      : [];
+    const translation =
+      categoryTranslations.find((t: { locale: string }) => t.locale === locale) ||
+      categoryTranslations[0] ||
+      null;
     await clearCategoriesCache();
 
     return {
@@ -102,6 +157,8 @@ class AdminCategoriesService {
         slug: translation?.slug || "",
         parentId: category.parentId,
         requiresSizes: category.requiresSizes || false,
+        homeStripPosition: refreshedCategory?.homeStripPosition ?? null,
+        imageUrl: extractCategoryImageUrl(refreshedCategory?.media),
       },
     };
   }
@@ -141,6 +198,8 @@ class AdminCategoriesService {
       slug: translation?.slug || "",
       parentId: category.parentId,
       requiresSizes: category.requiresSizes || false,
+      homeStripPosition: category.homeStripPosition,
+      imageUrl: extractCategoryImageUrl(category.media),
       children: category.children.map((child: { id: string; parentId: string | null; requiresSizes: boolean | null; translations?: Array<{ title: string; slug: string }> }) => {
         const childTranslations = Array.isArray(child.translations) ? child.translations : [];
         const childTranslation = childTranslations[0] || null;
@@ -164,6 +223,8 @@ class AdminCategoriesService {
     parentId?: string | null;
     requiresSizes?: boolean;
     subcategoryIds?: string[];
+    homeStripPosition?: number | null;
+    imageUrl?: string | null;
   }) {
     const locale = data.locale || "en";
     
@@ -215,9 +276,9 @@ class AdminCategoriesService {
         };
       }
 
-      // Check if the category to update is in the children of the potential parent
-      const isChild = await this.isCategoryDescendant(potentialParent.id, categoryId);
-      if (isChild) {
+      // Parent cannot be a descendant of the category being edited (would create a cycle).
+      const parentIsDescendant = await this.isCategoryDescendant(categoryId, data.parentId);
+      if (parentIsDescendant) {
         throw {
           status: 400,
           type: "https://api.shop.am/problems/bad-request",
@@ -264,14 +325,27 @@ class AdminCategoriesService {
       }
     }
 
-    const updateData: any = {};
-    
+    const updateData: {
+      parentId?: string | null;
+      requiresSizes?: boolean;
+      media?: { url: string }[];
+    } = {};
+
     if (data.parentId !== undefined) {
       updateData.parentId = data.parentId || null;
     }
-    
+
     if (data.requiresSizes !== undefined) {
       updateData.requiresSizes = data.requiresSizes;
+    }
+
+    if (data.imageUrl !== undefined) {
+      updateData.media = buildCategoryMediaFromImageUrl(data.imageUrl);
+    }
+
+    if (data.homeStripPosition !== undefined) {
+      const homeStripPosition = parseHomeStripPositionInput(data.homeStripPosition);
+      await this.assignHomeStripPosition(categoryId, homeStripPosition);
     }
 
     // Update translation if title is provided
@@ -324,8 +398,131 @@ class AdminCategoriesService {
         slug: translation?.slug || "",
         parentId: updatedCategory.parentId,
         requiresSizes: updatedCategory.requiresSizes || false,
+        homeStripPosition: updatedCategory.homeStripPosition,
+        imageUrl: extractCategoryImageUrl(updatedCategory.media),
       },
     };
+  }
+
+  /**
+   * Toggle category visibility on the home page strip (star control).
+   */
+  async toggleHomeStrip(categoryId: string) {
+    const category = await db.category.findUnique({
+      where: { id: categoryId },
+      select: { homeStripPosition: true },
+    });
+
+    if (!category) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "Category not found",
+        detail: `Category with id '${categoryId}' does not exist`,
+      };
+    }
+
+    if (category.homeStripPosition !== null) {
+      await this.assignHomeStripPosition(categoryId, null);
+      await clearCategoriesCache();
+      return { data: { homeStripPosition: null } };
+    }
+
+    const nextPosition = await this.findNextHomeStripPosition();
+    if (nextPosition === null) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/bad-request",
+        title: "Home strip full",
+        detail: `All ${HOME_CATEGORY_STRIP_MAX_POSITION} home page slots are already assigned`,
+      };
+    }
+
+    await this.assignHomeStripPosition(categoryId, nextPosition);
+    await clearCategoriesCache();
+
+    return { data: { homeStripPosition: nextPosition } };
+  }
+
+  /**
+   * Assigns a unique home strip slot (1–6). Clears the slot from any other category first.
+   */
+  private async assignHomeStripPosition(
+    categoryId: string,
+    position: number | null,
+  ): Promise<void> {
+    if (position === null) {
+      await db.category.update({
+        where: { id: categoryId },
+        data: { homeStripPosition: null },
+      });
+      return;
+    }
+
+    await db.category.updateMany({
+      where: {
+        homeStripPosition: position,
+        id: { not: categoryId },
+        deletedAt: null,
+      },
+      data: { homeStripPosition: null },
+    });
+
+    await db.category.update({
+      where: { id: categoryId },
+      data: { homeStripPosition: position },
+    });
+
+    await this.ensureDefaultStripImage(categoryId, position);
+  }
+
+  private async findNextHomeStripPosition(): Promise<number | null> {
+    const used = await db.category.findMany({
+      where: {
+        deletedAt: null,
+        homeStripPosition: { not: null },
+      },
+      select: { homeStripPosition: true },
+    });
+
+    const usedPositions = new Set(
+      used
+        .map((item) => item.homeStripPosition)
+        .filter((value): value is number => value !== null),
+    );
+
+    for (
+      let position = HOME_CATEGORY_STRIP_MIN_POSITION;
+      position <= HOME_CATEGORY_STRIP_MAX_POSITION;
+      position += 1
+    ) {
+      if (!usedPositions.has(position)) {
+        return position;
+      }
+    }
+
+    return null;
+  }
+
+  private async ensureDefaultStripImage(
+    categoryId: string,
+    position: number,
+  ): Promise<void> {
+    const category = await db.category.findUnique({
+      where: { id: categoryId },
+      select: { media: true },
+    });
+
+    if (!category || extractCategoryImageUrl(category.media)) {
+      return;
+    }
+
+    await db.category.update({
+      where: { id: categoryId },
+      data: {
+        media: [{ url: getDefaultStripImageByPosition(position) }],
+      },
+    });
   }
 
   /**
@@ -354,6 +551,90 @@ class AdminCategoriesService {
     }
 
     return this.isCategoryDescendant(ancestorId, category.parent.id, visited);
+  }
+
+  /**
+   * Reorder sibling categories (same parentId)
+   */
+  async reorderCategories(data: {
+    parentId?: string | null;
+    categoryIds: string[];
+  }) {
+    const parentId = data.parentId ?? null;
+
+    if (!Array.isArray(data.categoryIds) || data.categoryIds.length === 0) {
+      throw {
+        status: 400,
+        type: 'https://api.shop.am/problems/bad-request',
+        title: 'Invalid reorder payload',
+        detail: 'categoryIds must be a non-empty array',
+      };
+    }
+
+    const uniqueIds = new Set(data.categoryIds);
+    if (uniqueIds.size !== data.categoryIds.length) {
+      throw {
+        status: 400,
+        type: 'https://api.shop.am/problems/bad-request',
+        title: 'Invalid reorder payload',
+        detail: 'categoryIds must not contain duplicates',
+      };
+    }
+
+    const siblings = await db.category.findMany({
+      where: {
+        deletedAt: null,
+        parentId,
+      },
+      select: { id: true },
+      orderBy: { position: 'asc' },
+    });
+
+    const siblingIds = siblings.map((item) => item.id);
+    if (siblingIds.length !== data.categoryIds.length) {
+      throw {
+        status: 400,
+        type: 'https://api.shop.am/problems/bad-request',
+        title: 'Invalid reorder payload',
+        detail: 'categoryIds must include all sibling categories for the given parent',
+      };
+    }
+
+    const siblingIdSet = new Set(siblingIds);
+    const hasInvalidId = data.categoryIds.some((id) => !siblingIdSet.has(id));
+    if (hasInvalidId) {
+      throw {
+        status: 400,
+        type: 'https://api.shop.am/problems/bad-request',
+        title: 'Invalid reorder payload',
+        detail: 'One or more categoryIds do not belong to the specified parent',
+      };
+    }
+
+    await db.$transaction(
+      data.categoryIds.map((id, index) =>
+        db.category.update({
+          where: { id },
+          data: { position: index },
+        }),
+      ),
+    );
+
+    await clearCategoriesCache();
+
+    return { success: true };
+  }
+
+  private async getNextSiblingPosition(parentId: string | null): Promise<number> {
+    const result = await db.category.aggregate({
+      where: {
+        deletedAt: null,
+        parentId,
+      },
+      _max: { position: true },
+    });
+
+    return (result._max.position ?? -1) + 1;
   }
 
   /**

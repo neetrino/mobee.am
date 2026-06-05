@@ -207,14 +207,11 @@ export function InstallmentRequestModal({
         onClick={(event) => event.stopPropagation()}
         style={{ zIndex: 10000 }}
       >
-        <div className={`flex ${isSuccess ? 'justify-end' : 'items-start justify-between gap-4'} mb-4`}>
-          {!isSuccess ? (
-            <p className="text-sm leading-relaxed text-gray-700">{t('product.aparik.modalIntro')}</p>
-          ) : null}
+        <div className="relative mb-4">
           <button
             type="button"
             onClick={handleClose}
-            className="shrink-0 rounded-full p-1 text-gray-400 transition-colors hover:text-gray-600"
+            className="absolute right-0 top-0 shrink-0 rounded-full p-1 text-gray-400 transition-colors hover:text-gray-600"
             aria-label={t('checkout.modals.closeModal')}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -226,18 +223,27 @@ export function InstallmentRequestModal({
               />
             </svg>
           </button>
+          {!isSuccess ? (
+            <div className="px-8">
+              <h2 className="mb-2 text-center text-lg font-semibold text-gray-900">
+                {t('product.aparik.modalTitle')}
+              </h2>
+              <p className="text-sm leading-relaxed text-gray-700">{t('product.aparik.modalIntro')}</p>
+            </div>
+          ) : null}
         </div>
 
         {isSuccess ? (
           <InstallmentRequestSuccessView message={t('product.aparik.submitSuccess')} />
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <Input
               label={t('checkout.form.firstName')}
               value={form.firstName}
               onChange={(event) => handleFieldChange('firstName', event.target.value)}
               error={errors.firstName}
               disabled={isSubmitting}
+              required
             />
             <Input
               label={t('checkout.form.lastName')}
@@ -245,6 +251,7 @@ export function InstallmentRequestModal({
               onChange={(event) => handleFieldChange('lastName', event.target.value)}
               error={errors.lastName}
               disabled={isSubmitting}
+              required
             />
             <Input
               label={t('checkout.form.email')}
@@ -253,6 +260,7 @@ export function InstallmentRequestModal({
               onChange={(event) => handleFieldChange('email', event.target.value)}
               error={errors.email}
               disabled={isSubmitting}
+              required
             />
             <Input
               label={t('checkout.form.phone')}
@@ -265,6 +273,7 @@ export function InstallmentRequestModal({
               error={errors.phone}
               disabled={isSubmitting}
               maxLength={PHONE_DIGITS_MAX}
+              required
             />
 
             {errors.submit ? (

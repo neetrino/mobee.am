@@ -23,6 +23,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       spellCheck = false,
       autoCorrect = 'off',
       autoCapitalize = 'off',
+      required = false,
       ...props
     },
     ref
@@ -60,10 +61,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={`mb-1 block text-sm font-medium ${error ? 'text-red-700' : 'text-gray-700'}`}
           >
             {label}
+            {required ? (
+              <span className="ml-0.5 text-red-500" aria-hidden="true">
+                *
+              </span>
+            ) : null}
           </label>
         )}
         <input
           ref={ref}
+          required={required}
           aria-invalid={error ? true : undefined}
           spellCheck={spellCheck}
           autoCorrect={autoCorrect}

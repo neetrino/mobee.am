@@ -3,6 +3,8 @@
 import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
+import { CategoryImageField } from './CategoryImageField';
+import { HomeStripPositionSelect } from './HomeStripPositionSelect';
 
 interface EditCategoryModalProps {
   isOpen: boolean;
@@ -67,6 +69,16 @@ export function EditCategoryModal({
                 ))}
             </select>
           </div>
+          <CategoryImageField
+            imageUrl={formData.imageUrl}
+            onChange={(imageUrl) => onFormDataChange({ ...formData, imageUrl })}
+          />
+          <HomeStripPositionSelect
+            value={formData.homeStripPosition}
+            categories={categories}
+            editingCategoryId={editingCategory.id}
+            onChange={(homeStripPosition) => onFormDataChange({ ...formData, homeStripPosition })}
+          />
           <div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input

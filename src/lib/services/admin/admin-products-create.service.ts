@@ -1,6 +1,5 @@
 import { db } from "@white-shop/db";
 import { PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE } from "@/lib/database/productVariantDb.constants";
-import { cacheService } from "@/lib/services/cache.service";
 import { revalidateProductCache } from "./admin-products-update/cache-revalidator";
 import { findOrCreateAttributeValue } from "../../utils/variant-generator";
 import { ensureProductAttributesTable } from "../../utils/db-ensure";

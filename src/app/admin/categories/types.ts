@@ -3,7 +3,10 @@ export interface Category {
   slug: string;
   title: string;
   parentId: string | null;
+  position?: number;
   requiresSizes?: boolean;
+  homeStripPosition?: number | null;
+  imageUrl?: string | null;
   children?: Category[];
 }
 
@@ -16,6 +19,8 @@ export interface CategoryFormData {
   parentId: string;
   requiresSizes: boolean;
   subcategoryIds: string[];
+  homeStripPosition: number | null;
+  imageUrl: string | null;
 }
 
 
