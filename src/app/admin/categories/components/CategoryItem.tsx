@@ -1,6 +1,5 @@
 ﻿'use client';
 
-import { useTranslation } from '../../../../lib/i18n-client';
 import type { CategoryWithLevel } from '../types';
 import { CategoryTableRowCells } from './CategoryTableRowCells';
 
@@ -25,8 +24,6 @@ export function CategoryItem({
   onDelete,
   onHandlePointerDown,
 }: CategoryItemProps) {
-  const { t } = useTranslation();
-
   if (isDragging) {
     return (
       <tr
