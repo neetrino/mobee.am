@@ -1,9 +1,27 @@
 import { db } from "@white-shop/db";
+import {
+  HOME_CATEGORY_STRIP_MAX_POSITION,
+  HOME_CATEGORY_STRIP_MIN_POSITION,
+  normalizeHomeStripPosition,
+} from "@/lib/constants/home-category-strip.constants";
 import { cacheService } from "@/lib/services/cache.service";
 import { toSlug } from "@/lib/utils/slug";
 
 async function clearCategoriesCache(): Promise<void> {
   await cacheService.deletePattern("categories:*");
+}
+
+function parseHomeStripPositionInput(value: unknown): number | null {
+  const normalized = normalizeHomeStripPosition(value);
+  if (value !== null && value !== undefined && value !== '' && normalized === null) {
+    throw {
+      status: 400,
+      type: "https://api.shop.am/problems/bad-request",
+      title: "Invalid home strip position",
+      detail: `Home strip position must be between ${HOME_CATEGORY_STRIP_MIN_POSITION} and ${HOME_CATEGORY_STRIP_MAX_POSITION}, or empty`,
+    };
+  }
+  return normalized;
 }
 
 class AdminCategoriesService {
@@ -27,7 +45,13 @@ class AdminCategoriesService {
     });
 
     return {
-      data: categories.map((category: { id: string; parentId: string | null; requiresSizes: boolean | null; translations?: Array<{ title: string; slug: string }> }) => {
+      data: categories.map((category: {
+        id: string;
+        parentId: string | null;
+        requiresSizes: boolean | null;
+        homeStripPosition: number | null;
+        translations?: Array<{ title: string; slug: string }>;
+      }) => {
         const translations = Array.isArray(category.translations) ? category.translations : [];
         const translation = translations[0] || null;
         return {
@@ -36,6 +60,7 @@ class AdminCategoriesService {
           slug: translation?.slug || "",
           parentId: category.parentId,
           requiresSizes: category.requiresSizes || false,
+          homeStripPosition: category.homeStripPosition,
         };
       }),
     };
@@ -49,6 +74,7 @@ class AdminCategoriesService {
     locale?: string;
     parentId?: string;
     requiresSizes?: boolean;
+    homeStripPosition?: number | null;
   }) {
     const locale = data.locale || "en";
     
@@ -71,6 +97,8 @@ class AdminCategoriesService {
     // Generate slug from title (ReDoS-safe)
     const slug = toSlug(data.title);
 
+    const homeStripPosition = parseHomeStripPositionInput(data.homeStripPosition);
+
     const category = await db.category.create({
       data: {
         parentId: data.parentId || undefined,
@@ -90,9 +118,22 @@ class AdminCategoriesService {
       },
     });
 
-    // Безопасное получение translation с проверкой на существование массива
-    const categoryTranslations = Array.isArray(category.translations) ? category.translations : [];
-    const translation = categoryTranslations.find((t: { locale: string }) => t.locale === locale) || categoryTranslations[0] || null;
+    if (homeStripPosition !== null) {
+      await this.assignHomeStripPosition(category.id, homeStripPosition);
+    }
+
+    const refreshedCategory = await db.category.findUnique({
+      where: { id: category.id },
+      include: { translations: true },
+    });
+
+    const categoryTranslations = Array.isArray(refreshedCategory?.translations)
+      ? refreshedCategory.translations
+      : [];
+    const translation =
+      categoryTranslations.find((t: { locale: string }) => t.locale === locale) ||
+      categoryTranslations[0] ||
+      null;
     await clearCategoriesCache();
 
     return {
@@ -102,6 +143,7 @@ class AdminCategoriesService {
         slug: translation?.slug || "",
         parentId: category.parentId,
         requiresSizes: category.requiresSizes || false,
+        homeStripPosition: refreshedCategory?.homeStripPosition ?? null,
       },
     };
   }
@@ -141,6 +183,7 @@ class AdminCategoriesService {
       slug: translation?.slug || "",
       parentId: category.parentId,
       requiresSizes: category.requiresSizes || false,
+      homeStripPosition: category.homeStripPosition,
       children: category.children.map((child: { id: string; parentId: string | null; requiresSizes: boolean | null; translations?: Array<{ title: string; slug: string }> }) => {
         const childTranslations = Array.isArray(child.translations) ? child.translations : [];
         const childTranslation = childTranslations[0] || null;
@@ -164,6 +207,7 @@ class AdminCategoriesService {
     parentId?: string | null;
     requiresSizes?: boolean;
     subcategoryIds?: string[];
+    homeStripPosition?: number | null;
   }) {
     const locale = data.locale || "en";
     
@@ -215,9 +259,9 @@ class AdminCategoriesService {
         };
       }
 
-      // Check if the category to update is in the children of the potential parent
-      const isChild = await this.isCategoryDescendant(potentialParent.id, categoryId);
-      if (isChild) {
+      // Parent cannot be a descendant of the category being edited (would create a cycle).
+      const parentIsDescendant = await this.isCategoryDescendant(categoryId, data.parentId);
+      if (parentIsDescendant) {
         throw {
           status: 400,
           type: "https://api.shop.am/problems/bad-request",
@@ -264,14 +308,22 @@ class AdminCategoriesService {
       }
     }
 
-    const updateData: any = {};
-    
+    const updateData: {
+      parentId?: string | null;
+      requiresSizes?: boolean;
+    } = {};
+
     if (data.parentId !== undefined) {
       updateData.parentId = data.parentId || null;
     }
-    
+
     if (data.requiresSizes !== undefined) {
       updateData.requiresSizes = data.requiresSizes;
+    }
+
+    if (data.homeStripPosition !== undefined) {
+      const homeStripPosition = parseHomeStripPositionInput(data.homeStripPosition);
+      await this.assignHomeStripPosition(categoryId, homeStripPosition);
     }
 
     // Update translation if title is provided
@@ -324,8 +376,39 @@ class AdminCategoriesService {
         slug: translation?.slug || "",
         parentId: updatedCategory.parentId,
         requiresSizes: updatedCategory.requiresSizes || false,
+        homeStripPosition: updatedCategory.homeStripPosition,
       },
     };
+  }
+
+  /**
+   * Assigns a unique home strip slot (1–6). Clears the slot from any other category first.
+   */
+  private async assignHomeStripPosition(
+    categoryId: string,
+    position: number | null,
+  ): Promise<void> {
+    if (position === null) {
+      await db.category.update({
+        where: { id: categoryId },
+        data: { homeStripPosition: null },
+      });
+      return;
+    }
+
+    await db.category.updateMany({
+      where: {
+        homeStripPosition: position,
+        id: { not: categoryId },
+        deletedAt: null,
+      },
+      data: { homeStripPosition: null },
+    });
+
+    await db.category.update({
+      where: { id: categoryId },
+      data: { homeStripPosition: position },
+    });
   }
 
   /**

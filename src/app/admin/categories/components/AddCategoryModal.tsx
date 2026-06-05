@@ -3,6 +3,7 @@
 import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
+import { HomeStripPositionSelect } from './HomeStripPositionSelect';
 
 interface AddCategoryModalProps {
   isOpen: boolean;
@@ -63,6 +64,10 @@ export function AddCategoryModal({
                 ))}
             </select>
           </div>
+          <HomeStripPositionSelect
+            value={formData.homeStripPosition}
+            onChange={(homeStripPosition) => onFormDataChange({ ...formData, homeStripPosition })}
+          />
           <div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input

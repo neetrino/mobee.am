@@ -27,6 +27,14 @@ export function CategoryItem({ category, parentCategory, onEdit, onDelete }: Cat
               Sizes
             </span>
           )}
+          {category.homeStripPosition != null && (
+            <span className="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-supersudo">
+              {t('admin.categories.homeStripBadge').replace(
+                '{position}',
+                String(category.homeStripPosition),
+              )}
+            </span>
+          )}
         </div>
         <div className="text-xs text-gray-500 mt-1">
           {category.slug}

@@ -27,6 +27,7 @@ const initialFormData: CategoryFormData = {
   parentId: '',
   requiresSizes: false,
   subcategoryIds: [],
+  homeStripPosition: null,
 };
 
 /**
@@ -56,6 +57,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         title: formData.title.trim(),
         parentId: formData.parentId || undefined,
         requiresSizes: formData.requiresSizes,
+        homeStripPosition: formData.homeStripPosition,
         locale: 'en',
       });
       setShowAddModal(false);
@@ -87,6 +89,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         parentId: category.parentId || '',
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: categoryWithChildren.children?.map(child => child.id) || [],
+        homeStripPosition: categoryWithChildren.homeStripPosition ?? null,
       });
     } catch (err: unknown) {
       logger.error('Error fetching category children', { error: err });
@@ -95,6 +98,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         parentId: category.parentId || '',
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: [],
+        homeStripPosition: category.homeStripPosition ?? null,
       });
     }
     
@@ -114,6 +118,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         parentId: formData.parentId || null,
         requiresSizes: formData.requiresSizes,
         subcategoryIds: formData.subcategoryIds,
+        homeStripPosition: formData.homeStripPosition,
         locale: 'en',
       });
       setShowEditModal(false);
