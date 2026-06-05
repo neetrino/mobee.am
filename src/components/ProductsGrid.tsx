@@ -1,8 +1,9 @@
 'use client';
 
-import { memo, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { ProductCardListingProvider } from './ProductCardListingContext';
+import { getHomeCuratedProductCardProps } from './HomeBestChoiceStyleProductGrid';
 import { useTranslation } from '../lib/i18n-client';
 import { SHOP_LISTING_EAGER_IMAGE_CARD_COUNT } from '@/lib/performance/shop-listing-image-priority.constants';
 import type { ProductSortOption } from '@/lib/products/sort';
@@ -141,6 +142,7 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
 
   /** Home / mobile card chrome for the whole compact shop (incl. iPad Pro). */
   const useHomeCardChrome = !isLegacyDesktopShop;
+  const homeCardProps = getHomeCuratedProductCardProps(useHomeCardChrome);
 
   return (
     <ProductCardListingProvider>
@@ -154,9 +156,7 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
                 discountPercent: product.discountPercent ?? undefined,
               }}
               viewMode={cardViewMode}
-              homeProductGridCard={useHomeCardChrome}
-              shiftImageInFrame={useHomeCardChrome}
-              smallerFooterPrice={useHomeCardChrome}
+              {...homeCardProps}
               imageLoadPriority={index < SHOP_LISTING_EAGER_IMAGE_CARD_COUNT}
             />
           </div>

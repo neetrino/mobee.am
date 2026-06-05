@@ -16,11 +16,11 @@ export function InstallmentPriceButton({ onClick, className = '' }: InstallmentP
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex shrink-0 items-center justify-center gap-1.5 bg-white font-medium text-[#e91e63] transition-opacity hover:opacity-80 ${className}`}
+      className={`group inline-flex shrink-0 items-center justify-center gap-1.5 font-medium text-[#2db2ff] transition-colors hover:text-[#2db2ff] ${className}`}
       aria-label={t('product.aparik.buttonLabel')}
     >
-      <Calculator size={18} strokeWidth={2.25} aria-hidden className="shrink-0" />
-      <span className="whitespace-nowrap text-[11px] leading-none tracking-wide sm:text-xs">
+      <Calculator size={18} strokeWidth={2} aria-hidden className="shrink-0" />
+      <span className="whitespace-nowrap text-xs leading-none no-underline group-hover:underline group-hover:decoration-[#2db2ff] group-hover:underline-offset-2">
         {t('product.aparik.buttonLabel')}
       </span>
     </button>
