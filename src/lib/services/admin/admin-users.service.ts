@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import type { AdminUserUpdateInput } from "@/lib/schemas/admin-users.schema";
 
 class AdminUsersService {
   /**
@@ -46,12 +47,12 @@ class AdminUsersService {
   /**
    * Update user
    */
-  async updateUser(userId: string, data: any) {
+  async updateUser(userId: string, data: AdminUserUpdateInput) {
     return await db.user.update({
       where: { id: userId },
       data: {
-        blocked: data.blocked,
-        roles: data.roles,
+        ...(data.blocked !== undefined ? { blocked: data.blocked } : {}),
+        ...(data.roles !== undefined ? { roles: data.roles } : {}),
       },
       select: {
         id: true,

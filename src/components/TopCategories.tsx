@@ -10,6 +10,7 @@ import {
   categoryStripCardAspectClass,
   categoryStripHref,
   categoryStripInnerHeightClass,
+  getCategoryStripDesktopGridClass,
   getCategoryStripVisual,
   resolveCategoryStripSlotKey,
   type CategoryStripSlotKey,
@@ -27,6 +28,7 @@ const montserrat = Montserrat({
 });
 
 const CATEGORY_STRIP_LOADING_SKELETON_COUNT = 3;
+const CATEGORY_STRIP_DESKTOP_TWO_ROW_THRESHOLD = 6;
 
 function CategoryStripDesktopImage({
   slotKey,
@@ -91,12 +93,15 @@ export function TopCategories() {
   const { items, loadingHomeStrip: loading } = useHomeCategoryStrip();
 
   const sortedItems = useMemo(
-    () => [...items].sort((a, b) => a.homeStripPosition - b.homeStripPosition),
+    () => [...items].sort((a, b) => a.position - b.position),
     [items],
   );
 
-  const gridColsClass =
-    CATEGORY_STRIP_GRID_COLS[sortedItems.length] ?? CATEGORY_STRIP_GRID_COLS[1];
+  const gridColsClass = getCategoryStripDesktopGridClass(sortedItems.length);
+  const usesTwoDesktopRows = sortedItems.length > CATEGORY_STRIP_DESKTOP_TWO_ROW_THRESHOLD;
+  const desktopSectionPaddingClass = usesTwoDesktopRows
+    ? 'pb-6 pt-8 lg:pb-24 lg:pt-6 xl:pb-28 xl:pt-8'
+    : 'pb-6 pt-8 lg:pb-40 lg:pt-6 xl:pt-8';
 
   if (loading) {
     return (
@@ -130,8 +135,8 @@ export function TopCategories() {
   }
 
   return (
-    <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
-      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-40 lg:pt-6 xl:pt-8`}>
+      <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} ${desktopSectionPaddingClass}`}>
         <div className="flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide lg:hidden">
           {sortedItems.map((category, index) => {
             const slotKey = resolveStripSlotKey(category, index);

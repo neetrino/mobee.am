@@ -30,13 +30,31 @@ class ProductsFindQueryService {
       };
     }
 
-    const listingMode = !filters.ids?.length;
+    const isIdsBatchLookup = Boolean(filters.ids?.length);
+    /** Card fields only — id batch lookups (compare) must not load productAttributes. */
+    const listingMode = true;
+
+    if (isIdsBatchLookup) {
+      const products = await executeProductQuery(
+        where,
+        limit,
+        (page - 1) * limit,
+        filters.sort,
+        listingMode,
+        lang,
+      );
+      return {
+        products,
+        bestsellerProductIds,
+        total: products.length,
+      };
+    }
 
     const isPriceSort =
       filters.sort === "price-asc" || filters.sort === "price-desc";
 
     const needOverFetch =
-      !filters.ids?.length &&
+      !isIdsBatchLookup &&
       (Boolean(filters.category || filters.search) ||
         filters.minPrice != null ||
         filters.maxPrice != null ||

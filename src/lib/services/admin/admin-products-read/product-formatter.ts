@@ -17,6 +17,7 @@ export function formatProductForList(product: {
     compareAtPrice: number | null;
   }>;
   media?: unknown[];
+  categoryIds?: string[];
 }) {
   // Безопасное получение translation с проверкой на существование массива
   const translation = Array.isArray(product.translations) && product.translations.length > 0
@@ -42,6 +43,7 @@ export function formatProductForList(product: {
     compareAtPrice: variant?.compareAtPrice || null,
     colorStocks: [], // Can be enhanced later
     image,
+    categoryIds: product.categoryIds || [],
     createdAt: product.createdAt.toISOString(),
   };
 }

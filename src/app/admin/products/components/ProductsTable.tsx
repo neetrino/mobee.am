@@ -5,7 +5,22 @@ import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../../../lib/currency';
-import type { Product, ProductsResponse } from '../types';
+import type { Category, Product, ProductsResponse } from '../types';
+
+function resolveProductCategories(
+  categoryIds: string[] | undefined,
+  categories: Category[]
+): Array<{ id: string; title: string }> {
+  if (!categoryIds || categoryIds.length === 0) {
+    return [];
+  }
+
+  const categoryMap = new Map(categories.map((category) => [category.id, category.title]));
+  return categoryIds.flatMap((id) => {
+    const title = categoryMap.get(id);
+    return title ? [{ id, title }] : [];
+  });
+}
 
 interface ProductsTableProps {
   loading: boolean;
@@ -17,6 +32,7 @@ interface ProductsTableProps {
   sortBy: string;
   handleHeaderSort: (field: 'price' | 'createdAt' | 'title' | 'stock') => void;
   currency: CurrencyCode;
+  categories: Category[];
   handleDeleteProduct: (productId: string, productTitle: string) => void;
   handleTogglePublished: (productId: string, currentStatus: boolean, productTitle: string) => void;
   handleToggleFeatured: (productId: string, currentStatus: boolean, productTitle: string) => void;
@@ -35,6 +51,7 @@ export function ProductsTable({
   sortBy,
   handleHeaderSort,
   currency,
+  categories,
   handleDeleteProduct,
   handleTogglePublished,
   handleToggleFeatured,
@@ -176,6 +193,15 @@ export function ProductsTable({
                     </button>
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('admin.products.category')}
+                  </th>
+                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('admin.products.featured')}
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pl-6">
+                    <span className="ml-6 inline-block">{t('admin.products.actions')}</span>
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <button
                       type="button"
                       onClick={() => handleHeaderSort('createdAt')}
@@ -210,16 +236,13 @@ export function ProductsTable({
                       </span>
                     </button>
                   </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('admin.products.featured')}
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pl-6">
-                    <span className="ml-6 inline-block">{t('admin.products.actions')}</span>
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sortedProducts.map((product) => (
+                {sortedProducts.map((product) => {
+                  const productCategories = resolveProductCategories(product.categoryIds, categories);
+
+                  return (
                   <tr key={product.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4">
                       <input
@@ -251,13 +274,13 @@ export function ProductsTable({
                               className="px-3 py-1 bg-gray-100 rounded-supersudo text-sm"
                             >
                               <span className="font-medium text-gray-900">{colorStock.color}:</span>
-                              <span className="ml-1 text-gray-600">{colorStock.stock} {t('admin.products.pcs')}</span>
+                              <span className="ml-1 text-gray-600">{colorStock.stock}</span>
                             </div>
                           ))}
                         </div>
                       ) : (
                         <span className="text-sm text-gray-500">
-                          {product.stock > 0 ? `${product.stock} ${t('admin.products.pcs')}` : `0 ${t('admin.products.pcs')}`}
+                          {product.stock}
                         </span>
                       )}
                     </td>
@@ -279,8 +302,21 @@ export function ProductsTable({
                         ) : null}
                       </div>
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(product.createdAt).toLocaleDateString('hy-AM')}
+                    <td className="px-3 py-4">
+                      {productCategories.length === 0 ? (
+                        <span className="text-sm text-gray-400">{t('admin.products.noCategory')}</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1.5">
+                          {productCategories.map((category) => (
+                            <span
+                              key={category.id}
+                              className="inline-flex rounded-supersudo bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+                            >
+                              {category.title}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-center">
                       <button
@@ -312,23 +348,25 @@ export function ProductsTable({
                           variant="ghost"
                           size="sm"
                           onClick={() => router.push(`/supersudo/products/add?id=${product.id}`)}
-                          className="text-admin-600 hover:text-admin-800 hover:bg-admin-50"
+                          aria-label={t('admin.products.edit')}
+                          title={t('admin.products.edit')}
+                          className="p-2 text-admin-600 hover:text-admin-800 hover:bg-admin-50"
                         >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
-                          {t('admin.products.edit')}
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteProduct(product.id, product.title)}
-                          className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                          aria-label={t('admin.products.delete')}
+                          title={t('admin.products.delete')}
+                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50"
                         >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
-                          {t('admin.products.delete')}
                         </Button>
                         <button
                           type="button"
@@ -349,8 +387,12 @@ export function ProductsTable({
                         </button>
                       </div>
                     </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(product.createdAt).toLocaleDateString('hy-AM')}
+                    </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

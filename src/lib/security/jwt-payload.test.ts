@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { resolveAdminGateFromJwtPayload } from "@/lib/security/jwt-payload";
 
 describe("resolveAdminGateFromJwtPayload", () => {
-  it("returns legacy when roles claim is absent", () => {
-    expect(resolveAdminGateFromJwtPayload({ userId: "u1" })).toBe("legacy");
+  it("denies tokens without roles claim", () => {
+    expect(resolveAdminGateFromJwtPayload({ userId: "u1" })).toBe("deny");
   });
 
   it("allows admin role", () => {

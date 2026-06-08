@@ -9,8 +9,10 @@ interface CategoryItemProps {
   reorderEnabled: boolean;
   isDragging: boolean;
   placeholderHeight: number;
+  togglingHomePageId?: string | null;
   onEdit: (category: CategoryWithLevel) => void;
   onDelete: (categoryId: string, categoryTitle: string) => void;
+  onToggleHomePage: (categoryId: string) => void;
   onHandlePointerDown: (event: React.PointerEvent<HTMLDivElement>) => void;
 }
 
@@ -20,8 +22,10 @@ export function CategoryItem({
   reorderEnabled,
   isDragging,
   placeholderHeight,
+  togglingHomePageId,
   onEdit,
   onDelete,
+  onToggleHomePage,
   onHandlePointerDown,
 }: CategoryItemProps) {
   if (isDragging) {
@@ -48,8 +52,10 @@ export function CategoryItem({
         subcategoryLabel={subcategoryLabel}
         reorderEnabled={reorderEnabled}
         isHandleActive={false}
+        togglingHomePage={togglingHomePageId === category.id}
         onEdit={onEdit}
         onDelete={onDelete}
+        onToggleHomePage={onToggleHomePage}
         onHandlePointerDown={onHandlePointerDown}
       />
     </tr>

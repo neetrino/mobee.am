@@ -13,8 +13,10 @@ interface CategoriesListProps {
   categories: Category[];
   searchQuery: string;
   reordering: boolean;
+  togglingHomePageId?: string | null;
   onEdit: (category: Category) => void;
   onDelete: (categoryId: string, categoryTitle: string) => void;
+  onToggleHomePage: (categoryId: string) => void;
   onReorder: (payload: CategoryReorderPayload) => Promise<void>;
 }
 
@@ -22,8 +24,10 @@ export function CategoriesList({
   categories,
   searchQuery,
   reordering,
+  togglingHomePageId,
   onEdit,
   onDelete,
+  onToggleHomePage,
   onReorder,
 }: CategoriesListProps) {
   const { t } = useTranslation();
@@ -77,6 +81,9 @@ export function CategoriesList({
             <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
               {t('admin.categories.tableSubcategory')}
             </th>
+            <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              {t('admin.categories.tableProducts')}
+            </th>
             <th className="px-3 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
               {t('admin.categories.tableActions')}
             </th>
@@ -91,8 +98,10 @@ export function CategoriesList({
               reorderEnabled={reorderEnabled}
               isDragging={draggingId === category.id}
               placeholderHeight={placeholderHeight}
+              togglingHomePageId={togglingHomePageId}
               onEdit={onEdit}
               onDelete={onDelete}
+              onToggleHomePage={onToggleHomePage}
               onHandlePointerDown={(event) => {
                 event.preventDefault();
                 event.currentTarget.setPointerCapture(event.pointerId);

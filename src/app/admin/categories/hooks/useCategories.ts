@@ -3,11 +3,15 @@ import { apiClient } from '../../../../lib/api-client';
 import { logger } from '../../../../lib/utils/logger';
 import type { Category } from '../types';
 
+interface FetchCategoriesOptions {
+  silent?: boolean;
+}
+
 interface UseCategoriesReturn {
   categories: Category[];
   loading: boolean;
   error: string | null;
-  fetchCategories: () => Promise<void>;
+  fetchCategories: (options?: FetchCategoriesOptions) => Promise<void>;
 }
 
 /**
@@ -18,9 +22,13 @@ export function useCategories(): UseCategoriesReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCategories = useCallback(async () => {
+  const fetchCategories = useCallback(async (options?: FetchCategoriesOptions) => {
+    const silent = options?.silent === true;
+
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       setError(null);
       logger.debug('Fetching categories');
       const response = await apiClient.get<{ data: Category[] }>('/api/v1/admin/categories');
@@ -31,7 +39,9 @@ export function useCategories(): UseCategoriesReturn {
       setCategories([]);
       setError(err instanceof Error ? err.message : 'Failed to fetch categories');
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, []);
 

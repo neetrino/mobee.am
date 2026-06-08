@@ -5,8 +5,9 @@ export interface Category {
   parentId: string | null;
   position?: number;
   requiresSizes?: boolean;
-  homeStripPosition?: number | null;
+  showOnHomePage?: boolean;
   imageUrl?: string | null;
+  productCount?: number;
   children?: Category[];
 }
 
@@ -19,10 +20,6 @@ export interface CategoryFormData {
   parentId: string;
   requiresSizes: boolean;
   subcategoryIds: string[];
-  homeStripPosition: number | null;
   imageUrl: string | null;
 }
-
-
-
 

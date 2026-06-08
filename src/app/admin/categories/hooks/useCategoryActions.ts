@@ -19,12 +19,13 @@ interface UseCategoryActionsReturn {
   handleEditCategory: (category: Category) => Promise<void>;
   handleUpdateCategory: (fetchCategories: () => Promise<void>) => Promise<void>;
   handleDeleteCategory: (categoryId: string, categoryTitle: string, fetchCategories: () => Promise<void>) => Promise<void>;
-  handleToggleHomeStrip: (categoryId: string, fetchCategories: () => Promise<void>) => Promise<void>;
+  handleToggleHomePage: (categoryId: string, fetchCategories: () => Promise<void>) => Promise<void>;
   handleReorderCategories: (
     payload: { parentId: string | null; categoryIds: string[] },
-    fetchCategories: () => Promise<void>,
+    fetchCategories: (options?: { silent?: boolean }) => Promise<void>,
   ) => Promise<void>;
   reordering: boolean;
+  togglingHomePageId: string | null;
   resetForm: () => void;
 }
 
@@ -33,7 +34,6 @@ const initialFormData: CategoryFormData = {
   parentId: '',
   requiresSizes: false,
   subcategoryIds: [],
-  homeStripPosition: null,
   imageUrl: null,
 };
 
@@ -48,6 +48,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
   const [formData, setFormData] = useState<CategoryFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
   const [reordering, setReordering] = useState(false);
+  const [togglingHomePageId, setTogglingHomePageId] = useState<string | null>(null);
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -65,7 +66,6 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         title: formData.title.trim(),
         parentId: formData.parentId || undefined,
         requiresSizes: formData.requiresSizes,
-        homeStripPosition: formData.homeStripPosition,
         imageUrl: formData.imageUrl,
         locale: 'en',
       });
@@ -88,17 +88,16 @@ export function useCategoryActions(): UseCategoryActionsReturn {
 
   const handleEditCategory = async (category: Category) => {
     setEditingCategory(category);
-    
+
     try {
       const response = await apiClient.get<{ data: Category }>(`/api/v1/admin/categories/${category.id}`);
       const categoryWithChildren = response.data;
-      
+
       setFormData({
         title: category.title,
         parentId: category.parentId || '',
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: categoryWithChildren.children?.map(child => child.id) || [],
-        homeStripPosition: categoryWithChildren.homeStripPosition ?? null,
         imageUrl: categoryWithChildren.imageUrl ?? null,
       });
     } catch (err: unknown) {
@@ -108,11 +107,10 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         parentId: category.parentId || '',
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: [],
-        homeStripPosition: category.homeStripPosition ?? null,
         imageUrl: category.imageUrl ?? null,
       });
     }
-    
+
     setShowEditModal(true);
   };
 
@@ -129,7 +127,6 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         parentId: formData.parentId || null,
         requiresSizes: formData.requiresSizes,
         subcategoryIds: formData.subcategoryIds,
-        homeStripPosition: formData.homeStripPosition,
         imageUrl: formData.imageUrl,
         locale: 'en',
       });
@@ -151,33 +148,36 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     }
   };
 
-  const handleToggleHomeStrip = async (
+  const handleToggleHomePage = async (
     categoryId: string,
     fetchCategories: () => Promise<void>,
   ) => {
+    setTogglingHomePageId(categoryId);
     try {
       await apiClient.patch(`/api/v1/admin/categories/${categoryId}/home-strip`);
       await fetchCategories();
       showToast(t('admin.categories.homeStripToggled'), 'success');
     } catch (err: unknown) {
-      logger.error('Error toggling home strip', { error: err });
+      logger.error('Error toggling home page visibility', { error: err });
       const errorMessage = err && typeof err === 'object' && 'data' in err
         ? (err as { data?: { detail?: string } }).data?.detail
         : err && typeof err === 'object' && 'message' in err
         ? (err as { message?: string }).message
         : t('admin.categories.errorUpdating');
       showToast(errorMessage || t('admin.categories.errorUpdating'), 'error');
+    } finally {
+      setTogglingHomePageId(null);
     }
   };
 
   const handleReorderCategories = async (
     payload: { parentId: string | null; categoryIds: string[] },
-    fetchCategories: () => Promise<void>,
+    fetchCategories: (options?: { silent?: boolean }) => Promise<void>,
   ) => {
     setReordering(true);
     try {
       await apiClient.patch('/api/v1/admin/categories/reorder', payload);
-      await fetchCategories();
+      await fetchCategories({ silent: true });
       showToast(t('admin.categories.reorderSuccess'), 'success');
     } catch (err: unknown) {
       logger.error('Error reordering categories', { error: err });
@@ -244,13 +244,11 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     handleEditCategory,
     handleUpdateCategory,
     handleDeleteCategory,
-    handleToggleHomeStrip,
+    handleToggleHomePage,
     handleReorderCategories,
     reordering,
+    togglingHomePageId,
     resetForm,
   };
 }
-
-
-
 

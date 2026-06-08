@@ -96,6 +96,53 @@ export function getSiblingItemsInDisplayOrder(
   return items.filter((item) => item.parentId === parentId);
 }
 
+interface SiblingSlotBounds {
+  top: number;
+  bottom: number;
+  height: number;
+}
+
+function getSiblingSlotBounds(
+  items: CategoryWithLevel[],
+  siblings: CategoryWithLevel[],
+  draggedId: string,
+): Array<SiblingSlotBounds | null> {
+  return siblings.map((sibling) => {
+    const selector =
+      sibling.id === draggedId
+        ? `[data-category-placeholder="${draggedId}"]`
+        : `[data-category-id="${sibling.id}"]`;
+    const element = document.querySelector(selector);
+    if (!(element instanceof HTMLElement)) {
+      return null;
+    }
+
+    if (sibling.id === draggedId) {
+      const rect = element.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, height: rect.height };
+    }
+
+    const rowIndex = items.findIndex((item) => item.id === sibling.id);
+    if (rowIndex === -1) {
+      const rect = element.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, height: rect.height };
+    }
+
+    const blockEnd = getCategoryBlockEndIndex(items, rowIndex);
+    const lastRow = document.querySelector(
+      `[data-category-id="${items[blockEnd - 1]?.id ?? sibling.id}"]`,
+    );
+    if (!(lastRow instanceof HTMLElement)) {
+      const rect = element.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, height: rect.height };
+    }
+
+    const top = element.getBoundingClientRect().top;
+    const bottom = lastRow.getBoundingClientRect().bottom;
+    return { top, bottom, height: Math.max(bottom - top, element.getBoundingClientRect().height) };
+  });
+}
+
 export function getSiblingSlotIndexFromPointer(
   clientY: number,
   items: CategoryWithLevel[],
@@ -108,33 +155,24 @@ export function getSiblingSlotIndexFromPointer(
   }
 
   const siblings = getSiblingItemsInDisplayOrder(items, dragged.parentId);
-  const slotMetrics = siblings.map((sibling) => {
-    const selector =
-      sibling.id === draggedId
-        ? `[data-category-placeholder="${draggedId}"]`
-        : `[data-category-id="${sibling.id}"]`;
-    const element = document.querySelector(selector);
-    if (!(element instanceof HTMLElement)) {
-      return null;
-    }
+  const slotBounds = getSiblingSlotBounds(items, siblings, draggedId);
 
-    const rect = element.getBoundingClientRect();
-    return {
-      center: rect.top + rect.height / 2,
-      height: rect.height,
-    };
-  });
-
-  if (slotMetrics.some((metric) => metric === null)) {
+  if (slotBounds.some((bounds) => bounds === null)) {
     return null;
   }
 
+  const bounds = slotBounds as SiblingSlotBounds[];
   let nextIndex = siblings.length - 1;
-  for (let index = 0; index < slotMetrics.length; index += 1) {
-    const metric = slotMetrics[index];
-    if (metric && clientY < metric.center) {
-      nextIndex = index;
-      break;
+
+  if (clientY < bounds[0].top) {
+    nextIndex = 0;
+  } else {
+    for (let index = 0; index < bounds.length - 1; index += 1) {
+      const boundary = (bounds[index].bottom + bounds[index + 1].top) / 2;
+      if (clientY < boundary) {
+        nextIndex = index + 1;
+        break;
+      }
     }
   }
 
@@ -142,13 +180,17 @@ export function getSiblingSlotIndexFromPointer(
     return null;
   }
 
-  if (stableIndex >= 0 && stableIndex < slotMetrics.length) {
-    const currentMetric = slotMetrics[stableIndex];
-    if (currentMetric) {
-      const deadZone = Math.max(18, currentMetric.height * 0.22);
-      if (Math.abs(clientY - currentMetric.center) < deadZone) {
-        return null;
-      }
+  const isExtremeMove = nextIndex === 0 || nextIndex === siblings.length - 1;
+  if (
+    !isExtremeMove &&
+    stableIndex >= 0 &&
+    stableIndex < bounds.length
+  ) {
+    const currentBounds = bounds[stableIndex];
+    const deadZone = Math.max(12, currentBounds.height * 0.15);
+    const currentMid = currentBounds.top + currentBounds.height / 2;
+    if (Math.abs(clientY - currentMid) < deadZone) {
+      return null;
     }
   }
 

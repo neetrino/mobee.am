@@ -1,5 +1,5 @@
-import * as bcrypt from "bcryptjs";
 import { db } from "@white-shop/db";
+import { hashPassword, verifyPassword } from "@/lib/security/password-hash";
 import { signAccessToken } from "@/lib/security/sign-access-token";
 import { logger } from "../utils/logger";
 
@@ -81,7 +81,7 @@ class AuthService {
     }
 
     // Hash password
-    const passwordHash = await bcrypt.hash(data.password, 10);
+    const passwordHash = await hashPassword(data.password);
 
     // Create user
     let user;
@@ -201,12 +201,9 @@ class AuthService {
     }
 
     // Check password
-    const isValidPassword = await bcrypt.compare(
-      data.password,
-      user.passwordHash
-    );
+    const passwordCheck = await verifyPassword(data.password, user.passwordHash);
 
-    if (!isValidPassword) {
+    if (!passwordCheck.valid) {
       logger.debug("Auth login: invalid password");
       throw {
         status: 401,
@@ -214,6 +211,15 @@ class AuthService {
         title: "Invalid credentials",
         detail: "Invalid email or password",
       };
+    }
+
+    if (passwordCheck.needsRehash) {
+      const upgradedHash = await hashPassword(data.password);
+      await db.user.update({
+        where: { id: user.id },
+        data: { passwordHash: upgradedHash },
+        select: { id: true },
+      });
     }
 
     if (user.blocked) {

@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
-import * as bcrypt from "bcryptjs";
 import { db } from "@white-shop/db";
+import { hashPassword } from "@/lib/security/password-hash";
 import { sendPasswordResetEmail } from "@/lib/email/send-password-reset-email";
 import {
   PASSWORD_RESET_EXPIRY_MS,
@@ -133,7 +133,7 @@ export async function resetPasswordByToken(
     };
   }
 
-  const passwordHash = await bcrypt.hash(newPassword.trim(), 10);
+  const passwordHash = await hashPassword(newPassword.trim());
   await db.user.update({
     where: { id: user.id },
     data: {

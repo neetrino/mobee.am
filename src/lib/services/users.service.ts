@@ -1,10 +1,11 @@
 import { db } from "@white-shop/db";
-import * as bcrypt from "bcryptjs";
+import { hashPassword, verifyPassword } from "@/lib/security/password-hash";
 import type {
   AddressCreateInput,
   AddressUpdateInput,
   ProfileUpdateInput,
 } from "@/lib/schemas/users.schema";
+import { logger } from "@/lib/utils/logger";
 
 class UsersService {
   /**
@@ -163,8 +164,8 @@ class UsersService {
     }
 
     try {
-      const isValid = await bcrypt.compare(oldPassword.trim(), user.passwordHash);
-      if (!isValid) {
+      const passwordCheck = await verifyPassword(oldPassword.trim(), user.passwordHash);
+      if (!passwordCheck.valid) {
         throw {
           status: 401,
           type: "https://api.shop.am/problems/unauthorized",
@@ -172,15 +173,12 @@ class UsersService {
           detail: "The old password is incorrect",
         };
       }
-    } catch (bcryptError: any) {
-      // Handle bcrypt errors
-      console.error("❌ [USERS SERVICE] bcrypt.compare error:", {
-        error: bcryptError,
-        message: bcryptError?.message,
-        userId,
-        hasOldPassword: !!oldPassword,
-        hasPasswordHash: !!user.passwordHash,
-      });
+    } catch (verifyError: unknown) {
+      const verifyErr = verifyError as { status?: number; type?: string };
+      if (verifyErr.status && verifyErr.type) {
+        throw verifyError;
+      }
+      logger.error("Users service password verify error", { error: verifyError, userId });
       throw {
         status: 500,
         type: "https://api.shop.am/problems/internal-error",
@@ -190,7 +188,7 @@ class UsersService {
     }
 
     try {
-      const newPasswordHash = await bcrypt.hash(newPassword.trim(), 10);
+      const newPasswordHash = await hashPassword(newPassword.trim());
       await db.user.update({
         where: { id: userId },
         data: { passwordHash: newPasswordHash },
@@ -198,12 +196,8 @@ class UsersService {
       });
 
       return { success: true };
-    } catch (hashError: any) {
-      console.error("❌ [USERS SERVICE] bcrypt.hash error:", {
-        error: hashError,
-        message: hashError?.message,
-        userId,
-      });
+    } catch (hashError: unknown) {
+      logger.error("Users service password hash error", { error: hashError, userId });
       throw {
         status: 500,
         type: "https://api.shop.am/problems/internal-error",
