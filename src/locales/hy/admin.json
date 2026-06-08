@@ -217,7 +217,7 @@
     "uploadingImage": "Վերբեռնվում է...",
     "removeImage": "Հեռացնել նկար",
     "homeStarAdd": "Ցուցադրել home page-ում",
-    "homeStarRemove": "Հանել home page-ից (տեղ {position})",
+    "homeStarRemove": "Հանել home page-ից",
     "homeStripToggled": "Home page-ի կարգավորումը թարմացվեց",
     "titleRequired": "Խնդրում ենք մուտքագրել կատեգորիայի անվանում",
     "creating": "Ստեղծվում է...",

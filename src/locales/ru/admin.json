@@ -217,7 +217,7 @@
     "uploadingImage": "Загрузка...",
     "removeImage": "Удалить изображение",
     "homeStarAdd": "Показать на главной",
-    "homeStarRemove": "Убрать с главной (слот {position})",
+    "homeStarRemove": "Убрать с главной",
     "homeStripToggled": "Настройка главной страницы обновлена",
     "titleRequired": "Пожалуйста, введите название категории",
     "creating": "Создание...",

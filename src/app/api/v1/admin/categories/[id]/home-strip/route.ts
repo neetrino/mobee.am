@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateToken, requireAdmin } from '@/lib/middleware/auth';
 import { adminService } from '@/lib/services/admin.service';
 
+/**
+ * PATCH /api/v1/admin/categories/[id]/home-strip
+ * Toggle category visibility on the home page strip (star control).
+ */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

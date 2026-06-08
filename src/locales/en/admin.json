@@ -217,7 +217,7 @@
     "uploadingImage": "Uploading...",
     "removeImage": "Remove image",
     "homeStarAdd": "Show on home page",
-    "homeStarRemove": "Remove from home page (slot {position})",
+    "homeStarRemove": "Remove from home page",
     "homeStripToggled": "Home page display updated",
     "titleRequired": "Please enter category title",
     "creating": "Creating...",

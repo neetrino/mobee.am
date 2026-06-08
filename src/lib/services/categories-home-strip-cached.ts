@@ -1,12 +1,12 @@
 import { db } from '@white-shop/db';
 import type { CategoryTreeNode } from '@/lib/category-nav';
-import { HOME_CATEGORY_STRIP_MAX_POSITION } from '@/lib/constants/home-category-strip.constants';
+import { pickHomeStripCategories } from '@/lib/categoryHomeStripOrder';
 import { cacheService } from '@/lib/services/cache.service';
 
 const CACHE_TTL_SECONDS = 300;
 
 export type HomeStripCategoryItem = CategoryTreeNode & {
-  homeStripPosition: number;
+  position: number;
 };
 
 export type HomeCategoryStripPayload = {
@@ -18,7 +18,7 @@ function buildHomeStripCacheKey(lang: string): string {
 }
 
 /**
- * Categories configured for the home page strip (`homeStripPosition` 1–6).
+ * Home page category strip follows `/supersudo/categories` display order (`position`).
  */
 export async function getCachedHomeCategoryStrip(
   lang: string,
@@ -37,39 +37,50 @@ export async function getCachedHomeCategoryStrip(
     where: {
       published: true,
       deletedAt: null,
-      homeStripPosition: {
-        gte: 1,
-        lte: HOME_CATEGORY_STRIP_MAX_POSITION,
-      },
     },
     include: {
       translations: true,
     },
     orderBy: {
-      homeStripPosition: 'asc',
+      position: 'asc',
     },
   });
 
-  const data = categories.flatMap((category): HomeStripCategoryItem[] => {
-      const translation =
-        category.translations.find((tr) => tr.locale === lang) ||
-        category.translations[0];
-      if (!translation || category.homeStripPosition === null) {
-        return [];
-      }
+  const orderedCategories = pickHomeStripCategories(
+    categories.map((category) => ({
+      id: category.id,
+      parentId: category.parentId,
+      position: category.position,
+      showOnHomePage: category.homeStripPosition !== null,
+    })),
+  );
 
-      return [
-        {
-          id: category.id,
-          slug: translation.slug,
-          title: translation.title,
-          fullPath: translation.fullPath,
-          media: category.media ?? [],
-          children: [],
-          homeStripPosition: category.homeStripPosition,
-        },
-      ];
-    });
+  const categoryById = new Map(categories.map((category) => [category.id, category]));
+
+  const data = orderedCategories.flatMap((orderedCategory, index): HomeStripCategoryItem[] => {
+    const category = categoryById.get(orderedCategory.id);
+    if (!category) {
+      return [];
+    }
+
+    const translation =
+      category.translations.find((tr) => tr.locale === lang) || category.translations[0];
+    if (!translation) {
+      return [];
+    }
+
+    return [
+      {
+        id: category.id,
+        slug: translation.slug,
+        title: translation.title,
+        fullPath: translation.fullPath,
+        media: category.media ?? [],
+        children: [],
+        position: index,
+      },
+    ];
+  });
 
   const result: HomeCategoryStripPayload = { data };
   await cacheService.setex(cacheKey, CACHE_TTL_SECONDS, JSON.stringify(result));

@@ -10,9 +10,9 @@ import {
   WATCHES_SLUG_PARTS,
 } from './category-nav';
 
-import { HOME_CATEGORY_STRIP_LIMIT } from './constants/home-category-strip.constants';
+import { HOME_CATEGORY_STRIP_DESKTOP_COLUMNS } from './constants/home-category-strip.constants';
 
-export { HOME_CATEGORY_STRIP_LIMIT };
+export { HOME_CATEGORY_STRIP_DESKTOP_COLUMNS };
 
 export type CategoryStripSlotKey =
   | 'computers'
@@ -122,6 +122,18 @@ export const CATEGORY_STRIP_GRID_COLS: Record<number, string> = {
   6: 'lg:grid-cols-6',
 };
 
+export function getCategoryStripDesktopGridClass(itemCount: number): string {
+  if (itemCount <= 0) {
+    return CATEGORY_STRIP_GRID_COLS[1];
+  }
+
+  if (itemCount <= HOME_CATEGORY_STRIP_DESKTOP_COLUMNS) {
+    return CATEGORY_STRIP_GRID_COLS[itemCount] ?? CATEGORY_STRIP_GRID_COLS[1];
+  }
+
+  return CATEGORY_STRIP_GRID_COLS[HOME_CATEGORY_STRIP_DESKTOP_COLUMNS];
+}
+
 function categoryMatchesSlugParts(category: CategoryTreeNode, parts: readonly string[]): boolean {
   const tokens = category.slug.toLowerCase().split(/[-_/]/);
   return parts.some((part) => tokens.includes(part));
@@ -137,23 +149,19 @@ export function resolveCategoryStripSlotKey(
     }
   }
 
-  if (
-    index !== undefined &&
-    index >= 0 &&
-    index < CATEGORY_STRIP_SLOT_ORDER.length
-  ) {
-    return CATEGORY_STRIP_SLOT_ORDER[index];
+  if (index !== undefined && index >= 0) {
+    return CATEGORY_STRIP_SLOT_ORDER[index % CATEGORY_STRIP_SLOT_ORDER.length];
   }
 
   return null;
 }
 
-export function mapHomeStripItemsByPosition<T extends { homeStripPosition: number }>(
+export function mapHomeStripItemsByPosition<T extends { position: number }>(
   items: T[],
 ): Map<number, T> {
   const map = new Map<number, T>();
   for (const item of items) {
-    map.set(item.homeStripPosition, item);
+    map.set(item.position, item);
   }
   return map;
 }

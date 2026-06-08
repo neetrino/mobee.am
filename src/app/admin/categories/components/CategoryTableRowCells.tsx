@@ -5,14 +5,17 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { CategoryWithLevel } from '../types';
 import { CategoryDragHandle } from './CategoryDragHandle';
+import { CategoryHomeStarButton } from './CategoryHomeStarButton';
 
 interface CategoryTableRowCellsProps {
   category: CategoryWithLevel;
   subcategoryLabel: string;
   reorderEnabled: boolean;
   isHandleActive: boolean;
+  togglingHomePage?: boolean;
   onEdit?: (category: CategoryWithLevel) => void;
   onDelete?: (categoryId: string, categoryTitle: string) => void;
+  onToggleHomePage?: (categoryId: string) => void;
   onHandlePointerDown?: (event: React.PointerEvent<HTMLDivElement>) => void;
 }
 
@@ -27,8 +30,10 @@ export function CategoryTableRowCells({
   subcategoryLabel,
   reorderEnabled,
   isHandleActive,
+  togglingHomePage = false,
   onEdit,
   onDelete,
+  onToggleHomePage,
   onHandlePointerDown,
 }: CategoryTableRowCellsProps) {
   const { t } = useTranslation();
@@ -68,9 +73,14 @@ export function CategoryTableRowCells({
       <td className="min-w-[140px] px-3 py-3 text-sm text-gray-600">
         {subcategoryLabel || '—'}
       </td>
-      <td className="w-28 px-3 py-3">
+      <td className="w-36 px-3 py-3">
         {isInteractive ? (
           <div className="flex items-center justify-end gap-2">
+            <CategoryHomeStarButton
+              showOnHomePage={category.showOnHomePage === true}
+              disabled={togglingHomePage}
+              onToggle={() => onToggleHomePage?.(category.id)}
+            />
             <button
               type="button"
               onClick={() => onEdit?.(category)}
@@ -90,6 +100,11 @@ export function CategoryTableRowCells({
           </div>
         ) : (
           <div className="flex items-center justify-end gap-2 opacity-80">
+            <CategoryHomeStarButton
+              showOnHomePage={category.showOnHomePage === true}
+              disabled
+              onToggle={() => undefined}
+            />
             <div className="flex size-9 items-center justify-center rounded-supersudo border border-gray-200 bg-gray-100 text-gray-700">
               <Pencil className="size-4" aria-hidden="true" />
             </div>
