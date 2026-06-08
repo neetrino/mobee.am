@@ -71,7 +71,7 @@ model Category {
   id                String                @id @default(cuid())
   parentId          String?
   position          Int                   @default(0)
-  // 1–6 = home category strip slot; null = hidden from home strip
+  // Non-null = starred for home page strip; order follows admin `position`
   homeStripPosition Int?
   published         Boolean               @default(false)
   requiresSizes     Boolean               @default(false)
