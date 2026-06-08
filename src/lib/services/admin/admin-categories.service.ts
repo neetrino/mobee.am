@@ -3,6 +3,7 @@ import {
   buildCategoryMediaFromImageUrl,
   extractCategoryImageUrl,
 } from "@/lib/categoryMedia";
+import { getCategoryProductCountMap } from "@/lib/services/admin/category-product-counts";
 import { cacheService } from "@/lib/services/cache.service";
 import { toSlug } from "@/lib/utils/slug";
 
@@ -31,6 +32,7 @@ class AdminCategoriesService {
     });
 
     const activeCategoryIds = new Set(categories.map((category) => category.id));
+    const productCountMap = await getCategoryProductCountMap(categories.map((category) => category.id));
 
     return {
       data: categories.map((category: {
@@ -58,6 +60,7 @@ class AdminCategoriesService {
           requiresSizes: category.requiresSizes || false,
           showOnHomePage: category.homeStripPosition !== null,
           imageUrl: extractCategoryImageUrl(category.media),
+          productCount: productCountMap.get(category.id) ?? 0,
         };
       }),
     };

@@ -81,6 +81,9 @@ export function CategoriesList({
             <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
               {t('admin.categories.tableSubcategory')}
             </th>
+            <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              {t('admin.categories.tableProducts')}
+            </th>
             <th className="px-3 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
               {t('admin.categories.tableActions')}
             </th>

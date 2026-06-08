@@ -73,6 +73,9 @@ export function CategoryTableRowCells({
       <td className="min-w-[140px] px-3 py-3 text-sm text-gray-600">
         {subcategoryLabel || '—'}
       </td>
+      <td className="w-24 px-3 py-3 text-sm tabular-nums text-gray-700">
+        {(category.productCount ?? 0) > 0 ? category.productCount : '—'}
+      </td>
       <td className="w-36 px-3 py-3">
         {isInteractive ? (
           <div className="flex items-center justify-end gap-2">

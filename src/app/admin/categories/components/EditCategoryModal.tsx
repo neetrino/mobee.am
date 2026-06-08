@@ -1,6 +1,8 @@
 ﻿'use client';
 
+import { useEffect } from 'react';
 import { Button, Input } from '@/app/admin/lib/adminShopUi';
+import { acquireBodyScrollLock } from '../../../../lib/body-scroll-lock';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
 import { CategoryImageField } from './CategoryImageField';
@@ -28,11 +30,19 @@ export function EditCategoryModal({
 }: EditCategoryModalProps) {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    if (!isOpen || !editingCategory) {
+      return;
+    }
+    return acquireBodyScrollLock();
+  }, [isOpen, editingCategory]);
+
   if (!isOpen || !editingCategory) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-supersudo p-6 max-w-md w-full mx-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4 sm:p-6">
+      <div className="flex min-h-full items-start justify-center">
+      <div className="bg-white rounded-supersudo p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.categories.editCategory')}</h3>
         <div className="space-y-4">
           <div>
@@ -144,6 +154,7 @@ export function EditCategoryModal({
             {t('admin.common.cancel')}
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -235,6 +235,7 @@
     "tableImage": "Image",
     "tableName": "Category name",
     "tableSubcategory": "Subcategory",
+    "tableProducts": "Products",
     "tableActions": "Actions",
     "dragHandle": "Drag to reorder",
     "reorderSuccess": "Category order updated",

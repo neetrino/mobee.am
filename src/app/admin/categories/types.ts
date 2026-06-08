@@ -7,6 +7,7 @@ export interface Category {
   requiresSizes?: boolean;
   showOnHomePage?: boolean;
   imageUrl?: string | null;
+  productCount?: number;
   children?: Category[];
 }
 
