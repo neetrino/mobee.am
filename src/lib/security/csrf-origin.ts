@@ -23,6 +23,18 @@ function originFromReferer(referer: string): string | null {
   }
 }
 
+function normalizeOrigin(origin: string): string {
+  return origin.replace(/\/+$/, "");
+}
+
+function isAllowedOrigin(candidate: string | null | undefined, allowed: string[]): boolean {
+  if (!candidate) {
+    return false;
+  }
+  const normalized = normalizeOrigin(candidate);
+  return allowed.some((entry) => normalizeOrigin(entry) === normalized);
+}
+
 /**
  * Validates Origin/Referer for cookie-authenticated mutating API requests (CSRF mitigation).
  * Same-origin browser fetch with credentials always sends Origin in modern browsers.
@@ -41,26 +53,38 @@ export function verifyMutationOrigin(request: NextRequest): boolean {
     return true;
   }
 
+  const hostOrigin = normalizeOrigin(request.nextUrl.origin);
+  const origin = request.headers.get("origin")?.trim();
+  const referer = request.headers.get("referer")?.trim();
+
+  if (origin && normalizeOrigin(origin) === hostOrigin) {
+    return true;
+  }
+
+  if (referer) {
+    const refererOrigin = originFromReferer(referer);
+    if (refererOrigin && normalizeOrigin(refererOrigin) === hostOrigin) {
+      return true;
+    }
+  }
+
   const allowed = resolveAllowedOrigins();
   if (allowed.length === 0) {
     return false;
   }
 
-  const origin = request.headers.get("origin")?.trim();
-  if (origin && allowed.includes(origin)) {
+  if (isAllowedOrigin(origin, allowed)) {
     return true;
   }
 
-  const referer = request.headers.get("referer")?.trim();
   if (referer) {
     const refererOrigin = originFromReferer(referer);
-    if (refererOrigin && allowed.includes(refererOrigin)) {
+    if (isAllowedOrigin(refererOrigin, allowed)) {
       return true;
     }
   }
 
-  const hostOrigin = request.nextUrl.origin;
-  if (allowed.includes(hostOrigin) && !origin && !referer) {
+  if (isAllowedOrigin(hostOrigin, allowed) && !origin && !referer) {
     return true;
   }
 

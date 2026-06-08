@@ -1,4 +1,3 @@
-import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import * as jose from "jose";
 import { getAccessTokenFromRequest } from "@/lib/security/auth-cookie";
@@ -92,8 +91,13 @@ function isGuestOrderLookup(request: NextRequest): boolean {
   return Boolean(request.nextUrl.searchParams.get("email")?.trim());
 }
 
-function hashGuestOrderEmailKey(email: string): string {
-  return createHash("sha256").update(email.trim().toLowerCase()).digest("hex").slice(0, 24);
+async function hashGuestOrderEmailKey(email: string): Promise<string> {
+  const data = new TextEncoder().encode(email.trim().toLowerCase());
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hex = Array.from(new Uint8Array(hashBuffer), (byte) =>
+    byte.toString(16).padStart(2, "0")
+  ).join("");
+  return hex.slice(0, 24);
 }
 
 function isPasswordResetPath(pathname: string, method: string): boolean {
@@ -120,7 +124,7 @@ function applyCors(
   return response;
 }
 
-function csrfForbiddenResponse(request: NextRequest): NextResponse {
+function csrfForbiddenResponse(): NextResponse {
   return NextResponse.json(
     {
       type: "https://api.shop.am/problems/forbidden",
@@ -147,7 +151,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!verifyMutationOrigin(request)) {
-    return applyCors(csrfForbiddenResponse(request), request);
+    return applyCors(csrfForbiddenResponse(), request);
   }
 
   let rateLimitResponse: NextResponse | null = null;
@@ -174,7 +178,7 @@ export async function middleware(request: NextRequest) {
         rateLimitResponse = await checkRateLimitByIpAndSuffix(
           request,
           RATE_LIMIT_GUEST_ORDER_EMAIL,
-          hashGuestOrderEmailKey(email)
+          await hashGuestOrderEmailKey(email)
         );
       }
     }
