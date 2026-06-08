@@ -30,8 +30,10 @@ class AdminCategoriesService {
       },
     });
 
+    const activeCategoryIds = new Set(categories.map((category) => category.id));
+
     return {
-      data:       categories.map((category: {
+      data: categories.map((category: {
         id: string;
         parentId: string | null;
         position: number;
@@ -42,11 +44,16 @@ class AdminCategoriesService {
       }) => {
         const translations = Array.isArray(category.translations) ? category.translations : [];
         const translation = translations[0] || null;
+        const parentId =
+          category.parentId && activeCategoryIds.has(category.parentId)
+            ? category.parentId
+            : null;
+
         return {
           id: category.id,
           title: translation?.title || "",
           slug: translation?.slug || "",
-          parentId: category.parentId,
+          parentId,
           position: category.position,
           requiresSizes: category.requiresSizes || false,
           showOnHomePage: category.homeStripPosition !== null,
@@ -461,6 +468,10 @@ class AdminCategoriesService {
       };
     }
 
+    if (parentId === null) {
+      await this.normalizeOrphanCategoryParents();
+    }
+
     const siblings = await db.category.findMany({
       where: {
         deletedAt: null,
@@ -503,6 +514,27 @@ class AdminCategoriesService {
     await clearCategoriesCache();
 
     return { success: true };
+  }
+
+  private async normalizeOrphanCategoryParents(): Promise<void> {
+    const categories = await db.category.findMany({
+      where: { deletedAt: null, parentId: { not: null } },
+      select: { id: true, parentId: true },
+    });
+
+    const activeIds = new Set(categories.map((category) => category.id));
+    const orphanIds = categories
+      .filter((category) => category.parentId && !activeIds.has(category.parentId))
+      .map((category) => category.id);
+
+    if (orphanIds.length === 0) {
+      return;
+    }
+
+    await db.category.updateMany({
+      where: { id: { in: orphanIds } },
+      data: { parentId: null },
+    });
   }
 
   private async getNextSiblingPosition(parentId: string | null): Promise<number> {

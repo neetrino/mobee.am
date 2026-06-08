@@ -22,7 +22,7 @@ interface UseCategoryActionsReturn {
   handleToggleHomePage: (categoryId: string, fetchCategories: () => Promise<void>) => Promise<void>;
   handleReorderCategories: (
     payload: { parentId: string | null; categoryIds: string[] },
-    fetchCategories: () => Promise<void>,
+    fetchCategories: (options?: { silent?: boolean }) => Promise<void>,
   ) => Promise<void>;
   reordering: boolean;
   togglingHomePageId: string | null;
@@ -172,12 +172,12 @@ export function useCategoryActions(): UseCategoryActionsReturn {
 
   const handleReorderCategories = async (
     payload: { parentId: string | null; categoryIds: string[] },
-    fetchCategories: () => Promise<void>,
+    fetchCategories: (options?: { silent?: boolean }) => Promise<void>,
   ) => {
     setReordering(true);
     try {
       await apiClient.patch('/api/v1/admin/categories/reorder', payload);
-      await fetchCategories();
+      await fetchCategories({ silent: true });
       showToast(t('admin.categories.reorderSuccess'), 'success');
     } catch (err: unknown) {
       logger.error('Error reordering categories', { error: err });
