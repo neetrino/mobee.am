@@ -13,6 +13,7 @@ export interface Product {
     stock: number;
   }>;
   image: string | null;
+  categoryIds?: string[];
   createdAt: string;
 }
 

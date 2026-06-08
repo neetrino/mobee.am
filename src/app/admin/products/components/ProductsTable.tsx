@@ -5,7 +5,22 @@ import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../../../lib/currency';
-import type { Product, ProductsResponse } from '../types';
+import type { Category, Product, ProductsResponse } from '../types';
+
+function resolveProductCategories(
+  categoryIds: string[] | undefined,
+  categories: Category[]
+): Array<{ id: string; title: string }> {
+  if (!categoryIds || categoryIds.length === 0) {
+    return [];
+  }
+
+  const categoryMap = new Map(categories.map((category) => [category.id, category.title]));
+  return categoryIds.flatMap((id) => {
+    const title = categoryMap.get(id);
+    return title ? [{ id, title }] : [];
+  });
+}
 
 interface ProductsTableProps {
   loading: boolean;
@@ -17,6 +32,7 @@ interface ProductsTableProps {
   sortBy: string;
   handleHeaderSort: (field: 'price' | 'createdAt' | 'title' | 'stock') => void;
   currency: CurrencyCode;
+  categories: Category[];
   handleDeleteProduct: (productId: string, productTitle: string) => void;
   handleTogglePublished: (productId: string, currentStatus: boolean, productTitle: string) => void;
   handleToggleFeatured: (productId: string, currentStatus: boolean, productTitle: string) => void;
@@ -35,6 +51,7 @@ export function ProductsTable({
   sortBy,
   handleHeaderSort,
   currency,
+  categories,
   handleDeleteProduct,
   handleTogglePublished,
   handleToggleFeatured,
@@ -176,6 +193,15 @@ export function ProductsTable({
                     </button>
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('admin.products.category')}
+                  </th>
+                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('admin.products.featured')}
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pl-6">
+                    <span className="ml-6 inline-block">{t('admin.products.actions')}</span>
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <button
                       type="button"
                       onClick={() => handleHeaderSort('createdAt')}
@@ -210,16 +236,13 @@ export function ProductsTable({
                       </span>
                     </button>
                   </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('admin.products.featured')}
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pl-6">
-                    <span className="ml-6 inline-block">{t('admin.products.actions')}</span>
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sortedProducts.map((product) => (
+                {sortedProducts.map((product) => {
+                  const productCategories = resolveProductCategories(product.categoryIds, categories);
+
+                  return (
                   <tr key={product.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4">
                       <input
@@ -279,8 +302,21 @@ export function ProductsTable({
                         ) : null}
                       </div>
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(product.createdAt).toLocaleDateString('hy-AM')}
+                    <td className="px-3 py-4">
+                      {productCategories.length === 0 ? (
+                        <span className="text-sm text-gray-400">{t('admin.products.noCategory')}</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1.5">
+                          {productCategories.map((category) => (
+                            <span
+                              key={category.id}
+                              className="inline-flex rounded-supersudo bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+                            >
+                              {category.title}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-center">
                       <button
@@ -351,8 +387,12 @@ export function ProductsTable({
                         </button>
                       </div>
                     </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(product.createdAt).toLocaleDateString('hy-AM')}
+                    </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

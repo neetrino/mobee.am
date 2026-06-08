@@ -342,6 +342,8 @@
     "product": "ԱՊՐԱՆՔ",
     "stock": "ՊԱՇԱՐ",
     "price": "ԳԻՆ",
+    "category": "ԿԱՏԵԳՈՐԻԱ",
+    "noCategory": "—",
     "status": "ԿԱՐԳԱՎԻՃԱԿ",
     "featured": "ԱՌԱՋԱՐԿՎԱԾ",
     "created": "ՍՏԵՂծՎԱԾ",

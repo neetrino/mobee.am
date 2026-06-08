@@ -342,6 +342,8 @@
     "product": "ТОВАР",
     "stock": "НАЛИЧИЕ",
     "price": "ЦЕНА",
+    "category": "КАТЕГОРИЯ",
+    "noCategory": "—",
     "status": "СТАТУС",
     "featured": "РЕКОМЕНДУЕМЫЕ",
     "created": "СОЗДАН",

@@ -340,6 +340,8 @@
     "product": "PRODUCT",
     "stock": "STOCK",
     "price": "PRICE",
+    "category": "CATEGORY",
+    "noCategory": "—",
     "status": "STATUS",
     "featured": "FEATURED",
     "created": "CREATED",
