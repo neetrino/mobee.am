@@ -3,9 +3,12 @@ import {
   buildCategoryMediaFromImageUrl,
   extractCategoryImageUrl,
 } from "@/lib/categoryMedia";
+import { DEFAULT_LANGUAGE } from "@/lib/language";
 import { getCategoryProductCountMap } from "@/lib/services/admin/category-product-counts";
 import { cacheService } from "@/lib/services/cache.service";
 import { toSlug } from "@/lib/utils/slug";
+
+const ADMIN_CATEGORY_LOCALE = DEFAULT_LANGUAGE;
 
 async function clearCategoriesCache(): Promise<void> {
   await cacheService.deletePattern("categories:*");
@@ -22,7 +25,7 @@ class AdminCategoriesService {
       },
       include: {
         translations: {
-          where: { locale: "en" },
+          where: { locale: ADMIN_CATEGORY_LOCALE },
           take: 1,
         },
       },
@@ -76,7 +79,7 @@ class AdminCategoriesService {
     requiresSizes?: boolean;
     imageUrl?: string | null;
   }) {
-    const locale = data.locale || "en";
+    const locale = data.locale || ADMIN_CATEGORY_LOCALE;
     
     // Validate parent category exists if parentId is provided
     if (data.parentId) {
@@ -154,13 +157,13 @@ class AdminCategoriesService {
       where: { id: categoryId },
       include: {
         translations: {
-          where: { locale: "en" },
+          where: { locale: ADMIN_CATEGORY_LOCALE },
           take: 1,
         },
         children: {
           include: {
             translations: {
-              where: { locale: "en" },
+              where: { locale: ADMIN_CATEGORY_LOCALE },
               take: 1,
             },
           },
@@ -207,7 +210,7 @@ class AdminCategoriesService {
     subcategoryIds?: string[];
     imageUrl?: string | null;
   }) {
-    const locale = data.locale || "en";
+    const locale = data.locale || ADMIN_CATEGORY_LOCALE;
     
     const category = await db.category.findUnique({
       where: { id: categoryId },
@@ -324,28 +327,26 @@ class AdminCategoriesService {
       updateData.media = buildCategoryMediaFromImageUrl(data.imageUrl);
     }
 
-    // Update translation if title is provided
+    // Keep all locale rows in sync so storefront language switches stay consistent.
     if (data.title) {
       const slug = toSlug(data.title);
 
       const categoryTranslations = Array.isArray(category.translations) ? category.translations : [];
-      const existingTranslation = categoryTranslations.find((t: { locale: string }) => t.locale === locale);
 
-      if (existingTranslation) {
-        // Update existing translation
-        await db.categoryTranslation.update({
-          where: { id: existingTranslation.id },
-          data: {
-            title: data.title,
-            slug,
-          },
-        });
-      } else {
-        // Create new translation
+      if (categoryTranslations.length === 0) {
         await db.categoryTranslation.create({
           data: {
             categoryId: category.id,
             locale,
+            title: data.title,
+            slug,
+            fullPath: slug,
+          },
+        });
+      } else {
+        await db.categoryTranslation.updateMany({
+          where: { categoryId: category.id },
+          data: {
             title: data.title,
             slug,
             fullPath: slug,

@@ -1,6 +1,7 @@
 import { db } from '@white-shop/db';
 import type { CategoryTreeNode } from '@/lib/category-nav';
 import { pickHomeStripCategories } from '@/lib/categoryHomeStripOrder';
+import { pickCategoryTranslation } from '@/lib/pickCategoryTranslation';
 import { cacheService } from '@/lib/services/cache.service';
 
 const CACHE_TTL_SECONDS = 300;
@@ -63,8 +64,7 @@ export async function getCachedHomeCategoryStrip(
       return [];
     }
 
-    const translation =
-      category.translations.find((tr) => tr.locale === lang) || category.translations[0];
+    const translation = pickCategoryTranslation(category.translations, lang);
     if (!translation) {
       return [];
     }

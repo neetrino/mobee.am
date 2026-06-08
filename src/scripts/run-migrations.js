@@ -31,8 +31,11 @@ if (fs.existsSync(envPath)) {
 }
 
 const dbPath = path.join(__dirname, '../../shared/db');
+const withRootEnvScript = path.join(dbPath, 'scripts/with-root-env.cjs');
 
-process.chdir(dbPath);
+function runPrismaCommand(args) {
+  execSync(`node "${withRootEnvScript}" ${args}`, { stdio: 'inherit' });
+}
 
 const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
 const isNonInteractiveHost =
@@ -40,7 +43,7 @@ const isNonInteractiveHost =
 
 try {
   console.log('🔄 Attempting to deploy migrations...');
-  execSync('pnpm run db:migrate:deploy', { stdio: 'inherit' });
+  runPrismaCommand('migrate deploy');
   console.log('✅ Migrations deployed successfully');
   process.exit(0);
 } catch (_error) {
@@ -59,7 +62,7 @@ try {
   }
   console.log('⚠️  Migration deploy failed, trying db:push (local dev only)...');
   try {
-    execSync('pnpm run db:push', { stdio: 'inherit' });
+    runPrismaCommand('db push');
     console.log('✅ Database schema pushed successfully');
     process.exit(0);
   } catch (_pushErr) {

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { DEFAULT_LANGUAGE } from '@/lib/language';
 import { getCachedHomeCategoryStrip } from '@/lib/services/categories-home-strip-cached';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const lang = searchParams.get('lang') || 'en';
+    const lang = searchParams.get('lang') || DEFAULT_LANGUAGE;
 
     const { result, cacheStatus } = await getCachedHomeCategoryStrip(lang);
 
