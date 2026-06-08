@@ -124,7 +124,7 @@ function applyCors(
   return response;
 }
 
-function csrfForbiddenResponse(request: NextRequest): NextResponse {
+function csrfForbiddenResponse(): NextResponse {
   return NextResponse.json(
     {
       type: "https://api.shop.am/problems/forbidden",
@@ -151,7 +151,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!verifyMutationOrigin(request)) {
-    return applyCors(csrfForbiddenResponse(request), request);
+    return applyCors(csrfForbiddenResponse(), request);
   }
 
   let rateLimitResponse: NextResponse | null = null;
