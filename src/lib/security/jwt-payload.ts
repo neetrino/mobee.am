@@ -7,14 +7,13 @@ export type AccessTokenPayload = JWTPayload & {
 
 /**
  * Middleware admin gate for JWTs that include `roles` (issued after security hardening).
- * - `legacy` — old tokens without roles; routes still enforce admin via DB.
- * - `allow` / `deny` — explicit decision from token claims.
+ * Tokens without `roles` are denied — users must re-login to receive a hardened token.
  */
 export function resolveAdminGateFromJwtPayload(
   payload: JWTPayload
-): "allow" | "deny" | "legacy" {
+): "allow" | "deny" {
   if (!Object.prototype.hasOwnProperty.call(payload, "roles")) {
-    return "legacy";
+    return "deny";
   }
 
   const roles = (payload as AccessTokenPayload).roles;

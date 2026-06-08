@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { isRuntimeDdlEnabled } from "@/lib/security/runtime-ddl";
 import { logger } from "./logger";
 
 // Cache to track if table check has been performed
@@ -39,6 +40,15 @@ export async function ensureProductAttributesTable(): Promise<boolean> {
       prismaError?.message?.includes('does not exist') ||
       prismaError?.message?.includes('product_attributes')
     ) {
+      if (!isRuntimeDdlEnabled()) {
+        logger.error(
+          'product_attributes table missing; run prisma migrate (runtime DDL disabled in production)'
+        );
+        tableChecked = true;
+        tableExists = false;
+        return false;
+      }
+
       logger.info('product_attributes table not found, creating...');
       
       try {
@@ -186,6 +196,15 @@ export async function ensureProductReviewsTable(): Promise<boolean> {
       prismaError?.message?.includes('does not exist') ||
       prismaError?.message?.includes('product_reviews')
     ) {
+      if (!isRuntimeDdlEnabled()) {
+        logger.error(
+          'product_reviews table missing; run prisma migrate (runtime DDL disabled in production)'
+        );
+        reviewsTableChecked = true;
+        reviewsTableExists = false;
+        return false;
+      }
+
       logger.info('product_reviews table not found, creating...');
       
       try {
@@ -343,6 +362,15 @@ export async function ensureProductVariantAttributesColumn(): Promise<boolean> {
       prismaError?.message?.includes('product_variants.attributes') ||
       (prismaError?.message?.includes('column') && prismaError?.message?.includes('attributes'))
     ) {
+      if (!isRuntimeDdlEnabled()) {
+        logger.error(
+          'product_variants.attributes column missing; run prisma migrate (runtime DDL disabled in production)'
+        );
+        attributesColumnChecked = true;
+        attributesColumnExists = false;
+        return false;
+      }
+
       logger.info('product_variants.attributes column not found, creating...');
       
       try {

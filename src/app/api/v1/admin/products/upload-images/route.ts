@@ -5,6 +5,7 @@ import {
   requireAdmin,
   type AuthUser,
 } from "@/lib/middleware/auth";
+import { validateImageBuffer } from "@/lib/security/image-magic-bytes";
 import {
   MAX_ADMIN_IMAGE_BYTES,
   MAX_ADMIN_IMAGES_PER_REQUEST,
@@ -185,6 +186,19 @@ export async function POST(req: NextRequest) {
             title: "Validation Error",
             status: 400,
             detail: `Image at index ${i} exceeds ${MAX_ADMIN_IMAGE_BYTES} bytes`,
+            instance: req.url,
+          },
+          { status: 400 }
+        );
+      }
+
+      if (!validateImageBuffer(parsed.buffer, parsed.mime)) {
+        return NextResponse.json(
+          {
+            type: "https://api.shop.am/problems/validation-error",
+            title: "Validation Error",
+            status: 400,
+            detail: `Image at index ${i} content does not match declared type`,
             instance: req.url,
           },
           { status: 400 }

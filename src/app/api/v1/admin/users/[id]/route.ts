@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { safeParseAdminUserUpdate } from "@/lib/schemas/admin-users.schema";
 import { adminService } from "@/lib/services/admin.service";
 
 export async function PUT(
@@ -22,8 +23,21 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const data = await req.json();
-    const result = await adminService.updateUser(id, data);
+    const body = await req.json();
+    const parsed = safeParseAdminUserUpdate(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Validation Error",
+          status: 400,
+          detail: parsed.error.issues.map((issue) => issue.message).join("; ") || "Invalid payload",
+          instance: req.url,
+        },
+        { status: 400 }
+      );
+    }
+    const result = await adminService.updateUser(id, parsed.data);
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("❌ [ADMIN] Error:", error);

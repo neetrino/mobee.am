@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { isRuntimeDdlEnabled } from "@/lib/security/runtime-ddl";
 import { logger } from "../../../utils/logger";
 
 /**
@@ -34,7 +35,14 @@ export async function ensureColorsColumnsExist(): Promise<void> {
     const imageUrlExists = imageUrlCheck[0]?.exists || false;
 
     if (colorsExists && imageUrlExists) {
-      return; // Columns already exist
+      return;
+    }
+
+    if (!isRuntimeDdlEnabled()) {
+      logger.error(
+        "attribute_values colors/imageUrl columns missing; run prisma migrate (runtime DDL disabled in production)"
+      );
+      return;
     }
 
     logger.info('Adding missing colors/imageUrl columns...');

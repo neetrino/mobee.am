@@ -20,6 +20,13 @@ interface RateLimitConfig {
 
 const limiterCache = new Map<string, Ratelimit>();
 
+function isRateLimitConfigured(): boolean {
+  return Boolean(
+    process.env.UPSTASH_REDIS_REST_URL?.trim() &&
+      process.env.UPSTASH_REDIS_REST_TOKEN?.trim()
+  );
+}
+
 function getLimiter(config: RateLimitConfig): Ratelimit | null {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -43,24 +50,19 @@ function getLimiter(config: RateLimitConfig): Ratelimit | null {
   return limiter;
 }
 
-/**
- * Returns 429 response when limit exceeded; `null` when allowed or Redis is not configured.
- */
-export async function checkRateLimitByIp(
-  request: NextRequest,
-  config: RateLimitConfig
-): Promise<NextResponse | null> {
-  const limiter = getLimiter(config);
-  if (!limiter) {
-    return null;
-  }
+function rateLimitUnavailableResponse(): NextResponse {
+  return NextResponse.json(
+    {
+      type: "https://api.shop.am/problems/service-unavailable",
+      title: "Service Unavailable",
+      status: 503,
+      detail: "Rate limiting is not configured. Contact support.",
+    },
+    { status: 503 }
+  );
+}
 
-  const ip = getClientIp(request);
-  const { success } = await limiter.limit(ip);
-  if (success) {
-    return null;
-  }
-
+function tooManyRequestsResponse(): NextResponse {
   return NextResponse.json(
     {
       type: "https://api.shop.am/problems/too-many-requests",
@@ -71,6 +73,48 @@ export async function checkRateLimitByIp(
     { status: 429 }
   );
 }
+
+/**
+ * Returns 429 when limit exceeded; 503 in production when Redis is missing;
+ * `null` when allowed or rate limiting is skipped in development.
+ */
+export async function checkRateLimitByKey(
+  request: NextRequest,
+  config: RateLimitConfig,
+  key: string
+): Promise<NextResponse | null> {
+  const limiter = getLimiter(config);
+  if (!limiter) {
+    if (process.env.NODE_ENV === "production") {
+      return rateLimitUnavailableResponse();
+    }
+    return null;
+  }
+
+  const { success } = await limiter.limit(key);
+  return success ? null : tooManyRequestsResponse();
+}
+
+/** IP-scoped rate limit (auth, contact, etc.). */
+export async function checkRateLimitByIp(
+  request: NextRequest,
+  config: RateLimitConfig
+): Promise<NextResponse | null> {
+  const ip = getClientIp(request);
+  return checkRateLimitByKey(request, config, ip);
+}
+
+/** IP + extra suffix (e.g. hashed email for guest order lookup). */
+export async function checkRateLimitByIpAndSuffix(
+  request: NextRequest,
+  config: RateLimitConfig,
+  suffix: string
+): Promise<NextResponse | null> {
+  const ip = getClientIp(request);
+  return checkRateLimitByKey(request, config, `${ip}:${suffix}`);
+}
+
+export { isRateLimitConfigured };
 
 export const RATE_LIMIT_AUTH: RateLimitConfig = {
   prefix: "ratelimit:auth",
@@ -93,5 +137,12 @@ export const RATE_LIMIT_CONTACT: RateLimitConfig = {
 export const RATE_LIMIT_GUEST_ORDER: RateLimitConfig = {
   prefix: "ratelimit:guest-order",
   requests: 30,
+  window: "60 s",
+};
+
+/** Stricter per-email cap against guest order enumeration. */
+export const RATE_LIMIT_GUEST_ORDER_EMAIL: RateLimitConfig = {
+  prefix: "ratelimit:guest-order-email",
+  requests: 10,
   window: "60 s",
 };

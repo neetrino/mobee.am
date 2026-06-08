@@ -1,18 +1,23 @@
+import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import * as jose from "jose";
 import { getAccessTokenFromRequest } from "@/lib/security/auth-cookie";
 import { getCorsHeaders } from "@/lib/security/cors";
+import { verifyMutationOrigin } from "@/lib/security/csrf-origin";
+import { assertProductionSecurityEnv } from "@/lib/security/env";
 import { JWT_ALGORITHM } from "@/lib/security/jwt.constants";
 import { resolveAdminGateFromJwtPayload } from "@/lib/security/jwt-payload";
 import {
   checkRateLimitByIp,
+  checkRateLimitByIpAndSuffix,
   RATE_LIMIT_AUTH,
   RATE_LIMIT_CONTACT,
   RATE_LIMIT_GUEST_ORDER,
+  RATE_LIMIT_GUEST_ORDER_EMAIL,
   RATE_LIMIT_PASSWORD,
 } from "@/lib/security/rate-limit";
 
-/** Protect /api/v1/admin/* — valid JWT + admin role when roles claim is present. */
+/** Protect /api/v1/admin/* — valid JWT + admin role in token claims. */
 async function requireAdminAuth(request: NextRequest): Promise<NextResponse | null> {
   const token = getAccessTokenFromRequest(request);
 
@@ -87,6 +92,10 @@ function isGuestOrderLookup(request: NextRequest): boolean {
   return Boolean(request.nextUrl.searchParams.get("email")?.trim());
 }
 
+function hashGuestOrderEmailKey(email: string): string {
+  return createHash("sha256").update(email.trim().toLowerCase()).digest("hex").slice(0, 24);
+}
+
 function isPasswordResetPath(pathname: string, method: string): boolean {
   if (pathname === "/api/v1/auth/forgot-password" && method === "POST") {
     return true;
@@ -111,7 +120,21 @@ function applyCors(
   return response;
 }
 
+function csrfForbiddenResponse(request: NextRequest): NextResponse {
+  return NextResponse.json(
+    {
+      type: "https://api.shop.am/problems/forbidden",
+      title: "Forbidden",
+      status: 403,
+      detail: "Cross-site request blocked",
+    },
+    { status: 403 }
+  );
+}
+
 export async function middleware(request: NextRequest) {
+  assertProductionSecurityEnv();
+
   const pathname = request.nextUrl.pathname;
 
   if (!pathname.startsWith("/api/")) {
@@ -121,6 +144,10 @@ export async function middleware(request: NextRequest) {
   const corsHeaders = getCorsHeaders(request);
   if (request.method === "OPTIONS") {
     return new NextResponse(null, { status: 204, headers: corsHeaders });
+  }
+
+  if (!verifyMutationOrigin(request)) {
+    return applyCors(csrfForbiddenResponse(request), request);
   }
 
   let rateLimitResponse: NextResponse | null = null;
@@ -141,6 +168,16 @@ export async function middleware(request: NextRequest) {
     rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_CONTACT);
   } else if (isGuestOrderLookup(request)) {
     rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_GUEST_ORDER);
+    if (!rateLimitResponse) {
+      const email = request.nextUrl.searchParams.get("email")?.trim();
+      if (email) {
+        rateLimitResponse = await checkRateLimitByIpAndSuffix(
+          request,
+          RATE_LIMIT_GUEST_ORDER_EMAIL,
+          hashGuestOrderEmailKey(email)
+        );
+      }
+    }
   }
 
   if (rateLimitResponse) {
