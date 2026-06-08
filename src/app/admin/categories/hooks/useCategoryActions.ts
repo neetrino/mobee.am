@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { apiClient } from '../../../../lib/api-client';
+import { DEFAULT_LANGUAGE } from '../../../../lib/language';
 import { logger } from '../../../../lib/utils/logger';
 import { showToast } from '../../../../components/Toast';
 import { confirmDialog } from '../../../../components/ConfirmDialog';
@@ -67,7 +68,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         parentId: formData.parentId || undefined,
         requiresSizes: formData.requiresSizes,
         imageUrl: formData.imageUrl,
-        locale: 'en',
+        locale: DEFAULT_LANGUAGE,
       });
       setShowAddModal(false);
       resetForm();
@@ -128,7 +129,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         requiresSizes: formData.requiresSizes,
         subcategoryIds: formData.subcategoryIds,
         imageUrl: formData.imageUrl,
-        locale: 'en',
+        locale: DEFAULT_LANGUAGE,
       });
       setShowEditModal(false);
       setEditingCategory(null);
