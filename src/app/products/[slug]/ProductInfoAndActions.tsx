@@ -209,7 +209,7 @@ export function ProductInfoAndActions({
           <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
           {t(language, 'product.moreDetails')}
         </button>
-        <InstallmentPriceButton onClick={handleInstallmentClick} />
+        <InstallmentPriceButton onClick={handleInstallmentClick} size="md" />
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">

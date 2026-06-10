@@ -96,7 +96,7 @@ function validateForm(values: FormState, t: (key: string) => string): FormErrors
 
 function InstallmentRequestSuccessView({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center px-2 py-8 text-center">
+    <div className="flex flex-col items-start py-4">
       <div
         className="mb-5 flex size-16 items-center justify-center rounded-full bg-[#e8f5e9]"
         aria-hidden
@@ -111,7 +111,7 @@ function InstallmentRequestSuccessView({ message }: { message: string }) {
           />
         </svg>
       </div>
-      <p className="max-w-sm text-sm leading-relaxed text-gray-800">{message}</p>
+      <p className="text-left text-sm leading-relaxed text-gray-800">{message}</p>
     </div>
   );
 }
@@ -207,7 +207,7 @@ export function InstallmentRequestModal({
         onClick={(event) => event.stopPropagation()}
         style={{ zIndex: 10000 }}
       >
-        <div className="relative mb-4">
+        <div className="relative mb-6">
           <button
             type="button"
             onClick={handleClose}
@@ -224,11 +224,13 @@ export function InstallmentRequestModal({
             </svg>
           </button>
           {!isSuccess ? (
-            <div className="px-8">
-              <h2 className="mb-2 text-center text-lg font-semibold text-gray-900">
+            <div className="pr-10 text-left">
+              <h2 className="mb-3 text-lg font-semibold text-gray-900">
                 {t('product.aparik.modalTitle')}
               </h2>
-              <p className="text-sm leading-relaxed text-gray-700">{t('product.aparik.modalIntro')}</p>
+              <p className="text-sm leading-relaxed text-gray-700">
+                {t('product.aparik.modalIntro')}
+              </p>
             </div>
           ) : null}
         </div>
