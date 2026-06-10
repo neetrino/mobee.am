@@ -25,13 +25,13 @@ export function ProfileSectionHost({
   closeLabel,
   ...sheetBodyProps
 }: ProfileSectionHostProps) {
-  if (!profileSheetOpen) {
-    return null;
-  }
-
   const body = <ProfileSheetBody {...sheetBodyProps} />;
 
   if (isDesktopLayout) {
+    if (!profileSheetOpen) {
+      return null;
+    }
+
     return (
       <section
         className="overflow-hidden rounded-[20px] border border-admin-100 bg-white shadow-sm"
@@ -62,7 +62,7 @@ export function ProfileSectionHost({
 
   return (
     <ProfileSectionModal
-      open
+      open={profileSheetOpen}
       title={modalTitle}
       onClose={onCloseSheet}
       closeLabel={closeLabel}

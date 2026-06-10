@@ -3,11 +3,11 @@
 import { createPortal } from 'react-dom';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Input } from '@shop/ui';
-import { acquireBodyScrollLock } from '../../lib/body-scroll-lock';
 import { useTranslation } from '../../lib/i18n-client';
 import { apiClient } from '../../lib/api-client';
 import { isValidEmail } from '../../lib/utils/email';
 import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
+import { useAnimatedModalDismiss } from '../../lib/useAnimatedModalDismiss';
 import type { CurrencyCode } from '../../lib/currency';
 
 interface InstallmentRequestModalProps {
@@ -142,39 +142,32 @@ export function InstallmentRequestModal({
   const [isSuccess, setIsSuccess] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
+  const {
+    isVisible,
+    requestClose,
+    handlePanelAnimationEnd,
+    backdropMotionClass,
+    panelMotionClass,
+  } = useAnimatedModalDismiss({
+    isOpen,
+    onClose,
+    blockClose: isSubmitting,
+    lockBodyScroll: true,
+    panelMotionVariant: 'sheet',
+  });
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-    return acquireBodyScrollLock();
-  }, [isOpen]);
-
-  const handleClose = () => {
-    if (isSubmitting) {
+    if (isVisible) {
       return;
     }
     setForm(EMPTY_FORM);
     setErrors({});
     setIsSuccess(false);
-    onClose();
-  };
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !isSubmitting) {
-        handleClose();
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, isSubmitting]);
+  }, [isVisible]);
 
   const handleFieldChange = (field: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -222,7 +215,7 @@ export function InstallmentRequestModal({
     }
   };
 
-  if (!isOpen || !isMounted) {
+  if (!isVisible || !isMounted) {
     return null;
   }
 
@@ -232,17 +225,18 @@ export function InstallmentRequestModal({
     >
       <button
         type="button"
-        className="absolute inset-0 bg-black/50"
+        className={`absolute inset-0 bg-black/50 ${backdropMotionClass}`}
         aria-label={t('checkout.modals.closeModal')}
-        onClick={handleClose}
+        onClick={requestClose}
       />
       <div
         lang={FORM_INPUT_LATIN_LANG}
         role="dialog"
         aria-modal="true"
         aria-labelledby="installment-request-modal-title"
-        className="relative z-10 flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-2xl"
+        className={`relative z-10 flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-2xl ${panelMotionClass}`}
         onClick={(event) => event.stopPropagation()}
+        onAnimationEnd={handlePanelAnimationEnd}
       >
         <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-100 px-4 py-4 sm:px-6">
           {!isSuccess ? (
@@ -264,7 +258,7 @@ export function InstallmentRequestModal({
           )}
           <button
             type="button"
-            onClick={handleClose}
+            onClick={requestClose}
             className="shrink-0 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
             aria-label={t('checkout.modals.closeModal')}
           >

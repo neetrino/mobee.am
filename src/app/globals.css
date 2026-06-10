@@ -94,6 +94,124 @@
     animation: fade-out 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
+  @keyframes mobile-drawer-backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes mobile-drawer-backdrop-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes mobile-drawer-panel-in {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes mobile-drawer-panel-out {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  .animate-mobile-drawer-backdrop-in {
+    animation: mobile-drawer-backdrop-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .animate-mobile-drawer-backdrop-out {
+    animation: mobile-drawer-backdrop-out 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-mobile-drawer-panel-in {
+    animation: mobile-drawer-panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .animate-mobile-drawer-panel-out {
+    animation: mobile-drawer-panel-out 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes mobile-sheet-panel-in {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes mobile-sheet-panel-out {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+
+  @keyframes modal-dialog-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes modal-dialog-panel-out {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+
+  .animate-storefront-sheet-modal-panel-in {
+    animation: mobile-sheet-panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .animate-storefront-sheet-modal-panel-out {
+    animation: mobile-sheet-panel-out 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-storefront-dialog-modal-panel-in {
+    animation: modal-dialog-panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .animate-storefront-dialog-modal-panel-out {
+    animation: modal-dialog-panel-out 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @media (min-width: 640px) {
+    .animate-storefront-sheet-modal-panel-in {
+      animation-name: modal-dialog-panel-in;
+    }
+
+    .animate-storefront-sheet-modal-panel-out {
+      animation-name: modal-dialog-panel-out;
+    }
+  }
+
   /* Special offers CTA (“more”): double nudge on hover in, mirrored nudge on hover out */
   @keyframes cta-arrow-nudge-in {
     0%,
@@ -142,7 +260,17 @@
     }
 
     .animate-fade-in,
-    .animate-fade-out {
+    .animate-fade-out,
+    .animate-mobile-drawer-backdrop-in,
+    .animate-mobile-drawer-backdrop-out,
+    .animate-mobile-drawer-panel-in,
+    .animate-mobile-drawer-panel-out,
+    .animate-mobile-sheet-panel-in,
+    .animate-mobile-sheet-panel-out,
+    .animate-storefront-sheet-modal-panel-in,
+    .animate-storefront-sheet-modal-panel-out,
+    .animate-storefront-dialog-modal-panel-in,
+    .animate-storefront-dialog-modal-panel-out {
       animation-duration: 0.01ms;
       animation-iteration-count: 1;
     }
