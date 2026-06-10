@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
-import { acquireBodyScrollLock } from '../../lib/body-scroll-lock';
+import { type ReactNode } from 'react';
+import { useAnimatedModalDismiss } from '../../lib/useAnimatedModalDismiss';
 
 interface ProfileSectionModalProps {
   open: boolean;
@@ -24,21 +24,20 @@ export function ProfileSectionModal({
   children,
   lockBodyScroll = true,
 }: ProfileSectionModalProps) {
-  useEffect(() => {
-    if (!open || !lockBodyScroll) return;
-    return acquireBodyScrollLock();
-  }, [open, lockBodyScroll]);
+  const {
+    isVisible,
+    requestClose,
+    handlePanelAnimationEnd,
+    backdropMotionClass,
+    panelMotionClass,
+  } = useAnimatedModalDismiss({
+    isOpen: open,
+    onClose,
+    lockBodyScroll,
+    panelMotionVariant: 'sheet',
+  });
 
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [open, onClose]);
-
-  if (!open) {
+  if (!isVisible) {
     return null;
   }
 
@@ -46,15 +45,17 @@ export function ProfileSectionModal({
     <div className="fixed inset-0 z-[55] flex flex-col justify-end sm:justify-center sm:p-4">
       <button
         type="button"
-        className="absolute inset-0 bg-black/50"
+        className={`absolute inset-0 bg-black/50 ${backdropMotionClass}`}
         aria-label={closeLabel}
-        onClick={onClose}
+        onClick={requestClose}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-section-title"
-        className="relative z-10 flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] border border-admin-100 bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-[20px]"
+        className={`relative z-10 flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] border border-admin-100 bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-[20px] ${panelMotionClass}`}
+        onClick={(event) => event.stopPropagation()}
+        onAnimationEnd={handlePanelAnimationEnd}
       >
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-4 py-3 sm:px-5">
           <h2 id="profile-section-title" className="min-w-0 truncate text-lg font-semibold text-gray-900">
@@ -62,7 +63,7 @@ export function ProfileSectionModal({
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={requestClose}
             className="shrink-0 rounded-full p-2 text-gray-500 transition-colors hover:bg-admin-50 hover:text-admin-700 focus:outline-none focus:ring-2 focus:ring-admin-400"
             aria-label={closeLabel}
           >

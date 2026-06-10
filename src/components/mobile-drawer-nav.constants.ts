@@ -30,6 +30,21 @@ export const MOBILE_DRAWER_ADMIN_MENU_ITEM_ACTIVE_CLASS =
 export const MOBILE_DRAWER_ADMIN_SUBMENU_HORIZONTAL_TRIM_CLASS =
   'ml-auto min-w-0 !w-[calc(100%-20px)] max-w-full';
 
+/** Drawer shell — fixed root + scrim + sliding panel (Header mobile menu). */
+export const MOBILE_DRAWER_SHELL_ROOT_CLASS = 'fixed inset-0 z-50 lg:hidden';
+
+export const MOBILE_DRAWER_SHELL_BACKDROP_CLASS = 'absolute inset-0 bg-black/40';
+
 /** Drawer panel — same width as Header mobile menu (`w-[min(83vw,24rem)]`). */
 export const MOBILE_DRAWER_SHELL_PANEL_CLASS =
-  'flex h-full min-h-screen min-w-[17rem] w-[min(83vw,24rem)] max-w-full flex-col bg-white shadow-2xl';
+  'relative z-10 flex h-full min-h-screen min-w-[17rem] w-[min(83vw,24rem)] max-w-full flex-col bg-white shadow-2xl';
+
+export const MOBILE_DRAWER_SHELL_TRANSITION_MS = 320;
+
+export const MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS = 'animate-mobile-drawer-backdrop-in';
+
+export const MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS = 'animate-mobile-drawer-backdrop-out';
+
+export const MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS = 'animate-mobile-drawer-panel-in';
+
+export const MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS = 'animate-mobile-drawer-panel-out';

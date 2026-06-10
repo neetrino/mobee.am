@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { CSSProperties, FormEvent } from 'react';
+import type { AnimationEvent, CSSProperties, FormEvent, TransitionEvent } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
@@ -21,6 +21,7 @@ import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
   HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
   HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE,
+  HEADER_PRIMARY_PEEK_TRANSITION_MS,
   getDockedBarTopMotionStyle,
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS,
@@ -43,6 +44,14 @@ import {
   MOBILE_DRAWER_NAV_BUTTON_CLASS,
   MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
   MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS,
+  MOBILE_DRAWER_SHELL_BACKDROP_CLASS,
+  MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS,
+  MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS,
+  MOBILE_DRAWER_SHELL_PANEL_CLASS,
+  MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS,
+  MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS,
+  MOBILE_DRAWER_SHELL_ROOT_CLASS,
+  MOBILE_DRAWER_SHELL_TRANSITION_MS,
 } from './mobile-drawer-nav.constants';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
 
@@ -132,7 +141,10 @@ const mobilePrimaryLangButtonClassName =
 
 /** Mobile locale flyout — white card (no outer gray frame). */
 const MOBILE_LOCALE_MENU_PANEL_CLASS =
-  'absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),8rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white py-0 shadow-xl ring-1 ring-black/5';
+  'absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),8rem)] origin-top-right overflow-hidden rounded-2xl border border-gray-200 bg-white py-0 shadow-xl ring-1 ring-black/5';
+
+const MOBILE_LOCALE_MENU_MOTION_IN_CLASS = 'animate-fade-in';
+const MOBILE_LOCALE_MENU_MOTION_OUT_CLASS = 'animate-fade-out';
 
 const MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS =
   'border-b border-gray-100 bg-gray-50/80 px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500';
@@ -375,13 +387,15 @@ export function Header() {
   const showSearchModalRef = useRef(false);
   showSearchModalRef.current = showSearchModal;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuExiting, setMobileMenuExiting] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
+  const [mobileLocaleMenuExiting, setMobileLocaleMenuExiting] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
   const { categories, loadingCategories } = useCategoriesTree();
   const [, setSelectedCategory] = useState<Category | null>(null);
 
-  useHeaderRoutePrefetch(router, { boostKey: mobileMenuOpen || showCategoriesPillMenu });
+  useHeaderRoutePrefetch(router, { boostKey: mobileMenuOpen || mobileMenuExiting || showCategoriesPillMenu });
 
   const prefetchNavHref = useCallback(
     (href: string) => prefetchHeaderHref(router, href),
@@ -427,6 +441,7 @@ export function Header() {
   const [desktopPrimaryBarHeightPx, setDesktopPrimaryBarHeightPx] = useState(0);
   const lastScrollYRef = useRef(0);
   const prevMobileSearchDockedRef = useRef<boolean | null>(null);
+  const [mobileStripPeekMounted, setMobileStripPeekMounted] = useState(false);
   const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
   const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
   const [headerLayoutReady, setHeaderLayoutReady] = useState(false);
@@ -555,6 +570,8 @@ export function Header() {
   useEffect(() => {
     if (prevMobileSearchDockedRef.current === true && mobileSearchDocked === false) {
       setPrimaryBarPeekFromScrollUp(false);
+      setMobileStripPeekMounted(false);
+      setMobileStripPeekSlideIn(false);
     }
     prevMobileSearchDockedRef.current = mobileSearchDocked;
   }, [mobileSearchDocked]);
@@ -614,6 +631,8 @@ export function Header() {
 
   useEffect(() => {
     setPrimaryBarPeekFromScrollUp(false);
+    setMobileStripPeekMounted(false);
+    setMobileStripPeekSlideIn(false);
     lastScrollYRef.current = typeof window !== 'undefined' ? window.scrollY : 0;
   }, [pathname]);
 
@@ -625,6 +644,7 @@ export function Header() {
       setMobileStripPeekSlideIn(false);
       return;
     }
+    setMobileStripPeekMounted(true);
     setMobileStripPeekSlideIn(false);
     let innerId = 0;
     const outerId = requestAnimationFrame(() => {
@@ -637,6 +657,87 @@ export function Header() {
       cancelAnimationFrame(innerId);
     };
   }, [mobileStripPeekActive]);
+
+  const handleMobileStripPeekTransitionEnd = useCallback(
+    (event: TransitionEvent<HTMLDivElement>) => {
+      if (event.propertyName !== 'transform') {
+        return;
+      }
+      if (!mobileStripPeekActive && !mobileStripPeekSlideIn) {
+        setMobileStripPeekMounted(false);
+      }
+    },
+    [mobileStripPeekActive, mobileStripPeekSlideIn],
+  );
+
+  useEffect(() => {
+    if (mobileStripPeekActive || mobileStripPeekSlideIn || !mobileStripPeekMounted) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      setMobileStripPeekMounted(false);
+    }, HEADER_PRIMARY_PEEK_TRANSITION_MS);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [mobileStripPeekActive, mobileStripPeekSlideIn, mobileStripPeekMounted]);
+
+  const closeMobileLocaleMenu = useCallback(() => {
+    setShowMobilePrimaryLangMenu((open) => {
+      if (open) {
+        setMobileLocaleMenuExiting(true);
+      }
+      return false;
+    });
+  }, []);
+
+  const toggleMobileLocaleMenu = useCallback(() => {
+    if (mobileLocaleMenuExiting) {
+      return;
+    }
+    if (showMobilePrimaryLangMenu) {
+      closeMobileLocaleMenu();
+      return;
+    }
+    setMobileLocaleMenuExiting(false);
+    setShowMobilePrimaryLangMenu(true);
+  }, [mobileLocaleMenuExiting, showMobilePrimaryLangMenu, closeMobileLocaleMenu]);
+
+  const handleMobileLocaleMenuAnimationEnd = useCallback((event: AnimationEvent<HTMLDivElement>) => {
+    if (event.animationName.includes('fade-out')) {
+      setMobileLocaleMenuExiting(false);
+    }
+  }, []);
+
+  const mobileLocaleMenuVisible = showMobilePrimaryLangMenu || mobileLocaleMenuExiting;
+
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen((open) => {
+      if (open) {
+        setMobileMenuExiting(true);
+      }
+      return false;
+    });
+  }, []);
+
+  const openMobileMenu = useCallback(() => {
+    if (mobileMenuExiting) {
+      return;
+    }
+    setMobileMenuExiting(false);
+    setMobileMenuOpen(true);
+  }, [mobileMenuExiting]);
+
+  const handleMobileMenuPanelAnimationEnd = useCallback((event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+    if (event.animationName.includes('mobile-drawer-panel-out')) {
+      setMobileMenuExiting(false);
+    }
+  }, []);
+
+  const mobileMenuVisible = mobileMenuOpen || mobileMenuExiting;
 
   useEffect(() => {
     if (!desktopPrimaryPeekActive) {
@@ -840,7 +941,7 @@ export function Header() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (mobilePrimaryLangRef.current && !mobilePrimaryLangRef.current.contains(event.target as Node)) {
-        setShowMobilePrimaryLangMenu(false);
+        closeMobileLocaleMenu();
       }
       const clickTarget = event.target as Node;
       const inDesktopCategories = categoriesPillWrapRef.current?.contains(clickTarget);
@@ -880,15 +981,27 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    if (mobileMenuOpen || !mobileMenuExiting) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      setMobileMenuExiting(false);
+    }, MOBILE_DRAWER_SHELL_TRANSITION_MS);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [mobileMenuOpen, mobileMenuExiting]);
+
+  useEffect(() => {
     if (typeof document === 'undefined') {
       return;
     }
 
-    if (!mobileMenuOpen) {
+    if (!mobileMenuVisible) {
       return;
     }
     return acquireBodyScrollLock();
-  }, [mobileMenuOpen]);
+  }, [mobileMenuVisible]);
 
   // Focus search input when modal opens; sync dropdown with query. When modal is closed, do not
   // force-close the dropdown so the desktop secondary search bar can keep showing results.
@@ -923,11 +1036,11 @@ export function Header() {
       }
 
       if (showMobilePrimaryLangMenu) {
-        setShowMobilePrimaryLangMenu(false);
+        closeMobileLocaleMenu();
       }
 
       if (mobileMenuOpen) {
-        setMobileMenuOpen(false);
+        closeMobileMenu();
       }
     };
 
@@ -935,7 +1048,7 @@ export function Header() {
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [showSearchModal, mobileMenuOpen, showCategoriesPillMenu, showMobilePrimaryLangMenu]);
+  }, [showSearchModal, mobileMenuOpen, showCategoriesPillMenu, showMobilePrimaryLangMenu, closeMobileLocaleMenu, closeMobileMenu]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -975,7 +1088,7 @@ export function Header() {
     mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? mobileSearchFlowSpacerPx : 0;
 
   const mobileSearchPeekTopPx =
-    mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0;
+    mobileStripPeekSlideIn && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0;
   const mobileDockedSearchTopStyle: CSSProperties | undefined = mobileSearchDocked
     ? { top: mobileSearchPeekTopPx, ...getDockedBarTopMotionStyle(mobileSearchPeekTopPx) }
     : undefined;
@@ -1000,22 +1113,23 @@ export function Header() {
           ref={mobileStrip1WrapRef}
           className="lg:hidden"
           style={
-            mobileStripPeekActive && mobileStrip1HeightPx > 0
+            mobileStripPeekMounted && mobileStrip1HeightPx > 0
               ? { height: mobileStrip1HeightPx }
               : undefined
           }
         >
           <div
             ref={mobileStrip1Ref}
+            onTransitionEnd={handleMobileStripPeekTransitionEnd}
             className={`border-b border-gray-100 ${
-              mobileStripPeekActive
+              mobileStripPeekMounted
                 ? `fixed left-0 right-0 top-0 z-[45] border-b border-gray-200 bg-white shadow-sm will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
                     mobileStripPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
                   }`
                 : ''
             }`}
             style={
-              mobileStripPeekActive && headerLayoutReady
+              mobileStripPeekMounted && headerLayoutReady
                 ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE }
                 : undefined
             }
@@ -1026,8 +1140,8 @@ export function Header() {
                 type="button"
                 onClick={() => {
                   setShowCategoriesPillMenu(false);
-                  setShowMobilePrimaryLangMenu(false);
-                  setMobileMenuOpen(true);
+                  closeMobileLocaleMenu();
+                  openMobileMenu();
                 }}
                 className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
                 aria-expanded={mobileMenuOpen}
@@ -1056,7 +1170,7 @@ export function Header() {
             <div className="relative z-20 shrink-0" ref={mobilePrimaryLangRef}>
               <button
                 type="button"
-                onClick={() => setShowMobilePrimaryLangMenu((open) => !open)}
+                onClick={toggleMobileLocaleMenu}
                 className={mobilePrimaryLangButtonClassName}
                 aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
                 aria-expanded={showMobilePrimaryLangMenu}
@@ -1065,12 +1179,17 @@ export function Header() {
               >
                 <GlobeLanguageIcon />
               </button>
-              {showMobilePrimaryLangMenu ? (
+              {mobileLocaleMenuVisible ? (
                 <div
                   id="header-mobile-locale-menu"
-                  className={MOBILE_LOCALE_MENU_PANEL_CLASS}
+                  className={`${MOBILE_LOCALE_MENU_PANEL_CLASS} ${
+                    mobileLocaleMenuExiting
+                      ? MOBILE_LOCALE_MENU_MOTION_OUT_CLASS
+                      : MOBILE_LOCALE_MENU_MOTION_IN_CLASS
+                  }`}
                   role="dialog"
                   aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
+                  onAnimationEnd={handleMobileLocaleMenuAnimationEnd}
                 >
                   <div className={MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} id="header-mobile-locale-lang-heading">
                     {t('common.localeMenu.languageSection')}
@@ -1084,7 +1203,7 @@ export function Header() {
                           key={code}
                           type="button"
                           onClick={() => {
-                            setShowMobilePrimaryLangMenu(false);
+                            closeMobileLocaleMenu();
                             if (!active) setStoredLanguage(code);
                           }}
                           className={mobileLocaleMenuLangRowClass(active)}
@@ -1108,7 +1227,7 @@ export function Header() {
                           key={currency.code}
                           type="button"
                           onClick={() => {
-                            setShowMobilePrimaryLangMenu(false);
+                            closeMobileLocaleMenu();
                             if (!active) handleCurrencyChange(currency.code);
                           }}
                           className={mobileLocaleMenuCurrencyRowClass(active)}
@@ -1370,21 +1489,35 @@ export function Header() {
       />
 
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
+      {mobileMenuVisible ? (
         <div
-          className="fixed inset-0 z-50 flex bg-black/40 lg:hidden"
+          className={MOBILE_DRAWER_SHELL_ROOT_CLASS}
           role="dialog"
           aria-modal="true"
-          onClick={() => setMobileMenuOpen(false)}
         >
+          <button
+            type="button"
+            className={`${MOBILE_DRAWER_SHELL_BACKDROP_CLASS} ${
+              mobileMenuExiting
+                ? MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS
+                : MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS
+            }`}
+            aria-label={t('common.ariaLabels.closeMenu')}
+            onClick={closeMobileMenu}
+          />
           <div
-            className="flex h-full min-h-screen min-w-[17rem] w-[min(83vw,24rem)] max-w-full flex-col bg-white shadow-2xl"
+            className={`${MOBILE_DRAWER_SHELL_PANEL_CLASS} ${
+              mobileMenuExiting
+                ? MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS
+                : MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS
+            }`}
             onClick={(event) => event.stopPropagation()}
+            onAnimationEnd={handleMobileMenuPanelAnimationEnd}
           >
             <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
               <Link
                 href="/"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={closeMobileMenu}
                 aria-label={t('common.navigation.home')}
                 className="flex min-w-0 max-w-[min(200px,70%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
               >
@@ -1392,7 +1525,7 @@ export function Header() {
               </Link>
               <button
                 type="button"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={closeMobileMenu}
                 className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
                 aria-label={t('common.ariaLabels.closeMenu')}
               >
@@ -1411,7 +1544,7 @@ export function Header() {
                       key={link.href}
                       href={link.href}
                       prefetch
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={closeMobileMenu}
                       className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
                     >
                       <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
@@ -1424,7 +1557,7 @@ export function Header() {
                   <Link
                     href="/compare"
                     prefetch
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                     className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700 md:hidden`}
                   >
                     <span className="flex min-w-0 flex-1 items-center gap-2 normal-case font-medium text-gray-700">
@@ -1455,7 +1588,7 @@ export function Header() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Search Modal */}
       {showSearchModal && (

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { apiClient, ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth/AuthContext';
+import { useAnimatedModalDismiss } from '@/lib/useAnimatedModalDismiss';
 import { DELETE_ACCOUNT_CONFIRM_PHRASE } from './profile-delete-account.constants';
 
 interface ProfileDeleteAccountProps {
@@ -22,21 +23,32 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
   const [deleting, setDeleting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
+  const {
+    isVisible,
+    requestClose,
+    handlePanelAnimationEnd,
+    backdropMotionClass,
+    panelMotionClass,
+  } = useAnimatedModalDismiss({
+    isOpen: modalOpen,
+    onClose: () => setModalOpen(false),
+    blockClose: deleting,
+    lockBodyScroll: true,
+    panelMotionVariant: 'dialog',
+  });
+
   useEffect(() => {
-    if (!modalOpen) return;
+    if (isVisible) {
+      return;
+    }
     setConfirmStep(1);
     setTypedPhrase('');
     setLocalError(null);
-  }, [modalOpen]);
+  }, [isVisible]);
 
   const phraseMatches = typedPhrase.trim() === DELETE_ACCOUNT_CONFIRM_PHRASE;
 
   const openModal = () => setModalOpen(true);
-
-  const closeModal = () => {
-    if (deleting) return;
-    setModalOpen(false);
-  };
 
   const handleFinalDelete = async () => {
     if (!phraseMatches) {
@@ -133,18 +145,21 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
         )}
       </button>
 
-      {modalOpen && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
-          role="presentation"
-          onClick={closeModal}
-        >
+      {isVisible ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <button
+            type="button"
+            className={`absolute inset-0 bg-black/40 ${backdropMotionClass}`}
+            aria-label={t('profile.deleteAccount.cancel')}
+            onClick={requestClose}
+          />
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-account-title"
-            className="max-w-md rounded-[15px] border border-gray-200 bg-white p-6 shadow-xl"
+            className={`relative z-10 max-w-md rounded-[15px] border border-gray-200 bg-white p-6 shadow-xl ${panelMotionClass}`}
             onClick={(e) => e.stopPropagation()}
+            onAnimationEnd={handlePanelAnimationEnd}
           >
             {confirmStep === 1 ? (
               <>
@@ -156,7 +171,7 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
                   <button
                     type="button"
                     disabled={deleting}
-                    onClick={closeModal}
+                    onClick={requestClose}
                     className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                   >
                     {t('profile.deleteAccount.cancel')}
@@ -215,7 +230,7 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
                     <button
                       type="button"
                       disabled={deleting}
-                      onClick={closeModal}
+                      onClick={requestClose}
                       className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                     >
                       {t('profile.deleteAccount.cancel')}
@@ -234,7 +249,7 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
             )}
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }
