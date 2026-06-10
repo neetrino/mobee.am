@@ -31,7 +31,13 @@ export function getStorefrontModalPanelMotionClass(
     : STOREFRONT_MODAL_SHEET_PANEL_MOTION_IN_CLASS;
 }
 
-export function isStorefrontModalPanelExitAnimation(event: AnimationEvent): boolean {
+interface StorefrontModalPanelAnimationEndEvent {
+  animationName: string;
+}
+
+export function isStorefrontModalPanelExitAnimation(
+  event: StorefrontModalPanelAnimationEndEvent,
+): boolean {
   return (
     event.animationName.includes('mobile-sheet-panel-out') ||
     event.animationName.includes('modal-dialog-panel-out')
