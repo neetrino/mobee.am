@@ -17,6 +17,7 @@ import type { HomeStripCategoryItem } from '../lib/services/categories-home-stri
 import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { TopCategoriesMobileIcon } from './TopCategoriesMobileIcon';
+import { reorderHomeStripItemsForMobile } from '../lib/homeCategoryStripMobileOrder';
 import { useHomeCategoryStrip } from './useHomeCategoryStrip';
 
 const montserrat = Montserrat({
@@ -96,6 +97,11 @@ export function TopCategories() {
     [items],
   );
 
+  const mobileSortedItems = useMemo(
+    () => reorderHomeStripItemsForMobile(sortedItems),
+    [sortedItems],
+  );
+
   if (loading) {
     return (
       <section className={`bg-white ${montserrat.className}`} aria-hidden>
@@ -129,8 +135,8 @@ export function TopCategories() {
       <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-8 lg:pt-6 xl:pt-8`}>
         <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} lg:hidden`}>
-          {sortedItems.map((category, index) => {
-            const slotKey = resolveStripSlotKey(category, index);
+          {mobileSortedItems.map((category) => {
+            const slotKey = resolveStripSlotKey(category, category.position);
             const imageSrc = extractCategoryImageUrl(category.media);
 
             return (
