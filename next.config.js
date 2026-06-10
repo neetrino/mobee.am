@@ -93,8 +93,8 @@ const nextConfig = {
    * generated under shared/db/generated/client.
    */
   serverExternalPackages: process.env.VERCEL
-    ? ['@prisma/client', 'prisma']
-    : ['@prisma/client', 'prisma', '@white-shop/db'],
+    ? ['@prisma/client', 'prisma', 'argon2']
+    : ['@prisma/client', 'prisma', '@white-shop/db', 'argon2'],
   /**
    * Admin UI files live under `src/app/admin` but are only exposed at `/supersudo`.
    * `beforeFiles` runs before filesystem matching, so `/admin` never resolves to that tree.

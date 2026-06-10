@@ -6,11 +6,9 @@ import { Montserrat } from 'next/font/google';
 import { useMemo } from 'react';
 import { extractCategoryImageUrl } from '../lib/categoryMedia';
 import {
-  CATEGORY_STRIP_GRID_COLS,
   categoryStripCardAspectClass,
   categoryStripHref,
   categoryStripInnerHeightClass,
-  getCategoryStripDesktopGridClass,
   getCategoryStripVisual,
   resolveCategoryStripSlotKey,
   type CategoryStripSlotKey,
@@ -19,6 +17,7 @@ import type { HomeStripCategoryItem } from '../lib/services/categories-home-stri
 import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { TopCategoriesMobileIcon } from './TopCategoriesMobileIcon';
+import { reorderHomeStripItemsForMobile } from '../lib/homeCategoryStripMobileOrder';
 import { useHomeCategoryStrip } from './useHomeCategoryStrip';
 
 const montserrat = Montserrat({
@@ -28,7 +27,8 @@ const montserrat = Montserrat({
 });
 
 const CATEGORY_STRIP_LOADING_SKELETON_COUNT = 3;
-const CATEGORY_STRIP_DESKTOP_TWO_ROW_THRESHOLD = 6;
+const CATEGORY_STRIP_SCROLL_ROW_CLASS =
+  'flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide xl:gap-3';
 
 function CategoryStripDesktopImage({
   slotKey,
@@ -97,17 +97,16 @@ export function TopCategories() {
     [items],
   );
 
-  const gridColsClass = getCategoryStripDesktopGridClass(sortedItems.length);
-  const usesTwoDesktopRows = sortedItems.length > CATEGORY_STRIP_DESKTOP_TWO_ROW_THRESHOLD;
-  const desktopSectionPaddingClass = usesTwoDesktopRows
-    ? 'pb-6 pt-8 lg:pb-24 lg:pt-6 xl:pb-28 xl:pt-8'
-    : 'pb-6 pt-8 lg:pb-40 lg:pt-6 xl:pt-8';
+  const mobileSortedItems = useMemo(
+    () => reorderHomeStripItemsForMobile(sortedItems),
+    [sortedItems],
+  );
 
   if (loading) {
     return (
       <section className={`bg-white ${montserrat.className}`} aria-hidden>
-        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-40 lg:pt-6 xl:pt-8`}>
-          <div className="flex gap-2 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] lg:hidden">
+        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-8 lg:pt-6 xl:pt-8`}>
+          <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} lg:hidden`}>
             {Array.from({ length: CATEGORY_STRIP_LOADING_SKELETON_COUNT }, (_, index) => (
               <div key={index} className="flex shrink-0 flex-col items-center gap-2">
                 <div className="size-[65px] animate-pulse rounded-lg bg-[#eceff2]" />
@@ -115,13 +114,11 @@ export function TopCategories() {
               </div>
             ))}
           </div>
-          <div
-            className={`hidden lg:grid ${CATEGORY_STRIP_GRID_COLS[CATEGORY_STRIP_LOADING_SKELETON_COUNT]} lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3`}
-          >
+          <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} hidden lg:flex`}>
             {Array.from({ length: CATEGORY_STRIP_LOADING_SKELETON_COUNT }, (_, index) => (
               <div
                 key={index}
-                className="min-w-0 aspect-[197/201] animate-pulse rounded-[24px] bg-[#eceff2] xl:rounded-[30px]"
+                className="aspect-[197/201] w-[197px] shrink-0 animate-pulse rounded-[24px] bg-[#eceff2] xl:rounded-[30px]"
               />
             ))}
           </div>
@@ -136,10 +133,10 @@ export function TopCategories() {
 
   return (
       <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
-      <div className={`${SITE_CONTENT_GUTTERS_CLASS} ${desktopSectionPaddingClass}`}>
-        <div className="flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide lg:hidden">
-          {sortedItems.map((category, index) => {
-            const slotKey = resolveStripSlotKey(category, index);
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-8 lg:pt-6 xl:pt-8`}>
+        <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} lg:hidden`}>
+          {mobileSortedItems.map((category) => {
+            const slotKey = resolveStripSlotKey(category, category.position);
             const imageSrc = extractCategoryImageUrl(category.media);
 
             return (
@@ -156,9 +153,7 @@ export function TopCategories() {
             );
           })}
         </div>
-        <div
-          className={`hidden lg:grid ${gridColsClass} lg:items-stretch lg:gap-2 lg:pb-0 xl:gap-3`}
-        >
+        <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} hidden lg:flex`}>
           {sortedItems.map((category, index) => {
             const slotKey = resolveStripSlotKey(category, index);
             const visual = getCategoryStripVisual(slotKey);
@@ -168,7 +163,7 @@ export function TopCategories() {
               <Link
                 key={category.id}
                 href={categoryStripHref(category)}
-                className={`category-strip-card-cq group relative flex min-w-0 w-full flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(visual)}`}
+                className={`category-strip-card-cq group relative flex w-[197px] shrink-0 flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(visual)}`}
               >
                 <div className="relative h-full w-full min-h-0 overflow-hidden">
                   <CategoryStripDesktopImage slotKey={slotKey} imageSrc={imageSrc} />
