@@ -1,5 +1,6 @@
 import { extractCategoryImageUrl } from './categoryMedia';
 import type { CategoryTreeNode } from './category-nav';
+import { isHouseholdAppliancesStripCategory } from './homeCategoryStripMobileOrder';
 import {
   ACCESSORIES_SLUG_PARTS,
   COMPUTERS_SLUG_PARTS,
@@ -206,6 +207,21 @@ export function resolveCategoryStripImageForItem(
 
 export function getCategoryStripVisual(slotKey: CategoryStripSlotKey): CategoryStripVisual {
   return CATEGORY_STRIP_VISUALS[slotKey];
+}
+
+export function getCategoryStripTitleTranslateClass(
+  category: CategoryTreeNode,
+  slotKey: CategoryStripSlotKey,
+): string {
+  if (isHouseholdAppliancesStripCategory(category)) {
+    return '-translate-y-[3px]';
+  }
+
+  if (slotKey === 'accessories') {
+    return '-translate-y-[6px]';
+  }
+
+  return '-translate-y-[8px]';
 }
 
 export function categoryStripHref(category: CategoryTreeNode): string {
