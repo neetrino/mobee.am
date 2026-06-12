@@ -40,7 +40,7 @@ export function OrderSummary({
   orderSummary,
   currency,
   shippingMethod,
-  deliverySpeed,
+  deliverySpeed: _deliverySpeed,
   shippingCity,
   loadingDeliveryPrice,
   deliveryPrice,

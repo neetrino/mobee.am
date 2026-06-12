@@ -33,7 +33,7 @@ export function OrderSummaryModal({
   orderSummary,
   currency,
   shippingMethod,
-  deliverySpeed,
+  deliverySpeed: _deliverySpeed,
   shippingCity,
   loadingDeliveryPrice,
   deliveryPrice,
