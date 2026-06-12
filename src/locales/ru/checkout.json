@@ -95,8 +95,8 @@
     "aparikDescription": "Получить предложение рассрочки",
     "idram": "Idram",
     "idramDescription": "Оплатите кошельком Idram или картой",
-    "arca": "ArCa",
-    "arcaDescription": "Оплатите картой ArCa",
+    "arca": "Картой",
+    "arcaDescription": "Оплатите картой Visa, Mastercard или ArCa",
     "paymentDetails": "Детали оплаты",
     "enterCardDetails": "Введите данные вашей карты для завершения оплаты"
   },

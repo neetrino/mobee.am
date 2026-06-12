@@ -95,8 +95,8 @@
     "aparikDescription": "Get an installment offer",
     "idram": "Idram",
     "idramDescription": "Pay with Idram wallet or card",
-    "arca": "ArCa",
-    "arcaDescription": "Pay with ArCa card",
+    "arca": "Card",
+    "arcaDescription": "Pay with Visa, Mastercard or ArCa card",
     "paymentDetails": "Payment Details",
     "enterCardDetails": "Enter your card details to complete payment"
   },
