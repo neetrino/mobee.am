@@ -16,6 +16,7 @@ import {
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA,
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
+import { PurchaseIntentSection } from './components/PurchaseIntentSection';
 import { ShippingCitySelect } from './components/ShippingCitySelect';
 
 const CHECKOUT_FORM_SECTION_CARD_CLASS = `p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS}`;
@@ -25,6 +26,7 @@ interface CheckoutFormProps {
   setValue: UseFormSetValue<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
+  purchaseIntent: 'buy_now' | 'aparik';
   shippingMethod: 'pickup' | 'delivery';
   shippingCity?: string;
   deliveryAvailable: boolean;
@@ -46,6 +48,7 @@ export function CheckoutForm({
   setValue,
   errors,
   isSubmitting,
+  purchaseIntent,
   shippingMethod,
   shippingCity = '',
   deliveryAvailable,
@@ -95,6 +98,14 @@ export function CheckoutForm({
         </div>
       </Card>
 
+      <PurchaseIntentSection
+        register={register}
+        setValue={setValue}
+        purchaseIntent={purchaseIntent}
+        isSubmitting={isSubmitting}
+      />
+
+      {purchaseIntent === 'buy_now' && (
       <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS} data-shipping-method-section>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingMethod')}</h2>
         {errors.shippingMethod && (
@@ -247,8 +258,9 @@ export function CheckoutForm({
           )}
         </div>
       </Card>
+      )}
 
-      {shippingMethod === 'delivery' && (
+      {purchaseIntent === 'buy_now' && shippingMethod === 'delivery' && (
         <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS} data-shipping-section>
           <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.shippingAddress')}</h2>
           {errors.shippingAddress || errors.shippingCity ? (
@@ -286,6 +298,7 @@ export function CheckoutForm({
         </Card>
       )}
 
+      {purchaseIntent === 'buy_now' && (
       <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.paymentMethod')}</h2>
         {errors.paymentMethod && (
@@ -357,6 +370,7 @@ export function CheckoutForm({
           ))}
         </div>
       </Card>
+      )}
 
     </div>
   );

@@ -39,6 +39,7 @@ export default function CheckoutPage() {
     errors,
     isSubmitting,
     setValue,
+    purchaseIntent,
     paymentMethod,
     shippingMethod,
     shippingCity,
@@ -92,6 +93,7 @@ export default function CheckoutPage() {
             setValue={setValue}
             errors={errors}
             isSubmitting={isSubmitting}
+            purchaseIntent={purchaseIntent}
             shippingMethod={shippingMethod}
             shippingCity={shippingCity}
             deliveryAvailable={deliveryAvailable}
@@ -115,6 +117,7 @@ export default function CheckoutPage() {
             requiresRegionalQuote={requiresRegionalQuote}
             error={error}
             isSubmitting={isSubmitting}
+            purchaseIntent={purchaseIntent}
             register={register}
             promoCodeError={errors.promoCode?.message}
             onPlaceOrder={(e) => {

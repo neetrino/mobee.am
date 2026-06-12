@@ -1,8 +1,11 @@
+export type CheckoutPurchaseIntent = 'buy_now' | 'aparik';
+
 export type CheckoutFormData = {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
+  purchaseIntent: CheckoutPurchaseIntent;
   shippingMethod: 'pickup' | 'delivery';
   deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
