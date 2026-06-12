@@ -5,7 +5,7 @@ import { getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
-import { usePaymentMethods } from './utils/payment-methods';
+import { filterPaymentMethods, usePaymentMethods } from './utils/payment-methods';
 import { useCheckoutSchema } from './utils/validation-schema';
 import { useDeliveryPrice } from './hooks/useDeliveryPrice';
 import { useCart } from './hooks/useCart';
@@ -26,7 +26,7 @@ export function useCheckout() {
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
-  const paymentMethods = usePaymentMethods();
+  const allPaymentMethods = usePaymentMethods();
   const { cart, loading, fetchCart } = useCart(isLoggedIn);
   const subtotalAfterDiscountAmd = useMemo(
     () => (cart ? getCartSubtotalAfterDiscountAmd(cart.totals) : 0),
@@ -51,6 +51,7 @@ export function useCheckout() {
       lastName: '',
       email: '',
       phone: '',
+      purchaseIntent: 'buy_now',
       shippingMethod: 'pickup',
       deliverySpeed: 'standard',
       paymentMethod: 'cash_on_delivery',
@@ -64,10 +65,19 @@ export function useCheckout() {
     },
   });
 
+  const purchaseIntent = watch('purchaseIntent');
   const paymentMethod = watch('paymentMethod');
   const shippingMethod = watch('shippingMethod');
   const shippingCity = watch('shippingCity');
   const deliverySpeed = watch('deliverySpeed');
+
+  const paymentMethods = useMemo(
+    () =>
+      purchaseIntent === 'buy_now'
+        ? filterPaymentMethods(allPaymentMethods, { shippingMethod })
+        : [],
+    [allPaymentMethods, purchaseIntent, shippingMethod]
+  );
 
   const { deliveryPrice, loadingDeliveryPrice, requiresRegionalQuote } = useDeliveryPrice(
     cart,
@@ -96,9 +106,32 @@ export function useCheckout() {
   });
 
   useEffect(() => {
-    if (shippingMethod === 'pickup') {
-      setValue('deliverySpeed', 'standard');
+    if (purchaseIntent === 'aparik') {
+      setValue('paymentMethod', 'aparik', { shouldValidate: false });
+      setValue('shippingMethod', 'pickup', { shouldValidate: false });
+      setValue('shippingAddress', '');
+      setValue('shippingCity', '');
+      clearErrors(['shippingMethod', 'paymentMethod', 'shippingAddress', 'shippingCity']);
+      return;
     }
+
+    if (paymentMethod === 'aparik') {
+      setValue('paymentMethod', 'cash_on_delivery', { shouldValidate: false });
+    }
+  }, [purchaseIntent, paymentMethod, setValue, clearErrors]);
+
+  useEffect(() => {
+    if (purchaseIntent !== 'buy_now') {
+      return;
+    }
+
+    if (shippingMethod === 'delivery' && paymentMethod === 'cash_on_delivery') {
+      setValue('paymentMethod', 'idram', { shouldValidate: true, shouldDirty: true });
+    }
+  }, [purchaseIntent, shippingMethod, paymentMethod, setValue]);
+
+  useEffect(() => {
+    setValue('deliverySpeed', 'standard', { shouldValidate: false });
   }, [shippingMethod, setValue]);
 
   useEffect(() => {
@@ -162,12 +195,19 @@ export function useCheckout() {
           return;
         }
 
-        if (paymentMethod === 'arca' || paymentMethod === 'idram') {
+        if (
+          data.purchaseIntent === 'buy_now' &&
+          (paymentMethod === 'arca' || paymentMethod === 'idram')
+        ) {
           setShowCardModal(true);
           return;
         }
 
-        submitOrder(data);
+        submitOrder({
+          ...data,
+          paymentMethod: data.purchaseIntent === 'aparik' ? 'aparik' : data.paymentMethod,
+          shippingMethod: data.purchaseIntent === 'aparik' ? 'pickup' : data.shippingMethod,
+        });
       },
       (validationErrors: FieldErrors<CheckoutFormData>) => {
         scrollToFirstFieldError(validationErrors);
@@ -200,6 +240,7 @@ export function useCheckout() {
     errors,
     isSubmitting,
     setValue,
+    purchaseIntent,
     paymentMethod,
     shippingMethod,
     shippingCity,

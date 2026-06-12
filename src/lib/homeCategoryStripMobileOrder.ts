@@ -43,7 +43,7 @@ function isTabletsStripCategory(category: CategoryTreeNode): boolean {
   return titleIncludesMarker(category.title, TABLETS_TITLE_MARKERS);
 }
 
-function isHouseholdAppliancesStripCategory(category: CategoryTreeNode): boolean {
+export function isHouseholdAppliancesStripCategory(category: CategoryTreeNode): boolean {
   if (categoryMatchesSlugParts(category, HOUSEHOLD_APPLIANCES_SLUG_PARTS)) {
     return true;
   }

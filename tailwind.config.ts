@@ -34,6 +34,8 @@ const config: Config = {
     },
     extend: {
       spacing: {
+        /** Logo chips on checkout card payment row (`w-15`). */
+        '15': '3.75rem',
         'admin-mobile-menu-top': `${ADMIN_MOBILE_MENU_OFFSET_TOP_PX}px`,
         'admin-mobile-menu-left': `${ADMIN_MOBILE_MENU_OFFSET_LEFT_PX}px`,
         /** `/checkout` — horizontal gutter from viewport at `lg+` (both sides). */

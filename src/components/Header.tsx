@@ -36,7 +36,11 @@ import {
 } from './header-strip-layout';
 import { SiteBrandLogo } from './SiteBrandLogo';
 import { CompareIcon } from './icons/CompareIcon';
-import { HeaderSecondaryBar } from './HeaderSecondaryBar';
+import {
+  getHeaderDropdownPanelMotionClass,
+  HeaderSecondaryBar,
+  useHeaderDropdownMotion,
+} from './HeaderSecondaryBar';
 import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.constants';
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
@@ -218,25 +222,40 @@ function HeaderSearchSync({
 
 /** Root categories mega menu (desktop secondary bar). */
 function CategoriesMenuFlyout({
+  open,
+  onEnteredChange,
   loading,
   roots,
   onItemNavigate,
   loadingLabel,
   onLinkHover,
 }: {
+  open: boolean;
+  onEnteredChange?: (entered: boolean) => void;
   loading: boolean;
   roots: Category[];
   onItemNavigate: () => void;
   loadingLabel: string;
   onLinkHover: (href: string) => void;
 }) {
+  const { menuVisible, menuEntered } = useHeaderDropdownMotion(open);
   const columnCount = Math.min(roots.length, CATEGORY_MEGA_MENU_MAX_COLUMNS);
+
+  useEffect(() => {
+    onEnteredChange?.(menuEntered);
+  }, [menuEntered, onEnteredChange]);
+
+  if (!menuVisible) {
+    return null;
+  }
 
   return (
     <>
       <div className="absolute left-0 top-full z-[55] h-2 w-full" aria-hidden />
       <div className="absolute left-0 top-full z-[55] pt-2">
-        <div className="max-h-[min(24rem,calc(100vh-6rem))] w-max max-w-[min(calc(100vw-2rem),44rem)] overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-2xl">
+        <div
+          className={`max-h-[min(24rem,calc(100vh-6rem))] w-max max-w-[min(calc(100vw-2rem),44rem)] overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-2xl ${getHeaderDropdownPanelMotionClass(menuEntered)}`}
+        >
           {loading ? (
             <div className="px-4 py-2 text-sm text-gray-500">{loadingLabel}</div>
           ) : (
@@ -389,6 +408,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileMenuExiting, setMobileMenuExiting] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
+  const [categoriesMenuEntered, setCategoriesMenuEntered] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
   const [mobileLocaleMenuExiting, setMobileLocaleMenuExiting] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
@@ -1424,19 +1444,20 @@ export function Header() {
         categoriesWrapRef={categoriesPillWrapRef}
         categoriesLabel={t('common.navigation.categories')}
         isCategoriesMenuOpen={showCategoriesPillMenu}
+        categoriesChevronOpen={categoriesMenuEntered}
         onCategoriesButtonClick={() => {
           setShowCategoriesPillMenu((open) => !open);
         }}
         categoriesMenu={
-          showCategoriesPillMenu ? (
-            <CategoriesMenuFlyout
-              loading={loadingCategories}
-              roots={getRootCategories(categories)}
-              onItemNavigate={() => setShowCategoriesPillMenu(false)}
-              loadingLabel={t('common.messages.loading')}
-              onLinkHover={prefetchNavHref}
-            />
-          ) : null
+          <CategoriesMenuFlyout
+            open={showCategoriesPillMenu}
+            onEnteredChange={setCategoriesMenuEntered}
+            loading={loadingCategories}
+            roots={getRootCategories(categories)}
+            onItemNavigate={() => setShowCategoriesPillMenu(false)}
+            loadingLabel={t('common.messages.loading')}
+            onLinkHover={prefetchNavHref}
+          />
         }
         searchQuery={searchQuery}
         onSearchChange={(value) => {

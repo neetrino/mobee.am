@@ -13,6 +13,7 @@ function buildCheckoutSchema(t: (key: string) => string, deliveryAvailable: bool
         .string()
         .min(1, t('checkout.errors.phoneRequired'))
         .regex(/^\+?[0-9]{8,15}$/, t('checkout.errors.invalidPhone')),
+      purchaseIntent: z.enum(['buy_now', 'aparik']),
       shippingMethod: z.enum(['pickup', 'delivery'], {
         message: t('checkout.errors.selectShippingMethod'),
       }),
@@ -47,6 +48,9 @@ function buildCheckoutSchema(t: (key: string) => string, deliveryAvailable: bool
     })
     .refine(
       (data) => {
+        if (data.purchaseIntent === 'aparik') {
+          return true;
+        }
         if (data.shippingMethod === 'delivery' && deliveryAvailable) {
           return Boolean(data.shippingAddress && data.shippingAddress.trim().length > 0);
         }
@@ -59,6 +63,9 @@ function buildCheckoutSchema(t: (key: string) => string, deliveryAvailable: bool
     )
     .refine(
       (data) => {
+        if (data.purchaseIntent === 'aparik') {
+          return true;
+        }
         if (data.shippingMethod === 'delivery' && deliveryAvailable) {
           return Boolean(data.shippingCity && data.shippingCity.trim().length > 0);
         }

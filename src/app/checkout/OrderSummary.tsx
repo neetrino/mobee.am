@@ -29,6 +29,7 @@ interface OrderSummaryProps {
   requiresRegionalQuote: boolean;
   error: string | null;
   isSubmitting: boolean;
+  purchaseIntent: 'buy_now' | 'aparik';
   register: UseFormRegister<CheckoutFormData>;
   promoCodeError?: string;
   onPlaceOrder: (e?: React.FormEvent) => void;
@@ -39,30 +40,22 @@ export function OrderSummary({
   orderSummary,
   currency,
   shippingMethod,
-  deliverySpeed,
+  deliverySpeed: _deliverySpeed,
   shippingCity,
   loadingDeliveryPrice,
   deliveryPrice,
   requiresRegionalQuote,
   error,
   isSubmitting,
+  purchaseIntent,
   register,
   promoCodeError,
   onPlaceOrder,
 }: OrderSummaryProps) {
   const { t } = useTranslation();
 
-  const checkoutBlocked = shippingMethod === 'delivery' && requiresRegionalQuote;
-
-  const deliveryTypeSuffix =
-    shippingMethod === 'delivery' &&
-    deliveryPrice !== null &&
-    !requiresRegionalQuote &&
-    !loadingDeliveryPrice
-      ? deliverySpeed === 'express'
-        ? ` · ${t('checkout.summary.shippingExpress')}`
-        : ` · ${t('checkout.summary.shippingStandard')}`
-      : '';
+  const isAparikIntent = purchaseIntent === 'aparik';
+  const checkoutBlocked = !isAparikIntent && shippingMethod === 'delivery' && requiresRegionalQuote;
 
   const shippingLabel =
     shippingMethod === 'pickup'
@@ -73,8 +66,8 @@ export function OrderSummary({
           ? t('checkout.summary.regionalQuotePending')
           : deliveryPrice !== null
             ? deliveryPrice === 0
-              ? `${t('checkout.shipping.freeDelivery')}${deliveryTypeSuffix}`
-              : `${formatPriceInCurrency(orderSummary.shippingDisplay, currency)}${deliveryTypeSuffix}` +
+              ? t('checkout.shipping.freeDelivery')
+              : `${formatPriceInCurrency(orderSummary.shippingDisplay, currency)}` +
                 (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
             : t('checkout.placeholders.selectCity');
 
@@ -99,10 +92,12 @@ export function OrderSummary({
             <span>{t('checkout.summary.subtotal')}</span>
             <span>{formatPriceInCurrency(orderSummary.subtotalDisplay, currency)}</span>
           </div>
-          <div className="flex justify-between text-gray-600">
-            <span>{t('checkout.summary.shipping')}</span>
-            <span className="text-right max-w-[60%]">{shippingLabel}</span>
-          </div>
+          {!isAparikIntent && (
+            <div className="flex justify-between text-gray-600">
+              <span>{t('checkout.summary.shipping')}</span>
+              <span className="text-right max-w-[60%]">{shippingLabel}</span>
+            </div>
+          )}
           {orderSummary.totalExcludesPendingShipping && (
             <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">
               {t('checkout.summary.totalPendingShippingNote')}
@@ -133,8 +128,18 @@ export function OrderSummary({
           disabled={isSubmitting || checkoutBlocked}
           onClick={onPlaceOrder}
         >
-          {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
+          {isSubmitting
+            ? t('checkout.buttons.processing')
+            : isAparikIntent
+              ? t('checkout.buttons.sendApplication')
+              : t('checkout.buttons.placeOrder')}
         </Button>
+
+        {isAparikIntent && (
+          <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+            {t('checkout.messages.aparikApplicationNote')}
+          </p>
+        )}
       </Card>
     </div>
   );

@@ -4,6 +4,13 @@
   "shippingMethod": "Shipping Method",
   "shippingAddress": "Shipping Address",
   "paymentMethod": "Payment Method",
+  "purchaseIntent": {
+    "title": "Purchase type",
+    "buyNow": "Buy now",
+    "buyNowDescription": "Order and pay now",
+    "aparik": "Installments",
+    "aparikDescription": "Get an installment offer"
+  },
   "orderSummary": "Order Summary",
   "promoCode": {
     "title": "Promo Code"
@@ -95,8 +102,8 @@
     "aparikDescription": "Get an installment offer",
     "idram": "Idram",
     "idramDescription": "Pay with Idram wallet or card",
-    "arca": "ArCa",
-    "arcaDescription": "Pay with ArCa card",
+    "arca": "Card",
+    "arcaDescription": "Pay with Visa, Mastercard or ArCa card",
     "paymentDetails": "Payment Details",
     "enterCardDetails": "Enter your card details to complete payment"
   },
@@ -114,6 +121,7 @@
   },
   "buttons": {
     "placeOrder": "Place Order",
+    "sendApplication": "Send application",
     "processing": "Processing...",
     "continueToPayment": "Continue to Payment",
     "continueShopping": "Continue Shopping",
@@ -133,6 +141,7 @@
     "cashOnDeliveryPickup": "Cash on Delivery: You will pay cash when you pick up your order. Card details are not required.",
     "aparikInfo": "Installments: You will pay cash at the store when you pick up your order. Card details are not required.",
     "aparikPickup": "Installments: You will pay cash at the store when you pick up your order. Card details are not required.",
+    "aparikApplicationNote": "Based on your details, our specialist will review your application and contact you as soon as possible to present the terms and answer your questions.",
     "storePickupInfo": "Store Pickup: You will pick up your order from our store. Delivery is free."
   },
   "errors": {

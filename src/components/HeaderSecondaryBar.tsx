@@ -103,7 +103,65 @@ const iconLinkClass =
   'flex h-8 w-8 shrink-0 items-center justify-center text-[#4b5563] transition-colors hover:text-gray-900';
 
 const PROFILE_MENU_ID = 'header-secondary-profile-menu';
+const PROFILE_MENU_HOVER_CLOSE_DELAY_MS = 250;
+export const HEADER_DROPDOWN_MOTION_MS = 300;
+export const HEADER_DROPDOWN_PANEL_MOTION_CLASS =
+  'transition-[opacity,transform] duration-300 ease-in-out motion-reduce:transition-none';
+export const HEADER_DROPDOWN_CHEVRON_MOTION_CLASS =
+  'transition-transform duration-300 ease-in-out motion-reduce:transition-none';
+const HEADER_DROPDOWN_PANEL_ENTERED_CLASS = 'translate-y-0 opacity-100';
+const HEADER_DROPDOWN_PANEL_EXIT_CLASS =
+  'pointer-events-none -translate-y-0.5 opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100';
 const CURRENCY_MENU_ID = 'header-secondary-currency-menu';
+
+export function useHeaderDropdownMotion(open: boolean): {
+  menuVisible: boolean;
+  menuEntered: boolean;
+} {
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuEntered, setMenuEntered] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelCloseTimer = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      cancelCloseTimer();
+      setMenuVisible(true);
+      setMenuEntered(false);
+      const outerFrame = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setMenuEntered(true);
+        });
+      });
+      return () => cancelAnimationFrame(outerFrame);
+    }
+
+    cancelCloseTimer();
+    setMenuEntered(false);
+    closeTimerRef.current = setTimeout(() => {
+      setMenuVisible(false);
+      closeTimerRef.current = null;
+    }, HEADER_DROPDOWN_MOTION_MS);
+
+    return () => cancelCloseTimer();
+  }, [open, cancelCloseTimer]);
+
+  useEffect(() => () => cancelCloseTimer(), [cancelCloseTimer]);
+
+  return { menuVisible, menuEntered };
+}
+
+export function getHeaderDropdownPanelMotionClass(menuEntered: boolean): string {
+  return `${HEADER_DROPDOWN_PANEL_MOTION_CLASS} ${
+    menuEntered ? HEADER_DROPDOWN_PANEL_ENTERED_CLASS : HEADER_DROPDOWN_PANEL_EXIT_CLASS
+  }`;
+}
 
 interface HeaderCurrencyOption {
   code: CurrencyCode;
@@ -121,9 +179,45 @@ function HeaderCurrencyMenu({
   onCurrencyChange: (currency: CurrencyCode) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuEntered, setMenuEntered] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const close = useCallback(() => setOpen(false), []);
+  const cancelCloseTimer = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  const beginMenuClose = useCallback(() => {
+    cancelCloseTimer();
+    setMenuEntered(false);
+    closeTimerRef.current = setTimeout(() => {
+      setOpen(false);
+      setMenuVisible(false);
+      closeTimerRef.current = null;
+    }, HEADER_DROPDOWN_MOTION_MS);
+  }, [cancelCloseTimer]);
+
+  const openMenu = useCallback(() => {
+    cancelCloseTimer();
+    setOpen(true);
+    setMenuVisible(true);
+    setMenuEntered(false);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setMenuEntered(true);
+      });
+    });
+  }, [cancelCloseTimer]);
+
+  const close = useCallback(() => {
+    beginMenuClose();
+  }, [beginMenuClose]);
+
+  useEffect(() => () => cancelCloseTimer(), [cancelCloseTimer]);
 
   useEffect(() => {
     if (!open) {
@@ -131,12 +225,12 @@ function HeaderCurrencyMenu({
     }
     const onDocMouseDown = (event: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(event.target as Node)) {
-        setOpen(false);
+        beginMenuClose();
       }
     };
     document.addEventListener('mousedown', onDocMouseDown);
     return () => document.removeEventListener('mousedown', onDocMouseDown);
-  }, [open]);
+  }, [open, beginMenuClose]);
 
   useEffect(() => {
     if (!open) {
@@ -144,28 +238,28 @@ function HeaderCurrencyMenu({
     }
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setOpen(false);
+        beginMenuClose();
       }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open]);
+  }, [open, beginMenuClose]);
 
   return (
     <div ref={wrapRef} className="relative -translate-x-4 shrink-0">
       <button
         type="button"
         id={`${CURRENCY_MENU_ID}-trigger`}
-        aria-expanded={open}
+        aria-expanded={menuEntered}
         aria-haspopup="true"
         aria-controls={CURRENCY_MENU_ID}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => (menuEntered ? beginMenuClose() : openMenu())}
         className="flex h-8 min-w-[64px] items-center justify-center gap-1.5 rounded-full bg-[#2db2ff] px-3 text-[12px] font-bold leading-none text-white transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff] active:opacity-90"
         aria-label="Change currency"
       >
         <span>{selectedCurrency}</span>
         <svg
-          className={`h-3 w-3 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
+          className={`h-3 w-3 ${HEADER_DROPDOWN_CHEVRON_MOTION_CLASS} ${menuEntered ? 'rotate-180' : 'rotate-0'}`}
           fill="none"
           viewBox="0 0 12 12"
           stroke="currentColor"
@@ -174,14 +268,16 @@ function HeaderCurrencyMenu({
           <path d="M3 4.5L6 7.5L9 4.5" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
-      {open ? (
+      {menuVisible ? (
         <div
           id={CURRENCY_MENU_ID}
           role="menu"
           aria-labelledby={`${CURRENCY_MENU_ID}-trigger`}
           className="absolute -left-2 top-full z-[60] w-[86px] pt-2"
         >
-          <div className="overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-2xl">
+          <div
+            className={`overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-2xl ${getHeaderDropdownPanelMotionClass(menuEntered)}`}
+          >
             {currencies.map((currency) => {
               const active = selectedCurrency === currency.code;
               return (
@@ -230,9 +326,52 @@ function ProfileAccountMenu({
   onLogout: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuEntered, setMenuEntered] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const hoverCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const close = useCallback(() => setOpen(false), []);
+  const cancelHoverClose = useCallback(() => {
+    if (hoverCloseTimerRef.current) {
+      clearTimeout(hoverCloseTimerRef.current);
+      hoverCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const beginMenuClose = useCallback(() => {
+    cancelHoverClose();
+    setMenuEntered(false);
+    hoverCloseTimerRef.current = setTimeout(() => {
+      setOpen(false);
+      setMenuVisible(false);
+      hoverCloseTimerRef.current = null;
+    }, HEADER_DROPDOWN_MOTION_MS);
+  }, [cancelHoverClose]);
+
+  const close = useCallback(() => {
+    beginMenuClose();
+  }, [beginMenuClose]);
+
+  const openMenu = useCallback(() => {
+    cancelHoverClose();
+    setOpen(true);
+    setMenuVisible(true);
+    setMenuEntered(false);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setMenuEntered(true);
+      });
+    });
+  }, [cancelHoverClose]);
+
+  const scheduleHoverClose = useCallback(() => {
+    cancelHoverClose();
+    hoverCloseTimerRef.current = setTimeout(() => {
+      beginMenuClose();
+    }, PROFILE_MENU_HOVER_CLOSE_DELAY_MS);
+  }, [cancelHoverClose, beginMenuClose]);
+
+  useEffect(() => () => cancelHoverClose(), [cancelHoverClose]);
 
   useEffect(() => {
     if (!open) {
@@ -240,12 +379,12 @@ function ProfileAccountMenu({
     }
     const onDocMouseDown = (event: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(event.target as Node)) {
-        setOpen(false);
+        beginMenuClose();
       }
     };
     document.addEventListener('mousedown', onDocMouseDown);
     return () => document.removeEventListener('mousedown', onDocMouseDown);
-  }, [open]);
+  }, [open, beginMenuClose]);
 
   useEffect(() => {
     if (!open) {
@@ -253,33 +392,38 @@ function ProfileAccountMenu({
     }
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setOpen(false);
+        beginMenuClose();
       }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open]);
+  }, [open, beginMenuClose]);
 
   const itemClass =
     'mx-1 flex w-[calc(100%-0.5rem)] items-center gap-2 rounded-full px-3 py-2.5 text-left text-[13px] font-normal leading-normal text-gray-800 transition-colors hover:bg-admin-50';
 
   return (
-    <div ref={wrapRef} className="relative shrink-0">
+    <div
+      ref={wrapRef}
+      className="relative shrink-0"
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleHoverClose}
+    >
       <button
         type="button"
         id={`${PROFILE_MENU_ID}-trigger`}
-        aria-expanded={open}
+        aria-expanded={menuEntered}
         aria-haspopup="true"
         aria-controls={PROFILE_MENU_ID}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => (menuEntered ? beginMenuClose() : openMenu())}
         className="flex items-center gap-1.5 rounded-md text-[#4b5563] transition-colors hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2db2ff]"
         aria-label={profileAria}
       >
         <UserOutlineIcon className="shrink-0" />
         <span className="whitespace-nowrap text-[13px] font-semibold leading-normal">{profileLabel}</span>
         <span
-          className={`flex h-4 w-4 shrink-0 items-center justify-center text-gray-500 transition-transform duration-200 ease-out motion-reduce:transition-none ${
-            open ? 'rotate-180' : 'rotate-0'
+          className={`flex h-4 w-4 shrink-0 items-center justify-center text-gray-500 ${HEADER_DROPDOWN_CHEVRON_MOTION_CLASS} ${
+            menuEntered ? 'rotate-180' : 'rotate-0'
           }`}
           aria-hidden
         >
@@ -294,7 +438,7 @@ function ProfileAccountMenu({
           </svg>
         </span>
       </button>
-      {open ? (
+      {menuVisible ? (
         <>
           <div className="absolute right-0 top-full z-[60] h-2 w-full min-w-[144px]" aria-hidden />
           <div
@@ -302,8 +446,12 @@ function ProfileAccountMenu({
             role="menu"
             aria-labelledby={`${PROFILE_MENU_ID}-trigger`}
             className="absolute right-0 top-full z-[60] min-w-[100px] pt-2"
+            onMouseEnter={openMenu}
+            onMouseLeave={scheduleHoverClose}
           >
-            <div className="overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-2xl">
+            <div
+              className={`overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-2xl ${getHeaderDropdownPanelMotionClass(menuEntered)}`}
+            >
               <Link href="/profile" role="menuitem" prefetch className={itemClass} onClick={close}>
                 {profileLabel}
               </Link>
@@ -337,6 +485,7 @@ export interface HeaderSecondaryBarProps {
   categoriesWrapRef: RefObject<HTMLDivElement>;
   categoriesLabel: string;
   isCategoriesMenuOpen: boolean;
+  categoriesChevronOpen?: boolean;
   onCategoriesButtonClick: () => void;
   categoriesMenu: ReactNode;
   searchQuery: string;
@@ -395,6 +544,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
       categoriesWrapRef,
       categoriesLabel,
       isCategoriesMenuOpen,
+      categoriesChevronOpen,
       onCategoriesButtonClick,
       categoriesMenu,
       searchQuery,
@@ -436,6 +586,7 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
     },
     ref,
   ) {
+    const categoriesChevronExpanded = categoriesChevronOpen ?? isCategoriesMenuOpen;
     const topOffset = Math.max(0, Math.round(dockedViewportTopOffsetPx));
     const positionClass = dockToViewportTop ? 'fixed left-0 right-0 z-50' : 'relative z-50';
     const positionStyle: CSSProperties | undefined = dockToViewportTop
@@ -464,8 +615,8 @@ export const HeaderSecondaryBar = forwardRef<HTMLDivElement, HeaderSecondaryBarP
                   <span className="whitespace-nowrap text-[13px] font-bold leading-7">{categoriesLabel}</span>
                 </span>
                 <span
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center text-white transition-transform duration-200 ease-out motion-reduce:transition-none ${
-                    isCategoriesMenuOpen ? 'rotate-180' : 'rotate-0'
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center text-white ${HEADER_DROPDOWN_CHEVRON_MOTION_CLASS} ${
+                    categoriesChevronExpanded ? 'rotate-180' : 'rotate-0'
                   }`}
                   aria-hidden
                 >

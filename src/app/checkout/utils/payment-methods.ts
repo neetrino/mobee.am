@@ -9,16 +9,26 @@ export interface PaymentMethod {
   logo: string | null;
 }
 
+interface FilterPaymentMethodsOptions {
+  shippingMethod: 'pickup' | 'delivery';
+}
+
+export function filterPaymentMethods(
+  methods: PaymentMethod[],
+  { shippingMethod }: FilterPaymentMethodsOptions
+): PaymentMethod[] {
+  return methods.filter((method) => {
+    if (method.id === 'cash_on_delivery' && shippingMethod === 'delivery') {
+      return false;
+    }
+    return true;
+  });
+}
+
 export function usePaymentMethods(): PaymentMethod[] {
   const { t } = useTranslation();
 
   return [
-    {
-      id: 'aparik',
-      name: t('checkout.payment.aparik'),
-      description: t('checkout.payment.aparikDescription'),
-      logo: '/assets/payments/aparik.png',
-    },
     {
       id: 'cash_on_delivery',
       name: t('checkout.payment.cashOnDelivery'),

@@ -30,9 +30,34 @@ export const CHECKOUT_CONTACT_FIELDS_GRID_CLASS =
 /** Selected shipping/payment option — Mobee brand blue (replaces purple accent). */
 export const CHECKOUT_OPTION_SELECTED_CHROME_CLASS = 'border-admin-500 bg-admin-50';
 
-/** Payment logo in the fixed 80×48 slot (`CheckoutForm`). */
+/** Payment logo slot in `CheckoutForm`. */
+export const CHECKOUT_PAYMENT_LOGO_SLOT_CLASS =
+  'relative flex h-9 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-gray-200 bg-white';
+
+/** Wrapper for separate Visa / ArCa logo chips on the card payment option. */
+export const CHECKOUT_PAYMENT_CARD_BRANDS_ROW_CLASS = 'flex shrink-0 items-center gap-1.5';
+
+/** Individual logo chip inside {@link CHECKOUT_PAYMENT_CARD_BRANDS_ROW_CLASS}. */
+export const CHECKOUT_PAYMENT_CARD_BRAND_CHIP_CLASS =
+  'relative flex h-9 w-15 shrink-0 items-center justify-center overflow-hidden rounded border border-gray-200 bg-white';
+
+export const CHECKOUT_PAYMENT_CARD_BRAND_IMG_CLASS = 'h-3.5 w-auto max-w-[2rem] object-contain';
+
+/** Visa wordmark inside the brand chip — slightly larger mark, same chip frame. */
+export const CHECKOUT_PAYMENT_CARD_BRAND_VISA_IMG_CLASS =
+  'h-4 w-auto max-w-[2.25rem] object-contain scale-[1.28] origin-center';
+
+/** Mastercard mark inside the brand chip — larger mark, same chip frame. */
+export const CHECKOUT_PAYMENT_CARD_BRAND_MASTERCARD_IMG_CLASS =
+  'h-4 w-auto max-w-[2.45rem] object-contain scale-[1.4] origin-center';
+
+/** ArCa wordmark inside the brand chip — larger mark, same chip frame. */
+export const CHECKOUT_PAYMENT_CARD_BRAND_ARCA_IMG_CLASS =
+  'h-6 w-auto max-w-[3.25rem] object-contain scale-[2.12] origin-center';
+
+/** Payment logo in the fixed slot (`CheckoutForm`). */
 export const CHECKOUT_PAYMENT_LOGO_IMG_CLASS =
-  'w-full h-full object-contain p-1.5';
+  'h-full w-full object-contain p-1';
 
 /**
  * ArCa wordmark PNG — less padding + scale so the mark fills the frame more than Idram/cash.

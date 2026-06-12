@@ -4,6 +4,13 @@
   "shippingMethod": "Առաքման եղանակ",
   "shippingAddress": "Առաքման հասցե",
   "paymentMethod": "Վճարման եղանակ",
+  "purchaseIntent": {
+    "title": "Գնման տեսակ",
+    "buyNow": "Գնել հիմա",
+    "buyNowDescription": "Պատվիրեք և վճարեք հիմա",
+    "aparik": "Ապառիկ",
+    "aparikDescription": "Ստանալ ապառիկի առաջարկ"
+  },
   "orderSummary": "Պատվերի ամփոփում",
   "promoCode": {
     "title": "Պրոմոկոդ"
@@ -89,14 +96,14 @@
     }
   },
   "payment": {
-    "cashOnDelivery": "Կանխիկ առաքման ժամանակ",
+    "cashOnDelivery": "Կանխիկ",
     "cashOnDeliveryDescription": "Վճարեք կանխիկ, երբ ստանաք ձեր պատվերը",
     "aparik": "Ապառիկ",
     "aparikDescription": "Ստանալ ապառիկի առաջարկ",
     "idram": "Idram",
     "idramDescription": "Վճարեք Idram դրամապանակով կամ քարտով",
-    "arca": "ArCa",
-    "arcaDescription": "Վճարեք ArCa քարտով",
+    "arca": "Քարտով",
+    "arcaDescription": "Վճարեք Visa, Mastercard կամ ArCa քարտով",
     "paymentDetails": "Վճարման մանրամասներ",
     "enterCardDetails": "Մուտքագրեք ձեր քարտի տվյալները՝ վճարումն ավարտելու համար"
   },
@@ -114,6 +121,7 @@
   },
   "buttons": {
     "placeOrder": "Պատվիրել",
+    "sendApplication": "Ուղարկել հայտ",
     "processing": "Մշակվում է...",
     "continueToPayment": "Անցնել վճարման",
     "continueShopping": "Շարունակել գնումները",
@@ -133,6 +141,7 @@
     "cashOnDeliveryPickup": "Կանխիկ առաքման ժամանակ: Դուք կվճարեք կանխիկ, երբ վերցնեք ձեր պատվերը: Քարտի տվյալներ չեն պահանջվում:",
     "aparikInfo": "Ապառիկ: Դուք կվճարեք կանխիկ խանութում, երբ վերցնեք պատվերը: Քարտի տվյալներ չեն պահանջվում:",
     "aparikPickup": "Ապառիկ: Դուք կվճարեք կանխիկ խանութում, երբ վերցնեք պատվերը: Քարտի տվյալներ չեն պահանջվում:",
+    "aparikApplicationNote": "Ձեր տվյալների հիման վրա մեր մասնագետը կդիտարկի ձեր հայտը և հնարավորինս շուտ կկապվի ձեզ հետ՝ ներկայացնելու պայմանները և պատասխանելու ձեր հարցերին։",
     "storePickupInfo": "Խանութից վերցնել: Դուք կվերցնեք ձեր պատվերը մեր խանութից: Առաքումն անվճար է:"
   },
   "errors": {
