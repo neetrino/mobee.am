@@ -8,14 +8,10 @@ import {
   CHECKOUT_CONTACT_FIELDS_GRID_CLASS,
   CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS,
   CHECKOUT_FORM_CARD_RADIUS_CLASS,
-  CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS,
-  CHECKOUT_FORM_CARD_RADIUS_TOP_CLASS,
   CHECKOUT_OPTION_SELECTED_CHROME_CLASS,
-  CHECKOUT_PAYMENT_LOGO_IMG_CLASS,
-  CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK,
-  CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA,
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
+import { CheckoutPaymentMethodLogo } from './components/CheckoutPaymentMethodLogo';
 import { PurchaseIntentSection } from './components/PurchaseIntentSection';
 import { ShippingCitySelect } from './components/ShippingCitySelect';
 
@@ -30,7 +26,6 @@ interface CheckoutFormProps {
   shippingMethod: 'pickup' | 'delivery';
   shippingCity?: string;
   deliveryAvailable: boolean;
-  deliverySpeed: 'standard' | 'express';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
   paymentMethods: Array<{
     id: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
@@ -52,7 +47,6 @@ export function CheckoutForm({
   shippingMethod,
   shippingCity = '',
   deliveryAvailable,
-  deliverySpeed,
   paymentMethod,
   paymentMethods,
   logoErrors,
@@ -143,111 +137,32 @@ export function CheckoutForm({
             </div>
           </label>
           {deliveryAvailable ? (
-            <div
-              className={`${CHECKOUT_FORM_CARD_RADIUS_CLASS} border-2 transition-colors ${
+            <label
+              className={`flex cursor-pointer items-center border-2 p-4 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
                 shippingMethod === 'delivery'
-                  ? `${CHECKOUT_OPTION_SELECTED_CHROME_CLASS} ring-1 ring-admin-200/80`
-                  : 'border-gray-300 bg-white hover:bg-gray-50/60'
+                  ? CHECKOUT_OPTION_SELECTED_CHROME_CLASS
+                  : 'border-gray-300 hover:bg-gray-50'
               }`}
             >
-              <label
-                className={`flex cursor-pointer items-center p-4 ${
-                  shippingMethod === 'delivery' ? CHECKOUT_FORM_CARD_RADIUS_TOP_CLASS : ''
-                }`}
-              >
-                <input
-                  type="radio"
-                  {...register('shippingMethod')}
-                  value="delivery"
-                  checked={shippingMethod === 'delivery'}
-                  onChange={() => {
-                    setValue('shippingMethod', 'delivery', { shouldValidate: true, shouldDirty: true });
-                    setValue('deliverySpeed', 'standard', { shouldValidate: true });
-                  }}
-                  className={`mr-4 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
-                  disabled={isSubmitting}
-                  aria-controls={
-                    shippingMethod === 'delivery' ? 'delivery-type-options' : undefined
-                  }
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900">{t('checkout.shipping.delivery')}</div>
-                  <div className="text-sm text-gray-600">{t('checkout.shipping.deliveryDescription')}</div>
-                </div>
-              </label>
-
-              {shippingMethod === 'delivery' && (
-                <div
-                  id="delivery-type-options"
-                  role="group"
-                  aria-label={t('checkout.shipping.deliveryTypesGroupLabel')}
-                  className={`border-t border-admin-200/90 bg-white/90 px-4 pb-4 pt-3 ${CHECKOUT_FORM_CARD_RADIUS_BOTTOM_CLASS}`}
-                >
-                  <div className="ml-0.5 space-y-2 border-l-2 border-admin-400 pl-3">
-                    <label
-                      className={`flex cursor-pointer items-start gap-3 border p-3 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
-                        deliverySpeed === 'standard'
-                          ? `${CHECKOUT_OPTION_SELECTED_CHROME_CLASS}`
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        {...register('deliverySpeed')}
-                        value="standard"
-                        checked={deliverySpeed === 'standard'}
-                        onChange={(e) =>
-                          setValue('deliverySpeed', e.target.value as 'standard' | 'express', {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                          })
-                        }
-                        className={`mt-0.5 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
-                        disabled={isSubmitting}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-gray-900">
-                          {t('checkout.shipping.standardDelivery')}
-                        </div>
-                        <div className="text-xs text-gray-600 leading-snug mt-0.5">
-                          {t('checkout.shipping.standardDeliveryDescription')}
-                        </div>
-                      </div>
-                    </label>
-                    <label
-                      className={`flex cursor-pointer items-start gap-3 border p-3 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
-                        deliverySpeed === 'express'
-                          ? `${CHECKOUT_OPTION_SELECTED_CHROME_CLASS}`
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        {...register('deliverySpeed')}
-                        value="express"
-                        checked={deliverySpeed === 'express'}
-                        onChange={(e) =>
-                          setValue('deliverySpeed', e.target.value as 'standard' | 'express', {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                          })
-                        }
-                        className={`mt-0.5 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
-                        disabled={isSubmitting}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-gray-900">
-                          {t('checkout.shipping.expressDelivery')}
-                        </div>
-                        <div className="text-xs text-gray-600 leading-snug mt-0.5">
-                          {t('checkout.shipping.expressDeliveryDescription')}
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              )}
-            </div>
+              <input
+                type="radio"
+                {...register('shippingMethod')}
+                value="delivery"
+                checked={shippingMethod === 'delivery'}
+                onChange={(e) =>
+                  setValue('shippingMethod', e.target.value as 'pickup' | 'delivery', {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+                className={`mr-4 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
+                disabled={isSubmitting}
+              />
+              <div className="flex-1">
+                <div className="font-medium text-gray-900">{t('checkout.shipping.delivery')}</div>
+                <div className="text-sm text-gray-600">{t('checkout.shipping.deliveryDescription')}</div>
+              </div>
+            </label>
           ) : (
             <p
               className={`border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
@@ -329,43 +244,46 @@ export function CheckoutForm({
                     shouldDirty: true,
                   })
                 }
-                className={`mr-4 ${CHECKOUT_RADIO_ACCENT_CLASS}`}
+                className={`mr-4 shrink-0 self-center ${CHECKOUT_RADIO_ACCENT_CLASS}`}
                 disabled={isSubmitting}
               />
-              <div className="flex items-center gap-4 flex-1">
-                <div className="relative w-20 h-12 flex-shrink-0 bg-white rounded border border-gray-200 flex items-center justify-center overflow-hidden">
-                  {!method.logo || logoErrors[method.id] ? (
-                    <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                  ) : (
-                    <img
-                      src={method.logo}
-                      alt={method.name}
-                      className={
-                        method.id === 'arca'
-                          ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_ARCA
-                          : method.id === 'aparik'
-                            ? CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK
-                            : CHECKOUT_PAYMENT_LOGO_IMG_CLASS
-                      }
-                      loading="lazy"
-                      onError={() => {
-                        setLogoErrors((prev) => ({ ...prev, [method.id]: true }));
+              {method.id === 'arca' ? (
+                <div className="flex min-w-0 flex-1 flex-col items-start gap-2 md:flex-row md:items-center md:gap-3">
+                  <div className="min-w-0 w-full md:order-2 md:flex-1">
+                    <div className="font-medium text-gray-900">{method.name}</div>
+                    <div className="hidden text-sm leading-snug text-gray-600 md:block">
+                      {method.description}
+                    </div>
+                  </div>
+                  <div className="md:order-1">
+                    <CheckoutPaymentMethodLogo
+                      methodId={method.id}
+                      logo={method.logo}
+                      name={method.name}
+                      logoErrors={logoErrors}
+                      onLogoError={(methodId) => {
+                        setLogoErrors((prev) => ({ ...prev, [methodId]: true }));
                       }}
                     />
-                  )}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">{method.name}</div>
-                  <div className="text-sm text-gray-600">{method.description}</div>
+              ) : (
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <CheckoutPaymentMethodLogo
+                    methodId={method.id}
+                    logo={method.logo}
+                    name={method.name}
+                    logoErrors={logoErrors}
+                    onLogoError={(methodId) => {
+                      setLogoErrors((prev) => ({ ...prev, [methodId]: true }));
+                    }}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-gray-900">{method.name}</div>
+                    <div className="hidden text-sm leading-snug text-gray-600 md:block">{method.description}</div>
+                  </div>
                 </div>
-              </div>
+              )}
             </label>
           ))}
         </div>

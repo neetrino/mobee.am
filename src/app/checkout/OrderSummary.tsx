@@ -57,16 +57,6 @@ export function OrderSummary({
   const isAparikIntent = purchaseIntent === 'aparik';
   const checkoutBlocked = !isAparikIntent && shippingMethod === 'delivery' && requiresRegionalQuote;
 
-  const deliveryTypeSuffix =
-    shippingMethod === 'delivery' &&
-    deliveryPrice !== null &&
-    !requiresRegionalQuote &&
-    !loadingDeliveryPrice
-      ? deliverySpeed === 'express'
-        ? ` · ${t('checkout.summary.shippingExpress')}`
-        : ` · ${t('checkout.summary.shippingStandard')}`
-      : '';
-
   const shippingLabel =
     shippingMethod === 'pickup'
       ? t('checkout.shipping.freePickup')
@@ -76,8 +66,8 @@ export function OrderSummary({
           ? t('checkout.summary.regionalQuotePending')
           : deliveryPrice !== null
             ? deliveryPrice === 0
-              ? `${t('checkout.shipping.freeDelivery')}${deliveryTypeSuffix}`
-              : `${formatPriceInCurrency(orderSummary.shippingDisplay, currency)}${deliveryTypeSuffix}` +
+              ? t('checkout.shipping.freeDelivery')
+              : `${formatPriceInCurrency(orderSummary.shippingDisplay, currency)}` +
                 (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
             : t('checkout.placeholders.selectCity');
 

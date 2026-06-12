@@ -31,7 +31,7 @@ export function PurchaseIntentSection({
   return (
     <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS} data-purchase-intent-section>
       <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.purchaseIntent.title')}</h2>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <label
           className={`flex min-w-0 cursor-pointer items-center border-2 p-4 transition-all ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${
             purchaseIntent === 'buy_now'

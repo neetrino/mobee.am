@@ -97,7 +97,6 @@ export default function CheckoutPage() {
             shippingMethod={shippingMethod}
             shippingCity={shippingCity}
             deliveryAvailable={deliveryAvailable}
-            deliverySpeed={deliverySpeed}
             paymentMethod={paymentMethod}
             paymentMethods={paymentMethods}
             logoErrors={logoErrors}

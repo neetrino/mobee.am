@@ -131,9 +131,7 @@ export function useCheckout() {
   }, [purchaseIntent, shippingMethod, paymentMethod, setValue]);
 
   useEffect(() => {
-    if (shippingMethod === 'pickup') {
-      setValue('deliverySpeed', 'standard');
-    }
+    setValue('deliverySpeed', 'standard', { shouldValidate: false });
   }, [shippingMethod, setValue]);
 
   useEffect(() => {
