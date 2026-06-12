@@ -15,7 +15,8 @@ export type HomeCategoryStripPayload = {
 };
 
 function buildHomeStripCacheKey(lang: string): string {
-  return `categories:home-strip:${lang}`;
+  // v2: bust stale en cache after home-strip category i18n migration (20260612100000).
+  return `categories:home-strip:v2:${lang}`;
 }
 
 /**
