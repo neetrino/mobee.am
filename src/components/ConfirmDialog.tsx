@@ -1,12 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../lib/i18n-client';
-import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
+import { useAnimatedModalDismiss } from '../lib/useAnimatedModalDismiss';
 
 /** Mobee-styled confirm (aligns with Toast / primary #2DB2FF). */
-const CONFIRM_DIALOG_OVERLAY_CLASS =
-  'fixed inset-0 z-[110] flex items-center justify-center bg-black/40 p-4' as const;
+const CONFIRM_DIALOG_ROOT_CLASS = 'fixed inset-0 z-[110] flex items-center justify-center p-4' as const;
 const CONFIRM_DIALOG_PANEL_CLASS =
   'w-full max-w-md rounded-[14px] border border-[#2DB2FF]/35 bg-white p-6 shadow-xl ring-1 ring-[#2DB2FF]/15' as const;
 
@@ -46,13 +45,20 @@ export function confirmDialog(options: ConfirmDialogOptions): Promise<boolean> {
 export function ConfirmDialogContainer() {
   const { t } = useTranslation();
   const [active, setActive] = useState<Queued | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const isClosingRef = useRef(false);
 
   const pump = useCallback(() => {
     setActive((prev) => {
       if (prev !== null) {
         return prev;
       }
-      return queue.shift() ?? null;
+      const next = queue.shift() ?? null;
+      if (next) {
+        isClosingRef.current = false;
+        setIsOpen(true);
+      }
+      return next;
     });
   }, []);
 
@@ -63,24 +69,56 @@ export function ConfirmDialogContainer() {
     };
   }, [pump]);
 
-  const finish = useCallback((result: boolean) => {
+  const {
+    isVisible,
+    requestClose,
+    handlePanelAnimationEnd,
+    backdropMotionClass,
+    panelMotionClass,
+  } = useAnimatedModalDismiss({
+    isOpen,
+    onClose: () => setIsOpen(false),
+    lockBodyScroll: true,
+    panelMotionVariant: 'dialog',
+  });
+
+  const advanceQueueAfterClose = useCallback(() => {
+    isClosingRef.current = false;
     setActive((prev) => {
-      if (prev) {
-        prev.resolve(result);
+      if (prev === null) {
+        return null;
       }
-      return queue.shift() ?? null;
+      const next = queue.shift() ?? null;
+      if (next) {
+        setIsOpen(true);
+      }
+      return next;
     });
   }, []);
 
   useEffect(() => {
-    if (!active) {
+    if (isVisible || !isClosingRef.current) {
       return;
     }
-    return acquireBodyScrollLock();
-  }, [active]);
+    advanceQueueAfterClose();
+  }, [isVisible, advanceQueueAfterClose]);
+
+  const finish = useCallback(
+    (result: boolean) => {
+      setActive((prev) => {
+        if (prev) {
+          prev.resolve(result);
+        }
+        return prev;
+      });
+      isClosingRef.current = true;
+      requestClose();
+    },
+    [requestClose],
+  );
 
   useEffect(() => {
-    if (!active) {
+    if (!isVisible) {
       return;
     }
     const onKeyDown = (event: KeyboardEvent) => {
@@ -90,9 +128,9 @@ export function ConfirmDialogContainer() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [active, finish]);
+  }, [isVisible, finish]);
 
-  if (!active) {
+  if (!isVisible || !active) {
     return null;
   }
 
@@ -106,10 +144,10 @@ export function ConfirmDialogContainer() {
     : 'rounded-[14px] bg-[#2DB2FF] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2DB2FF]/40';
 
   return (
-    <div className={CONFIRM_DIALOG_OVERLAY_CLASS} role="presentation">
+    <div className={CONFIRM_DIALOG_ROOT_CLASS} role="presentation">
       <button
         type="button"
-        className="absolute inset-0 cursor-default"
+        className={`absolute inset-0 cursor-default bg-black/40 ${backdropMotionClass}`}
         aria-label={cancelText}
         onClick={() => finish(false)}
       />
@@ -118,8 +156,9 @@ export function ConfirmDialogContainer() {
         aria-modal="true"
         {...(options.title ? { 'aria-labelledby': 'confirm-dialog-title' } : {})}
         aria-describedby="confirm-dialog-message"
-        className={`relative ${CONFIRM_DIALOG_PANEL_CLASS}`}
+        className={`relative ${CONFIRM_DIALOG_PANEL_CLASS} ${panelMotionClass}`}
         onClick={(e) => e.stopPropagation()}
+        onAnimationEnd={handlePanelAnimationEnd}
       >
         {options.title ? (
           <h2 id="confirm-dialog-title" className="text-lg font-semibold text-gray-900">

@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import { useTranslation } from '../lib/i18n-client';
+import { PAYMENT_ICON_SRC, UI_ICONS_BASE } from '../lib/constants/ui-icons.constants';
 
-const FOOTER_PAYMENT_IMAGE_BASE = '/images/footer/payments';
+const FOOTER_PAYMENT_IMAGE_BASE = `${UI_ICONS_BASE}/payments`;
 
 /** Figma mobee-new node 211:2265 — payment methods row in first footer column. */
 const PAYMENT_CHIP_HEIGHT_PX = 30;
@@ -24,8 +25,17 @@ const PAYMENT_TILES: readonly PaymentTile[] = [
   { file: 'visa', chipWidthClass: 'w-[73px]', imgWidth: 48, imgHeight: 22 },
 ];
 
+function resolvePaymentLogoSrc(file: string): string {
+  const mapped: Record<string, string> = {
+    idram: PAYMENT_ICON_SRC.idram,
+    arca: PAYMENT_ICON_SRC.arca,
+    visa: PAYMENT_ICON_SRC.visa,
+  };
+  return mapped[file] ?? `${FOOTER_PAYMENT_IMAGE_BASE}/${file}.webp`;
+}
+
 function PaymentLogoChip({ tile }: { tile: PaymentTile }) {
-  const src = `${FOOTER_PAYMENT_IMAGE_BASE}/${tile.file}.png`;
+  const src = resolvePaymentLogoSrc(tile.file);
   return (
     <div
       className={`flex ${tile.chipWidthClass} shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#f6f7f9]`}

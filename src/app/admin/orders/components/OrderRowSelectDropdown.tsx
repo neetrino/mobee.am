@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MutableRefObject, type RefObject } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type AnimationEvent, type MutableRefObject, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
+import { useAnimatedFlyoutDismiss } from '../../../../lib/useAnimatedFlyoutDismiss';
 import {
   ORDERS_FILTER_DROPDOWN_FLYOUT_MAX_WIDTH_CLASS,
   ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS,
@@ -84,9 +85,20 @@ interface PortalListboxProps {
   onPick: (next: string) => void;
   portalRef: MutableRefObject<HTMLDivElement | null>;
   position: { top: number; left: number; width: number };
+  flyoutMotionClass: string;
+  onFlyoutAnimationEnd: (event: AnimationEvent<HTMLDivElement>) => void;
 }
 
-function PortalListbox({ id, value, options, onPick, portalRef, position }: PortalListboxProps) {
+function PortalListbox({
+  id,
+  value,
+  options,
+  onPick,
+  portalRef,
+  position,
+  flyoutMotionClass,
+  onFlyoutAnimationEnd,
+}: PortalListboxProps) {
   const setPortalEl = useCallback(
     (el: HTMLDivElement | null) => {
       portalRef.current = el;
@@ -104,7 +116,7 @@ function PortalListbox({ id, value, options, onPick, portalRef, position }: Port
         minWidth: position.width,
       }}
     >
-      <div id={`${id}-listbox`} role="listbox" className={ORDERS_FILTER_DROPDOWN_PANEL_CLASS}>
+      <div id={`${id}-listbox`} role="listbox" className={`${ORDERS_FILTER_DROPDOWN_PANEL_CLASS} ${flyoutMotionClass}`} onAnimationEnd={onFlyoutAnimationEnd}>
         {options.map((opt) => {
           const active = opt.value === value;
           return (
@@ -144,6 +156,7 @@ export function OrderRowSelectDropdown({
   const rootRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const dismiss = useCallback(() => setIsOpen(false), []);
+  const { isVisible, flyoutMotionClass, handleFlyoutAnimationEnd } = useAnimatedFlyoutDismiss(isOpen);
 
   const dismissExtraRefs = useMemo(
     () => [portalRef as RefObject<HTMLElement | null>],
@@ -169,7 +182,7 @@ export function OrderRowSelectDropdown({
     : 'max-w-full min-w-0';
 
   useLayoutEffect(() => {
-    if (!isOpen) {
+    if (!isVisible) {
       setPortalPosition(null);
       return;
     }
@@ -188,7 +201,7 @@ export function OrderRowSelectDropdown({
       window.removeEventListener('resize', updatePosition);
       document.removeEventListener('scroll', updatePosition, true);
     };
-  }, [isOpen]);
+  }, [isVisible]);
 
   return (
     <div ref={rootRef} className="relative w-max max-w-full min-w-0">
@@ -197,7 +210,7 @@ export function OrderRowSelectDropdown({
         id={`${id}-trigger`}
         aria-controls={`${id}-listbox`}
         className={`relative flex h-auto min-h-5 items-center justify-center overflow-hidden rounded-supersudo px-2.5 py-1.5 text-center text-xs font-medium ring-1 ring-black/5 transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-admin active:opacity-90 ${triggerTintClassName} ${triggerSizingClassName}`}
-        aria-expanded={isOpen}
+        aria-expanded={isVisible}
         aria-haspopup="listbox"
         aria-label={ariaLabel}
         onClick={() => setIsOpen((o) => !o)}
@@ -206,7 +219,7 @@ export function OrderRowSelectDropdown({
           {displayLabel}
         </span>
         <span
-          className={`${ORDER_ROW_DROPDOWN_CHEVRON_WRAP_CLASS} absolute right-1.5 top-1/2 z-[1] -translate-y-1/2 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+          className={`${ORDER_ROW_DROPDOWN_CHEVRON_WRAP_CLASS} absolute right-1.5 top-1/2 z-[1] -translate-y-1/2 ${isVisible ? 'rotate-180' : 'rotate-0'}`}
           aria-hidden
         >
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -220,7 +233,7 @@ export function OrderRowSelectDropdown({
           </svg>
         </span>
       </button>
-      {isOpen && portalPosition
+      {isVisible && portalPosition
         ? createPortal(
             <PortalListbox
               id={id}
@@ -229,6 +242,8 @@ export function OrderRowSelectDropdown({
               onPick={handlePick}
               portalRef={portalRef}
               position={portalPosition}
+              flyoutMotionClass={flyoutMotionClass}
+              onFlyoutAnimationEnd={handleFlyoutAnimationEnd}
             />,
             document.body,
           )

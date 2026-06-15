@@ -1,52 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import { LANGUAGES, type LanguageCode, getStoredLanguage, setStoredLanguage } from '../lib/language';
+import { LanguageFlagIcon } from './LanguageFlagIcon';
 
 const ChevronDownIcon = () => (
   <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
-
-// Language icons/flags
-const getLanguageIcon = (code: LanguageCode): React.ReactNode => {
-  const icons: Record<LanguageCode, React.ReactNode> = {
-    en: (
-      <Image
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg/1024px-Flag_of_the_United_Kingdom_%283-5%29.svg.png"
-        alt="English"
-        width={25}
-        height={25}
-        className="rounded"
-        unoptimized
-      />
-    ),
-    hy: (
-      <Image
-        src="https://janarmenia.com/uploads/0000/83/2022/04/28/anthem-armenia.jpg"
-        alt="Armenian"
-        width={25}
-        height={25}
-        className="rounded"
-        unoptimized
-      />
-    ),
-    ru: (
-      <Image
-        src="https://flagfactoryshop.com/image/cache/catalog/products/flags/national/mockups/russia_coa-600x400.jpg"
-        alt="Russian"
-        width={25}
-        height={25}
-        className="rounded"
-        unoptimized
-      />
-    ),
-    ka: '🌐', // Georgian - fallback icon since it's not displayed in header
-  };
-  return icons[code] || '🌐';
-};
 
 // Language colors for better visual distinction
 const getLanguageColor = (code: LanguageCode, isActive: boolean): string => {
@@ -55,7 +17,7 @@ const getLanguageColor = (code: LanguageCode, isActive: boolean): string => {
       en: 'bg-blue-50 border-blue-200',
       hy: 'bg-orange-50 border-orange-200',
       ru: 'bg-red-50 border-red-200',
-      ka: 'bg-gray-100 border-gray-200', // Georgian - fallback color since it's not displayed in header
+      ka: 'bg-gray-100 border-gray-200',
     };
     return colors[code] || 'bg-gray-100 border-gray-200';
   }
@@ -142,7 +104,7 @@ export function LanguageSwitcherHeader() {
         className="flex items-center gap-1 sm:gap-2 bg-transparent md:bg-white px-2 sm:px-3 py-1.5 sm:py-2 text-gray-800 transition-colors"
       >
         <span className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-base sm:text-lg leading-none">
-          {getLanguageIcon(currentLang)}
+          <LanguageFlagIcon code={currentLang} />
         </span>
         <span className="text-xs sm:text-sm font-medium">{LANGUAGES[currentLang].name}</span>
         <ChevronDownIcon />
@@ -153,7 +115,6 @@ export function LanguageSwitcherHeader() {
             .filter((lang) => lang.code !== 'ka') // Exclude Georgian (ka) from header
             .map((lang) => {
             const isActive = currentLang === lang.code;
-            const icon = getLanguageIcon(lang.code);
             const colorClass = getLanguageColor(lang.code, isActive);
             
             return (
@@ -168,7 +129,9 @@ export function LanguageSwitcherHeader() {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl flex-shrink-0">{icon}</span>
+                  <span className="flex-shrink-0">
+                    <LanguageFlagIcon code={lang.code} />
+                  </span>
                   <div className="flex-1 flex items-center justify-between">
                     <span className={isActive ? 'font-semibold' : 'font-medium'}>
                       {lang.nativeName}
@@ -186,4 +149,3 @@ export function LanguageSwitcherHeader() {
     </div>
   );
 }
-

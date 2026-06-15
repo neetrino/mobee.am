@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import type { SVGAttributes } from 'react';
+import { FOOTER_SOCIAL_FACEBOOK_ICON_SRC } from '../../lib/constants/ui-icons.constants';
 
 type GlyphProps = Omit<SVGAttributes<SVGSVGElement>, 'children'>;
 
 /** Slightly inset from 24px row so strokes are not clipped at DPR boundaries. */
 const GLYPH_CLASS = 'block h-[22px] w-[22px] shrink-0 text-black';
 
-const FOOTER_SOCIAL_FACEBOOK_SRC = '/images/footer/social-facebook-black.png';
+const FOOTER_SOCIAL_FACEBOOK_SRC = FOOTER_SOCIAL_FACEBOOK_ICON_SRC;
 /** Figma mobee-new `facebook-black` export (node 582:781). */
 const FOOTER_SOCIAL_FACEBOOK_INTRINSIC_PX = 24;
 

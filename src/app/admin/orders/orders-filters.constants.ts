@@ -29,6 +29,17 @@ export const ORDERS_FILTER_DROPDOWN_OPTION_CLASS =
 
 export const ORDERS_FILTER_DROPDOWN_OPTION_ACTIVE_CLASS = 'bg-admin-50 font-semibold text-admin-800';
 
+/** Mobee form field select trigger (`/supersudo/delivery`, products stock filter). */
+export const ADMIN_FORM_SELECT_TRIGGER_CLASS =
+  'flex w-full min-w-0 flex-nowrap items-center justify-between gap-2 rounded-supersudo border border-gray-300 bg-white px-4 py-2.5 text-left text-sm text-gray-900 shadow-sm transition-opacity hover:bg-gray-50/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-admin disabled:cursor-not-allowed disabled:opacity-60';
+
+export const ADMIN_FORM_SELECT_CHEVRON_WRAP_CLASS =
+  'flex h-6 w-6 shrink-0 items-center justify-center text-gray-600 transition-transform duration-200 ease-out motion-reduce:transition-none';
+
+export const ADMIN_FORM_SELECT_PLACEHOLDER_TEXT_CLASS = 'text-gray-500';
+
+export const ADMIN_FORM_SELECT_VALUE_TEXT_CLASS = 'text-gray-800';
+
 /** Portaled order-row status/payment listbox — above table rows and typical admin chrome. */
 export const ORDER_ROW_SELECT_PORTAL_Z_INDEX_CLASS = 'z-[280]';
 

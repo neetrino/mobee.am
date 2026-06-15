@@ -4,6 +4,25 @@ export const ADMIN_SIDEBAR_DESKTOP_WIDTH_FULL_CLASS = 'w-64';
 /** Desktop admin sidebar: collapsed icon rail width (Tailwind class). */
 export const ADMIN_SIDEBAR_DESKTOP_WIDTH_ICON_RAIL_CLASS = 'w-16';
 
+/** Smooth width transition when toggling desktop sidebar (lg+). */
+export const ADMIN_SIDEBAR_DESKTOP_WIDTH_TRANSITION_CLASS =
+  'transition-[width] duration-300 ease-in-out motion-reduce:transition-none';
+
+/** Smooth padding transition on sidebar nav shell. */
+export const ADMIN_SIDEBAR_NAV_SHELL_TRANSITION_CLASS =
+  'transition-[padding] duration-300 ease-in-out motion-reduce:transition-none';
+
+/** Smooth layout shift for main column when sidebar toggles. */
+export const ADMIN_PAGE_MAIN_LAYOUT_TRANSITION_CLASS =
+  'transition-[padding,transform] duration-300 ease-in-out motion-reduce:transition-none';
+
+/** Fade/slide labels and header chrome during sidebar collapse. */
+export const ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS =
+  'transition-all duration-300 ease-in-out motion-reduce:transition-none';
+
+export const ADMIN_SIDEBAR_HEADER_FADE_TRANSITION_CLASS =
+  'transition-all duration-300 ease-in-out motion-reduce:transition-none';
+
 /**
  * Figma mobee-new node 178:526 (Overlay+Shadow) — elevation on collapsed home mark.
  * Matches design dev mode shadow stack.

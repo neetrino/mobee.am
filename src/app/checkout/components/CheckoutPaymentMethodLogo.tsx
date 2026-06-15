@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { PaymentMethodId } from '../utils/payment-methods';
+import { PAYMENT_ICON_SRC } from '../../../lib/constants/ui-icons.constants';
 import {
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS,
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK,
@@ -37,9 +38,9 @@ interface CheckoutPaymentMethodLogoProps {
 }
 
 const CARD_BRAND_LOGOS = [
-  { id: 'visa', src: '/assets/payments/visa.png', alt: 'Visa' },
-  { id: 'mastercard', src: '/assets/payments/mastercard.png', alt: 'Mastercard' },
-  { id: 'arca', src: '/assets/payments/arca.png', alt: 'ArCa' },
+  { id: 'visa', src: PAYMENT_ICON_SRC.visa, alt: 'Visa' },
+  { id: 'mastercard', src: PAYMENT_ICON_SRC.mastercard, alt: 'Mastercard' },
+  { id: 'arca', src: PAYMENT_ICON_SRC.arca, alt: 'ArCa' },
 ] as const;
 
 function PaymentFallbackIcon() {
