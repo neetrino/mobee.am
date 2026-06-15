@@ -94,6 +94,36 @@
     animation: fade-out 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
+  @keyframes admin-filter-flyout-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes admin-filter-flyout-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  .animate-admin-filter-flyout-in {
+    animation: admin-filter-flyout-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .animate-admin-filter-flyout-out {
+    animation: admin-filter-flyout-out 0.16s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
   @keyframes mobile-drawer-backdrop-in {
     from {
       opacity: 0;
@@ -261,6 +291,8 @@
 
     .animate-fade-in,
     .animate-fade-out,
+    .animate-admin-filter-flyout-in,
+    .animate-admin-filter-flyout-out,
     .animate-mobile-drawer-backdrop-in,
     .animate-mobile-drawer-backdrop-out,
     .animate-mobile-drawer-panel-in,

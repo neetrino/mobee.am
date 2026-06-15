@@ -8,6 +8,7 @@ import {
   MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS,
   MOBILE_DRAWER_ADMIN_SUBMENU_HORIZONTAL_TRIM_CLASS,
 } from '../../../components/mobile-drawer-nav.constants';
+import { ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS } from '../admin-sidebar-layout.constants';
 import type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
 import { ProductsNavRow } from './AdminSidebarProductsNavRow';
 
@@ -73,32 +74,26 @@ function NavItemButton({ tab, isActive, onNavigate, presentation, desktopCollaps
     );
   }
 
-  if (desktopCollapsed) {
-    return (
-      <button
-        type="button"
-        onClick={onNavigate}
-        title={tab.label}
-        aria-label={tab.label}
-        className={`flex w-full items-center justify-center rounded-supersudo px-2 py-3 text-sm font-medium transition-all ${subTrimClass} ${
-          isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-        }`.trim()}
-      >
-        <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
-      </button>
-    );
-  }
+  const collapsedRail = presentation === 'desktopSidebar' && Boolean(desktopCollapsed);
 
   return (
     <button
       type="button"
       onClick={onNavigate}
-      className={`flex w-full items-center gap-3 rounded-supersudo px-4 py-3 text-left text-sm font-medium transition-all ${subTrimClass} ${
-        isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-      }`.trim()}
+      title={collapsedRail ? tab.label : undefined}
+      aria-label={collapsedRail ? tab.label : undefined}
+      className={`flex w-full items-center rounded-supersudo py-3 text-sm font-medium transition-all duration-300 ease-in-out motion-reduce:transition-none ${subTrimClass} ${
+        collapsedRail ? 'justify-center px-2' : 'gap-3 px-4 text-left'
+      } ${isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`.trim()}
     >
       <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
-      <span>{tab.label}</span>
+      <span
+        className={`truncate ${ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS} ${
+          collapsedRail ? 'max-w-0 opacity-0' : 'max-w-[12rem] opacity-100'
+        }`}
+      >
+        {tab.label}
+      </span>
     </button>
   );
 }

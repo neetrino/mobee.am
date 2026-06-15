@@ -7,6 +7,7 @@ import {
   ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS,
   ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS,
   ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS,
+  ADMIN_PAGE_MAIN_LAYOUT_TRANSITION_CLASS,
 } from '../admin-sidebar-layout.constants';
 import {
   readAdminSidebarDesktopCollapsedFromSession,
@@ -60,7 +61,7 @@ export function AdminPageShell({
           onDesktopCollapsedChange={setDesktopSidebarCollapsed}
         />
         <div
-          className={`flex-1 min-w-0 w-full mx-auto ${ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS} ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
+          className={`flex-1 min-w-0 w-full mx-auto ${ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS} ${ADMIN_PAGE_MAIN_LAYOUT_TRANSITION_CLASS} ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
             desktopSidebarCollapsed ? '' : (mainClassName ?? '')
           }`.trim()}
         >
