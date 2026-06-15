@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type AnimationEvent, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { useAnimatedFlyoutDismiss } from '../../../lib/useAnimatedFlyoutDismiss';
 import {
   ADMIN_FORM_SELECT_CHEVRON_WRAP_CLASS,
