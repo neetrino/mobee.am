@@ -1,6 +1,7 @@
 'use client';
 
 import type { PaymentMethodId } from '../utils/payment-methods';
+import { PAYMENT_ICON_SRC } from '../../../lib/constants/ui-icons.constants';
 import {
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS,
   CHECKOUT_PAYMENT_LOGO_IMG_CLASS_APARIK,
@@ -22,15 +23,15 @@ const sizeClasses = {
 
 const PAYMENT_LOGO: Record<PaymentMethodId, { src: string; alt: string }> = {
   cash_on_delivery: {
-    src: '/assets/payments/cash-on-delivery.png',
+    src: PAYMENT_ICON_SRC.cashOnDelivery,
     alt: 'Cash on delivery',
   },
   aparik: {
-    src: '/assets/payments/aparik.png',
+    src: PAYMENT_ICON_SRC.aparik,
     alt: 'Ապառիկ',
   },
-  arca: { src: '/assets/payments/arca.png', alt: 'ArCa' },
-  idram: { src: '/assets/payments/idram.png', alt: 'Idram' },
+  arca: { src: PAYMENT_ICON_SRC.arca, alt: 'ArCa' },
+  idram: { src: PAYMENT_ICON_SRC.idram, alt: 'Idram' },
 };
 
 export function PaymentMethodLogo({
