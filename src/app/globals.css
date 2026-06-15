@@ -225,7 +225,7 @@
   }
 
   .animate-storefront-dialog-modal-panel-in {
-    animation: modal-dialog-panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: modal-dialog-panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   .animate-storefront-dialog-modal-panel-out {
