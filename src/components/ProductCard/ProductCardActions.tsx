@@ -81,11 +81,11 @@ export function ProductCardActions({
   );
 
   const cornerIdleWishlist = homeProductGridCard
-    ? 'max-lg:border max-lg:border-gray-100 max-lg:bg-white max-lg:text-gray-900 max-lg:shadow-sm max-lg:hover:bg-gray-50 bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5] lg:bg-[#e8f0f8]'
+    ? 'max-lg:border-0 max-lg:bg-white max-lg:text-[#757575] max-lg:shadow-none max-lg:hover:bg-gray-50 bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5] lg:bg-[#e8f0f8]'
     : 'bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]';
 
   const cornerIdleCompare = homeProductGridCard
-    ? 'max-lg:border max-lg:border-gray-100 max-lg:bg-white max-lg:text-gray-900 max-lg:shadow-sm max-lg:hover:bg-gray-50 border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5] lg:border-transparent lg:bg-[#e8f0f8]'
+    ? 'max-lg:border-0 max-lg:bg-white max-lg:text-[#757575] max-lg:shadow-none max-lg:hover:bg-gray-50 border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5] lg:border-transparent lg:bg-[#e8f0f8]'
     : 'border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]';
 
   /** Home mobile: wishlist/compare a bit closer to the image right edge; other cards keep uniform `right-*` below `lg`. */
@@ -119,15 +119,22 @@ export function ProductCardActions({
         <button
           type="button"
           onClick={onCompareToggle}
-          className={`${gridCornerSize} flex shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
+          className={`${gridCornerSize} flex shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
+            homeProductGridCard ? 'max-lg:border-0 border-2' : 'border-2'
+          } ${
             isInCompare
-              ? 'border-transparent bg-white text-admin-500 shadow-md'
+              ? 'max-lg:border-transparent max-lg:bg-white border-transparent bg-white shadow-md'
               : cornerIdleCompare
           }`}
           title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
           aria-label={isInCompare ? t('common.ariaLabels.removeFromCompare') : t('common.ariaLabels.addToCompare')}
+          aria-pressed={isInCompare}
         >
-          <CompareIcon isActive={isInCompare} size={gridCornerIconCompare + 4} />
+          <CompareIcon
+            isActive={isInCompare}
+            size={gridCornerIconCompare + 4}
+            className={homeProductGridCard && !isInCompare ? 'max-lg:text-[#757575]' : undefined}
+          />
         </button>
       </div>
     );

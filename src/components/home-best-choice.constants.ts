@@ -83,7 +83,7 @@ export const HOME_CURATED_SECTION_DESKTOP_TITLE_CLASS =
  * Home curated rows: visible section title below `lg` (synced with carousel indicators).
  */
 export const HOME_CURATED_SECTION_MOBILE_TITLE_CLASS =
-  'text-xl font-bold leading-snug text-[#303030]' as const;
+  'text-lg font-bold leading-snug text-[#303030]' as const;
 
 /**
  * Home special-offers block: vertical offset from the featured (“Առաջարկված”) row above.

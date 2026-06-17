@@ -23,6 +23,8 @@ interface ProductCardInfoProps {
   omitBrandRow?: boolean;
   /** Home mobile grid — title at 12px regular on small screens. */
   titleSizeMobileFigma?: boolean;
+  /** Home mobile grid — overlapping color swatches. */
+  homeProductGridCard?: boolean;
 }
 
 /**
@@ -41,13 +43,14 @@ export function ProductCardInfo({
   hidePrice = false,
   omitBrandRow = false,
   titleSizeMobileFigma = false,
+  homeProductGridCard = false,
 }: ProductCardInfoProps) {
   const { t } = useTranslation();
 
   const paddingClass = (() => {
     if (hidePrice) {
       if (omitBrandRow) {
-        return 'px-3 pb-2 pt-2 max-lg:pt-4 lg:px-5 lg:pb-4 lg:pt-0';
+        return 'px-3 pb-0 pt-3 max-lg:flex max-lg:flex-col max-lg:gap-2.5 lg:px-5 lg:pb-4 lg:pt-0';
       }
       return isCompact
         ? 'px-3 pt-2 pb-2 max-lg:pt-4'
@@ -90,7 +93,11 @@ export function ProductCardInfo({
 
       {/* Available Colors */}
       {colors && colors.length > 0 && (
-        <ProductColors colors={colors} isCompact={isCompact} />
+        <ProductColors
+          colors={colors}
+          isCompact={isCompact}
+          homeProductGridCard={homeProductGridCard}
+        />
       )}
 
       {!hidePrice ? (

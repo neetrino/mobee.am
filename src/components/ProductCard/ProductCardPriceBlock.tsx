@@ -40,7 +40,7 @@ export function ProductCardPriceBlock({
         ) : null}
       </div>
       {homeProductGridCard ? (
-        <div className="hidden min-h-[14px] max-lg:block" aria-hidden={!showStrike}>
+        <div className="flex min-h-[14px] flex-col gap-[5px] max-lg:flex lg:hidden" aria-hidden={!showStrike}>
           {showStrike && listPrice != null ? (
             <span className="text-[10px] font-normal italic leading-tight text-[#8e8e93] line-through">
               {formatPrice(listPrice, currency)}

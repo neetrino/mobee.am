@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { AnimationEvent, CSSProperties, FormEvent, TransitionEvent } from 'react';
+import type { AnimationEvent, CSSProperties, FormEvent } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
-import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
+import { getStoredLanguage } from '../lib/language';
 import { useInstantSearch } from './hooks/useInstantSearch';
 import { useHeaderRoutePrefetch, prefetchHeaderHref } from './hooks/useHeaderRoutePrefetch';
 import { SearchDropdown } from './SearchDropdown';
@@ -22,26 +22,22 @@ import {
   HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
   HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE,
   HEADER_PRIMARY_PEEK_TRANSITION_MS,
-  getDockedBarTopMotionStyle,
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS,
   HEADER_STRIP_PADDING_Y,
-  MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS,
   MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS,
   MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS,
-  MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
 import { SiteBrandLogo } from './SiteBrandLogo';
-import { CompareIcon } from './icons/CompareIcon';
+import { MobileHeaderToolbar } from './MobileHeaderToolbar';
 import {
   getHeaderDropdownPanelMotionClass,
   HeaderSecondaryBar,
   useHeaderDropdownMotion,
 } from './HeaderSecondaryBar';
-import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.constants';
 import { useCategoriesTree } from './CategoriesTreeContext';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 import {
@@ -78,13 +74,6 @@ const montserrat = Montserrat({
   display: 'swap',
 });
 
-/** Right padding on pill so input clears the submit control (half-width overlap). */
-const MOBILE_HOME_SEARCH_PILL_RIGHT_PAD_CLASS = 'pr-28';
-/** Same height as pill (h-11); right edge flush with pill (absolute in wrapper). */
-const MOBILE_HOME_SEARCH_SUBMIT_CLASS =
-  'absolute right-0 top-1/2 z-10 flex h-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#2DB2FF] px-4 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-95 active:opacity-90';
-
-// Navigation links will be translated dynamically using useTranslation hook
 const primaryNavLinks = [
   { href: '/about', translationKey: 'common.navigation.about' },
   { href: '/contact', translationKey: 'common.navigation.contact' },
@@ -101,77 +90,12 @@ interface Category {
 const CATEGORY_MEGA_MENU_MAX_COLUMNS = 4;
 const CATEGORY_MEGA_MENU_MIN_COLUMN_WIDTH_PX = 150;
 
-// Icon Components
 const SearchIcon = () => (
   <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
     <path d="M15.5 15.5L19 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 );
-
-/** Globe stroke in 24×24 viewBox at 22px render: 2 * (24/22). */
-const MOBILE_GLOBE_STROKE_USER_UNITS = (2 * 24) / 22;
-
-/** Globe for mobile primary strip language control (inherits text color for strokes). */
-const GlobeLanguageIcon = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="shrink-0 text-black"
-    aria-hidden
-  >
-    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS} />
-    <path
-      d="M2 12h20"
-      stroke="currentColor"
-      strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS}
-      strokeLinecap="round"
-    />
-    <path
-      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-      stroke="currentColor"
-      strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS}
-    />
-  </svg>
-);
-
-const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
-
-const mobilePrimaryLangButtonClassName =
-  'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
-
-/** Mobile locale flyout — white card (no outer gray frame). */
-const MOBILE_LOCALE_MENU_PANEL_CLASS =
-  'absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),8rem)] origin-top-right overflow-hidden rounded-2xl border border-gray-200 bg-white py-0 shadow-xl ring-1 ring-black/5';
-
-const MOBILE_LOCALE_MENU_MOTION_IN_CLASS = 'animate-fade-in';
-const MOBILE_LOCALE_MENU_MOTION_OUT_CLASS = 'animate-fade-out';
-
-const MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS =
-  'border-b border-gray-100 bg-gray-50/80 px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500';
-
-const MOBILE_LOCALE_MENU_ROW_LANG =
-  'w-full px-3 py-2.5 text-center text-sm transition-colors duration-150';
-
-const MOBILE_LOCALE_MENU_ROW_CURRENCY =
-  'flex w-full items-center justify-center gap-2 px-3 py-2.5 text-sm transition-colors duration-150';
-
-function mobileLocaleMenuLangRowClass(active: boolean): string {
-  if (active) {
-    return `${MOBILE_LOCALE_MENU_ROW_LANG} bg-admin-50 font-semibold text-admin-800`;
-  }
-  return `${MOBILE_LOCALE_MENU_ROW_LANG} font-normal text-gray-800 hover:bg-admin-50/40`;
-}
-
-function mobileLocaleMenuCurrencyRowClass(active: boolean): string {
-  if (active) {
-    return `${MOBILE_LOCALE_MENU_ROW_CURRENCY} bg-admin-50 font-semibold text-admin-800`;
-  }
-  return `${MOBILE_LOCALE_MENU_ROW_CURRENCY} font-normal text-gray-800 hover:bg-admin-50/40`;
-}
 
 /**
  * Component that syncs search params with state
@@ -441,11 +365,8 @@ export function Header() {
   const searchDropdownOpenRef = useRef(false);
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
-  const mobileStrip1WrapRef = useRef<HTMLDivElement>(null);
-  const mobileStrip1Ref = useRef<HTMLDivElement>(null);
   const desktopPrimaryWrapRef = useRef<HTMLDivElement>(null);
   const desktopPrimaryRowRef = useRef<HTMLDivElement>(null);
-  const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
   const mobilePrimaryLangRef = useRef<HTMLDivElement>(null);
   const primaryStripRef = useRef<HTMLElement | null>(null);
@@ -454,17 +375,10 @@ export function Header() {
   const searchQueryForDockRef = useRef('');
   const [secondaryDocked, setSecondaryDocked] = useState(false);
   const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
-  const [mobileSearchDocked, setMobileSearchDocked] = useState(false);
-  const [mobileSearchFlowSpacerPx, setMobileSearchFlowSpacerPx] = useState(0);
   const [primaryBarPeekFromScrollUp, setPrimaryBarPeekFromScrollUp] = useState(false);
-  const [mobileStrip1HeightPx, setMobileStrip1HeightPx] = useState(0);
   const [desktopPrimaryBarHeightPx, setDesktopPrimaryBarHeightPx] = useState(0);
   const lastScrollYRef = useRef(0);
-  const prevMobileSearchDockedRef = useRef<boolean | null>(null);
-  const [mobileStripPeekMounted, setMobileStripPeekMounted] = useState(false);
-  const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
   const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
-  const [headerLayoutReady, setHeaderLayoutReady] = useState(false);
 
   const syncSecondaryDock = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -492,45 +406,12 @@ export function Header() {
     setSecondaryDocked(primaryScrolledPast && !blockDockForSearchUi);
   }, []);
 
-  const syncMobileSearchDock = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    if (window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY).matches) {
-      setMobileSearchDocked(false);
-      setMobileSearchFlowSpacerPx(0);
-      return;
-    }
-    const strip1Wrap = mobileStrip1WrapRef.current;
-    const searchWrap = mobileSearchWrapRef.current;
-    if (searchWrap) {
-      const h = Math.round(searchWrap.getBoundingClientRect().height);
-      if (h > 0) {
-        setMobileSearchFlowSpacerPx(h);
-      }
-    }
-    if (!strip1Wrap) {
-      return;
-    }
-    const stripScrolledPast = strip1Wrap.getBoundingClientRect().bottom <= 0;
-    const blockDockForSearchUi =
-      searchQueryForDockRef.current.trim().length > 0 || searchDropdownOpenRef.current;
-    setMobileSearchDocked(stripScrolledPast && !blockDockForSearchUi);
-  }, []);
-
   useLayoutEffect(() => {
-    const stripInner = mobileStrip1Ref.current;
     const desktopInner = desktopPrimaryRowRef.current;
     if (typeof ResizeObserver === 'undefined') {
       return;
     }
     const measure = () => {
-      if (stripInner) {
-        const h = Math.round(stripInner.getBoundingClientRect().height);
-        if (h > 0) {
-          setMobileStrip1HeightPx(h);
-        }
-      }
       if (desktopInner) {
         const h = Math.round(desktopInner.getBoundingClientRect().height);
         if (h > 0) {
@@ -540,9 +421,6 @@ export function Header() {
     };
     measure();
     const ro = new ResizeObserver(measure);
-    if (stripInner) {
-      ro.observe(stripInner);
-    }
     if (desktopInner) {
       ro.observe(desktopInner);
     }
@@ -565,36 +443,6 @@ export function Header() {
       ro.disconnect();
     };
   }, [syncSecondaryDock]);
-
-  useLayoutEffect(() => {
-    syncMobileSearchDock();
-    const searchWrap = mobileSearchWrapRef.current;
-    if (typeof ResizeObserver === 'undefined' || !searchWrap) {
-      setHeaderLayoutReady(true);
-      return;
-    }
-    const ro = new ResizeObserver(() => {
-      syncMobileSearchDock();
-    });
-    ro.observe(searchWrap);
-    setHeaderLayoutReady(true);
-    return () => {
-      ro.disconnect();
-    };
-  }, [syncMobileSearchDock]);
-
-  /**
-   * When the mobile search bar returns to the normal flow (no longer docked), drop peek state so a
-   * later dock does not reopen the strip without an intentional scroll-up gesture.
-   */
-  useEffect(() => {
-    if (prevMobileSearchDockedRef.current === true && mobileSearchDocked === false) {
-      setPrimaryBarPeekFromScrollUp(false);
-      setMobileStripPeekMounted(false);
-      setMobileStripPeekSlideIn(false);
-    }
-    prevMobileSearchDockedRef.current = mobileSearchDocked;
-  }, [mobileSearchDocked]);
 
   useEffect(() => {
     lastScrollYRef.current = window.scrollY;
@@ -620,7 +468,6 @@ export function Header() {
         setSearchDropdownOpen(false);
       }
       syncSecondaryDock();
-      syncMobileSearchDock();
       if (isDesktopLayout) {
         const primaryEl = primaryStripRef.current;
         if (primaryEl && primaryEl.getBoundingClientRect().bottom > 0) {
@@ -630,16 +477,13 @@ export function Header() {
     };
     const onResize = () => {
       syncSecondaryDock();
-      syncMobileSearchDock();
     };
     syncSecondaryDock();
-    syncMobileSearchDock();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
     const mq = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
     const onMq = () => {
       syncSecondaryDock();
-      syncMobileSearchDock();
     };
     mq.addEventListener('change', onMq);
     return () => {
@@ -647,60 +491,14 @@ export function Header() {
       window.removeEventListener('resize', onResize);
       mq.removeEventListener('change', onMq);
     };
-  }, [syncSecondaryDock, syncMobileSearchDock]);
+  }, [syncSecondaryDock]);
 
   useEffect(() => {
     setPrimaryBarPeekFromScrollUp(false);
-    setMobileStripPeekMounted(false);
-    setMobileStripPeekSlideIn(false);
     lastScrollYRef.current = typeof window !== 'undefined' ? window.scrollY : 0;
   }, [pathname]);
 
-  const mobileStripPeekActive = mobileSearchDocked && primaryBarPeekFromScrollUp;
   const desktopPrimaryPeekActive = secondaryDocked && primaryBarPeekFromScrollUp;
-
-  useEffect(() => {
-    if (!mobileStripPeekActive) {
-      setMobileStripPeekSlideIn(false);
-      return;
-    }
-    setMobileStripPeekMounted(true);
-    setMobileStripPeekSlideIn(false);
-    let innerId = 0;
-    const outerId = requestAnimationFrame(() => {
-      innerId = requestAnimationFrame(() => {
-        setMobileStripPeekSlideIn(true);
-      });
-    });
-    return () => {
-      cancelAnimationFrame(outerId);
-      cancelAnimationFrame(innerId);
-    };
-  }, [mobileStripPeekActive]);
-
-  const handleMobileStripPeekTransitionEnd = useCallback(
-    (event: TransitionEvent<HTMLDivElement>) => {
-      if (event.propertyName !== 'transform') {
-        return;
-      }
-      if (!mobileStripPeekActive && !mobileStripPeekSlideIn) {
-        setMobileStripPeekMounted(false);
-      }
-    },
-    [mobileStripPeekActive, mobileStripPeekSlideIn],
-  );
-
-  useEffect(() => {
-    if (mobileStripPeekActive || mobileStripPeekSlideIn || !mobileStripPeekMounted) {
-      return;
-    }
-    const timeoutId = window.setTimeout(() => {
-      setMobileStripPeekMounted(false);
-    }, HEADER_PRIMARY_PEEK_TRANSITION_MS);
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [mobileStripPeekActive, mobileStripPeekSlideIn, mobileStripPeekMounted]);
 
   const closeMobileLocaleMenu = useCallback(() => {
     setShowMobilePrimaryLangMenu((open) => {
@@ -800,8 +598,7 @@ export function Header() {
   useLayoutEffect(() => {
     searchQueryForDockRef.current = searchQuery;
     syncSecondaryDock();
-    syncMobileSearchDock();
-  }, [searchQuery, searchDropdownOpen, syncSecondaryDock, syncMobileSearchDock]);
+  }, [searchQuery, searchDropdownOpen, syncSecondaryDock]);
 
   const fetchCart = async () => {
     if (!isLoggedIn) {
@@ -1103,21 +900,11 @@ export function Header() {
     window.dispatchEvent(new Event('currency-updated'));
   };
 
-  /** In-flow placeholder for the fixed search row only; peeking strip1 height is reserved on its wrap. */
-  const mobileDockedHeaderSpacerPx =
-    mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? mobileSearchFlowSpacerPx : 0;
-
-  const mobileSearchPeekTopPx =
-    mobileStripPeekSlideIn && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0;
-  const mobileDockedSearchTopStyle: CSSProperties | undefined = mobileSearchDocked
-    ? { top: mobileSearchPeekTopPx, ...getDockedBarTopMotionStyle(mobileSearchPeekTopPx) }
-    : undefined;
-
   return (
     <div className={`relative z-50 ${montserrat.className}`}>
     <header
       ref={primaryStripRef}
-      className="overflow-visible border-b border-gray-200 bg-white lg:border-b-0"
+      className="overflow-visible bg-white max-lg:border-b-0 lg:border-b-0"
     >
       <Suspense fallback={null}>
         <HeaderSearchSync
@@ -1127,236 +914,41 @@ export function Header() {
         />
       </Suspense>
 
+      <MobileHeaderToolbar
+        t={t}
+        compareCount={compareCount}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchResults={searchResults}
+        searchLoading={searchLoading}
+        searchError={searchError}
+        searchDropdownOpen={searchDropdownOpen}
+        setSearchDropdownOpen={setSearchDropdownOpen}
+        searchSelectedIndex={searchSelectedIndex}
+        searchHandleKeyDown={searchHandleKeyDown}
+        handleSearch={handleSearch}
+        clearSearch={clearSearch}
+        routerPush={router.push}
+        showSearchModal={showSearchModal}
+        formRef={mobileHomeSearchFormRef}
+        inputRef={mobileHomeSearchInputRef}
+        localeContainerRef={mobilePrimaryLangRef}
+        localeMenuVisible={mobileLocaleMenuVisible}
+        localeMenuExiting={mobileLocaleMenuExiting}
+        selectedCurrency={selectedCurrency}
+        onToggleLocaleMenu={toggleMobileLocaleMenu}
+        onCloseLocaleMenu={closeMobileLocaleMenu}
+        onLocaleMenuAnimationEnd={handleMobileLocaleMenuAnimationEnd}
+        onCurrencyChange={handleCurrencyChange}
+        onOpenMenu={() => {
+          setShowCategoriesPillMenu(false);
+          closeMobileLocaleMenu();
+          openMobileMenu();
+        }}
+        mobileMenuOpen={mobileMenuOpen}
+      />
+
       <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        {/* Mobile — strip 1 scrolls away; strip 2 pins to viewport top once strip 1 has left */}
-        <div
-          ref={mobileStrip1WrapRef}
-          className="lg:hidden"
-          style={
-            mobileStripPeekMounted && mobileStrip1HeightPx > 0
-              ? { height: mobileStrip1HeightPx }
-              : undefined
-          }
-        >
-          <div
-            ref={mobileStrip1Ref}
-            onTransitionEnd={handleMobileStripPeekTransitionEnd}
-            className={`border-b border-gray-100 ${
-              mobileStripPeekMounted
-                ? `fixed left-0 right-0 top-0 z-[45] border-b border-gray-200 bg-white shadow-sm will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
-                    mobileStripPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
-                  }`
-                : ''
-            }`}
-            style={
-              mobileStripPeekMounted && headerLayoutReady
-                ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE }
-                : undefined
-            }
-          >
-          <div className="relative flex items-center justify-between gap-3 py-2.5">
-            <div className="relative z-20 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowCategoriesPillMenu(false);
-                  closeMobileLocaleMenu();
-                  openMobileMenu();
-                }}
-                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
-                aria-expanded={mobileMenuOpen}
-                aria-label={t('common.ariaLabels.openMenu')}
-              >
-                <span className={MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS} aria-hidden>
-                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
-                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
-                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
-                </span>
-              </button>
-            </div>
-            {/* Figma 180:1419 mark + 178:529 wordmark — center cluster like desktop */}
-            <Link
-              href="/"
-              className="absolute left-1/2 top-1/2 z-10 flex max-w-[min(220px,48vw)] -translate-x-1/2 -translate-y-1/2 shrink-0 items-center justify-center transition-opacity active:opacity-90"
-              aria-label={t('common.navigation.home')}
-            >
-              <SiteBrandLogo
-                decorative
-                alt={t('common.ariaLabels.siteLogo')}
-                heightClass="h-8"
-                priority
-              />
-            </Link>
-            <div className="relative z-20 shrink-0" ref={mobilePrimaryLangRef}>
-              <button
-                type="button"
-                onClick={toggleMobileLocaleMenu}
-                className={mobilePrimaryLangButtonClassName}
-                aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
-                aria-expanded={showMobilePrimaryLangMenu}
-                aria-haspopup="dialog"
-                aria-controls="header-mobile-locale-menu"
-              >
-                <GlobeLanguageIcon />
-              </button>
-              {mobileLocaleMenuVisible ? (
-                <div
-                  id="header-mobile-locale-menu"
-                  className={`${MOBILE_LOCALE_MENU_PANEL_CLASS} ${
-                    mobileLocaleMenuExiting
-                      ? MOBILE_LOCALE_MENU_MOTION_OUT_CLASS
-                      : MOBILE_LOCALE_MENU_MOTION_IN_CLASS
-                  }`}
-                  role="dialog"
-                  aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
-                  onAnimationEnd={handleMobileLocaleMenuAnimationEnd}
-                >
-                  <div className={MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} id="header-mobile-locale-lang-heading">
-                    {t('common.localeMenu.languageSection')}
-                  </div>
-                  <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-lang-heading">
-                    {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
-                      const active = getStoredLanguage() === code;
-                      const label = LANGUAGES[code].nativeName;
-                      return (
-                        <button
-                          key={code}
-                          type="button"
-                          onClick={() => {
-                            closeMobileLocaleMenu();
-                            if (!active) setStoredLanguage(code);
-                          }}
-                          className={mobileLocaleMenuLangRowClass(active)}
-                        >
-                          {label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div
-                    className={`${MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} border-t border-gray-200`}
-                    id="header-mobile-locale-currency-heading"
-                  >
-                    {t('common.localeMenu.currencySection')}
-                  </div>
-                  <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-currency-heading">
-                    {Object.values(CURRENCIES).map((currency) => {
-                      const active = selectedCurrency === currency.code;
-                      return (
-                        <button
-                          key={currency.code}
-                          type="button"
-                          onClick={() => {
-                            closeMobileLocaleMenu();
-                            if (!active) handleCurrencyChange(currency.code);
-                          }}
-                          className={mobileLocaleMenuCurrencyRowClass(active)}
-                        >
-                          <span>{currency.code}</span>
-                          <span className={active ? 'text-admin-700' : 'text-gray-500'}>{currency.symbol}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-          </div>
-        </div>
-
-        {headerLayoutReady && mobileDockedHeaderSpacerPx > 0 ? (
-          <div
-            aria-hidden
-            className="shrink-0 motion-reduce:transition-none lg:hidden"
-            style={{
-              height: mobileDockedHeaderSpacerPx,
-              ...HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
-            }}
-          />
-        ) : null}
-
-        <div
-          ref={mobileSearchWrapRef}
-          className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
-            headerLayoutReady && mobileSearchDocked
-              ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none'
-              : ''
-          }`}
-          style={headerLayoutReady ? mobileDockedSearchTopStyle : undefined}
-        >
-          <div className={headerLayoutReady && mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
-            <form
-              ref={mobileHomeSearchFormRef}
-              onSubmit={handleSearch}
-              className="relative min-w-0 w-full"
-              suppressHydrationWarning
-            >
-              <div className="relative w-full min-w-0">
-                <div
-                  className={`flex h-11 min-w-0 items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3 ${MOBILE_HOME_SEARCH_PILL_RIGHT_PAD_CLASS}`}
-                >
-                  <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <circle cx="11" cy="11" r="7" strokeWidth={2} />
-                      <path strokeLinecap="round" strokeWidth={2} d="M20 20l-4.3-4.3" />
-                    </svg>
-                  </span>
-                  <input
-                    ref={mobileHomeSearchInputRef}
-                    type="search"
-                    name="header-mobile-home-search"
-                    suppressHydrationWarning
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      if (e.target.value.trim().length >= 1) {
-                        setSearchDropdownOpen(true);
-                      } else {
-                        setSearchDropdownOpen(false);
-                      }
-                    }}
-                    onFocus={() => {
-                      if (searchQuery.trim().length >= 1) {
-                        setSearchDropdownOpen(true);
-                      }
-                    }}
-                    onKeyDown={searchHandleKeyDown}
-                    placeholder={t('common.mainHeader.searchPlaceholder')}
-                    autoComplete="off"
-                    className={`min-w-0 flex-1 bg-transparent ${MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS} text-gray-900 outline-none placeholder:text-[#6b7280]`}
-                    aria-controls="header-mobile-search-results"
-                    aria-expanded={searchDropdownOpen && searchResults.length > 0}
-                    aria-autocomplete="list"
-                  />
-                </div>
-                <button type="submit" className={MOBILE_HOME_SEARCH_SUBMIT_CLASS}>
-                  {t('common.buttons.search')}
-                </button>
-              </div>
-              {!showSearchModal ? (
-                <SearchDropdown
-                  listboxId="header-mobile-search-results"
-                  results={searchResults}
-                  loading={searchLoading}
-                  error={searchError}
-                  isOpen={searchDropdownOpen}
-                  selectedIndex={searchSelectedIndex}
-                  query={searchQuery}
-                  onResultClick={(result) => {
-                    router.push(`/products/${result.slug}`);
-                    clearSearch();
-                    setSearchDropdownOpen(false);
-                  }}
-                  onClose={() => setSearchDropdownOpen(false)}
-                  className="mt-1"
-                />
-              ) : null}
-            </form>
-          </div>
-        </div>
-
-        {/* Desktop — Figma spacing at 2xl; nav link gaps scale lg → xl (iPad Pro uses lg gap-4). */}
         <div
           ref={desktopPrimaryWrapRef}
           className="hidden motion-reduce:transition-none lg:block"
@@ -1574,34 +1166,6 @@ export function Header() {
                       </svg>
                     </Link>
                   ))}
-
-                  <Link
-                    href="/compare"
-                    prefetch
-                    onClick={closeMobileMenu}
-                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700 md:hidden`}
-                  >
-                    <span className="flex min-w-0 flex-1 items-center gap-2 normal-case font-medium text-gray-700">
-                      <CompareIcon size={18} className="shrink-0" />
-                      <span className="min-w-0 flex-1 text-pretty">{t('common.navigation.compare')}</span>
-                    </span>
-                    <span className="flex shrink-0 items-center gap-2">
-                      {compareCount > 0 ? (
-                        <span className={HEADER_NAV_COUNT_INLINE_BADGE_CLASS}>
-                          {compareCount > 99 ? '99+' : compareCount}
-                        </span>
-                      ) : null}
-                      <svg
-                        className="h-5 w-5 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        aria-hidden
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </Link>
 
                   <MobileDrawerSupportPhoneButtons />
                 </div>

@@ -20,7 +20,7 @@ type HomeMobileSectionTitleProps = {
 };
 
 const HOME_MOBILE_SECTION_TITLE_ROOT_DEFAULT =
-  'flex items-center justify-between px-4 pt-4 lg:hidden';
+  'flex items-center justify-between pt-4 lg:hidden';
 
 const HOME_MOBILE_CAROUSEL_PAGE_ACTIVE_DOT_CLASS =
   'h-1 w-4 shrink-0 rounded-full bg-[#2db2ff]';

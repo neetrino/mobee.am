@@ -68,6 +68,18 @@ export const MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS =
 export const MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS =
   'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
 
+/** Figma Mobee-Dev-Neew mobile toolbar — 44×44 circular control beside search pill. */
+export const MOBILE_HEADER_TOOLBAR_ICON_BUTTON_SIZE_CLASS = 'h-11 w-11';
+
+/**
+ * Figma Mobee-Dev-Neew mobile toolbar — circular icon buttons beside the search pill (compare, globe, menu).
+ */
+export const MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS =
+  `relative flex ${MOBILE_HEADER_TOOLBAR_ICON_BUTTON_SIZE_CLASS} shrink-0 items-center justify-center rounded-full bg-[#f7f7f7] text-[#757575] transition-opacity active:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400`;
+
+/** @deprecated Use {@link MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS}. */
+export const MOBILE_HOME_TOOLBAR_ICON_BUTTON_CLASS = MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS;
+
 /** Same chrome as {@link MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS} with horizontal padding for a text label (e.g. `/supersudo` drawer trigger). */
 export const MOBILE_PRIMARY_MENU_OPEN_BUTTON_WITH_LABEL_CLASS =
   'flex h-10 shrink-0 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
