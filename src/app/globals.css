@@ -425,6 +425,54 @@
   margin-top: 0.25rem;
 }
 
+/* Product specs table (mobilecentre import) */
+.product-specs {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-top: 0.75rem;
+}
+
+.product-specs td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.product-specs .spec-label {
+  color: #6b7280;
+  width: 45%;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.product-specs .spec-value {
+  color: #111827;
+}
+
+.product-specs .specs-section td {
+  padding: 0.75rem 0.75rem 0.375rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  border-bottom: none;
+  padding-left: 0;
+}
+
+.product-specs tr:last-child td {
+  border-bottom: none;
+}
+
+.product-status {
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
 /* `/supersudo/settings` — online payments checkbox (white tick; no blue focus ring) */
 @layer components {
   .admin-settings-online-payments-checkbox {

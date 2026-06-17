@@ -12,11 +12,14 @@ export const PRODUCT_CARD_DISPLAY_IMAGE_SRC =
     : FALLBACK_PRODUCT_CARD_DISPLAY_SRC;
 
 /**
- * Temporary storefront override: every product uses `PRODUCT_CARD_DISPLAY_IMAGE_SRC`
- * (local `public/images/product-card-display.png` or `NEXT_PUBLIC_PRODUCT_CARD_DISPLAY_IMAGE_URL`).
+ * Returns the product's own image if available, otherwise falls back to the
+ * static display image.
  */
 export function resolveProductCardImageSrc(
-  _productImage: string | null | undefined,
+  productImage: string | null | undefined,
 ): string {
+  if (typeof productImage === "string" && productImage.trim().length > 0) {
+    return productImage.trim();
+  }
   return PRODUCT_CARD_DISPLAY_IMAGE_SRC;
 }
