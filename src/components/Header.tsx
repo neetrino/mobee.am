@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { AnimationEvent, CSSProperties, FormEvent } from 'react';
+import type { AnimationEvent, FormEvent } from 'react';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage } from '../lib/language';
@@ -21,7 +21,6 @@ import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
   HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
   HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE,
-  HEADER_PRIMARY_PEEK_TRANSITION_MS,
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS,
   HEADER_STRIP_PADDING_Y,

@@ -1,6 +1,6 @@
 'use client';
 
-import type { RefObject, Ref, FormEvent, AnimationEvent } from 'react';
+import type { Ref, AnimationEvent } from 'react';
 import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
 import type { CurrencyCode } from '../lib/currency';
 import { CURRENCIES } from '../lib/currency';

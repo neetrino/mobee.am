@@ -29,8 +29,10 @@ export function useMobileHeaderSearchDock({
   const [searchBarHeightPx, setSearchBarHeightPx] = useState(0);
   const [logoRowHeightPx, setLogoRowHeightPx] = useState(0);
 
-  searchDropdownOpenRef.current = searchDropdownOpen;
-  searchQueryRef.current = searchQuery;
+  useEffect(() => {
+    searchDropdownOpenRef.current = searchDropdownOpen;
+    searchQueryRef.current = searchQuery;
+  }, [searchDropdownOpen, searchQuery]);
 
   const syncDock = useCallback(() => {
     if (typeof window === 'undefined') {
