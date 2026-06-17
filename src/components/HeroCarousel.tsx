@@ -27,7 +27,7 @@ function MobileHeroIphoneBanner() {
 
   return (
     <div
-      className={`pb-2 pt-[calc(theme(spacing.4)*1.05+4px)] lg:hidden ${montserrat.className}`}
+      className={`pb-1 pt-2 lg:hidden ${montserrat.className}`}
     >
       <div className={HERO_MOBILE_CONTENT_GUTTERS_CLASS}>
         <div className="relative isolate min-h-[208px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-3 pt-5 sm:min-h-[220px]">

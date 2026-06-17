@@ -11,6 +11,9 @@ interface ProductCardPriceBlockProps {
   discountClass: string;
   homeProductGridCard?: boolean;
   showStrike?: boolean;
+  /** Home mobile grid — keep strike row height for aligned card footers. */
+  reserveMobileStrikeRow?: boolean;
+  className?: string;
 }
 
 export function ProductCardPriceBlock({
@@ -22,11 +25,19 @@ export function ProductCardPriceBlock({
   discountClass,
   homeProductGridCard = false,
   showStrike = false,
+  reserveMobileStrikeRow = false,
+  className = '',
 }: ProductCardPriceBlockProps) {
   return (
-    <div className="min-w-0 flex flex-col gap-0.5">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className={`whitespace-nowrap font-bold tabular-nums text-gray-900 ${priceClass}`}>
+    <div className={`min-w-0 flex flex-col gap-0.5 ${className}`}>
+      <div className="flex min-w-0 flex-wrap items-center gap-1">
+        <span
+          className={`font-bold tabular-nums text-gray-900 ${
+            homeProductGridCard
+              ? 'whitespace-nowrap max-lg:whitespace-normal max-lg:break-words'
+              : 'min-w-0 truncate'
+          } ${priceClass}`}
+        >
           {formatPrice(price || 0, currency)}
         </span>
         {discountPercent && discountPercent > 0 ? (
@@ -40,14 +51,16 @@ export function ProductCardPriceBlock({
         ) : null}
       </div>
       {homeProductGridCard ? (
-        <div className="hidden min-h-[14px] max-lg:block" aria-hidden={!showStrike}>
+        <div className="flex min-h-[14px] items-center max-lg:flex lg:hidden" aria-hidden={!showStrike && !reserveMobileStrikeRow}>
           {showStrike && listPrice != null ? (
             <span className="text-[10px] font-normal italic leading-tight text-[#8e8e93] line-through">
               {formatPrice(listPrice, currency)}
             </span>
-          ) : (
-            <span className="invisible block text-[10px] leading-tight">&nbsp;</span>
-          )}
+          ) : reserveMobileStrikeRow ? (
+            <span className="invisible text-[10px] leading-tight" aria-hidden>
+              &nbsp;
+            </span>
+          ) : null}
         </div>
       ) : null}
     </div>

@@ -54,10 +54,13 @@ export function ProductCardListingProvider({ children }: { children: ReactNode }
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useTranslation();
+  const [clientStorageReady, setClientStorageReady] = useState(false);
   const [wishlistVersion, setWishlistVersion] = useState(0);
   const [compareVersion, setCompareVersion] = useState(0);
 
   useEffect(() => {
+    setClientStorageReady(true);
+
     const onWishlistUpdate = () => setWishlistVersion((value) => value + 1);
     const onCompareUpdate = () => setCompareVersion((value) => value + 1);
     window.addEventListener('wishlist-updated', onWishlistUpdate);
@@ -71,17 +74,23 @@ export function ProductCardListingProvider({ children }: { children: ReactNode }
   const isInWishlist = useCallback(
     (productId: string) => {
       void wishlistVersion;
+      if (!clientStorageReady) {
+        return false;
+      }
       return isProductInWishlist(productId);
     },
-    [wishlistVersion],
+    [wishlistVersion, clientStorageReady],
   );
 
   const isInCompare = useCallback(
     (productId: string) => {
       void compareVersion;
+      if (!clientStorageReady) {
+        return false;
+      }
       return isProductIdInCompare(productId);
     },
-    [compareVersion],
+    [compareVersion, clientStorageReady],
   );
 
   const createWishlistToggle = useCallback(

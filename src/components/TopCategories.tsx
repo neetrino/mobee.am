@@ -106,7 +106,7 @@ export function TopCategories() {
   if (loading) {
     return (
       <section className={`bg-white ${montserrat.className}`} aria-hidden>
-        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-8 lg:pt-6 xl:pt-8`}>
+        <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-4 pt-3 lg:pb-8 lg:pt-6 xl:pt-8`}>
           <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} lg:hidden`}>
             {Array.from({ length: CATEGORY_STRIP_LOADING_SKELETON_COUNT }, (_, index) => (
               <div key={index} className="flex shrink-0 flex-col items-center gap-2">

@@ -18,6 +18,8 @@ interface ProductCardImageProps {
   squareImageFrame?: boolean;
   /** Eager load for above-the-fold grid cells (LCP on shop / home). */
   imageLoadPriority?: boolean;
+  /** Home mobile Figma — compact 143×91 image frame. */
+  homeProductGridCard?: boolean;
 }
 
 /**
@@ -33,14 +35,17 @@ export function ProductCardImage({
   shiftImageInFrame = false,
   squareImageFrame = true,
   imageLoadPriority = false,
+  homeProductGridCard = false,
 }: ProductCardImageProps) {
   const showPlaceholder = imageError;
   const imageSrc = resolveProductCardImageSrc(image);
   /** max-lg: frame 90% width vs desktop (171 / 212) so title clears the image on small screens. */
-  const frameClass = isCompact
-    ? "w-[171px] max-w-[84%] max-lg:w-[153.9px]"
-    : "w-[212px] max-w-[84%] max-lg:w-[190.8px]";
-  const aspectClass = squareImageFrame ? "aspect-square" : "aspect-[3/4]";
+  const frameClass = homeProductGridCard
+    ? 'h-[91px] w-[143px] max-w-full max-lg:h-[80px] max-lg:w-full max-lg:max-w-[130px]'
+    : isCompact
+      ? 'w-[171px] max-w-[84%] max-lg:w-[153.9px]'
+      : 'w-[212px] max-w-[84%] max-lg:w-[190.8px]';
+  const aspectClass = homeProductGridCard ? '' : squareImageFrame ? 'aspect-square' : 'aspect-[3/4]';
 
   return (
     <div className={`relative ${aspectClass} shrink-0 ${frameClass}`} data-cart-fly-source>
