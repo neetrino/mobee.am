@@ -50,7 +50,7 @@ export function ProductCardInfo({
   const paddingClass = (() => {
     if (hidePrice) {
       if (omitBrandRow) {
-        return 'px-3 pb-0 pt-3 max-lg:flex max-lg:flex-col max-lg:gap-2.5 lg:px-5 lg:pb-4 lg:pt-0';
+        return 'px-3 pb-0 pt-2 max-lg:flex max-lg:flex-col max-lg:gap-1 lg:px-5 lg:pb-4 lg:pt-0';
       }
       return isCompact
         ? 'px-3 pt-2 pb-2 max-lg:pt-4'

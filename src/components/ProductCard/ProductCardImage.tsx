@@ -41,7 +41,7 @@ export function ProductCardImage({
   const imageSrc = resolveProductCardImageSrc(image);
   /** max-lg: frame 90% width vs desktop (171 / 212) so title clears the image on small screens. */
   const frameClass = homeProductGridCard
-    ? 'h-[91px] w-[143px] max-w-none max-lg:h-[91px] max-lg:w-[143px]'
+    ? 'h-[91px] w-[143px] max-w-full max-lg:h-[80px] max-lg:w-full max-lg:max-w-[130px]'
     : isCompact
       ? 'w-[171px] max-w-[84%] max-lg:w-[153.9px]'
       : 'w-[212px] max-w-[84%] max-lg:w-[190.8px]';

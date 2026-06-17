@@ -14,6 +14,13 @@ import { useTranslation } from '../../lib/i18n-client';
 import type { CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
 import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
+import {
+  MOBILE_HOME_CARD_ADD_BUTTON_SIZE_CLASS,
+  MOBILE_HOME_CARD_FOOTER_ACTIONS_MIN_HEIGHT_CLASS,
+  MOBILE_HOME_CARD_FOOTER_GAP_CLASS,
+  MOBILE_HOME_CARD_INSTALLMENT_HEIGHT_CLASS,
+  MOBILE_HOME_CARD_PRICE_ROW_MIN_HEIGHT_CLASS,
+} from './product-card-mobile-home.constants';
 
 interface ProductCardGridProps {
   product: {
@@ -113,7 +120,7 @@ export function ProductCardGrid({
 
   /** Mobile Figma 1:3459 — compact image band with overlaid controls. */
   const imageStackClass = homeProductGridCard
-    ? 'relative shrink-0 max-lg:h-[100px] max-lg:min-h-[100px] max-lg:overflow-visible lg:h-[380px]'
+    ? 'relative shrink-0 max-lg:h-[100px] max-lg:min-h-[100px] max-lg:overflow-hidden lg:h-[380px]'
     : isCompact
       ? 'relative shrink-0 max-lg:min-h-[240px] lg:h-[380px]'
       : 'relative shrink-0 max-lg:min-h-[277px] lg:h-[380px]';
@@ -128,8 +135,8 @@ export function ProductCardGrid({
 
   const footerPad = homeProductGridCard
     ? isCompact
-      ? 'px-3 pb-3 max-lg:px-3 max-lg:pb-3 max-lg:pt-0'
-      : 'px-3 pb-3 max-lg:px-3 max-lg:pb-3 max-lg:pt-0 lg:px-5 lg:pb-5 lg:pt-[17px]'
+      ? 'px-3 pb-3 max-lg:px-3 max-lg:pb-3 max-lg:pt-1'
+      : 'px-3 pb-3 max-lg:px-3 max-lg:pb-3 max-lg:pt-1 lg:px-5 lg:pb-5 lg:pt-[17px]'
     : isCompact
       ? 'px-3 pb-3'
       : 'px-5 pb-5';
@@ -225,30 +232,6 @@ export function ProductCardGrid({
           titleSizeMobileFigma={homeProductGridCard}
           homeProductGridCard={homeProductGridCard}
         />
-        {homeProductGridCard ? (
-          <div className="flex items-center justify-between gap-2.5 px-3 pb-2 max-lg:flex lg:hidden">
-            <ProductCardPriceBlock
-              price={product.price}
-              currency={currency}
-              discountPercent={product.discountPercent}
-              listPrice={listPrice}
-              priceClass={mobileHomePriceClass}
-              discountClass={discountClass}
-              homeProductGridCard={homeProductGridCard}
-              showStrike={showStrike}
-            />
-            <ProductCardAddToCartButton
-              layout="mobileRound"
-              inStock={product.inStock}
-              isAddingToCart={isAddingToCart}
-              isCompact={isCompact}
-              title={addToCartLabel}
-              ariaLabel={addToCartAria}
-              addToCartLabel={t('common.buttons.addToCart')}
-              onAddToCart={onAddToCart}
-            />
-          </div>
-        ) : null}
         <div className={infoPricePad}>
           <ProductCardPriceBlock
             price={product.price}
@@ -265,15 +248,46 @@ export function ProductCardGrid({
       </div>
 
       <div
-        className={`shrink-0 flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-0 ${footerPad} ${
+        className={`mt-auto shrink-0 flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-0 ${footerPad} ${
           homeProductGridCard ? 'max-lg:gap-0' : ''
         }`}
       >
         {homeProductGridCard ? (
-          <div className="flex justify-center max-lg:flex lg:hidden">
+          <div
+            className={`flex w-full flex-col max-lg:flex lg:hidden ${MOBILE_HOME_CARD_FOOTER_GAP_CLASS} ${MOBILE_HOME_CARD_FOOTER_ACTIONS_MIN_HEIGHT_CLASS} max-lg:justify-end`}
+          >
+            <div
+              className={`flex w-full items-start justify-between gap-2 ${MOBILE_HOME_CARD_PRICE_ROW_MIN_HEIGHT_CLASS}`}
+            >
+              <ProductCardPriceBlock
+                price={product.price}
+                currency={currency}
+                discountPercent={product.discountPercent}
+                listPrice={listPrice}
+                priceClass={mobileHomePriceClass}
+                discountClass={discountClass}
+                homeProductGridCard={homeProductGridCard}
+                showStrike={showStrike}
+                reserveMobileStrikeRow
+                className="min-w-0 flex-1"
+              />
+              <div className={MOBILE_HOME_CARD_ADD_BUTTON_SIZE_CLASS}>
+                <ProductCardAddToCartButton
+                  layout="mobileRound"
+                  inStock={product.inStock}
+                  isAddingToCart={isAddingToCart}
+                  isCompact={isCompact}
+                  title={addToCartLabel}
+                  ariaLabel={addToCartAria}
+                  addToCartLabel={t('common.buttons.addToCart')}
+                  onAddToCart={onAddToCart}
+                />
+              </div>
+            </div>
             <InstallmentPriceButton
               onClick={handleInstallmentClick}
               variant="homeMobilePill"
+              className={`w-full ${MOBILE_HOME_CARD_INSTALLMENT_HEIGHT_CLASS}`}
             />
           </div>
         ) : null}

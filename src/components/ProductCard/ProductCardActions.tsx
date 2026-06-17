@@ -40,7 +40,13 @@ export function ProductCardActions({
   const iconSize = isCompact ? 18 : 24;
   const buttonSize = isCompact ? 'w-10 h-10' : 'w-12 h-12';
   /** Figma mobee-new: 42px controls, ~11px from top, heart above compare */
-  const gridCornerSize = isCompact ? 'h-10 w-10 min-h-10 min-w-10' : 'h-[42px] w-[42px] min-h-[42px] min-w-[42px]';
+  const gridCornerSize = homeProductGridCard
+    ? isCompact
+      ? 'h-10 w-10 min-h-10 min-w-10 max-lg:h-9 max-lg:w-9 max-lg:min-h-9 max-lg:min-w-9'
+      : 'h-[42px] w-[42px] min-h-[42px] min-w-[42px] max-lg:h-9 max-lg:w-9 max-lg:min-h-9 max-lg:min-w-9'
+    : isCompact
+      ? 'h-10 w-10 min-h-10 min-w-10'
+      : 'h-[42px] w-[42px] min-h-[42px] min-w-[42px]';
   const gridCornerIconWishlist = isCompact ? 18 : 20;
   const gridCornerIconCompare = isCompact ? 16 : 18;
 
@@ -88,11 +94,11 @@ export function ProductCardActions({
     ? 'max-lg:border-0 max-lg:bg-white max-lg:text-[#757575] max-lg:shadow-none max-lg:hover:bg-gray-50 border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5] lg:border-transparent lg:bg-[#e8f0f8]'
     : 'border-transparent bg-[#e8f0f8] text-gray-900 shadow-sm hover:bg-[#dbe8f5]';
 
-  /** Home mobile: wishlist/compare a bit closer to the image right edge; other cards keep uniform `right-*` below `lg`. */
+  /** Home mobile: wishlist/compare slightly higher on compact Figma cards. */
   const cornerOnImageStackPositionClass = homeProductGridCard
     ? isCompact
-      ? 'top-[11px] gap-1.5 max-lg:right-[2px] lg:right-4'
-      : 'top-[12px] gap-[7px] max-lg:right-[4px] lg:right-[25px]'
+      ? 'top-[11px] gap-1.5 max-lg:top-[5px] max-lg:right-1 lg:right-4'
+      : 'top-[12px] gap-[7px] max-lg:top-[5px] max-lg:gap-1.5 max-lg:right-1 lg:right-[25px]'
     : isCompact
       ? 'top-[11px] gap-1.5 right-4'
       : 'top-[12px] gap-[7px] right-[18px]';

@@ -42,7 +42,7 @@ export function InstallmentPriceButton({
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex h-9 w-[153px] shrink-0 items-center justify-center gap-1.5 rounded-[40px] border-2 border-[#2db2ff] bg-transparent pl-2.5 pr-[13px] py-1.5 text-sm font-medium text-[#2db2ff] transition-opacity hover:opacity-90 ${className}`}
+        className={`flex h-9 min-h-9 w-full items-center justify-center gap-1.5 rounded-[40px] border-2 border-[#2db2ff] bg-transparent px-3 py-1.5 text-sm font-medium text-[#2db2ff] transition-opacity hover:opacity-90 ${className}`}
         aria-label={label}
       >
         <ProductCardInstallmentExchangeIcon size={24} className="shrink-0" />
