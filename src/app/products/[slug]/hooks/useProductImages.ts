@@ -1,17 +1,28 @@
 import { useMemo } from "react";
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from "../../../../lib/productCardDisplayImage";
-import type { Product } from "../types";
+import type { Product, ProductMedia } from "../types";
 
-/** Same storefront hero image repeated so the PDP gallery shows three slides. */
-const PDP_GALLERY_SLIDE_COUNT = 3;
+function extractMediaUrl(item: ProductMedia | string): string | null {
+  if (typeof item === "string") return item || null;
+  return item?.url || null;
+}
 
 /**
- * Product detail gallery — storefront display image repeated for multi-image UI until product media drives the gallery.
+ * Returns the gallery image URLs from product.media.
+ * Falls back to the variant imageUrl if media is empty.
  */
-export function useProductImages(_product: Product | null): string[] {
-  return useMemo(
-    () =>
-      Array.from({ length: PDP_GALLERY_SLIDE_COUNT }, () => PRODUCT_CARD_DISPLAY_IMAGE_SRC),
-    [],
-  );
+export function useProductImages(product: Product | null): string[] {
+  return useMemo(() => {
+    if (!product) return [];
+
+    const mediaUrls = (product.media ?? [])
+      .map(extractMediaUrl)
+      .filter((url): url is string => Boolean(url));
+
+    if (mediaUrls.length > 0) return mediaUrls;
+
+    const variantUrl = product.variants?.[0]?.imageUrl;
+    if (variantUrl) return [variantUrl];
+
+    return [];
+  }, [product]);
 }
