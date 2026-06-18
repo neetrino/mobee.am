@@ -271,6 +271,11 @@ model ProductVariant {
   position       Int                    @default(0)
   published      Boolean                @default(true)
   attributes     Json?                  // JSONB: Stores variant attributes as { "color": [...], "size": [...] }
+  // External source tracking (MobileCentre and future sources)
+  source         String?
+  sourcePid      String?
+  visibleId      String?
+  sourceUrl      String?
   options        ProductVariantOption[]
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
@@ -280,6 +285,7 @@ model ProductVariant {
   orderItems OrderItem[]
 
   @@index([productId])
+  @@index([source])
   @@map("product_variants")
 }
 
