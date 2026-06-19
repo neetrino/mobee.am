@@ -7,8 +7,11 @@ import {
   HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT,
   HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT,
   HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET,
+  HOME_BEST_CHOICE_MOBILE_CAROUSEL_PAGE_GAP_CLASS,
+  HOME_BEST_CHOICE_MOBILE_INNER_GRID_PHONE_CLASS,
+  HOME_BEST_CHOICE_MOBILE_INNER_GRID_TABLET_CLASS,
 } from './home-best-choice.constants';
-import { chunkArray } from '../lib/chunk-array';
+import { chunkArray, padChunkToGroupSize } from '../lib/chunk-array';
 import {
   useHomeBestChoiceCarouselPageSync,
   type MobileCarouselViewState,
@@ -17,6 +20,7 @@ import { useHomeDesktopCarouselPager } from './useHomeDesktopCarouselPager';
 import { HomeDesktopCarouselArrows } from './HomeDesktopCarouselArrows';
 import { useHomeDesktopCarouselHomeStyle } from './useHomeDesktopCarouselHomeStyle';
 
+/** Card cell — stretch to grid row height so every card in a row matches. */
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
 /** Mobile carousel — Figma footer (compact price, round cart). */
@@ -40,9 +44,9 @@ export function getHomeCuratedDesktopProductCardProps(homeStyle: boolean) {
   } as const;
 }
 
-/** Horizontal snap scroll shell only — add breakpoint visibility in the caller (`lg:hidden`, `xl:hidden`, …). */
+/** Horizontal snap scroll shell — add breakpoint visibility in the caller (`lg:hidden`, `xl:hidden`, …). */
 export const HOME_BEST_CHOICE_MOBILE_CAROUSEL_SCROLL =
-  'flex [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory';
+  `flex ${HOME_BEST_CHOICE_MOBILE_CAROUSEL_PAGE_GAP_CLASS} [touch-action:pan-x_pan-y] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory`;
 
 /** Horizontal snap carousel below `lg` (home PDP rows: mobile strip hides when desktop grid appears). */
 export const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
@@ -58,8 +62,8 @@ const HOME_BEST_CHOICE_DESKTOP_PAGE = 'w-full min-w-full shrink-0 snap-start';
 
 export function homeBestChoiceMobileInnerGridClass(cardsPerView: number): string {
   return cardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET
-    ? 'grid grid-cols-3 gap-5'
-    : 'grid grid-cols-2 gap-4';
+    ? HOME_BEST_CHOICE_MOBILE_INNER_GRID_TABLET_CLASS
+    : HOME_BEST_CHOICE_MOBILE_INNER_GRID_PHONE_CLASS;
 }
 
 /**
@@ -159,14 +163,22 @@ export function HomeBestChoiceStyleProductGrid({
         {mobilePages.map((page, pageIndex) => (
           <div key={`page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
             <div className={mobileInnerGridClass}>
-              {page.map((product) => (
-                <BestChoiceProductCell
-                  key={product.id}
-                  product={product}
-                  viewMode={cardViewMode}
-                  cardProps={getHomeCuratedProductCardProps(true)}
-                />
-              ))}
+              {padChunkToGroupSize(page, mobileCardsPerView).map((product, slotIndex) =>
+                product ? (
+                  <BestChoiceProductCell
+                    key={product.id}
+                    product={product}
+                    viewMode={cardViewMode}
+                    cardProps={getHomeCuratedProductCardProps(true)}
+                  />
+                ) : (
+                  <div
+                    key={`empty-${pageIndex}-${slotIndex}`}
+                    aria-hidden
+                    className="min-h-0 min-w-0 h-full"
+                  />
+                ),
+              )}
             </div>
           </div>
         ))}
@@ -267,9 +279,17 @@ export function HomeBestChoiceStyleProductGridSkeleton({
         {mobilePages.map((pageIndices, pageIndex) => (
           <div key={`sk-page-${pageIndex}`} className={HOME_BEST_CHOICE_MOBILE_PAGE}>
             <div className={mobileInnerGridClass}>
-              {pageIndices.map((i) => (
-                <SkeletonCell key={i} />
-              ))}
+              {padChunkToGroupSize(pageIndices, mobileCardsPerView).map((slot, slotIndex) =>
+                slot !== undefined ? (
+                  <SkeletonCell key={slot} />
+                ) : (
+                  <div
+                    key={`sk-empty-${pageIndex}-${slotIndex}`}
+                    aria-hidden
+                    className="min-h-0 min-w-0 h-full"
+                  />
+                ),
+              )}
             </div>
           </div>
         ))}

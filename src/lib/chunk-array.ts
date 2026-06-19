@@ -11,3 +11,12 @@ export function chunkArray<T>(items: readonly T[], groupSize: number): T[][] {
   }
   return groups;
 }
+
+/** Pads a chunk so every carousel page keeps a full grid (consistent column widths). */
+export function padChunkToGroupSize<T>(chunk: readonly T[], groupSize: number): (T | undefined)[] {
+  const out: (T | undefined)[] = [...chunk];
+  while (out.length < groupSize) {
+    out.push(undefined);
+  }
+  return out;
+}
