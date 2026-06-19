@@ -84,6 +84,7 @@ export function ProfileSheetBody(props: ProfileSheetBodyProps) {
           currency={props.currency}
           onOrderClick={props.handleOrderClick}
           t={t}
+          embeddedInSheet
         />
       );
     case 'personal':
