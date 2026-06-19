@@ -2,17 +2,6 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
-function getMobileCarouselPageStride(scrollElement: HTMLElement): number {
-  const pageWidth = scrollElement.clientWidth;
-  if (pageWidth <= 0) {
-    return 0;
-  }
-
-  const gapValue = getComputedStyle(scrollElement).columnGap || getComputedStyle(scrollElement).gap;
-  const gapPx = gapValue ? Number.parseFloat(gapValue) : 0;
-  return pageWidth + gapPx;
-}
-
 export type MobileCarouselViewState = {
   pageIndex: number;
   pageCount: number;
@@ -35,10 +24,10 @@ export function useHomeBestChoiceCarouselPageSync(
     if (!el) {
       return;
     }
-    const pageStride = getMobileCarouselPageStride(el);
+    const pageWidth = el.clientWidth;
     const pageIndex =
-      pageStride > 0
-        ? Math.min(pageCount - 1, Math.max(0, Math.round(el.scrollLeft / pageStride)))
+      pageWidth > 0
+        ? Math.min(pageCount - 1, Math.max(0, Math.round(el.scrollLeft / pageWidth)))
         : 0;
     onViewChange({ pageIndex, pageCount });
   }, [onViewChange, pageCount]);

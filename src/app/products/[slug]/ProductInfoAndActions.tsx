@@ -106,7 +106,7 @@ export function ProductInfoAndActions({
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-w-0 w-full flex-col">
       {product.brand && <p className="mb-1 text-sm text-gray-500">{product.brand.name}</p>}
       <h1 className="text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">{title}</h1>
 
@@ -200,16 +200,20 @@ export function ProductInfoAndActions({
         getOptionValue={getOptionValue}
       />
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 text-sm">
+      <div className="mt-8 flex w-full min-w-0 flex-col items-start gap-2 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
         <button
           type="button"
           onClick={onScrollToDetails}
-          className="inline-flex w-fit items-center gap-2 font-medium text-admin hover:underline"
+          className="order-2 inline-flex max-w-full items-center gap-2 font-medium text-admin hover:underline sm:order-1"
         >
           <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
           {t(language, 'product.moreDetails')}
         </button>
-        <InstallmentPriceButton onClick={handleInstallmentClick} size="md" />
+        <InstallmentPriceButton
+          onClick={handleInstallmentClick}
+          size="md"
+          className="order-1 max-sm:w-full max-sm:justify-start sm:order-2"
+        />
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">

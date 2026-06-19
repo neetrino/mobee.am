@@ -130,7 +130,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     <div
       className={`max-w-7xl mx-auto px-4 py-12 max-lg:pb-4 sm:px-6 lg:py-12 ${PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS} ${PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS}`}
     >
-      <div className="grid grid-cols-1 product-2col:grid-cols-[55%_45%] gap-12 items-start">
+      <div className="grid grid-cols-1 items-start gap-12 product-2col:grid-cols-[55%_45%] [&>*]:min-w-0">
         <ProductImageGallery
           images={images}
           product={product}
@@ -179,11 +179,11 @@ export default function ProductPage({ params }: ProductPageProps) {
 
       <section
         id="product-long-description"
-        className="mt-16 max-w-3xl scroll-mt-24 border-t border-gray-200 pt-12"
+        className="mt-16 min-w-0 max-w-3xl scroll-mt-24 overflow-x-hidden border-t border-gray-200 pt-12"
       >
         <h2 className="mb-4 text-xl font-semibold text-gray-900">{t(language, 'product.description_title')}</h2>
         <div
-          className="prose prose-sm max-w-none text-gray-600"
+          className="prose prose-sm max-w-none break-words text-gray-600 [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto"
           dangerouslySetInnerHTML={{
             __html: sanitizeHtml(
               getProductText(language, product.id, 'longDescription') || product.description || ''

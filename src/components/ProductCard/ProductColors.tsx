@@ -12,74 +12,19 @@ interface ProductColorsProps {
   colors: Array<string | ColorData>;
   isCompact?: boolean;
   maxVisible?: number;
-  /** Home mobile Figma — overlapping swatches with blue ring on first color. */
-  homeProductGridCard?: boolean;
 }
 
 /**
  * Component for displaying product color options
  */
-export function ProductColors({
-  colors,
-  isCompact = false,
-  maxVisible = 6,
-  homeProductGridCard = false,
-}: ProductColorsProps) {
+export function ProductColors({ colors, isCompact = false, maxVisible = 6 }: ProductColorsProps) {
   if (!colors || colors.length === 0) {
     return null;
   }
 
-  const visibleColors = colors.slice(0, maxVisible);
-
-  if (homeProductGridCard) {
-    return (
-      <div className="mb-0 flex items-center max-lg:mb-0 lg:mb-2">
-        {visibleColors.map((colorData, index) => {
-          const colorValue = typeof colorData === 'string' ? colorData : colorData.value;
-          const imageUrl = typeof colorData === 'object' ? colorData.imageUrl : null;
-          const colorsHex = typeof colorData === 'object' ? colorData.colors : null;
-          const colorHex =
-            colorsHex && Array.isArray(colorsHex) && colorsHex.length > 0
-              ? colorsHex[0]
-              : getColorHex(colorValue);
-
-          return (
-            <div
-              key={index}
-              className={`relative size-5 shrink-0 overflow-hidden rounded-full border-2 bg-white ${
-                index === 0 ? 'border-[#2db2ff]' : 'border-white'
-              } ${index > 0 ? '-ml-1.5' : ''}`}
-              style={{ zIndex: visibleColors.length - index }}
-              title={colorValue}
-              aria-label={`Color: ${colorValue}`}
-            >
-              <div
-                className="size-full rounded-full"
-                style={imageUrl ? undefined : { backgroundColor: colorHex }}
-              >
-                {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt={colorValue}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : null}
-              </div>
-            </div>
-          );
-        })}
-        {colors.length > maxVisible ? (
-          <span className="ml-1.5 text-xs text-gray-500">+{colors.length - maxVisible}</span>
-        ) : null}
-      </div>
-    );
-  }
-
   return (
     <div className={`flex items-center gap-1.5 ${isCompact ? 'mb-1' : 'mb-2'} flex-wrap`}>
-      {visibleColors.map((colorData, index) => {
+      {colors.slice(0, maxVisible).map((colorData, index) => {
         const colorValue = typeof colorData === 'string' ? colorData : colorData.value;
         const imageUrl = typeof colorData === 'object' ? colorData.imageUrl : null;
         const colorsHex = typeof colorData === 'object' ? colorData.colors : null;
