@@ -44,7 +44,6 @@ export function ProfileHeader({
               firstName={profile?.firstName}
               lastName={profile?.lastName}
               size="lg"
-              className="flex-shrink-0"
             />
             <div className="min-w-0 flex-1 break-words">
               <h1 className="mb-1 break-words text-lg font-bold text-gray-900">
@@ -95,7 +94,6 @@ export function ProfileHeader({
               firstName={profile?.firstName}
               lastName={profile?.lastName}
               size="lg"
-              className="flex-shrink-0"
             />
             <div className="min-w-0 flex-1 break-words">
               <h1 className="mb-1 break-words text-lg font-bold text-gray-900">
