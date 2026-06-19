@@ -38,7 +38,7 @@ interface CompareIconProps {
    */
   className?: string;
   /**
-   * Active state — icon renders in Mobee blue (#2db2ff).
+   * Preserved for API compatibility; color comes from parent via currentColor.
    */
   isActive?: boolean;
 }
@@ -51,11 +51,7 @@ export function CompareIcon({
   size = 18,
   strokeWidth = 1.5,
   className = '',
-  isActive = false,
 }: CompareIconProps) {
-  const toneClass = isActive ? 'text-[#2db2ff]' : '';
-  const mergedClassName = [toneClass, className].filter(Boolean).join(' ') || undefined;
-
   return (
     <svg
       width={size}
@@ -63,7 +59,7 @@ export function CompareIcon({
       viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={mergedClassName}
+      className={className || undefined}
       aria-hidden
     >
       <rect
