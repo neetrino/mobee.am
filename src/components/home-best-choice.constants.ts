@@ -25,6 +25,17 @@ export const HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA = `(min-width: ${HOME_BE
   HOME_BEST_CHOICE_MOBILE_DESKTOP_MIN_WIDTH_PX - 1
 }px)`;
 
+/** Horizontal space between mobile carousel snap pages (matches Tailwind `gap-4`). */
+export const HOME_BEST_CHOICE_MOBILE_CAROUSEL_PAGE_GAP_CLASS = 'gap-4';
+
+/** Home mobile carousel 2×2 phone grid — equal-height cards per row. */
+export const HOME_BEST_CHOICE_MOBILE_INNER_GRID_PHONE_CLASS =
+  'grid grid-cols-2 gap-x-2 gap-y-5';
+
+/** Home mobile carousel 3×2 tablet grid. */
+export const HOME_BEST_CHOICE_MOBILE_INNER_GRID_TABLET_CLASS =
+  'grid grid-cols-3 gap-x-5 gap-y-5';
+
 /**
  * Column/gap track for home best-choice desktop grid and cart line items.
  * Home wraps with `hidden` + `lg:grid` + column variant (see {@link HomeBestChoiceStyleProductGrid}).

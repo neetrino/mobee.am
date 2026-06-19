@@ -16,7 +16,7 @@ export const CONTACT_ICON_LOCATION_SRC = `${UI_ICONS_BASE}/contact/location-pin-
 
 export const HEADER_PHONE_ICON_SRC = `${UI_ICONS_BASE}/header/phone-call-round.webp`;
 
-export const DEFAULT_USER_AVATAR_SRC = `${UI_ICONS_BASE}/profile/default-avatar.webp`;
+export const DEFAULT_USER_AVATAR_SRC = '/images/default-profile-avatar.svg';
 
 export const FOOTER_SOCIAL_FACEBOOK_ICON_SRC = `${UI_ICONS_BASE}/footer/social-facebook.webp`;
 
