@@ -84,10 +84,6 @@ function buildDescriptionHtml(raw) {
   return html || null;
 }
 
-function cleanName(raw) {
-  return raw.replace(/^Mobile Centre\.\s*-\s*/i, "").trim();
-}
-
 async function main() {
   console.log("=== Update MobileCentre descriptions ===");
   const products = JSON.parse(fs.readFileSync(PRODUCTS_JSON, "utf8"));
@@ -96,7 +92,6 @@ async function main() {
   let notFound = 0;
 
   for (const raw of products) {
-    const name = cleanName(raw.name);
     const descHtml = buildDescriptionHtml(raw.description);
     if (!descHtml) { notFound++; continue; }
 
