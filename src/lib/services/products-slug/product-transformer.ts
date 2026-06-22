@@ -65,6 +65,37 @@ function calculateActualDiscount(
 }
 
 /**
+ * Transform variant media array to response format
+ */
+function transformVariantMedia(variant: ProductVariantWithOptions): Array<{ url: string; alt?: string }> {
+  const rawMedia = (variant as { media?: unknown[] }).media;
+  if (!Array.isArray(rawMedia) || rawMedia.length === 0) {
+    return [];
+  }
+
+  const result: Array<{ url: string; alt?: string }> = [];
+  for (const item of rawMedia) {
+    if (typeof item === "string") {
+      const processed = processImageUrl(item);
+      if (processed) result.push({ url: processed });
+      continue;
+    }
+    if (item && typeof item === "object" && "url" in item) {
+      const url = processImageUrl(item as { url?: string });
+      if (url) {
+        result.push({
+          url,
+          alt: typeof (item as { alt?: string }).alt === "string"
+            ? (item as { alt?: string }).alt
+            : undefined,
+        });
+      }
+    }
+  }
+  return result;
+}
+
+/**
  * Transform product media (separate main from variant images)
  */
 function transformMedia(
@@ -74,8 +105,30 @@ function transformMedia(
     logger.warn('Product media is not an array, returning empty array');
     return [];
   }
+
+  const variantsHaveOwnMedia = Array.isArray(product.variants) &&
+    product.variants.some((variant) => {
+      const media = (variant as { media?: unknown[] }).media;
+      return Array.isArray(media) && media.length > 0;
+    });
+
+  const mediaAsStrings = product.media.map((item: unknown) => {
+    if (typeof item === 'string') return item;
+    if (item && typeof item === 'object' && 'url' in item) return item as { url?: string };
+    if (item && typeof item === 'object' && 'src' in item) return item as { src?: string };
+    if (item && typeof item === 'object' && 'value' in item) return item as { value?: string };
+    return String(item);
+  });
+
+  if (variantsHaveOwnMedia) {
+    return cleanImageUrls(
+      mediaAsStrings
+        .map((item) => processImageUrl(item))
+        .filter((url): url is string => url !== null)
+    );
+  }
   
-  // Collect all variant images for separation
+  // Collect all variant images for separation (legacy products)
   const variantImages: string[] = [];
   if (Array.isArray(product.variants) && product.variants.length > 0) {
     product.variants.forEach((variant: ProductVariantWithOptions) => {
@@ -86,18 +139,7 @@ function transformMedia(
     });
   }
   
-  // Separate main images from variant images
-  // Convert JsonValue[] to (string | ImageUrlInput)[] for type compatibility
-  const mediaAsStrings = product.media.map((item: unknown) => {
-    if (typeof item === 'string') return item;
-    if (item && typeof item === 'object' && 'url' in item) return item as { url?: string };
-    if (item && typeof item === 'object' && 'src' in item) return item as { src?: string };
-    if (item && typeof item === 'object' && 'value' in item) return item as { value?: string };
-    return String(item);
-  });
   const { main } = separateMainAndVariantImages(mediaAsStrings, variantImages);
-  
-  // Clean and validate final main images
   const cleanedMain = cleanImageUrls(main);
   
   logger.debug('Main media images count (after cleanup)', { count: cleanedMain.length });
@@ -169,6 +211,7 @@ function transformVariants(
       }
 
       const variantImageUrl = transformVariantImageUrl(variant);
+      const variantMedia = transformVariantMedia(variant);
       
       if (variantImageUrl) {
         logger.debug('Variant has imageUrl', {
@@ -188,6 +231,7 @@ function transformVariants(
         productDiscount: productDiscount > 0 ? productDiscount : null,
         stock: variant.stock,
         imageUrl: variantImageUrl,
+        media: variantMedia,
         options: Array.isArray(variant.options) ? variant.options.map((opt: ProductVariantWithOptions['options'][number]) => {
           // Support both new format (AttributeValue) and old format (attributeKey/value)
           if (opt.attributeValue) {

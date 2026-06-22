@@ -29,6 +29,7 @@ export interface ProductVariant {
   productDiscount?: number | null;
   globalDiscount?: number | null;
   imageUrl?: string;
+  media?: ProductMedia[];
 }
 
 export interface ProductLabel {

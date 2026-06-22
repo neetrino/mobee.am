@@ -2,18 +2,19 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getOptionValue } from '../utils/variant-helpers';
 import { findVariantByColorAndSize, findVariantByAllAttributes } from '../utils/variant-finders';
 import { switchToVariantImage, handleColorSelect as handleColorSelectUtil } from '../utils/image-switching';
+import { getVariantMedia } from '../utils/variant-media';
 import type { Product, ProductVariant, VariantOption } from '../types';
 
 interface UseVariantSelectionProps {
   product: Product | null;
-  images: string[];
   setCurrentImageIndex: (index: number) => void;
+  setThumbnailStartIndex: (index: number) => void;
 }
 
 export function useVariantSelection({
   product,
-  images,
   setCurrentImageIndex,
+  setThumbnailStartIndex,
 }: UseVariantSelectionProps) {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -36,9 +37,11 @@ export function useVariantSelection({
     return findVariantByAllAttributes(product, color, size, otherAttributes);
   }, [product]);
 
-  const switchToVariantImageFn = useCallback((variant: ProductVariant | null) => {
-    switchToVariantImage(variant, product, images, setCurrentImageIndex);
-  }, [product, images, setCurrentImageIndex]);
+  const applyVariantGallery = useCallback((variant: ProductVariant | null) => {
+    const gallery = getVariantMedia(product, variant);
+    switchToVariantImage(variant, product, gallery, setCurrentImageIndex);
+    setThumbnailStartIndex(0);
+  }, [product, setCurrentImageIndex, setThumbnailStartIndex]);
 
   // Initialize variant when product changes
   useEffect(() => {
@@ -49,8 +52,9 @@ export function useVariantSelection({
       const sizeValue = getOptionValueFn(initialVariant.options, 'size');
       if (colorValue) setSelectedColor(colorValue);
       if (sizeValue) setSelectedSize(sizeValue);
+      applyVariantGallery(initialVariant);
     }
-  }, [product, selectedVariant, getOptionValueFn, setSelectedVariant, setSelectedColor, setSelectedSize]);
+  }, [product, selectedVariant, getOptionValueFn, applyVariantGallery]);
 
   // Update variant when selections change
   useEffect(() => {
@@ -58,7 +62,7 @@ export function useVariantSelection({
       const newVariant = findVariantByAllAttributesFn(selectedColor, selectedSize, selectedAttributeValues);
       if (newVariant && newVariant.id !== selectedVariant?.id) {
         setSelectedVariant(newVariant);
-        switchToVariantImageFn(newVariant);
+        applyVariantGallery(newVariant);
         const colorValue = getOptionValueFn(newVariant.options, 'color');
         const sizeValue = getOptionValueFn(newVariant.options, 'size');
         if (colorValue && colorValue !== selectedColor?.toLowerCase().trim()) {
@@ -67,22 +71,29 @@ export function useVariantSelection({
         if (sizeValue && sizeValue !== selectedSize?.toLowerCase().trim()) {
           setSelectedSize(sizeValue);
         }
-      } else if (newVariant && newVariant.imageUrl) {
-        switchToVariantImageFn(newVariant);
       }
     }
-  }, [selectedColor, selectedSize, selectedAttributeValues, findVariantByAllAttributesFn, selectedVariant?.id, product, getOptionValueFn, switchToVariantImageFn, setSelectedVariant, setSelectedColor, setSelectedSize]);
+  }, [
+    selectedColor,
+    selectedSize,
+    selectedAttributeValues,
+    findVariantByAllAttributesFn,
+    selectedVariant?.id,
+    product,
+    getOptionValueFn,
+    applyVariantGallery,
+  ]);
 
   const handleColorSelect = useCallback((color: string) => {
     handleColorSelectUtil(
       color,
       product,
-      images,
+      [],
       selectedColor,
       setSelectedColor,
       setCurrentImageIndex
     );
-  }, [product, images, selectedColor, setSelectedColor, setCurrentImageIndex]);
+  }, [product, selectedColor, setSelectedColor, setCurrentImageIndex]);
 
   const handleSizeSelect = useCallback((size: string) => {
     if (selectedSize === size) {
@@ -120,4 +131,3 @@ export function useVariantSelection({
     handleAttributeValueSelect,
   };
 }
-
