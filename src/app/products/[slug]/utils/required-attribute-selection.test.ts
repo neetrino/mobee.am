@@ -10,6 +10,7 @@ import type { AttributeGroupValue } from '../types';
 function group(values: Partial<AttributeGroupValue>[]): AttributeGroupValue[] {
   return values.map((value) => ({
     value: value.value ?? 'value',
+    label: value.label ?? value.value ?? 'value',
     valueId: value.valueId,
     stock: value.stock ?? 1,
     variants: value.variants ?? [],
