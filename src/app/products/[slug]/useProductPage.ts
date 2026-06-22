@@ -13,6 +13,7 @@ import { useVariantSelection } from './hooks/useVariantSelection';
 import { useProductActions } from './hooks/useProductActions';
 import { useProductQuantity } from './hooks/useProductQuantity';
 import { useProductCalculations } from './hooks/useProductCalculations';
+import { getVariantMainImageIndex } from './utils/variant-media';
 import { resolveCompareCategoryId } from '../../../lib/shop/compare-storage';
 
 export function useProductPage(params: Promise<{ slug?: string }>) {
@@ -35,8 +36,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     variantIdFromUrl,
   });
 
-  const images = useProductImages(product);
-
   const {
     selectedVariant,
     setSelectedVariant,
@@ -50,9 +49,11 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     handleAttributeValueSelect,
   } = useVariantSelection({
     product,
-    images,
     setCurrentImageIndex,
+    setThumbnailStartIndex,
   });
+
+  const images = useProductImages(product, currentVariant);
 
   const attributeGroups = useAttributeGroups({
     product,
@@ -117,6 +118,12 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
       setCurrentImageIndex(0);
     }
   }, [images.length, currentImageIndex]);
+
+  useEffect(() => {
+    if (!currentVariant || images.length === 0) return;
+    setCurrentImageIndex(getVariantMainImageIndex(currentVariant, images));
+    setThumbnailStartIndex(0);
+  }, [currentVariant?.id, images]);
 
   useEffect(() => {
     if (product && product.variants && product.variants.length > 0 && variantIdFromUrl) {
