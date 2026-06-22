@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { Product, ProductVariant, AttributeGroupValue } from '../types';
+import { getMissingRequiredAttributeKeys } from '../utils/required-attribute-selection';
 
 interface UseProductCalculationsProps {
   product: Product | null;
@@ -7,6 +8,7 @@ interface UseProductCalculationsProps {
   attributeGroups: Map<string, AttributeGroupValue[]>;
   selectedColor: string | null;
   selectedSize: string | null;
+  selectedAttributeValues: Map<string, string>;
 }
 
 export function useProductCalculations({
@@ -15,12 +17,26 @@ export function useProductCalculations({
   attributeGroups,
   selectedColor,
   selectedSize,
+  selectedAttributeValues,
 }: UseProductCalculationsProps) {
+  const missingRequiredAttributeKeys = useMemo(
+    () =>
+      getMissingRequiredAttributeKeys(
+        attributeGroups,
+        selectedColor,
+        selectedSize,
+        selectedAttributeValues,
+      ),
+    [attributeGroups, selectedColor, selectedSize, selectedAttributeValues],
+  );
+
+  const isVariationRequired = missingRequiredAttributeKeys.length > 0;
   const price = currentVariant?.price || 0;
   const originalPrice = currentVariant?.originalPrice;
   const compareAtPrice = currentVariant?.compareAtPrice;
   const discountPercent = currentVariant?.productDiscount || product?.productDiscount || null;
-  const isOutOfStock = !currentVariant || currentVariant.stock <= 0;
+  const isOutOfStock =
+    !isVariationRequired && (!currentVariant || currentVariant.stock <= 0);
 
   const colorGroups = useMemo(() => {
     const groups: Array<{ color: string; stock: number; variants: ProductVariant[] }> = [];
@@ -48,12 +64,6 @@ export function useProductCalculations({
     return groups;
   }, [attributeGroups]);
 
-  const hasColorAttribute = colorGroups.length > 0 && colorGroups.some(g => g.stock > 0);
-  const hasSizeAttribute = sizeGroups.length > 0 && sizeGroups.some(g => g.stock > 0);
-  const needsColor = hasColorAttribute && !selectedColor;
-  const needsSize = hasSizeAttribute && !selectedSize;
-  const isVariationRequired = needsColor || needsSize;
-
   const unavailableAttributes = useMemo(() => {
     const unavailable = new Map<string, boolean>();
     if (!currentVariant || !product) return unavailable;
@@ -79,7 +89,11 @@ export function useProductCalculations({
   }, [currentVariant, attributeGroups, product]);
 
   const hasUnavailableAttributes = unavailableAttributes.size > 0;
-  const canAddToCart = !isOutOfStock && !isVariationRequired && !hasUnavailableAttributes;
+  const canAddToCart =
+    !isVariationRequired &&
+    Boolean(currentVariant) &&
+    (currentVariant?.stock ?? 0) > 0 &&
+    !hasUnavailableAttributes;
 
   return {
     price,
@@ -90,6 +104,7 @@ export function useProductCalculations({
     colorGroups,
     sizeGroups,
     isVariationRequired,
+    missingRequiredAttributeKeys,
     unavailableAttributes,
     hasUnavailableAttributes,
     canAddToCart,

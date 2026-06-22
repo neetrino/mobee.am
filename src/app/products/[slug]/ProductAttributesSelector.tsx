@@ -1,5 +1,6 @@
 'use client';
 
+import { getProductColorHex, isKnownProductColor } from '../../../lib/product-color-hex.constants';
 import type { ReactNode } from 'react';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { t, getAttributeLabel } from '../../../lib/i18n';
@@ -28,34 +29,19 @@ export interface ProductAttributesSelectorProps {
   getOptionValue: (options: VariantOption[] | undefined, key: string) => string | null;
 }
 
-const getColorValue = (colorName: string): string => {
-  const colorMap: Record<string, string> = {
-    beige: '#F5F5DC',
-    black: '#000000',
-    blue: '#0000FF',
-    brown: '#A52A2A',
-    gray: '#808080',
-    grey: '#808080',
-    green: '#008000',
-    red: '#FF0000',
-    white: '#FFFFFF',
-    yellow: '#FFFF00',
-    orange: '#FFA500',
-    pink: '#FFC0CB',
-    purple: '#800080',
-    navy: '#000080',
-    maroon: '#800000',
-    olive: '#808000',
-    teal: '#008080',
-    cyan: '#00FFFF',
-    magenta: '#FF00FF',
-    lime: '#00FF00',
-    silver: '#C0C0C0',
-    gold: '#FFD700',
-  };
-  const normalizedName = colorName.toLowerCase().trim();
-  return colorMap[normalizedName] || '#CCCCCC';
-};
+const getColorValue = (colorName: string): string => getProductColorHex(colorName);
+
+function resolveSwatchHex(value: string, label: string, colors?: string[] | null): string {
+  if (colors?.length) return colors[0];
+  if (isKnownProductColor(value)) return getProductColorHex(value);
+  if (isKnownProductColor(label)) return getProductColorHex(label);
+  return getProductColorHex(value);
+}
+
+function swatchNeedsBorder(hex: string): boolean {
+  const normalized = hex.toLowerCase();
+  return normalized === '#ffffff' || normalized === '#f0f0f0' || normalized === '#f5f5f7' || normalized === '#f6f2ef';
+}
 
 function sortAttributeEntries(
   entries: Array<[string, AttributeGroupValue[]]>
@@ -149,15 +135,15 @@ export function ProductAttributesSelector({
                     const isSelected = selectedColor === g.value?.toLowerCase().trim();
                     const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
                     const hasImage = Boolean(processedImageUrl?.trim());
-                    const colorHex =
-                      g.colors && Array.isArray(g.colors) && g.colors.length > 0 ? g.colors[0] : getColorValue(g.value);
+                    const colorHex = resolveSwatchHex(g.value, g.label, g.colors);
+                    const borderClass = swatchNeedsBorder(colorHex) ? 'border-gray-300' : '';
                     return (
                       <button
                         key={g.valueId || g.value}
                         type="button"
                         onClick={() => onColorSelect(g.value)}
                         title={getAttributeLabel(language, attrKey, g.value)}
-                        className={`h-14 w-14 shrink-0 overflow-hidden rounded-md border-2 transition-all ${
+                        className={`h-14 w-14 shrink-0 overflow-hidden rounded-md border-2 transition-all ${borderClass} ${
                           isSelected ? 'border-admin ring-2 ring-admin/25' : 'border-gray-200 hover:border-gray-400'
                         } ${g.stock <= 0 ? 'opacity-60' : ''}`}
                         style={hasImage ? undefined : { backgroundColor: colorHex }}

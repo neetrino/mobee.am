@@ -8,6 +8,17 @@ import {
 import { logger } from "../../utils/logger";
 import type { ProductWithFullRelations, ProductVariantWithOptions } from "./types";
 
+function normalizeAttributeValueColors(colors: unknown): string[] | null {
+  if (Array.isArray(colors)) {
+    const parsed = colors.filter((item): item is string => typeof item === "string" && item.length > 0);
+    return parsed.length > 0 ? parsed : null;
+  }
+  if (typeof colors === "string" && colors.trim()) {
+    return [colors.trim()];
+  }
+  return null;
+}
+
 /**
  * Get discount settings from database
  */
@@ -313,7 +324,7 @@ function transformProductAttributes(
               value: val.value,
               label: valTranslation?.label || val.value,
               imageUrl: val.imageUrl || null,
-              colors: val.colors || null,
+              colors: normalizeAttributeValueColors(val.colors),
             };
           }) : [],
         },
