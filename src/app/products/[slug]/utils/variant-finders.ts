@@ -149,6 +149,73 @@ export function findVariantByAllAttributes(
     return anyMatch;
   }
 
+  return findVariantByAllAttributesFallback(
+    product,
+    normalizedColor || null,
+    normalizedSize || null,
+  );
+}
+
+/**
+ * Find variant only when all provided attribute values match exactly.
+ * Does not fall back to partial matches or the first variant.
+ */
+export function findVariantByAllAttributesStrict(
+  product: Product | null,
+  color: string | null,
+  size: string | null,
+  otherAttributes: Map<string, string>,
+): ProductVariant | null {
+  if (!product?.variants || product.variants.length === 0) return null;
+
+  const normalizedColor = color?.toLowerCase().trim();
+  const normalizedSize = size?.toLowerCase().trim();
+
+  const variantMatches = (variant: ProductVariant): boolean => {
+    if (normalizedColor && !variantHasColor(variant, normalizedColor)) {
+      return false;
+    }
+
+    if (normalizedSize) {
+      const vSize = getOptionValue(variant.options, 'size');
+      if (vSize !== normalizedSize) return false;
+    }
+
+    for (const [attrKey, attrValue] of otherAttributes.entries()) {
+      if (attrKey === 'color' || attrKey === 'size') continue;
+
+      const variantValue = getOptionValue(variant.options, attrKey);
+      const normalizedAttrValue = attrValue.toLowerCase().trim();
+      const option = variant.options?.find(
+        (opt) => opt.key === attrKey || opt.attribute === attrKey,
+      );
+
+      if (!option) return false;
+
+      if (option.valueId && attrValue && option.valueId === attrValue) {
+        continue;
+      }
+
+      if (variantValue !== normalizedAttrValue) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  return (
+    product.variants.find((variant) => variantMatches(variant) && variant.imageUrl) ??
+    product.variants.find((variant) => variantMatches(variant)) ??
+    null
+  );
+}
+
+function findVariantByAllAttributesFallback(
+  product: Product,
+  normalizedColor: string | null,
+  normalizedSize: string | null,
+): ProductVariant | null {
   // 3. Fallback: find by color and size only
   if (normalizedColor || normalizedSize) {
     return findVariantByColorAndSize(

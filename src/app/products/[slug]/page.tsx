@@ -183,7 +183,7 @@ export default function ProductPage({ params }: ProductPageProps) {
       >
         <h2 className="mb-4 text-xl font-semibold text-gray-900">{t(language, 'product.description_title')}</h2>
         <div
-          className="prose prose-sm max-w-none break-words text-gray-600 [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto"
+          className="product-description-content prose prose-sm max-w-none break-words text-gray-600 [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto"
           dangerouslySetInnerHTML={{
             __html: sanitizeHtml(
               getProductText(language, product.id, 'longDescription') || product.description || ''

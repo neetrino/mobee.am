@@ -37,6 +37,7 @@ const {
   mediaHasMobileCentreUrl,
   extractMediaUrl,
 } = require("./lib/mobilecentre-variant-media.cjs");
+const { buildDescriptionHtml } = require("./lib/mobilecentre-description-html.cjs");
 
 // ─── Load .env ─────────────────────────────────────────────────────────────────
 
@@ -168,76 +169,6 @@ const CATEGORY_LABELS = {
   "apple-tv": { en: "Apple TV", hy: "Apple TV", ru: "Apple TV" },
   accessories: { en: "Accessories", hy: "Աքսեսուարներ", ru: "Аксессуары" },
 };
-
-// ─── Description parser ───────────────────────────────────────────────────────
-
-const NOISE_PATTERNS = [
-  /Նշված արժեքը/,
-  /Ապառիկը ձևակերպելիս/,
-  /Յունիբանկ/,
-  /ԱԿԲԱ Բանկ/,
-  /Ինեկոբանկ/,
-  /ՎՏԲ/,
-  /unibank\.am/,
-  /acba\.am/,
-  /inecobank\.am/,
-  /vtb\.am/,
-  /Tweet/,
-  /Share/,
-  /Դուք հաջողությամբ/,
-  /Ապրանքը պահպանված/,
-  /Բոնուսային միավոր/,
-  /Մեր մասին/,
-  /© 20/,
-  /MobileCentre/,
-  /\+374/,
-];
-const SECTION_HEADERS = new Set([
-  "Հիշողություն և Պրոցեսոր",
-  "Ցանց",
-  "Սնուցում",
-  "Այլ",
-  "Տեսախցիկներ",
-  "Էկրան",
-]);
-
-function buildDescriptionHtml(raw) {
-  if (!raw) return null;
-  const parts = raw.split("|").map((s) => s.trim()).filter(Boolean);
-  const rows = [];
-  let i = 0;
-  while (i < parts.length) {
-    const token = parts[i];
-    if (NOISE_PATTERNS.some((p) => p.test(token))) break;
-    if (token.startsWith("http")) { i++; continue; }
-    if (SECTION_HEADERS.has(token)) { rows.push({ type: "section", label: token }); i++; continue; }
-    const next = parts[i + 1];
-    if (next && !NOISE_PATTERNS.some((p) => p.test(next)) && !next.startsWith("http")) {
-      rows.push({ type: "row", label: token, value: next });
-      i += 2;
-    } else {
-      if (token.length < 100) rows.push({ type: "status", label: token });
-      i++;
-    }
-  }
-  if (!rows.length) return null;
-  const statusRows = rows.filter((r) => r.type === "status");
-  const specRows = rows.filter((r) => r.type !== "status");
-  let html = "";
-  if (statusRows.length)
-    html += `<p class="product-status">${statusRows.map((r) => r.label).join(" · ")}</p>`;
-  if (specRows.length) {
-    html += `<table class="product-specs"><tbody>`;
-    for (const row of specRows) {
-      if (row.type === "section")
-        html += `<tr class="specs-section"><td colspan="2">${row.label}</td></tr>`;
-      else
-        html += `<tr><td class="spec-label">${row.label}</td><td class="spec-value">${row.value}</td></tr>`;
-    }
-    html += `</tbody></table>`;
-  }
-  return html || null;
-}
 
 // ─── DB helpers ───────────────────────────────────────────────────────────────
 

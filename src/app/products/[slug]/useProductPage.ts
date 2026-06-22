@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useMemo } from 'react';
 import { getStoredCurrency } from '../../../lib/currency';
 import { type LanguageCode } from '../../../lib/language';
 import { useUiLanguage } from '../../../components/UiLanguageProvider';
@@ -15,6 +15,8 @@ import { useProductQuantity } from './hooks/useProductQuantity';
 import { useProductCalculations } from './hooks/useProductCalculations';
 import { getVariantMainImageIndex } from './utils/variant-media';
 import { resolveCompareCategoryId } from '../../../lib/shop/compare-storage';
+import { getMissingRequiredAttributeKeys } from './utils/required-attribute-selection';
+import { findVariantByAllAttributesStrict } from './utils/variant-finders';
 
 export function useProductPage(params: Promise<{ slug?: string }>) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -37,23 +39,18 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   });
 
   const {
-    selectedVariant,
-    setSelectedVariant,
     selectedColor,
     selectedSize,
     selectedAttributeValues,
-    currentVariant,
     getOptionValue,
     handleColorSelect,
     handleSizeSelect,
     handleAttributeValueSelect,
+    applyVariantSelection,
   } = useVariantSelection({
     product,
     setCurrentImageIndex,
-    setThumbnailStartIndex,
   });
-
-  const images = useProductImages(product, currentVariant);
 
   const attributeGroups = useAttributeGroups({
     product,
@@ -61,6 +58,28 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     selectedSize,
     selectedAttributeValues,
   });
+
+  const currentVariant = useMemo(() => {
+    if (!product?.variants?.length) return null;
+
+    const missingKeys = getMissingRequiredAttributeKeys(
+      attributeGroups,
+      selectedColor,
+      selectedSize,
+      selectedAttributeValues,
+    );
+
+    if (missingKeys.length > 0) return null;
+
+    return findVariantByAllAttributesStrict(
+      product,
+      selectedColor,
+      selectedSize,
+      selectedAttributeValues,
+    );
+  }, [product, attributeGroups, selectedColor, selectedSize, selectedAttributeValues]);
+
+  const images = useProductImages(product, currentVariant);
 
   const {
     price,
@@ -80,6 +99,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     attributeGroups,
     selectedColor,
     selectedSize,
+    selectedAttributeValues,
   });
 
   const { quantity, setQuantity: _setQuantity, maxQuantity, adjustQuantity } = useProductQuantity({
@@ -126,24 +146,59 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   }, [currentVariant?.id, images]);
 
   useEffect(() => {
-    if (product && product.variants && product.variants.length > 0 && variantIdFromUrl) {
-      const variantById = product.variants.find(v => v.id === variantIdFromUrl || v.id.endsWith(variantIdFromUrl));
-      const variantByIndex = product.variants[parseInt(variantIdFromUrl) - 1];
-      const initialVariant = variantById || variantByIndex || product.variants[0];
-      setSelectedVariant(initialVariant);
+    if (!product?.variants?.length || !variantIdFromUrl) return;
+
+    const variantById = product.variants.find(
+      (variant) => variant.id === variantIdFromUrl || variant.id.endsWith(variantIdFromUrl),
+    );
+    const variantByIndex = product.variants[parseInt(variantIdFromUrl, 10) - 1];
+    const initialVariant = variantById || variantByIndex;
+
+    if (initialVariant) {
+      applyVariantSelection(initialVariant);
       setCurrentImageIndex(0);
       setThumbnailStartIndex(0);
     }
-  }, [product, variantIdFromUrl, setSelectedVariant]);
+  }, [product, variantIdFromUrl, applyVariantSelection]);
+
+  const resolveAttributeLabel = (attrKey: string): string => {
+    const productAttr = product?.productAttributes?.find((pa) => pa.attribute?.key === attrKey);
+    if (productAttr?.attribute?.name) return productAttr.attribute.name;
+    if (attrKey === 'color' || attrKey === 'colour') return t(language, 'product.color');
+    if (attrKey === 'size') return t(language, 'product.size');
+    return attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
+  };
 
   const getRequiredAttributesMessage = (): string => {
-    const needsColor = colorGroups.length > 0 && colorGroups.some(g => g.stock > 0) && !selectedColor;
-    const needsSize = sizeGroups.length > 0 && sizeGroups.some(g => g.stock > 0) && !selectedSize;
-    
-    if (needsColor && needsSize) return t(language, 'product.selectColorAndSize');
-    if (needsColor) return t(language, 'product.selectColor');
-    if (needsSize) return t(language, 'product.selectSize');
-    return t(language, 'product.selectOptions');
+    const missingKeys = getMissingRequiredAttributeKeys(
+      attributeGroups,
+      selectedColor,
+      selectedSize,
+      selectedAttributeValues,
+    );
+
+    if (missingKeys.length === 0) {
+      return t(language, 'product.selectOptions');
+    }
+
+    const needsColor = missingKeys.some((key) => key === 'color' || key === 'colour');
+    const needsSize = missingKeys.includes('size');
+    const otherMissing = missingKeys.filter(
+      (key) => key !== 'color' && key !== 'colour' && key !== 'size',
+    );
+
+    if (needsColor && needsSize && otherMissing.length === 0) {
+      return t(language, 'product.selectColorAndSize');
+    }
+    if (needsColor && missingKeys.length === 1) {
+      return t(language, 'product.selectColor');
+    }
+    if (needsSize && missingKeys.length === 1) {
+      return t(language, 'product.selectSize');
+    }
+
+    const labels = missingKeys.map((key) => resolveAttributeLabel(key));
+    return `${t(language, 'product.selectOptions')}: ${labels.join(', ')}`;
   };
 
   return {
@@ -156,7 +211,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     setThumbnailStartIndex,
     currency,
     language,
-    selectedVariant,
     selectedColor,
     selectedSize,
     selectedAttributeValues,

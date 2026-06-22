@@ -42,7 +42,10 @@ export function ProductInfo({
             </div>
           </div>
         </div>
-        <div className="text-gray-600 mb-8 prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }} />
+        <div
+          className="product-description-content text-gray-600 mb-8 prose prose-sm max-w-none break-words [&_img]:max-w-full [&_img]:h-auto"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }}
+        />
       </div>
     </div>
   );
