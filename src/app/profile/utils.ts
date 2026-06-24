@@ -25,6 +25,28 @@ export function orderListItemToDetailsPlaceholder(row: OrderListItem): OrderDeta
   };
 }
 
+export function orderNumberToDetailsPlaceholder(orderNumber: string): OrderDetails {
+  return {
+    id: orderNumber,
+    number: orderNumber,
+    status: 'pending',
+    paymentStatus: 'pending',
+    fulfillmentStatus: 'pending',
+    items: [],
+    totals: {
+      subtotal: 0,
+      discount: 0,
+      shipping: 0,
+      tax: 0,
+      total: 0,
+      currency: 'AMD',
+    },
+    shippingMethod: 'delivery',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 export const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
     case 'pending':

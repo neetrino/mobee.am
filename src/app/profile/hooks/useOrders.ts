@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, type MouseEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, useRef, type MouseEvent } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { acquireBodyScrollLock } from '../../../lib/body-scroll-lock';
 import { apiClient } from '../../../lib/api-client';
-import { LAYOUT_DESKTOP_MIN_WIDTH_PX } from '../../../lib/layout-breakpoints.constants';
 import { useTranslation } from '../../../lib/i18n-client';
-import { orderListItemToDetailsPlaceholder } from '../utils';
+import { getLoginRedirectToProfileOrdersPath, getProfileOrdersPath } from '../profile-orders-path';
+import { orderListItemToDetailsPlaceholder, orderNumberToDetailsPlaceholder } from '../utils';
 import type { OrderDetails, OrderListItem, ProfileTab } from '../types';
 
 interface OrdersMeta {
@@ -32,7 +32,9 @@ export function useOrders({
   onSuccess,
 }: UseOrdersProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const orderFromUrlHandledRef = useRef<string | null>(null);
   
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -80,7 +82,7 @@ export function useOrders({
     }
   }, [isLoggedIn, authLoading, activeTab, tabDataEnabled, loadOrders]);
 
-  const loadOrderDetails = async (orderNumber: string) => {
+  const loadOrderDetails = useCallback(async (orderNumber: string) => {
     try {
       setOrderDetailsLoading(true);
       setOrderDetailsError(null);
@@ -93,20 +95,41 @@ export function useOrders({
     } finally {
       setOrderDetailsLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    const orderNumber = searchParams.get('order')?.trim();
+    if (
+      !isLoggedIn ||
+      authLoading ||
+      activeTab !== 'orders' ||
+      !tabDataEnabled ||
+      !orderNumber ||
+      orderFromUrlHandledRef.current === orderNumber
+    ) {
+      return;
+    }
+
+    orderFromUrlHandledRef.current = orderNumber;
+    setOrderDetailsError(null);
+    const listOrder = orders.find((order) => order.number === orderNumber);
+    setSelectedOrder(
+      listOrder ? orderListItemToDetailsPlaceholder(listOrder) : orderNumberToDetailsPlaceholder(orderNumber),
+    );
+    void loadOrderDetails(orderNumber);
+  }, [activeTab, authLoading, isLoggedIn, loadOrderDetails, orders, searchParams, tabDataEnabled]);
 
   const handleOrderClick = (order: OrderListItem, e: MouseEvent<HTMLAnchorElement>) => {
-    if (window.innerWidth >= LAYOUT_DESKTOP_MIN_WIDTH_PX) {
-      e.preventDefault();
-      setOrderDetailsError(null);
-      setSelectedOrder(orderListItemToDetailsPlaceholder(order));
-      void loadOrderDetails(order.number);
-    }
+    e.preventDefault();
+    setOrderDetailsError(null);
+    setSelectedOrder(orderListItemToDetailsPlaceholder(order));
+    void loadOrderDetails(order.number);
+    router.replace(getProfileOrdersPath({ orderNumber: order.number }), { scroll: false });
   };
 
   const handleReOrder = async () => {
     if (!selectedOrder || !isLoggedIn) {
-      router.push('/login?redirect=/profile?tab=orders');
+      router.push(getLoginRedirectToProfileOrdersPath());
       return;
     }
 

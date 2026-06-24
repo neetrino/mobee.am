@@ -1,7 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../../lib/i18n-client';
+import {
+  getLoginRedirectToProfileOrdersPath,
+  getProfileOrdersPath,
+} from '../../../profile/profile-orders-path';
 import {
   ORDER_CONFIRMATION_CARD_CLASS,
   ORDER_CONFIRMATION_SHELL_CLASS,
@@ -12,11 +17,16 @@ import {
 
 interface OrderConfirmationCardProps {
   orderNumber: string;
-  onViewDetails: () => void;
+  isLoggedIn: boolean;
 }
 
-export function OrderConfirmationCard({ orderNumber, onViewDetails }: OrderConfirmationCardProps) {
+export function OrderConfirmationCard({ orderNumber, isLoggedIn }: OrderConfirmationCardProps) {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const handleViewOrderDetails = () => {
+    router.push(isLoggedIn ? getProfileOrdersPath() : getLoginRedirectToProfileOrdersPath());
+  };
 
   return (
     <div className={ORDER_CONFIRMATION_SHELL_CLASS}>
@@ -43,7 +53,7 @@ export function OrderConfirmationCard({ orderNumber, onViewDetails }: OrderConfi
           </p>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row">
-            <button type="button" onClick={onViewDetails} className={ORDER_VIEW_DETAILS_BUTTON_CLASS}>
+            <button type="button" onClick={handleViewOrderDetails} className={ORDER_VIEW_DETAILS_BUTTON_CLASS}>
               {t('orders.placedSuccess.viewOrderDetails')}
             </button>
             <Link href="/products" className={ORDER_CONTINUE_SHOPPING_OUTLINE_BUTTON_CLASS}>
