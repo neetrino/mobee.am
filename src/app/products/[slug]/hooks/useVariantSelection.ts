@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getOptionValue } from '../utils/variant-helpers';
 import { handleColorSelect as handleColorSelectUtil } from '../utils/image-switching';
 import type { Product, ProductVariant, VariantOption } from '../types';
@@ -8,16 +8,13 @@ interface UseVariantSelectionProps {
   setCurrentImageIndex: (index: number) => void;
 }
 
-function buildAttributeValuesFromVariant(
-  variant: ProductVariant,
-  getOptionValueFn: (options: VariantOption[] | undefined, key: string) => string | null,
-): {
+function buildAttributeValuesFromVariant(variant: ProductVariant): {
   color: string | null;
   size: string | null;
   attributes: Map<string, string>;
 } {
-  const color = getOptionValueFn(variant.options, 'color');
-  const size = getOptionValueFn(variant.options, 'size');
+  const color = getOptionValue(variant.options, 'color');
+  const size = getOptionValue(variant.options, 'size');
   const attributes = new Map<string, string>();
 
   variant.options?.forEach((option) => {
@@ -37,6 +34,11 @@ function buildAttributeValuesFromVariant(
   return { color, size, attributes };
 }
 
+function getDefaultVariant(product: Product): ProductVariant | null {
+  if (!product.variants?.length) return null;
+  return product.variants.find((variant) => variant.stock > 0) ?? product.variants[0] ?? null;
+}
+
 export function useVariantSelection({
   product,
   setCurrentImageIndex,
@@ -44,23 +46,41 @@ export function useVariantSelection({
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedAttributeValues, setSelectedAttributeValues] = useState<Map<string, string>>(new Map());
+  const initializedProductIdRef = useRef<string | null>(null);
 
-  const getOptionValueFn = useCallback((options: VariantOption[] | undefined, key: string): string | null => {
-    return getOptionValue(options, key);
-  }, []);
-
-  useEffect(() => {
-    setSelectedColor(null);
-    setSelectedSize(null);
-    setSelectedAttributeValues(new Map());
-  }, [product?.id]);
+  const productId = product?.id ?? null;
+  const variantCount = product?.variants?.length ?? 0;
 
   const applyVariantSelection = useCallback((variant: ProductVariant) => {
-    const { color, size, attributes } = buildAttributeValuesFromVariant(variant, getOptionValueFn);
+    const { color, size, attributes } = buildAttributeValuesFromVariant(variant);
     setSelectedColor(color);
     setSelectedSize(size);
     setSelectedAttributeValues(attributes);
-  }, [getOptionValueFn]);
+  }, []);
+
+  useEffect(() => {
+    if (!productId || variantCount === 0) {
+      initializedProductIdRef.current = null;
+      setSelectedColor(null);
+      setSelectedSize(null);
+      setSelectedAttributeValues(new Map());
+      return;
+    }
+
+    if (!product) {
+      return;
+    }
+
+    if (initializedProductIdRef.current === productId) {
+      return;
+    }
+
+    initializedProductIdRef.current = productId;
+    const initialVariant = getDefaultVariant(product);
+    if (initialVariant) {
+      applyVariantSelection(initialVariant);
+    }
+  }, [productId, variantCount, applyVariantSelection]);
 
   const handleColorSelect = useCallback((color: string) => {
     handleColorSelectUtil(
@@ -74,27 +94,21 @@ export function useVariantSelection({
   }, [product, selectedColor, setCurrentImageIndex]);
 
   const handleSizeSelect = useCallback((size: string) => {
-    if (selectedSize === size) {
-      setSelectedSize(null);
-    } else {
-      setSelectedSize(size);
-    }
-  }, [selectedSize]);
+    setSelectedSize(size.toLowerCase().trim());
+  }, []);
 
   const handleAttributeValueSelect = useCallback((attrKey: string, value: string) => {
     setSelectedAttributeValues((currentValues) => {
       const nextValues = new Map(currentValues);
-      const currentValue = currentValues.get(attrKey);
-
-      if (currentValue === value) {
-        nextValues.delete(attrKey);
-      } else {
-        nextValues.set(attrKey, value);
-      }
-
+      nextValues.set(attrKey, value);
       return nextValues;
     });
   }, []);
+
+  const getOptionValueFn = useCallback(
+    (options: VariantOption[] | undefined, key: string): string | null => getOptionValue(options, key),
+    [],
+  );
 
   return {
     selectedColor,

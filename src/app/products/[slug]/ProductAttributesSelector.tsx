@@ -205,8 +205,9 @@ export function ProductAttributesSelector({
             <SpecRow key={attrKey} label={label} unavailable={isUnavailable}>
               <div className="flex flex-wrap gap-2">
                 {attrGroups.map((g) => {
-                  const selectedValueId = selectedAttributeValues.get(attrKey);
-                  const isSelected = selectedValueId === g.valueId || (!g.valueId && selectedColor === g.value);
+                  const selectedValue = selectedAttributeValues.get(attrKey);
+                  const optionValue = g.valueId || g.value;
+                  const isSelected = selectedValue === optionValue || selectedValue === g.value;
                   const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
                   const hasImage = Boolean(processedImageUrl?.trim());
                   const hasColors = Boolean(g.colors?.length);
