@@ -26,15 +26,10 @@ export function handleColorSelect(
   color: string,
   _product: Product | null,
   _images: string[],
-  selectedColor: string | null,
+  _selectedColor: string | null,
   setSelectedColor: (color: string | null) => void,
   _setCurrentImageIndex: (index: number) => void,
 ): void {
   if (!color) return;
-  const normalizedColor = color.toLowerCase().trim();
-  if (selectedColor === normalizedColor) {
-    setSelectedColor(null);
-  } else {
-    setSelectedColor(normalizedColor);
-  }
+  setSelectedColor(color.toLowerCase().trim());
 }
