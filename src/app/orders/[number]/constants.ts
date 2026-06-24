@@ -16,3 +16,19 @@ export const ORDER_CONTINUE_SHOPPING_BUTTON_CLASS =
 
 export const ORDER_VIEW_CART_LINK_CLASS =
   'mt-5 block w-full text-center text-sm font-medium text-gray-800 underline-offset-2 transition-colors hover:text-gray-900 hover:underline';
+
+/** Post-checkout confirmation card — centered on page (Figma screenshot). */
+export const ORDER_CONFIRMATION_SHELL_CLASS =
+  'mx-auto flex min-h-[calc(100vh-12rem)] w-full max-w-3xl items-center justify-center px-4 py-12 sm:px-6';
+
+export const ORDER_CONFIRMATION_CARD_CLASS =
+  'w-full rounded-2xl border border-gray-200 bg-white px-10 py-10 shadow-sm sm:px-14';
+
+export const ORDER_CONFIRMATION_SUCCESS_ICON_CLASS =
+  'mb-6 flex size-16 items-center justify-center rounded-full bg-emerald-50';
+
+export const ORDER_VIEW_DETAILS_BUTTON_CLASS =
+  'flex flex-1 items-center justify-center rounded-xl bg-admin-500 px-4 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-admin-600 focus-visible:outline focus-visible:ring-2 focus-visible:ring-admin-500 focus-visible:ring-offset-2';
+
+export const ORDER_CONTINUE_SHOPPING_OUTLINE_BUTTON_CLASS =
+  'flex flex-1 items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:ring-2 focus-visible:ring-gray-400/30 focus-visible:ring-offset-2';

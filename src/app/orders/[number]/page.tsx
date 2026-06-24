@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
 import { getStoredCurrency } from '../../../lib/currency';
@@ -8,6 +8,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { LoadingState } from './components/LoadingState';
 import { ErrorState } from './components/ErrorState';
+import { OrderConfirmationCard } from './components/OrderConfirmationCard';
 import { OrderStatus } from './components/OrderStatus';
 import { OrderItems } from './components/OrderItems';
 import { ShippingAddress } from './components/ShippingAddress';
@@ -19,7 +20,6 @@ import {
   ORDER_PLACED_QUERY_PARAM,
   ORDER_PLACED_QUERY_VALUE,
 } from '../order-placed.constants';
-import { showToast } from '../../../components/Toast';
 import type { Order } from './types';
 
 export default function OrderPage() {
@@ -32,11 +32,19 @@ export default function OrderPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currency, setCurrency] = useState(getStoredCurrency());
-  const placedToastShownRef = useRef(false);
 
   const orderNumber = typeof params.number === 'string' ? params.number : '';
   const guestEmail = searchParams.get('email')?.trim() ?? '';
   const justPlaced = searchParams.get(ORDER_PLACED_QUERY_PARAM) === ORDER_PLACED_QUERY_VALUE;
+
+  const handleViewOrderDetails = useCallback(() => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete(ORDER_PLACED_QUERY_PARAM);
+    const query = nextParams.toString();
+    router.replace(query ? `/orders/${orderNumber}?${query}` : `/orders/${orderNumber}`, {
+      scroll: false,
+    });
+  }, [orderNumber, router, searchParams]);
 
   const fetchOrder = useCallback(async () => {
     if (!orderNumber) {
@@ -82,32 +90,20 @@ export default function OrderPage() {
     };
   }, [fetchOrder]);
 
-  useEffect(() => {
-    if (!order || !justPlaced || placedToastShownRef.current) {
-      return;
-    }
-
-    placedToastShownRef.current = true;
-    showToast(
-      t('orders.placedSuccess.message').replace('{number}', order.number),
-      'success',
-      5000
-    );
-
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete(ORDER_PLACED_QUERY_PARAM);
-    const query = nextParams.toString();
-    router.replace(query ? `/orders/${order.number}?${query}` : `/orders/${order.number}`, {
-      scroll: false,
-    });
-  }, [justPlaced, order, router, searchParams, t]);
-
   if (loading) {
     return <LoadingState />;
   }
 
   if (error || !order) {
     return <ErrorState error={error} />;
+  }
+
+  if (justPlaced) {
+    return (
+      <div className="bg-gray-50">
+        <OrderConfirmationCard orderNumber={order.number} onViewDetails={handleViewOrderDetails} />
+      </div>
+    );
   }
 
   const placedDateLabel = formatOrderPlacedDate(order.createdAt, lang);
