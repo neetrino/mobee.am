@@ -16,7 +16,6 @@ export const PRODUCT_VARIANT_DB_SELECT = {
   stockReserved: true,
   weightGrams: true,
   imageUrl: true,
-  media: true,
   position: true,
   published: true,
   attributes: true,

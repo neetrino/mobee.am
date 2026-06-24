@@ -12,6 +12,9 @@
     "aparikDescription": "Ստանալ ապառիկի առաջարկ"
   },
   "orderSummary": "Պատվերի ամփոփում",
+  "orderItems": {
+    "title": "Ձեր պատվերի ապրանքները"
+  },
   "promoCode": {
     "title": "Պրոմոկոդ"
   },

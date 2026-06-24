@@ -12,12 +12,17 @@ import {
   CHECKOUT_RADIO_ACCENT_CLASS,
 } from './constants';
 import { CheckoutPaymentMethodLogo } from './components/CheckoutPaymentMethodLogo';
+import { CheckoutOrderItems } from './components/CheckoutOrderItems';
 import { PurchaseIntentSection } from './components/PurchaseIntentSection';
 import { ShippingCitySelect } from './components/ShippingCitySelect';
+import type { Cart } from './types';
 
 const CHECKOUT_FORM_SECTION_CARD_CLASS = `p-6 ${CHECKOUT_FORM_CARD_RADIUS_CLASS} ${CHECKOUT_FORM_CARD_FRAME_MATCH_CART_CLASS}`;
 
 interface CheckoutFormProps {
+  cart: Cart;
+  onRemoveItem: (itemId: string) => void;
+  removingItemId?: string | null;
   register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
@@ -39,6 +44,9 @@ interface CheckoutFormProps {
 }
 
 export function CheckoutForm({
+  cart,
+  onRemoveItem,
+  removingItemId = null,
   register,
   setValue,
   errors,
@@ -57,6 +65,8 @@ export function CheckoutForm({
 
   return (
     <div className="space-y-6 lg:col-span-7">
+      <CheckoutOrderItems cart={cart} onRemove={onRemoveItem} removingItemId={removingItemId} />
+
       <Card className={CHECKOUT_FORM_SECTION_CARD_CLASS}>
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.contactInformation')}</h2>
         <div className={CHECKOUT_CONTACT_FIELDS_GRID_CLASS}>

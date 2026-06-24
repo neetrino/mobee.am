@@ -12,6 +12,9 @@
     "aparikDescription": "Получить предложение по рассрочке"
   },
   "orderSummary": "Итоги заказа",
+  "orderItems": {
+    "title": "Товары в вашем заказе"
+  },
   "promoCode": {
     "title": "Промокод"
   },

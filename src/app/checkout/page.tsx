@@ -48,6 +48,8 @@ export default function CheckoutPage() {
     orderSummary,
     handlePlaceOrder,
     onSubmit,
+    removeItem,
+    removingItemId,
   } = useCheckout();
 
   if (loading) {
@@ -89,6 +91,9 @@ export default function CheckoutPage() {
       <form onSubmit={handlePlaceOrder} lang={FORM_INPUT_LATIN_LANG}>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <CheckoutForm
+            cart={cart}
+            onRemoveItem={removeItem}
+            removingItemId={removingItemId}
             register={register}
             setValue={setValue}
             errors={errors}

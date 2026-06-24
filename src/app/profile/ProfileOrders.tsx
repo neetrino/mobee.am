@@ -4,6 +4,7 @@ import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../li
 import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import { ProfileSectionCard } from './ProfileSectionCard';
 import { getStatusColor, getPaymentStatusColor } from './utils';
+import { getProfileOrdersPath } from './profile-orders-path';
 import type { OrderListItem } from './types';
 
 interface ProfileOrdersProps {
@@ -72,7 +73,7 @@ export function ProfileOrders({
         {orders.map((order) => (
           <Link
             key={order.id}
-            href={`/orders/${order.number}`}
+            href={getProfileOrdersPath({ orderNumber: order.number })}
             onClick={(e) => onOrderClick(order, e)}
             className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
           >

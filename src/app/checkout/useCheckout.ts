@@ -27,7 +27,7 @@ export function useCheckout() {
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
   const allPaymentMethods = usePaymentMethods();
-  const { cart, loading, fetchCart } = useCart(isLoggedIn);
+  const { cart, loading, fetchCart, removeItem, removingItemId } = useCart(isLoggedIn);
   const subtotalAfterDiscountAmd = useMemo(
     () => (cart ? getCartSubtotalAfterDiscountAmd(cart.totals) : 0),
     [cart]
@@ -250,5 +250,7 @@ export function useCheckout() {
     handlePlaceOrder,
     onSubmit,
     isLoggedIn,
+    removeItem,
+    removingItemId,
   };
 }

@@ -3,6 +3,7 @@ import { Button, Card } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { PROFILE_DASHBOARD_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor } from './utils';
+import { getProfileOrdersPath } from './profile-orders-path';
 import type { DashboardData, OrderListItem, ProfileTab } from './types';
 
 interface ProfileDashboardProps {
@@ -136,7 +137,7 @@ export function ProfileDashboard({
             {dashboardData.recentOrders.map((order) => (
               <Link
                 key={order.id}
-                href={`/orders/${order.number}`}
+                href={getProfileOrdersPath({ orderNumber: order.number })}
                 onClick={(e) => onOrderClick(order as OrderListItem, e)}
                 className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
               >

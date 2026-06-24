@@ -12,6 +12,9 @@
     "aparikDescription": "Get an installment offer"
   },
   "orderSummary": "Order Summary",
+  "orderItems": {
+    "title": "Products in Your Order"
+  },
   "promoCode": {
     "title": "Promo Code"
   },
