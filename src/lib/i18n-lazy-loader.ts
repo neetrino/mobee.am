@@ -3,22 +3,55 @@ import { type Namespace, VALID_NAMESPACES } from './i18n-types';
 
 import enCommon from '../locales/en/common.json';
 import enAdmin from '../locales/en/admin.json';
+import enHome from '../locales/en/home.json';
+import hyHome from '../locales/hy/home.json';
+import ruHome from '../locales/ru/home.json';
 
 type TranslationRecord = Record<string, unknown>;
 type LocaleStore = Partial<Record<Namespace, TranslationRecord>>;
+
+const HOME_BY_LANG: Partial<Record<LanguageCode, TranslationRecord>> = {
+  en: enHome as TranslationRecord,
+  hy: hyHome as TranslationRecord,
+  ru: ruHome as TranslationRecord,
+};
 
 const localeStores: Partial<Record<LanguageCode, LocaleStore>> = {
   en: {
     common: enCommon as TranslationRecord,
     admin: enAdmin as TranslationRecord,
+    home: enHome as TranslationRecord,
   },
 };
 
 const inflightLoads = new Map<string, Promise<void>>();
 const listeners = new Set<() => void>();
+let translationRevision = 0;
+
+export function getLazyTranslationRevision(): number {
+  return translationRevision;
+}
 
 function notifyListeners(): void {
+  translationRevision += 1;
   listeners.forEach((listener) => listener());
+}
+
+/**
+ * Synchronously seeds storefront-critical namespaces for SSR and first paint.
+ * `home` is required on the homepage hero; `common` is already eager for `en`.
+ */
+export function seedStorefrontLocale(lang: LanguageCode): void {
+  const home = HOME_BY_LANG[lang];
+  if (!home) {
+    return;
+  }
+
+  if (!localeStores[lang]) {
+    localeStores[lang] = {};
+  }
+
+  localeStores[lang]!.home = home;
 }
 
 export function subscribeLazyTranslations(listener: () => void): () => void {
@@ -33,12 +66,20 @@ export function clearLazyTranslationStore(): void {
       localeStores[lang] = {
         common: enCommon as TranslationRecord,
         admin: enAdmin as TranslationRecord,
+        home: enHome as TranslationRecord,
       };
       continue;
     }
     delete localeStores[lang];
   }
   notifyListeners();
+}
+
+export async function preloadStorefrontNamespaces(lang: LanguageCode): Promise<void> {
+  await preloadNamespaces(lang, ['common', 'home']);
+  if (lang !== 'en') {
+    await preloadNamespaces('en', ['common', 'home']);
+  }
 }
 
 function getNamespaceLoader(lang: LanguageCode, namespace: Namespace): () => Promise<{ default: TranslationRecord }> {
