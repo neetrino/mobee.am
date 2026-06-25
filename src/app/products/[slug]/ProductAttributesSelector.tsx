@@ -87,6 +87,9 @@ function SpecRow({
 const selectedPillClass = 'border-admin bg-admin-50 text-gray-900';
 const idlePillClass = 'border-gray-200 text-gray-900 hover:border-gray-400';
 const oosPillClass = 'border-gray-200 text-gray-400 line-through opacity-80';
+const COLOR_SWATCH_BUTTON_CLASS =
+  'h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 transition-all';
+const COLOR_SWATCH_ROW_CLASS = 'flex flex-wrap justify-end gap-2.5';
 
 export function ProductAttributesSelector({
   product,
@@ -130,7 +133,7 @@ export function ProductAttributesSelector({
           if (isColor) {
             return (
               <SpecRow key={attrKey} label={label} unavailable={isUnavailable}>
-                <div className="flex flex-wrap gap-3">
+                <div className={COLOR_SWATCH_ROW_CLASS}>
                   {attrGroups.map((g) => {
                     const isSelected = selectedColor === g.value?.toLowerCase().trim();
                     const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
@@ -143,7 +146,7 @@ export function ProductAttributesSelector({
                         type="button"
                         onClick={() => onColorSelect(g.value)}
                         title={getAttributeLabel(language, attrKey, g.value)}
-                        className={`h-14 w-14 shrink-0 overflow-hidden rounded-md border-2 transition-all ${borderClass} ${
+                        className={`${COLOR_SWATCH_BUTTON_CLASS} ${borderClass} ${
                           isSelected ? 'border-admin ring-2 ring-admin/25' : 'border-gray-200 hover:border-gray-400'
                         } ${g.stock <= 0 ? 'opacity-60' : ''}`}
                         style={hasImage ? undefined : { backgroundColor: colorHex }}
@@ -231,7 +234,7 @@ export function ProductAttributesSelector({
                           className="h-6 w-6 rounded object-cover"
                         />
                       ) : hasColors && colorHex ? (
-                        <span className="h-6 w-6 rounded border border-gray-300" style={{ backgroundColor: colorHex }} />
+                        <span className="h-6 w-6 shrink-0 rounded-full border border-gray-300" style={{ backgroundColor: colorHex }} />
                       ) : null}
                       <span>{getAttributeLabel(language, attrKey, g.value)}</span>
                     </button>
@@ -249,7 +252,7 @@ export function ProductAttributesSelector({
     <div>
       {colorGroups.length > 0 && (
         <SpecRow label={t(language, 'product.color')} unavailable={false}>
-          <div className="flex flex-wrap gap-3">
+          <div className={COLOR_SWATCH_ROW_CLASS}>
             {colorGroups.map((g) => {
               const isSelected = selectedColor === g.color?.toLowerCase().trim();
               const oos = g.stock <= 0;
@@ -259,7 +262,7 @@ export function ProductAttributesSelector({
                   type="button"
                   onClick={() => onColorSelect(g.color)}
                   title={getAttributeLabel(language, 'color', g.color)}
-                  className={`h-14 w-14 shrink-0 rounded-md border-2 transition-all ${
+                  className={`${COLOR_SWATCH_BUTTON_CLASS} ${
                     isSelected ? 'border-admin ring-2 ring-admin/25' : 'border-gray-200 hover:border-gray-400'
                   } ${oos ? 'opacity-60' : ''}`}
                   style={{ backgroundColor: getColorValue(g.color) }}
