@@ -32,6 +32,7 @@ interface ProductRow {
     compareAtPrice: number | null;
     stock: number;
     imageUrl: string | null;
+    media: unknown;
   }>;
 }
 
@@ -104,7 +105,10 @@ class GuestCartHydrateService {
         },
         variants: {
           where: { published: true },
-          select: PRODUCT_VARIANT_DB_SELECT,
+          select: {
+            ...PRODUCT_VARIANT_DB_SELECT,
+            media: true,
+          },
         },
       },
     })) as ProductRow[];
@@ -128,7 +132,7 @@ class GuestCartHydrateService {
 
       const image = resolveCartLineProductImageUrl(
         { media: product.media },
-        { imageUrl: variant.imageUrl },
+        { imageUrl: variant.imageUrl, media: variant.media },
       );
       const originalPrice =
         variant.compareAtPrice != null && variant.compareAtPrice > variant.price

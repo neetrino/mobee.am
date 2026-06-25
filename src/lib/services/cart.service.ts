@@ -100,6 +100,7 @@ class CartService {
           price: number;
           compareAtPrice?: number | null;
           imageUrl?: string | null;
+          media?: unknown;
         };
       }) => {
         const product = item.product;
@@ -110,7 +111,7 @@ class CartService {
 
         const imageUrl = resolveCartLineProductImageUrl(
           { media: product?.media },
-          { imageUrl: variant?.imageUrl ?? null },
+          { imageUrl: variant?.imageUrl ?? null, media: variant?.media },
         );
 
         const productDiscount = product?.discountPercent ?? 0;

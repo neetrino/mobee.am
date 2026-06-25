@@ -29,6 +29,7 @@ interface ProductInfoAndActionsProps {
   quantity: number;
   maxQuantity: number;
   isOutOfStock: boolean;
+  isSingleVariantOutOfStock: boolean;
   isVariationRequired: boolean;
   hasUnavailableAttributes: boolean;
   unavailableAttributes: Map<string, boolean>;
@@ -63,6 +64,7 @@ export function ProductInfoAndActions({
   quantity,
   maxQuantity,
   isOutOfStock,
+  isSingleVariantOutOfStock,
   isVariationRequired,
   hasUnavailableAttributes,
   unavailableAttributes,
@@ -164,6 +166,13 @@ export function ProductInfoAndActions({
       {isVariationRequired && (
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="text-sm font-medium text-amber-900">{getRequiredAttributesMessage()}</p>
+        </div>
+      )}
+      {isSingleVariantOutOfStock && !isVariationRequired && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
+          <p className="text-sm font-medium text-red-800">
+            {t(language, 'product.outOfStock')}
+          </p>
         </div>
       )}
       {hasUnavailableAttributes && !isVariationRequired && (

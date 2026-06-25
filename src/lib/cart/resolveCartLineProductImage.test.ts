@@ -2,16 +2,31 @@ import { describe, expect, it } from "vitest";
 import { resolveCartLineProductImageUrl } from "./resolveCartLineProductImage";
 
 describe("resolveCartLineProductImageUrl", () => {
-  it("uses product media when present", () => {
+  it("prefers variant imageUrl over product media", () => {
     expect(
       resolveCartLineProductImageUrl(
         { media: ["https://cdn.example.com/a.jpg"] },
         { imageUrl: "https://cdn.example.com/v.jpg" },
       ),
+    ).toBe("https://cdn.example.com/v.jpg");
+  });
+
+  it("uses variant media when imageUrl is empty", () => {
+    expect(
+      resolveCartLineProductImageUrl(
+        { media: ["https://cdn.example.com/a.jpg"] },
+        { media: [{ url: "https://cdn.example.com/vm.jpg" }] },
+      ),
+    ).toBe("https://cdn.example.com/vm.jpg");
+  });
+
+  it("falls back to product media when variant has no image", () => {
+    expect(
+      resolveCartLineProductImageUrl({ media: ["https://cdn.example.com/a.jpg"] }, { imageUrl: null }),
     ).toBe("https://cdn.example.com/a.jpg");
   });
 
-  it("falls back to variant imageUrl when media empty", () => {
+  it("falls back to variant imageUrl when product media empty", () => {
     expect(
       resolveCartLineProductImageUrl({ media: [] }, { imageUrl: "https://cdn.example.com/v.jpg" }),
     ).toBe("https://cdn.example.com/v.jpg");
