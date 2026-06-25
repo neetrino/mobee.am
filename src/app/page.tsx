@@ -6,6 +6,7 @@ import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
 import { HomeProductSectionsSection } from '../components/home/HomeProductSectionsSection';
 import { HomePagePartnerLogos } from '../components/HomePagePartnerLogos';
 import { readLanguageFromCookies } from '../lib/language';
+import { getCachedHomeCategoryStrip } from '../lib/services/categories-home-strip-cached';
 
 function HomeProductSectionsFallback() {
   return (
@@ -19,6 +20,7 @@ function HomeProductSectionsFallback() {
 export default async function HomePage() {
   const cookieStore = await cookies();
   const language = readLanguageFromCookies(cookieStore);
+  const { result: homeStrip } = await getCachedHomeCategoryStrip(language);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
@@ -26,7 +28,7 @@ export default async function HomePage() {
         <HeroCarousel />
       </section>
 
-      <TopCategories />
+      <TopCategories initialItems={homeStrip.data} initialLocale={language} />
 
       <FeaturedIntroHeading />
 

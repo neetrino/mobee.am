@@ -6,6 +6,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
+import {
+  buildShopHrefFromSearchParams,
+  prefetchStorefrontRoute,
+  warmShopFromSearchParams,
+} from '@/lib/navigation/storefront-prefetch';
 import { useProductsFilters } from './ProductsFiltersProvider';
 
 interface CategoryFilterProps {
@@ -95,7 +100,16 @@ export function CategoryFilter({
       params.delete('category');
     }
     params.delete('page');
-    router.push(`/shop?${params.toString()}`);
+
+    const record: Record<string, string | undefined> = {};
+    params.forEach((value, key) => {
+      record[key] = value;
+    });
+
+    const href = buildShopHrefFromSearchParams(record);
+    prefetchStorefrontRoute(router, href);
+    warmShopFromSearchParams(record, getStoredLanguage());
+    router.push(href);
   };
 
   if (categories.length === 0) {

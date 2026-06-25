@@ -7,6 +7,7 @@ import { getStoredLanguage } from '../lib/language';
 import { getStoredCurrency, formatPrice as formatCurrencyPrice, type CurrencyCode } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 
 interface PriceFilterProps {
   currentMinPrice?: string;
@@ -214,8 +215,13 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
 
         // Use a small delay to debounce rapid changes
         const timeoutId = setTimeout(() => {
-          const nextUrl = nextQueryString ? `${pathname}?${nextQueryString}` : pathname;
-          router.replace(nextUrl, { scroll: false });
+          const href = warmShopNavigationFromSearchParams(
+            router,
+            params,
+            getStoredLanguage(),
+            pathname,
+          );
+          router.replace(href, { scroll: false });
         }, 300);
         
         return () => clearTimeout(timeoutId);

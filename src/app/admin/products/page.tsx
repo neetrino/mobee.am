@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
 import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { buildAdminSessionCacheKey, readAdminSessionCache } from '@/lib/admin/admin-session-cache';
+import { fetchAdminListWithCache } from '@/lib/admin/admin-list-cache';
+import { DEFAULT_PRODUCTS_LIST_PARAMS } from '@/lib/admin/admin-page-warm';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getStoredCurrency, initializeCurrencyRates, type CurrencyCode } from '../../../lib/currency';
 import { ProductFilters } from './components/ProductFilters';
@@ -18,8 +21,11 @@ export default function ProductsPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin } = useAuth();
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const initialProductsCache = readAdminSessionCache<ProductsResponse>(
+    buildAdminSessionCacheKey('/supersudo/products', DEFAULT_PRODUCTS_LIST_PARAMS),
+  );
+  const [products, setProducts] = useState<Product[]>(initialProductsCache?.data ?? []);
+  const [loading, setLoading] = useState(initialProductsCache === null);
   const [search, setSearch] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [categories, setCategories] = useState<Category[]>([]);
@@ -28,7 +34,7 @@ export default function ProductsPage() {
   const [skuSearch, setSkuSearch] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'inStock' | 'outOfStock'>('all');
   const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState<ProductsResponse['meta'] | null>(null);
+  const [meta, setMeta] = useState<ProductsResponse['meta'] | null>(initialProductsCache?.meta ?? null);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('createdAt-desc');
@@ -41,7 +47,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     if (isLoggedIn && isAdmin) {
-      fetchCategories();
+      void fetchCategories();
     }
   }, [isLoggedIn, isAdmin]);
 
@@ -73,13 +79,6 @@ export default function ProductsPage() {
       };
     }
   }, []);
-
-  // Fetch categories on mount
-  useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchCategories();
-    }
-  }, [isLoggedIn, isAdmin]);
 
   // Close category dropdown when clicking outside
   useEffect(() => {
@@ -120,9 +119,8 @@ export default function ProductsPage() {
      
   }, [isLoggedIn, isAdmin, page, search, selectedCategories, skuSearch, stockFilter, sortBy, minPrice, maxPrice]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (force = false) => {
     try {
-      setLoading(true);
       const params: Record<string, string> = {
         page: page.toString(),
         limit: '20',
@@ -156,13 +154,33 @@ export default function ProductsPage() {
         params.stock = stockFilter;
       }
 
-      const response = await apiClient.get<ProductsResponse>('/api/v1/admin/products', {
+      const cached = readAdminSessionCache<ProductsResponse>(
+        buildAdminSessionCacheKey('/supersudo/products', params),
+      );
+      if (!force && cached) {
+        setProducts(cached.data || []);
+        setMeta(cached.meta || null);
+        setLoading(false);
+        return;
+      }
+
+      if (products.length === 0 && !cached) {
+        setLoading(true);
+      }
+
+      const { data: response } = await fetchAdminListWithCache<ProductsResponse>({
+        route: '/supersudo/products',
         params,
+        force,
+        fetcher: () =>
+          apiClient.get<ProductsResponse>('/api/v1/admin/products', {
+            params,
+          }),
       });
 
       setProducts(response.data || []);
       setMeta(response.meta || null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [ADMIN] Error fetching products:', err);
       showToast(
         t('admin.products.errorLoading').replace(

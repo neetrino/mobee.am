@@ -1,8 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useMemo } from 'react';
 import { extractCategoryImageUrl } from '../lib/categoryMedia';
 import {
@@ -19,13 +18,16 @@ import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { TopCategoriesMobileIcon } from './TopCategoriesMobileIcon';
 import { reorderHomeStripItemsForMobile } from '../lib/homeCategoryStripMobileOrder';
+import { CategoryStripLink } from './CategoryStripLink';
+import type { LanguageCode } from '../lib/language';
 import { useHomeCategoryStrip } from './useHomeCategoryStrip';
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['700'],
-  display: 'swap',
-});
+type TopCategoriesProps = {
+  initialItems?: HomeStripCategoryItem[];
+  initialLocale?: LanguageCode;
+};
+
+const montserrat = siteMontserrat;
 
 const CATEGORY_STRIP_LOADING_SKELETON_COUNT = 3;
 const CATEGORY_STRIP_SCROLL_ROW_CLASS =
@@ -89,9 +91,12 @@ function resolveStripSlotKey(
   return resolveCategoryStripSlotKey(category, index) ?? 'computers';
 }
 
-export function TopCategories() {
+export function TopCategories({ initialItems, initialLocale }: TopCategoriesProps = {}) {
   const { t } = useTranslation();
-  const { items, loadingHomeStrip: loading } = useHomeCategoryStrip();
+  const { items, loadingHomeStrip: loading } = useHomeCategoryStrip({
+    initialItems,
+    initialLocale,
+  });
 
   const sortedItems = useMemo(
     () => [...items].sort((a, b) => a.position - b.position),
@@ -141,16 +146,17 @@ export function TopCategories() {
             const imageSrc = extractCategoryImageUrl(category.media);
 
             return (
-              <Link
+              <CategoryStripLink
                 key={category.id}
                 href={categoryStripHref(category)}
+                categorySlug={category.slug}
                 className="flex shrink-0 flex-col items-center gap-2 transition-opacity active:opacity-90"
               >
                 <TopCategoriesMobileIcon imageSrc={imageSrc} slotKey={slotKey} />
                 <span className="shrink-0 rounded-full bg-[#f7f7f7] px-4 py-2 text-sm font-medium leading-normal text-[#303030]">
                   {category.title}
                 </span>
-              </Link>
+              </CategoryStripLink>
             );
           })}
         </div>
@@ -161,9 +167,10 @@ export function TopCategories() {
             const imageSrc = extractCategoryImageUrl(category.media);
 
             return (
-              <Link
+              <CategoryStripLink
                 key={category.id}
                 href={categoryStripHref(category)}
+                categorySlug={category.slug}
                 className={`category-strip-card-cq group relative flex w-[197px] shrink-0 flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(visual)}`}
               >
                 <div className="relative h-full w-full min-h-0 overflow-hidden">
@@ -178,7 +185,7 @@ export function TopCategories() {
                     {category.title}
                   </span>
                 </div>
-              </Link>
+              </CategoryStripLink>
             );
           })}
         </div>

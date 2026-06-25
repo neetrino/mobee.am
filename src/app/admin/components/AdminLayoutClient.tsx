@@ -4,10 +4,9 @@ import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
-import { useTranslation } from '@/lib/i18n-client';
-import { preloadAdminNamespaces } from '@/lib/i18n-lazy-loader';
-import { useUiLanguage } from '@/components/UiLanguageProvider';
+import { useAdminTranslation } from '@/lib/i18n-client';
 import { adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
+import { AdminNavProvider } from './AdminNavProvider';
 import { AdminPageShell } from './AdminPageShell';
 
 const ADMIN_DASHBOARD_PATHS = new Set(['/supersudo', '/admin']);
@@ -30,17 +29,12 @@ interface AdminLayoutClientProps {
  * Shared admin shell: auth gate + persistent sidebar across client navigations.
  */
 export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
-  const { t } = useTranslation();
-  const lang = useUiLanguage();
+  const { t } = useAdminTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => adminNavMarkMount('AdminLayoutClient'), []);
-
-  useEffect(() => {
-    void preloadAdminNamespaces(lang);
-  }, [lang]);
 
   useEffect(() => {
     if (isLoading) {
@@ -71,13 +65,15 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
   }
 
   return (
-    <AdminPageShell
-      currentPath={pathname || '/supersudo'}
-      router={router}
-      t={t}
-      mainClassName={resolveAdminMainClassName(pathname)}
-    >
-      {children}
-    </AdminPageShell>
+    <AdminNavProvider>
+      <AdminPageShell
+        currentPath={pathname || '/supersudo'}
+        router={router}
+        t={t}
+        mainClassName={resolveAdminMainClassName(pathname)}
+      >
+        {children}
+      </AdminPageShell>
+    </AdminNavProvider>
   );
 }

@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useMemo, type ReactNode } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ProductsHeader } from '@/components/ProductsHeader';
 import { ProductsGrid } from '@/components/ProductsGrid';
 import { ShopSortFilter } from '@/components/ShopSortFilter';
 import type { LanguageCode } from '@/lib/language';
+import { getStoredLanguage } from '@/lib/language';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
 import { useTranslation } from '@/lib/i18n-client';
 import { parseProductSortOption } from '@/lib/products/sort';
@@ -15,12 +16,14 @@ import {
   getPaginationPagesPhoneWindow,
   type PaginationPageItem,
 } from '@/lib/pagination/get-pagination-pages';
+import { warmShopPaginationNavigation } from '@/lib/navigation/storefront-prefetch';
 import { useShopCatalog, type ShopCatalogProduct } from './useShopCatalog';
 
 type ShopPaginationPageItemsProps = {
   items: PaginationPageItem[];
   currentPage: number;
   buildUrl: (pageNum: number) => string;
+  searchParamsRecord: Record<string, string | undefined>;
   keyPrefix: string;
   className: string;
 };
@@ -29,6 +32,7 @@ function ShopPaginationPageItems({
   items,
   currentPage,
   buildUrl,
+  searchParamsRecord,
   keyPrefix,
   className,
 }: ShopPaginationPageItemsProps) {
@@ -52,16 +56,53 @@ function ShopPaginationPageItems({
             {item}
           </span>
         ) : (
-          <Link
+          <ShopPaginationLink
             key={`${keyPrefix}-page-${item}`}
             href={buildUrl(item)}
+            pageNum={item}
+            searchParamsRecord={searchParamsRecord}
             className="inline-flex h-10 min-w-9 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:min-w-10 sm:px-3"
           >
             {item}
-          </Link>
+          </ShopPaginationLink>
         ),
       )}
     </div>
+  );
+}
+
+type ShopPaginationLinkProps = {
+  href: string;
+  pageNum: number;
+  searchParamsRecord: Record<string, string | undefined>;
+  className: string;
+  children: ReactNode;
+};
+
+function ShopPaginationLink({
+  href,
+  pageNum,
+  searchParamsRecord,
+  className,
+  children,
+}: ShopPaginationLinkProps) {
+  const router = useRouter();
+
+  const warm = () => {
+    warmShopPaginationNavigation(router, searchParamsRecord, pageNum, getStoredLanguage());
+  };
+
+  return (
+    <Link
+      href={href}
+      prefetch
+      className={className}
+      onPointerDown={warm}
+      onMouseEnter={warm}
+      onFocus={warm}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -91,7 +132,7 @@ export function ShopCatalogArea({
   serverLanguage,
 }: ShopCatalogAreaProps = {}) {
   const searchParams = useSearchParams();
-  const { productsData, loading, error } = useShopCatalog({
+  const { productsData, loading, refreshing, error } = useShopCatalog({
     initialPayload,
     initialFiltersKey,
     serverLanguage,
@@ -100,6 +141,14 @@ export function ShopCatalogArea({
 
   const page = parseInt(searchParams.get('page') || '1', 10);
   const sort = parseProductSortOption(searchParams.get('sort') ?? undefined);
+
+  const searchParamsRecord = useMemo(() => {
+    const record: Record<string, string | undefined> = {};
+    searchParams.forEach((value, key) => {
+      record[key] = value;
+    });
+    return record;
+  }, [searchParams]);
 
   const normalizedProducts = useMemo(() => {
     const rows = productsData?.data ?? [];
@@ -169,7 +218,19 @@ export function ShopCatalogArea({
           <ShopGridSkeleton />
         ) : normalizedProducts.length > 0 ? (
           <>
-            <ProductsGrid products={normalizedProducts} sortBy={sort} />
+            <div
+              className={`relative transition-opacity duration-200 ${refreshing ? 'opacity-60' : 'opacity-100'}`}
+              aria-busy={refreshing}
+            >
+              <ProductsGrid products={normalizedProducts} sortBy={sort} />
+              {refreshing ? (
+                <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center pt-4">
+                  <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-gray-600 shadow-sm">
+                    {t('common.messages.loading')}
+                  </span>
+                </div>
+              ) : null}
+            </div>
 
             {totalPages > 1 && (
               <nav
@@ -180,12 +241,14 @@ export function ShopCatalogArea({
                   <div className="flex w-max min-w-full justify-center px-1 sm:px-0">
                     <div className="inline-flex flex-nowrap items-center gap-1 rounded-[9999px] py-1 sm:gap-2 sm:py-2 sm:px-3">
                   {page > 1 ? (
-                    <Link
+                    <ShopPaginationLink
                       href={buildPaginationUrl(1)}
+                      pageNum={1}
+                      searchParamsRecord={searchParamsRecord}
                       className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:px-4"
                     >
                       {t('common.pagination.first')}
-                    </Link>
+                    </ShopPaginationLink>
                   ) : (
                     <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#9AA4B2] sm:px-4">
                       {t('common.pagination.first')}
@@ -198,6 +261,7 @@ export function ShopCatalogArea({
                     items={getPaginationPagesPhoneWindow(totalPages, page)}
                     currentPage={page}
                     buildUrl={buildPaginationUrl}
+                    searchParamsRecord={searchParamsRecord}
                     keyPrefix="phone"
                     className="md:hidden"
                   />
@@ -205,6 +269,7 @@ export function ShopCatalogArea({
                     items={getPaginationPages(totalPages, page)}
                     currentPage={page}
                     buildUrl={buildPaginationUrl}
+                    searchParamsRecord={searchParamsRecord}
                     keyPrefix="tablet"
                     className="hidden md:inline-flex"
                   />
@@ -212,12 +277,14 @@ export function ShopCatalogArea({
                   <div className="mx-0.5 h-6 w-px shrink-0 bg-[#E2E8F0] sm:mx-1" aria-hidden />
 
                   {page < totalPages ? (
-                    <Link
+                    <ShopPaginationLink
                       href={buildPaginationUrl(totalPages)}
+                      pageNum={totalPages}
+                      searchParamsRecord={searchParamsRecord}
                       className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#0F172B] transition-colors hover:border-[#d8dbe1] hover:bg-[#f6f7f9] sm:px-4"
                     >
                       {t('common.pagination.last')}
-                    </Link>
+                    </ShopPaginationLink>
                   ) : (
                     <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[9999px] border border-transparent px-2 text-sm font-medium text-[#9AA4B2] sm:px-4">
                       {t('common.pagination.last')}

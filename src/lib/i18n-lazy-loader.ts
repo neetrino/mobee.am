@@ -2,7 +2,6 @@ import type { LanguageCode } from './language';
 import { type Namespace, VALID_NAMESPACES } from './i18n-types';
 
 import enCommon from '../locales/en/common.json';
-import enAdmin from '../locales/en/admin.json';
 import enHome from '../locales/en/home.json';
 import hyHome from '../locales/hy/home.json';
 import ruHome from '../locales/ru/home.json';
@@ -19,7 +18,6 @@ const HOME_BY_LANG: Partial<Record<LanguageCode, TranslationRecord>> = {
 const localeStores: Partial<Record<LanguageCode, LocaleStore>> = {
   en: {
     common: enCommon as TranslationRecord,
-    admin: enAdmin as TranslationRecord,
     home: enHome as TranslationRecord,
   },
 };
@@ -65,7 +63,6 @@ export function clearLazyTranslationStore(): void {
     if (lang === 'en') {
       localeStores[lang] = {
         common: enCommon as TranslationRecord,
-        admin: enAdmin as TranslationRecord,
         home: enHome as TranslationRecord,
       };
       continue;

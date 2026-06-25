@@ -6,6 +6,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   clientT,
   syncGetAttributeLabel,
@@ -28,6 +29,9 @@ import { useUiLanguage } from '../components/UiLanguageProvider';
  */
 export function useTranslation() {
   const lang = useUiLanguage();
+  const pathname = usePathname();
+  const isAdminRoute =
+    pathname?.startsWith('/supersudo') === true || pathname?.startsWith('/admin') === true;
 
   useSyncExternalStore(
     subscribeLazyTranslations,
@@ -37,8 +41,10 @@ export function useTranslation() {
 
   useEffect(() => {
     void preloadStorefrontNamespaces(lang);
-    void preloadAdminNamespaces(lang);
-  }, [lang]);
+    if (isAdminRoute) {
+      void preloadAdminNamespaces(lang);
+    }
+  }, [isAdminRoute, lang]);
 
   const translate = useCallback(
     (path: string) => {
@@ -85,3 +91,41 @@ export function useTranslation() {
 }
 
 export type { ProductField } from './i18n-types';
+
+/**
+ * Admin-only translation hook — preloads admin namespace (use inside `/supersudo` only).
+ */
+export function useAdminTranslation() {
+  const lang = useUiLanguage();
+
+  useSyncExternalStore(
+    subscribeLazyTranslations,
+    getLazyTranslationRevision,
+    getLazyTranslationRevision,
+  );
+
+  useEffect(() => {
+    void preloadAdminNamespaces(lang);
+  }, [lang]);
+
+  const translate = useCallback(
+    (path: string) => {
+      if (!path || typeof path !== 'string') {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[i18n] useAdminTranslation: Invalid path provided to t()', path);
+        }
+        return '';
+      }
+      return clientT(lang, path);
+    },
+    [lang],
+  );
+
+  return useMemo(
+    () => ({
+      t: translate,
+      lang,
+    }),
+    [translate, lang],
+  );
+}

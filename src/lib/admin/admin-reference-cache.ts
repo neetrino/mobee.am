@@ -1,3 +1,5 @@
+import { dedupedAdminRequest } from '@/lib/admin/admin-request-dedup';
+
 /**
  * Short-lived in-memory cache for stable admin reference GET data (client-side only).
  */
@@ -34,7 +36,7 @@ export async function getCachedAdminReference<T>(
     return existing.value as T;
   }
 
-  const value = await fetcher();
+  const value = await dedupedAdminRequest(`admin-ref:${key}`, fetcher);
   cache.set(key, {
     value,
     expiresAt: Date.now() + ADMIN_REFERENCE_CACHE_TTL_MS,

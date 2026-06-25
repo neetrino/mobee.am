@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Inter } from 'next/font/google';
+import { siteInter } from '../lib/fonts/site-fonts';
 import type { ReactNode } from 'react';
 import { useTranslation } from '../lib/i18n-client';
 import {
@@ -19,11 +19,7 @@ import {
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
 
-const inter = Inter({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '700', '900'],
-  display: 'swap',
-});
+const inter = siteInter;
 
 /** Footer credit company name links to Neetrino site. */
 const FOOTER_CREDIT_COMPANY_HREF = 'https://neetrino.com/';

@@ -1,12 +1,14 @@
 ﻿'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
 import { useAdminPageNavDebug } from '../hooks/useAdminPageNavDebug';
+import { useAdminCachedQuery } from '../hooks/useAdminCachedQuery';
+import { buildAdminSessionCacheKey } from '@/lib/admin/admin-session-cache';
 interface User {
   id: string;
   email: string;
@@ -31,45 +33,44 @@ interface UsersResponse {
 
 export default function UsersPage() {
   const { t } = useTranslation();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState<UsersResponse['meta'] | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'customer'>('all');
 
-  useAdminPageNavDebug(loading);
+  const usersCacheKey = buildAdminSessionCacheKey('/supersudo/users', {
+    page: page.toString(),
+    limit: '20',
+    search: search || '',
+    role: roleFilter === 'all' ? '' : roleFilter,
+  });
 
-  const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true);
-      console.log('👥 [ADMIN] Fetching users...', { page, search, roleFilter });
-      
-      const response = await apiClient.get<UsersResponse>('/api/v1/admin/users', {
+  const {
+    data: usersResponse,
+    loading,
+    refetch: refetchUsers,
+  } = useAdminCachedQuery<UsersResponse>({
+    cacheKey: usersCacheKey,
+    fetcher: () =>
+      apiClient.get<UsersResponse>('/api/v1/admin/users', {
         params: {
           page: page.toString(),
           limit: '20',
           search: search || '',
           role: roleFilter === 'all' ? '' : roleFilter,
         },
-      });
+      }),
+  });
 
-      console.log('✅ [ADMIN] Users fetched:', response);
-      setUsers(response.data || []);
-      setMeta(response.meta || null);
-    } catch (err) {
-      console.error('❌ [ADMIN] Error fetching users:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, roleFilter]);
+  const users = usersResponse?.data ?? [];
+  const meta = usersResponse?.meta ?? null;
 
-  useEffect(() => {
-    fetchUsers();
-     
-  }, [fetchUsers]);
+  useAdminPageNavDebug(loading);
+
+  const fetchUsers = useCallback(async () => {
+    await refetchUsers({ force: true });
+  }, [refetchUsers]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

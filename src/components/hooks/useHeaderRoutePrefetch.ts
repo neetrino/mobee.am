@@ -7,6 +7,10 @@ import {
   HEADER_PREFETCH_ROUTES,
 } from '@/lib/navigation/header-prefetch-routes';
 import { getStoredLanguage } from '@/lib/language';
+import {
+  prefetchStorefrontRoute,
+  warmShopFromSearchParams,
+} from '@/lib/navigation/storefront-prefetch';
 
 type UseHeaderRoutePrefetchOptions = {
   /** Re-run warm prefetch when this toggles (e.g. mobile drawer / categories menu). */
@@ -25,11 +29,7 @@ export function useHeaderRoutePrefetch(
   useEffect(() => {
     const warm = () => {
       for (const href of HEADER_PREFETCH_ROUTES) {
-        try {
-          router.prefetch(href);
-        } catch {
-          // ignore prefetch failures in dev / offline
-        }
+        prefetchStorefrontRoute(router, href);
       }
 
       const lang = getStoredLanguage();
@@ -64,9 +64,18 @@ export function useHeaderRoutePrefetch(
  * Prefetch a single href — use on category mega-menu hover.
  */
 export function prefetchHeaderHref(router: AppRouterInstance, href: string): void {
-  try {
-    router.prefetch(href);
-  } catch {
-    // ignore
+  prefetchStorefrontRoute(router, href);
+
+  if (href.startsWith('/shop')) {
+    try {
+      const url = new URL(href, 'http://localhost');
+      const record: Record<string, string | undefined> = {};
+      url.searchParams.forEach((value, key) => {
+        record[key] = value;
+      });
+      warmShopFromSearchParams(record, getStoredLanguage());
+    } catch {
+      // ignore malformed href
+    }
   }
 }

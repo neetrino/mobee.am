@@ -22,6 +22,7 @@ class ProductsService {
 
   // Slug methods
   findBySlug = productsSlugService.findBySlug.bind(productsSlugService);
+  findProductIdBySlug = productsSlugService.findProductIdBySlug.bind(productsSlugService);
 }
 
 export const productsService = new ProductsService();

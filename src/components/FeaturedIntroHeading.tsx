@@ -1,15 +1,11 @@
 'use client';
 
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-});
+const montserrat = siteMontserrat;
 
 export function FeaturedIntroHeading() {
   const { t } = useTranslation();

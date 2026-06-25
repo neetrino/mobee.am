@@ -1,9 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../../lib/api-client';
 import { ApiError } from '../../lib/api-client/types';
 import type { LanguageCode } from '../../lib/language';
+import {
+  buildRelatedProductsCacheKey,
+  fetchRelatedProductsDeduped,
+  readRelatedProductsCache,
+  writeRelatedProductsCache,
+} from '../../lib/products/related-products-cache';
 
 export interface RelatedProduct {
   id: string;
@@ -34,53 +40,119 @@ export interface RelatedProduct {
   }>;
 }
 
+export type RelatedProductsContext = {
+  productId: string;
+  primaryCategoryId?: string | null;
+  categoryIds?: string[];
+};
+
 interface UseRelatedProductsProps {
   currentProductSlug: string;
   language: LanguageCode;
+  relatedContext?: RelatedProductsContext | null;
+}
+
+function buildRelatedQueryParams(
+  language: LanguageCode,
+  relatedContext?: RelatedProductsContext | null,
+): Record<string, string> {
+  const params: Record<string, string> = {
+    limit: '10',
+    lang: language,
+  };
+
+  if (relatedContext?.productId) {
+    params.productId = relatedContext.productId;
+    if (relatedContext.primaryCategoryId) {
+      params.primaryCategoryId = relatedContext.primaryCategoryId;
+    }
+    const categoryIds = relatedContext.categoryIds?.filter(Boolean) ?? [];
+    if (categoryIds.length > 0) {
+      params.categoryIds = categoryIds.join(',');
+    }
+  }
+
+  return params;
 }
 
 /**
- * Hook for fetching related products
+ * Hook for fetching related products — cache-first, non-blocking, in-flight deduped.
  */
-export function useRelatedProducts({ currentProductSlug, language }: UseRelatedProductsProps) {
-  const [products, setProducts] = useState<RelatedProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+export function useRelatedProducts({
+  currentProductSlug,
+  language,
+  relatedContext,
+}: UseRelatedProductsProps) {
+  const cacheKey = buildRelatedProductsCacheKey(
+    currentProductSlug,
+    language,
+    relatedContext?.productId,
+  );
+  const cachedInitial = readRelatedProductsCache(cacheKey);
+  const [products, setProducts] = useState<RelatedProduct[]>(cachedInitial ?? []);
+  const [loading, setLoading] = useState(cachedInitial === null);
+  const [failed, setFailed] = useState(false);
+  const relatedContextRef = useRef(relatedContext);
+  relatedContextRef.current = relatedContext;
 
   useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      try {
-        setLoading(true);
-        
-        const params: Record<string, string> = {
-          limit: '10',
-          lang: language,
-        };
+    let cancelled = false;
 
-        const response = await apiClient.get<{
-          data: RelatedProduct[];
-        }>(`/api/v1/products/${encodeURIComponent(currentProductSlug)}/related`, {
-          params,
+    const run = async () => {
+      const key = buildRelatedProductsCacheKey(
+        currentProductSlug,
+        language,
+        relatedContextRef.current?.productId,
+      );
+      const cached = readRelatedProductsCache(key);
+      if (cached) {
+        setProducts(cached);
+        setLoading(false);
+        setFailed(false);
+        return;
+      }
+
+      setLoading(true);
+      setFailed(false);
+
+      try {
+        const fetched = await fetchRelatedProductsDeduped(key, async () => {
+          const params = buildRelatedQueryParams(language, relatedContextRef.current);
+          const response = await apiClient.get<{ data: RelatedProduct[] }>(
+            `/api/v1/products/${encodeURIComponent(currentProductSlug)}/related`,
+            { params },
+          );
+          return response.data.slice(0, 10);
         });
 
-        setProducts(response.data.slice(0, 10));
-      } catch (error) {
-        if (error instanceof ApiError && error.status === 404) {
-          setProducts([]);
-        } else {
-          console.error('[RelatedProducts] Error fetching related products:', error);
-          setProducts([]);
+        if (cancelled) {
+          return;
         }
+
+        setProducts(fetched);
+        writeRelatedProductsCache(key, fetched);
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+        if (!(error instanceof ApiError && error.status === 404)) {
+          console.error('[RelatedProducts] Error fetching related products:', error);
+        }
+        setProducts([]);
+        setFailed(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchRelatedProducts();
-  }, [currentProductSlug, language]);
+    void run();
 
-  return { products, loading };
+    return () => {
+      cancelled = true;
+    };
+  }, [currentProductSlug, language, relatedContext?.productId, relatedContext?.categoryIds?.join(',')]);
+
+  return { products, loading, failed };
 }
-
-
-
-

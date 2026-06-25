@@ -5,27 +5,54 @@ import { productsService } from "@/lib/services/products.service";
 
 export const dynamic = "force-dynamic";
 
+async function resolveProductIdFromSlug(
+  slug: string,
+  lang: string,
+): Promise<string | null> {
+  const productId = await productsService.findProductIdBySlug(slug, lang);
+  if (productId) {
+    return productId;
+  }
+
+  if (lang !== "en") {
+    return productsService.findProductIdBySlug(slug, "en");
+  }
+
+  return null;
+}
+
+async function resolveProductId(
+  slug: string,
+  lang: string,
+  productIdParam: string | null,
+): Promise<string | null> {
+  const fromQuery = productIdParam?.trim();
+  if (fromQuery) {
+    return fromQuery;
+  }
+
+  return resolveProductIdFromSlug(slug, lang);
+}
+
 /**
  * GET /api/v1/products/[slug]/reviews
  * Get all reviews for a product (by slug)
  * Query params:
  *   - my=true: Get current user's review (requires authentication)
+ *   - productId: Skip slug lookup when provided from PDP
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
     const { slug } = await params;
     const { searchParams } = new URL(req.url);
     const lang = searchParams.get("lang") || "en";
     const myReview = searchParams.get("my") === "true";
-    
-    console.log('📝 [REVIEWS API] GET request for product slug:', slug, { myReview });
 
-    // First, get the product by slug to get the productId
-    const product = await productsService.findBySlug(slug, lang);
-    if (!product || !product.id) {
+    const productId = await resolveProductId(slug, lang, searchParams.get("productId"));
+    if (!productId) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/not-found",
@@ -34,11 +61,10 @@ export async function GET(
           detail: `Product with slug '${slug}' does not exist`,
           instance: req.url,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    // If my=true, return user's review
     if (myReview) {
       const user = await authenticateToken(req);
       if (!user) {
@@ -50,38 +76,44 @@ export async function GET(
             detail: "Authentication required",
             instance: req.url,
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
 
-      const review = await reviewsService.getUserReview(product.id, user.id, true);
+      const review = await reviewsService.getUserReview(productId, user.id, true);
       return NextResponse.json(review);
     }
 
-    // Otherwise, return all published reviews
-    const reviews = await reviewsService.getProductReviews(product.id, {
+    const reviews = await reviewsService.getProductReviews(productId, {
       publishedOnly: true,
     });
 
     return NextResponse.json(reviews);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as {
+      type?: string;
+      title?: string;
+      status?: number;
+      detail?: string;
+      message?: string;
+    };
     console.error("❌ [REVIEWS API] GET Error:", error);
     return NextResponse.json(
       {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
+        type: err.type || "https://api.shop.am/problems/internal-error",
+        title: err.title || "Internal Server Error",
+        status: err.status || 500,
+        detail: err.detail || err.message || "An error occurred",
         instance: req.url,
       },
-      { status: error.status || 500 }
+      { status: err.status || 500 },
     );
   }
 }
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
   return NextResponse.json(
@@ -92,7 +124,6 @@ export async function POST(
       detail: `Review creation is disabled for v1 read-only scope on product '${slug}'`,
       instance: req.url,
     },
-    { status: 405 }
+    { status: 405 },
   );
 }
-

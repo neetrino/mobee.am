@@ -1,200 +1,69 @@
-'use client';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { readLanguageFromCookies, type LanguageCode } from '@/lib/language';
+import { getCachedProductBySlug } from '@/lib/services/products-slug-cached';
+import { ProductPageClient } from './ProductPageClient';
+import { parseProductSlugParam } from './parse-product-slug-param';
+import { RESERVED_ROUTES, type Product } from './types';
 
-import { useRef } from 'react';
-import { apiClient } from '../../../lib/api-client';
-import { t, getProductText } from '../../../lib/i18n';
-import { sanitizeHtml } from '../../../lib/utils/sanitize';
-import { useAuth } from '../../../lib/auth/AuthContext';
-import { RelatedProducts } from '../../../components/RelatedProducts';
-import { showToast } from '../../../components/Toast';
-import { ProductImageGallery } from './ProductImageGallery';
-import { ProductInfoAndActions } from './ProductInfoAndActions';
-import { useProductPage } from './useProductPage';
-import type { ProductPageProps } from './types';
-import { dispatchCartFlyAnimation } from '@/lib/cart/dispatchCartFlyAnimation';
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from '@/lib/productCardDisplayImage';
-import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
-import {
-  PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS,
-  PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS,
-} from './product-pdp-ipad-pro-band.constants';
+type ProductPageProps = {
+  params: Promise<{ slug: string }>;
+};
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const { isLoggedIn } = useAuth();
-  const addToCartInFlightRef = useRef(false);
+function isNotFoundError(error: unknown): boolean {
+  return (error as { status?: number }).status === 404;
+}
 
-  const scrollToProductDetails = () => {
-    document.getElementById('product-long-description')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-  
-  const {
-    product,
-    loading,
-    images,
-    currentImageIndex,
-    setCurrentImageIndex,
-    thumbnailStartIndex,
-    setThumbnailStartIndex,
-    currency,
-    language,
-    selectedColor,
-    selectedSize,
-    selectedAttributeValues,
-    isInWishlist,
-    isInCompare,
-    quantity,
-    attributeGroups,
-    colorGroups,
-    sizeGroups,
-    currentVariant,
-    price,
-    discountPercent,
-    maxQuantity,
-    isOutOfStock,
-    isVariationRequired,
-    hasUnavailableAttributes,
-    unavailableAttributes,
-    canAddToCart,
-    getOptionValue,
-    adjustQuantity,
-    handleColorSelect,
-    handleSizeSelect,
-    handleAttributeValueSelect,
-    handleAddToWishlist,
-    handleCompareToggle,
-    getRequiredAttributesMessage,
-  } = useProductPage(params);
-
-  const handleAddToCart = () => {
-    if (!canAddToCart || !product || !currentVariant || addToCartInFlightRef.current) {
-      return;
+async function loadInitialProduct(
+  slug: string,
+  locale: LanguageCode,
+): Promise<{ product: Product | null; notFound: boolean }> {
+  try {
+    const { result } = await getCachedProductBySlug(slug, locale);
+    return { product: result as Product, notFound: false };
+  } catch (error: unknown) {
+    if (!isNotFoundError(error)) {
+      throw error;
     }
-
-    const flyEl = document.querySelector<HTMLElement>('[data-pdp-cart-fly-source]');
-    const slideSrc = images[currentImageIndex];
-    const flyUrl =
-      typeof slideSrc === 'string' && slideSrc.length > 0 ? slideSrc : PRODUCT_CARD_DISPLAY_IMAGE_SRC;
-
-    if (!isLoggedIn) {
-      upsertGuestCartItem({
-        productId: product.id,
-        productSlug: product.slug,
-        variantId: currentVariant.id,
-        quantity,
-      });
-      window.dispatchEvent(new Event('cart-updated'));
-      dispatchCartFlyAnimation(flyUrl, flyEl);
-      return;
-    }
-
-    addToCartInFlightRef.current = true;
-    window.dispatchEvent(
-      new CustomEvent('cart-updated', {
-        detail: { optimisticAdd: { quantity, price } },
-      }),
-    );
-    dispatchCartFlyAnimation(flyUrl, flyEl);
-
-    void (async () => {
-      try {
-        const response = await apiClient.post<{
-          cartSummary?: { itemsCount: number; total: number };
-        }>('/api/v1/cart/items', {
-          productId: product.id,
-          variantId: currentVariant.id,
-          quantity,
-        });
-        window.dispatchEvent(
-          new CustomEvent('cart-updated', {
-            detail: response.cartSummary ?? null,
-          }),
-        );
-      } catch {
-        window.dispatchEvent(new Event('cart-updated'));
-        showToast(t(language, 'product.errorAddingToCart'), 'error');
-      } finally {
-        addToCartInFlightRef.current = false;
-      }
-    })();
-  };
-
-  if (loading || !product) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        {t(language, 'common.messages.loading')}
-      </div>
-    );
   }
 
+  if (locale !== 'en') {
+    try {
+      const { result } = await getCachedProductBySlug(slug, 'en');
+      return { product: result as Product, notFound: false };
+    } catch (fallbackError: unknown) {
+      if (isNotFoundError(fallbackError)) {
+        return { product: null, notFound: true };
+      }
+      throw fallbackError;
+    }
+  }
+
+  return { product: null, notFound: true };
+}
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { slug: rawSlug } = await params;
+  const { slug, variantIdFromUrl } = parseProductSlugParam(rawSlug);
+
+  if (!slug || RESERVED_ROUTES.includes(slug.toLowerCase())) {
+    redirect(`/${slug}`);
+  }
+
+  const cookieStore = await cookies();
+  const initialLocale = readLanguageFromCookies(cookieStore);
+  const { product: initialProduct, notFound: initialNotFound } = await loadInitialProduct(
+    slug,
+    initialLocale,
+  );
+
   return (
-    <div
-      className={`max-w-7xl mx-auto px-4 py-12 max-lg:pb-4 sm:px-6 lg:py-12 ${PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS} ${PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS}`}
-    >
-      <div className="grid grid-cols-1 items-start gap-12 product-2col:grid-cols-[55%_45%] [&>*]:min-w-0">
-        <ProductImageGallery
-          images={images}
-          product={product}
-          discountPercent={discountPercent}
-          language={language}
-          currentImageIndex={currentImageIndex}
-          onImageIndexChange={setCurrentImageIndex}
-          thumbnailStartIndex={thumbnailStartIndex}
-          onThumbnailStartIndexChange={setThumbnailStartIndex}
-        />
-
-        <ProductInfoAndActions
-          product={product}
-          price={price}
-          discountPercent={discountPercent}
-          currency={currency}
-          language={language}
-          quantity={quantity}
-          maxQuantity={maxQuantity}
-          isOutOfStock={isOutOfStock}
-          isVariationRequired={isVariationRequired}
-          hasUnavailableAttributes={hasUnavailableAttributes}
-          unavailableAttributes={unavailableAttributes}
-          canAddToCart={canAddToCart}
-          isInWishlist={isInWishlist}
-          isInCompare={isInCompare}
-          currentVariant={currentVariant}
-          attributeGroups={attributeGroups}
-          selectedColor={selectedColor}
-          selectedSize={selectedSize}
-          selectedAttributeValues={selectedAttributeValues}
-          colorGroups={colorGroups}
-          sizeGroups={sizeGroups}
-          onQuantityAdjust={adjustQuantity}
-          onAddToCart={handleAddToCart}
-          onAddToWishlist={handleAddToWishlist}
-          onCompareToggle={handleCompareToggle}
-          onScrollToDetails={scrollToProductDetails}
-          onColorSelect={handleColorSelect}
-          onSizeSelect={handleSizeSelect}
-          onAttributeValueSelect={handleAttributeValueSelect}
-          getOptionValue={getOptionValue}
-          getRequiredAttributesMessage={getRequiredAttributesMessage}
-        />
-      </div>
-
-      <section
-        id="product-long-description"
-        className="mt-16 min-w-0 max-w-3xl scroll-mt-24 overflow-x-hidden border-t border-gray-200 pt-12"
-      >
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">{t(language, 'product.description_title')}</h2>
-        <div
-          className="product-description-content prose prose-sm max-w-none break-words text-gray-600 [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto"
-          dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(
-              getProductText(language, product.id, 'longDescription') || product.description || ''
-            ),
-          }}
-        />
-      </section>
-
-      <div className="mt-16">
-        <RelatedProducts currentProductSlug={product.slug} />
-      </div>
-    </div>
+    <ProductPageClient
+      slug={slug}
+      variantIdFromUrl={variantIdFromUrl}
+      initialProduct={initialProduct}
+      initialLocale={initialLocale}
+      initialNotFound={initialNotFound}
+    />
   );
 }

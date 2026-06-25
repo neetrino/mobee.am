@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getStoredCurrency } from '../../../lib/currency';
 import { type LanguageCode } from '../../../lib/language';
 import { useUiLanguage } from '../../../components/UiLanguageProvider';
@@ -17,25 +17,39 @@ import { getVariantMainImageIndex } from './utils/variant-media';
 import { resolveCompareCategoryId } from '../../../lib/shop/compare-storage';
 import { getMissingRequiredAttributeKeys } from './utils/required-attribute-selection';
 import { findVariantByAllAttributesStrict } from './utils/variant-finders';
+import type { Product } from './types';
 
-export function useProductPage(params: Promise<{ slug?: string }>) {
+export type UseProductPageProps = {
+  slug: string;
+  variantIdFromUrl: string | null;
+  initialProduct?: Product | null;
+  initialLocale?: LanguageCode;
+  initialNotFound?: boolean;
+};
+
+export function useProductPage({
+  slug,
+  variantIdFromUrl,
+  initialProduct = null,
+  initialLocale,
+  initialNotFound = false,
+}: UseProductPageProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currency, setCurrency] = useState(getStoredCurrency());
   const language: LanguageCode = useUiLanguage();
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
 
-  const resolvedParams = use(params);
-  const rawSlug = resolvedParams?.slug ?? '';
-  const slugParts = rawSlug.includes(':') ? rawSlug.split(':') : [rawSlug];
-  const slug = slugParts[0];
-  const variantIdFromUrl = slugParts.length > 1 ? slugParts[1] : null;
-
   const {
     product,
+    shellProduct,
     loading,
+    isNotFound,
   } = useProductFetch({
     slug,
     variantIdFromUrl,
+    initialProduct,
+    initialLocale,
+    initialNotFound,
   });
 
   const {
@@ -123,10 +137,10 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   useEffect(() => {
     const handleCurrencyUpdate = () => setCurrency(getStoredCurrency());
     const handleCurrencyRatesUpdate = () => setCurrency(getStoredCurrency());
-    
+
     window.addEventListener('currency-updated', handleCurrencyUpdate);
     window.addEventListener('currency-rates-updated', handleCurrencyRatesUpdate);
-    
+
     return () => {
       window.removeEventListener('currency-updated', handleCurrencyUpdate);
       window.removeEventListener('currency-rates-updated', handleCurrencyRatesUpdate);
@@ -240,5 +254,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     handleAddToWishlist,
     handleCompareToggle,
     getRequiredAttributesMessage,
+    shellProduct,
+    isNotFound,
   };
 }

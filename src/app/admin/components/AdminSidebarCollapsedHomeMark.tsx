@@ -1,16 +1,10 @@
 'use client';
 
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import {
   ADMIN_SIDEBAR_COLLAPSED_HOME_MARK_CLASS,
   ADMIN_SIDEBAR_COLLAPSED_HOME_MARK_LETTER_CLASS,
 } from '../admin-sidebar-layout.constants';
-
-const montserratCollapsedMark = Montserrat({
-  subsets: ['latin'],
-  weight: ['700'],
-  display: 'swap',
-});
 
 export interface AdminSidebarCollapsedHomeMarkProps {
   className?: string;
@@ -21,7 +15,7 @@ export interface AdminSidebarCollapsedHomeMarkProps {
  */
 export function AdminSidebarCollapsedHomeMark({ className = '' }: AdminSidebarCollapsedHomeMarkProps) {
   const outer = `${ADMIN_SIDEBAR_COLLAPSED_HOME_MARK_CLASS} ${className}`.trim();
-  const inner = `${montserratCollapsedMark.className} ${ADMIN_SIDEBAR_COLLAPSED_HOME_MARK_LETTER_CLASS}`.trim();
+  const inner = `${siteMontserrat.className} ${ADMIN_SIDEBAR_COLLAPSED_HOME_MARK_LETTER_CLASS}`.trim();
 
   return (
     <span className={outer} aria-hidden>

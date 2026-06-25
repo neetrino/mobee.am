@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { t } from '../lib/i18n';
-import { useRelatedProducts, type RelatedProduct } from './hooks/useRelatedProducts';
+import { useRelatedProducts, type RelatedProduct, type RelatedProductsContext } from './hooks/useRelatedProducts';
 import { useCarousel } from './hooks/useCarousel';
 import { useVisibleCards } from './hooks/useVisibleCards';
 import { ProductCardListingProvider } from './ProductCardListingContext';
@@ -45,6 +45,7 @@ import { useRelatedProductsMobileCardsPerPage } from './hooks/useRelatedProducts
 
 interface RelatedProductsProps {
   currentProductSlug: string;
+  relatedContext?: RelatedProductsContext | null;
 }
 
 /** Full grid slots on every snap page so card column widths stay consistent (last partial page). */
@@ -84,7 +85,7 @@ type RelatedMobileTitleNavLatch = 'prev' | 'next' | null;
  * iPad mini band: 3 cards per page; iPad Pro band (900–1279px): 4 cards per page; phones: 2.
  * At `xl+`: draggable strip with arrows/dots (unchanged wide desktop).
  */
-export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
+export function RelatedProducts({ currentProductSlug, relatedContext }: RelatedProductsProps) {
   const language = useUiLanguage();
   const desktopHomeStyle = useHomeDesktopCarouselHomeStyle();
   const relatedMobileCardsPerPage = useRelatedProductsMobileCardsPerPage();
@@ -93,7 +94,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
     useState<RelatedMobileTitleNavLatch>(null);
   
   const visibleCards = useVisibleCards();
-  const { products, loading } = useRelatedProducts({ currentProductSlug, language });
+  const { products, loading, failed } = useRelatedProducts({
+    currentProductSlug,
+    language,
+    relatedContext,
+  });
   
   const {
     currentIndex,
@@ -249,6 +254,11 @@ export function RelatedProducts({ currentProductSlug }: RelatedProductsProps) {
         </button>
       </span>
     ) : null;
+
+  // Hide section on hard failure; empty catalog still shows soft empty state.
+  if (failed && !loading && products.length === 0) {
+    return null;
+  }
 
   // Always show the section, even if no products (will show loading or empty state)
   return (
