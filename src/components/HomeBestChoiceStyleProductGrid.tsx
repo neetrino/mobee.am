@@ -23,6 +23,11 @@ import { useHomeDesktopCarouselHomeStyle } from './useHomeDesktopCarouselHomeSty
 /** Card cell — stretch to grid row height so every card in a row matches. */
 export const HOME_BEST_CHOICE_CARD_WIDTH = 'h-full min-h-0 w-full';
 
+/** Home / shop listing cards — “Add” opens the product page. */
+export const LISTING_ADD_BUTTON_NAVIGATES_TO_PRODUCT = {
+  addButtonNavigatesToProduct: true,
+} as const;
+
 /** Mobile carousel — Figma footer (compact price, round cart). */
 export function getHomeCuratedProductCardProps(homeStyle: boolean) {
   return {
@@ -111,7 +116,12 @@ function BestChoiceProductCell({
 }) {
   return (
     <div className={HOME_BEST_CHOICE_CARD_WIDTH}>
-      <ProductCard product={product} viewMode={viewMode} {...cardProps} />
+      <ProductCard
+        product={product}
+        viewMode={viewMode}
+        {...cardProps}
+        {...LISTING_ADD_BUTTON_NAVIGATES_TO_PRODUCT}
+      />
     </div>
   );
 }

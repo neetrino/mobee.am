@@ -41,6 +41,7 @@ interface ProductCardListProps {
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
+  addButtonNavigatesToProduct?: boolean;
 }
 
 /**
@@ -58,11 +59,18 @@ export function ProductCardList({
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
+  addButtonNavigatesToProduct = false,
 }: ProductCardListProps) {
   const { t } = useTranslation();
   const categoryLine = getProductCardCategoryLineLabel(product);
   const imageSrc = resolveProductCardImageSrc(product.image);
   const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';
+  const primaryActionDisabled = addButtonNavigatesToProduct
+    ? false
+    : !product.inStock || isAddingToCart;
+  const primaryActionEnabled = addButtonNavigatesToProduct
+    ? true
+    : product.inStock && !isAddingToCart;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
@@ -165,9 +173,9 @@ export function ProductCardList({
             {/* Cart Icon */}
             <button
               onClick={onAddToCart}
-              disabled={!product.inStock || isAddingToCart}
+              disabled={primaryActionDisabled}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
-                product.inStock && !isAddingToCart
+                primaryActionEnabled
                   ? 'cursor-pointer bg-gray-100 text-gray-700 hover:bg-admin-500 hover:text-white'
                   : 'cursor-default bg-gray-100 text-gray-400'
               }`}
