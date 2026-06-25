@@ -12,7 +12,9 @@ import {
   syncGetProductText,
 } from './i18n-client-runtime';
 import {
+  getLazyTranslationRevision,
   preloadAdminNamespaces,
+  preloadStorefrontNamespaces,
   subscribeLazyTranslations,
 } from './i18n-lazy-loader';
 import { type ProductField } from './i18n-types';
@@ -27,9 +29,14 @@ import { useUiLanguage } from '../components/UiLanguageProvider';
 export function useTranslation() {
   const lang = useUiLanguage();
 
-  useSyncExternalStore(subscribeLazyTranslations, () => lang, () => lang);
+  useSyncExternalStore(
+    subscribeLazyTranslations,
+    getLazyTranslationRevision,
+    getLazyTranslationRevision,
+  );
 
   useEffect(() => {
+    void preloadStorefrontNamespaces(lang);
     void preloadAdminNamespaces(lang);
   }, [lang]);
 

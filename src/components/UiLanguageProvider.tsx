@@ -13,7 +13,10 @@ import {
   getStoredLanguage,
   persistLanguageCookie,
 } from '../lib/language';
-import { clearLazyTranslationStore } from '../lib/i18n-lazy-loader';
+import {
+  clearLazyTranslationStore,
+  seedStorefrontLocale,
+} from '../lib/i18n-lazy-loader';
 
 const UiLanguageContext = createContext<LanguageCode | null>(null);
 
@@ -31,14 +34,17 @@ export function UiLanguageProvider({
 }) {
   const [lang, setLang] = useState<LanguageCode>(initialLanguage);
 
+  seedStorefrontLocale(lang);
+
   useEffect(() => {
-    setLang((current) => {
-      const stored = getStoredLanguage();
-      if (stored === current) return current;
-      clearLazyTranslationStore();
-      persistLanguageCookie(stored);
-      return stored;
-    });
+      setLang((current) => {
+        const stored = getStoredLanguage();
+        if (stored === current) return current;
+        clearLazyTranslationStore();
+        seedStorefrontLocale(stored);
+        persistLanguageCookie(stored);
+        return stored;
+      });
   }, []);
 
   useEffect(() => {
@@ -47,6 +53,7 @@ export function UiLanguageProvider({
       setLang((prev) => {
         if (next === prev) return prev;
         clearLazyTranslationStore();
+        seedStorefrontLocale(next);
         return next;
       });
     };
