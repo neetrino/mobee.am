@@ -1,8 +1,9 @@
 ﻿'use client';
 
 import { useRouter } from 'next/navigation';
+import { AdminTableSkeleton } from '../../components/AdminTableSkeleton';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
-import { ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC } from '@/app/admin/admin-uniform-product-thumbnail.constants';
+import { resolveAdminProductThumbnailSrc } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../../../lib/currency';
 import type { Category, Product, ProductsResponse } from '../types';
@@ -65,10 +66,7 @@ export function ProductsTable({
   return (
     <Card className="overflow-hidden">
       {loading ? (
-        <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.products.loadingProducts')}</p>
-        </div>
+        <AdminTableSkeleton rows={10} columns={8} />
       ) : sortedProducts.length === 0 ? (
         <div className="p-8 text-center">
           <p className="text-gray-600">{t('admin.products.noProducts')}</p>
@@ -255,7 +253,7 @@ export function ProductsTable({
                     <td className="px-3 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <img
-                          src={ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC}
+                          src={resolveAdminProductThumbnailSrc(product.image)}
                           alt={product.title}
                           className="h-12 w-12 rounded-supersudo object-cover mr-3"
                         />

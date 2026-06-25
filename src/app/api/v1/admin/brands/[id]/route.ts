@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import { invalidateAdminReferenceServerCache } from "@/lib/admin/admin-reference-server-cache";
 
 /**
  * PUT /api/v1/admin/brands/[id]
@@ -11,18 +12,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const { id } = await params;
@@ -30,7 +22,7 @@ export async function PUT(
     console.log("📤 [ADMIN BRANDS] PUT request:", { id, body });
 
     const result = await adminService.updateBrand(id, body);
-    console.log("✅ [ADMIN BRANDS] Brand updated:", id);
+    await invalidateAdminReferenceServerCache("brands");
 
     return NextResponse.json(result);
   } catch (error: any) {
@@ -57,25 +49,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const { id } = await params;
     console.log("🗑️ [ADMIN BRANDS] DELETE request:", id);
 
     await adminService.deleteBrand(id);
-    console.log("✅ [ADMIN BRANDS] Brand deleted:", id);
+    await invalidateAdminReferenceServerCache("brands");
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

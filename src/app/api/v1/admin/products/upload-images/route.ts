@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import {
-  authenticateToken,
-  requireAdmin,
-  type AuthUser,
-} from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { validateImageBuffer } from "@/lib/security/image-magic-bytes";
 import {
   MAX_ADMIN_IMAGE_BYTES,
@@ -35,8 +31,8 @@ function parseDataUrl(dataUrl: string): { mime: string; buffer: Buffer } | null 
   return { mime, buffer };
 }
 
-function forbiddenAdminResponse(req: NextRequest, user: AuthUser | null) {
-  logger.warn("Admin upload images: unauthorized", { userId: user?.id });
+function forbiddenAdminResponse(req: NextRequest) {
+  logger.warn("Admin upload images: unauthorized");
   return NextResponse.json(
     {
       type: "https://api.shop.am/problems/forbidden",
@@ -49,12 +45,13 @@ function forbiddenAdminResponse(req: NextRequest, user: AuthUser | null) {
   );
 }
 
-async function requireAdminUser(req: NextRequest): Promise<AuthUser | NextResponse> {
-  const user = await authenticateToken(req);
-  if (!user || !requireAdmin(user)) {
-    return forbiddenAdminResponse(req, user);
+async function requireAdminUser(req: NextRequest): Promise<NextResponse | { userId: string }> {
+  const authResult = await requireAdminApiContext(req);
+  if (authResult instanceof NextResponse) {
+    return forbiddenAdminResponse(req);
   }
-  return user;
+
+  return { userId: authResult.userId };
 }
 
 function getR2HealthStatus(): R2HealthStatus {

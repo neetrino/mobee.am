@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
-import { ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC } from '@/app/admin/admin-uniform-product-thumbnail.constants';
+import { resolveAdminProductThumbnailSrc } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { ProductDiscountsPagination } from './ProductDiscountsPagination';
 
@@ -116,7 +116,7 @@ export function ProductDiscountsCard({
               >
                 <div className="flex-shrink-0">
                   <img
-                    src={ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC}
+                    src={resolveAdminProductThumbnailSrc(product.image)}
                     alt={product.title}
                     className="w-16 h-16 object-cover rounded-supersudo"
                   />

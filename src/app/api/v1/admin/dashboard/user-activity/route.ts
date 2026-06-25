@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 
 /**
@@ -9,27 +9,16 @@ import { adminService } from "@/lib/services/admin.service";
 export async function GET(req: NextRequest) {
   try {
     console.log("👥 [USER-ACTIVITY] Request received");
-    const user = await authenticateToken(req);
-    
-    if (!user || !requireAdmin(user)) {
-      console.log("❌ [USER-ACTIVITY] Unauthorized or not admin");
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     // Get limit from query params
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-    console.log(`✅ [USER-ACTIVITY] User authenticated: ${user.id}, limit: ${limit}`);
+    console.log(`✅ [USER-ACTIVITY] Request authenticated, limit: ${limit}`);
     const result = await adminService.getUserActivity(limit);
     console.log("✅ [USER-ACTIVITY] User activity data retrieved successfully");
     

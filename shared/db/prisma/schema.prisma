@@ -232,6 +232,7 @@ model Product {
   reviews    ProductReview[]
 
   @@index([brandId])
+  @@index([primaryCategoryId])
   @@index([published, publishedAt])
   @@index([featured])
   @@index([deletedAt])
@@ -286,6 +287,7 @@ model ProductVariant {
   orderItems OrderItem[]
 
   @@index([productId])
+  @@index([stock, published])
   @@index([source])
   @@map("product_variants")
 }
@@ -424,6 +426,7 @@ model Order {
 
   @@index([userId])
   @@index([status, createdAt(sort: Desc)])
+  @@index([paymentStatus, createdAt(sort: Desc)])
   @@index([customerEmail])
   @@index([createdAt(sort: Desc)])
   @@map("orders")

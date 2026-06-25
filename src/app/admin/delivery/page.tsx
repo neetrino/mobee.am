@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
+import { useRouter } from 'next/navigation';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { AdminFormSelectDropdown } from '../components/AdminFormSelectDropdown';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
@@ -28,33 +28,20 @@ interface DeliverySettings {
 
 export default function DeliveryPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [locations, setLocations] = useState<DeliveryLocation[]>([]);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchDeliverySettings();
-    }
-  }, [isLoggedIn, isAdmin]);
+    fetchDeliverySettings();
+  }, []);
 
   const fetchDeliverySettings = async () => {
     try {
       setLoading(true);
       console.log('[ADMIN] Fetching delivery settings...');
-      const data = await apiClient.get<DeliverySettings>('/api/v1/admin/delivery');
+      const data = await fetchAdminReference<DeliverySettings>('delivery');
       setLocations(data.locations || []);
       console.log('[ADMIN] Delivery settings loaded:', data);
     } catch (err: any) {
@@ -70,6 +57,7 @@ export default function DeliveryPage() {
     try {
       console.log('[ADMIN] Saving delivery settings...', { locations });
       await apiClient.put('/api/v1/admin/delivery', { locations });
+      invalidateAdminReferenceCache('delivery');
       showToast(t('admin.delivery.savedSuccess'), 'success');
       console.log('[ADMIN] Delivery settings saved');
       await fetchDeliverySettings();
@@ -100,7 +88,7 @@ export default function DeliveryPage() {
     setLocations(updated);
   };
 
-  if (isLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -109,10 +97,6 @@ export default function DeliveryPage() {
         </div>
       </div>
     );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null;
   }
 
   const countryOptions = [
@@ -126,7 +110,6 @@ export default function DeliveryPage() {
   ];
 
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/delivery'} router={router} t={t}>
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.delivery.title')}</h1>
@@ -229,6 +212,5 @@ export default function DeliveryPage() {
           </Button>
         </div>
       </div>
-    </AdminPageShell>
   );
 }

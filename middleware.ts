@@ -5,7 +5,11 @@ import { getCorsHeaders } from "@/lib/security/cors";
 import { verifyMutationOrigin } from "@/lib/security/csrf-origin";
 import { assertProductionSecurityEnv } from "@/lib/security/env";
 import { JWT_ALGORITHM } from "@/lib/security/jwt.constants";
-import { resolveAdminGateFromJwtPayload } from "@/lib/security/jwt-payload";
+import { resolveAdminGateFromJwtPayload, type AccessTokenPayload } from "@/lib/security/jwt-payload";
+import {
+  setTrustedAdminHeaders,
+  stripTrustedAdminHeaders,
+} from "@/lib/middleware/admin-context-headers";
 import {
   checkRateLimitByIp,
   checkRateLimitByIpAndSuffix,
@@ -16,33 +20,46 @@ import {
   RATE_LIMIT_PASSWORD,
 } from "@/lib/security/rate-limit";
 
+type AdminAuthResult =
+  | { ok: true; userId: string; roles: string[] }
+  | { ok: false; response: NextResponse };
+
 /** Protect /api/v1/admin/* — valid JWT + admin role in token claims. */
-async function requireAdminAuth(request: NextRequest): Promise<NextResponse | null> {
-  const token = getAccessTokenFromRequest(request);
+async function requireAdminAuth(request: NextRequest): Promise<AdminAuthResult> {
+  const cleanedHeaders = stripTrustedAdminHeaders(request.headers);
+  const token = getAccessTokenFromRequest(
+    new NextRequest(request.url, { headers: cleanedHeaders, method: request.method }),
+  );
 
   if (!token) {
-    return NextResponse.json(
-      {
-        type: "https://api.shop.am/problems/unauthorized",
-        title: "Unauthorized",
-        status: 401,
-        detail: "Missing or invalid session",
-      },
-      { status: 401 }
-    );
+    return {
+      ok: false,
+      response: NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/unauthorized",
+          title: "Unauthorized",
+          status: 401,
+          detail: "Missing or invalid session",
+        },
+        { status: 401 },
+      ),
+    };
   }
 
   const secret = process.env.JWT_SECRET;
   if (!secret) {
-    return NextResponse.json(
-      {
-        type: "https://api.shop.am/problems/internal-error",
-        title: "Internal Server Error",
-        status: 500,
-        detail: "Server configuration error",
-      },
-      { status: 500 }
-    );
+    return {
+      ok: false,
+      response: NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/internal-error",
+          title: "Internal Server Error",
+          status: 500,
+          detail: "Server configuration error",
+        },
+        { status: 500 },
+      ),
+    };
   }
 
   try {
@@ -53,28 +70,51 @@ async function requireAdminAuth(request: NextRequest): Promise<NextResponse | nu
 
     const gate = resolveAdminGateFromJwtPayload(payload);
     if (gate === "deny") {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-        },
-        { status: 403 }
-      );
+      return {
+        ok: false,
+        response: NextResponse.json(
+          {
+            type: "https://api.shop.am/problems/forbidden",
+            title: "Forbidden",
+            status: 403,
+            detail: "Admin access required",
+          },
+          { status: 403 },
+        ),
+      };
     }
 
-    return null;
+    const userId = (payload as AccessTokenPayload).userId?.trim();
+    const roles = (payload as AccessTokenPayload).roles;
+    if (!userId || !Array.isArray(roles) || roles.length === 0) {
+      return {
+        ok: false,
+        response: NextResponse.json(
+          {
+            type: "https://api.shop.am/problems/unauthorized",
+            title: "Unauthorized",
+            status: 401,
+            detail: "Invalid or expired token",
+          },
+          { status: 401 },
+        ),
+      };
+    }
+
+    return { ok: true, userId, roles };
   } catch {
-    return NextResponse.json(
-      {
-        type: "https://api.shop.am/problems/unauthorized",
-        title: "Unauthorized",
-        status: 401,
-        detail: "Invalid or expired token",
-      },
-      { status: 401 }
-    );
+    return {
+      ok: false,
+      response: NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/unauthorized",
+          title: "Unauthorized",
+          status: 401,
+          detail: "Invalid or expired token",
+        },
+        { status: 401 },
+      ),
+    };
   }
 }
 
@@ -136,10 +176,26 @@ function csrfForbiddenResponse(): NextResponse {
   );
 }
 
+function isAdminPageRoute(pathname: string): boolean {
+  return pathname === "/supersudo" || pathname.startsWith("/supersudo/");
+}
+
+function forwardWithAdminPageHeader(request: NextRequest): NextResponse {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-mobee-admin-route", "1");
+  return NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+}
+
 export async function middleware(request: NextRequest) {
   assertProductionSecurityEnv();
 
   const pathname = request.nextUrl.pathname;
+
+  if (isAdminPageRoute(pathname)) {
+    return forwardWithAdminPageHeader(request);
+  }
 
   if (!pathname.startsWith("/api/")) {
     return NextResponse.next();
@@ -155,12 +211,19 @@ export async function middleware(request: NextRequest) {
   }
 
   let rateLimitResponse: NextResponse | null = null;
+  let adminForwardHeaders: Headers | null = null;
 
   if (pathname.startsWith("/api/v1/admin/")) {
     const authRes = await requireAdminAuth(request);
-    if (authRes) {
-      return applyCors(authRes, request);
+    if (!authRes.ok) {
+      return applyCors(authRes.response, request);
     }
+
+    adminForwardHeaders = stripTrustedAdminHeaders(request.headers);
+    setTrustedAdminHeaders(adminForwardHeaders, {
+      userId: authRes.userId,
+      roles: authRes.roles,
+    });
   } else if (
     (pathname === "/api/v1/auth/login" || pathname === "/api/v1/auth/register") &&
     request.method === "POST"
@@ -188,12 +251,16 @@ export async function middleware(request: NextRequest) {
     return applyCors(rateLimitResponse, request);
   }
 
-  const response = NextResponse.next();
+  const response = adminForwardHeaders
+    ? NextResponse.next({ request: { headers: adminForwardHeaders } })
+    : NextResponse.next();
   return applyCors(response, request);
 }
 
 export const config = {
   matcher: [
+    "/supersudo",
+    "/supersudo/:path*",
     "/api/v1/admin/:path*",
     "/api/v1/auth/login",
     "/api/v1/auth/register",

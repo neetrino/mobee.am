@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { apiClient } from '../../../../lib/api-client';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { DEFAULT_LANGUAGE } from '../../../../lib/language';
 import { logger } from '../../../../lib/utils/logger';
 import { showToast } from '../../../../components/Toast';
@@ -72,6 +73,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       });
       setShowAddModal(false);
       resetForm();
+      invalidateAdminReferenceCache('categories');
       await fetchCategories();
       showToast(t('admin.categories.createdSuccess'), 'success');
     } catch (err: unknown) {
@@ -134,6 +136,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       setShowEditModal(false);
       setEditingCategory(null);
       resetForm();
+      invalidateAdminReferenceCache('categories');
       await fetchCategories();
       showToast(t('admin.categories.updatedSuccess'), 'success');
     } catch (err: unknown) {
@@ -156,6 +159,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     setTogglingHomePageId(categoryId);
     try {
       await apiClient.patch(`/api/v1/admin/categories/${categoryId}/home-strip`);
+      invalidateAdminReferenceCache('categories');
       await fetchCategories();
       showToast(t('admin.categories.homeStripToggled'), 'success');
     } catch (err: unknown) {
@@ -178,6 +182,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     setReordering(true);
     try {
       await apiClient.patch('/api/v1/admin/categories/reorder', payload);
+      invalidateAdminReferenceCache('categories');
       await fetchCategories({ silent: true });
       showToast(t('admin.categories.reorderSuccess'), 'success');
     } catch (err: unknown) {
@@ -209,6 +214,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       logger.info('Deleting category', { categoryId, categoryTitle });
       await apiClient.delete(`/api/v1/admin/categories/${categoryId}`);
       logger.info('Category deleted successfully');
+      invalidateAdminReferenceCache('categories');
       await fetchCategories();
       showToast(t('admin.categories.deletedSuccess'), 'success');
     } catch (err: unknown) {

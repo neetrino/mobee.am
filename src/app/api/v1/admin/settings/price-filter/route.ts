@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import {
+  getCachedAdminReferenceResponse,
+  invalidateAdminReferenceServerCache,
+} from "@/lib/admin/admin-reference-server-cache";
 
 /**
  * GET /api/v1/admin/settings/price-filter
@@ -9,23 +13,14 @@ import { adminService } from "@/lib/services/admin.service";
 export async function GET(req: NextRequest) {
   try {
     console.log('⚙️ [PRICE FILTER API] GET request received');
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      console.log('❌ [PRICE FILTER API] Unauthorized access attempt');
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
-    const result = await adminService.getPriceFilterSettings();
-    console.log('✅ [PRICE FILTER API] Settings retrieved:', result);
+    const result = await getCachedAdminReferenceResponse("price-filter-settings", () =>
+      adminService.getPriceFilterSettings(),
+    );
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("❌ [PRICE FILTER API] GET Error:", error);
@@ -49,19 +44,9 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     console.log('⚙️ [PRICE FILTER API] PUT request received');
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      console.log('❌ [PRICE FILTER API] Unauthorized access attempt');
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const data = await req.json();
@@ -169,7 +154,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const result = await adminService.updatePriceFilterSettings(data);
-    console.log('✅ [PRICE FILTER API] Settings updated:', result);
+    await invalidateAdminReferenceServerCache("price-filter-settings");
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("❌ [PRICE FILTER API] PUT Error:", error);

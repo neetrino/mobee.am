@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import { useMemo } from 'react';
 import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { LineChart } from '../LineChart';
@@ -13,6 +14,20 @@ interface OrdersByDayChartProps {
 
 export function OrdersByDayChart({ ordersByDay, currency }: OrdersByDayChartProps) {
   const { t } = useTranslation();
+
+  const maxCount = useMemo(
+    () => Math.max(...ordersByDay.map((day) => day.count), 1),
+    [ordersByDay],
+  );
+
+  const dayRows = useMemo(
+    () =>
+      ordersByDay.map((day) => ({
+        day,
+        percentage: (day.count / maxCount) * 100,
+      })),
+    [ordersByDay, maxCount],
+  );
 
   return (
     <Card className="p-8 bg-white shadow-lg border border-gray-200 rounded-supersudo hover:shadow-xl transition-shadow duration-300">
@@ -46,13 +61,9 @@ export function OrdersByDayChart({ ordersByDay, currency }: OrdersByDayChartProp
           
           {/* Detailed List - Modern Design */}
           <div className="space-y-3">
-            {ordersByDay.map((day) => {
-              const maxCount = Math.max(...ordersByDay.map(d => d.count), 1);
-              const percentage = (day.count / maxCount) * 100;
-              
-              return (
-                <div 
-                  key={day._id} 
+            {dayRows.map(({ day, percentage }) => (
+              <div
+                key={day._id} 
                   className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-supersudo border border-gray-200 hover:border-admin-300 hover:shadow-md transition-all duration-300 group"
                 >
                   <div className="w-32 text-sm font-semibold text-gray-700 flex-shrink-0">
@@ -78,8 +89,7 @@ export function OrdersByDayChart({ ordersByDay, currency }: OrdersByDayChartProp
                     </div>
                   </div>
                 </div>
-              );
-            })}
+            ))}
           </div>
         </>
       )}

@@ -6,13 +6,6 @@ import { useState, useCallback, useEffect } from 'react';
 import { apiClient } from '../../../lib/api-client';
 import type { AdminStatsSummary } from '@/lib/contracts/admin-analytics';
 
-interface ActivityItem {
-  type: string;
-  title: string;
-  description: string;
-  timestamp: string;
-}
-
 interface RecentOrder {
   id: string;
   number: string;
@@ -58,6 +51,13 @@ interface UserActivity {
   }>;
 }
 
+interface AdminDashboardBundleResponse {
+  stats: AdminStatsSummary | null;
+  recentOrders: RecentOrder[];
+  topProducts: TopProduct[];
+  userActivity: UserActivity | null;
+}
+
 interface UseAdminDashboardProps {
   isLoggedIn: boolean;
   isAdmin: boolean;
@@ -66,156 +66,60 @@ interface UseAdminDashboardProps {
 
 export function useAdminDashboard({ isLoggedIn, isAdmin, isLoading }: UseAdminDashboardProps) {
   const [stats, setStats] = useState<AdminStatsSummary | null>(null);
-  const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
   const [userActivity, setUserActivity] = useState<UserActivity | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
-  const [activityLoading, setActivityLoading] = useState(true);
   const [recentOrdersLoading, setRecentOrdersLoading] = useState(true);
   const [topProductsLoading, setTopProductsLoading] = useState(true);
   const [userActivityLoading, setUserActivityLoading] = useState(true);
 
-  const fetchStats = useCallback(async () => {
+  const fetchDashboard = useCallback(async () => {
+    setStatsLoading(true);
+    setRecentOrdersLoading(true);
+    setTopProductsLoading(true);
+    setUserActivityLoading(true);
+
     try {
-      console.log('📊 [ADMIN] Fetching statistics...');
-      setStatsLoading(true);
+      const bundle = await apiClient.get<AdminDashboardBundleResponse>('/api/v1/admin/dashboard', {
+        params: {
+          recentOrdersLimit: '5',
+          topProductsLimit: '5',
+          userActivityLimit: '10',
+        },
+      });
 
-      const data = await apiClient.get<AdminStatsSummary>('/api/v1/admin/stats');
-      console.log('✅ [ADMIN] Statistics fetched:', data);
-
-      if (data && typeof data === 'object') {
-        setStats(data);
-      } else {
-        console.warn('⚠️ [ADMIN] Invalid response format from server');
-        setStats(null);
-      }
-    } catch (err: unknown) {
-      console.error('❌ [ADMIN] Error fetching stats:', err);
-      if (err && typeof err === 'object' && 'message' in err) {
-        console.error('❌ [ADMIN] Error details:', {
-          message: (err as { message?: string }).message,
-          stack: (err as { stack?: string }).stack,
-          status: (err as { status?: number }).status,
-        });
-      }
+      setStats(bundle?.stats ?? null);
+      setRecentOrders(Array.isArray(bundle?.recentOrders) ? bundle.recentOrders : []);
+      setTopProducts(Array.isArray(bundle?.topProducts) ? bundle.topProducts : []);
+      setUserActivity(bundle?.userActivity ?? null);
+    } catch {
       setStats(null);
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
-
-  const fetchActivity = useCallback(async () => {
-    try {
-      console.log('📋 [ADMIN] Fetching recent activity...');
-      setActivityLoading(true);
-
-      const response = await apiClient.get<{ data: ActivityItem[] }>('/api/v1/admin/activity', {
-        params: { limit: '10' },
-      });
-      console.log('✅ [ADMIN] Activity fetched:', response);
-
-      if (response && response.data && Array.isArray(response.data)) {
-        setActivity(response.data);
-      } else {
-        console.warn('⚠️ [ADMIN] Invalid activity response format:', response);
-        setActivity([]);
-      }
-    } catch (err: unknown) {
-      console.error('❌ [ADMIN] Error fetching activity:', err);
-      if (err && typeof err === 'object' && 'message' in err) {
-        console.error('❌ [ADMIN] Activity error details:', {
-          message: (err as { message?: string }).message,
-          status: (err as { status?: number }).status,
-        });
-      }
-      setActivity([]);
-    } finally {
-      setActivityLoading(false);
-    }
-  }, []);
-
-  const fetchRecentOrders = useCallback(async () => {
-    try {
-      console.log('📋 [ADMIN] Fetching recent orders...');
-      setRecentOrdersLoading(true);
-      const response = await apiClient.get<{ data: RecentOrder[] }>('/api/v1/admin/dashboard/recent-orders', {
-        params: { limit: '5' },
-      });
-      if (response?.data && Array.isArray(response.data)) {
-        setRecentOrders(response.data);
-      } else {
-        setRecentOrders([]);
-      }
-    } catch (err: unknown) {
-      console.error('❌ [ADMIN] Error fetching recent orders:', err);
       setRecentOrders([]);
-    } finally {
-      setRecentOrdersLoading(false);
-    }
-  }, []);
-
-  const fetchTopProducts = useCallback(async () => {
-    try {
-      console.log('📊 [ADMIN] Fetching top products...');
-      setTopProductsLoading(true);
-      const response = await apiClient.get<{ data: TopProduct[] }>('/api/v1/admin/dashboard/top-products', {
-        params: { limit: '5' },
-      });
-      if (response?.data && Array.isArray(response.data)) {
-        setTopProducts(response.data);
-      } else {
-        setTopProducts([]);
-      }
-    } catch (err: unknown) {
-      console.error('❌ [ADMIN] Error fetching top products:', err);
       setTopProducts([]);
-    } finally {
-      setTopProductsLoading(false);
-    }
-  }, []);
-
-  const fetchUserActivity = useCallback(async () => {
-    try {
-      console.log('👥 [ADMIN] Fetching user activity...');
-      setUserActivityLoading(true);
-      const response = await apiClient.get<{ data: UserActivity }>('/api/v1/admin/dashboard/user-activity', {
-        params: { limit: '10' },
-      });
-      if (response?.data) {
-        setUserActivity(response.data);
-      } else {
-        setUserActivity(null);
-      }
-    } catch (err: unknown) {
-      console.error('❌ [ADMIN] Error fetching user activity:', err);
       setUserActivity(null);
     } finally {
+      setStatsLoading(false);
+      setRecentOrdersLoading(false);
+      setTopProductsLoading(false);
       setUserActivityLoading(false);
     }
   }, []);
 
   useEffect(() => {
     if (!isLoading && isLoggedIn && isAdmin) {
-      fetchStats();
-      fetchActivity();
-      fetchRecentOrders();
-      fetchTopProducts();
-      fetchUserActivity();
+      fetchDashboard();
     }
-  }, [isLoading, isLoggedIn, isAdmin, fetchStats, fetchActivity, fetchRecentOrders, fetchTopProducts, fetchUserActivity]);
+  }, [isLoading, isLoggedIn, isAdmin, fetchDashboard]);
 
   return {
     stats,
-    activity,
     recentOrders,
     topProducts,
     userActivity,
     statsLoading,
-    activityLoading,
     recentOrdersLoading,
     topProductsLoading,
     userActivityLoading,
   };
 }
-

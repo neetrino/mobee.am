@@ -91,12 +91,6 @@ export async function executeProductListQuery(
   const queryStartTime = Date.now();
   
   try {
-    // Test database connection first
-    logger.debug('Testing database connection...');
-    await db.$queryRaw`SELECT 1`;
-    logger.debug('Database connection OK');
-
-    // Fetch products
     logger.debug('Fetching products...');
     const products = await db.product.findMany({
       where,

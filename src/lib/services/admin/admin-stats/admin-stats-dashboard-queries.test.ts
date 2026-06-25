@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  queryRaw: vi.fn(),
   orderItemGroupBy: vi.fn(),
   orderItemFindMany: vi.fn(),
   orderAggregate: vi.fn(),
@@ -16,6 +17,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@white-shop/db", () => ({
   db: {
+    $queryRaw: mocks.queryRaw,
     orderItem: {
       groupBy: mocks.orderItemGroupBy,
       findMany: mocks.orderItemFindMany,
@@ -43,11 +45,10 @@ import { getStats } from "./stats-calculator";
 import { getUserActivity } from "./user-activity";
 
 const {
-  orderItemGroupBy,
+  queryRaw,
   orderItemFindMany,
   orderAggregate,
   orderGroupBy,
-  orderCount,
   orderFindFirst,
   userCount,
   userFindMany,
@@ -65,23 +66,22 @@ describe("getStats dashboard query pattern", () => {
     userCount.mockResolvedValue(10);
     productCount.mockResolvedValue(20);
     productVariantCount.mockResolvedValue(1);
-    orderCount.mockImplementation((args?: { where?: { status?: string; createdAt?: { gte: Date } } }) => {
-      const w = args?.where;
-      if (w && "status" in w && w.status === "pending") return Promise.resolve(2);
-      if (w && "createdAt" in w && w.createdAt) return Promise.resolve(5);
-      return Promise.resolve(100);
-    });
+    queryRaw.mockResolvedValue([{ total: 100, pending: 2, recent: 5 }]);
     orderAggregate.mockResolvedValue({ _sum: { total: 999.5 } });
     orderFindFirst.mockResolvedValue({ currency: "AMD" });
 
     const result = await getStats();
 
+    expect(queryRaw).toHaveBeenCalled();
     expect(orderAggregate).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({ OR: expect.any(Array) }),
         _sum: { total: true },
       })
     );
+    expect(result.orders.total).toBe(100);
+    expect(result.orders.pending).toBe(2);
+    expect(result.orders.recent).toBe(5);
     expect(result.revenue.total).toBe(999.5);
     expect(result.revenue.currency).toBe("AMD");
   });
@@ -92,9 +92,14 @@ describe("getTopProducts dashboard query pattern", () => {
     vi.clearAllMocks();
   });
 
-  it("aggregates with groupBy and does not scan all line items via findMany", async () => {
-    orderItemGroupBy.mockResolvedValue([
-      { variantId: "var-1", _sum: { quantity: 3, total: 150 }, _count: { id: 2 } },
+  it("aggregates with SQL and does not scan all line items via findMany", async () => {
+    queryRaw.mockResolvedValue([
+      {
+        variantId: "var-1",
+        totalQuantity: 3,
+        totalRevenue: 150,
+        orderCount: 2,
+      },
     ]);
     productVariantFindMany.mockResolvedValue([
       {
@@ -108,16 +113,7 @@ describe("getTopProducts dashboard query pattern", () => {
     const out = await getTopProducts(5);
 
     expect(orderItemFindMany).not.toHaveBeenCalled();
-    expect(orderItemGroupBy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        by: ["variantId"],
-        where: expect.objectContaining({
-          variantId: { not: null },
-          order: expect.objectContaining({ createdAt: expect.any(Object) }),
-        }),
-        _sum: expect.objectContaining({ quantity: true, total: true }),
-      })
-    );
+    expect(queryRaw).toHaveBeenCalled();
     expect(out).toHaveLength(1);
     expect(out[0]).toMatchObject({
       variantId: "var-1",

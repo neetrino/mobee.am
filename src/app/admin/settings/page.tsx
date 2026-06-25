@@ -1,16 +1,17 @@
 ﻿'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
+import { useRouter } from 'next/navigation';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
 import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
 import { ADMIN_SETTINGS_ONLINE_PAYMENTS_CHECKBOX_CLASS } from './online-payments-checkbox.constants';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '@/components/Toast';
+import { useAdminPageNavDebug } from '../hooks/useAdminPageNavDebug';
 interface Settings {
   defaultCurrency?: string;
   globalDiscount?: number;
@@ -27,9 +28,7 @@ const SETTINGS_DEFAULT_CURRENCY_OPTIONS = [
 
 export default function SettingsPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<Settings>({
@@ -43,26 +42,17 @@ export default function SettingsPage() {
     },
   });
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
+  useAdminPageNavDebug(loading);
 
   useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchSettings();
-    }
-  }, [isLoggedIn, isAdmin]);
+    fetchSettings();
+  }, []);
 
   const fetchSettings = async () => {
     try {
       setLoading(true);
       console.log('⚙️ [ADMIN] Fetching settings...');
-      const data = await apiClient.get<Settings>('/api/v1/admin/settings');
+      const data = await fetchAdminReference<Settings>('settings');
       setSettings({
         defaultCurrency: data.defaultCurrency || 'AMD',
         globalDiscount: data.globalDiscount,
@@ -113,7 +103,8 @@ export default function SettingsPage() {
         defaultCurrency: settings.defaultCurrency,
         currencyRates: currencyRatesToSave,
       });
-      
+      invalidateAdminReferenceCache('settings');
+
       // Clear currency rates cache to force reload
       console.log('🔄 [ADMIN] Clearing currency rates cache...');
       clearCurrencyRatesCache();
@@ -137,7 +128,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (isLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -148,12 +139,7 @@ export default function SettingsPage() {
     );
   }
 
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
-
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/settings'} router={router} t={t}>
       <div className="mx-auto w-full max-w-4xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.settings.title')}</h1>
@@ -474,7 +460,6 @@ export default function SettingsPage() {
           </Button>
         </div>
       </div>
-    </AdminPageShell>
   );
 }
 

@@ -23,10 +23,17 @@ class AdminCategoriesService {
       where: {
         deletedAt: null,
       },
-      include: {
+      select: {
+        id: true,
+        parentId: true,
+        position: true,
+        requiresSizes: true,
+        homeStripPosition: true,
+        media: true,
         translations: {
           where: { locale: ADMIN_CATEGORY_LOCALE },
           take: 1,
+          select: { title: true, slug: true },
         },
       },
       orderBy: {

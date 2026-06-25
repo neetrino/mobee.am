@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 
 /**
@@ -142,19 +142,9 @@ export async function GET(req: NextRequest) {
   
   try {
     // Аутентификация и проверка прав администратора
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      console.warn("⚠️ [ADMIN PRODUCTS API] Unauthorized access attempt", { userId: user?.id });
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     // Валидация и нормализация параметров
@@ -231,19 +221,9 @@ export async function POST(req: NextRequest) {
   
   try {
     // Аутентификация и проверка прав администратора
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      console.warn("⚠️ [ADMIN PRODUCTS API] Unauthorized POST attempt", { userId: user?.id });
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     // Парсинг тела запроса

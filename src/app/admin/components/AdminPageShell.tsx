@@ -1,7 +1,8 @@
 'use client';
 
 import type { ReactNode, SetStateAction } from 'react';
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
 import { useRouter } from 'next/navigation';
 import {
   ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS,
@@ -31,6 +32,8 @@ export function AdminPageShell({
   mainClassName,
 }: AdminPageShellProps) {
   const [desktopSidebarCollapsed, setDesktopSidebarCollapsedState] = useState(false);
+
+  useEffect(() => adminNavMarkMount('AdminPageShell'), []);
 
   useLayoutEffect(() => {
     setDesktopSidebarCollapsedState(readAdminSidebarDesktopCollapsedFromSession());

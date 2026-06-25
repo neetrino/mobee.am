@@ -1,14 +1,12 @@
 ﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
+import { useAdminPageNavDebug } from '../hooks/useAdminPageNavDebug';
 interface User {
   id: string;
   email: string;
@@ -33,9 +31,6 @@ interface UsersResponse {
 
 export default function UsersPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -45,14 +40,7 @@ export default function UsersPage() {
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'customer'>('all');
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
+  useAdminPageNavDebug(loading);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -79,11 +67,9 @@ export default function UsersPage() {
   }, [page, search, roleFilter]);
 
   useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchUsers();
-    }
+    fetchUsers();
      
-  }, [isLoggedIn, isAdmin, page, search, roleFilter]);
+  }, [fetchUsers]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,20 +86,10 @@ export default function UsersPage() {
   };
 
   const toggleSelectAll = () => {
-    // Ընտրում ենք միայն այն օգտատերերին, որոնք տեսանելի են ընթացիկ ֆիլտրով
-    const visibleUsers =
-      roleFilter === 'all'
-        ? users
-        : users.filter((u) =>
-            roleFilter === 'admin'
-              ? u.roles?.includes('admin')
-              : u.roles?.includes('customer')
-          );
-
-    if (visibleUsers.length === 0) return;
+    if (users.length === 0) return;
 
     setSelectedIds((prev) => {
-      const allIds = visibleUsers.map((u) => u.id);
+      const allIds = users.map((u) => u.id);
       const hasAll = allIds.every((id) => prev.has(id));
       return hasAll ? new Set() : new Set(allIds);
     });
@@ -169,21 +145,6 @@ export default function UsersPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
-
   // Տեսանելի օգտատերերի filter Admin / Customer ֆիլտրով
   const filteredUsers =
     roleFilter === 'all'
@@ -195,7 +156,6 @@ export default function UsersPage() {
         );
 
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/users'} router={router} t={t}>
       <div className="mx-auto w-full min-w-0 max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.users.title')}</h1>
@@ -442,7 +402,6 @@ export default function UsersPage() {
           )}
         </Card>
       </div>
-    </AdminPageShell>
   );
 }
 

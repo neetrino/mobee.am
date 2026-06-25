@@ -1,94 +1,112 @@
-import { db } from "@white-shop/db";
-
-const TOP_PRODUCTS_WINDOW_DAYS = 365;
-
-function extractImageFromMedia(media: unknown[] | undefined): string | null {
-  if (!Array.isArray(media) || media.length === 0) return null;
-  const firstMedia = media[0];
-  if (typeof firstMedia === "string") return firstMedia;
-  if (firstMedia && typeof firstMedia === "object" && "url" in firstMedia) {
-    return (firstMedia as { url?: string }).url || null;
-  }
-  return null;
-}
-
-function windowStartDate() {
-  const d = new Date();
-  d.setDate(d.getDate() - TOP_PRODUCTS_WINDOW_DAYS);
-  return d;
-}
-
-function mapTopRowsToProducts(
-  sorted: Array<{
-    variantId: string | null;
-    _sum: { quantity: number | null; total: number | null };
-    _count: { id: number };
-  }>,
-  variantById: Map<
-    string,
-    {
-      id: string;
-      productId: string;
-      sku: string | null;
-      product: {
-        media: unknown;
-        translations: Array<{ title: string }>;
-      } | null;
-    }
-  >
-) {
-  return sorted.map((row) => {
-    const v = variantById.get(row.variantId!);
-    const title = v?.product?.translations?.[0]?.title ?? "Unknown Product";
-    return {
-      variantId: row.variantId!,
-      productId: v?.productId ?? "",
-      title,
-      sku: v?.sku ?? "N/A",
-      totalQuantity: row._sum.quantity ?? 0,
-      totalRevenue: row._sum.total ?? 0,
-      orderCount: row._count.id,
-      image: extractImageFromMedia(v?.product?.media as unknown[] | undefined),
-    };
-  });
-}
-
-/**
- * Get top products for admin dashboard (aggregated in DB, bounded time window)
- */
-export async function getTopProducts(limit: number = 5) {
-  const grouped = await db.orderItem.groupBy({
-    by: ["variantId"],
-    where: {
-      variantId: { not: null },
-      order: { createdAt: { gte: windowStartDate() } },
-    },
-    _sum: { quantity: true, total: true },
-    _count: { id: true },
-  });
-
-  const sorted = grouped
-    .filter((row) => row.variantId)
-    .sort((a, b) => (b._sum.total ?? 0) - (a._sum.total ?? 0))
-    .slice(0, limit);
-
-  if (sorted.length === 0) return [];
-
-  const variants = await db.productVariant.findMany({
-    where: { id: { in: sorted.map((r) => r.variantId!) } },
-    select: {
-      id: true,
-      productId: true,
-      sku: true,
-      product: {
-        select: {
-          media: true,
-          translations: { where: { locale: "en" }, take: 1, select: { title: true } },
-        },
-      },
-    },
-  });
-
-  const variantById = new Map(variants.map((v) => [v.id, v]));
-  return mapTopRowsToProducts(sorted, variantById);
-}
+import { db } from "@white-shop/db";
+import { smartSplitUrls } from "../../../utils/image-utils";
+
+const TOP_PRODUCTS_WINDOW_DAYS = 365;
+
+interface TopProductAggregateRow {
+  variantId: string;
+  totalQuantity: number;
+  totalRevenue: number;
+  orderCount: number;
+}
+
+function extractImageFromMedia(media: unknown[] | undefined): string | null {
+  if (!Array.isArray(media) || media.length === 0) return null;
+  const firstMedia = media[0];
+  if (typeof firstMedia === "string") return firstMedia;
+  if (firstMedia && typeof firstMedia === "object" && "url" in firstMedia) {
+    return (firstMedia as { url?: string }).url || null;
+  }
+  return null;
+}
+
+function resolveProductImage(
+  media: unknown[] | undefined,
+  variantImageUrl: string | null | undefined,
+): string | null {
+  const fromMedia = extractImageFromMedia(media);
+  if (fromMedia) return fromMedia;
+
+  if (typeof variantImageUrl === "string" && variantImageUrl.trim().length > 0) {
+    const urls = smartSplitUrls(variantImageUrl);
+    return urls[0] ?? null;
+  }
+
+  return null;
+}
+
+function windowStartDate() {
+  const d = new Date();
+  d.setDate(d.getDate() - TOP_PRODUCTS_WINDOW_DAYS);
+  return d;
+}
+
+async function fetchTopProductAggregates(limit: number): Promise<TopProductAggregateRow[]> {
+  const windowStart = windowStartDate();
+
+  const rows = await db.$queryRaw<TopProductAggregateRow[]>`
+    SELECT
+      oi."variantId" AS "variantId",
+      COALESCE(SUM(oi.quantity), 0)::float AS "totalQuantity",
+      COALESCE(SUM(oi.total), 0)::float AS "totalRevenue",
+      COUNT(oi.id)::int AS "orderCount"
+    FROM order_items oi
+    INNER JOIN orders o ON o.id = oi."orderId"
+    WHERE oi."variantId" IS NOT NULL
+      AND o."createdAt" >= ${windowStart}
+    GROUP BY oi."variantId"
+    ORDER BY SUM(oi.total) DESC
+    LIMIT ${limit}
+  `;
+
+  return rows;
+}
+
+/**
+ * Get top products for admin dashboard (SQL LIMIT + targeted variant fetch)
+ */
+export async function getTopProducts(limit: number = 5) {
+  const safeLimit = Math.max(1, Math.min(limit, 50));
+  const sorted = await fetchTopProductAggregates(safeLimit);
+
+  if (sorted.length === 0) {
+    return [];
+  }
+
+  const variants = await db.productVariant.findMany({
+    where: { id: { in: sorted.map((row) => row.variantId) } },
+    select: {
+      id: true,
+      productId: true,
+      sku: true,
+      imageUrl: true,
+      product: {
+        select: {
+          media: true,
+          translations: { where: { locale: "en" }, take: 1, select: { title: true } },
+        },
+      },
+    },
+  });
+
+  const variantById = new Map(variants.map((variant) => [variant.id, variant]));
+
+  return sorted.map((row) => {
+    const variant = variantById.get(row.variantId);
+    const title = variant?.product?.translations?.[0]?.title ?? "Unknown Product";
+
+    return {
+      variantId: row.variantId,
+      productId: variant?.productId ?? "",
+      title,
+      sku: variant?.sku ?? "N/A",
+      totalQuantity: row.totalQuantity,
+      totalRevenue: row.totalRevenue,
+      orderCount: row.orderCount,
+      image: resolveProductImage(
+        variant?.product?.media as unknown[] | undefined,
+        variant?.imageUrl,
+      ),
+    };
+  });
+}

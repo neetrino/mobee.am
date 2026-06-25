@@ -6,6 +6,13 @@
 
 import { type LanguageCode } from './language';
 import { getStoredLanguage } from './language';
+import {
+  type Namespace,
+  type ProductField,
+  VALID_NAMESPACES,
+} from './i18n-types';
+
+export type { Namespace, ProductField } from './i18n-types';
 
 // Pre-load all translations at build time for optimal performance
 import enCommon from '../locales/en/common.json';
@@ -82,10 +89,6 @@ import ruRegister from '../locales/ru/register.json';
 import ruCategories from '../locales/ru/categories.json';
 import ruOrders from '../locales/ru/orders.json';
 import ruAdmin from '../locales/ru/admin.json';
-
-// Type definitions for better type safety
-export type Namespace = 'common' | 'home' | 'product' | 'products' | 'attributes' | 'delivery' | 'about' | 'contact' | 'faq' | 'login' | 'cookies' | 'delivery-terms' | 'terms' | 'privacy' | 'support' | 'stores' | 'returns' | 'refund-policy' | 'profile' | 'checkout' | 'register' | 'categories' | 'orders' | 'admin';
-export type ProductField = 'title' | 'shortDescription' | 'longDescription';
 
 // Translation store - organized by language and namespace
 // Supports en, hy, and ru languages
@@ -254,10 +257,9 @@ export function t(lang: LanguageCode | undefined, path: string): string {
   }
 
   // Validate namespace
-  const validNamespaces: Namespace[] = ['common', 'home', 'product', 'products', 'attributes', 'delivery', 'about', 'contact', 'faq', 'login', 'cookies', 'delivery-terms', 'terms', 'privacy', 'support', 'stores', 'returns', 'refund-policy', 'profile', 'checkout', 'register', 'categories', 'orders', 'admin'];
-  if (!validNamespaces.includes(namespace)) {
+  if (!VALID_NAMESPACES.includes(namespace)) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[i18n] Invalid namespace: "${namespace}". Valid namespaces: ${validNamespaces.join(', ')}`);
+      console.warn(`[i18n] Invalid namespace: "${namespace}". Valid namespaces: ${VALID_NAMESPACES.join(', ')}`);
     }
     return path;
   }

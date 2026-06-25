@@ -179,16 +179,7 @@ class AdminAttributesReadService {
             if (!Array.isArray(colorsArray)) {
               colorsArray = [];
             }
-            
-            console.log('🎨 [ADMIN ATTRIBUTES READ SERVICE] Parsed colors for value:', {
-              valueId: value.id,
-              valueLabel: valueTranslation?.label || value.value,
-              colorsData,
-              colorsDataType: typeof colorsData,
-              colorsArray,
-              colorsArrayLength: colorsArray.length
-            });
-            
+
             return {
               id: value.id,
               value: value.value,

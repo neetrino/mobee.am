@@ -1,12 +1,11 @@
 ﻿'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
 
@@ -40,7 +39,7 @@ function BrandsSection() {
     try {
       setLoading(true);
       console.log('🏷️ [ADMIN] Fetching brands...');
-      const response = await apiClient.get<{ data: Brand[] }>('/api/v1/admin/brands');
+      const response = await fetchAdminReference<{ data: Brand[] }>('brands');
       setBrands(response.data || []);
       console.log('✅ [ADMIN] Brands loaded:', response.data?.length || 0);
     } catch (err) {
@@ -66,7 +65,7 @@ function BrandsSection() {
     try {
       console.log(`🗑️ [ADMIN] Deleting brand: ${brandName} (${brandId})`);
       await apiClient.delete(`/api/v1/admin/brands/${brandId}`);
-      console.log('✅ [ADMIN] Brand deleted successfully');
+      invalidateAdminReferenceCache('brands');
       fetchBrands();
       showToast(t('admin.brands.deletedSuccess'), 'success');
     } catch (err: any) {
@@ -131,6 +130,7 @@ function BrandsSection() {
         showToast(t('admin.brands.createdSuccess'), 'success');
       }
       
+      invalidateAdminReferenceCache('brands');
       fetchBrands();
       handleCloseModal();
     } catch (err: any) {
@@ -312,45 +312,17 @@ function BrandsSection() {
 
 export default function BrandsPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
 
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/brands'} router={router} t={t}>
-      <div className="mx-auto w-full max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.brands.title')}</h1>
-        </div>
-
-        <Card className="p-6">
-          <BrandsSection />
-        </Card>
+    <div className="mx-auto w-full max-w-7xl">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">{t('admin.brands.title')}</h1>
       </div>
-    </AdminPageShell>
+
+      <Card className="p-6">
+        <BrandsSection />
+      </Card>
+    </div>
   );
 }
 
