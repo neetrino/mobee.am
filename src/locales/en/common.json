@@ -96,7 +96,6 @@
   "compare": {
     "title": "Compare Products",
     "empty": "No products to compare",
-    "emptyDescription": "Add products to compare by category — up to 4 in each category (e.g. phones with phones, watches with watches). Different categories appear in separate sections.",
     "perCategoryHint": "Each category has its own comparison table (up to 4 products per category).",
     "uncategorized": "Other products",
     "category": "Category",
