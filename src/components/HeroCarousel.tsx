@@ -1,22 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { Montserrat, Noto_Sans_Armenian } from 'next/font/google';
+import { siteMontserrat, siteNotoArmenian } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { HERO_MOBILE_CONTENT_GUTTERS_CLASS, SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  display: 'swap',
-});
-
-const notoArmenian = Noto_Sans_Armenian({
-  subsets: ['armenian'],
-  weight: ['400', '700', '900'],
-  display: 'swap',
-});
+const montserrat = siteMontserrat;
+const notoArmenian = siteNotoArmenian;
 
 const IMG_AIRPODS = '/images/hero/airpods-max.png';
 const IMG_IPHONE = '/images/hero/iphone.png';

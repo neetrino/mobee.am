@@ -2,7 +2,6 @@
 
 import { memo, useCallback } from 'react';
 import type { MouseEvent, MutableRefObject, ReactNode } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { apiClient } from '../../lib/api-client';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
@@ -11,6 +10,8 @@ import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
 import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
 import { showToast } from '../../components/Toast';
+import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
+import { ProductCardNavLink } from '../../components/ProductCard/ProductCardNavLink';
 
 export interface CompareTableProduct {
   id: string;
@@ -72,6 +73,21 @@ async function resolveVariantForCart(product: CompareTableProduct): Promise<{
     variantId: productDetails.variants[0].id,
     bodyProductId: productDetails.id,
   };
+}
+
+function buildCompareNavPayload(product: CompareTableProduct) {
+  return buildProductCardCachePayload({
+    id: product.id,
+    slug: product.slug,
+    title: product.title,
+    price: product.price,
+    image: product.image,
+    inStock: product.inStock,
+    brand: product.brand,
+    defaultVariantId: product.defaultVariantId,
+    compareAtPrice: product.compareAtPrice ?? product.originalPrice,
+    discountPercent: product.discountPercent,
+  });
 }
 
 function CompareProductColumn({
@@ -205,7 +221,11 @@ const CompareGroupTableComponent = ({
       id: 'image',
       label: t('common.compare.image'),
       renderCell: (product) => (
-        <Link href={`/products/${product.slug}`} className="inline-block">
+        <ProductCardNavLink
+          slug={product.slug}
+          cachePayload={buildCompareNavPayload(product)}
+          className="inline-block"
+        >
           <div
             className="relative mx-auto h-32 w-32 overflow-hidden rounded-lg bg-gray-100"
             data-cart-fly-source
@@ -219,19 +239,20 @@ const CompareGroupTableComponent = ({
               loading="lazy"
             />
           </div>
-        </Link>
+        </ProductCardNavLink>
       ),
     },
     {
       id: 'name',
       label: t('common.compare.name'),
       renderCell: (product) => (
-        <Link
-          href={`/products/${product.slug}`}
+        <ProductCardNavLink
+          slug={product.slug}
+          cachePayload={buildCompareNavPayload(product)}
           className="block text-center text-base font-semibold text-gray-900 transition-colors hover:text-blue-600"
         >
           {product.title}
-        </Link>
+        </ProductCardNavLink>
       ),
     },
     {
@@ -264,12 +285,13 @@ const CompareGroupTableComponent = ({
       label: t('common.compare.actions'),
       renderCell: (product) => (
         <div className="flex flex-col items-center gap-2">
-          <Link
-            href={`/products/${product.slug}`}
+          <ProductCardNavLink
+            slug={product.slug}
+            cachePayload={buildCompareNavPayload(product)}
             className="text-sm font-medium text-black transition-colors hover:text-admin-500"
           >
             {t('common.compare.viewDetails')}
-          </Link>
+          </ProductCardNavLink>
           {product.inStock && (
             <button
               type="button"

@@ -3,15 +3,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '../lib/api-client';
 import type { HomeStripCategoryItem } from '../lib/services/categories-home-strip-cached';
-import { getStoredLanguage } from '../lib/language';
+import { getStoredLanguage, type LanguageCode } from '../lib/language';
 
 interface HomeCategoryStripResponse {
   data: HomeStripCategoryItem[];
 }
 
-export function useHomeCategoryStrip() {
-  const [items, setItems] = useState<HomeStripCategoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+export type UseHomeCategoryStripOptions = {
+  initialItems?: HomeStripCategoryItem[];
+  initialLocale?: LanguageCode;
+};
+
+export function useHomeCategoryStrip(options: UseHomeCategoryStripOptions = {}) {
+  const { initialItems, initialLocale } = options;
+  const hasInitial = Boolean(initialItems && initialItems.length > 0);
+
+  const [items, setItems] = useState<HomeStripCategoryItem[]>(initialItems ?? []);
+  const [loading, setLoading] = useState(!hasInitial);
 
   const fetchHomeStrip = useCallback(async () => {
     try {
@@ -30,8 +38,12 @@ export function useHomeCategoryStrip() {
   }, []);
 
   useEffect(() => {
+    if (hasInitial && initialLocale === getStoredLanguage()) {
+      setLoading(false);
+      return;
+    }
     void fetchHomeStrip();
-  }, [fetchHomeStrip]);
+  }, [fetchHomeStrip, hasInitial, initialLocale]);
 
   useEffect(() => {
     const onLang = () => void fetchHomeStrip();

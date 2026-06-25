@@ -1,8 +1,9 @@
 // Product page types and interfaces
 
-export interface ProductPageProps {
+/** @deprecated Legacy client page props — use ProductPageClientProps in ProductPageClient.tsx */
+export type ProductPageProps = {
   params: Promise<{ slug?: string }>;
-}
+};
 
 export interface ProductMedia {
   url?: string;

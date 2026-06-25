@@ -1,10 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@shop/ui';
 import { formatPrice } from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
+import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
+import { ProductCardNavLink } from '../../components/ProductCard/ProductCardNavLink';
 import {
   CART_ITEM_ROW_DESKTOP_IMAGE_FRAME_CLASS,
   CART_ITEM_ROW_DESKTOP_IMAGE_MAT_CLASS,
@@ -54,6 +55,17 @@ export function WishlistItemCard({
   const currencyCode = currency as CurrencyCode;
   const listPrice = product.compareAtPrice ?? product.originalPrice;
   const showStrike = listPrice !== null && listPrice > product.price;
+  const listingCacheSource = buildProductCardCachePayload({
+    id: product.id,
+    slug: product.slug,
+    title: product.title,
+    price: product.price,
+    image: product.image,
+    inStock: product.inStock,
+    brand: product.brand,
+    defaultVariantId: product.defaultVariantId,
+    compareAtPrice: listPrice,
+  });
 
   return (
     <div
@@ -80,11 +92,12 @@ export function WishlistItemCard({
           <div
             className={`flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-2 ${CART_ITEM_ROW_DESKTOP_IMAGE_MAT_CLASS}`}
           >
-            <Link
-              href={`/products/${product.slug}`}
+            <ProductCardNavLink
+              slug={product.slug}
+              cachePayload={listingCacheSource}
               className="relative block h-full min-h-[104px] w-full max-lg:min-h-[104px] lg:min-h-0"
-              data-cart-fly-source
             >
+              <span data-cart-fly-source className="absolute inset-0" aria-hidden />
               {product.image ? (
                 <Image
                   src={product.image}
@@ -105,7 +118,7 @@ export function WishlistItemCard({
                   </svg>
                 </div>
               )}
-            </Link>
+            </ProductCardNavLink>
           </div>
         </div>
       </div>
@@ -120,12 +133,13 @@ export function WishlistItemCard({
           >
             <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 21.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
-          <Link
-            href={`/products/${product.slug}`}
+          <ProductCardNavLink
+            slug={product.slug}
+            cachePayload={listingCacheSource}
             className="line-clamp-2 text-sm font-medium leading-snug text-gray-900 transition-colors hover:text-blue-600"
           >
             {product.title}
-          </Link>
+          </ProductCardNavLink>
         </div>
         {product.brand?.name ? (
           <p className="mt-1 line-clamp-1 pl-5 text-[10px] text-gray-500">{product.brand.name}</p>

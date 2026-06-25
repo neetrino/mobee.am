@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from '../lib/i18n-client';
 import { formatPrice, getStoredCurrency } from '../lib/currency';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
+import { buildProductCardCachePayload } from '@/lib/products/product-card-cache';
+import { warmProductCardNavigation } from '@/lib/products/product-card-nav';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
 
 export interface SearchDropdownProps {
@@ -36,7 +39,23 @@ export function SearchDropdown({
   listboxId = 'search-results',
 }: SearchDropdownProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const currency = getStoredCurrency();
+
+  const warmSearchResult = (result: InstantSearchResultItem) => {
+    warmProductCardNavigation(
+      buildProductCardCachePayload({
+        id: result.id,
+        slug: result.slug,
+        title: result.title,
+        price: result.price,
+        image: result.image,
+        compareAtPrice: result.compareAtPrice,
+        inStock: true,
+      }),
+      router,
+    );
+  };
 
   if (!isOpen) {
     return null;
@@ -75,6 +94,9 @@ export function SearchDropdown({
                 <button
                   type="button"
                   onClick={() => onResultClick(result)}
+                  onPointerDown={() => warmSearchResult(result)}
+                  onMouseEnter={() => warmSearchResult(result)}
+                  onFocus={() => warmSearchResult(result)}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
                     index === selectedIndex ? 'bg-gray-100' : 'hover:bg-gray-50'
                   }`}

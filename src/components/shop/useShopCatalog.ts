@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import { getStoredLanguage, type LanguageCode } from '@/lib/language';
@@ -8,7 +8,7 @@ import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-p
 import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
-import { usePrefetchNextProductListPage } from './usePrefetchNextProductListPage';
+import { usePrefetchAdjacentProductListPages } from './usePrefetchAdjacentProductListPages';
 
 export interface ShopCatalogProduct {
   id: string;
@@ -86,7 +86,10 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
     initialPayload && initialFiltersKey ? payloadToResponse(initialPayload, initialPayload.meta?.limit ?? 12) : null,
   );
   const [loading, setLoading] = useState(() => !(initialPayload && initialFiltersKey));
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
+  const productsDataRef = useRef(productsData);
+  productsDataRef.current = productsData;
 
   useEffect(() => {
     const onLanguageUpdate = () => setLanguage(getStoredLanguage());
@@ -102,8 +105,14 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
   const filtersKey = useMemo(() => buildProductListCacheKey(filters), [filters]);
 
   const fetchList = useCallback(async () => {
-    setLoading(true);
+    const hasVisibleRows = (productsDataRef.current?.data?.length ?? 0) > 0;
+    if (hasVisibleRows) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
     setError(false);
+
     try {
       const params = productFiltersToApiParams(filters);
       const result = await apiClient.get<ProductsResponse>('/api/v1/products', { params });
@@ -119,17 +128,20 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
     } catch (e) {
       console.error('❌ [SHOP CATALOG]', e);
       setError(true);
-      setProductsData({
-        data: [],
-        meta: {
-          total: 0,
-          page: 1,
-          limit: filters.limit ?? 12,
-          totalPages: 0,
-        },
-      });
+      if (!hasVisibleRows) {
+        setProductsData({
+          data: [],
+          meta: {
+            total: 0,
+            page: 1,
+            limit: filters.limit ?? 12,
+            totalPages: 0,
+          },
+        });
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [filters]);
 
@@ -137,13 +149,14 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
     if (initialFiltersKey && filtersKey === initialFiltersKey && initialPayload) {
       setProductsData(payloadToResponse(initialPayload, filters.limit ?? 12));
       setLoading(false);
+      setRefreshing(false);
       setError(false);
       return;
     }
     void fetchList();
   }, [fetchList, filtersKey, filters.limit, initialFiltersKey, initialPayload]);
 
-  usePrefetchNextProductListPage(filters, productsData?.meta);
+  usePrefetchAdjacentProductListPages(filters, productsData?.meta);
 
-  return { productsData, loading, error, refetch: fetchList, filters };
+  return { productsData, loading, refreshing, error, refetch: fetchList, filters };
 }

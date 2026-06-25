@@ -6,12 +6,15 @@ import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
 import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
+import { removeAdminSessionCache } from '@/lib/admin/admin-session-cache';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
 import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
 import { ADMIN_SETTINGS_ONLINE_PAYMENTS_CHECKBOX_CLASS } from './online-payments-checkbox.constants';
 import { showToast } from '@/components/Toast';
 import { useAdminPageNavDebug } from '../hooks/useAdminPageNavDebug';
+import { useAdminCachedQuery } from '../hooks/useAdminCachedQuery';
+import { buildAdminSessionCacheKey } from '@/lib/admin/admin-session-cache';
 interface Settings {
   defaultCurrency?: string;
   globalDiscount?: number;
@@ -26,64 +29,44 @@ const SETTINGS_DEFAULT_CURRENCY_OPTIONS = [
   { value: 'EUR', i18nKey: 'admin.settings.eur' },
 ] as const;
 
+const SETTINGS_CACHE_KEY = buildAdminSessionCacheKey('/supersudo/settings', {});
+
+const DEFAULT_SETTINGS: Settings = {
+  defaultCurrency: 'AMD',
+  currencyRates: {
+    USD: 1,
+    AMD: 400,
+    EUR: 0.92,
+    RUB: 90,
+    GEL: 2.7,
+  },
+};
+
 export default function SettingsPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [settings, setSettings] = useState<Settings>({
-    defaultCurrency: 'AMD',
-    currencyRates: {
-      USD: 1,
-      AMD: 400,
-      EUR: 0.92,
-      RUB: 90,
-      GEL: 2.7,
-    },
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+
+  const { data: loadedSettings, loading, refetch: refetchSettings } = useAdminCachedQuery<Settings>({
+    cacheKey: SETTINGS_CACHE_KEY,
+    fetcher: () => fetchAdminReference<Settings>('settings'),
   });
 
-  useAdminPageNavDebug(loading);
-
   useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  const fetchSettings = async () => {
-    try {
-      setLoading(true);
-      console.log('⚙️ [ADMIN] Fetching settings...');
-      const data = await fetchAdminReference<Settings>('settings');
-      setSettings({
-        defaultCurrency: data.defaultCurrency || 'AMD',
-        globalDiscount: data.globalDiscount,
-        categoryDiscounts: data.categoryDiscounts,
-        brandDiscounts: data.brandDiscounts,
-        currencyRates: data.currencyRates || {
-          USD: 1,
-          AMD: 400,
-          EUR: 0.92,
-          RUB: 90,
-          GEL: 2.7,
-        },
-      });
-      console.log('✅ [ADMIN] Settings loaded:', data);
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error fetching settings:', err);
-      // Use defaults if error
-      setSettings({
-        defaultCurrency: 'AMD',
-        currencyRates: {
-          USD: 1,
-          AMD: 400,
-          EUR: 0.92,
-          RUB: 90,
-          GEL: 2.7,
-        },
-      });
-    } finally {
-      setLoading(false);
+    if (!loadedSettings) {
+      return;
     }
-  };
+    setSettings({
+      defaultCurrency: loadedSettings.defaultCurrency || 'AMD',
+      globalDiscount: loadedSettings.globalDiscount,
+      categoryDiscounts: loadedSettings.categoryDiscounts,
+      brandDiscounts: loadedSettings.brandDiscounts,
+      currencyRates: loadedSettings.currencyRates || DEFAULT_SETTINGS.currencyRates,
+    });
+  }, [loadedSettings]);
+
+  useAdminPageNavDebug(loading);
 
   const handleSave = async () => {
     setSaving(true);
@@ -104,6 +87,8 @@ export default function SettingsPage() {
         currencyRates: currencyRatesToSave,
       });
       invalidateAdminReferenceCache('settings');
+      removeAdminSessionCache(SETTINGS_CACHE_KEY);
+      await refetchSettings({ force: true });
 
       // Clear currency rates cache to force reload
       console.log('🔄 [ADMIN] Clearing currency rates cache...');

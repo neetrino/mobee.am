@@ -1,17 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 import { WHY_CHOOSE_US_ICON_SRC } from '../lib/constants/ui-icons.constants';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-});
+const montserrat = siteMontserrat;
 
 type BenefitId = 'warranty' | 'delivery' | 'installment' | 'original';
 

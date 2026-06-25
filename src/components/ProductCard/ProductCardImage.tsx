@@ -3,7 +3,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { resolveProductCardImageSrc } from "../../lib/productCardDisplayImage";
+import {
+  type ProductCardCachePayload,
+} from "../../lib/products/product-card-cache";
+import { buildProductCardNavHandlers } from "../../lib/products/product-card-nav";
 import { ProductImagePlaceholder } from "../ProductImagePlaceholder";
+import { useRouter } from "next/navigation";
 
 interface ProductCardImageProps {
   slug: string;
@@ -18,6 +23,7 @@ interface ProductCardImageProps {
   squareImageFrame?: boolean;
   /** Eager load for above-the-fold grid cells (LCP on shop / home). */
   imageLoadPriority?: boolean;
+  listingCacheSource?: ProductCardCachePayload;
 }
 
 /**
@@ -33,9 +39,14 @@ export function ProductCardImage({
   shiftImageInFrame = false,
   squareImageFrame = true,
   imageLoadPriority = false,
+  listingCacheSource,
 }: ProductCardImageProps) {
+  const router = useRouter();
   const showPlaceholder = imageError;
   const imageSrc = resolveProductCardImageSrc(image);
+  const warmHandlers = listingCacheSource
+    ? buildProductCardNavHandlers(listingCacheSource, router)
+    : undefined;
   /** max-lg: frame 90% width vs desktop (171 / 212) so title clears the image on small screens. */
   const frameClass = isCompact
     ? "w-[171px] max-w-[84%] max-lg:w-[153.9px]"
@@ -48,6 +59,8 @@ export function ProductCardImage({
         href={`/products/${slug}`}
         className="absolute inset-0 block"
         aria-label={title}
+        prefetch
+        {...(warmHandlers ?? {})}
       >
         {showPlaceholder ? (
           <ProductImagePlaceholder

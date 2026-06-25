@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
 import type { AnimationEvent, FormEvent } from 'react';
@@ -67,11 +67,7 @@ const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
 /** Any scroll-down past this delta hides the peeking primary strip again. */
 const PRIMARY_STRIP_SCROLL_DOWN_HIDE_THRESHOLD_PX = 2;
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['500', '600', '800', '900'],
-  display: 'swap',
-});
+const montserrat = siteMontserrat;
 
 const primaryNavLinks = [
   { href: '/about', translationKey: 'common.navigation.about' },

@@ -8,6 +8,7 @@ import { getStoredLanguage } from '../lib/language';
 import { getColorHex } from '../lib/colorMap';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 
 interface ColorFilterProps {
   category?: string;
@@ -98,7 +99,8 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
     // Reset page to 1 when filters change
     params.delete('page');
 
-    router.push(`/shop?${params.toString()}`);
+    const href = warmShopNavigationFromSearchParams(router, params, getStoredLanguage());
+    router.push(href);
   };
 
   if (loading && colors.length === 0) {

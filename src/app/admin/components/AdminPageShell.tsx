@@ -2,8 +2,9 @@
 
 import type { ReactNode, SetStateAction } from 'react';
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
-import { useRouter } from 'next/navigation';
+import { useAdminNav } from './AdminNavProvider';
 import {
   ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS,
   ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS,
@@ -18,19 +19,21 @@ import { AdminSidebar } from './AdminSidebar';
 
 interface AdminPageShellProps {
   currentPath: string;
-  router: ReturnType<typeof useRouter>;
+  router: AppRouterInstance;
   t: ReturnType<typeof import('../../../lib/i18n-client').useTranslation>['t'];
   children: ReactNode;
   mainClassName?: string;
 }
 
 export function AdminPageShell({
-  currentPath,
+  currentPath: _currentPath,
   router,
   t,
   children,
   mainClassName,
 }: AdminPageShellProps) {
+  const { effectivePath } = useAdminNav();
+  const currentPath = effectivePath;
   const [desktopSidebarCollapsed, setDesktopSidebarCollapsedState] = useState(false);
 
   useEffect(() => adminNavMarkMount('AdminPageShell'), []);

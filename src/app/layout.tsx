@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { cookies, headers } from 'next/headers';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
 import { SiteChrome } from '../components/SiteChrome';
+import { siteInter } from '../lib/fonts/site-fonts';
 import {
   SITE_APP_ICON_PATH,
   SITE_BRAND_NAME,
@@ -17,7 +17,7 @@ import { getCachedCategoriesTree } from '../lib/services/categories-tree-cached'
 import { TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT } from '../lib/tablet-ipad-air-like-layout';
 import { withRootLayoutDevTiming } from '../lib/root-layout-dev-timing';
 
-const inter = Inter({ subsets: ['latin'], adjustFontFallback: true });
+const inter = siteInter;
 
 export const viewport: Viewport = {
   width: 'device-width',

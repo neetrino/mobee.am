@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import { useTranslation } from '../lib/i18n-client';
 
 interface MobileFiltersDrawerProps {
   title?: string;
   triggerLabel?: string;
-  children: ReactNode;
+  children?: ReactNode;
+  /** Lazy panel factory — invoked only while the drawer is open. */
+  renderWhenOpen?: () => ReactNode;
   openEventName?: string;
 }
 
@@ -19,6 +20,7 @@ export function MobileFiltersDrawer({
   title,
   triggerLabel: _triggerLabel,
   children,
+  renderWhenOpen,
   openEventName,
 }: MobileFiltersDrawerProps) {
   const { t } = useTranslation();
@@ -71,7 +73,9 @@ export function MobileFiltersDrawer({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6">{children}</div>
+            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
+              {renderWhenOpen ? renderWhenOpen() : children}
+            </div>
           </div>
         </div>
       )}

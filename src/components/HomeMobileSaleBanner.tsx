@@ -1,20 +1,11 @@
 'use client';
 
-import { Montserrat, Noto_Sans_Armenian } from 'next/font/google';
+import { siteMontserrat, siteNotoArmenian } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '800', '900'],
-  display: 'swap',
-});
-
-const notoArmenian = Noto_Sans_Armenian({
-  subsets: ['armenian'],
-  weight: ['400', '700', '900'],
-  display: 'swap',
-});
+const montserrat = siteMontserrat;
+const notoArmenian = siteNotoArmenian;
 
 /**
  * Bottom-of-scroll promo card matching Figma mobile (chat + SALE 50%).

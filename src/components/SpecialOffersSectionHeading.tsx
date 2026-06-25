@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
@@ -11,11 +11,7 @@ import {
   HOME_SPECIAL_OFFERS_SECTION_OUTER_MARGIN_CLASS,
 } from './home-best-choice.constants';
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-});
+const montserrat = siteMontserrat;
 
 type SpecialOffersSectionHeadingProps = {
   /** Product grid — same card system as “best choice”, placed under the title row. */

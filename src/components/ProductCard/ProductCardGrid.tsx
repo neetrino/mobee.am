@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { ProductCardImage } from './ProductCardImage';
+import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
 import { ProductCardInfo } from './ProductCardInfo';
 import { ProductCardActions } from './ProductCardActions';
 import { ProductCardPriceBlock } from './ProductCardPriceBlock';
@@ -178,6 +179,7 @@ export function ProductCardGrid({
               shiftImageInFrame={shiftImageInFrame}
               squareImageFrame={squareImageFrame}
               imageLoadPriority={imageLoadPriority}
+              listingCacheSource={buildProductCardCachePayload(product)}
             />
           </div>
         </div>
@@ -214,6 +216,7 @@ export function ProductCardGrid({
           hidePrice
           omitBrandRow={homeProductGridCard}
           titleSizeMobileFigma={homeProductGridCard}
+          listingCacheSource={buildProductCardCachePayload(product)}
         />
         <div className={infoPricePad}>
           <ProductCardPriceBlock

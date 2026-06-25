@@ -257,6 +257,20 @@ async function fetchWithoutAttributeValue(
 }
 
 /**
+ * Lightweight slug → id lookup for reviews and similar routes (published products only).
+ */
+export async function findProductIdBySlug(
+  slug: string,
+  lang: string = 'en',
+): Promise<string | null> {
+  const product = await db.product.findFirst({
+    where: getBaseWhere(slug, lang),
+    select: { id: true },
+  });
+  return product?.id ?? null;
+}
+
+/**
  * Build and execute product query by slug with comprehensive error handling
  */
 export async function buildProductQuery(

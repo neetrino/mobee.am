@@ -7,6 +7,7 @@ import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 
 interface BrandFilterProps {
   category?: string;
@@ -82,7 +83,8 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
       params.delete('brand');
     }
     params.delete('page');
-    router.push(`/shop?${params.toString()}`);
+    const href = warmShopNavigationFromSearchParams(router, params, getStoredLanguage());
+    router.push(href);
   };
 
   if (loading && brands.length === 0) {

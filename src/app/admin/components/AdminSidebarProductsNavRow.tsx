@@ -4,31 +4,31 @@ import type { AdminMenuItem } from '../../../components/AdminMenuDrawer';
 import { MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS } from '../../../components/mobile-drawer-nav.constants';
 import { ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS } from '../admin-sidebar-layout.constants';
 import type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
+import { AdminSidebarNavLink } from './AdminSidebarNavLink';
 
 export interface ProductsNavRowProps {
   tab: AdminMenuItem;
   isActive: boolean;
   isExpanded: boolean;
-  onNavigate: () => void;
   onToggleExpand: () => void;
   expandAria: string;
   collapseAria: string;
   presentation: AdminSidebarNavPresentation;
-  /** Narrow desktop rail: icon only, no submenu toggle. */
   iconRail?: boolean;
+  onAfterNavigate?: () => void;
 }
 
 type ProductsNavRowBranchProps = Pick<
   ProductsNavRowProps,
-  'tab' | 'isActive' | 'isExpanded' | 'onNavigate' | 'onToggleExpand'
+  'tab' | 'isActive' | 'isExpanded' | 'onToggleExpand' | 'onAfterNavigate'
 > & { toggleAriaLabel: string };
 
 function ProductsNavRowMobile({
   tab,
   isActive,
   isExpanded,
-  onNavigate,
   onToggleExpand,
+  onAfterNavigate,
   toggleAriaLabel,
 }: ProductsNavRowBranchProps) {
   const outer = isActive
@@ -39,14 +39,14 @@ function ProductsNavRowMobile({
 
   return (
     <div className={`flex w-full min-w-0 overflow-hidden rounded-2xl border text-sm font-medium ${outer}`}>
-      <button
-        type="button"
-        onClick={onNavigate}
+      <AdminSidebarNavLink
+        href={tab.path}
+        onAfterNavigate={onAfterNavigate}
         className={`flex min-w-0 flex-1 items-center justify-start gap-3 px-4 py-3 text-left ${!isActive ? 'text-gray-800' : ''}`}
       >
         <span className={`flex-shrink-0 ${iconColorMobile}`}>{tab.icon}</span>
         <span className={`${MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS} truncate`}>{tab.label}</span>
-      </button>
+      </AdminSidebarNavLink>
       <button
         type="button"
         onClick={onToggleExpand}
@@ -73,8 +73,8 @@ function ProductsNavRowDesktop({
   tab,
   isActive,
   isExpanded,
-  onNavigate,
   onToggleExpand,
+  onAfterNavigate,
   toggleAriaLabel,
   iconRail = false,
 }: ProductsNavRowBranchProps & { iconRail?: boolean }) {
@@ -87,9 +87,9 @@ function ProductsNavRowDesktop({
     <div
       className={`flex w-full min-w-0 items-stretch rounded-supersudo text-sm font-medium transition-all duration-300 ease-in-out motion-reduce:transition-none ${containerColors}`}
     >
-      <button
-        type="button"
-        onClick={onNavigate}
+      <AdminSidebarNavLink
+        href={tab.path}
+        onAfterNavigate={onAfterNavigate}
         title={iconRail ? tab.label : undefined}
         aria-label={iconRail ? tab.label : undefined}
         className={`flex min-w-0 flex-1 items-center rounded-l-supersudo py-3 transition-all duration-300 ease-in-out motion-reduce:transition-none ${
@@ -104,7 +104,7 @@ function ProductsNavRowDesktop({
         >
           {tab.label}
         </span>
-      </button>
+      </AdminSidebarNavLink>
       <button
         type="button"
         onClick={onToggleExpand}

@@ -7,7 +7,7 @@ import {
   ADMIN_SIDEBAR_NAV_SCROLL_TOP_PADDING_CLASS,
 } from '../admin-sidebar-layout.constants';
 import type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
-import { adminNavMarkClick, adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
+import { adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
 import { isProductGroupPathActive, PrimaryNavList } from './AdminSidebarPrimaryNav';
 
 export type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
@@ -29,7 +29,7 @@ export interface AdminSidebarNavBodyProps {
  */
 export function AdminSidebarNavBody({
   currentPath,
-  router,
+  router: _router,
   t,
   onAfterNavigate,
   presentation = 'desktopSidebar',
@@ -47,12 +47,6 @@ export function AdminSidebarNavBody({
       setIsProductsExpanded(true);
     }
   }, [productGroupActive]);
-
-  const goTo = (path: string) => {
-    adminNavMarkClick(path);
-    router.push(path);
-    onAfterNavigate?.();
-  };
 
   const scrollShellClass =
     presentation === 'mobileDrawer'
@@ -79,10 +73,10 @@ export function AdminSidebarNavBody({
           productGroupActive={productGroupActive}
           isProductsExpanded={isProductsExpanded}
           setIsProductsExpanded={setIsProductsExpanded}
-          goTo={goTo}
           t={t}
           presentation={presentation}
           desktopCollapsed={desktopCollapsed}
+          onAfterNavigate={onAfterNavigate}
         />
       </div>
     </div>

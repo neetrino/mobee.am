@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useWishlist } from './hooks/useWishlist';
 import { useCompare } from './hooks/useCompare';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
+import { warmProductCardNavigation } from '../lib/products/product-card-nav';
+import { buildProductCardCachePayload } from '../lib/products/product-card-cache';
 import { useAddToCart } from './hooks/useAddToCart';
 import { useCurrency } from './hooks/useCurrency';
 import { resolveCompareCategoryId } from '../lib/shop/compare-storage';
@@ -155,6 +157,7 @@ function useProductCardPrimaryActionHandler(
       event.stopPropagation();
 
       if (addButtonNavigatesToProduct) {
+        warmProductCardNavigation(buildProductCardCachePayload(product), router);
         router.push(buildProductPagePath(product.slug));
         return;
       }
@@ -166,7 +169,7 @@ function useProductCardPrimaryActionHandler(
         flySourceEl,
       });
     },
-    [addButtonNavigatesToProduct, addToCart, product.image, product.slug, router],
+    [addButtonNavigatesToProduct, addToCart, product, router],
   );
 
   return {

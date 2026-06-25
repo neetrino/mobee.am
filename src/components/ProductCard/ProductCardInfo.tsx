@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { formatPrice } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import { ProductColors } from './ProductColors';
+import { ProductCardNavLink } from './ProductCardNavLink';
+import type { ProductCardCachePayload } from '../../lib/products/product-card-cache';
 import type { CurrencyCode } from '../../lib/currency';
 
 interface ProductCardInfoProps {
@@ -23,6 +25,7 @@ interface ProductCardInfoProps {
   omitBrandRow?: boolean;
   /** Home mobile grid — title at 12px regular on small screens. */
   titleSizeMobileFigma?: boolean;
+  listingCacheSource?: ProductCardCachePayload;
 }
 
 /**
@@ -41,6 +44,7 @@ export function ProductCardInfo({
   hidePrice = false,
   omitBrandRow = false,
   titleSizeMobileFigma = false,
+  listingCacheSource,
 }: ProductCardInfoProps) {
   const { t } = useTranslation();
 
@@ -71,22 +75,41 @@ export function ProductCardInfo({
 
   return (
     <div className={paddingClass}>
-      <Link href={`/products/${slug}`} className="block">
-        {!omitBrandRow ? (
-          <p
-            className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
-          >
-            {brandName || t('common.defaults.category')}
-          </p>
-        ) : null}
-        <h3 className={titleClass}>{title}</h3>
-        {categoryLine ? (
-          <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
-            <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
-            <span className="line-clamp-2">{categoryLine}</span>
-          </p>
-        ) : null}
-      </Link>
+      {listingCacheSource ? (
+        <ProductCardNavLink slug={slug} cachePayload={listingCacheSource} className="block">
+          {!omitBrandRow ? (
+            <p
+              className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
+            >
+              {brandName || t('common.defaults.category')}
+            </p>
+          ) : null}
+          <h3 className={titleClass}>{title}</h3>
+          {categoryLine ? (
+            <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
+              <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
+              <span className="line-clamp-2">{categoryLine}</span>
+            </p>
+          ) : null}
+        </ProductCardNavLink>
+      ) : (
+        <Link href={`/products/${slug}`} className="block" prefetch>
+          {!omitBrandRow ? (
+            <p
+              className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
+            >
+              {brandName || t('common.defaults.category')}
+            </p>
+          ) : null}
+          <h3 className={titleClass}>{title}</h3>
+          {categoryLine ? (
+            <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
+              <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
+              <span className="line-clamp-2">{categoryLine}</span>
+            </p>
+          ) : null}
+        </Link>
+      )}
 
       {/* Available Colors */}
       {colors && colors.length > 0 && (

@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
 import type { MouseEvent } from 'react';
 import { formatPrice } from '../../lib/currency';
@@ -9,8 +8,10 @@ import { CompareIcon } from '../icons/CompareIcon';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { WishlistHeartIcon } from '../icons/WishlistHeartIcon';
 import { ProductColors } from './ProductColors';
+import { ProductCardNavLink } from './ProductCardNavLink';
 import type { CurrencyCode } from '../../lib/currency';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
+import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
 import type { ProductLabel } from '../ProductLabels';
 import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
 
@@ -64,6 +65,7 @@ export function ProductCardList({
   const { t } = useTranslation();
   const categoryLine = getProductCardCategoryLineLabel(product);
   const imageSrc = resolveProductCardImageSrc(product.image);
+  const listingCacheSource = buildProductCardCachePayload(product);
   const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';
   const primaryActionDisabled = addButtonNavigatesToProduct
     ? false
@@ -76,11 +78,13 @@ export function ProductCardList({
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
       <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:px-7 sm:py-5">
         {/* Product Image */}
-        <Link
-          href={`/products/${product.slug}`}
+        <ProductCardNavLink
+          slug={product.slug}
+          cachePayload={listingCacheSource}
           className="relative h-20 w-20 flex-shrink-0 self-start overflow-hidden rounded-lg border border-gray-100 bg-white sm:h-28 sm:w-28 sm:self-center"
-          data-cart-fly-source
+          aria-label={product.title}
         >
+          <span className="relative block h-full w-full" data-cart-fly-source>
           {!imageError ? (
             <Image
               src={imageSrc}
@@ -98,11 +102,12 @@ export function ProductCardList({
               </svg>
             </div>
           )}
-        </Link>
+          </span>
+        </ProductCardNavLink>
 
         {/* Product Info */}
         <div className="flex-1 min-w-0 w-full sm:w-auto">
-          <Link href={`/products/${product.slug}`} className="block">
+          <ProductCardNavLink slug={product.slug} cachePayload={listingCacheSource} className="block">
             <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400">
               {product.brand?.name || t('common.defaults.category')}
             </p>
@@ -115,7 +120,7 @@ export function ProductCardList({
                 <span className="line-clamp-2">{categoryLine}</span>
               </p>
             ) : null}
-          </Link>
+          </ProductCardNavLink>
           {/* Available Colors */}
           {product.colors && product.colors.length > 0 && (
             <div className="flex items-center gap-1.5 mt-2 flex-wrap">
