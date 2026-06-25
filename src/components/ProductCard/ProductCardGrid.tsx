@@ -52,6 +52,7 @@ interface ProductCardGridProps {
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
+  addButtonNavigatesToProduct?: boolean;
 }
 
 /**
@@ -75,6 +76,7 @@ export function ProductCardGrid({
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
+  addButtonNavigatesToProduct = false,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
@@ -106,6 +108,13 @@ export function ProductCardGrid({
           String(product.discountPercent),
         )
       : null;
+
+  const primaryActionDisabled = addButtonNavigatesToProduct
+    ? false
+    : !product.inStock || isAddingToCart;
+  const primaryActionEnabled = addButtonNavigatesToProduct
+    ? true
+    : product.inStock && !isAddingToCart;
 
   const cardShellClass = homeProductGridCard
     ? 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:hover:shadow-none lg:min-h-[583px]'
@@ -230,9 +239,9 @@ export function ProductCardGrid({
           <button
             type="button"
             onClick={onAddToCart}
-            disabled={!product.inStock || isAddingToCart}
+            disabled={primaryActionDisabled}
             className={`inline-flex shrink-0 items-center justify-center bg-[#2db2ff] font-medium text-white transition-opacity ${
-              product.inStock && !isAddingToCart
+              primaryActionEnabled
                 ? 'cursor-pointer hover:opacity-90'
                 : 'cursor-default opacity-50'
             } ${

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { ProductCardListingProvider } from './ProductCardListingContext';
-import { getHomeCuratedProductCardProps } from './HomeBestChoiceStyleProductGrid';
+import { getHomeCuratedProductCardProps, LISTING_ADD_BUTTON_NAVIGATES_TO_PRODUCT } from './HomeBestChoiceStyleProductGrid';
 import { useTranslation } from '../lib/i18n-client';
 import { SHOP_LISTING_EAGER_IMAGE_CARD_COUNT } from '@/lib/performance/shop-listing-image-priority.constants';
 import type { ProductSortOption } from '@/lib/products/sort';
@@ -157,6 +157,7 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
               }}
               viewMode={cardViewMode}
               {...homeCardProps}
+              {...LISTING_ADD_BUTTON_NAVIGATES_TO_PRODUCT}
               imageLoadPriority={index < SHOP_LISTING_EAGER_IMAGE_CARD_COUNT}
             />
           </div>

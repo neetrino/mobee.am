@@ -1,7 +1,8 @@
 'use client';
 
-import { memo, useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import type { MouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { useWishlist } from './hooks/useWishlist';
 import { useCompare } from './hooks/useCompare';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
@@ -50,6 +51,8 @@ interface ProductCardProps {
   specialOffersHomeCard?: boolean;
   homeProductGridCard?: boolean;
   imageLoadPriority?: boolean;
+  /** Listing cards (home/shop): primary button opens PDP instead of adding to cart. */
+  addButtonNavigatesToProduct?: boolean;
 }
 
 interface ProductCardBodyProps extends ProductCardProps {
@@ -71,6 +74,7 @@ function ProductCardBody({
   specialOffersHomeCard = false,
   homeProductGridCard = false,
   imageLoadPriority = false,
+  addButtonNavigatesToProduct = false,
   currency,
   isInWishlist,
   isInCompare,
@@ -96,6 +100,7 @@ function ProductCardBody({
         onWishlistToggle={onWishlistToggle}
         onCompareToggle={onCompareToggle}
         onAddToCart={onAddToCart}
+        addButtonNavigatesToProduct={addButtonNavigatesToProduct}
       />
     );
   }
@@ -119,11 +124,20 @@ function ProductCardBody({
       onWishlistToggle={onWishlistToggle}
       onCompareToggle={onCompareToggle}
       onAddToCart={onAddToCart}
+      addButtonNavigatesToProduct={addButtonNavigatesToProduct}
     />
   );
 }
 
-function useProductCardAddToCartHandler(product: Product) {
+function buildProductPagePath(slug: string): string {
+  return `/products/${slug}`;
+}
+
+function useProductCardPrimaryActionHandler(
+  product: Product,
+  addButtonNavigatesToProduct: boolean,
+) {
+  const router = useRouter();
   const { isAddingToCart, addToCart } = useAddToCart({
     productId: product.id,
     productSlug: product.slug,
@@ -135,25 +149,41 @@ function useProductCardAddToCartHandler(product: Product) {
     compareAtPrice: product.compareAtPrice ?? product.originalPrice ?? null,
   });
 
-  const handleAddToCart = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const root = (event.currentTarget as HTMLElement).closest('[data-product-card-root]');
-    const flySourceEl = root?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
-    void addToCart({
-      imageUrl: resolveProductCardImageSrc(product.image),
-      flySourceEl,
-    });
-  };
+  const handlePrimaryAction = useCallback(
+    (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-  return { isAddingToCart, handleAddToCart };
+      if (addButtonNavigatesToProduct) {
+        router.push(buildProductPagePath(product.slug));
+        return;
+      }
+
+      const root = (event.currentTarget as HTMLElement).closest('[data-product-card-root]');
+      const flySourceEl = root?.querySelector<HTMLElement>('[data-cart-fly-source]') ?? null;
+      void addToCart({
+        imageUrl: resolveProductCardImageSrc(product.image),
+        flySourceEl,
+      });
+    },
+    [addButtonNavigatesToProduct, addToCart, product.image, product.slug, router],
+  );
+
+  return {
+    isAddingToCart: addButtonNavigatesToProduct ? false : isAddingToCart,
+    handlePrimaryAction,
+  };
 }
 
 function ProductCardFromListing({
   listing,
+  addButtonNavigatesToProduct = false,
   ...props
 }: ProductCardProps & { listing: ProductCardListingInteractions }) {
-  const { isAddingToCart, handleAddToCart } = useProductCardAddToCartHandler(props.product);
+  const { isAddingToCart, handlePrimaryAction } = useProductCardPrimaryActionHandler(
+    props.product,
+    addButtonNavigatesToProduct,
+  );
 
   return (
     <ProductCardBody
@@ -164,17 +194,24 @@ function ProductCardFromListing({
       isAddingToCart={isAddingToCart}
       onWishlistToggle={listing.onWishlistToggle}
       onCompareToggle={listing.onCompareToggle}
-      onAddToCart={handleAddToCart}
+      onAddToCart={handlePrimaryAction}
+      addButtonNavigatesToProduct={addButtonNavigatesToProduct}
     />
   );
 }
 
-function ProductCardWithHooks(props: ProductCardProps) {
+function ProductCardWithHooks({
+  addButtonNavigatesToProduct = false,
+  ...props
+}: ProductCardProps) {
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(props.product.id);
   const compareCategoryId = resolveCompareCategoryId(props.product);
   const { isInCompare, toggleCompare } = useCompare(props.product.id, compareCategoryId);
-  const { isAddingToCart, handleAddToCart } = useProductCardAddToCartHandler(props.product);
+  const { isAddingToCart, handlePrimaryAction } = useProductCardPrimaryActionHandler(
+    props.product,
+    addButtonNavigatesToProduct,
+  );
 
   const handleWishlistToggle = (event: MouseEvent) => {
     event.preventDefault();
@@ -197,7 +234,8 @@ function ProductCardWithHooks(props: ProductCardProps) {
       isAddingToCart={isAddingToCart}
       onWishlistToggle={handleWishlistToggle}
       onCompareToggle={handleCompareToggle}
-      onAddToCart={handleAddToCart}
+      onAddToCart={handlePrimaryAction}
+      addButtonNavigatesToProduct={addButtonNavigatesToProduct}
     />
   );
 }
