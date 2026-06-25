@@ -14,6 +14,7 @@ import { useProductPage } from './useProductPage';
 import type { Product } from './types';
 import type { LanguageCode } from '../../../lib/language';
 import { dispatchCartFlyAnimation } from '@/lib/cart/dispatchCartFlyAnimation';
+import { resolveCartLineProductImageUrl } from '@/lib/cart/resolveCartLineProductImage';
 import { PRODUCT_CARD_DISPLAY_IMAGE_SRC, resolveProductCardImageSrc } from '@/lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
 import { formatPriceInCurrency } from '@/lib/currency';
@@ -126,6 +127,20 @@ export function ProductPageClient({
         productSlug: product.slug,
         variantId: currentVariant.id,
         quantity,
+        snapshot: {
+          title: product.title,
+          image: resolveCartLineProductImageUrl(
+            { media: product.media },
+            { imageUrl: currentVariant.imageUrl ?? null, media: currentVariant.media },
+          ),
+          price,
+          originalPrice:
+            currentVariant.compareAtPrice != null && currentVariant.compareAtPrice > price
+              ? currentVariant.compareAtPrice
+              : currentVariant.originalPrice ?? null,
+          sku: currentVariant.sku,
+          stock: currentVariant.stock,
+        },
       });
       window.dispatchEvent(new Event('cart-updated'));
       dispatchCartFlyAnimation(flyUrl, flyEl);
