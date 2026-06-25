@@ -3,7 +3,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
 import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { SiteBrandLogo } from '../../../components/SiteBrandLogo';
@@ -35,9 +36,12 @@ export function AdminSidebar({
   desktopCollapsed,
   onDesktopCollapsedChange,
 }: AdminSidebarProps) {
+  useEffect(() => adminNavMarkMount('AdminSidebar'), []);
+
+  const menuTabs = useMemo(() => getAdminMenuTABS(t), [t]);
   const siteHomeHref = useMemo(
-    () => getAdminMenuTABS(t).find((tab) => tab.id === 'home')?.path ?? '/',
-    [t],
+    () => menuTabs.find((tab) => tab.id === 'home')?.path ?? '/',
+    [menuTabs],
   );
 
   const toggleDesktopSidebar = () => {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiClient } from '../../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
 import { logger } from '../../../../lib/utils/logger';
 import type { Category } from '../types';
 
@@ -31,7 +31,7 @@ export function useCategories(): UseCategoriesReturn {
       }
       setError(null);
       logger.debug('Fetching categories');
-      const response = await apiClient.get<{ data: Category[] }>('/api/v1/admin/categories');
+      const response = await fetchAdminReference<{ data: Category[] }>('categories');
       setCategories(response.data || []);
       logger.info('Categories loaded', { count: response.data?.length || 0 });
     } catch (err: unknown) {

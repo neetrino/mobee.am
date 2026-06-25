@@ -24,8 +24,24 @@ export async function getOrders(filters: OrderFilters = {}) {
       skip,
       take: limit,
       orderBy,
-      include: {
-        items: true,
+      select: {
+        id: true,
+        number: true,
+        status: true,
+        paymentStatus: true,
+        fulfillmentStatus: true,
+        total: true,
+        subtotal: true,
+        discountAmount: true,
+        shippingAmount: true,
+        taxAmount: true,
+        currency: true,
+        customerEmail: true,
+        customerPhone: true,
+        createdAt: true,
+        _count: {
+          select: { items: true },
+        },
         user: {
           select: {
             id: true,
@@ -41,7 +57,12 @@ export async function getOrders(filters: OrderFilters = {}) {
   ]);
 
   // Format orders for response
-  const formattedOrders = orders.map(formatOrderForList);
+  const formattedOrders = orders.map((order) =>
+    formatOrderForList({
+      ...order,
+      itemsCount: order._count.items,
+    }),
+  );
 
   return {
     data: formattedOrders,

@@ -1,38 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import { withAdminPerfLog } from "@/lib/admin/admin-perf-log";
 
 export async function GET(req: NextRequest) {
-  try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
+  return withAdminPerfLog("/api/v1/admin/users", async (markAuthComplete) => {
+    try {
+      const authResult = await requireAdminApiContext(req);
+      if (authResult instanceof NextResponse) {
+        return authResult;
+      }
+      markAuthComplete(authResult.source);
+
+      const searchParams = req.nextUrl.searchParams;
+      const page = parseInt(searchParams.get("page") || "1", 10);
+      const limit = parseInt(searchParams.get("limit") || "20", 10);
+      const search = searchParams.get("search") || undefined;
+      const role = searchParams.get("role") || undefined;
+
+      const result = await adminService.getUsers({
+        page: Number.isFinite(page) ? page : 1,
+        limit: Number.isFinite(limit) ? limit : 20,
+        search: search?.trim() || undefined,
+        role: role?.trim() || undefined,
+      });
+
+      return NextResponse.json(result);
+    } catch (error: unknown) {
+      const err = error as {
+        type?: string;
+        title?: string;
+        status?: number;
+        detail?: string;
+        message?: string;
+      };
+      console.error("[ADMIN USERS] Error:", err.message ?? err.detail);
       return NextResponse.json(
         {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
+          type: err.type || "https://api.shop.am/problems/internal-error",
+          title: err.title || "Internal Server Error",
+          status: err.status || 500,
+          detail: err.detail || err.message || "An error occurred",
           instance: req.url,
         },
-        { status: 403 }
+        { status: err.status || 500 },
       );
     }
-
-    const filters = {};
-    const result = await adminService.getUsers(filters);
-    return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("❌ [ADMIN] Error:", error);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
-

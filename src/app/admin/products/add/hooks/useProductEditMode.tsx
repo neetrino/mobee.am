@@ -21,8 +21,6 @@ import { buildFormData } from '../utils/productFormDataBuilder';
 
 interface UseProductEditModeProps {
   productId: string | null;
-  isLoggedIn: boolean;
-  isAdmin: boolean;
   attributes: any[];
   defaultCurrency: CurrencyCode;
   setLoadingProduct: (loading: boolean) => void;
@@ -38,8 +36,6 @@ interface UseProductEditModeProps {
 
 export function useProductEditMode({
   productId,
-  isLoggedIn,
-  isAdmin,
   attributes,
   defaultCurrency,
   setLoadingProduct,
@@ -56,7 +52,7 @@ export function useProductEditMode({
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (productId && isLoggedIn && isAdmin) {
+    if (productId) {
       const loadProduct = async () => {
         try {
           setLoadingProduct(true);
@@ -285,8 +281,6 @@ export function useProductEditMode({
     }
   }, [
     productId,
-    isLoggedIn,
-    isAdmin,
     router,
     attributes,
     defaultCurrency,

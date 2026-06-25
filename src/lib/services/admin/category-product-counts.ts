@@ -1,11 +1,14 @@
 import { db } from "@white-shop/db";
+import { logAdminCategoryCountsPerf } from "@/lib/admin/admin-perf-log";
 
-function incrementCategoryCount(countMap: Map<string, number>, categoryId: string): void {
-  countMap.set(categoryId, (countMap.get(categoryId) ?? 0) + 1);
+interface CategoryCountRow {
+  categoryId: string;
+  count: number;
 }
 
 /**
  * Counts non-deleted products per category (primary or secondary assignment).
+ * Uses SQL aggregation instead of loading all products into Node.js.
  */
 export async function getCategoryProductCountMap(
   categoryIds: string[],
@@ -16,38 +19,37 @@ export async function getCategoryProductCountMap(
     return countMap;
   }
 
-  const categoryIdSet = new Set(categoryIds);
+  const startedAt = Date.now();
 
-  const products = await db.product.findMany({
-    where: {
-      deletedAt: null,
-      OR: [
-        { primaryCategoryId: { in: categoryIds } },
-        { categoryIds: { hasSome: categoryIds } },
-      ],
-    },
-    select: {
-      primaryCategoryId: true,
-      categoryIds: true,
-    },
+  const rows = await db.$queryRaw<CategoryCountRow[]>`
+    WITH product_category_links AS (
+      SELECT p.id AS product_id, p."primaryCategoryId" AS category_id
+      FROM products p
+      WHERE p."deletedAt" IS NULL
+        AND p."primaryCategoryId" IS NOT NULL
+
+      UNION
+
+      SELECT p.id AS product_id, unnest(p."categoryIds") AS category_id
+      FROM products p
+      WHERE p."deletedAt" IS NULL
+    )
+    SELECT
+      pcl.category_id AS "categoryId",
+      COUNT(DISTINCT pcl.product_id)::int AS count
+    FROM product_category_links pcl
+    WHERE pcl.category_id = ANY(${categoryIds}::text[])
+    GROUP BY pcl.category_id
+  `;
+
+  logAdminCategoryCountsPerf({
+    totalMs: Date.now() - startedAt,
+    categories: categoryIds.length,
+    rows: rows.length,
   });
 
-  for (const product of products) {
-    const productCategoryIds = new Set<string>();
-
-    if (product.primaryCategoryId && categoryIdSet.has(product.primaryCategoryId)) {
-      productCategoryIds.add(product.primaryCategoryId);
-    }
-
-    for (const categoryId of product.categoryIds) {
-      if (categoryIdSet.has(categoryId)) {
-        productCategoryIds.add(categoryId);
-      }
-    }
-
-    for (const categoryId of productCategoryIds) {
-      incrementCategoryCount(countMap, categoryId);
-    }
+  for (const row of rows) {
+    countMap.set(row.categoryId, row.count);
   }
 
   return countMap;

@@ -1,20 +1,16 @@
 ﻿'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '@/components/Toast';
 
 export default function PriceFilterSettingsPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [stepSizeUSD, setStepSizeUSD] = useState<string>('');
@@ -32,7 +28,7 @@ export default function PriceFilterSettingsPage() {
     try {
       console.log('⚙️ [PRICE FILTER SETTINGS] Fetching settings...');
       setLoading(true);
-      const response = await apiClient.get<{
+      const response = await fetchAdminReference<{
         minPrice?: number;
         maxPrice?: number;
         stepSize?: number;
@@ -42,7 +38,7 @@ export default function PriceFilterSettingsPage() {
           RUB?: number;
           GEL?: number;
         };
-      }>('/api/v1/admin/settings/price-filter');
+      }>('price-filter-settings');
       const minPriceStr = response.minPrice?.toString() || '';
       const maxPriceStr = response.maxPrice?.toString() || '';
       const per = response.stepSizePerCurrency || {};
@@ -204,7 +200,8 @@ export default function PriceFilterSettingsPage() {
         stepSize: stepValueUSD, // keep legacy field for backwards compatibility (USD as base)
         stepSizePerCurrency: Object.keys(stepSizePerCurrency).length ? stepSizePerCurrency : null,
       });
-      
+      invalidateAdminReferenceCache('price-filter-settings');
+
       showToast(t('admin.priceFilter.savedSuccess'), 'success');
       console.log('✅ [PRICE FILTER SETTINGS] Settings saved');
     } catch (err: any) {
@@ -217,43 +214,10 @@ export default function PriceFilterSettingsPage() {
   };
 
   useEffect(() => {
-    if (!isLoading && isLoggedIn && isAdmin) {
-      fetchSettings();
-    }
-  }, [isLoading, isLoggedIn, isAdmin, fetchSettings]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn) {
-        console.log('❌ [PRICE FILTER SETTINGS] User not logged in, redirecting to login...');
-        router.push('/login');
-        return;
-      }
-      if (!isAdmin) {
-        console.log('❌ [PRICE FILTER SETTINGS] User is not admin, redirecting to home...');
-        router.push('/');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null; // Will redirect
-  }
+    fetchSettings();
+  }, [fetchSettings]);
 
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/price-filter-settings'} router={router} t={t}>
       <div className="mx-auto w-full max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -396,7 +360,6 @@ export default function PriceFilterSettingsPage() {
             </Card>
         </div>
       </div>
-    </AdminPageShell>
   );
 }
 

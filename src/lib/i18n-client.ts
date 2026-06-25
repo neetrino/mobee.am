@@ -5,26 +5,34 @@
  * This file contains React hooks that can only be used in Client Components
  */
 
-import { useMemo, useCallback } from 'react';
-import { t, getProductText, getAttributeLabel, type ProductField } from './i18n';
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
+import {
+  clientT,
+  syncGetAttributeLabel,
+  syncGetProductText,
+} from './i18n-client-runtime';
+import {
+  preloadAdminNamespaces,
+  subscribeLazyTranslations,
+} from './i18n-lazy-loader';
+import { type ProductField } from './i18n-types';
 import { useUiLanguage } from '../components/UiLanguageProvider';
 
 /**
  * React hook for translations in client components
  * Automatically handles language updates and memoization
- * 
+ *
  * @returns Object with translation function and current language
- * 
- * @example
- * ```tsx
- * const { t, lang } = useTranslation();
- * return <button>{t('common.buttons.addToCart')}</button>;
- * ```
  */
 export function useTranslation() {
   const lang = useUiLanguage();
 
-  // Memoized translation function with validation
+  useSyncExternalStore(subscribeLazyTranslations, () => lang, () => lang);
+
+  useEffect(() => {
+    void preloadAdminNamespaces(lang);
+  }, [lang]);
+
   const translate = useCallback(
     (path: string) => {
       if (!path || typeof path !== 'string') {
@@ -33,31 +41,29 @@ export function useTranslation() {
         }
         return '';
       }
-      return t(lang, path);
+      return clientT(lang, path);
     },
-    [lang]
+    [lang],
   );
 
-  // Memoized product text getter
   const getProduct = useCallback(
     (productId: string, field: ProductField) => {
       if (!productId || typeof productId !== 'string') {
         return '';
       }
-      return getProductText(lang, productId, field);
+      return syncGetProductText(lang, productId, field);
     },
-    [lang]
+    [lang],
   );
 
-  // Memoized attribute label getter
   const getAttribute = useCallback(
     (type: string, value: string) => {
       if (!type || !value || typeof type !== 'string' || typeof value !== 'string') {
         return value || '';
       }
-      return getAttributeLabel(lang, type, value);
+      return syncGetAttributeLabel(lang, type, value);
     },
-    [lang]
+    [lang],
   );
 
   return useMemo(
@@ -67,9 +73,8 @@ export function useTranslation() {
       getProductText: getProduct,
       getAttributeLabel: getAttribute,
     }),
-    [translate, lang, getProduct, getAttribute]
+    [translate, lang, getProduct, getAttribute],
   );
 }
 
-
-
+export type { ProductField } from './i18n-types';

@@ -274,9 +274,14 @@ exports.Prisma.ProductVariantScalarFieldEnum = {
   stockReserved: 'stockReserved',
   weightGrams: 'weightGrams',
   imageUrl: 'imageUrl',
+  media: 'media',
   position: 'position',
   published: 'published',
   attributes: 'attributes',
+  source: 'source',
+  sourcePid: 'sourcePid',
+  visibleId: 'visibleId',
+  sourceUrl: 'sourceUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/api-client';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '@/lib/i18n-client';
 import type { Brand, Category } from '../types';
 
@@ -50,6 +51,7 @@ export function useBrandAndCategoryCreation({
           if (!finalBrandIds.includes(brandResponse.data.id)) {
             finalBrandIds.push(brandResponse.data.id);
           }
+          invalidateAdminReferenceCache('brands');
           setBrands((prev) => [...prev, brandResponse.data]);
           console.log('✅ [ADMIN] Brand created:', brandResponse.data.id);
           creationMessages.push(t('admin.products.add.brandCreatedSuccess').replace('{name}', newBrandName.trim()));
@@ -72,6 +74,7 @@ export function useBrandAndCategoryCreation({
         });
         if (categoryResponse.data) {
           finalPrimaryCategoryId = categoryResponse.data.id;
+          invalidateAdminReferenceCache('categories');
           setCategories((prev) => [...prev, categoryResponse.data]);
           console.log('✅ [ADMIN] Category created:', categoryResponse.data.id);
           creationMessages.push(

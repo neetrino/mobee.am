@@ -1,9 +1,7 @@
 'use client';
 
 import { Card } from '@/app/admin/lib/adminShopUi';
-import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { GlobalDiscountCard } from './components/GlobalDiscountCard';
 import { QuickInfoCard } from './components/QuickInfoCard';
 import { CategoryDiscountsCard } from './components/CategoryDiscountsCard';
@@ -30,9 +28,6 @@ interface AdminProductsListMeta {
 }
 
 interface QuickSettingsContentProps {
-  currentPath: string;
-  router: ReturnType<typeof useRouter>;
-  t: ReturnType<typeof useTranslation>['t'];
   globalDiscount: number;
   setGlobalDiscount: (value: number) => void;
   discountLoading: boolean;
@@ -66,9 +61,6 @@ interface QuickSettingsContentProps {
 }
 
 export function QuickSettingsContent({
-  currentPath,
-  router,
-  t,
   globalDiscount,
   setGlobalDiscount,
   discountLoading,
@@ -100,9 +92,10 @@ export function QuickSettingsContent({
   handleProductDiscountSave,
   savingProductId,
 }: QuickSettingsContentProps) {
+  const { t } = useTranslation();
+
   return (
-    <AdminPageShell currentPath={currentPath} router={router} t={t}>
-      <div className="mx-auto w-full max-w-7xl">
+    <div className="mx-auto w-full max-w-7xl">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.quickSettings.title')}</h1>
@@ -164,6 +157,5 @@ export function QuickSettingsContent({
           savingProductId={savingProductId}
         />
       </div>
-    </AdminPageShell>
   );
 }

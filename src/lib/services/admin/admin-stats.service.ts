@@ -4,6 +4,10 @@ import { getRecentOrders } from "./admin-stats/recent-orders";
 import { getTopProducts } from "./admin-stats/top-products";
 import { getActivity } from "./admin-stats/activity";
 import { getAnalytics } from "./admin-stats/analytics";
+import {
+  getDashboardBundle,
+  type AdminDashboardBundleOptions,
+} from "./admin-stats/dashboard-bundle";
 import type { AdminAnalyticsPeriod } from "@/lib/contracts/admin-analytics";
 
 /**
@@ -36,6 +40,13 @@ class AdminStatsService {
    */
   async getTopProducts(limit: number = 5) {
     return getTopProducts(limit);
+  }
+
+  /**
+   * Batch dashboard data for BFF endpoint
+   */
+  async getDashboardBundle(options: AdminDashboardBundleOptions = {}) {
+    return getDashboardBundle(options);
   }
 
   /**

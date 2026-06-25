@@ -1,12 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { GET, POST } from "./route";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { isR2Configured, uploadToR2 } from "@/lib/r2";
 
-vi.mock("@/lib/middleware/auth", () => ({
-  authenticateToken: vi.fn(),
-  requireAdmin: vi.fn(),
+vi.mock("@/lib/middleware/admin-api-auth", () => ({
+  requireAdminApiContext: vi.fn(),
 }));
 
 vi.mock("@/lib/r2", () => ({
@@ -25,12 +24,25 @@ const TEST_JPEG_DATA_URL = `data:image/jpeg;base64,${Buffer.from([
 describe("/api/v1/admin/products/upload-images", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(authenticateToken).mockResolvedValue({ id: "admin-1", role: "admin" } as never);
-    vi.mocked(requireAdmin).mockReturnValue(true);
+    vi.mocked(requireAdminApiContext).mockResolvedValue({
+      userId: "admin-1",
+      roles: ["admin"],
+      source: "fallback-auth",
+    });
   });
 
   it("returns 403 on GET when not admin", async () => {
-    vi.mocked(requireAdmin).mockReturnValue(false);
+    vi.mocked(requireAdminApiContext).mockResolvedValue(
+      NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/forbidden",
+          title: "Forbidden",
+          status: 403,
+          detail: "Admin access required",
+        },
+        { status: 403 },
+      ),
+    );
     const req = new NextRequest("http://localhost:3000/api/v1/admin/products/upload-images", {
       method: "GET",
     });

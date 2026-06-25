@@ -1,13 +1,13 @@
 'use client';
 
 import { useTranslation } from '../../../lib/i18n-client';
+import { useAdminPageNavDebug } from '../hooks/useAdminPageNavDebug';
 import { useOrders } from './useOrders';
 import { OrdersFilters } from './components/OrdersFilters';
 import { BulkDeleteConfirmSheet } from './components/BulkDeleteConfirmSheet';
 import { BulkSelectionControls } from './components/BulkSelectionControls';
 import { OrdersTable } from './components/OrdersTable';
 import { OrderDetailsModal } from './components/OrderDetailsModal';
-import { AdminPageShell } from '../components/AdminPageShell';
 
 export function OrdersPageContent() {
   const { t } = useTranslation();
@@ -52,9 +52,10 @@ export function OrdersPageContent() {
     searchParams,
   } = useOrders();
 
+  useAdminPageNavDebug(loading);
+
   return (
-    <AdminPageShell currentPath="/supersudo/orders" router={router} t={t}>
-      <div className="mx-auto w-full max-w-7xl">
+    <div className="mx-auto w-full max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.orders.title')}</h1>
         </div>
@@ -121,7 +122,6 @@ export function OrdersPageContent() {
             formatCurrency={formatCurrency}
           />
         )}
-      </div>
-    </AdminPageShell>
+    </div>
   );
 }

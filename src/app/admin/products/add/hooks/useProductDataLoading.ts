@@ -1,13 +1,10 @@
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
 import { CURRENCIES, type CurrencyCode } from '@/lib/currency';
 import type { Brand, Category, Attribute } from '../types';
 
 interface UseProductDataLoadingProps {
-  isLoggedIn: boolean;
-  isAdmin: boolean;
-  isLoading: boolean;
   setBrands: (brands: Brand[]) => void;
   setCategories: (categories: Category[]) => void;
   setAttributes: (attributes: Attribute[]) => void;
@@ -22,9 +19,6 @@ interface UseProductDataLoadingProps {
 }
 
 export function useProductDataLoading({
-  isLoggedIn,
-  isAdmin,
-  isLoading,
   setBrands,
   setCategories,
   setAttributes,
@@ -37,18 +31,6 @@ export function useProductDataLoading({
   brandsExpanded,
   setBrandsExpanded,
 }: UseProductDataLoadingProps) {
-  const router = useRouter();
-
-  // Auth check
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
   // Close attributes dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,7 +52,7 @@ export function useProductDataLoading({
   useEffect(() => {
     const loadDefaultCurrency = async () => {
       try {
-        const settingsRes = await apiClient.get<{ defaultCurrency?: string }>('/api/v1/admin/settings');
+        const settingsRes = await fetchAdminReference<{ defaultCurrency?: string }>('settings');
         const currency = (settingsRes.defaultCurrency || 'AMD') as CurrencyCode;
         if (currency in CURRENCIES) {
           setDefaultCurrency(currency);
@@ -81,11 +63,9 @@ export function useProductDataLoading({
         setDefaultCurrency('AMD');
       }
     };
-    
-    if (isLoggedIn && isAdmin) {
-      loadDefaultCurrency();
-    }
-  }, [isLoggedIn, isAdmin, setDefaultCurrency]);
+
+    loadDefaultCurrency();
+  }, [setDefaultCurrency]);
 
   // Fetch brands, categories, and attributes
   useEffect(() => {
@@ -93,8 +73,8 @@ export function useProductDataLoading({
       try {
         console.log('📥 [ADMIN] Fetching brands, categories, and attributes...');
         const [brandsRes, categoriesRes, attributesRes] = await Promise.all([
-          apiClient.get<{ data: Brand[] }>('/api/v1/admin/brands'),
-          apiClient.get<{ data: Category[] }>('/api/v1/admin/categories'),
+          fetchAdminReference<{ data: Brand[] }>('brands'),
+          fetchAdminReference<{ data: Category[] }>('categories'),
           apiClient.get<{ data: Attribute[] }>('/api/v1/admin/attributes'),
         ]);
         setBrands(brandsRes.data || []);
@@ -112,14 +92,14 @@ export function useProductDataLoading({
             key: attr.key,
             name: attr.name,
             valuesCount: attr.values?.length || 0,
-            values: attr.values?.map(v => ({ 
-              value: v.value, 
+            values: attr.values?.map(v => ({
+              value: v.value,
               label: v.label,
               colors: v.colors,
               colorsType: typeof v.colors,
               colorsIsArray: Array.isArray(v.colors),
               colorsLength: v.colors?.length,
-              imageUrl: v.imageUrl 
+              imageUrl: v.imageUrl
             })) || []
           })));
           const colorAttr = attributesRes.data.find(a => a.key === 'color');
@@ -139,15 +119,15 @@ export function useProductDataLoading({
         }
         // Debug: Log categories with requiresSizes
         if (categoriesRes.data) {
-          console.log('📋 [ADMIN] Categories with requiresSizes:', 
-            categoriesRes.data.map(cat => ({ 
-              id: cat.id, 
-              title: cat.title, 
-              requiresSizes: cat.requiresSizes 
+          console.log('📋 [ADMIN] Categories with requiresSizes:',
+            categoriesRes.data.map(cat => ({
+              id: cat.id,
+              title: cat.title,
+              requiresSizes: cat.requiresSizes
             }))
           );
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('❌ [ADMIN] Error fetching data:', err);
       }
     };
@@ -188,5 +168,3 @@ export function useProductDataLoading({
     }
   }, [brandsExpanded, setBrandsExpanded]);
 }
-
-

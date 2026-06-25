@@ -10,10 +10,13 @@ class AdminBrandsService {
       where: {
         deletedAt: null,
       },
-      include: {
+      select: {
+        id: true,
+        slug: true,
         translations: {
           where: { locale: "en" },
           take: 1,
+          select: { name: true },
         },
       },
       orderBy: {

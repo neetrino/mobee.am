@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
@@ -12,6 +12,7 @@ import {
   SITE_SHARE_TITLE,
 } from '../lib/brand.constants';
 import { readLanguageFromCookies } from '../lib/language';
+import type { CategoryTreeNode } from '../lib/category-nav';
 import { getCachedCategoriesTree } from '../lib/services/categories-tree-cached';
 import { TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT } from '../lib/tablet-ipad-air-like-layout';
 
@@ -55,9 +56,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const layoutStart = Date.now();
   const cookieStore = await cookies();
   const initialLanguage = readLanguageFromCookies(cookieStore);
-  const { result: categoriesTree } = await getCachedCategoriesTree(initialLanguage);
+  const headersList = await headers();
+  const isAdminRoute = headersList.get('x-mobee-admin-route') === '1';
+  const categoriesTree = isAdminRoute
+    ? { data: [] as CategoryTreeNode[] }
+    : (await getCachedCategoriesTree(initialLanguage)).result;
+  if (process.env.NODE_ENV === 'development') {
+    console.info(`[ROOT_LAYOUT] total=${Date.now() - layoutStart}ms admin=${isAdminRoute}`);
+  }
 
   return (
     <html lang={initialLanguage} className="h-full" suppressHydrationWarning>

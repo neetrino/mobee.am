@@ -1,12 +1,9 @@
 ﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { MessageDetailDialog, type AdminContactMessage } from './components/MessageDetailDialog';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
@@ -25,9 +22,6 @@ interface MessagesResponse {
 
 export default function MessagesPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -35,15 +29,6 @@ export default function MessagesPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [detailMessage, setDetailMessage] = useState<Message | null>(null);
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -68,11 +53,9 @@ export default function MessagesPage() {
   }, [page]);
 
   useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchMessages();
-    }
+    fetchMessages();
      
-  }, [isLoggedIn, isAdmin, page]);
+  }, [fetchMessages]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
@@ -116,23 +99,8 @@ export default function MessagesPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
-
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/messages'} router={router} t={t}>
+    <>
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.messages.title')}</h1>
@@ -260,7 +228,7 @@ export default function MessagesPage() {
         </Card>
       </div>
       <MessageDetailDialog message={detailMessage} onClose={() => setDetailMessage(null)} />
-    </AdminPageShell>
+    </>
   );
 }
 

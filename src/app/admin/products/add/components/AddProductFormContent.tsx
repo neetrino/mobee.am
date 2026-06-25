@@ -1,8 +1,10 @@
 'use client';
 
 import type { ChangeEvent } from 'react';
+import dynamic from 'next/dynamic';
 import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
+import { AdminContentSkeleton } from '../../../components/AdminContentSkeleton';
 import type {
   Brand,
   Category,
@@ -13,14 +15,22 @@ import type {
 } from '../types';
 import type { CurrencyCode } from '@/lib/currency';
 import { BasicInformation } from './BasicInformation';
-import { ProductImages } from './ProductImages';
 import { CategoriesBrands } from './CategoriesBrands';
 import { SimpleProductFields } from './SimpleProductFields';
 import { AttributesSelection } from './AttributesSelection';
-import { VariantBuilder } from './VariantBuilder';
 import { ProductLabels } from './ProductLabels';
 import { Publishing } from './Publishing';
 import { FormActions } from './FormActions';
+
+const ProductImages = dynamic(
+  () => import('./ProductImages').then((module) => ({ default: module.ProductImages })),
+  { loading: () => <AdminContentSkeleton lines={2} /> },
+);
+
+const VariantBuilder = dynamic(
+  () => import('./VariantBuilder').then((module) => ({ default: module.VariantBuilder })),
+  { loading: () => <AdminContentSkeleton lines={4} /> },
+);
 
 interface AddProductFormContentProps {
   formData: {

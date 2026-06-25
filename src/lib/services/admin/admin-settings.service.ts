@@ -11,6 +11,10 @@ class AdminSettingsService {
           in: ['globalDiscount', 'categoryDiscounts', 'brandDiscounts', 'defaultCurrency', 'currencyRates'],
         },
       },
+      select: {
+        key: true,
+        value: true,
+      },
     });
     
     const globalDiscountSetting = settings.find((s) => s.key === 'globalDiscount');
