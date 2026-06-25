@@ -84,7 +84,7 @@ const oosPillClass = 'border-gray-200 text-gray-400 line-through opacity-80';
 const pillButtonClass =
   'inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border-2 px-4 py-2 text-sm font-medium transition-colors';
 const colorSwatchButtonClass =
-  'h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 transition-all';
+  'inline-flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 transition-all';
 
 function renderColorSwatch({
   value,
@@ -189,7 +189,7 @@ export function ProductAttributesSelector({
                     label: only.label,
                     colors: only.colors,
                     imageUrl: only.imageUrl,
-                    isSelected: false,
+                    isSelected: selectedColor === only.value?.toLowerCase().trim(),
                     oos: only.stock <= 0,
                     ariaLabel: colorLabel,
                   })}
