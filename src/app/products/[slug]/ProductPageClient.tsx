@@ -82,6 +82,7 @@ export function ProductPageClient({
     discountPercent,
     maxQuantity,
     isOutOfStock,
+    isSingleVariantOutOfStock,
     isVariationRequired,
     hasUnavailableAttributes,
     unavailableAttributes,
@@ -244,6 +245,7 @@ export function ProductPageClient({
           quantity={quantity}
           maxQuantity={maxQuantity}
           isOutOfStock={isOutOfStock}
+          isSingleVariantOutOfStock={isSingleVariantOutOfStock}
           isVariationRequired={isVariationRequired}
           hasUnavailableAttributes={hasUnavailableAttributes}
           unavailableAttributes={unavailableAttributes}

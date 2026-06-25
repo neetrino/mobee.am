@@ -38,6 +38,15 @@ export function useProductCalculations({
   const isOutOfStock =
     !isVariationRequired && (!currentVariant || currentVariant.stock <= 0);
 
+  const isSingleVariantOutOfStock = useMemo(() => {
+    const variantCount = product?.variants?.length ?? 0;
+    return (
+      variantCount === 1 &&
+      Boolean(currentVariant) &&
+      (currentVariant?.stock ?? 0) <= 0
+    );
+  }, [product?.variants?.length, currentVariant]);
+
   const colorGroups = useMemo(() => {
     const groups: Array<{ color: string; stock: number; variants: ProductVariant[] }> = [];
     const colorAttrGroup = attributeGroups.get('color');
@@ -66,7 +75,7 @@ export function useProductCalculations({
 
   const unavailableAttributes = useMemo(() => {
     const unavailable = new Map<string, boolean>();
-    if (!currentVariant || !product) return unavailable;
+    if (!currentVariant || !product || isSingleVariantOutOfStock) return unavailable;
     
     currentVariant.options?.forEach((option) => {
       const attrKey = option.key || option.attribute;
@@ -86,7 +95,7 @@ export function useProductCalculations({
     });
     
     return unavailable;
-  }, [currentVariant, attributeGroups, product]);
+  }, [currentVariant, attributeGroups, product, isSingleVariantOutOfStock]);
 
   const hasUnavailableAttributes = unavailableAttributes.size > 0;
   const canAddToCart =
@@ -101,6 +110,7 @@ export function useProductCalculations({
     compareAtPrice: compareAtPrice ?? null,
     discountPercent,
     isOutOfStock,
+    isSingleVariantOutOfStock,
     colorGroups,
     sizeGroups,
     isVariationRequired,
