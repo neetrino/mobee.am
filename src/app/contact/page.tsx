@@ -7,6 +7,7 @@ import { useTranslation } from '../../lib/i18n-client';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../../lib/contactPhoneDisplay';
 import { showToast } from '../../components/Toast';
 import { apiClient, ApiError } from '../../lib/api-client';
+import { ContactMapEmbed } from '../../components/ContactMapEmbed';
 import {
   CONTACT_ICON_EMAIL_SRC,
   CONTACT_ICON_LOCATION_SRC,
@@ -273,6 +274,12 @@ export default function ContactPage() {
           </div>
         </div>
         </div>
+      </div>
+
+      <div
+        className={`lg:hidden max-w-7xl mx-auto px-4 sm:px-6 pb-12 ${CONTACT_PAGE_IPAD_MINI_SHIFT_RIGHT_CLASS}`}
+      >
+        <ContactMapEmbed addressText={t('contact.address')} />
       </div>
     </div>
   );

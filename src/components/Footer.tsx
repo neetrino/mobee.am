@@ -18,6 +18,7 @@ import {
 } from './footer/footerSocialGlyphs';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
+import { ContactMapEmbed } from './ContactMapEmbed';
 
 const inter = siteInter;
 
@@ -60,12 +61,6 @@ const FOOTER_MAP_EMBED_SHELL_BASE_CLASS = `relative mt-8 block h-[220px] w-full 
 
 /** Map top spacing — same for all locales (previously HY-only tune). */
 const FOOTER_MAP_MARGIN_TOP_CLASS = 'lg:max-xl:mt-[calc(1.5rem+10px)] xl:mt-[19px]';
-
-/** Google Maps embed from address (no API key). */
-function footerGoogleMapsEmbedSrc(addressQuery: string): string {
-  const q = encodeURIComponent(addressQuery);
-  return `https://www.google.com/maps?q=${q}&z=15&output=embed`;
-}
 
 const FOOTER_NAV_LINK_CLASS =
   'px-6 py-2.5 text-[14px] font-bold leading-7 tracking-[0.2px] text-black transition-colors hover:text-[#00a1ff]';
@@ -151,21 +146,11 @@ function ContactIconBlock({ icon, children, className, alignIconTop = false, bod
 }
 
 function FooterMapEmbed({ addressText }: { readonly addressText: string }) {
-  const { t } = useTranslation();
-  const embedSrc = footerGoogleMapsEmbedSrc(addressText);
-
   return (
-    <div className={`${FOOTER_MAP_EMBED_SHELL_BASE_CLASS} ${FOOTER_MAP_MARGIN_TOP_CLASS}`}>
-      <iframe
-        title={t('common.footer.mapEmbedTitle')}
-        src={embedSrc}
-        className="pointer-events-auto absolute inset-0 h-full w-full border-0"
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-        allowFullScreen
-        suppressHydrationWarning
-      />
-    </div>
+    <ContactMapEmbed
+      addressText={addressText}
+      shellClassName={`${FOOTER_MAP_EMBED_SHELL_BASE_CLASS} ${FOOTER_MAP_MARGIN_TOP_CLASS}`}
+    />
   );
 }
 
