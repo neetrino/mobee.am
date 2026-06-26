@@ -3,23 +3,31 @@ import { type Namespace, VALID_NAMESPACES } from './i18n-types';
 
 import enCommon from '../locales/en/common.json';
 import enHome from '../locales/en/home.json';
+import hyCommon from '../locales/hy/common.json';
 import hyHome from '../locales/hy/home.json';
+import ruCommon from '../locales/ru/common.json';
 import ruHome from '../locales/ru/home.json';
 
 type TranslationRecord = Record<string, unknown>;
 type LocaleStore = Partial<Record<Namespace, TranslationRecord>>;
 
-const HOME_BY_LANG: Partial<Record<LanguageCode, TranslationRecord>> = {
-  en: enHome as TranslationRecord,
-  hy: hyHome as TranslationRecord,
-  ru: ruHome as TranslationRecord,
-};
-
-const localeStores: Partial<Record<LanguageCode, LocaleStore>> = {
+const STOREFRONT_SEED_BY_LANG: Partial<Record<LanguageCode, LocaleStore>> = {
   en: {
     common: enCommon as TranslationRecord,
     home: enHome as TranslationRecord,
   },
+  hy: {
+    common: hyCommon as TranslationRecord,
+    home: hyHome as TranslationRecord,
+  },
+  ru: {
+    common: ruCommon as TranslationRecord,
+    home: ruHome as TranslationRecord,
+  },
+};
+
+const localeStores: Partial<Record<LanguageCode, LocaleStore>> = {
+  en: { ...STOREFRONT_SEED_BY_LANG.en },
 };
 
 const inflightLoads = new Map<string, Promise<void>>();
@@ -37,11 +45,11 @@ function notifyListeners(): void {
 
 /**
  * Synchronously seeds storefront-critical namespaces for SSR and first paint.
- * `home` is required on the homepage hero; `common` is already eager for `en`.
+ * `common` + `home` must be available before lazy loads complete to avoid en fallback hydration mismatches.
  */
 export function seedStorefrontLocale(lang: LanguageCode): void {
-  const home = HOME_BY_LANG[lang];
-  if (!home) {
+  const seed = STOREFRONT_SEED_BY_LANG[lang];
+  if (!seed) {
     return;
   }
 
@@ -49,7 +57,7 @@ export function seedStorefrontLocale(lang: LanguageCode): void {
     localeStores[lang] = {};
   }
 
-  localeStores[lang]!.home = home;
+  Object.assign(localeStores[lang]!, seed);
 }
 
 export function subscribeLazyTranslations(listener: () => void): () => void {
@@ -60,11 +68,9 @@ export function subscribeLazyTranslations(listener: () => void): () => void {
 export function clearLazyTranslationStore(): void {
   inflightLoads.clear();
   for (const lang of Object.keys(localeStores) as LanguageCode[]) {
-    if (lang === 'en') {
-      localeStores[lang] = {
-        common: enCommon as TranslationRecord,
-        home: enHome as TranslationRecord,
-      };
+    const seed = STOREFRONT_SEED_BY_LANG[lang];
+    if (seed) {
+      localeStores[lang] = { ...seed };
       continue;
     }
     delete localeStores[lang];

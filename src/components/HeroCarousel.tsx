@@ -21,11 +21,8 @@ function MobileHeroIphoneBanner() {
       className={`pb-1 pt-2 lg:hidden ${montserrat.className}`}
     >
       <div className={HERO_MOBILE_CONTENT_GUTTERS_CLASS}>
-        <div className="relative isolate min-h-[208px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-3 pt-5 sm:min-h-[220px]">
-          <div className="relative z-10 flex max-w-[55%] flex-col items-start gap-2">
-            <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-normal leading-normal text-[#14ae5c]">
-              {t('home.hero_free_shipping')}
-            </span>
+        <div className="relative isolate min-h-[208px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-3 pt-3 sm:min-h-[220px] sm:pt-4">
+          <div className="relative z-10 flex max-w-[55%] flex-col items-start">
             <p
               className={`${titleClass} text-[clamp(1.5rem,7vw,2rem)] font-bold leading-tight tracking-tight text-black`}
             >
@@ -67,11 +64,6 @@ export function HeroCarousel() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:gap-5">
           <div className="relative min-h-[320px] flex-1 overflow-visible sm:min-h-[346px] lg:min-h-[292px] xl:min-h-[346px]">
             <div className="absolute inset-0 z-0 rounded-[40px] bg-[#e9ecf0]" aria-hidden />
-            <div className="absolute right-4 top-4 z-30 sm:right-8 sm:top-8 md:right-10 md:top-10">
-              <span className="inline-flex items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[12px] font-normal leading-normal text-[#14ae5c]">
-                {t('home.hero_free_shipping')}
-              </span>
-            </div>
 
             <div className="relative z-20 flex h-full min-h-[inherit] flex-col px-6 pb-4 pt-12 sm:max-w-[min(52%,20rem)] sm:px-10 sm:pb-10 sm:pt-14 md:max-w-[55%] md:px-[54px] md:pb-8">
               <h2
@@ -139,10 +131,7 @@ export function HeroCarousel() {
 
             <div className="relative min-h-[160px] overflow-hidden rounded-[40px] bg-[#e9ecf0]">
               <div className="relative z-10 flex h-full flex-col px-6 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-5">
-                <span className="inline-flex w-fit items-center rounded-full bg-white px-1.5 py-0.5 text-[12px] font-normal leading-normal text-[#14ae5c]">
-                  {t('home.hero_free_shipping')}
-                </span>
-                <p className="mt-3 max-w-[137px] text-[22px] font-bold leading-none text-black">
+                <p className="max-w-[137px] text-[22px] font-bold leading-none text-black">
                   {t('home.hero_iphone_title')}
                 </p>
               </div>
