@@ -7,6 +7,7 @@ import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { ShopFilterSectionHeader } from './shop/ShopFilterSectionHeader';
 import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 
 interface BrandFilterProps {
@@ -87,12 +88,23 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
     router.push(href);
   };
 
+  const clearBrands = () => {
+    setSelected([]);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('brand');
+    params.delete('page');
+    const href = warmShopNavigationFromSearchParams(router, params, getStoredLanguage());
+    router.push(href);
+  };
+
   if (loading && brands.length === 0) {
     return (
       <section className="border-b border-[#E2E8F0] pb-6">
-        <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#1D293D]">
-          {t('products.filters.brand.title')}
-        </h3>
+        <ShopFilterSectionHeader
+          title={t('products.filters.brand.title')}
+          showClear={selected.length > 0}
+          onClear={clearBrands}
+        />
         <div className="mt-3 text-sm text-gray-500">{t('products.filters.brand.loading')}</div>
       </section>
     );
@@ -104,9 +116,11 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
 
   return (
     <section className="border-b border-[#E2E8F0] pb-6">
-      <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#1D293D]">
-        {t('products.filters.brand.title')}
-      </h3>
+      <ShopFilterSectionHeader
+        title={t('products.filters.brand.title')}
+        showClear={selected.length > 0}
+        onClear={clearBrands}
+      />
 
       {brands.length > 0 ? (
         <div className="mt-4 space-y-3">
