@@ -18,11 +18,11 @@ function MobileHeroIphoneBanner() {
 
   return (
     <div
-      className={`pb-1 pt-2 lg:hidden ${montserrat.className}`}
+      className={`pb-1 pt-4 sm:pt-5 lg:hidden ${montserrat.className}`}
     >
       <div className={HERO_MOBILE_CONTENT_GUTTERS_CLASS}>
-        <div className="relative isolate min-h-[208px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-3 pt-3 sm:min-h-[220px] sm:pt-4">
-          <div className="relative z-10 flex max-w-[55%] flex-col items-start">
+        <div className="relative isolate min-h-[208px] overflow-hidden rounded-[30px] bg-[#e3ebf7] px-4 pb-3 pt-12 sm:min-h-[220px] sm:pt-14">
+          <div className="relative z-10 flex max-w-[55%] flex-col items-start pl-2 sm:pl-3 -translate-y-[2px]">
             <p
               className={`${titleClass} text-[clamp(1.5rem,7vw,2rem)] font-bold leading-tight tracking-tight text-black`}
             >
@@ -130,7 +130,7 @@ export function HeroCarousel() {
             </div>
 
             <div className="relative min-h-[160px] overflow-hidden rounded-[40px] bg-[#e9ecf0]">
-              <div className="relative z-10 flex h-full flex-col px-6 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-5">
+              <div className="relative z-10 flex h-full flex-col px-6 pb-6 pt-11 sm:px-8 sm:pb-8 sm:pt-12">
                 <p className="max-w-[137px] text-[22px] font-bold leading-none text-black">
                   {t('home.hero_iphone_title')}
                 </p>
