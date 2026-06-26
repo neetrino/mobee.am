@@ -8,6 +8,7 @@ import { getStoredLanguage } from '../lib/language';
 import { getColorHex } from '../lib/colorMap';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { ShopFilterSectionHeader } from './shop/ShopFilterSectionHeader';
 import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 
 interface ColorFilterProps {
@@ -103,12 +104,19 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
     router.push(href);
   };
 
+  const clearColors = () => {
+    setSelected([]);
+    applyFilters([]);
+  };
+
   if (loading && colors.length === 0) {
     return (
       <section className="border-b border-[#E2E8F0] pb-6">
-        <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#1D293D]">
-          {t('products.filters.color.title')}
-        </h3>
+        <ShopFilterSectionHeader
+          title={t('products.filters.color.title')}
+          showClear={selected.length > 0}
+          onClear={clearColors}
+        />
         <div className="mt-3 text-sm text-gray-500">{t('products.filters.color.loading')}</div>
       </section>
     );
@@ -116,9 +124,11 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
 
   return (
     <section className="border-b border-[#E2E8F0] pb-6">
-      <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#1D293D]">
-        {t('products.filters.color.title')}
-      </h3>
+      <ShopFilterSectionHeader
+        title={t('products.filters.color.title')}
+        showClear={selected.length > 0}
+        onClear={clearColors}
+      />
       {colors.length === 0 ? (
         <div className="text-sm text-gray-500 py-4 text-center">
           {t('products.filters.color.noColors')}

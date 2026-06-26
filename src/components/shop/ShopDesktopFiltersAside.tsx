@@ -49,12 +49,9 @@ export function ShopDesktopFiltersAside(props: ShopDesktopFiltersAsideProps) {
     >
       <div className="bg-white px-6 pt-6">
         <div className="mb-6">
-          <h2 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#0F172B]">
+          <h2 className="text-xl font-bold leading-7 tracking-[-0.02em] text-[#0F172B]">
             {t('products.filters.sidebar.title')}
           </h2>
-          <p className="mt-1 text-sm leading-5 tracking-[-0.01em] text-[#62748E]">
-            {t('products.filters.sidebar.subtitle')}
-          </p>
         </div>
         <ShopFilterSections {...props} />
       </div>

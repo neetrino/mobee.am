@@ -60,7 +60,7 @@ export function MobileFiltersDrawer({
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <p className="text-lg font-semibold text-gray-900">{defaultTitle}</p>
+              <p className="text-xl font-bold text-gray-900">{defaultTitle}</p>
               <button
                 type="button"
                 onClick={() => setOpen(false)}

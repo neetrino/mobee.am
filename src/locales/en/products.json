@@ -1,5 +1,6 @@
 {
   "filters": {
+    "clearSection": "Clear",
     "sidebar": {
       "title": "Filter",
       "subtitle": "Find what fits you best"
