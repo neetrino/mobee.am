@@ -1,24 +1,31 @@
 import type { CSSProperties } from 'react';
 import {
+  SHOP_FILTER_SIDEBAR_BODY_SCROLL_CLASS,
+  SHOP_FILTER_SIDEBAR_BOTTOM_OFFSET_CSS,
   SHOP_FILTER_SIDEBAR_SCROLL_CLASS,
+  SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
   SHOP_FILTER_SIDEBAR_WIDTH_CSS,
 } from './shop-layout.constants';
 
 export function ShopFiltersAsideFallback() {
   return (
     <aside
-      className={`hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start ${SHOP_FILTER_SIDEBAR_SCROLL_CLASS}`}
+      className={`hidden lg:flex lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-[var(--shop-filter-sidebar-top-offset)] lg:bg-white ${SHOP_FILTER_SIDEBAR_SCROLL_CLASS}`}
       style={
         {
           ['--shop-filter-aside-width']: SHOP_FILTER_SIDEBAR_WIDTH_CSS,
+          ['--shop-filter-sidebar-top-offset']: SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
+          ['--shop-filter-sidebar-bottom-offset']: SHOP_FILTER_SIDEBAR_BOTTOM_OFFSET_CSS,
         } as CSSProperties
       }
     >
-      <div className="animate-pulse space-y-6 bg-white px-6 pt-6">
-        <div className="h-12 rounded bg-gray-200" />
-        <div className="h-24 rounded bg-gray-200" />
-        <div className="h-32 rounded bg-gray-200" />
-        <div className="h-32 rounded bg-gray-200" />
+      <div className="shrink-0 px-6 pt-6 pb-4">
+        <div className="h-8 w-24 animate-pulse rounded bg-gray-200" />
+      </div>
+      <div className={`${SHOP_FILTER_SIDEBAR_BODY_SCROLL_CLASS} space-y-6`}>
+        <div className="h-24 animate-pulse rounded bg-gray-200" />
+        <div className="h-32 animate-pulse rounded bg-gray-200" />
+        <div className="h-32 animate-pulse rounded bg-gray-200" />
       </div>
     </aside>
   );
