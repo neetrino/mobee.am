@@ -457,13 +457,63 @@
 .product-specs .spec-label {
   color: #6b7280;
   width: 46%;
+  min-width: 0;
   font-weight: 400;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  padding-right: 0.5rem;
 }
 
 .prose .product-specs .spec-value,
 .product-specs .spec-value {
   color: #111827;
   font-weight: 500;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+@media (max-width: 639px) {
+  .product-description-content .product-specs,
+  .prose .product-specs,
+  .product-specs {
+    font-size: 0.8125rem;
+    margin-top: 0.5rem;
+    border-radius: 0.625rem;
+  }
+
+  .prose .product-specs td,
+  .product-specs td {
+    padding: 0.5rem 0.625rem;
+    line-height: 1.35;
+  }
+
+  .prose .product-specs .spec-label,
+  .product-specs .spec-label {
+    width: 52%;
+    font-size: 0.8125rem;
+  }
+
+  .prose .product-specs .spec-value,
+  .product-specs .spec-value {
+    width: 48%;
+    font-size: 0.8125rem;
+  }
+
+  .prose .product-specs .specs-section td,
+  .product-specs .specs-section td {
+    padding: 0.75rem 0.625rem 0.25rem;
+  }
+
+  .prose .product-specs .specs-section-title,
+  .product-specs .specs-section-title {
+    font-size: 0.9375rem;
+  }
+
+  #product-long-description {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 .prose .product-specs tr.spec-row:nth-child(even) td,
@@ -531,8 +581,12 @@
 }
 
 .product-specs .specs-section--memory .specs-section-icon,
+.product-specs .specs-section--processor .specs-section-icon,
 .product-specs .specs-section--network .specs-section-icon,
+.product-specs .specs-section--connectivity .specs-section-icon,
 .product-specs .specs-section--power .specs-section-icon,
+.product-specs .specs-section--physical .specs-section-icon,
+.product-specs .specs-section--warranty .specs-section-icon,
 .product-specs .specs-section--other .specs-section-icon {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280' stroke-width='1.75'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21'/%3E%3C/svg%3E");
 }

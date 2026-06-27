@@ -32,6 +32,9 @@ const RELATED_PRODUCTS_LABELS = new Set([
 ]);
 
 const SECTION_HEADERS = new Set([
+  "Կապ",
+  "Պրոցեսորներ, Միջուկներ, Թելեր",
+  "Հիշողություն",
   "Ընդհանուր բնութագրեր",
   "Հիշողություն և Պրոցեսոր",
   "Ցանց",
@@ -39,9 +42,13 @@ const SECTION_HEADERS = new Set([
   "Այլ",
   "Տեսախցիկներ",
   "Էկրան",
+  "Հիմնական",
 ]);
 
 const SECTION_SLUGS = {
+  "Կապ": "network",
+  "Պրոցեսորներ, Միջուկներ, Թելեր": "processor",
+  "Հիշողություն": "memory",
   "Ընդհանուր բնութագրեր": "general",
   "Էկրան": "screen",
   "Տեսախցիկներ": "cameras",
@@ -49,6 +56,7 @@ const SECTION_SLUGS = {
   "Ցանց": "network",
   "Սնուցում": "power",
   "Այլ": "other",
+  "Հիմնական": "general",
 };
 
 const SPEC_LABELS = new Set([
@@ -76,9 +84,105 @@ const SPEC_LABELS = new Set([
   "Գույնը",
   "Մոդել",
   "Արտադրող",
+  "Էկրանի տեսակ",
+  "Էկրանի լուծաչափ",
+  "Էկրանի անկյունագիծ",
+  "Էկրանի չափս",
+  "Վեբ տեսախցիկ",
+  "Օպերատիվ հիշողություն",
+  "Կոշտ սկավառակի հիշողություն",
+  "Կոշտ սկավառակի տեսակ",
+  "Գրաֆիկական հիշողություն",
+  "Պրոցեսորի մոդել",
+  "SIM քարտի տեսակ",
+  "Bluetooth",
+  "WiFi",
+  "Մարտկոց",
+  "Չափսեր",
+  "Քաշ",
+  "Գույն",
+  "Տեսակ",
+  "Սարքի տեսակ",
+  "Այլ",
+  "Storage",
+  "Memory",
+  "Type",
+  "Other",
+  "Device type",
+  "Operating system",
+  "Screen diagonal",
+  "Screen resolution",
+  "Display type",
+  "RAM",
+  "Graphics memory",
+  "Storage type",
+  "Webcam",
+  "Color",
+  "Dimensions",
+  "Weight",
+  "Battery",
+  "Warranty",
+  "Память",
+  "Встроенная память",
+  "Тип устройства",
+  "Тип накопителя",
+  "SIM card",
 ]);
 
 const STATUS_ONLY_TOKENS = new Set(["Առկա է խանութներում"]);
+
+const VALUE_PATTERNS = [
+  /^\d+(\.\d+)?\s*(inch|inches|in)\b/i,
+  /^\d+(\.\d+)?\s*(cm|mm|mAh|Wh|W|kg|g|Hz|GHz|MHz|MP)\b/i,
+  /^\d+\s*(GB|TB|MB)\b/i,
+  /^\d+\s*x\s*\d+/i,
+  /^\d{4}$/,
+  /^\d+\s*(months?|years?)\b/i,
+  /^(Այո|Ոչ|Yes|No)$/i,
+  /^(macOS|iOS|iPadOS|Windows|Android|Linux|HarmonyOS)$/i,
+  /^(SSD|HDD|NVMe|eMMC|UFS)$/i,
+  /^(Notebook|Laptop|Smartphone|Tablet|Desktop|Ultrabook|MacBook)$/i,
+];
+
+function looksLikeValue(token) {
+  if (!token) return false;
+  if (VALUE_PATTERNS.some((pattern) => pattern.test(token))) {
+    return true;
+  }
+  if (/^[A-Z0-9][\w\s\-./+%(),]*$/i.test(token) && token.length <= 80) {
+    return !SPEC_LABELS.has(token) && !SECTION_HEADERS.has(token);
+  }
+  return false;
+}
+
+function looksLikeLabel(token) {
+  if (!token) return false;
+  if (SPEC_LABELS.has(token) || SECTION_HEADERS.has(token)) {
+    return true;
+  }
+  if (/[\u0531-\u0587]/.test(token)) {
+    return !looksLikeValue(token);
+  }
+  return false;
+}
+
+function pairConfidence(left, right) {
+  const leftIsLabel = looksLikeLabel(left);
+  const rightIsLabel = looksLikeLabel(right);
+  const leftIsValue = looksLikeValue(left);
+  const rightIsValue = looksLikeValue(right);
+
+  if (leftIsLabel && rightIsValue && !rightIsLabel) return "label-value";
+  if (leftIsValue && rightIsLabel && !leftIsLabel) return "value-label";
+  if (SPEC_LABELS.has(left) && !SPEC_LABELS.has(right)) return "label-value";
+  if (SPEC_LABELS.has(right) && !SPEC_LABELS.has(left)) return "value-label";
+  return "low";
+}
+
+function pushRow(rows, label, value) {
+  rows.push({ type: "row", label, value });
+}
+
 
 function escapeHtml(value) {
   return String(value)
@@ -158,16 +262,48 @@ function buildDescriptionHtml(raw) {
     }
 
     if (
-      SPEC_LABELS.has(token) &&
       next &&
-      !SECTION_HEADERS.has(next) &&
-      !SPEC_LABELS.has(next) &&
       !shouldStopParsing(next) &&
-      !next.startsWith("http")
+      !next.startsWith("http") &&
+      !SECTION_HEADERS.has(next)
     ) {
-      rows.push({ type: "row", label: token, value: next });
-      i += 2;
-      continue;
+      const confidence = pairConfidence(token, next);
+
+      if (confidence === "label-value") {
+        pushRow(rows, token, next);
+        i += 2;
+        continue;
+      }
+
+      if (confidence === "value-label") {
+        pushRow(rows, next, token);
+        i += 2;
+        continue;
+      }
+
+      if (SPEC_LABELS.has(token) && !SPEC_LABELS.has(next)) {
+        pushRow(rows, token, next);
+        i += 2;
+        continue;
+      }
+
+      if (looksLikeValue(token) && looksLikeLabel(next)) {
+        pushRow(rows, next, token);
+        i += 2;
+        continue;
+      }
+
+      if (looksLikeLabel(token) && looksLikeValue(next)) {
+        pushRow(rows, token, next);
+        i += 2;
+        continue;
+      }
+
+      if (token.length < 100 && next.length < 100) {
+        pushRow(rows, token, next);
+        i += 2;
+        continue;
+      }
     }
 
     if (next && !shouldStopParsing(next) && !next.startsWith("http")) {

@@ -73,6 +73,8 @@ export interface Product {
   title: string;
   subtitle?: string;
   description?: string;
+  /** Armenian source description (hy translation) for locale fallback on PDP. */
+  sourceDescription?: string | null;
   /** Primary image URL aligned with product cards (`processImageUrl(media[0])`). */
   image?: string | null;
   media: ProductMedia[] | string[];
