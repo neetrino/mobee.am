@@ -29,6 +29,42 @@
   "priceInfoTitle": "Գինը կարող է ներառել ԱԱՀ։ Զամբյուղում վերջնական գինը կարող է փոխվել ընտրված տարբերակից կախված։",
   "moreDetails": "Ավելի մանրամասն",
   "availableInStores": "Առկա է խանութներում",
+  "specs": {
+    "sections": {
+      "general": "Ընդհանուր բնութագրեր",
+      "screen": "Էկրան",
+      "cameras": "Տեսախցիկներ",
+      "memory": "Հիշողություն և Պրոցեսոր",
+      "network": "Ցանց",
+      "power": "Սնուցում",
+      "other": "Այլ"
+    },
+    "labels": {
+      "availableInStores": "Առկա է խանութներում",
+      "warranty": "Երաշխիք",
+      "announcementYear": "Հայտարարության տարին",
+      "operatingSystem": "Օպերացիոն համակարգ",
+      "screenType": "Էկրանի տեսակը",
+      "screenResolution": "Էկրանի կետայնություն",
+      "screenSize": "Էկրանի չափսը",
+      "frontCamera": "Դիմային տեսախցիկ",
+      "mainCamera": "Հիմնական տեսախցիկ",
+      "builtInStorage": "Ներկառուցված հիշողություն",
+      "processor": "Պրոցեսոր",
+      "simCardType": "SIM քարտի տեսակը",
+      "bluetooth": "Բլութուս",
+      "wifi": "Wi-fi",
+      "battery": "Ակումուլատոր",
+      "fastCharging": "Արագ լիցքավորում",
+      "fastCooling": "Արագ գազարկում",
+      "waterResistant": "Ջրակայուն",
+      "dimensions": "Չափսը",
+      "weight": "Քաշը",
+      "color": "Գույնը",
+      "model": "Մոդել",
+      "manufacturer": "Արտադրող"
+    }
+  },
   "aparik": {
     "buttonLabel": "Ապառիկ գին",
     "modalTitle": "Ապառիկի Հարցում",

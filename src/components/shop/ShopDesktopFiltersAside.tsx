@@ -5,8 +5,6 @@ import type { CSSProperties } from 'react';
 import { useTranslation } from '@/lib/i18n-client';
 import { useDesktopViewport } from '@/components/hooks/useDesktopViewport';
 import {
-  SHOP_FILTER_SIDEBAR_SCROLL_CLASS,
-  SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
   SHOP_FILTER_SIDEBAR_WIDTH_CSS,
 } from '@/app/shop/shop-layout.constants';
 import type { ShopFilterSectionsProps } from './ShopFilterSections';
@@ -39,12 +37,11 @@ export function ShopDesktopFiltersAside(props: ShopDesktopFiltersAsideProps) {
 
   const style = {
     ['--shop-filter-aside-width']: SHOP_FILTER_SIDEBAR_WIDTH_CSS,
-    ['--shop-filter-sidebar-top-offset']: SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
   } as CSSProperties;
 
   return (
     <aside
-      className={`lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-[var(--shop-filter-sidebar-top-offset)] lg:border-r lg:border-[#e7e7e7] lg:pr-0 ${SHOP_FILTER_SIDEBAR_SCROLL_CLASS}`}
+      className="lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:border-r lg:border-[#e7e7e7] lg:pr-0"
       style={style}
     >
       <div className="bg-white px-6 pt-6">

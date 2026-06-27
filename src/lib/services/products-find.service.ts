@@ -44,6 +44,7 @@ class ProductsFindService {
       paginatedProducts,
       lang,
       discounts,
+      { colors: filters.colors },
     );
 
     return {

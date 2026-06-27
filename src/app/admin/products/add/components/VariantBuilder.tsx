@@ -169,7 +169,7 @@ export function VariantBuilder({
                     <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t('admin.products.add.compareAtPrice')}
                     </th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
                       {t('admin.products.add.stock')}
                     </th>
                     <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -178,8 +178,8 @@ export function VariantBuilder({
                     <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t('admin.products.add.image')}
                     </th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
-                      {t('admin.products.add.actions') || 'Actions'}
+                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-14">
+                      {t('admin.products.add.remove')}
                     </th>
                   </tr>
                 </thead>
@@ -297,7 +297,7 @@ export function VariantBuilder({
                             <span className="text-xs text-gray-500">{CURRENCIES[defaultCurrency].symbol}</span>
                           </div>
                         </td>
-                        <td className="px-2 py-2 whitespace-nowrap">
+                        <td className="px-2 py-2">
                           <Input
                             type="number"
                             value={variant.stock}
@@ -307,7 +307,7 @@ export function VariantBuilder({
                               );
                             }}
                             placeholder={t('admin.products.add.quantityPlaceholder')}
-                            className="w-16 text-xs"
+                            className="w-12 max-w-full text-xs [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                             min="0"
                           />
                         </td>
@@ -384,10 +384,11 @@ export function VariantBuilder({
                           <button
                             type="button"
                             onClick={() => onVariantDelete(variant.id)}
-                            className="px-2 py-1 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-supersudo hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors flex items-center gap-1"
-                            title={t('admin.products.add.deleteVariant') || 'Delete variant'}
+                            className="inline-flex items-center justify-center rounded-supersudo border border-red-300 bg-red-50 p-2.5 text-red-700 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            title={t('admin.products.add.deleteVariant')}
+                            aria-label={t('admin.products.add.deleteVariant')}
                           >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -395,7 +396,6 @@ export function VariantBuilder({
                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                               />
                             </svg>
-                            {t('admin.products.add.delete') || 'Delete'}
                           </button>
                         </td>
                       </tr>

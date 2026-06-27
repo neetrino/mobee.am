@@ -1,13 +1,12 @@
 import type { CSSProperties } from 'react';
 import {
-  SHOP_FILTER_SIDEBAR_SCROLL_CLASS,
   SHOP_FILTER_SIDEBAR_WIDTH_CSS,
 } from './shop-layout.constants';
 
 export function ShopFiltersAsideFallback() {
   return (
     <aside
-      className={`hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start ${SHOP_FILTER_SIDEBAR_SCROLL_CLASS}`}
+      className="hidden lg:block lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start"
       style={
         {
           ['--shop-filter-aside-width']: SHOP_FILTER_SIDEBAR_WIDTH_CSS,

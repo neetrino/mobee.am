@@ -26,6 +26,10 @@ interface ColorOption {
   colors?: string[] | null;
 }
 
+function withAvailableColors(items: ColorOption[]): ColorOption[] {
+  return items.filter((color) => color.count > 0);
+}
+
 export function ColorFilter({ category, search, minPrice, maxPrice, selectedColors = [] }: ColorFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,7 +41,7 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
 
   useEffect(() => {
     if (filtersContext?.data?.colors) {
-      setColors(filtersContext.data.colors);
+      setColors(withAvailableColors(filtersContext.data.colors));
       setLoading(false);
       return;
     }
@@ -68,7 +72,7 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
       // Fetch filters from API
       const response = await apiClient.get<{ colors: ColorOption[]; sizes: unknown[] }>('/api/v1/products/filters', { params });
       
-      setColors(response.colors || []);
+      setColors(withAvailableColors(response.colors || []));
     } catch (error) {
       setColors([]);
     } finally {

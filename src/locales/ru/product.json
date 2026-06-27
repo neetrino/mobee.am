@@ -29,6 +29,42 @@
   "priceInfoTitle": "Цена указана с учётом НДС, если применимо. Итоговая цена может зависеть от выбранного варианта.",
   "moreDetails": "Подробнее",
   "availableInStores": "Доступно в магазинах",
+  "specs": {
+    "sections": {
+      "general": "Общие характеристики",
+      "screen": "Экран",
+      "cameras": "Камеры",
+      "memory": "Память и процессор",
+      "network": "Сеть",
+      "power": "Питание",
+      "other": "Другое"
+    },
+    "labels": {
+      "availableInStores": "Доступно в магазинах",
+      "warranty": "Гарантия",
+      "announcementYear": "Год анонса",
+      "operatingSystem": "Операционная система",
+      "screenType": "Тип экрана",
+      "screenResolution": "Разрешение экрана",
+      "screenSize": "Размер экрана",
+      "frontCamera": "Фронтальная камера",
+      "mainCamera": "Основная камера",
+      "builtInStorage": "Встроенная память",
+      "processor": "Процессор",
+      "simCardType": "Тип SIM-карты",
+      "bluetooth": "Bluetooth",
+      "wifi": "Wi-Fi",
+      "battery": "Аккумулятор",
+      "fastCharging": "Быстрая зарядка",
+      "fastCooling": "Быстрое охлаждение",
+      "waterResistant": "Водонепроницаемость",
+      "dimensions": "Размеры",
+      "weight": "Вес",
+      "color": "Цвет",
+      "model": "Модель",
+      "manufacturer": "Производитель"
+    }
+  },
   "aparik": {
     "buttonLabel": "Рассрочка",
     "modalTitle": "Запрос на рассрочку",

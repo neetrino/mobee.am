@@ -1,7 +1,14 @@
 import { db } from "@white-shop/db";
-import { processImageUrl } from "../utils/image-utils";
 import { cacheService } from "./cache.service";
 import { ProductWithRelations } from "./products-find-query.service";
+import {
+  findListingDisplayVariant,
+  resolveListingProductImage,
+} from "./products-listing-display-variant";
+
+export type ProductListingTransformContext = {
+  colors?: string;
+};
 
 const DISCOUNT_CONTEXT_CACHE_KEY = "product-list:discount-context";
 const DISCOUNT_CONTEXT_TTL_SEC = 120;
@@ -72,6 +79,7 @@ class ProductsFindTransformService {
     products: ProductWithRelations[],
     lang: string = "en",
     discounts: ProductDiscountContext,
+    listingContext?: ProductListingTransformContext,
   ): Promise<any[]> {
     const { globalDiscount, categoryDiscounts, brandDiscounts } = discounts;
 
@@ -89,11 +97,17 @@ class ProductsFindTransformService {
         ? brandTranslations.find((t: { locale: string }) => t.locale === lang) || brandTranslations[0]
         : null;
       
-      // Безопасное получение variant
       const variants = Array.isArray(product.variants) ? product.variants : [];
-      const variant = variants.length > 0
-        ? variants.sort((a: { price: number }, b: { price: number }) => a.price - b.price)[0]
-        : null;
+      const displayVariant = findListingDisplayVariant(
+        variants,
+        listingContext?.colors,
+        lang,
+      );
+      const variant =
+        displayVariant ??
+        (variants.length > 0
+          ? variants.sort((a: { price: number }, b: { price: number }) => a.price - b.price)[0]
+          : null);
 
       // Get all unique colors from ALL variants with imageUrl and colors hex (support both new and old format)
       // IMPORTANT: Only collect colors that actually exist in variants
@@ -262,16 +276,12 @@ class ProductsFindTransformService {
         originalPrice: appliedDiscount > 0 ? originalPrice : variant?.compareAtPrice || null,
         compareAtPrice: variant?.compareAtPrice || null,
         discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
-        image: (() => {
-          // Use unified image utilities to get first valid main image
-          if (!Array.isArray(product.media) || product.media.length === 0) {
-            return null;
-          }
-          
-          // Process first image - cast JsonValue to ImageUrlInput
-          const firstImage = processImageUrl(product.media[0] as string | null | undefined | { url?: string; src?: string; value?: string });
-          return firstImage || null;
-        })(),
+        image: resolveListingProductImage(
+          product,
+          displayVariant,
+          listingContext?.colors,
+          lang,
+        ),
         inStock: (variant?.stock || 0) > 0,
         labels: Array.isArray(product.labels)
           ? product.labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({
