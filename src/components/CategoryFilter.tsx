@@ -12,6 +12,7 @@ import {
   warmShopFromSearchParams,
 } from '@/lib/navigation/storefront-prefetch';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { ShopFilterSectionHeader } from './shop/ShopFilterSectionHeader';
 
 interface CategoryFilterProps {
   selectedCategories?: string[];
@@ -112,15 +113,35 @@ export function CategoryFilter({
     router.push(href);
   };
 
+  const clearCategories = () => {
+    setSelected([]);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('category');
+    params.delete('page');
+
+    const record: Record<string, string | undefined> = {};
+    params.forEach((value, key) => {
+      record[key] = value;
+    });
+
+    const href = buildShopHrefFromSearchParams(record);
+    prefetchStorefrontRoute(router, href);
+    warmShopFromSearchParams(record, getStoredLanguage());
+    router.push(href);
+  };
+
   if (categories.length === 0) {
     return null;
   }
 
   return (
     <section className="border-b border-[#E2E8F0] pb-6">
-      <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#111827]">
-        {t('products.filters.category.title')}
-      </h3>
+      <ShopFilterSectionHeader
+        title={t('products.filters.category.title')}
+        titleClassName="text-base font-semibold leading-6 tracking-[-0.02em] text-[#111827]"
+        showClear={selected.length > 0}
+        onClear={clearCategories}
+      />
 
       <div className="mt-4 space-y-3">
         {categories.map((category) => {

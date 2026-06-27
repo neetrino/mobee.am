@@ -54,13 +54,13 @@ export function MobileFiltersDrawer({
           onClick={() => setOpen(false)}
         >
           <div
-            className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
+            className="flex h-dvh max-h-dvh min-h-0 w-1/2 min-w-[16rem] max-w-full flex-col bg-white shadow-2xl"
             role="dialog"
             aria-modal="true"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <p className="text-lg font-semibold text-gray-900">{defaultTitle}</p>
+            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
+              <p className="text-xl font-bold text-gray-900">{defaultTitle}</p>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -73,7 +73,7 @@ export function MobileFiltersDrawer({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-5 py-6 pb-10 [-webkit-overflow-scrolling:touch]">
               {renderWhenOpen ? renderWhenOpen() : children}
             </div>
           </div>

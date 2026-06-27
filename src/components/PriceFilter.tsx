@@ -12,6 +12,7 @@ import {
 } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { ShopFilterSectionHeader } from './shop/ShopFilterSectionHeader';
 import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 import {
   priceToSliderPercentage,
@@ -300,13 +301,38 @@ export function PriceFilter({
   const minPercentage = priceToSliderPercentage(safeMinPrice, boundsMin, boundsMax);
   const maxPercentage = priceToSliderPercentage(safeMaxPrice, boundsMin, boundsMax);
 
+  const hasActivePriceFilter =
+    Boolean(currentMinPrice) ||
+    Boolean(currentMaxPrice) ||
+    safeMinPrice !== priceRange.min ||
+    safeMaxPrice !== priceRange.max;
+
+  const clearPriceFilter = () => {
+    syncRefs(priceRange.min, priceRange.max);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('minPrice');
+    params.delete('maxPrice');
+    params.delete('page');
+    const href = warmShopNavigationFromSearchParams(
+      router,
+      params,
+      getStoredLanguage(),
+      pathname,
+    );
+    router.push(href);
+  };
+
   return (
     <section className="border-b border-[#E2E8F0] pb-6">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#314158]">
-          {t('products.filters.price.sectionTitle')}
-        </h3>
-        <p className="text-base font-bold leading-6 tracking-[-0.02em] text-black">
+        <ShopFilterSectionHeader
+          title={t('products.filters.price.sectionTitle')}
+          titleClassName="text-base font-semibold leading-6 tracking-[-0.02em] text-[#314158]"
+          showClear={hasActivePriceFilter}
+          onClear={clearPriceFilter}
+          className="min-w-0 flex-1"
+        />
+        <p className="shrink-0 text-base font-bold leading-6 tracking-[-0.02em] text-black">
           {formatPrice(safeMinPrice)} - {formatPrice(safeMaxPrice)}
         </p>
       </div>
