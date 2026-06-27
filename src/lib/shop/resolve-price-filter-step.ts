@@ -1,4 +1,11 @@
-import type { PriceFilterStepConfig } from './resolve-price-filter-step';
+import type { CurrencyCode } from '../currency';
+
+export interface PriceFilterStepConfig {
+  min: number;
+  max: number;
+  stepSize?: number | null;
+  stepSizePerCurrency?: Partial<Record<CurrencyCode, number>> | null;
+}
 
 /**
  * Slider values are stored in USD (product base prices). Step size for dragging
