@@ -486,6 +486,21 @@
   background: transparent;
 }
 
+.prose .product-specs .specs-section-title,
+.product-specs .specs-section-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #111827;
+}
+
+@media (min-width: 640px) {
+  .prose .product-specs .specs-section-title,
+  .product-specs .specs-section-title {
+    font-size: 1.125rem;
+  }
+}
+
 .prose .product-specs .specs-section:first-child td,
 .product-specs .specs-section:first-child td {
   padding-top: 0.25rem;

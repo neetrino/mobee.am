@@ -88,10 +88,7 @@ export const OrderRow = memo(function OrderRow({
       >
         <div className={`inline-block -translate-x-[93px] ${ORDER_ROW_ORDER_NUMBER_VERTICAL_CLASS} text-sm font-medium text-gray-900`}>{order.number}</div>
       </td>
-      <td
-        className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
-        onClick={() => onViewDetails(order.id)}
-      >
+      <td className="px-2 py-3 align-top text-sm break-words sm:px-3">
         <div className="-translate-x-[100px]">
           <div className="text-sm font-medium text-gray-900">
             {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
@@ -99,7 +96,13 @@ export const OrderRow = memo(function OrderRow({
           {order.customerPhone && (
             <div className="text-xs text-gray-500 break-all">{order.customerPhone}</div>
           )}
-          <div className="mt-2 text-xs text-admin-600">{t('admin.orders.viewOrderDetails')}</div>
+          <button
+            type="button"
+            onClick={() => onViewDetails(order.id)}
+            className="mt-2 text-left text-xs font-medium text-admin-600 underline-offset-2 transition-colors hover:text-admin-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-admin focus-visible:ring-offset-1 rounded-sm"
+          >
+            {t('admin.orders.viewOrderDetails')}
+          </button>
         </div>
       </td>
       <td className="px-2 py-3 align-top text-sm font-medium text-gray-900 break-words sm:px-3">

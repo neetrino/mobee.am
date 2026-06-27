@@ -51,6 +51,35 @@ const SECTION_SLUGS = {
   "Այլ": "other",
 };
 
+const SPEC_LABELS = new Set([
+  "Առկա է խանութներում",
+  "Երաշխիք",
+  "Հայտարարության տարին",
+  "Օպերացիոն համակարգ",
+  "Էկրանի տեսակը",
+  "Էկրանի կետայնություն",
+  "Էկրանի չափսը",
+  "Դիմային տեսախցիկ",
+  "Հիմնական տեսախցիկ",
+  "Ներկառուցված հիշողություն",
+  "Պրոցեսոր",
+  "SIM քարտի տեսակը",
+  "Բլութուս",
+  "Wi-fi",
+  "Wi-Fi",
+  "Ակումուլատոր",
+  "Արագ լիցքավորում",
+  "Արագ գազարկում",
+  "Ջրակայուն",
+  "Չափսը",
+  "Քաշը",
+  "Գույնը",
+  "Մոդել",
+  "Արտադրող",
+]);
+
+const STATUS_ONLY_TOKENS = new Set(["Առկա է խանութներում"]);
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -121,6 +150,26 @@ function buildDescriptionHtml(raw) {
       i++;
       continue;
     }
+
+    if (STATUS_ONLY_TOKENS.has(token)) {
+      rows.push({ type: "status", label: token });
+      i++;
+      continue;
+    }
+
+    if (
+      SPEC_LABELS.has(token) &&
+      next &&
+      !SECTION_HEADERS.has(next) &&
+      !SPEC_LABELS.has(next) &&
+      !shouldStopParsing(next) &&
+      !next.startsWith("http")
+    ) {
+      rows.push({ type: "row", label: token, value: next });
+      i += 2;
+      continue;
+    }
+
     if (next && !shouldStopParsing(next) && !next.startsWith("http")) {
       rows.push({ type: "row", label: token, value: next });
       i += 2;
@@ -147,7 +196,7 @@ function buildDescriptionHtml(raw) {
     for (const row of specRows) {
       if (row.type === "section") {
         const slug = SECTION_SLUGS[row.label] || "other";
-        html += `<tr class="specs-section specs-section--${slug}"><td colspan="2"><span class="specs-section-icon" aria-hidden="true"></span>${escapeHtml(row.label)}</td></tr>`;
+        html += `<tr class="specs-section specs-section--${slug}"><td colspan="2"><span class="specs-section-icon" aria-hidden="true"></span><span class="specs-section-title">${escapeHtml(row.label)}</span></td></tr>`;
       } else {
         html += `<tr class="spec-row"><td class="spec-label">${escapeHtml(row.label)}</td><td class="spec-value">${escapeHtml(row.value)}</td></tr>`;
       }

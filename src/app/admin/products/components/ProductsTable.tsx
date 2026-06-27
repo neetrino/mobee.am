@@ -8,6 +8,9 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../../../lib/currency';
 import type { Category, Product, ProductsResponse } from '../types';
 
+const PRODUCT_TABLE_TITLE_MAX_WIDTH_CLASS = 'max-w-[30ch]';
+const PRODUCT_TABLE_SLUG_MAX_WIDTH_CLASS = 'max-w-[28ch]';
+
 function resolveProductCategories(
   categoryIds: string[] | undefined,
   categories: Category[]
@@ -251,15 +254,25 @@ export function ProductsTable({
                       />
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+                      <div className="flex min-w-0 items-center">
                         <img
                           src={resolveAdminProductThumbnailSrc(product.image)}
                           alt={product.title}
-                          className="h-12 w-12 rounded-supersudo object-cover mr-3"
+                          className="mr-3 h-12 w-12 shrink-0 rounded-supersudo object-cover"
                         />
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{product.title}</div>
-                          <div className="text-sm text-gray-500">{product.slug}</div>
+                        <div className="min-w-0">
+                          <div
+                            className={`truncate text-sm font-medium text-gray-900 ${PRODUCT_TABLE_TITLE_MAX_WIDTH_CLASS}`}
+                            title={product.title}
+                          >
+                            {product.title}
+                          </div>
+                          <div
+                            className={`truncate text-sm text-gray-500 ${PRODUCT_TABLE_SLUG_MAX_WIDTH_CLASS}`}
+                            title={product.slug}
+                          >
+                            {product.slug}
+                          </div>
                         </div>
                       </div>
                     </td>

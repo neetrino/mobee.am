@@ -4,8 +4,9 @@ import { useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { apiClient } from '../../../lib/api-client';
-import { t, getProductText } from '../../../lib/i18n';
+import { t } from '../../../lib/i18n';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
+import { getProductDescriptionHtml } from '../../../lib/products/get-product-description-html';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { showToast } from '../../../components/Toast';
 import { ProductImageGallery } from './ProductImageGallery';
@@ -295,9 +296,7 @@ export function ProductPageClient({
         <div
           className="product-description-content prose prose-sm max-w-none break-words text-gray-600 [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto"
           dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(
-              getProductText(language, product.id, 'longDescription') || product.description || '',
-            ),
+            __html: sanitizeHtml(getProductDescriptionHtml(language, product.id, product.description)),
           }}
         />
       </section>

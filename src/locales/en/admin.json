@@ -493,7 +493,8 @@
       "failedToProcessImage": "Failed to process selected image",
       "enterDefaultPrice": "Enter default price for all variants:",
       "enterDefaultStock": "Enter default stock for all variants:",
-      "enterSkuPrefix": "Enter SKU prefix (will auto-add -color-size if applicable):"
+      "enterSkuPrefix": "Enter SKU prefix (will auto-add -color-size if applicable):",
+      "deleteVariant": "Delete variant"
     }
   },
   "settings": {

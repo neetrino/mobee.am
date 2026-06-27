@@ -8,7 +8,8 @@
     "price": {
       "title": "Фильтр по цене",
       "sectionTitle": "Цена",
-      "priceLabel": "Цена:"
+      "priceLabel": "Цена:",
+      "loading": "Загрузка..."
     },
     "category": {
       "title": "Категории"

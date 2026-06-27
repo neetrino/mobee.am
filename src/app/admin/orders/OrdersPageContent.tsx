@@ -115,6 +115,7 @@ export function OrdersPageContent() {
 
         {selectedOrderId && (
           <OrderDetailsModal
+            isOpen={selectedOrderId !== null}
             orderDetails={orderDetails}
             loading={loadingOrderDetails}
             currency={currency}

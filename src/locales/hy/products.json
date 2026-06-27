@@ -8,7 +8,8 @@
     "price": {
       "title": "Զտել ըստ գնի",
       "sectionTitle": "Գին",
-      "priceLabel": "Գին:"
+      "priceLabel": "Գին:",
+      "loading": "Բեռնվում է..."
     },
     "category": {
       "title": "Կատեգորիաներ"

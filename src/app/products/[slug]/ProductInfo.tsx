@@ -4,6 +4,7 @@ import { formatPrice } from '../../../lib/currency';
 import type { CurrencyCode } from '../../../lib/currency';
 import { getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
+import { getProductDescriptionHtml } from '../../../lib/products/get-product-description-html';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
 import type { Product } from './types';
 
@@ -44,7 +45,9 @@ export function ProductInfo({
         </div>
         <div
           className="product-description-content text-gray-600 mb-8 prose prose-sm max-w-none break-words [&_img]:max-w-full [&_img]:h-auto"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(getProductDescriptionHtml(language, product.id, product.description)),
+          }}
         />
       </div>
     </div>
