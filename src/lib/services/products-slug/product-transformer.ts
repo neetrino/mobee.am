@@ -347,6 +347,7 @@ export async function transformProduct(
   // Get translations
   const translations = Array.isArray(product.translations) ? product.translations : [];
   const translation = translations.find((t: { locale: string }) => t.locale === lang) || translations[0] || null;
+  const hyTranslation = translations.find((t: { locale: string }) => t.locale === 'hy') || null;
   
   // Get brand translation
   const brandTranslations = product.brand && Array.isArray(product.brand.translations)
@@ -402,6 +403,7 @@ export async function transformProduct(
     title: translation?.title || "",
     subtitle: translation?.subtitle || null,
     description: translation?.descriptionHtml || null,
+    sourceDescription: hyTranslation?.descriptionHtml || null,
     primaryCategoryId: product.primaryCategoryId ?? null,
     categoryIds: Array.isArray(product.categoryIds) ? [...product.categoryIds] : [],
     /** Same as product list/card: first gallery URL from raw `media[0]` (before variant separation). */

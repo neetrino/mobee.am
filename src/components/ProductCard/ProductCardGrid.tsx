@@ -54,6 +54,7 @@ interface ProductCardGridProps {
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
   addButtonNavigatesToProduct?: boolean;
+  linkColor?: string | null;
 }
 
 /**
@@ -78,6 +79,7 @@ export function ProductCardGrid({
   onCompareToggle,
   onAddToCart,
   addButtonNavigatesToProduct = false,
+  linkColor = null,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
@@ -180,6 +182,7 @@ export function ProductCardGrid({
               squareImageFrame={squareImageFrame}
               imageLoadPriority={imageLoadPriority}
               listingCacheSource={buildProductCardCachePayload(product)}
+              linkColor={linkColor}
             />
           </div>
         </div>
@@ -217,6 +220,7 @@ export function ProductCardGrid({
           omitBrandRow={homeProductGridCard}
           titleSizeMobileFigma={homeProductGridCard}
           listingCacheSource={buildProductCardCachePayload(product)}
+          linkColor={linkColor}
         />
         <div className={infoPricePad}>
           <ProductCardPriceBlock

@@ -148,26 +148,37 @@ function toSlug(str) {
 
 function detectCategory(name) {
   const n = (name || "").toLowerCase();
-  if (n.includes("iphone")) return "iphone";
-  if (n.includes("ipad")) return "ipad";
-  if (n.includes("macbook") || n.includes("mac mini") || n.includes("imac") ||
-      n.includes("mac pro") || n.includes("mac studio")) return "mac";
-  if (n.includes("airpods") || n.includes("airpod")) return "airpods";
-  if (n.includes("airtag")) return "airtag";
-  if (n.includes("apple watch") || n.includes("applewatch")) return "apple-watch";
-  if (n.includes("apple tv")) return "apple-tv";
+  if (n.includes("iphone") || n.includes("smartphone")) return "phones";
+  if (n.includes("ipad") || n.includes("tablet")) return "tablets";
+  if (
+    n.includes("macbook") ||
+    n.includes("mac mini") ||
+    n.includes("imac") ||
+    n.includes("mac pro") ||
+    n.includes("mac studio")
+  ) {
+    return "computers";
+  }
+  if (n.includes("airpods") || n.includes("airpod")) return "headphones";
+  if (n.includes("airtag")) return "accessories";
+  if (n.includes("apple watch") || n.includes("applewatch")) return "watches";
+  if (n.includes("apple tv") || /\btv\b/.test(n)) return "tvs";
   return "accessories";
 }
 
 const CATEGORY_LABELS = {
-  iphone: { en: "iPhone", hy: "iPhone", ru: "iPhone" },
-  ipad: { en: "iPad", hy: "iPad", ru: "iPad" },
-  mac: { en: "Mac", hy: "Mac", ru: "Mac" },
-  airpods: { en: "AirPods", hy: "AirPods", ru: "AirPods" },
-  airtag: { en: "AirTag", hy: "AirTag", ru: "AirTag" },
-  "apple-watch": { en: "Apple Watch", hy: "Apple Watch", ru: "Apple Watch" },
-  "apple-tv": { en: "Apple TV", hy: "Apple TV", ru: "Apple TV" },
-  accessories: { en: "Accessories", hy: "Աքսեսուարներ", ru: "Аксессуары" },
+  phones: { en: "Phones", hy: "Հեռախոս", ru: "Телефоны" },
+  tablets: { en: "Tablets", hy: "Պլանշետ", ru: "Планшеты" },
+  computers: { en: "Computers", hy: "Համակարգիչ", ru: "Компьютеры" },
+  watches: { en: "Watches", hy: "Ժամացույց", ru: "Часы" },
+  headphones: { en: "Headphones", hy: "Ականջակալ", ru: "Наушники" },
+  accessories: { en: "Accessories", hy: "Աքսեսուար", ru: "Аксессуары" },
+  tvs: { en: "TVs", hy: "Հեռուստացույց", ru: "Телевизоры" },
+  "household-appliances": {
+    en: "Household Appliances",
+    hy: "Կենցաղային տեխնիկա",
+    ru: "Бытовая техника",
+  },
 };
 
 // ─── DB helpers ───────────────────────────────────────────────────────────────

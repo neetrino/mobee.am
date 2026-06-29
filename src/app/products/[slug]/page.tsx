@@ -4,10 +4,12 @@ import { readLanguageFromCookies, type LanguageCode } from '@/lib/language';
 import { getCachedProductBySlug } from '@/lib/services/products-slug-cached';
 import { ProductPageClient } from './ProductPageClient';
 import { parseProductSlugParam } from './parse-product-slug-param';
+import { parseProductPageColorParam } from '@/lib/products/product-page-href';
 import { RESERVED_ROUTES, type Product } from './types';
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | undefined>>;
 };
 
 function isNotFoundError(error: unknown): boolean {
@@ -42,9 +44,11 @@ async function loadInitialProduct(
   return { product: null, notFound: true };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params, searchParams }: ProductPageProps) {
   const { slug: rawSlug } = await params;
+  const query = searchParams ? await searchParams : {};
   const { slug, variantIdFromUrl } = parseProductSlugParam(rawSlug);
+  const colorFromUrl = parseProductPageColorParam(query.color);
 
   if (!slug || RESERVED_ROUTES.includes(slug.toLowerCase())) {
     redirect(`/${slug}`);
@@ -61,6 +65,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <ProductPageClient
       slug={slug}
       variantIdFromUrl={variantIdFromUrl}
+      colorFromUrl={colorFromUrl}
       initialProduct={initialProduct}
       initialLocale={initialLocale}
       initialNotFound={initialNotFound}

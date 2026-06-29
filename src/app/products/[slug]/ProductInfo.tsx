@@ -46,7 +46,12 @@ export function ProductInfo({
         <div
           className="product-description-content text-gray-600 mb-8 prose prose-sm max-w-none break-words [&_img]:max-w-full [&_img]:h-auto"
           dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(getProductDescriptionHtml(language, product.id, product.description)),
+            __html: sanitizeHtml(
+              getProductDescriptionHtml(language, product.id, {
+                description: product.description,
+                sourceDescription: product.sourceDescription,
+              }),
+            ),
           }}
         />
       </div>

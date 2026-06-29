@@ -41,6 +41,7 @@ const RelatedProducts = dynamic(
 export type ProductPageClientProps = {
   slug: string;
   variantIdFromUrl: string | null;
+  colorFromUrl?: string | null;
   initialProduct: Product | null;
   initialLocale: LanguageCode;
   initialNotFound: boolean;
@@ -49,6 +50,7 @@ export type ProductPageClientProps = {
 export function ProductPageClient({
   slug,
   variantIdFromUrl,
+  colorFromUrl = null,
   initialProduct,
   initialLocale,
   initialNotFound,
@@ -102,6 +104,7 @@ export function ProductPageClient({
   } = useProductPage({
     slug,
     variantIdFromUrl,
+    colorFromUrl,
     initialProduct,
     initialLocale,
     initialNotFound,
@@ -290,13 +293,18 @@ export function ProductPageClient({
 
       <section
         id="product-long-description"
-        className="mt-16 min-w-0 max-w-3xl scroll-mt-24 overflow-x-hidden border-t border-gray-200 pt-12"
+        className="mt-16 min-w-0 max-w-3xl scroll-mt-24 overflow-x-hidden border-t border-gray-200 pt-12 max-lg:pb-6"
       >
         <h2 className="mb-4 text-xl font-semibold text-gray-900">{t(language, 'product.description_title')}</h2>
         <div
           className="product-description-content prose prose-sm max-w-none break-words text-gray-600 [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto"
           dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(getProductDescriptionHtml(language, product.id, product.description)),
+            __html: sanitizeHtml(
+              getProductDescriptionHtml(language, product.id, {
+                description: product.description,
+                sourceDescription: product.sourceDescription,
+              }),
+            ),
           }}
         />
       </section>

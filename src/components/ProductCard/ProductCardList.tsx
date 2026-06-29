@@ -43,6 +43,7 @@ interface ProductCardListProps {
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
   addButtonNavigatesToProduct?: boolean;
+  linkColor?: string | null;
 }
 
 /**
@@ -61,6 +62,7 @@ export function ProductCardList({
   onCompareToggle,
   onAddToCart,
   addButtonNavigatesToProduct = false,
+  linkColor = null,
 }: ProductCardListProps) {
   const { t } = useTranslation();
   const categoryLine = getProductCardCategoryLineLabel(product);
@@ -81,6 +83,7 @@ export function ProductCardList({
         <ProductCardNavLink
           slug={product.slug}
           cachePayload={listingCacheSource}
+          linkColor={linkColor}
           className="relative h-20 w-20 flex-shrink-0 self-start overflow-hidden rounded-lg border border-gray-100 bg-white sm:h-28 sm:w-28 sm:self-center"
           aria-label={product.title}
         >
@@ -107,7 +110,7 @@ export function ProductCardList({
 
         {/* Product Info */}
         <div className="flex-1 min-w-0 w-full sm:w-auto">
-          <ProductCardNavLink slug={product.slug} cachePayload={listingCacheSource} className="block">
+          <ProductCardNavLink slug={product.slug} cachePayload={listingCacheSource} linkColor={linkColor} className="block">
             <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400">
               {product.brand?.name || t('common.defaults.category')}
             </p>
