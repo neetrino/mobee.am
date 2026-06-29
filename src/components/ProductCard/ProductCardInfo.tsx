@@ -5,6 +5,7 @@ import { formatPrice } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import { ProductColors } from './ProductColors';
 import { ProductCardNavLink } from './ProductCardNavLink';
+import { buildProductPageHref } from '../../lib/products/product-page-href';
 import type { ProductCardCachePayload } from '../../lib/products/product-card-cache';
 import type { CurrencyCode } from '../../lib/currency';
 
@@ -26,6 +27,7 @@ interface ProductCardInfoProps {
   /** Home mobile grid — title at 12px regular on small screens. */
   titleSizeMobileFigma?: boolean;
   listingCacheSource?: ProductCardCachePayload;
+  linkColor?: string | null;
 }
 
 /**
@@ -45,6 +47,7 @@ export function ProductCardInfo({
   omitBrandRow = false,
   titleSizeMobileFigma = false,
   listingCacheSource,
+  linkColor = null,
 }: ProductCardInfoProps) {
   const { t } = useTranslation();
 
@@ -76,7 +79,7 @@ export function ProductCardInfo({
   return (
     <div className={paddingClass}>
       {listingCacheSource ? (
-        <ProductCardNavLink slug={slug} cachePayload={listingCacheSource} className="block">
+        <ProductCardNavLink slug={slug} cachePayload={listingCacheSource} linkColor={linkColor} className="block">
           {!omitBrandRow ? (
             <p
               className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
@@ -93,7 +96,7 @@ export function ProductCardInfo({
           ) : null}
         </ProductCardNavLink>
       ) : (
-        <Link href={`/products/${slug}`} className="block" prefetch>
+        <Link href={buildProductPageHref(slug, { color: linkColor })} className="block" prefetch>
           {!omitBrandRow ? (
             <p
               className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}

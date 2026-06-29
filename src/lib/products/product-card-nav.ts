@@ -8,12 +8,9 @@ import {
   prefetchStorefrontRoute,
   shouldAllowStorefrontPrefetch,
 } from '@/lib/navigation/storefront-prefetch';
+import { buildProductPageHref } from '@/lib/products/product-page-href';
 
 const warmedProductApis = new Set<string>();
-
-function buildProductPagePath(slug: string): string {
-  return `/products/${slug}`;
-}
 
 function warmProductDetailApi(slug: string, lang: string): void {
   if (!shouldAllowStorefrontPrefetch()) {
@@ -35,6 +32,7 @@ function warmProductDetailApi(slug: string, lang: string): void {
 export function warmProductCardNavigation(
   payload: ProductCardCachePayload,
   router?: AppRouterInstance,
+  linkColor?: string | null,
 ): void {
   touchProductCardCacheFromListing(payload);
 
@@ -43,7 +41,7 @@ export function warmProductCardNavigation(
     return;
   }
 
-  const href = buildProductPagePath(slug);
+  const href = buildProductPageHref(slug, { color: linkColor });
   if (router) {
     prefetchStorefrontRoute(router, href);
   }
@@ -54,12 +52,13 @@ export function warmProductCardNavigation(
 export function buildProductCardNavHandlers(
   payload: ProductCardCachePayload,
   router?: AppRouterInstance,
+  linkColor?: string | null,
 ): {
   onPointerDown: () => void;
   onMouseEnter: () => void;
   onFocus: () => void;
 } {
-  const warm = () => warmProductCardNavigation(payload, router);
+  const warm = () => warmProductCardNavigation(payload, router, linkColor);
   return {
     onPointerDown: warm,
     onMouseEnter: warm,

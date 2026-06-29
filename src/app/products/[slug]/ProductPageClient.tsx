@@ -41,6 +41,7 @@ const RelatedProducts = dynamic(
 export type ProductPageClientProps = {
   slug: string;
   variantIdFromUrl: string | null;
+  colorFromUrl?: string | null;
   initialProduct: Product | null;
   initialLocale: LanguageCode;
   initialNotFound: boolean;
@@ -49,6 +50,7 @@ export type ProductPageClientProps = {
 export function ProductPageClient({
   slug,
   variantIdFromUrl,
+  colorFromUrl = null,
   initialProduct,
   initialLocale,
   initialNotFound,
@@ -102,6 +104,7 @@ export function ProductPageClient({
   } = useProductPage({
     slug,
     variantIdFromUrl,
+    colorFromUrl,
     initialProduct,
     initialLocale,
     initialNotFound,

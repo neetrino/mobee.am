@@ -16,12 +16,13 @@ import { useProductCalculations } from './hooks/useProductCalculations';
 import { getVariantMainImageIndex } from './utils/variant-media';
 import { resolveCompareCategoryId } from '../../../lib/shop/compare-storage';
 import { getMissingRequiredAttributeKeys } from './utils/required-attribute-selection';
-import { findVariantByAllAttributesStrict } from './utils/variant-finders';
+import { findVariantByAllAttributesStrict, findVariantByColorAndSize } from './utils/variant-finders';
 import type { Product } from './types';
 
 export type UseProductPageProps = {
   slug: string;
   variantIdFromUrl: string | null;
+  colorFromUrl?: string | null;
   initialProduct?: Product | null;
   initialLocale?: LanguageCode;
   initialNotFound?: boolean;
@@ -30,6 +31,7 @@ export type UseProductPageProps = {
 export function useProductPage({
   slug,
   variantIdFromUrl,
+  colorFromUrl = null,
   initialProduct = null,
   initialLocale,
   initialNotFound = false,
@@ -175,6 +177,20 @@ export function useProductPage({
       setThumbnailStartIndex(0);
     }
   }, [product, variantIdFromUrl, applyVariantSelection]);
+
+  useEffect(() => {
+    if (!product?.variants?.length || !colorFromUrl || variantIdFromUrl) {
+      return;
+    }
+
+    const variant = findVariantByColorAndSize(product, colorFromUrl, null);
+    if (variant) {
+      applyVariantSelection(variant);
+      return;
+    }
+
+    handleColorSelect(colorFromUrl);
+  }, [product, colorFromUrl, variantIdFromUrl, applyVariantSelection, handleColorSelect]);
 
   const resolveAttributeLabel = (attrKey: string): string => {
     const productAttr = product?.productAttributes?.find((pa) => pa.attribute?.key === attrKey);

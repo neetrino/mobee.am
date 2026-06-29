@@ -7,6 +7,7 @@ import {
   type ProductCardCachePayload,
 } from "../../lib/products/product-card-cache";
 import { buildProductCardNavHandlers } from "../../lib/products/product-card-nav";
+import { buildProductPageHref } from "../../lib/products/product-page-href";
 import { ProductImagePlaceholder } from "../ProductImagePlaceholder";
 import { useRouter } from "next/navigation";
 
@@ -24,6 +25,7 @@ interface ProductCardImageProps {
   /** Eager load for above-the-fold grid cells (LCP on shop / home). */
   imageLoadPriority?: boolean;
   listingCacheSource?: ProductCardCachePayload;
+  linkColor?: string | null;
 }
 
 /**
@@ -40,12 +42,13 @@ export function ProductCardImage({
   squareImageFrame = true,
   imageLoadPriority = false,
   listingCacheSource,
+  linkColor = null,
 }: ProductCardImageProps) {
   const router = useRouter();
   const showPlaceholder = imageError;
   const imageSrc = resolveProductCardImageSrc(image);
   const warmHandlers = listingCacheSource
-    ? buildProductCardNavHandlers(listingCacheSource, router)
+    ? buildProductCardNavHandlers(listingCacheSource, router, linkColor)
     : undefined;
   /** max-lg: frame 90% width vs desktop (171 / 212) so title clears the image on small screens. */
   const frameClass = isCompact
@@ -56,7 +59,7 @@ export function ProductCardImage({
   return (
     <div className={`relative ${aspectClass} shrink-0 ${frameClass}`} data-cart-fly-source>
       <Link
-        href={`/products/${slug}`}
+        href={buildProductPageHref(slug, { color: linkColor })}
         className="absolute inset-0 block"
         aria-label={title}
         prefetch

@@ -11,6 +11,7 @@ import { getStoredLanguage } from '@/lib/language';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
 import { useTranslation } from '@/lib/i18n-client';
 import { parseProductSortOption } from '@/lib/products/sort';
+import { parseListingColorFilter } from '@/lib/shop/listing-color-link';
 import {
   getPaginationPages,
   getPaginationPagesPhoneWindow,
@@ -141,6 +142,7 @@ export function ShopCatalogArea({
 
   const page = parseInt(searchParams.get('page') || '1', 10);
   const sort = parseProductSortOption(searchParams.get('sort') ?? undefined);
+  const selectedFilterColors = parseListingColorFilter(searchParams.get('colors'));
 
   const searchParamsRecord = useMemo(() => {
     const record: Record<string, string | undefined> = {};
@@ -222,7 +224,11 @@ export function ShopCatalogArea({
               className={`relative transition-opacity duration-200 ${refreshing ? 'opacity-60' : 'opacity-100'}`}
               aria-busy={refreshing}
             >
-              <ProductsGrid products={normalizedProducts} sortBy={sort} />
+              <ProductsGrid
+                products={normalizedProducts}
+                sortBy={sort}
+                selectedFilterColors={selectedFilterColors}
+              />
               {refreshing ? (
                 <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center pt-4">
                   <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-gray-600 shadow-sm">

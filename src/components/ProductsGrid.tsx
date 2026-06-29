@@ -17,6 +17,7 @@ import {
   parseProductListingViewMode,
   type ProductListingViewMode,
 } from '@/lib/products/view-mode';
+import { resolveProductCardLinkColor } from '@/lib/shop/listing-color-link';
 
 interface Product {
   id: string;
@@ -36,11 +37,13 @@ interface Product {
   primaryCategoryId?: string | null;
   categoryIds?: string[];
   categories?: Array<{ id: string; slug?: string; title?: string }>;
+  colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
 }
 
 interface ProductsGridProps {
   products: Product[];
   sortBy?: ProductSortOption;
+  selectedFilterColors?: string[];
 }
 
 /**
@@ -57,7 +60,11 @@ function desktopShopGridClass(viewMode: ProductListingViewMode): string {
   return 'grid grid-cols-2 gap-x-2 gap-y-5 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
 }
 
-export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
+export function ProductsGrid({
+  products,
+  sortBy = 'default',
+  selectedFilterColors = [],
+}: ProductsGridProps) {
   const { t } = useTranslation();
   const [isCompactThreeColumn, setIsCompactThreeColumn] = useState(false);
   const [isLegacyDesktopShop, setIsLegacyDesktopShop] = useState(false);
@@ -159,6 +166,10 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
               {...homeCardProps}
               {...LISTING_ADD_BUTTON_NAVIGATES_TO_PRODUCT}
               imageLoadPriority={index < SHOP_LISTING_EAGER_IMAGE_CARD_COUNT}
+              linkColor={resolveProductCardLinkColor(
+                product.colors as Array<{ value: string }> | undefined,
+                selectedFilterColors,
+              )}
             />
           </div>
         ))}

@@ -7,6 +7,7 @@ import { useWishlist } from './hooks/useWishlist';
 import { useCompare } from './hooks/useCompare';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
 import { warmProductCardNavigation } from '../lib/products/product-card-nav';
+import { buildProductPageHref } from '../lib/products/product-page-href';
 import { buildProductCardCachePayload } from '../lib/products/product-card-cache';
 import { useAddToCart } from './hooks/useAddToCart';
 import { useCurrency } from './hooks/useCurrency';
@@ -55,6 +56,8 @@ interface ProductCardProps {
   imageLoadPriority?: boolean;
   /** Listing cards (home/shop): primary button opens PDP instead of adding to cart. */
   addButtonNavigatesToProduct?: boolean;
+  /** Active shop color filter to pre-select on PDP. */
+  linkColor?: string | null;
 }
 
 interface ProductCardBodyProps extends ProductCardProps {
@@ -65,6 +68,7 @@ interface ProductCardBodyProps extends ProductCardProps {
   onWishlistToggle: (event: MouseEvent) => void;
   onCompareToggle: (event: MouseEvent) => void;
   onAddToCart: (event: MouseEvent) => void;
+  linkColor?: string | null;
 }
 
 function ProductCardBody({
@@ -84,6 +88,7 @@ function ProductCardBody({
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
+  linkColor = null,
 }: ProductCardBodyProps) {
   const [imageError, setImageError] = useState(false);
   const isCompact = viewMode === 'grid-3';
@@ -103,6 +108,7 @@ function ProductCardBody({
         onCompareToggle={onCompareToggle}
         onAddToCart={onAddToCart}
         addButtonNavigatesToProduct={addButtonNavigatesToProduct}
+        linkColor={linkColor}
       />
     );
   }
@@ -127,17 +133,15 @@ function ProductCardBody({
       onCompareToggle={onCompareToggle}
       onAddToCart={onAddToCart}
       addButtonNavigatesToProduct={addButtonNavigatesToProduct}
+      linkColor={linkColor}
     />
   );
-}
-
-function buildProductPagePath(slug: string): string {
-  return `/products/${slug}`;
 }
 
 function useProductCardPrimaryActionHandler(
   product: Product,
   addButtonNavigatesToProduct: boolean,
+  linkColor: string | null = null,
 ) {
   const router = useRouter();
   const { isAddingToCart, addToCart } = useAddToCart({
@@ -157,8 +161,8 @@ function useProductCardPrimaryActionHandler(
       event.stopPropagation();
 
       if (addButtonNavigatesToProduct) {
-        warmProductCardNavigation(buildProductCardCachePayload(product), router);
-        router.push(buildProductPagePath(product.slug));
+        warmProductCardNavigation(buildProductCardCachePayload(product), router, linkColor);
+        router.push(buildProductPageHref(product.slug, { color: linkColor }));
         return;
       }
 
@@ -169,7 +173,7 @@ function useProductCardPrimaryActionHandler(
         flySourceEl,
       });
     },
-    [addButtonNavigatesToProduct, addToCart, product, router],
+    [addButtonNavigatesToProduct, addToCart, linkColor, product, router],
   );
 
   return {
@@ -186,6 +190,7 @@ function ProductCardFromListing({
   const { isAddingToCart, handlePrimaryAction } = useProductCardPrimaryActionHandler(
     props.product,
     addButtonNavigatesToProduct,
+    props.linkColor ?? null,
   );
 
   return (
@@ -214,6 +219,7 @@ function ProductCardWithHooks({
   const { isAddingToCart, handlePrimaryAction } = useProductCardPrimaryActionHandler(
     props.product,
     addButtonNavigatesToProduct,
+    props.linkColor ?? null,
   );
 
   const handleWishlistToggle = (event: MouseEvent) => {
