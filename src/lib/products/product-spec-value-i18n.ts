@@ -7,12 +7,15 @@ const YES_NO_CANONICAL: Readonly<Record<string, 'yes' | 'no'>> = {
   no: 'no',
   да: 'yes',
   нет: 'no',
+  კი: 'yes',
+  არა: 'no',
 };
 
 const YES_NO_BY_LOCALE: Readonly<Record<LanguageCode, Readonly<Record<'yes' | 'no', string>>>> = {
   hy: { yes: 'Այո', no: 'Ոչ' },
   en: { yes: 'Yes', no: 'No' },
   ru: { yes: 'Да', no: 'Нет' },
+  ka: { yes: 'კი', no: 'არა' },
 };
 
 /**
