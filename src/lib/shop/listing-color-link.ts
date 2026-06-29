@@ -1,5 +1,15 @@
 export interface ListingProductColor {
   value: string;
+  /** Canonical variant color token for PDP URLs (falls back to `value`). */
+  linkValue?: string;
+}
+
+function normalizeListingColorToken(color: string): string {
+  return color.trim().toLowerCase();
+}
+
+export function resolveListingColorLinkValue(color: ListingProductColor): string {
+  return normalizeListingColorToken(color.linkValue ?? color.value);
 }
 
 /**
@@ -31,7 +41,7 @@ export function resolveProductCardLinkColor(
   }
 
   const productColorValues = new Set(
-    (productColors ?? []).map((color) => color.value.toLowerCase().trim()),
+    (productColors ?? []).map((color) => resolveListingColorLinkValue(color)),
   );
 
   const matchingFilter = selectedFilterColors.find((color) => productColorValues.has(color));

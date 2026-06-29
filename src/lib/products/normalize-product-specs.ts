@@ -8,7 +8,6 @@ import {
   PRODUCT_SPEC_STATUS_ONLY_ARMENIAN,
 } from './product-spec-label-keys';
 import {
-  isOsStatusToken,
   isSectionOnlyLabel,
   looksLikeSpecValue,
   resolveSpecLabelKey,
@@ -405,28 +404,8 @@ export function normalizeProductSpecSections(
   return buildSectionsFromItems(mergedItems, lang);
 }
 
-function stripProductStatusNoise(html: string, lang: LanguageCode | undefined): string {
-  return html.replace(/<p class="product-status">([\s\S]*?)<\/p>/g, (match, inner: string) => {
-    const parts = inner
-      .split('·')
-      .map((part) => decodeHtmlEntities(part).trim())
-      .filter(Boolean)
-      .filter((part) => !isOsStatusToken(part))
-      .map((part) => {
-        const key = resolveSpecLabelKey(part);
-        if (!key) {
-          return part;
-        }
-        const translated = translateSpecLabel(lang, key);
-        return translated || part;
-      });
-
-    if (parts.length === 0) {
-      return '';
-    }
-
-    return `<p class="product-status">${parts.map((part) => escapeHtml(part)).join(' · ')}</p>`;
-  });
+function stripProductStatusNoise(html: string): string {
+  return html.replace(/<p class="product-status">[\s\S]*?<\/p>/g, '');
 }
 
 function renderSections(sections: NormalizedSpecSection[], lang: LanguageCode | undefined): string {
@@ -460,14 +439,14 @@ export function normalizeProductSpecsHtml(lang: LanguageCode | undefined, html: 
   }
 
   if (!html.includes('product-specs')) {
-    return stripProductStatusNoise(html, lang);
+    return stripProductStatusNoise(html);
   }
 
   const tableMatch = html.match(/<table class="product-specs"><tbody>([\s\S]*?)<\/tbody><\/table>/);
   const prefix = html.slice(0, tableMatch?.index ?? html.length);
   const suffix = tableMatch ? html.slice((tableMatch.index ?? 0) + tableMatch[0].length) : '';
 
-  const cleanedPrefix = stripProductStatusNoise(prefix, lang);
+  const cleanedPrefix = stripProductStatusNoise(prefix);
   if (!tableMatch) {
     return cleanedPrefix;
   }

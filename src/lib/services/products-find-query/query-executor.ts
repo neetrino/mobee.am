@@ -13,6 +13,7 @@ import type { ProductSortOption } from "@/lib/products/sort";
 type QueryExecutionContext = {
   listingMode: boolean;
   lang: string;
+  includeCompareDescriptions?: boolean;
 };
 
 function localeTranslationScope(lang: string) {
@@ -22,13 +23,20 @@ function localeTranslationScope(lang: string) {
 /**
  * Lightweight include for shop grid — skips productAttributes and deep attributeValue joins.
  */
-function getListingInclude(lang: string) {
-  const locale = localeTranslationScope(lang);
+function getListingInclude(ctx: QueryExecutionContext) {
+  const { lang, includeCompareDescriptions } = ctx;
+  const descriptionLocales =
+    includeCompareDescriptions && lang !== "hy" ? [lang, "hy"] : [lang];
+  const translations =
+    descriptionLocales.length === 1
+      ? { where: { locale: descriptionLocales[0] } }
+      : { where: { locale: { in: descriptionLocales } } };
+
   return {
-    translations: locale,
+    translations,
     brand: {
       include: {
-        translations: locale,
+        translations: localeTranslationScope(lang),
       },
     },
     variants: {
@@ -41,7 +49,7 @@ function getListingInclude(lang: string) {
     labels: true,
     categories: {
       include: {
-        translations: locale,
+        translations: localeTranslationScope(lang),
       },
     },
   };
@@ -49,7 +57,7 @@ function getListingInclude(lang: string) {
 
 function resolveQueryInclude(ctx: QueryExecutionContext) {
   if (ctx.listingMode) {
-    return getListingInclude(ctx.lang);
+    return getListingInclude(ctx);
   }
   return {
     ...getBaseInclude(),
@@ -155,8 +163,13 @@ export async function executeProductQuery(
   sort: ProductSortOption = "default",
   listingMode = false,
   lang = "en",
+  includeCompareDescriptions = false,
 ): Promise<ProductWithRelations[]> {
-  const ctx: QueryExecutionContext = { listingMode, lang };
+  const ctx: QueryExecutionContext = {
+    listingMode,
+    lang,
+    includeCompareDescriptions,
+  };
   const orderBy = getOrderBy(sort);
 
   if (listingMode) {
@@ -313,7 +326,7 @@ async function executeWithoutAttributeValue(
 ): Promise<ProductWithRelations[]> {
   const orderBy = getOrderBy(sort);
   const include = ctx.listingMode
-    ? getListingInclude(ctx.lang)
+    ? getListingInclude(ctx)
     : getBaseIncludeWithoutAttributeValue();
 
   if (ctx.listingMode) {

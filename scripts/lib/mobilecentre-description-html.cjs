@@ -317,16 +317,12 @@ function buildDescriptionHtml(raw) {
 
   if (rows.length === 0) return null;
 
-  const statusRows = rows.filter((r) => r.type === "status");
   const specRows = normalizeSpecSections(
     truncateRelatedProductRows(rows.filter((r) => r.type !== "status")),
   );
 
   let html = "";
-  if (statusRows.length > 0) {
-    html += `<p class="product-status">${statusRows.map((r) => escapeHtml(r.label)).join(" · ")}</p>`;
-  }
-
+  // Status tokens (Այո, iOS, «Առկա է խանութներում») are noise above the spec table — omit them.
   if (specRows.length > 0) {
     html += `<table class="product-specs"><tbody>`;
     for (const row of specRows) {

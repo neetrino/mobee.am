@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import type { MouseEvent, MutableRefObject, ReactNode } from 'react';
 import Image from 'next/image';
 import { apiClient } from '../../lib/api-client';
@@ -8,9 +8,11 @@ import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWit
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
+import { getStoredLanguage } from '../../lib/language';
 import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
 import { showToast } from '../../components/Toast';
 import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
+import { buildCompareSpecTableRows } from '../../lib/products/extract-compare-product-specs';
 import { ProductCardNavLink } from '../../components/ProductCard/ProductCardNavLink';
 
 export interface CompareTableProduct {
@@ -28,7 +30,8 @@ export interface CompareTableProduct {
     id: string;
     name: string;
   } | null;
-  description?: string;
+  description?: string | null;
+  sourceDescription?: string | null;
 }
 
 interface CompareGroupTableProps {
@@ -127,6 +130,21 @@ const CompareGroupTableComponent = ({
   addToCartInFlightRef,
   onRemove,
 }: CompareGroupTableProps) => {
+  const language = getStoredLanguage();
+
+  const descriptionSpecRows = useMemo(
+    () =>
+      buildCompareSpecTableRows(
+        products.map((product) => ({
+          id: product.id,
+          description: product.description,
+          sourceDescription: product.sourceDescription,
+        })),
+        language,
+      ),
+    [products, language],
+  );
+
   const handleAddToCart = useCallback(
     (e: MouseEvent, product: CompareTableProduct) => {
       e.preventDefault();
@@ -306,6 +324,17 @@ const CompareGroupTableComponent = ({
     },
   ];
 
+  const allRows = [
+    ...rows,
+    ...descriptionSpecRows.map((specRow) => ({
+      id: specRow.id,
+      label: specRow.label,
+      renderCell: (product: CompareTableProduct) => (
+        <span>{specRow.valuesByProductId.get(product.id) ?? '-'}</span>
+      ),
+    })),
+  ];
+
   return (
     <section className="mb-10 last:mb-0" aria-labelledby={sectionDomId}>
       <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
@@ -328,7 +357,7 @@ const CompareGroupTableComponent = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {rows.map((row) => (
+              {allRows.map((row) => (
                 <tr key={row.id} className="transition-colors hover:bg-gray-50">
                   <td className="sticky left-0 z-10 bg-gray-50 px-4 py-4 text-sm font-medium text-gray-700">
                     {row.label}

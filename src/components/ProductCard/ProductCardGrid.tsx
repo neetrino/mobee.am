@@ -31,7 +31,7 @@ interface ProductCardGridProps {
     compareAtPrice?: number | null;
     originalPrice?: number | null;
     discountPercent?: number | null;
-    colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+    colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
   };
   currency: CurrencyCode;
   isInWishlist: boolean;
@@ -55,6 +55,9 @@ interface ProductCardGridProps {
   onAddToCart: (e: MouseEvent) => void;
   addButtonNavigatesToProduct?: boolean;
   linkColor?: string | null;
+  selectedCardLinkColor?: string | null;
+  colorsInteractive?: boolean;
+  onCardColorSelect?: (color: { value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }) => void;
 }
 
 /**
@@ -80,6 +83,9 @@ export function ProductCardGrid({
   onAddToCart,
   addButtonNavigatesToProduct = false,
   linkColor = null,
+  selectedCardLinkColor = null,
+  colorsInteractive = false,
+  onCardColorSelect,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
@@ -221,6 +227,9 @@ export function ProductCardGrid({
           titleSizeMobileFigma={homeProductGridCard}
           listingCacheSource={buildProductCardCachePayload(product)}
           linkColor={linkColor}
+          selectedCardLinkColor={selectedCardLinkColor}
+          colorsInteractive={colorsInteractive}
+          onCardColorSelect={onCardColorSelect}
         />
         <div className={infoPricePad}>
           <ProductCardPriceBlock

@@ -29,6 +29,7 @@ describe('getVariantMedia', () => {
     expect(getVariantMedia(baseProduct, variant)).toEqual([
       'https://r2.example/products/mobilecentre/1/main.png',
       'https://r2.example/products/mobilecentre/1/gallery-1.png',
+      'https://r2.example/products/p1/fallback.png',
     ]);
   });
 
@@ -43,6 +44,52 @@ describe('getVariantMedia', () => {
     };
 
     expect(getVariantMedia(baseProduct, variant)).toEqual([
+      'https://r2.example/products/p1/fallback.png',
+    ]);
+  });
+
+  it('merges product gallery when variant only has imageUrl', () => {
+    const product: Product = {
+      ...baseProduct,
+      media: [
+        { url: 'https://r2.example/products/p1/gallery-1.png' },
+        { url: 'https://r2.example/products/p1/gallery-2.png' },
+        { url: 'https://r2.example/products/p1/gallery-3.png' },
+      ],
+    };
+    const variant: ProductVariant = {
+      id: 'v3',
+      sku: 'mc-3',
+      price: 100,
+      stock: 5,
+      available: true,
+      options: [],
+      imageUrl: 'https://r2.example/products/p1/main.png',
+    };
+
+    expect(getVariantMedia(product, variant)).toEqual([
+      'https://r2.example/products/p1/main.png',
+      'https://r2.example/products/p1/gallery-1.png',
+      'https://r2.example/products/p1/gallery-2.png',
+      'https://r2.example/products/p1/gallery-3.png',
+    ]);
+  });
+
+  it('splits comma-separated variant imageUrl into multiple gallery images', () => {
+    const variant: ProductVariant = {
+      id: 'v4',
+      sku: 'mc-4',
+      price: 100,
+      stock: 5,
+      available: true,
+      options: [],
+      imageUrl:
+        'https://r2.example/products/p1/a.png,https://r2.example/products/p1/b.png',
+    };
+
+    expect(getVariantMedia(baseProduct, variant)).toEqual([
+      'https://r2.example/products/p1/a.png',
+      'https://r2.example/products/p1/b.png',
       'https://r2.example/products/p1/fallback.png',
     ]);
   });

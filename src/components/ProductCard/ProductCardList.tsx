@@ -30,7 +30,7 @@ interface ProductCardListProps {
     compareAtPrice?: number | null;
     originalPrice?: number | null;
     discountPercent?: number | null;
-    colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+    colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
   };
   currency: CurrencyCode;
   isInWishlist: boolean;
@@ -44,6 +44,9 @@ interface ProductCardListProps {
   onAddToCart: (e: MouseEvent) => void;
   addButtonNavigatesToProduct?: boolean;
   linkColor?: string | null;
+  selectedCardLinkColor?: string | null;
+  colorsInteractive?: boolean;
+  onCardColorSelect?: (color: { value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }) => void;
 }
 
 /**
@@ -63,6 +66,9 @@ export function ProductCardList({
   onAddToCart,
   addButtonNavigatesToProduct = false,
   linkColor = null,
+  selectedCardLinkColor = null,
+  colorsInteractive = false,
+  onCardColorSelect,
 }: ProductCardListProps) {
   const { t } = useTranslation();
   const categoryLine = getProductCardCategoryLineLabel(product);
@@ -127,7 +133,13 @@ export function ProductCardList({
           {/* Available Colors */}
           {product.colors && product.colors.length > 0 && (
             <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-              <ProductColors colors={product.colors} maxVisible={6} />
+              <ProductColors
+                colors={product.colors}
+                maxVisible={6}
+                interactive={colorsInteractive}
+                selectedLinkValue={selectedCardLinkColor ?? linkColor}
+                onColorSelect={onCardColorSelect}
+              />
             </div>
           )}
         </div>

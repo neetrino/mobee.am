@@ -3,11 +3,14 @@ import { cacheService } from "./cache.service";
 import { ProductWithRelations } from "./products-find-query.service";
 import {
   findListingDisplayVariant,
+  getVariantColorLinkValue,
   resolveListingProductImage,
 } from "./products-listing-display-variant";
 
 export type ProductListingTransformContext = {
   colors?: string;
+  /** Compare tray: include description HTML for spec extraction. */
+  includeDescriptions?: boolean;
 };
 
 const DISCOUNT_CONTEXT_CACHE_KEY = "product-list:discount-context";
@@ -112,7 +115,7 @@ class ProductsFindTransformService {
       // Get all unique colors from ALL variants with imageUrl and colors hex (support both new and old format)
       // IMPORTANT: Only collect colors that actually exist in variants
       // IMPORTANT: Process ALL variants to get ALL colors, not just the first variant
-      const colorMap = new Map<string, { value: string; imageUrl?: string | null; colors?: string[] | null }>();
+      const colorMap = new Map<string, { value: string; linkValue: string; imageUrl?: string | null; colors?: string[] | null }>();
       
       
       // Process all variants to collect all unique colors
@@ -148,10 +151,17 @@ class ProductsFindTransformService {
           
           if (colorValue) {
             const normalizedValue = colorValue.trim().toLowerCase();
+            const canonicalValue = (
+              ('attributeValue' in colorOption && colorOption.attributeValue?.value) ||
+              colorOption.value ||
+              colorValue
+            ).trim();
+            const linkValue = canonicalValue.toLowerCase();
             // Store color with imageUrl and colors hex if not already stored or if we have better data
             if (!colorMap.has(normalizedValue) || (imageUrl && !colorMap.get(normalizedValue)?.imageUrl)) {
               colorMap.set(normalizedValue, {
                 value: colorValue.trim(),
+                linkValue,
                 imageUrl: imageUrl || null,
                 colors: colorsHex || null,
               });
@@ -174,6 +184,7 @@ class ProductsFindTransformService {
               if (!colorMap.has(normalizedValue)) {
                 colorMap.set(normalizedValue, {
                   value: colorValue.trim(),
+                  linkValue: colorValue.trim().toLowerCase(),
                   imageUrl: null,
                   colors: null,
                 });
@@ -205,6 +216,7 @@ class ProductsFindTransformService {
                   if (attrValue.imageUrl || attrValue.colors) {
                     colorMap.set(normalizedValue, {
                       value: colorValue.trim(),
+                      linkValue: existing?.linkValue ?? colorValue.trim().toLowerCase(),
                       imageUrl: attrValue.imageUrl || existing?.imageUrl || null,
                       colors: attrValue.colors || existing?.colors || null,
                     });
@@ -217,6 +229,10 @@ class ProductsFindTransformService {
       }
       
       const availableColors = Array.from(colorMap.values());
+      const displayColorSource = displayVariant ?? variant;
+      const displayColor = displayColorSource
+        ? getVariantColorLinkValue(displayColorSource, lang)
+        : null;
 
       const originalPrice = variant?.price || 0;
       let finalPrice = originalPrice;
@@ -292,7 +308,17 @@ class ProductsFindTransformService {
               color: label.color,
             }))
           : [],
-        colors: availableColors, // Add available colors array
+        colors: availableColors,
+        displayColor,
+        ...(listingContext?.includeDescriptions
+          ? {
+              description: translation?.descriptionHtml || null,
+              sourceDescription:
+                translations.find((t: { locale: string }) => t.locale === 'hy')?.descriptionHtml ||
+                translation?.descriptionHtml ||
+                null,
+            }
+          : {}),
       };
     });
 
