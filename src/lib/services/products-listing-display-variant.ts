@@ -12,6 +12,64 @@ function normalizeColorFilterList(colors?: string): string[] {
     .filter((value) => value.length > 0 && value !== "undefined" && value !== "null");
 }
 
+/**
+ * Canonical color token for PDP query params (variant option value, lowercased).
+ */
+export function getVariantColorLinkValue(
+  variant: ListingVariant,
+  lang = "en",
+): string | null {
+  const options = Array.isArray(variant.options) ? variant.options : [];
+
+  for (const opt of options) {
+    if ("attributeValue" in opt && opt.attributeValue) {
+      if (opt.attributeValue.attribute?.key !== "color") continue;
+      const raw = opt.attributeValue.value || opt.value;
+      if (typeof raw === "string" && raw.trim()) {
+        return raw.trim().toLowerCase();
+      }
+    }
+
+    const legacy = opt as {
+      attributeKey?: string | null;
+      key?: string;
+      attribute?: string;
+      value?: string | null;
+    };
+
+    if (
+      legacy.attributeKey === "color" ||
+      legacy.key === "color" ||
+      legacy.attribute === "color"
+    ) {
+      const label = getOptionColorValue(opt, lang);
+      const raw = legacy.value?.trim() || label;
+      if (raw) return raw.toLowerCase();
+    }
+  }
+
+  if (
+    variant.attributes &&
+    typeof variant.attributes === "object" &&
+    !Array.isArray(variant.attributes) &&
+    "color" in variant.attributes
+  ) {
+    const colorAttr = (variant.attributes as { color?: unknown }).color;
+    const items = Array.isArray(colorAttr) ? colorAttr : colorAttr ? [colorAttr] : [];
+    for (const item of items) {
+      const raw =
+        item && typeof item === "object" && "value" in item
+          ? (item as { value?: unknown }).value
+          : item;
+      if (typeof raw === "string" && raw.trim()) {
+        return raw.trim().toLowerCase();
+      }
+    }
+  }
+
+  return null;
+}
+
 function getOptionColorValue(opt: ListingOption, lang: string): string | null {
   if (!opt) return null;
 

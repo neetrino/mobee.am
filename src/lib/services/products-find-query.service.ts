@@ -42,6 +42,7 @@ class ProductsFindQueryService {
         filters.sort,
         listingMode,
         lang,
+        isIdsBatchLookup,
       );
       return {
         products,

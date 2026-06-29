@@ -14,6 +14,7 @@ import { useCurrency } from './hooks/useCurrency';
 import { resolveCompareCategoryId } from '../lib/shop/compare-storage';
 import { ProductCardList } from './ProductCard/ProductCardList';
 import { ProductCardGrid } from './ProductCard/ProductCardGrid';
+import { useProductCardColorState } from './ProductCard/useProductCardColorState';
 import {
   useProductCardListingInteractions,
   type ProductCardListingInteractions,
@@ -37,7 +38,8 @@ interface Product {
   originalPrice?: number | null;
   globalDiscount?: number | null;
   discountPercent?: number | null;
-  colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+  colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
+  displayColor?: string | null;
   primaryCategoryId?: string | null;
   categoryIds?: string[];
   categories?: Array<{ id: string; slug?: string; title?: string }>;
@@ -69,6 +71,10 @@ interface ProductCardBodyProps extends ProductCardProps {
   onCompareToggle: (event: MouseEvent) => void;
   onAddToCart: (event: MouseEvent) => void;
   linkColor?: string | null;
+  displayImage?: string | null;
+  selectedCardLinkColor?: string | null;
+  colorsInteractive?: boolean;
+  onCardColorSelect?: (color: { value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }) => void;
 }
 
 function ProductCardBody({
@@ -89,14 +95,19 @@ function ProductCardBody({
   onCompareToggle,
   onAddToCart,
   linkColor = null,
+  displayImage,
+  selectedCardLinkColor = null,
+  colorsInteractive = false,
+  onCardColorSelect,
 }: ProductCardBodyProps) {
   const [imageError, setImageError] = useState(false);
   const isCompact = viewMode === 'grid-3';
+  const cardImage = displayImage ?? product.image;
 
   if (viewMode === 'list') {
     return (
       <ProductCardList
-        product={product}
+        product={{ ...product, image: cardImage }}
         currency={currency}
         isInWishlist={isInWishlist}
         isInCompare={isInCompare}
@@ -109,13 +120,16 @@ function ProductCardBody({
         onAddToCart={onAddToCart}
         addButtonNavigatesToProduct={addButtonNavigatesToProduct}
         linkColor={linkColor}
+        selectedCardLinkColor={selectedCardLinkColor}
+        colorsInteractive={colorsInteractive}
+        onCardColorSelect={onCardColorSelect}
       />
     );
   }
 
   return (
     <ProductCardGrid
-      product={product}
+      product={{ ...product, image: cardImage }}
       currency={currency}
       isInWishlist={isInWishlist}
       isInCompare={isInCompare}
@@ -134,6 +148,9 @@ function ProductCardBody({
       onAddToCart={onAddToCart}
       addButtonNavigatesToProduct={addButtonNavigatesToProduct}
       linkColor={linkColor}
+      selectedCardLinkColor={selectedCardLinkColor}
+      colorsInteractive={colorsInteractive}
+      onCardColorSelect={onCardColorSelect}
     />
   );
 }
@@ -187,10 +204,17 @@ function ProductCardFromListing({
   addButtonNavigatesToProduct = false,
   ...props
 }: ProductCardProps & { listing: ProductCardListingInteractions }) {
+  const {
+    effectiveLinkColor,
+    displayImage,
+    selectedCardLinkColor,
+    colorsInteractive,
+    handleColorSelect,
+  } = useProductCardColorState(props.product, props.linkColor ?? null);
   const { isAddingToCart, handlePrimaryAction } = useProductCardPrimaryActionHandler(
     props.product,
     addButtonNavigatesToProduct,
-    props.linkColor ?? null,
+    effectiveLinkColor,
   );
 
   return (
@@ -204,6 +228,11 @@ function ProductCardFromListing({
       onCompareToggle={listing.onCompareToggle}
       onAddToCart={handlePrimaryAction}
       addButtonNavigatesToProduct={addButtonNavigatesToProduct}
+      linkColor={effectiveLinkColor}
+      displayImage={displayImage}
+      selectedCardLinkColor={selectedCardLinkColor}
+      colorsInteractive={colorsInteractive}
+      onCardColorSelect={handleColorSelect}
     />
   );
 }
@@ -216,10 +245,17 @@ function ProductCardWithHooks({
   const { isInWishlist, toggleWishlist } = useWishlist(props.product.id);
   const compareCategoryId = resolveCompareCategoryId(props.product);
   const { isInCompare, toggleCompare } = useCompare(props.product.id, compareCategoryId);
+  const {
+    effectiveLinkColor,
+    displayImage,
+    selectedCardLinkColor,
+    colorsInteractive,
+    handleColorSelect,
+  } = useProductCardColorState(props.product, props.linkColor ?? null);
   const { isAddingToCart, handlePrimaryAction } = useProductCardPrimaryActionHandler(
     props.product,
     addButtonNavigatesToProduct,
-    props.linkColor ?? null,
+    effectiveLinkColor,
   );
 
   const handleWishlistToggle = (event: MouseEvent) => {
@@ -245,6 +281,11 @@ function ProductCardWithHooks({
       onCompareToggle={handleCompareToggle}
       onAddToCart={handlePrimaryAction}
       addButtonNavigatesToProduct={addButtonNavigatesToProduct}
+      linkColor={effectiveLinkColor}
+      displayImage={displayImage}
+      selectedCardLinkColor={selectedCardLinkColor}
+      colorsInteractive={colorsInteractive}
+      onCardColorSelect={handleColorSelect}
     />
   );
 }

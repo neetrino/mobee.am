@@ -37,7 +37,8 @@ export function variantHasColor(
   // Check if any color option matches
   return colorOptions.some((opt) => {
     const optValue = opt.value?.toLowerCase().trim();
-    return optValue === normalizedColor;
+    const optValueId = opt.valueId?.toLowerCase().trim();
+    return optValue === normalizedColor || optValueId === normalizedColor;
   });
 }
 

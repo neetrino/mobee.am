@@ -1,14 +1,62 @@
 import type { Product, ProductMedia, ProductVariant } from '../types';
-import { processImageUrl } from '../../../../lib/utils/image-utils';
+import { processImageUrl, smartSplitUrls } from '../../../../lib/utils/image-utils';
 
 function extractMediaUrl(item: ProductMedia | string): string | null {
   if (typeof item === 'string') return item || null;
   return item?.url || null;
 }
 
+function dedupeUrls(urls: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const url of urls) {
+    if (!url || seen.has(url)) {
+      continue;
+    }
+    seen.add(url);
+    result.push(url);
+  }
+
+  return result;
+}
+
+function collectProductMediaUrls(product: Product): string[] {
+  return (product.media ?? [])
+    .map(extractMediaUrl)
+    .filter((url): url is string => Boolean(url));
+}
+
+function collectVariantImageUrls(selectedVariant: ProductVariant): string[] {
+  const fromImageUrl = selectedVariant.imageUrl
+    ? smartSplitUrls(selectedVariant.imageUrl)
+        .map((url) => processImageUrl(url))
+        .filter((url): url is string => Boolean(url))
+    : [];
+
+  const fromMedia = (selectedVariant.media ?? [])
+    .map(extractMediaUrl)
+    .filter((url): url is string => Boolean(url));
+
+  return dedupeUrls([...fromImageUrl, ...fromMedia]);
+}
+
+function mergeVariantAndProductGallery(
+  variantUrls: string[],
+  productUrls: string[],
+): string[] {
+  if (variantUrls.length === 0) {
+    return dedupeUrls(productUrls);
+  }
+
+  const variantSet = new Set(variantUrls);
+  const productExtras = productUrls.filter((url) => !variantSet.has(url));
+  return dedupeUrls([...variantUrls, ...productExtras]);
+}
+
 /**
  * Returns the active gallery for the selected variant.
- * Falls back to product.media when variant has no dedicated media.
+ * Merges variant images with product-level gallery (deduped).
  */
 export function getVariantMedia(
   product: Product | null,
@@ -16,31 +64,14 @@ export function getVariantMedia(
 ): string[] {
   if (!product) return [];
 
-  const variantMedia = (selectedVariant?.media ?? [])
-    .map(extractMediaUrl)
-    .filter((url): url is string => Boolean(url));
+  const productUrls = collectProductMediaUrls(product);
 
-  if (variantMedia.length > 0) {
-    const mainUrl = selectedVariant?.imageUrl
-      ? processImageUrl(selectedVariant.imageUrl)
-      : null;
-    if (mainUrl && variantMedia[0] !== mainUrl) {
-      const withoutMain = variantMedia.filter((url) => url !== mainUrl);
-      return [mainUrl, ...withoutMain];
-    }
-    return variantMedia;
+  if (!selectedVariant) {
+    return dedupeUrls(productUrls);
   }
 
-  if (selectedVariant?.imageUrl) {
-    const processed = processImageUrl(selectedVariant.imageUrl);
-    if (processed) return [processed];
-  }
-
-  const productMedia = (product.media ?? [])
-    .map(extractMediaUrl)
-    .filter((url): url is string => Boolean(url));
-
-  return productMedia;
+  const variantUrls = collectVariantImageUrls(selectedVariant);
+  return mergeVariantAndProductGallery(variantUrls, productUrls);
 }
 
 export function getVariantMainImageIndex(
@@ -51,9 +82,16 @@ export function getVariantMainImageIndex(
     return 0;
   }
 
-  const mainUrl = processImageUrl(selectedVariant.imageUrl);
-  if (!mainUrl) return 0;
+  const mainCandidates = smartSplitUrls(selectedVariant.imageUrl)
+    .map((url) => processImageUrl(url))
+    .filter((url): url is string => Boolean(url));
 
-  const index = images.findIndex((img) => img === mainUrl);
-  return index >= 0 ? index : 0;
+  for (const mainUrl of mainCandidates) {
+    const index = images.findIndex((img) => img === mainUrl);
+    if (index >= 0) {
+      return index;
+    }
+  }
+
+  return 0;
 }

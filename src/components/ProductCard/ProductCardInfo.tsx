@@ -18,7 +18,7 @@ interface ProductCardInfoProps {
   price: number;
   discountPercent?: number | null;
   currency: CurrencyCode;
-  colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+  colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
   isCompact?: boolean;
   /** Figma mobee-new: price lives in the bordered footer row with the add button */
   hidePrice?: boolean;
@@ -28,6 +28,9 @@ interface ProductCardInfoProps {
   titleSizeMobileFigma?: boolean;
   listingCacheSource?: ProductCardCachePayload;
   linkColor?: string | null;
+  selectedCardLinkColor?: string | null;
+  colorsInteractive?: boolean;
+  onCardColorSelect?: (color: { value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }) => void;
 }
 
 /**
@@ -48,6 +51,9 @@ export function ProductCardInfo({
   titleSizeMobileFigma = false,
   listingCacheSource,
   linkColor = null,
+  selectedCardLinkColor = null,
+  colorsInteractive = false,
+  onCardColorSelect,
 }: ProductCardInfoProps) {
   const { t } = useTranslation();
 
@@ -116,7 +122,13 @@ export function ProductCardInfo({
 
       {/* Available Colors */}
       {colors && colors.length > 0 && (
-        <ProductColors colors={colors} isCompact={isCompact} />
+        <ProductColors
+          colors={colors}
+          isCompact={isCompact}
+          interactive={colorsInteractive}
+          selectedLinkValue={selectedCardLinkColor ?? linkColor}
+          onColorSelect={onCardColorSelect}
+        />
       )}
 
       {!hidePrice ? (
