@@ -6,6 +6,9 @@ import { ProductSpecRow } from './ProductSpecCard';
 import { getProductSpecSectionIcon, getProductSpecSectionIconClassName } from './product-spec-row-icon';
 import { PRODUCT_DESCRIPTION_CARD_CLASS } from './product-description.constants';
 
+const HeroSectionIcon = getProductSpecSectionIcon('general');
+const HERO_SECTION_ICON_CLASS = getProductSpecSectionIconClassName('general');
+
 const HERO_GRID_CLASS =
   'grid grid-cols-[minmax(0,0.95fr)_minmax(0,1.55fr)] items-start gap-8 [direction:ltr]';
 
@@ -34,8 +37,6 @@ function filterHeroRows(rows: ProductDescriptionSpecRow[], imageAlt: string): Pr
 
 export function ProductHeroCard({ imageAlt, imageUrl, rows, language }: ProductHeroCardProps) {
   const visibleRows = filterHeroRows(rows, imageAlt);
-  const HeroIcon = getProductSpecSectionIcon('general');
-  const heroIconClassName = getProductSpecSectionIconClassName('general');
 
   return (
     <article className={PRODUCT_DESCRIPTION_CARD_CLASS}>
@@ -50,9 +51,9 @@ export function ProductHeroCard({ imageAlt, imageUrl, rows, language }: ProductH
           <div className="col-start-2 row-start-1 min-w-0">
             <header className="mb-4 flex items-center gap-2.5">
               <span
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${heroIconClassName}`}
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${HERO_SECTION_ICON_CLASS}`}
               >
-                <HeroIcon className="h-4 w-4" aria-hidden />
+                <HeroSectionIcon className="h-4 w-4" aria-hidden />
               </span>
               <h3 className="text-base font-bold text-gray-900">
                 {t(language, 'product.specs.sections.general')}

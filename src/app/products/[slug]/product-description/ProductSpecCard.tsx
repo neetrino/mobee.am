@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import { ChevronRight } from 'lucide-react';
 import type { LanguageCode } from '@/lib/language';
 import { isAffirmativeSpecValue } from '@/lib/products/product-spec-value-i18n';
@@ -15,12 +16,14 @@ interface ProductSpecRowProps {
 }
 
 export function ProductSpecRow({ row, language, showChevron = false }: ProductSpecRowProps) {
-  const Icon = getProductSpecRowIcon(row.labelKey);
   const isPositive = isAffirmativeSpecValue(row.value, language);
 
   return (
     <div className={ROW_CLASS}>
-      <Icon className="h-5 w-5 shrink-0 text-gray-400" aria-hidden />
+      {createElement(getProductSpecRowIcon(row.labelKey), {
+        className: 'h-5 w-5 shrink-0 text-gray-400',
+        'aria-hidden': true,
+      })}
       <span className="min-w-0 flex-1 text-sm text-gray-500">{row.label}</span>
       <span
         className={
@@ -59,7 +62,6 @@ export function ProductSpecCard({
     return null;
   }
 
-  const SectionIcon = getProductSpecSectionIcon(sectionSlug);
   const sectionIconClassName = getProductSpecSectionIconClassName(sectionSlug);
 
   return (
@@ -68,7 +70,10 @@ export function ProductSpecCard({
         <span
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${sectionIconClassName}`}
         >
-          <SectionIcon className="h-4 w-4" aria-hidden />
+          {createElement(getProductSpecSectionIcon(sectionSlug), {
+            className: 'h-4 w-4',
+            'aria-hidden': true,
+          })}
         </span>
         <h3 className="text-base font-bold text-gray-900">{title}</h3>
       </header>

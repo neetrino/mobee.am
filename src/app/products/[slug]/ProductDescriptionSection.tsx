@@ -22,12 +22,11 @@ export function ProductDescriptionSection({
   language,
   mainImageUrl,
 }: ProductDescriptionSectionProps) {
-  const descriptionSources = {
-    description: product.description,
-    sourceDescription: product.sourceDescription,
-  };
-
   const { specsResult, layout, fullHtml } = useMemo(() => {
+    const descriptionSources = {
+      description: product.description,
+      sourceDescription: product.sourceDescription,
+    };
     const extracted = extractProductDescriptionSpecs(language, product.id, descriptionSources);
     const layoutResult = buildPdpSpecLayout(extracted.sections);
     const html = getProductDescriptionHtml(language, product.id, descriptionSources);
@@ -37,7 +36,7 @@ export function ProductDescriptionSection({
       layout: layoutResult,
       fullHtml: html,
     };
-  }, [language, product.description, product.id, product.sourceDescription]);
+  }, [language, product]);
 
   const resolvedImageUrl = resolveProductCardImageSrc(mainImageUrl ?? product.image);
   const showDesktopCards = specsResult.hasSpecs && layout.hasLayout;
