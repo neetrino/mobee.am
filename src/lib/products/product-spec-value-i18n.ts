@@ -38,3 +38,13 @@ export function translateSpecValue(lang: LanguageCode | undefined, value: string
 export function isYesNoSpecValue(value: string): boolean {
   return YES_NO_CANONICAL[value.trim().toLowerCase()] !== undefined;
 }
+
+export function isAffirmativeSpecValue(value: string, lang: LanguageCode | undefined): boolean {
+  const trimmed = value.trim().toLowerCase();
+  if (YES_NO_CANONICAL[trimmed] === 'yes') {
+    return true;
+  }
+
+  const locale = lang ?? 'hy';
+  return value.trim() === YES_NO_BY_LOCALE[locale].yes;
+}
