@@ -41,7 +41,8 @@
       "power": "Battery",
       "physical": "Physical characteristics",
       "warranty": "Warranty",
-      "other": "Other"
+      "other": "Other",
+      "security": "Security"
     },
     "labels": {
       "availableInStores": "Available in stores",
