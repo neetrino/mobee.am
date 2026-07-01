@@ -169,6 +169,7 @@ export function ShopCatalogArea({
         brand: p.brand ?? null,
         defaultVariantId: p.defaultVariantId ?? null,
         colors: p.colors ?? [],
+        displayColor: p.displayColor ?? null,
         labels: p.labels ?? [],
         primaryCategoryId: p.primaryCategoryId ?? null,
         categoryIds: Array.isArray(p.categoryIds) ? [...p.categoryIds] : [],

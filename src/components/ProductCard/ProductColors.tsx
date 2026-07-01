@@ -26,6 +26,30 @@ function toColorOption(colorData: string | ColorData): ProductCardColorOption {
   return colorData;
 }
 
+function orderColorsForDisplay(
+  colors: Array<string | ColorData>,
+  displayLinkValue: string | null,
+): Array<string | ColorData> {
+  if (!displayLinkValue || colors.length <= 1) {
+    return colors;
+  }
+
+  const normalizedDisplay = displayLinkValue.trim().toLowerCase();
+  const matchIndex = colors.findIndex((colorData) => {
+    const option = toColorOption(colorData);
+    return resolveProductCardColorLinkValue(option) === normalizedDisplay;
+  });
+
+  if (matchIndex <= 0) {
+    return colors;
+  }
+
+  const reordered = [...colors];
+  const [matchedColor] = reordered.splice(matchIndex, 1);
+  reordered.unshift(matchedColor);
+  return reordered;
+}
+
 /**
  * Component for displaying product color options
  */
@@ -43,10 +67,11 @@ export function ProductColors({
 
   const swatchSizeClass = isCompact ? 'w-4 h-4' : 'w-5 h-5';
   const selectedRingClass = 'ring-2 ring-[#2db2ff] ring-offset-1';
+  const orderedColors = orderColorsForDisplay(colors, selectedLinkValue);
 
   return (
     <div className={`flex items-center gap-1.5 ${isCompact ? 'mb-1' : 'mb-2'} flex-wrap`}>
-      {colors.slice(0, maxVisible).map((colorData, index) => {
+      {orderedColors.slice(0, maxVisible).map((colorData, index) => {
         const colorOption = toColorOption(colorData);
         const colorValue = colorOption.value;
         const imageUrl = colorOption.imageUrl ?? null;
@@ -100,10 +125,11 @@ export function ProductColors({
         return (
           <div
             key={`${linkValue}-${index}`}
-            className={`${swatchSizeClass} rounded-full border border-gray-300 flex-shrink-0 overflow-hidden`}
+            className={`${swatchSizeClass} rounded-full border border-gray-300 flex-shrink-0 overflow-hidden ${isSelected ? selectedRingClass : ''}`}
             style={swatchStyle}
             title={colorValue}
             aria-label={`Color: ${colorValue}`}
+            aria-current={isSelected ? 'true' : undefined}
           >
             {swatchContent}
           </div>

@@ -22,7 +22,8 @@ export interface ShopCatalogProduct {
   inStock: boolean;
   brand: { id: string; name: string } | null;
   defaultVariantId?: string | null;
-  colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+  colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
+  displayColor?: string | null;
   originalPrice?: number | null;
   discountPercent?: number | null;
   labels?: Array<{

@@ -32,6 +32,7 @@ export const APPLE_PRODUCT_WHITELIST = [
   "iPad Air 13 M4",
   "iPad Pro 11 M5",
   "iPad Pro 13 M5",
+  "iPad mini",
   "iPad mini OLED",
   "iPad A18",
   "Apple Watch SE 3",

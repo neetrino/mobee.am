@@ -3,7 +3,7 @@ import { cacheService } from "./cache.service";
 import { ProductWithRelations } from "./products-find-query.service";
 import {
   findListingDisplayVariant,
-  getVariantColorLinkValue,
+  resolveListingDisplayColor,
   resolveListingProductImage,
 } from "./products-listing-display-variant";
 
@@ -229,10 +229,20 @@ class ProductsFindTransformService {
       }
       
       const availableColors = Array.from(colorMap.values());
-      const displayColorSource = displayVariant ?? variant;
-      const displayColor = displayColorSource
-        ? getVariantColorLinkValue(displayColorSource, lang)
-        : null;
+      const listingImage = resolveListingProductImage(
+        product,
+        displayVariant,
+        listingContext?.colors,
+        lang,
+      );
+      const displayColor = resolveListingDisplayColor(
+        variants,
+        displayVariant,
+        listingImage,
+        availableColors,
+        variant,
+        lang,
+      );
 
       const originalPrice = variant?.price || 0;
       let finalPrice = originalPrice;
@@ -292,12 +302,7 @@ class ProductsFindTransformService {
         originalPrice: appliedDiscount > 0 ? originalPrice : variant?.compareAtPrice || null,
         compareAtPrice: variant?.compareAtPrice || null,
         discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
-        image: resolveListingProductImage(
-          product,
-          displayVariant,
-          listingContext?.colors,
-          lang,
-        ),
+        image: listingImage,
         inStock: (variant?.stock || 0) > 0,
         labels: Array.isArray(product.labels)
           ? product.labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({

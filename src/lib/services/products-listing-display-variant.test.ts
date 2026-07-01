@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   findListingDisplayVariant,
+  resolveListingDisplayColor,
   resolveListingProductImage,
 } from "./products-listing-display-variant";
 import type { ProductWithRelations } from "./products-find-query.service";
@@ -77,5 +78,56 @@ describe("resolveListingProductImage", () => {
     expect(resolveListingProductImage(product, displayVariant, "orange", "en")).toBe(
       "https://cdn.example/orange.png",
     );
+  });
+});
+
+describe("resolveListingDisplayColor", () => {
+  const variants = [
+    {
+      id: "v-pink",
+      price: 100,
+      stock: 5,
+      imageUrl: "https://cdn.example/pink.png",
+      options: [{ attributeKey: "color", value: "Soft Pink" }],
+    },
+    {
+      id: "v-black",
+      price: 120,
+      stock: 3,
+      imageUrl: "https://cdn.example/black.png",
+      options: [{ attributeKey: "color", value: "Black" }],
+    },
+  ] as ProductWithRelations["variants"];
+
+  const availableColors = [
+    { value: "Soft Pink", linkValue: "soft pink", imageUrl: "https://cdn.example/pink.png" },
+    { value: "Black", linkValue: "black", imageUrl: "https://cdn.example/black.png" },
+  ];
+
+  it("matches the listing image to the correct color instead of the cheapest variant", () => {
+    expect(
+      resolveListingDisplayColor(
+        variants,
+        null,
+        "https://cdn.example/black.png",
+        availableColors,
+        variants[0],
+        "en",
+      ),
+    ).toBe("black");
+  });
+
+  it("uses the filtered display variant color when a color filter is active", () => {
+    const displayVariant = variants[1];
+    expect(
+      resolveListingDisplayColor(
+        variants,
+        displayVariant,
+        "https://cdn.example/black.png",
+        availableColors,
+        variants[0],
+        "en",
+      ),
+    ).toBe("black");
   });
 });
