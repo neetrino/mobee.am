@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { getStoredCurrency } from '../../../lib/currency';
 import { type LanguageCode } from '../../../lib/language';
 import { useUiLanguage } from '../../../components/UiLanguageProvider';
 import { t } from '../../../lib/i18n';
+import { syncProductPageColorInUrl } from '../../../lib/products/product-page-href';
 import { useAttributeGroups } from './useAttributeGroups';
 import { useProductImages } from './hooks/useProductImages';
 import { useProductFetch } from './hooks/useProductFetch';
@@ -40,6 +41,9 @@ export function useProductPage({
   const [currency, setCurrency] = useState(getStoredCurrency());
   const language: LanguageCode = useUiLanguage();
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
+  const hasUserSelectedColorRef = useRef(false);
+  const appliedUrlColorKeyRef = useRef<string | null>(null);
+  const appliedVariantIdFromUrlRef = useRef<string | null>(null);
 
   const {
     product,
@@ -63,6 +67,7 @@ export function useProductPage({
     handleSizeSelect,
     handleAttributeValueSelect,
     applyVariantSelection,
+    applyColorSelection,
   } = useVariantSelection({
     product,
     setCurrentImageIndex,
@@ -157,6 +162,12 @@ export function useProductPage({
   }, [images.length, currentImageIndex]);
 
   useEffect(() => {
+    hasUserSelectedColorRef.current = false;
+    appliedUrlColorKeyRef.current = null;
+    appliedVariantIdFromUrlRef.current = null;
+  }, [slug, colorFromUrl, variantIdFromUrl]);
+
+  useEffect(() => {
     if (!currentVariant || images.length === 0) return;
     setCurrentImageIndex(getVariantMainImageIndex(currentVariant, images));
     setThumbnailStartIndex(0);
@@ -164,6 +175,9 @@ export function useProductPage({
 
   useEffect(() => {
     if (!product?.variants?.length || !variantIdFromUrl) return;
+
+    const variantKey = `${product.id}:${variantIdFromUrl}`;
+    if (appliedVariantIdFromUrlRef.current === variantKey) return;
 
     const variantById = product.variants.find(
       (variant) => variant.id === variantIdFromUrl || variant.id.endsWith(variantIdFromUrl),
@@ -175,22 +189,48 @@ export function useProductPage({
       applyVariantSelection(initialVariant);
       setCurrentImageIndex(0);
       setThumbnailStartIndex(0);
+      appliedVariantIdFromUrlRef.current = variantKey;
     }
-  }, [product, variantIdFromUrl, applyVariantSelection]);
+  }, [product?.id, product?.variants?.length, variantIdFromUrl, applyVariantSelection]);
 
   useEffect(() => {
     if (!product?.variants?.length || !colorFromUrl || variantIdFromUrl) {
+      return;
+    }
+    if (hasUserSelectedColorRef.current) {
+      return;
+    }
+
+    const urlColorKey = `${product.id}:${colorFromUrl}`;
+    if (appliedUrlColorKeyRef.current === urlColorKey) {
       return;
     }
 
     const variant = findVariantByColorAndSize(product, colorFromUrl, null);
     if (variant) {
       applyVariantSelection(variant);
-      return;
+    } else {
+      applyColorSelection(colorFromUrl);
     }
 
-    handleColorSelect(colorFromUrl);
-  }, [product, colorFromUrl, variantIdFromUrl, applyVariantSelection, handleColorSelect]);
+    appliedUrlColorKeyRef.current = urlColorKey;
+  }, [
+    product?.id,
+    product?.variants?.length,
+    colorFromUrl,
+    variantIdFromUrl,
+    applyVariantSelection,
+    applyColorSelection,
+  ]);
+
+  const handleColorSelectWithUrlSync = useCallback(
+    (color: string) => {
+      hasUserSelectedColorRef.current = true;
+      handleColorSelect(color);
+      syncProductPageColorInUrl(slug, variantIdFromUrl, color);
+    },
+    [handleColorSelect, slug, variantIdFromUrl],
+  );
 
   const resolveAttributeLabel = (attrKey: string): string => {
     const productAttr = product?.productAttributes?.find((pa) => pa.attribute?.key === attrKey);
@@ -266,7 +306,7 @@ export function useProductPage({
     canAddToCart,
     getOptionValue,
     adjustQuantity,
-    handleColorSelect,
+    handleColorSelect: handleColorSelectWithUrlSync,
     handleSizeSelect,
     handleAttributeValueSelect,
     handleAddToWishlist,

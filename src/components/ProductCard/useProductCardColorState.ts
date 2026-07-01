@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { processImageUrl } from '../../lib/utils/image-utils';
+import { resolveDisplayColorFromListingImage } from '../../lib/shop/product-card-display-color';
+import { resolveListingColorLinkValue } from '../../lib/shop/listing-color-link';
 
 export interface ProductCardColorOption {
   value: string;
@@ -9,7 +11,7 @@ export interface ProductCardColorOption {
 }
 
 export function resolveProductCardColorLinkValue(color: ProductCardColorOption): string {
-  return (color.linkValue ?? color.value).trim().toLowerCase();
+  return resolveListingColorLinkValue(color);
 }
 
 export function useProductCardColorState(
@@ -30,9 +32,11 @@ export function useProductCardColorState(
   }, [product.id]);
 
   const effectiveLinkColor =
-    cardSelectedLinkColor ?? filterLinkColor ?? product.displayColor ?? null;
+    cardSelectedLinkColor ??
+    filterLinkColor ??
+    resolveDisplayColorFromListingImage(product.image, product.colors, product.displayColor ?? null);
   const displayImage = cardImageOverride ?? product.image;
-  const colorsInteractive = (product.colors?.length ?? 0) > 1;
+  const colorsInteractive = false;
 
   const handleColorSelect = useCallback((color: ProductCardColorOption) => {
     const linkValue = resolveProductCardColorLinkValue(color);

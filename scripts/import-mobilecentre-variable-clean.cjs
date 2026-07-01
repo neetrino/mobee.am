@@ -12,7 +12,7 @@
  *  2 – Delete old product images from Cloudflare R2
  *  3 – Delete existing product records from DB (safe relational order)
  *  4 – Apply DDL for source tracking columns (idempotent)
- *  5 – Ensure attribute records exist (color / storage / sim)
+ *  5 – Ensure attribute records exist (color / storage / connectivity / size / band_* / sim)
  *  7 – Import grouped products + variants with R2 image uploads
  *  9 – Verification summary
  *
@@ -65,10 +65,12 @@ let prisma = new PrismaClient({
 });
 
 function isConnectionError(e) {
+  const msg = e?.message || "";
   return (
     e?.errorCode === "P1001" ||
+    e?.errorCode === "P1008" ||
     e?.errorCode === "P1017" ||
-    /can't reach database|server has closed the connection/i.test(e?.message || "")
+    /can't reach database|server has closed the connection|connection terminated|connection reset|econnreset|socket hang up|connection timed out|unexpected eof/i.test(msg)
   );
 }
 
@@ -83,7 +85,7 @@ async function reconnectDb() {
   console.log("  ↩  DB reconnected.");
 }
 
-async function withRetry(fn, retries = 3) {
+async function withRetry(fn, retries = 5) {
   for (let i = 0; i < retries; i++) {
     try {
       return await fn();
@@ -91,6 +93,7 @@ async function withRetry(fn, retries = 3) {
       if (isConnectionError(e) && i < retries - 1) {
         console.warn(`\n  ⚠  DB connection lost (attempt ${i + 1}/${retries}), reconnecting...`);
         await reconnectDb();
+        await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
         continue;
       }
       throw e;
@@ -110,6 +113,21 @@ const SOURCE = "mobilecentre";
 const LOCALES = ["en", "hy", "ru"];
 const SKIP_R2 = process.argv.includes("--skip-r2");
 const CONFIRM = process.argv.includes("--confirm-destructive");
+
+const IMPORTER_SUPPORTED_OPTION_KEYS = new Set([
+  "color",
+  "storage",
+  "connectivity",
+  "size",
+  "band_color",
+  "band_type",
+  "band_size",
+  "case_material",
+  "sim",
+]);
+
+/** JSON keys mapped to importer attribute keys (not treated as unsupported). */
+const JSON_OPTION_KEY_ALIASES = { memory: "storage" };
 
 // ─── R2 client ─────────────────────────────────────────────────────────────────
 
@@ -229,6 +247,43 @@ async function generateUniqueSlug(model) {
   }
 }
 
+function collectJsonOptionKeys(items) {
+  const keys = new Set();
+  for (const group of items) {
+    for (const variant of group.variants || []) {
+      const opts = variant.options || {};
+      for (const [key, value] of Object.entries(opts)) {
+        if (value != null && String(value).trim()) keys.add(key);
+      }
+    }
+  }
+  return keys;
+}
+
+function validateJsonOptionKeys(items) {
+  const jsonKeys = collectJsonOptionKeys(items);
+  const unsupported = [];
+  for (const key of jsonKeys) {
+    const mapped = JSON_OPTION_KEY_ALIASES[key] || key;
+    if (!IMPORTER_SUPPORTED_OPTION_KEYS.has(mapped)) unsupported.push(key);
+  }
+
+  const jsonList = [...jsonKeys].sort();
+  const supportedList = [...IMPORTER_SUPPORTED_OPTION_KEYS].sort();
+
+  console.log("┌─ Option keys ──────────────────────────────────────");
+  console.log(`│  JSON option keys:      ${jsonList.join(", ") || "(none)"}`);
+  console.log(`│  Importer supported:    ${supportedList.join(", ")}`);
+  if (unsupported.length) {
+    console.log(`│  ❌ Unsupported in JSON: ${unsupported.join(", ")}`);
+  } else {
+    console.log("│  ✅ All JSON option keys are supported");
+  }
+  console.log("└────────────────────────────────────────────────────\n");
+
+  return { jsonKeys, unsupported };
+}
+
 // ─── PHASE 0 ──────────────────────────────────────────────────────────────────
 
 async function preflight() {
@@ -304,6 +359,8 @@ async function preflight() {
   if (isProd)  console.log("│  ⚠   PRODUCTION DB DETECTED");
   console.log("└────────────────────────────────────────────────────\n");
 
+  const keyCheck = validateJsonOptionKeys(items);
+
   if (!CONFIRM) {
     console.error("❌  Refusing to proceed without --confirm-destructive flag.");
     console.error("    This operation deletes ALL products and product images.\n");
@@ -311,6 +368,11 @@ async function preflight() {
   }
   if (isProd) {
     console.error("❌  Production environment detected. Aborting for safety.");
+    process.exit(1);
+  }
+  if (keyCheck.unsupported.length) {
+    console.error("❌  Aborting: JSON contains option keys the importer cannot map.");
+    console.error("    Fix JSON or extend IMPORTER_SUPPORTED_OPTION_KEYS before import.\n");
     process.exit(1);
   }
 
@@ -329,17 +391,24 @@ async function backup(imageUrls) {
   const dir = path.join(ROOT, "backups", "mobilecentre-clean-import", ts);
   fs.mkdirSync(dir, { recursive: true });
 
-  const products = await prisma.product.findMany({
-    include: {
-      translations: true,
-      variants: { include: { options: true } },
-      labels: true,
-    },
-  });
+  // Neon pooler may drop idle connections between preflight and backup.
+  await withRetry(() => prisma.$queryRaw`SELECT 1`);
+
+  const products = await withRetry(() =>
+    prisma.product.findMany({
+      include: {
+        translations: true,
+        variants: { include: { options: true } },
+        labels: true,
+      },
+    })
+  );
 
   const productIds = products.map((p) => p.id);
   const cartItems = productIds.length
-    ? await prisma.cartItem.findMany({ where: { productId: { in: productIds } } })
+    ? await withRetry(() =>
+        prisma.cartItem.findMany({ where: { productId: { in: productIds } } })
+      )
     : [];
 
   fs.writeFileSync(path.join(dir, "products-backup.json"), JSON.stringify(products, null, 2));
@@ -506,9 +575,15 @@ async function setupAttributes() {
   console.log("═══════════════════════════════════════════════\n");
 
   const defs = [
-    { key: "color",   name: "Color",   position: 0 },
+    { key: "color", name: "Color", position: 0 },
     { key: "storage", name: "Storage", position: 1 },
-    { key: "sim",     name: "SIM",     position: 2 },
+    { key: "connectivity", name: "Connectivity", position: 2 },
+    { key: "size", name: "Size", position: 3 },
+    { key: "band_color", name: "Band Color", position: 4 },
+    { key: "band_type", name: "Band Type", position: 5 },
+    { key: "band_size", name: "Band Size", position: 6 },
+    { key: "case_material", name: "Case Material", position: 7 },
+    { key: "sim", name: "SIM", position: 8 },
   ];
 
   const attrMap = {};
@@ -614,8 +689,14 @@ async function importProducts(parentGroups, attrMap, valueCache) {
     }
     const category = catCache[catSlug];
 
-    const rawDesc = parentGroup.description || null;
-    const descHtml = buildDescriptionHtml(rawDesc);
+    const rawDesc =
+      parentGroup.descriptionHtml ||
+      parentGroup.description ||
+      parentGroup.descriptionRaw ||
+      null;
+    const descHtml =
+      parentGroup.descriptionHtml ||
+      buildDescriptionHtml(typeof rawDesc === "string" ? rawDesc : null);
     const slug = await withRetry(() => generateUniqueSlug(model));
 
     let defaultVariantMedia = [];
@@ -742,7 +823,13 @@ async function importProducts(parentGroups, attrMap, valueCache) {
       const opts = item.options || {};
       const optDefs = [
         { key: "color", value: opts.color },
-        { key: "storage", value: opts.storage },
+        { key: "storage", value: opts.storage || opts.memory },
+        { key: "connectivity", value: opts.connectivity },
+        { key: "size", value: opts.size },
+        { key: "band_color", value: opts.band_color },
+        { key: "band_type", value: opts.band_type },
+        { key: "band_size", value: opts.band_size },
+        { key: "case_material", value: opts.case_material },
         { key: "sim", value: opts.sim },
       ];
       const attrJsonMap = {};
@@ -827,6 +914,38 @@ async function verify() {
   const noSku        = await prisma.productVariant.count({ where: { sku: null } });
   const noImage      = await prisma.productVariant.count({ where: { imageUrl: null } });
 
+  const orphanRows = await prisma.$queryRaw`
+    SELECT COUNT(*)::int AS orphan_variants
+    FROM product_variants v
+    LEFT JOIN products p ON p.id = v."productId"
+    WHERE p.id IS NULL
+  `;
+  const orphanVariants = orphanRows[0]?.orphan_variants ?? 0;
+
+  const variantsWithoutProductRows = await prisma.$queryRaw`
+    SELECT COUNT(*)::int AS cnt
+    FROM product_variants v
+    LEFT JOIN products p ON p.id = v."productId"
+    WHERE p.id IS NULL
+  `;
+  const variantsWithoutProduct = variantsWithoutProductRows[0]?.cnt ?? 0;
+
+  const noOptionsRows = await prisma.$queryRaw`
+    SELECT COUNT(*)::int AS cnt
+    FROM product_variants v
+    WHERE NOT EXISTS (
+      SELECT 1 FROM product_variant_options o WHERE o."variantId" = v.id
+    )
+  `;
+  const variantsWithoutOptions = noOptionsRows[0]?.cnt ?? 0;
+
+  const optionKeyRows = await prisma.$queryRaw`
+    SELECT "attributeKey", COUNT(*)::int AS cnt
+    FROM product_variant_options
+    GROUP BY "attributeKey"
+    ORDER BY "attributeKey"
+  `;
+
   // Scan for remaining mobilecentre.am URLs
   const products = await prisma.product.findMany({ select: { media: true } });
   const variants = await prisma.productVariant.findMany({ select: { imageUrl: true, media: true } });
@@ -846,18 +965,48 @@ async function verify() {
   console.log(`  Products:                    ${productCount}`);
   console.log(`  Variants:                    ${variantCount}`);
   console.log(`  Variant options:             ${optionCount}`);
-  console.log(`  Products without variants:   ${noVariants}  ${noVariants === 0 ? "✅" : "⚠"}`);
+  console.log(`  Orphan variants:             ${orphanVariants}  ${orphanVariants === 0 ? "✅" : "❌"}`);
+  console.log(`  Products without variants:   ${noVariants}  ${noVariants === 0 ? "✅" : "❌"}`);
+  console.log(`  Variants without product:    ${variantsWithoutProduct}  ${variantsWithoutProduct === 0 ? "✅" : "❌"}`);
+  console.log(`  Variants without options:    ${variantsWithoutOptions}  ${variantsWithoutOptions === 0 ? "✅" : "⚠"}`);
   console.log(`  Variants without SKU:        ${noSku}  ${noSku === 0 ? "✅" : "⚠"}`);
   console.log(`  Variants without imageUrl:   ${noImage}  ${SKIP_R2 ? "(skip-r2)" : noImage === 0 ? "✅" : "⚠"}`);
   console.log(`  mobilecentre.am in media:    ${mcInMedia}  ${mcInMedia === 0 ? "✅" : "❌"}`);
   console.log(`  mobilecentre.am in variants: ${mcInVariants}  ${mcInVariants === 0 ? "✅" : "❌"}`);
   console.log(`  mobilecentre.am in var media:${mcInVariantMedia}  ${mcInVariantMedia === 0 ? "✅" : "❌"}`);
 
+  if (optionKeyRows.length) {
+    console.log("  Option keys by attributeKey:");
+    for (const row of optionKeyRows) {
+      console.log(`    ${row.attributeKey}: ${row.cnt}`);
+    }
+  } else {
+    console.log("  Option keys by attributeKey: (none)");
+  }
+
   const imageOk = SKIP_R2 || mcTotal === 0;
-  const ok = productCount > 0 && variantCount > 0 && imageOk;
+  const integrityOk =
+    orphanVariants === 0 &&
+    noVariants === 0 &&
+    variantsWithoutProduct === 0;
+  const ok = productCount > 0 && variantCount > 0 && imageOk && integrityOk;
 
   console.log(`\n${ok ? "✅  IMPORT VERIFIED SUCCESSFULLY" : "⚠️   IMPORT COMPLETED WITH WARNINGS — check above"}\n`);
-  return { productCount, variantCount, optionCount, noVariants, noSku, noImage, mcInMedia, mcInVariants, mcInVariantMedia };
+  return {
+    productCount,
+    variantCount,
+    optionCount,
+    orphanVariants,
+    noVariants,
+    variantsWithoutProduct,
+    variantsWithoutOptions,
+    noSku,
+    noImage,
+    mcInMedia,
+    mcInVariants,
+    mcInVariantMedia,
+    optionKeyRows,
+  };
 }
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
@@ -893,7 +1042,7 @@ async function main() {
 
     console.log("Manual checks to perform:");
     console.log("  1. Open /shop — verify parent product cards (not per-variant)");
-    console.log("  2. Open a product PDP — verify color/storage/sim selectors");
+    console.log("  2. Open a product PDP — verify color/storage/connectivity/size/band selectors");
     console.log("  3. Change variant — verify price and image update");
     console.log("  4. Add to cart — confirm variantId is stored");
     console.log("  5. Open /supersudo/products — verify product list and variants tab");

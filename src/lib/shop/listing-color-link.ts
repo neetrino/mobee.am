@@ -2,6 +2,7 @@ export interface ListingProductColor {
   value: string;
   /** Canonical variant color token for PDP URLs (falls back to `value`). */
   linkValue?: string;
+  imageUrl?: string | null;
 }
 
 function normalizeListingColorToken(color: string): string {

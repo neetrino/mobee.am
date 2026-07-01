@@ -37,7 +37,8 @@ interface Product {
   primaryCategoryId?: string | null;
   categoryIds?: string[];
   categories?: Array<{ id: string; slug?: string; title?: string }>;
-  colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+  colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
+  displayColor?: string | null;
 }
 
 interface ProductsGridProps {
@@ -166,10 +167,11 @@ export function ProductsGrid({
               {...homeCardProps}
               {...LISTING_ADD_BUTTON_NAVIGATES_TO_PRODUCT}
               imageLoadPriority={index < SHOP_LISTING_EAGER_IMAGE_CARD_COUNT}
-              linkColor={resolveProductCardLinkColor(
-                product.colors as Array<{ value: string }> | undefined,
-                selectedFilterColors,
-              )}
+              linkColor={
+                selectedFilterColors.length > 0
+                  ? resolveProductCardLinkColor(product.colors, selectedFilterColors)
+                  : undefined
+              }
             />
           </div>
         ))}

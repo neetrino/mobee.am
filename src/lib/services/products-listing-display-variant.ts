@@ -187,6 +187,79 @@ export function findListingDisplayVariant(
   return [...pool].sort((a, b) => a.price - b.price)[0];
 }
 
+export type ListingColorOption = {
+  value: string;
+  linkValue: string;
+  imageUrl?: string | null;
+  colors?: string[] | null;
+};
+
+function normalizeImageForCompare(url: string | null | undefined): string | null {
+  const processed = processImageUrl(url ?? null);
+  if (!processed) return null;
+
+  try {
+    const parsed = new URL(processed, "https://placeholder.local");
+    return `${parsed.pathname}`.toLowerCase();
+  } catch {
+    return processed.toLowerCase();
+  }
+}
+
+function imagesMatchForListing(
+  left: string | null | undefined,
+  right: string | null | undefined,
+): boolean {
+  const normalizedLeft = normalizeImageForCompare(left);
+  const normalizedRight = normalizeImageForCompare(right);
+  return Boolean(normalizedLeft && normalizedRight && normalizedLeft === normalizedRight);
+}
+
+/**
+ * Resolves the color token shown on listing cards so it matches the displayed image.
+ */
+export function resolveListingDisplayColor(
+  variants: ListingVariant[],
+  displayVariant: ListingVariant | null,
+  listingImage: string | null,
+  availableColors: ListingColorOption[],
+  fallbackVariant: ListingVariant | null,
+  lang = "en",
+): string | null {
+  if (displayVariant) {
+    return getVariantColorLinkValue(displayVariant, lang);
+  }
+
+  if (listingImage) {
+    for (const variant of variants) {
+      if (!imagesMatchForListing(variant.imageUrl, listingImage)) continue;
+      const color = getVariantColorLinkValue(variant, lang);
+      if (color) return color;
+    }
+
+    for (const color of availableColors) {
+      if (!imagesMatchForListing(color.imageUrl, listingImage)) continue;
+      return color.linkValue;
+    }
+
+    for (const variant of variants) {
+      const options = Array.isArray(variant.options) ? variant.options : [];
+      for (const opt of options) {
+        if (!("attributeValue" in opt) || !opt.attributeValue?.imageUrl) continue;
+        if (!imagesMatchForListing(opt.attributeValue.imageUrl, listingImage)) continue;
+
+        const colorValue = getOptionColorValue(opt, lang);
+        if (colorValue) return colorValue;
+
+        const canonical = opt.attributeValue.value?.trim().toLowerCase();
+        if (canonical) return canonical;
+      }
+    }
+  }
+
+  return fallbackVariant ? getVariantColorLinkValue(fallbackVariant, lang) : null;
+}
+
 export function resolveListingProductImage(
   product: ProductWithRelations,
   displayVariant: ListingVariant | null,

@@ -76,22 +76,29 @@ export function useVariantSelection({
     }
 
     initializedProductIdRef.current = productId;
+
     const initialVariant = getDefaultVariant(product);
+
     if (initialVariant) {
       applyVariantSelection(initialVariant);
     }
-  }, [productId, variantCount, applyVariantSelection]);
+  }, [productId, variantCount, product, applyVariantSelection]);
+
+  const applyColorSelection = useCallback((color: string) => {
+    if (!color) return;
+    setSelectedColor(color.toLowerCase().trim());
+  }, []);
 
   const handleColorSelect = useCallback((color: string) => {
     handleColorSelectUtil(
       color,
       product,
       [],
-      selectedColor,
+      null,
       setSelectedColor,
-      setCurrentImageIndex
+      setCurrentImageIndex,
     );
-  }, [product, selectedColor, setCurrentImageIndex]);
+  }, [product, setCurrentImageIndex]);
 
   const handleSizeSelect = useCallback((size: string) => {
     setSelectedSize(size.toLowerCase().trim());
@@ -119,5 +126,6 @@ export function useVariantSelection({
     handleSizeSelect,
     handleAttributeValueSelect,
     applyVariantSelection,
+    applyColorSelection,
   };
 }
