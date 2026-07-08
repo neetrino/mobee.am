@@ -10,6 +10,7 @@ export const PRODUCT_VARIANT_DB_SELECT = {
   sku: true,
   barcode: true,
   price: true,
+  priceOnRequest: true,
   compareAtPrice: true,
   cost: true,
   stock: true,

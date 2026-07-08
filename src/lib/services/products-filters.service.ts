@@ -11,6 +11,7 @@ import {
   loadPriceBounds,
 } from "./products-price-range.utils";
 import { loadProductDiscountContext } from "./products-find-transform.service";
+import { minPricedVariantPrice } from "../products/variant-price-display";
 
 class ProductsFiltersService {
   /**
@@ -152,10 +153,9 @@ class ProductsFiltersService {
         if (!product || !product.variants || !Array.isArray(product.variants)) {
           return false;
         }
-        const prices = product.variants.map((v: { price?: number }) => v?.price).filter((p: number | undefined): p is number => p !== undefined);
-        if (prices.length === 0) return false;
-        const minPrice = Math.min(...prices);
-        return minPrice >= min && minPrice <= max;
+        const listMin = minPricedVariantPrice(product.variants);
+        if (listMin == null) return false;
+        return listMin >= min && listMin <= max;
       });
     }
 

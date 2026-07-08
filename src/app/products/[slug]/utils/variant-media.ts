@@ -41,12 +41,21 @@ function collectVariantImageUrls(selectedVariant: ProductVariant): string[] {
   return dedupeUrls([...fromImageUrl, ...fromMedia]);
 }
 
+function isMultiVariantProduct(product: Product): boolean {
+  return (product.variants?.length ?? 0) > 1;
+}
+
 function mergeVariantAndProductGallery(
   variantUrls: string[],
   productUrls: string[],
+  allowProductExtras: boolean,
 ): string[] {
   if (variantUrls.length === 0) {
     return dedupeUrls(productUrls);
+  }
+
+  if (!allowProductExtras) {
+    return dedupeUrls(variantUrls);
   }
 
   const variantSet = new Set(variantUrls);
@@ -56,7 +65,7 @@ function mergeVariantAndProductGallery(
 
 /**
  * Returns the active gallery for the selected variant.
- * Merges variant images with product-level gallery (deduped).
+ * Multi-variant products use variant-only media so color switches do not show other colors.
  */
 export function getVariantMedia(
   product: Product | null,
@@ -71,7 +80,8 @@ export function getVariantMedia(
   }
 
   const variantUrls = collectVariantImageUrls(selectedVariant);
-  return mergeVariantAndProductGallery(variantUrls, productUrls);
+  const allowProductExtras = !isMultiVariantProduct(product) || variantUrls.length === 0;
+  return mergeVariantAndProductGallery(variantUrls, productUrls, allowProductExtras);
 }
 
 export function getVariantMainImageIndex(

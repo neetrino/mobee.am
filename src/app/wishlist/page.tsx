@@ -129,7 +129,7 @@ export default function WishlistPage() {
   };
 
   const handleAddToCart = (product: WishlistItemCardProduct) => {
-    if (!product.inStock || addToCartInFlightRef.current.has(product.id)) {
+    if (!product.inStock || product.hasPrice === false || addToCartInFlightRef.current.has(product.id)) {
       return;
     }
 

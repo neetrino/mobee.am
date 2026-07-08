@@ -7,11 +7,19 @@ const baseProduct: Product = {
   slug: 'iphone-test',
   title: 'iPhone Test',
   media: [{ url: 'https://r2.example/products/p1/fallback.png' }],
-  variants: [],
+  variants: [{ id: 'v0', sku: 's0', price: 1, stock: 1, available: true, options: [] }],
+};
+
+const multiVariantProduct: Product = {
+  ...baseProduct,
+  variants: [
+    { id: 'v1', sku: 's1', price: 1, stock: 1, available: true, options: [] },
+    { id: 'v2', sku: 's2', price: 1, stock: 1, available: true, options: [] },
+  ],
 };
 
 describe('getVariantMedia', () => {
-  it('returns variant media when present', () => {
+  it('returns variant media when present (single-variant product keeps product extras)', () => {
     const variant: ProductVariant = {
       id: 'v1',
       sku: 'mc-1',
@@ -30,6 +38,27 @@ describe('getVariantMedia', () => {
       'https://r2.example/products/mobilecentre/1/main.png',
       'https://r2.example/products/mobilecentre/1/gallery-1.png',
       'https://r2.example/products/p1/fallback.png',
+    ]);
+  });
+
+  it('uses variant-only gallery for multi-variant products', () => {
+    const variant: ProductVariant = {
+      id: 'v1',
+      sku: 'mc-1',
+      price: 100,
+      stock: 5,
+      available: true,
+      options: [{ key: 'color', attribute: 'color', value: 'black' }],
+      imageUrl: 'https://r2.example/products/mobilecentre/1/main.png',
+      media: [
+        { url: 'https://r2.example/products/mobilecentre/1/main.png' },
+        { url: 'https://r2.example/products/mobilecentre/1/gallery-1.png' },
+      ],
+    };
+
+    expect(getVariantMedia(multiVariantProduct, variant)).toEqual([
+      'https://r2.example/products/mobilecentre/1/main.png',
+      'https://r2.example/products/mobilecentre/1/gallery-1.png',
     ]);
   });
 

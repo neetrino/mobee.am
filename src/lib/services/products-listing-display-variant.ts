@@ -1,4 +1,5 @@
 import { processImageUrl } from "../utils/image-utils";
+import { hasDisplayPrice } from "../products/variant-price-display";
 import type { ProductWithRelations } from "./products-find-query.service";
 
 type ListingVariant = ProductWithRelations["variants"][number];
@@ -166,7 +167,11 @@ export function findListingDisplayVariant(
     );
     if (withImage) return withImage;
 
-    return [...pool].sort((a, b) => a.price - b.price)[0];
+    return [...pool].sort((a, b) => {
+      const aKey = hasDisplayPrice(a) ? a.price : Number.POSITIVE_INFINITY;
+      const bKey = hasDisplayPrice(b) ? b.price : Number.POSITIVE_INFINITY;
+      return aKey - bKey;
+    })[0];
   }
 
   const matching = variants.filter((variant) =>
@@ -184,7 +189,11 @@ export function findListingDisplayVariant(
   );
   if (withImage) return withImage;
 
-  return [...pool].sort((a, b) => a.price - b.price)[0];
+  return [...pool].sort((a, b) => {
+    const aKey = hasDisplayPrice(a) ? a.price : Number.POSITIVE_INFINITY;
+    const bKey = hasDisplayPrice(b) ? b.price : Number.POSITIVE_INFINITY;
+    return aKey - bKey;
+  })[0];
 }
 
 export type ListingColorOption = {

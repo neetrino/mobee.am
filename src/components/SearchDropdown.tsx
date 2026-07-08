@@ -49,6 +49,7 @@ export function SearchDropdown({
         slug: result.slug,
         title: result.title,
         price: result.price,
+        hasPrice: result.hasPrice,
         image: result.image,
         compareAtPrice: result.compareAtPrice,
         inStock: true,
@@ -117,14 +118,19 @@ export function SearchDropdown({
                     {result.category && (
                       <p className="text-xs text-gray-500 mt-0.5">{result.category}</p>
                     )}
-                    <p className="text-sm font-semibold text-gray-700 mt-0.5">
-                      {formatPrice(result.price, currency)}
-                      {result.compareAtPrice != null && result.compareAtPrice > result.price && (
-                        <span className="ml-2 text-xs text-gray-500 line-through">
-                          {formatPrice(result.compareAtPrice, currency)}
-                        </span>
-                      )}
-                    </p>
+                    {(result.hasPrice ?? (result.price != null && result.price > 0)) &&
+                    result.price != null ? (
+                      <p className="text-sm font-semibold text-gray-700 mt-0.5">
+                        {formatPrice(result.price, currency)}
+                        {result.compareAtPrice != null && result.compareAtPrice > result.price ? (
+                          <span className="ml-2 text-xs text-gray-500 line-through">
+                            {formatPrice(result.compareAtPrice, currency)}
+                          </span>
+                        ) : null}
+                      </p>
+                    ) : (
+                      <p className="mt-0.5 min-h-[1.25rem]" aria-hidden="true" />
+                    )}
                   </div>
                 </button>
               </li>

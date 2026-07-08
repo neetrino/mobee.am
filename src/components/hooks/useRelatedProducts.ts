@@ -83,14 +83,9 @@ export function useRelatedProducts({
   language,
   relatedContext,
 }: UseRelatedProductsProps) {
-  const cacheKey = buildRelatedProductsCacheKey(
-    currentProductSlug,
-    language,
-    relatedContext?.productId,
-  );
-  const cachedInitial = readRelatedProductsCache(cacheKey);
-  const [products, setProducts] = useState<RelatedProduct[]>(cachedInitial ?? []);
-  const [loading, setLoading] = useState(cachedInitial === null);
+  // Keep SSR and the first client render identical — sessionStorage is read only in useEffect.
+  const [products, setProducts] = useState<RelatedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const relatedContextRef = useRef(relatedContext);
   relatedContextRef.current = relatedContext;

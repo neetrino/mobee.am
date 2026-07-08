@@ -17,7 +17,7 @@ import { useProductCalculations } from './hooks/useProductCalculations';
 import { getVariantMainImageIndex } from './utils/variant-media';
 import { resolveCompareCategoryId } from '../../../lib/shop/compare-storage';
 import { getMissingRequiredAttributeKeys } from './utils/required-attribute-selection';
-import { findVariantByAllAttributesStrict, findVariantByColorAndSize } from './utils/variant-finders';
+import { findVariantByAllAttributesStrict, findVariantByAllAttributes, findVariantByColorAndSize } from './utils/variant-finders';
 import type { Product } from './types';
 
 export type UseProductPageProps = {
@@ -71,6 +71,8 @@ export function useProductPage({
   } = useVariantSelection({
     product,
     setCurrentImageIndex,
+    colorFromUrl,
+    variantIdFromUrl,
   });
 
   const attributeGroups = useAttributeGroups({
@@ -100,10 +102,32 @@ export function useProductPage({
     );
   }, [product, attributeGroups, selectedColor, selectedSize, selectedAttributeValues]);
 
-  const images = useProductImages(product, currentVariant);
+  /** Partial selection (e.g. color only) — used for gallery, not cart price/stock. */
+  const galleryVariant = useMemo(() => {
+    if (!product?.variants?.length) return null;
+    if (currentVariant) return currentVariant;
+
+    const resolved = findVariantByAllAttributes(
+      product,
+      selectedColor,
+      selectedSize,
+      selectedAttributeValues,
+    );
+    if (resolved) return resolved;
+
+    if (selectedColor) {
+      return findVariantByColorAndSize(product, selectedColor, null);
+    }
+
+    return null;
+  }, [product, currentVariant, selectedColor, selectedSize, selectedAttributeValues]);
+
+  const images = useProductImages(product, galleryVariant);
 
   const {
     price,
+    hasPrice,
+    priceOnRequest,
     originalPrice,
     compareAtPrice,
     discountPercent,
@@ -168,10 +192,10 @@ export function useProductPage({
   }, [slug, colorFromUrl, variantIdFromUrl]);
 
   useEffect(() => {
-    if (!currentVariant || images.length === 0) return;
-    setCurrentImageIndex(getVariantMainImageIndex(currentVariant, images));
+    if (!galleryVariant || images.length === 0) return;
+    setCurrentImageIndex(getVariantMainImageIndex(galleryVariant, images));
     setThumbnailStartIndex(0);
-  }, [currentVariant?.id, images]);
+  }, [galleryVariant?.id, images]);
 
   useEffect(() => {
     if (!product?.variants?.length || !variantIdFromUrl) return;
@@ -209,10 +233,11 @@ export function useProductPage({
     const variant = findVariantByColorAndSize(product, colorFromUrl, null);
     if (variant) {
       applyVariantSelection(variant);
-    } else {
-      applyColorSelection(colorFromUrl);
+      appliedUrlColorKeyRef.current = urlColorKey;
+      return;
     }
 
+    applyColorSelection(colorFromUrl);
     appliedUrlColorKeyRef.current = urlColorKey;
   }, [
     product?.id,
@@ -294,6 +319,8 @@ export function useProductPage({
     sizeGroups,
     currentVariant,
     price,
+    hasPrice,
+    priceOnRequest,
     originalPrice,
     compareAtPrice,
     discountPercent,
@@ -314,5 +341,6 @@ export function useProductPage({
     getRequiredAttributesMessage,
     shellProduct,
     isNotFound,
+    galleryVariant,
   };
 }

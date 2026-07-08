@@ -22,7 +22,8 @@ interface ProductCardListProps {
     title: string;
     primaryCategoryId?: string | null;
     categories?: Array<{ id: string; slug?: string; title?: string }>;
-    price: number;
+    price: number | null;
+    hasPrice?: boolean;
     image: string | null;
     inStock: boolean;
     brand: { id: string; name: string } | null;
@@ -75,12 +76,13 @@ export function ProductCardList({
   const imageSrc = resolveProductCardImageSrc(product.image);
   const listingCacheSource = buildProductCardCachePayload(product);
   const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';
+  const productHasPrice = product.hasPrice ?? (product.price != null && product.price > 0);
   const primaryActionDisabled = addButtonNavigatesToProduct
     ? false
-    : !product.inStock || isAddingToCart;
+    : !product.inStock || !productHasPrice || isAddingToCart;
   const primaryActionEnabled = addButtonNavigatesToProduct
     ? true
-    : product.inStock && !isAddingToCart;
+    : product.inStock && productHasPrice && !isAddingToCart;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
@@ -148,14 +150,18 @@ export function ProductCardList({
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
           {/* Price */}
           <div className="flex flex-col">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={`whitespace-nowrap ${listPriceClass} font-semibold text-black`}>
-                {formatPrice(product.price || 0, currency)}
-              </span>
-              {product.discountPercent && product.discountPercent > 0 ? (
-                <span className="text-[0.7125rem] font-semibold text-blue-600 sm:text-[0.83125rem]">
-                  -{product.discountPercent}%
-                </span>
+            <div className="flex items-center gap-2 flex-wrap min-h-[1.5rem]">
+              {productHasPrice && product.price != null ? (
+                <>
+                  <span className={`whitespace-nowrap ${listPriceClass} font-semibold text-black`}>
+                    {formatPrice(product.price, currency)}
+                  </span>
+                  {product.discountPercent && product.discountPercent > 0 ? (
+                    <span className="text-[0.7125rem] font-semibold text-blue-600 sm:text-[0.83125rem]">
+                      -{product.discountPercent}%
+                    </span>
+                  ) : null}
+                </>
               ) : null}
             </div>
           </div>

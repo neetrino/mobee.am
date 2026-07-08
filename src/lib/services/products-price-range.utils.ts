@@ -9,6 +9,7 @@ import {
   computeEffectiveVariantPrice,
   resolveAppliedDiscountPercent,
 } from "./products-effective-price";
+import { hasDisplayPrice } from "../products/variant-price-display";
 
 export type PriceBoundsFilters = {
   category?: string;
@@ -26,7 +27,7 @@ type ProductPriceRow = {
   discountPercent?: number | null;
   primaryCategoryId?: string | null;
   brandId?: string | null;
-  variants: Array<{ price: number }>;
+  variants: Array<{ price: number; priceOnRequest?: boolean | null }>;
 };
 
 export async function buildPriceBoundsWhere(
@@ -96,6 +97,7 @@ export function computePriceBoundsFromProductRows(
     const discountPercent = resolveAppliedDiscountPercent(product, discounts);
 
     for (const variant of variants) {
+      if (!hasDisplayPrice(variant)) continue;
       if (typeof variant.price !== "number" || !Number.isFinite(variant.price)) {
         continue;
       }
@@ -125,7 +127,7 @@ export async function loadPriceBounds(filters: PriceBoundsFilters): Promise<Pric
       brandId: true,
       variants: {
         where: { published: true },
-        select: { price: true },
+        select: { price: true, priceOnRequest: true },
       },
     },
   });

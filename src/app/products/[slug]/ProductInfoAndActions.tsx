@@ -22,7 +22,8 @@ import type { AttributeGroupValue, Product, ProductVariant, VariantOption } from
 
 interface ProductInfoAndActionsProps {
   product: Product;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   discountPercent: number | null;
   currency: string;
   language: LanguageCode;
@@ -58,6 +59,7 @@ interface ProductInfoAndActionsProps {
 export function ProductInfoAndActions({
   product,
   price,
+  hasPrice = price != null && price > 0,
   discountPercent,
   currency,
   language,
@@ -123,40 +125,48 @@ export function ProductInfoAndActions({
       <hr className="my-5 border-0 border-t border-gray-200" />
 
       <div className={`flex flex-wrap items-center gap-4 ${PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS}`}>
-        <div
-          className="flex h-11 min-w-[8.5rem] select-none items-stretch overflow-hidden rounded-[15px] border border-gray-200 bg-white px-0.5"
-          role="group"
-          aria-label={t(language, 'product.quantity')}
-        >
-          <button
-            type="button"
-            onClick={() => onQuantityAdjust(-1)}
-            disabled={quantity <= 1}
-            className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
-            aria-label={t(language, 'common.ariaLabels.decreaseQuantity')}
+        {hasPrice ? (
+          <div
+            className="flex h-11 min-w-[8.5rem] select-none items-stretch overflow-hidden rounded-[15px] border border-gray-200 bg-white px-0.5"
+            role="group"
+            aria-label={t(language, 'product.quantity')}
           >
-            −
-          </button>
-          <span className="flex min-w-[2rem] items-center justify-center px-2 text-base font-bold tabular-nums leading-none text-gray-900">
-            {quantity}
-          </span>
-          <button
-            type="button"
-            onClick={() => onQuantityAdjust(1)}
-            disabled={quantity >= maxQuantity || maxQuantity <= 0}
-            className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
-            aria-label={t(language, 'common.ariaLabels.increaseQuantity')}
-          >
-            +
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => onQuantityAdjust(-1)}
+              disabled={quantity <= 1}
+              className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
+              aria-label={t(language, 'common.ariaLabels.decreaseQuantity')}
+            >
+              −
+            </button>
+            <span className="flex min-w-[2rem] items-center justify-center px-2 text-base font-bold tabular-nums leading-none text-gray-900">
+              {quantity}
+            </span>
+            <button
+              type="button"
+              onClick={() => onQuantityAdjust(1)}
+              disabled={quantity >= maxQuantity || maxQuantity <= 0}
+              className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
+              aria-label={t(language, 'common.ariaLabels.increaseQuantity')}
+            >
+              +
+            </button>
+          </div>
+        ) : null}
 
         <div className={`flex flex-wrap items-baseline justify-end gap-2 text-right ${PDP_IPAD_PRO_BAND_PRICE_TEXT_CLASS}`}>
-          <span className="text-xl font-bold text-gray-900 sm:text-2xl">
-            {formatPrice(price, currency as CurrencyCode)}
-          </span>
-          {discountPercent != null && discountPercent > 0 && (
-            <span className="text-sm font-semibold text-admin">-{discountPercent}%</span>
+          {hasPrice && price != null ? (
+            <>
+              <span className="text-xl font-bold text-gray-900 sm:text-2xl">
+                {formatPrice(price, currency as CurrencyCode)}
+              </span>
+              {discountPercent != null && discountPercent > 0 && (
+                <span className="text-sm font-semibold text-admin">-{discountPercent}%</span>
+              )}
+            </>
+          ) : (
+            <span className="min-h-[1.75rem]" aria-hidden="true" />
           )}
         </div>
       </div>
@@ -218,11 +228,13 @@ export function ProductInfoAndActions({
           <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
           {t(language, 'product.moreDetails')}
         </button>
-        <InstallmentPriceButton
-          onClick={handleInstallmentClick}
-          size="md"
-          className="order-1 max-sm:w-full max-sm:justify-start sm:order-2"
-        />
+        {hasPrice ? (
+          <InstallmentPriceButton
+            onClick={handleInstallmentClick}
+            size="md"
+            className="order-1 max-sm:w-full max-sm:justify-start sm:order-2"
+          />
+        ) : null}
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">
@@ -268,6 +280,7 @@ export function ProductInfoAndActions({
         </div>
       </div>
 
+      {hasPrice && price != null ? (
       <InstallmentRequestModal
         isOpen={isInstallmentModalOpen}
         onClose={() => setIsInstallmentModalOpen(false)}
@@ -282,6 +295,7 @@ export function ProductInfoAndActions({
         variantTitle={inquiryVariantDetails.variantTitle}
         sku={inquiryVariantDetails.sku}
       />
+      ) : null}
     </div>
   );
 }

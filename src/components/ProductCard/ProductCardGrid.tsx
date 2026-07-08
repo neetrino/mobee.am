@@ -23,7 +23,8 @@ interface ProductCardGridProps {
     title: string;
     primaryCategoryId?: string | null;
     categories?: Array<{ id: string; slug?: string; title?: string }>;
-    price: number;
+    price: number | null;
+    hasPrice?: boolean;
     image: string | null;
     inStock: boolean;
     brand: { id: string; name: string } | null;
@@ -102,11 +103,14 @@ export function ProductCardGrid({
       : 'text-[1.1875rem] leading-[1.6625rem]';
   })();
 
+  const productHasPrice = product.hasPrice ?? (product.price != null && product.price > 0);
   const listPrice = product.compareAtPrice ?? product.originalPrice ?? null;
   const showStrike =
     homeProductGridCard &&
+    productHasPrice &&
     listPrice != null &&
-    listPrice > (product.price || 0);
+    product.price != null &&
+    listPrice > product.price;
 
   const mobileDiscountLabel =
     homeProductGridCard &&
@@ -120,10 +124,10 @@ export function ProductCardGrid({
 
   const primaryActionDisabled = addButtonNavigatesToProduct
     ? false
-    : !product.inStock || isAddingToCart;
+    : !product.inStock || !productHasPrice || isAddingToCart;
   const primaryActionEnabled = addButtonNavigatesToProduct
     ? true
-    : product.inStock && !isAddingToCart;
+    : product.inStock && productHasPrice && !isAddingToCart;
 
   const cardShellClass = homeProductGridCard
     ? 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:hover:shadow-none lg:min-h-[583px]'
@@ -234,6 +238,7 @@ export function ProductCardGrid({
         <div className={infoPricePad}>
           <ProductCardPriceBlock
             price={product.price}
+            hasPrice={productHasPrice}
             currency={currency}
             discountPercent={product.discountPercent}
             listPrice={listPrice}
@@ -301,7 +306,9 @@ export function ProductCardGrid({
               </>
             )}
           </button>
-          <InstallmentPriceButton onClick={handleInstallmentClick} />
+          {productHasPrice ? (
+            <InstallmentPriceButton onClick={handleInstallmentClick} />
+          ) : null}
         </div>
         {homeProductGridCard ? (
           <div className="hidden min-h-[22px] max-lg:flex max-lg:items-center">
@@ -314,6 +321,7 @@ export function ProductCardGrid({
         ) : null}
       </div>
 
+      {productHasPrice && product.price != null ? (
       <InstallmentRequestModal
         isOpen={isInstallmentModalOpen}
         onClose={() => setIsInstallmentModalOpen(false)}
@@ -324,6 +332,7 @@ export function ProductCardGrid({
         currency="AMD"
         productImageUrl={product.image}
       />
+      ) : null}
     </div>
   );
 }

@@ -25,7 +25,9 @@ interface Product {
   slug: string;
   title: string;
   subtitle?: string | null;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
+  priceOnRequest?: boolean;
   image: string | null;
   inStock: boolean;
   brand: {
@@ -165,6 +167,7 @@ function useProductCardPrimaryActionHandler(
     productId: product.id,
     productSlug: product.slug,
     inStock: product.inStock,
+    hasPurchasablePrice: product.hasPrice !== false && (product.price == null ? false : product.price > 0),
     defaultVariantId: product.defaultVariantId ?? undefined,
     price: product.price,
     title: product.title,

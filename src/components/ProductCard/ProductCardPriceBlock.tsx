@@ -3,7 +3,8 @@
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
 
 interface ProductCardPriceBlockProps {
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   currency: CurrencyCode;
   discountPercent?: number | null;
   listPrice?: number | null;
@@ -15,6 +16,7 @@ interface ProductCardPriceBlockProps {
 
 export function ProductCardPriceBlock({
   price,
+  hasPrice = price != null && price > 0,
   currency,
   discountPercent,
   listPrice,
@@ -23,11 +25,15 @@ export function ProductCardPriceBlock({
   homeProductGridCard = false,
   showStrike = false,
 }: ProductCardPriceBlockProps) {
+  if (!hasPrice || price == null) {
+    return <div className="min-h-[1.25rem] min-w-0" aria-hidden="true" />;
+  }
+
   return (
     <div className="min-w-0 flex flex-col gap-0.5">
       <div className="flex flex-wrap items-center gap-2">
         <span className={`whitespace-nowrap font-bold tabular-nums text-gray-900 ${priceClass}`}>
-          {formatPrice(price || 0, currency)}
+          {formatPrice(price, currency)}
         </span>
         {discountPercent && discountPercent > 0 ? (
           <span

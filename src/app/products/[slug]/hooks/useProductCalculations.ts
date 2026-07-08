@@ -1,6 +1,9 @@
+'use client';
+
 import { useMemo } from 'react';
 import type { Product, ProductVariant, AttributeGroupValue } from '../types';
 import { getMissingRequiredAttributeKeys } from '../utils/required-attribute-selection';
+import { hasDisplayPrice } from '../../../../lib/products/variant-price-display';
 
 interface UseProductCalculationsProps {
   product: Product | null;
@@ -31,7 +34,8 @@ export function useProductCalculations({
   );
 
   const isVariationRequired = missingRequiredAttributeKeys.length > 0;
-  const price = currentVariant?.price || 0;
+  const variantHasPrice = hasDisplayPrice(currentVariant);
+  const price = variantHasPrice && currentVariant ? currentVariant.price : null;
   const originalPrice = currentVariant?.originalPrice;
   const compareAtPrice = currentVariant?.compareAtPrice;
   const discountPercent = currentVariant?.productDiscount || product?.productDiscount || null;
@@ -99,6 +103,7 @@ export function useProductCalculations({
 
   const hasUnavailableAttributes = unavailableAttributes.size > 0;
   const canAddToCart =
+    variantHasPrice &&
     !isVariationRequired &&
     Boolean(currentVariant) &&
     (currentVariant?.stock ?? 0) > 0 &&
@@ -106,6 +111,8 @@ export function useProductCalculations({
 
   return {
     price,
+    hasPrice: variantHasPrice,
+    priceOnRequest: Boolean(currentVariant?.priceOnRequest),
     originalPrice: originalPrice ?? null,
     compareAtPrice: compareAtPrice ?? null,
     discountPercent,
@@ -120,7 +127,3 @@ export function useProductCalculations({
     canAddToCart,
   };
 }
-
-
-
-
