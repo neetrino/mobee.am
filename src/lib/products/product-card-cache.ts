@@ -2,7 +2,8 @@ export type ProductCardCachePayload = {
   slug: string;
   id: string;
   title: string;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   currency?: string;
   image: string | null;
   brand?: { id: string; name: string } | null;
@@ -101,7 +102,8 @@ export function buildProductCardCachePayload(product: {
   id: string;
   slug: string;
   title: string;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   image: string | null;
   inStock?: boolean;
   brand?: { id: string; name: string } | null;
@@ -115,6 +117,7 @@ export function buildProductCardCachePayload(product: {
     id: product.id,
     title: product.title,
     price: product.price,
+    hasPrice: product.hasPrice ?? (product.price != null && product.price > 0),
     image: product.image,
     brand: product.brand ?? null,
     defaultVariantId: product.defaultVariantId ?? null,
@@ -129,7 +132,8 @@ export function touchProductCardCacheFromListing(product: {
   id: string;
   slug: string;
   title: string;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   image: string | null;
   inStock?: boolean;
   brand?: { id: string; name: string } | null;

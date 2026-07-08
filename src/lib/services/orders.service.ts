@@ -23,6 +23,10 @@ import {
   buildCheckoutCartItemDetails,
   type CheckoutCartItemDetails,
 } from "./orders/checkout-cart-item-details";
+import {
+  assertCartLinePurchasable,
+  assertVariantPurchasable,
+} from "../products/variant-price-display";
 import { normalizeCheckoutDisplayCurrency } from "../checkout/checkout-email-money";
 import { adminService } from "./admin.service";
 
@@ -394,6 +398,11 @@ class OrdersService {
               variantSku: variant.sku,
             });
             
+            assertCartLinePurchasable({
+              priceSnapshot: item.priceSnapshot,
+              variant,
+            });
+
             const cartItemDetails = buildCheckoutCartItemDetails({
               variant,
               product,
@@ -478,6 +487,7 @@ class OrdersService {
               detail: `Insufficient stock. Available: ${variant.stock}, Requested: ${item.quantity}`,
             };
           }
+          assertVariantPurchasable(variant);
           const cartItemDetails = buildCheckoutCartItemDetails({
             variant,
             product: variant.product,

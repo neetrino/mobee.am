@@ -5,6 +5,7 @@ import { Button } from '@shop/ui';
 import { formatPrice } from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
 import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
+import { hasDisplayPrice } from '../../lib/products/variant-price-display';
 import { ProductCardNavLink } from '../../components/ProductCard/ProductCardNavLink';
 import {
   CART_ITEM_ROW_DESKTOP_IMAGE_FRAME_CLASS,
@@ -25,7 +26,8 @@ export interface WishlistItemCardProduct {
   id: string;
   slug: string;
   title: string;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   originalPrice: number | null;
   compareAtPrice: number | null;
   image: string | null;
@@ -53,13 +55,20 @@ export function WishlistItemCard({
   t,
 }: WishlistItemCardProps) {
   const currencyCode = currency as CurrencyCode;
+  const productHasPrice =
+    product.hasPrice ?? hasDisplayPrice({ price: product.price ?? 0, priceOnRequest: false });
   const listPrice = product.compareAtPrice ?? product.originalPrice;
-  const showStrike = listPrice !== null && listPrice > product.price;
+  const showStrike =
+    productHasPrice &&
+    product.price != null &&
+    listPrice !== null &&
+    listPrice > product.price;
   const listingCacheSource = buildProductCardCachePayload({
     id: product.id,
     slug: product.slug,
     title: product.title,
     price: product.price,
+    hasPrice: productHasPrice,
     image: product.image,
     inStock: product.inStock,
     brand: product.brand,
@@ -147,14 +156,18 @@ export function WishlistItemCard({
       </div>
 
       <div className={CART_LINE_ITEM_CARD_FOOTER_CLASS}>
-        <div className="flex w-full flex-col items-center gap-1">
-          <span className="text-center text-sm font-bold tabular-nums text-gray-900">
-            {formatPrice(product.price, currencyCode)}
-          </span>
-          {showStrike && listPrice !== null ? (
-            <span className="text-center text-xs tabular-nums text-gray-500 line-through">
-              {formatPrice(listPrice, currencyCode)}
-            </span>
+        <div className="flex w-full flex-col items-center gap-1 min-h-[2.5rem]">
+          {productHasPrice && product.price != null ? (
+            <>
+              <span className="text-center text-sm font-bold tabular-nums text-gray-900">
+                {formatPrice(product.price, currencyCode)}
+              </span>
+              {showStrike && listPrice !== null ? (
+                <span className="text-center text-xs tabular-nums text-gray-500 line-through">
+                  {formatPrice(listPrice, currencyCode)}
+                </span>
+              ) : null}
+            </>
           ) : null}
         </div>
 
@@ -166,7 +179,7 @@ export function WishlistItemCard({
             variant="primary"
             type="button"
             onClick={() => onAddToCart(product)}
-            disabled={!product.inStock}
+            disabled={!product.inStock || !productHasPrice}
             className="w-full !cursor-pointer !rounded-full !bg-admin-500 !text-white hover:!bg-admin-600 focus:!ring-admin-500 disabled:!cursor-default disabled:opacity-50"
             size="md"
           >

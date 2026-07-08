@@ -263,6 +263,7 @@ model ProductVariant {
   sku            String?                @unique
   barcode        String?
   price          Float
+  priceOnRequest Boolean                @default(false)
   compareAtPrice Float?
   cost           Float?
   stock          Int                    @default(0)

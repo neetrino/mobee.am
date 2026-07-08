@@ -22,6 +22,8 @@ export interface ProductVariant {
   id: string;
   sku: string;
   price: number;
+  priceOnRequest?: boolean;
+  hasPrice?: boolean;
   originalPrice?: number | null;
   compareAtPrice?: number;
   stock: number;

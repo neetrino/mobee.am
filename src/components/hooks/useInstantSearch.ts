@@ -6,7 +6,8 @@ export interface InstantSearchResultItem {
   id: string;
   slug: string;
   title: string;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   compareAtPrice: number | null;
   image: string | null;
   category: string | null;

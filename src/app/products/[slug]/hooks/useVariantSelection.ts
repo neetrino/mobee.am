@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getOptionValue } from '../utils/variant-helpers';
+import { findVariantByColorAndSize } from '../utils/variant-finders';
 import { handleColorSelect as handleColorSelectUtil } from '../utils/image-switching';
 import type { Product, ProductVariant, VariantOption } from '../types';
 
 interface UseVariantSelectionProps {
   product: Product | null;
   setCurrentImageIndex: (index: number) => void;
+  colorFromUrl?: string | null;
+  variantIdFromUrl?: string | null;
 }
 
 function buildAttributeValuesFromVariant(variant: ProductVariant): {
@@ -27,7 +30,7 @@ function buildAttributeValuesFromVariant(variant: ProductVariant): {
     }
 
     if (option.value) {
-      attributes.set(key, option.value);
+      attributes.set(key, option.value.toLowerCase().trim());
     }
   });
 
@@ -39,14 +42,39 @@ function getDefaultVariant(product: Product): ProductVariant | null {
   return product.variants.find((variant) => variant.stock > 0) ?? product.variants[0] ?? null;
 }
 
+function resolveInitialVariant(
+  product: Product,
+  colorFromUrl?: string | null,
+  variantIdFromUrl?: string | null,
+): ProductVariant | null {
+  if (variantIdFromUrl) {
+    const variantById = product.variants.find(
+      (variant) =>
+        variant.id === variantIdFromUrl || variant.id.endsWith(variantIdFromUrl),
+    );
+    const variantByIndex = product.variants[parseInt(variantIdFromUrl, 10) - 1];
+    const fromUrl = variantById || variantByIndex;
+    if (fromUrl) return fromUrl;
+  }
+
+  if (colorFromUrl) {
+    const fromColor = findVariantByColorAndSize(product, colorFromUrl, null);
+    if (fromColor) return fromColor;
+  }
+
+  return getDefaultVariant(product);
+}
+
 export function useVariantSelection({
   product,
   setCurrentImageIndex,
+  colorFromUrl = null,
+  variantIdFromUrl = null,
 }: UseVariantSelectionProps) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedAttributeValues, setSelectedAttributeValues] = useState<Map<string, string>>(new Map());
-  const initializedProductIdRef = useRef<string | null>(null);
+  const initializedKeyRef = useRef<string | null>(null);
 
   const productId = product?.id ?? null;
   const variantCount = product?.variants?.length ?? 0;
@@ -60,7 +88,9 @@ export function useVariantSelection({
 
   useEffect(() => {
     if (!productId || variantCount === 0) {
-      initializedProductIdRef.current = null;
+      if (!productId) {
+        initializedKeyRef.current = null;
+      }
       setSelectedColor(null);
       setSelectedSize(null);
       setSelectedAttributeValues(new Map());
@@ -71,18 +101,26 @@ export function useVariantSelection({
       return;
     }
 
-    if (initializedProductIdRef.current === productId) {
+    const initKey = `${productId}:${colorFromUrl ?? ''}:${variantIdFromUrl ?? ''}`;
+    if (initializedKeyRef.current === initKey) {
       return;
     }
 
-    initializedProductIdRef.current = productId;
+    initializedKeyRef.current = initKey;
 
-    const initialVariant = getDefaultVariant(product);
+    const initialVariant = resolveInitialVariant(product, colorFromUrl, variantIdFromUrl);
 
     if (initialVariant) {
       applyVariantSelection(initialVariant);
     }
-  }, [productId, variantCount, product, applyVariantSelection]);
+  }, [
+    productId,
+    variantCount,
+    product,
+    applyVariantSelection,
+    colorFromUrl,
+    variantIdFromUrl,
+  ]);
 
   const applyColorSelection = useCallback((color: string) => {
     if (!color) return;

@@ -6,6 +6,10 @@ import {
   resolveListingDisplayColor,
   resolveListingProductImage,
 } from "./products-listing-display-variant";
+import {
+  hasDisplayPrice,
+  pickListingPriceVariant,
+} from "../products/variant-price-display";
 
 export type ProductListingTransformContext = {
   colors?: string;
@@ -106,11 +110,7 @@ class ProductsFindTransformService {
         listingContext?.colors,
         lang,
       );
-      const variant =
-        displayVariant ??
-        (variants.length > 0
-          ? variants.sort((a: { price: number }, b: { price: number }) => a.price - b.price)[0]
-          : null);
+      const variant = pickListingPriceVariant(variants, displayVariant);
 
       // Get all unique colors from ALL variants with imageUrl and colors hex (support both new and old format)
       // IMPORTANT: Only collect colors that actually exist in variants
@@ -244,9 +244,10 @@ class ProductsFindTransformService {
         lang,
       );
 
-      const originalPrice = variant?.price || 0;
+      const originalPrice = variant?.price ?? 0;
       let finalPrice = originalPrice;
       const productDiscount = product.discountPercent || 0;
+      const variantHasPrice = hasDisplayPrice(variant);
       
       // Calculate applied discount with priority: productDiscount > categoryDiscount > brandDiscount > globalDiscount
       let appliedDiscount = 0;
@@ -268,7 +269,7 @@ class ProductsFindTransformService {
         }
       }
 
-      if (appliedDiscount > 0 && originalPrice > 0) {
+      if (appliedDiscount > 0 && originalPrice > 0 && variantHasPrice) {
         finalPrice = originalPrice * (1 - appliedDiscount / 100);
       }
 
@@ -290,7 +291,7 @@ class ProductsFindTransformService {
         subtitle: translation?.subtitle || "",
         primaryCategoryId: product.primaryCategoryId ?? null,
         categoryIds: Array.isArray(product.categoryIds) ? [...product.categoryIds] : [],
-        defaultVariantId: variant?.id ?? null,
+        defaultVariantId: variant?.id ?? variants[0]?.id ?? null,
         brand: product.brand
           ? {
               id: product.brand.id,
@@ -298,12 +299,14 @@ class ProductsFindTransformService {
             }
           : null,
         categories,
-        price: finalPrice,
-        originalPrice: appliedDiscount > 0 ? originalPrice : variant?.compareAtPrice || null,
-        compareAtPrice: variant?.compareAtPrice || null,
-        discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
+        price: variantHasPrice ? finalPrice : null,
+        hasPrice: variantHasPrice,
+        priceOnRequest: Boolean(variant?.priceOnRequest),
+        originalPrice: variantHasPrice && appliedDiscount > 0 ? originalPrice : variantHasPrice ? variant?.compareAtPrice || null : null,
+        compareAtPrice: variantHasPrice ? variant?.compareAtPrice || null : null,
+        discountPercent: variantHasPrice && appliedDiscount > 0 ? appliedDiscount : null,
         image: listingImage,
-        inStock: (variant?.stock || 0) > 0,
+        inStock: variantHasPrice && (variant?.stock || 0) > 0,
         labels: Array.isArray(product.labels)
           ? product.labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({
               id: label.id,

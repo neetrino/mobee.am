@@ -83,6 +83,7 @@ export function ProductPageClient({
     sizeGroups,
     currentVariant,
     price,
+    hasPrice,
     discountPercent,
     maxQuantity,
     isOutOfStock,
@@ -101,6 +102,7 @@ export function ProductPageClient({
     getRequiredAttributesMessage,
     shellProduct,
     isNotFound,
+    galleryVariant,
   } = useProductPage({
     slug,
     variantIdFromUrl,
@@ -116,7 +118,7 @@ export function ProductPageClient({
   );
 
   const handleAddToCart = () => {
-    if (!canAddToCart || !product || !currentVariant || addToCartInFlightRef.current) {
+    if (!canAddToCart || !product || !currentVariant || addToCartInFlightRef.current || price == null) {
       return;
     }
 
@@ -154,7 +156,7 @@ export function ProductPageClient({
     addToCartInFlightRef.current = true;
     window.dispatchEvent(
       new CustomEvent('cart-updated', {
-        detail: { optimisticAdd: { quantity, price } },
+        detail: { optimisticAdd: { quantity, price: price ?? 0 } },
       }),
     );
     dispatchCartFlyAnimation(flyUrl, flyEl);
@@ -220,9 +222,13 @@ export function ProductPageClient({
             {shellProduct.brand?.name ? (
               <p className="text-sm text-gray-600">{shellProduct.brand.name}</p>
             ) : null}
-            <p className="text-xl font-semibold text-gray-900">
-              {formatPriceInCurrency(shellProduct.price, currency)}
-            </p>
+            {shellProduct.hasPrice && shellProduct.price != null ? (
+              <p className="text-xl font-semibold text-gray-900">
+                {formatPriceInCurrency(shellProduct.price, currency)}
+              </p>
+            ) : (
+              <p className="min-h-[1.75rem]" aria-hidden="true" />
+            )}
             <p className="text-sm text-gray-500">{t(language, 'common.messages.loading')}</p>
             <p className="text-xs text-gray-400">{t(language, 'product.selectOptions')}</p>
           </div>
@@ -245,6 +251,7 @@ export function ProductPageClient({
     >
       <div className="grid grid-cols-1 items-start gap-12 product-2col:grid-cols-[55%_45%] [&>*]:min-w-0">
         <ProductImageGallery
+          key={galleryVariant?.id ?? selectedColor ?? product.id}
           images={images}
           product={product}
           discountPercent={discountPercent}
@@ -258,6 +265,7 @@ export function ProductPageClient({
         <ProductInfoAndActions
           product={product}
           price={price}
+          hasPrice={hasPrice}
           discountPercent={discountPercent}
           currency={currency}
           language={language}

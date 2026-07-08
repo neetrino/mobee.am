@@ -9,6 +9,7 @@ import { ensureProductVariantAttributesColumn } from "../../utils/db-ensure";
 import { logger } from "../../utils/logger";
 import type { ProductWithRelations } from "./types";
 import type { ProductSortOption } from "@/lib/products/sort";
+import { listPriceSortKey } from "@/lib/products/variant-price-display";
 
 type QueryExecutionContext = {
   listingMode: boolean;
@@ -390,10 +391,9 @@ function getOrderBy(sort: ProductSortOption): Prisma.ProductOrderByWithRelationI
  * Listing "from" price: minimum published variant price (matches grid / filter sort).
  */
 function listPriceFromLightVariants(
-  variants: ReadonlyArray<{ price: number }>
+  variants: ReadonlyArray<{ price: number; priceOnRequest?: boolean | null }>,
 ): number {
-  if (variants.length === 0) return 0;
-  return Math.min(...variants.map((v) => v.price));
+  return listPriceSortKey([...variants]);
 }
 
 /**
@@ -415,7 +415,7 @@ export async function fetchProductsPageForPriceSort(
       createdAt: true,
       variants: {
         where: { published: true },
-        select: { price: true },
+        select: { price: true, priceOnRequest: true },
       },
     },
   });

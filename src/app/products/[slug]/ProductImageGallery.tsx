@@ -209,7 +209,7 @@ export function ProductImageGallery({
                     <img
                       src={image}
                       alt=""
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain p-0.5"
                       onError={() => markFailed(actualIndex)}
                     />
                   )}
@@ -355,7 +355,7 @@ export function ProductImageGallery({
                     <img
                       src={currentSrc}
                       alt={product.title}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain"
                       onError={() => markFailed(currentImageIndex)}
                     />
                   ) : (

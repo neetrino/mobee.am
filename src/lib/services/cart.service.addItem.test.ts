@@ -39,10 +39,25 @@ describe("cartService.addItem", () => {
       published: false,
       productId: "p-1",
       price: 100,
+      priceOnRequest: false,
     });
     await expect(
       cartService.addItem("user-1", { productId: "p-1", variantId: "v-1" }),
     ).rejects.toMatchObject({ status: 404, title: "Variant not found" });
+    expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+
+  it("throws 422 before transaction when variant is price on request", async () => {
+    mocks.findUnique.mockResolvedValue({
+      id: "v-1",
+      published: true,
+      productId: "p-1",
+      price: 0,
+      priceOnRequest: true,
+    });
+    await expect(
+      cartService.addItem("user-1", { productId: "p-1", variantId: "v-1" }),
+    ).rejects.toMatchObject({ status: 422, title: "Price unavailable" });
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
@@ -52,6 +67,7 @@ describe("cartService.addItem", () => {
       published: true,
       productId: "p-canonical",
       price: 100,
+      priceOnRequest: false,
     });
 
     const cartFindFirst = vi.fn().mockResolvedValue(null);

@@ -15,7 +15,8 @@ interface ProductCardInfoProps {
   /** Localized category line under the title (replaces product subtitle on cards). */
   categoryLine?: string | null;
   brandName?: string | null;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   discountPercent?: number | null;
   currency: CurrencyCode;
   colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
@@ -42,6 +43,7 @@ export function ProductCardInfo({
   categoryLine,
   brandName,
   price,
+  hasPrice = price != null && price > 0,
   discountPercent,
   currency,
   colors,
@@ -133,24 +135,28 @@ export function ProductCardInfo({
 
       {!hidePrice ? (
         <div className={`mt-2 flex items-center justify-between ${isCompact ? 'gap-2' : 'gap-4'}`}>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span
-                className={`whitespace-nowrap ${priceClass} font-semibold text-gray-900`}
-              >
-                {formatPrice(price || 0, currency)}
-              </span>
-              {discountPercent && discountPercent > 0 ? (
+          {hasPrice && price != null ? (
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
                 <span
-                  className={`${
-                    isCompact ? 'text-[0.7125rem]' : 'text-[0.83125rem]'
-                  } font-semibold text-blue-600`}
+                  className={`whitespace-nowrap ${priceClass} font-semibold text-gray-900`}
                 >
-                  -{discountPercent}%
+                  {formatPrice(price, currency)}
                 </span>
-              ) : null}
+                {discountPercent && discountPercent > 0 ? (
+                  <span
+                    className={`${
+                      isCompact ? 'text-[0.7125rem]' : 'text-[0.83125rem]'
+                    } font-semibold text-blue-600`}
+                  >
+                    -{discountPercent}%
+                  </span>
+                ) : null}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="min-h-[1.25rem]" aria-hidden="true" />
+          )}
         </div>
       ) : null}
     </div>

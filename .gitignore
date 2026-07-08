@@ -34,7 +34,7 @@ temp/
 # *.swo
 
 # MobileCentre import / cleanup artifacts (local only)
-.mobilecentre-image-cache.json
+data/product-import/cache/
 mobilecentre_apple_variable_products.json
 audit/
 backups/

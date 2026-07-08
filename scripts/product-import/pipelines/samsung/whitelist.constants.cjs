@@ -1,0 +1,62 @@
+"use strict";
+
+/** Canonical Samsung Galaxy phone parent models allowed for import. */
+const SAMSUNG_PHONE_WHITELIST = [
+  "Samsung Galaxy S25",
+  "Samsung Galaxy S25+",
+  "Samsung Galaxy S25 Ultra",
+  "Samsung Galaxy S25 Edge",
+  "Samsung Galaxy S25 FE",
+  "Samsung Galaxy S26",
+  "Samsung Galaxy S26+",
+  "Samsung Galaxy S26 Ultra",
+  "Samsung Galaxy A06",
+  "Samsung Galaxy A06 5G",
+  "Samsung Galaxy A07",
+  "Samsung Galaxy A07 5G",
+  "Samsung Galaxy A16",
+  "Samsung Galaxy A17",
+  "Samsung Galaxy A17 5G",
+  "Samsung Galaxy A26",
+  "Samsung Galaxy A26 5G",
+  "Samsung Galaxy A27",
+  "Samsung Galaxy A27 5G",
+  "Samsung Galaxy A36",
+  "Samsung Galaxy A36 5G",
+  "Samsung Galaxy A37",
+  "Samsung Galaxy A37 5G",
+  "Samsung Galaxy A56",
+  "Samsung Galaxy A56 5G",
+  "Samsung Galaxy A57",
+  "Samsung Galaxy A57 5G",
+  "Samsung Galaxy Z Fold7",
+  "Samsung Galaxy Z Flip7",
+  "Samsung Galaxy Z Flip7 FE",
+  "Samsung Galaxy Z TriFold",
+];
+
+/** YerevanMobile-only import scope for the missing-models audit. */
+const YEREVANMOBILE_IMPORT_SCOPE = [
+  "Samsung Galaxy A06",
+  "Samsung Galaxy A07",
+  "Samsung Galaxy A17",
+  "Samsung Galaxy A26",
+  "Samsung Galaxy A27",
+  "Samsung Galaxy A36",
+  "Samsung Galaxy A37",
+  "Samsung Galaxy A56",
+  "Samsung Galaxy A57",
+  "Samsung Galaxy A06 5G",
+  "Samsung Galaxy A07 5G",
+  "Samsung Galaxy A17 5G",
+  "Samsung Galaxy A26 5G",
+  "Samsung Galaxy A27 5G",
+  "Samsung Galaxy A36 5G",
+  "Samsung Galaxy A37 5G",
+  "Samsung Galaxy A56 5G",
+  "Samsung Galaxy A57 5G",
+  "Samsung Galaxy S25 Edge",
+  "Samsung Galaxy Z TriFold",
+];
+
+module.exports = { SAMSUNG_PHONE_WHITELIST, YEREVANMOBILE_IMPORT_SCOPE };

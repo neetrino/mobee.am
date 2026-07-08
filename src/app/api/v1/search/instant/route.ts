@@ -4,6 +4,7 @@ import { db } from '@white-shop/db';
 import { PRODUCT_VARIANT_DB_SELECT } from '@/lib/database/productVariantDb.constants';
 import { extractMediaUrl } from '@/lib/utils/extractMediaUrl';
 import { processImageUrl } from '@/lib/utils/image-utils';
+import { hasDisplayPrice, pickListingPriceVariant } from '@/lib/products/variant-price-display';
 
 const DEFAULT_LIMIT = 8;
 const MAX_LIMIT = 20;
@@ -12,7 +13,8 @@ export interface InstantSearchResult {
   id: string;
   slug: string;
   title: string;
-  price: number;
+  price: number | null;
+  hasPrice: boolean;
   compareAtPrice: number | null;
   image: string | null;
   category: string | null;
@@ -67,8 +69,6 @@ export async function GET(req: NextRequest) {
         translations: true,
         variants: {
           where: { published: true },
-          take: 1,
-          orderBy: { price: 'asc' },
           select: PRODUCT_VARIANT_DB_SELECT,
         },
         categories: { include: { translations: true } },
@@ -83,13 +83,14 @@ export async function GET(req: NextRequest) {
       const title = translation?.title ?? '';
 
       const variants = Array.isArray(product.variants) ? product.variants : [];
-      const firstVariant = variants[0];
-      const price = firstVariant?.price ?? 0;
-      const compareAtPrice = firstVariant?.compareAtPrice ?? null;
+      const pricedVariant = pickListingPriceVariant(variants);
+      const variantHasPrice = hasDisplayPrice(pricedVariant);
+      const price = variantHasPrice ? pricedVariant!.price : null;
+      const compareAtPrice = variantHasPrice ? pricedVariant?.compareAtPrice ?? null : null;
 
       let image: string | null = extractMediaUrl(product.media);
-      if (!image && firstVariant?.imageUrl) {
-        image = processImageUrl(firstVariant.imageUrl);
+      if (!image && pricedVariant?.imageUrl) {
+        image = processImageUrl(pricedVariant.imageUrl);
       }
 
       const categories = Array.isArray(product.categories) ? product.categories : [];
@@ -112,6 +113,7 @@ export async function GET(req: NextRequest) {
         slug,
         title,
         price,
+        hasPrice: variantHasPrice,
         compareAtPrice,
         image,
         category,
