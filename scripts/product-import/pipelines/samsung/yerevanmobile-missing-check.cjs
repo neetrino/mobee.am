@@ -48,7 +48,6 @@ const SAMSUNG_CATEGORY_URLS = [
 ];
 
 const LANGS = ["en", "am", "ru"];
-const COMMANDS = [];
 const MIN_PHONE_PRICE_AMD = 50000;
 
 function isProductPageUrl(url) {

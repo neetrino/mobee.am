@@ -1,6 +1,5 @@
 "use strict";
 
-const path = require("path");
 const fs = require("fs");
 const { validateVariantForImport, isWhitelistedParentModel } = require("../whitelist.cjs");
 const { variantDedupeKey, slugify } = require("../normalize.cjs");
