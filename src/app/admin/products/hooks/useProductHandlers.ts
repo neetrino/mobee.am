@@ -1,14 +1,27 @@
-import type { FormEvent } from 'react';
+import type { Dispatch, FormEvent, SetStateAction } from 'react';
 import { apiClient } from '../../../../lib/api-client';
+import { invalidateAdminSessionCacheByPrefix } from '@/lib/admin/admin-session-cache';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { showToast } from '../../../../components/Toast';
 import { confirmDialog } from '../../../../components/ConfirmDialog';
 import type { Product } from '../types';
 
+function patchProductInList(
+  setProducts: Dispatch<SetStateAction<Product[]>>,
+  productId: string,
+  patch: Partial<Product>,
+): void {
+  setProducts((prev) =>
+    prev.map((product) =>
+      product.id === productId ? { ...product, ...patch } : product,
+    ),
+  );
+}
+
 interface UseProductHandlersProps {
   products: Product[];
-  setProducts: (products: Product[]) => void;
-  fetchProducts: () => Promise<void>;
+  setProducts: Dispatch<SetStateAction<Product[]>>;
+  fetchProducts: (force?: boolean) => Promise<void>;
   selectedIds: Set<string>;
   setSelectedIds: (ids: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
   setPage: (page: number | ((prev: number) => number)) => void;
@@ -18,7 +31,7 @@ interface UseProductHandlersProps {
 
 export function useProductHandlers({
   products,
-  setProducts: _setProducts,
+  setProducts,
   fetchProducts,
   selectedIds,
   setSelectedIds,
@@ -101,88 +114,86 @@ export function useProductHandlers({
   };
 
   const handleTogglePublished = async (productId: string, currentStatus: boolean, productTitle: string) => {
+    const newStatus = !currentStatus;
+    patchProductInList(setProducts, productId, { published: newStatus });
+
     try {
-      const newStatus = !currentStatus;
-      
-      // При изменении только статуса published, отправляем только статус
-      // Это позволяет избежать проблем с валидацией вариантов (например, требование размеров)
-      // Варианты и другие данные останутся без изменений на сервере
-      const updateData = {
-        published: newStatus,
-      };
-      
-      console.log(`🔄 [ADMIN] Updating product status to ${newStatus ? 'published' : 'draft'}`);
-      
-      await apiClient.put(`/api/v1/admin/products/${productId}`, updateData);
-      
-      console.log(`✅ [ADMIN] Product ${newStatus ? 'published' : 'unpublished'} successfully`);
-      
-      // Refresh products list
-      fetchProducts();
-      
+      await apiClient.put(`/api/v1/admin/products/${productId}`, { published: newStatus });
+      invalidateAdminSessionCacheByPrefix('/supersudo/products');
+
       if (newStatus) {
         showToast(t('admin.products.productPublished').replace('{title}', productTitle), 'success');
       } else {
         showToast(t('admin.products.productDraft').replace('{title}', productTitle), 'success');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      patchProductInList(setProducts, productId, { published: currentStatus });
+      const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error updating product status:', err);
-      showToast(t('admin.products.errorUpdatingStatus').replace('{message}', err.message || t('admin.common.unknownErrorFallback')), 'error');
+      showToast(t('admin.products.errorUpdatingStatus').replace('{message}', message), 'error');
     }
   };
 
   const handleToggleFeatured = async (productId: string, currentStatus: boolean, _productTitle: string) => {
+    const newStatus = !currentStatus;
+    patchProductInList(setProducts, productId, { featured: newStatus });
+
     try {
-      const newStatus = !currentStatus;
-      
-      const updateData = {
-        featured: newStatus,
-      };
-      
-      console.log(`⭐ [ADMIN] Updating product featured status to ${newStatus ? 'featured' : 'not featured'}`);
-      
-      await apiClient.put(`/api/v1/admin/products/${productId}`, updateData);
-      
-      console.log(`✅ [ADMIN] Product ${newStatus ? 'marked as featured' : 'removed from featured'} successfully`);
-      
-      // Refresh products list
-      fetchProducts();
-    } catch (err: any) {
+      await apiClient.put(`/api/v1/admin/products/${productId}`, { featured: newStatus });
+      invalidateAdminSessionCacheByPrefix('/supersudo/products');
+    } catch (err: unknown) {
+      patchProductInList(setProducts, productId, { featured: currentStatus });
+      const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error updating product featured status:', err);
-      showToast(t('admin.products.errorUpdatingFeatured').replace('{message}', err.message || t('admin.common.unknownErrorFallback')), 'error');
+      showToast(t('admin.products.errorUpdatingFeatured').replace('{message}', message), 'error');
     }
   };
 
   const handleToggleAllFeatured = async () => {
     if (products.length === 0) return;
 
-    // Check if all products are featured
-    const allFeatured = products.every(p => p.featured);
+    const allFeatured = products.every((product) => product.featured);
     const newStatus = !allFeatured;
+    const previousById = new Map(products.map((product) => [product.id, product.featured ?? false]));
 
+    setProducts((prev) => prev.map((product) => ({ ...product, featured: newStatus })));
     setTogglingAllFeatured(true);
+
     try {
       const results = await Promise.allSettled(
-        products.map(product => 
-          apiClient.put(`/api/v1/admin/products/${product.id}`, { featured: newStatus })
-        )
+        products.map((product) =>
+          apiClient.put(`/api/v1/admin/products/${product.id}`, { featured: newStatus }),
+        ),
       );
-      
-      const failed = results.filter(r => r.status === 'rejected');
-      const successCount = products.length - failed.length;
-      
-      console.log(`✅ [ADMIN] Toggle all featured completed: ${successCount}/${products.length} successful`);
-      
-      // Refresh products list
-      await fetchProducts();
-      
-      if (failed.length > 0) {
+
+      const failedIds = products
+        .filter((_, index) => results[index]?.status === 'rejected')
+        .map((product) => product.id);
+
+      if (failedIds.length > 0) {
+        setProducts((prev) =>
+          prev.map((product) =>
+            failedIds.includes(product.id)
+              ? { ...product, featured: previousById.get(product.id) ?? false }
+              : product,
+          ),
+        );
         showToast(
-          t('admin.products.featuredToggleFinished').replace('{success}', successCount.toString()).replace('{total}', products.length.toString()),
+          t('admin.products.featuredToggleFinished')
+            .replace('{success}', (products.length - failedIds.length).toString())
+            .replace('{total}', products.length.toString()),
           'warning',
         );
       }
+
+      invalidateAdminSessionCacheByPrefix('/supersudo/products');
     } catch (err) {
+      setProducts((prev) =>
+        prev.map((product) => ({
+          ...product,
+          featured: previousById.get(product.id) ?? false,
+        })),
+      );
       console.error('❌ [ADMIN] Toggle all featured error:', err);
       showToast(t('admin.products.failedToUpdateFeatured'), 'error');
     } finally {
