@@ -33,7 +33,7 @@ export function HeroBannerAutoCarousel({ className = '' }: HeroBannerAutoCarouse
     >
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain overscroll-y-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ gap: HERO_BANNER_SLIDE_GAP_PX }}
         role="region"
         aria-roledescription="carousel"
@@ -53,7 +53,7 @@ export function HeroBannerAutoCarousel({ className = '' }: HeroBannerAutoCarouse
               aria-hidden={!isActive}
             >
               <div
-                className="relative overflow-hidden rounded-[30px] bg-[#eceff3] shadow-sm transition-[transform,opacity] ease-out lg:rounded-[40px]"
+                className="relative overflow-hidden rounded-[30px] bg-[#eceff3] shadow-sm transition-[transform,opacity] ease-out lg:rounded-[40px] motion-reduce:transition-none"
                 style={{
                   aspectRatio: String(HERO_BANNER_ASPECT_RATIO),
                   transitionDuration: `${HERO_BANNER_TRANSITION_MS}ms`,
@@ -68,6 +68,7 @@ export function HeroBannerAutoCarousel({ className = '' }: HeroBannerAutoCarouse
                   className="object-cover object-center"
                   sizes="(max-width: 1024px) 88vw, 1200px"
                   priority={index === 0}
+                  draggable={false}
                 />
               </div>
             </div>

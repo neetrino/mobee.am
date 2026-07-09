@@ -25,7 +25,7 @@ function prefersReducedMotion(): boolean {
 }
 
 /**
- * Auto-advancing index + scroll sync for the home hero peek carousel.
+ * Auto-advancing hero peek carousel with native horizontal scroll (track.scrollTo only — never scrollIntoView).
  */
 export function useHeroBannerAutoCarousel({
   slideCount,
@@ -33,22 +33,30 @@ export function useHeroBannerAutoCarousel({
 }: UseHeroBannerAutoCarouselOptions): UseHeroBannerAutoCarouselResult {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isInView, setIsInView] = useState(true);
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const isUserScrollingRef = useRef(false);
+  const userScrollResetTimerRef = useRef<number | null>(null);
 
   const registerSlideRef = useCallback((index: number, node: HTMLDivElement | null) => {
     slideRefs.current[index] = node;
   }, []);
 
-  const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = 'smooth') => {
+  const scrollTrackToIndex = useCallback((index: number, behavior: ScrollBehavior = 'smooth') => {
+    const track = trackRef.current;
     const slide = slideRefs.current[index];
-    if (!slide) {
+    if (!track || !slide) {
       return;
     }
-    slide.scrollIntoView({
+
+    const targetLeft = slide.offsetLeft - (track.clientWidth - slide.offsetWidth) / 2;
+    const maxScrollLeft = track.scrollWidth - track.clientWidth;
+    const clampedLeft = Math.max(0, Math.min(maxScrollLeft, targetLeft));
+
+    track.scrollTo({
+      left: clampedLeft,
       behavior,
-      block: 'nearest',
-      inline: 'center',
     });
   }, []);
 
@@ -59,13 +67,29 @@ export function useHeroBannerAutoCarousel({
       }
       const nextIndex = ((index % slideCount) + slideCount) % slideCount;
       setActiveIndex(nextIndex);
-      scrollToIndex(nextIndex);
+      scrollTrackToIndex(nextIndex);
     },
-    [scrollToIndex, slideCount],
+    [scrollTrackToIndex, slideCount],
   );
 
   const pause = useCallback(() => setIsPaused(true), []);
+
   const resume = useCallback(() => setIsPaused(false), []);
+
+  const markUserScrolling = useCallback(() => {
+    isUserScrollingRef.current = true;
+    setIsPaused(true);
+
+    if (userScrollResetTimerRef.current !== null) {
+      window.clearTimeout(userScrollResetTimerRef.current);
+    }
+
+    userScrollResetTimerRef.current = window.setTimeout(() => {
+      isUserScrollingRef.current = false;
+      setIsPaused(false);
+      userScrollResetTimerRef.current = null;
+    }, 800);
+  }, []);
 
   useEffect(() => {
     slideRefs.current = slideRefs.current.slice(0, slideCount);
@@ -75,24 +99,45 @@ export function useHeroBannerAutoCarousel({
     if (slideCount < 1) {
       return;
     }
-    scrollToIndex(0, 'auto');
-  }, [scrollToIndex, slideCount]);
+    scrollTrackToIndex(0, 'auto');
+  }, [scrollTrackToIndex, slideCount]);
 
   useEffect(() => {
-    if (slideCount < 2 || isPaused || prefersReducedMotion()) {
+    const track = trackRef.current;
+    if (!track) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.2 },
+    );
+
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (slideCount < 2 || isPaused || !isInView || prefersReducedMotion()) {
       return;
     }
 
     const timerId = window.setInterval(() => {
+      if (isUserScrollingRef.current) {
+        return;
+      }
+
       setActiveIndex((current) => {
         const nextIndex = (current + 1) % slideCount;
-        scrollToIndex(nextIndex);
+        scrollTrackToIndex(nextIndex);
         return nextIndex;
       });
     }, intervalMs);
 
     return () => window.clearInterval(timerId);
-  }, [intervalMs, isPaused, scrollToIndex, slideCount]);
+  }, [intervalMs, isInView, isPaused, scrollTrackToIndex, slideCount]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -123,9 +168,38 @@ export function useHeroBannerAutoCarousel({
       setActiveIndex(closestIndex);
     };
 
-    track.addEventListener('scroll', syncActiveIndexFromScroll, { passive: true });
-    return () => track.removeEventListener('scroll', syncActiveIndexFromScroll);
-  }, [slideCount]);
+    const onScroll = () => {
+      markUserScrolling();
+      syncActiveIndexFromScroll();
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+        return;
+      }
+
+      event.preventDefault();
+      window.scrollBy({
+        top: event.deltaY,
+        left: 0,
+        behavior: 'auto',
+      });
+    };
+
+    track.addEventListener('scroll', onScroll, { passive: true });
+    track.addEventListener('wheel', onWheel, { passive: false });
+    track.addEventListener('touchstart', markUserScrolling, { passive: true });
+
+    return () => {
+      track.removeEventListener('scroll', onScroll);
+      track.removeEventListener('wheel', onWheel);
+      track.removeEventListener('touchstart', markUserScrolling);
+
+      if (userScrollResetTimerRef.current !== null) {
+        window.clearTimeout(userScrollResetTimerRef.current);
+      }
+    };
+  }, [markUserScrolling, slideCount]);
 
   return {
     activeIndex,
