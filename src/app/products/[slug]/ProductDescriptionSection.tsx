@@ -57,25 +57,19 @@ export function ProductDescriptionSection({
       </h2>
 
       {showDesktopCards ? (
-        <div className="hidden lg:block">
-          <ProductDescriptionDesktop
-            layout={layout}
-            language={language}
-            productId={product.id}
-            productTitle={product.title}
-            imageUrl={resolvedImageUrl}
-          />
-        </div>
-      ) : null}
-
-      <div
-        className={
-          showDesktopCards
-            ? `${proseClassName} lg:hidden`
-            : `${proseClassName} lg:max-w-3xl`
-        }
-        dangerouslySetInnerHTML={{ __html: sanitizeHtml(fullHtml) }}
-      />
+        <ProductDescriptionDesktop
+          layout={layout}
+          language={language}
+          productId={product.id}
+          productTitle={product.title}
+          imageUrl={resolvedImageUrl}
+        />
+      ) : (
+        <div
+          className={`${proseClassName} lg:max-w-3xl`}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(fullHtml) }}
+        />
+      )}
     </section>
   );
 }

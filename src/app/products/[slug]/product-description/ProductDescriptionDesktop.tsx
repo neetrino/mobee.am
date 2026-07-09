@@ -36,7 +36,7 @@ export function ProductDescriptionDesktop({
         <div
           className={
             layout.memoryRows.length > 0 && layout.connectivityRows.length > 0
-              ? 'grid grid-cols-2 gap-4'
+              ? 'grid grid-cols-1 gap-4 md:grid-cols-2'
               : 'grid grid-cols-1 gap-4'
           }
         >
@@ -61,7 +61,6 @@ export function ProductDescriptionDesktop({
           rows={layout.additionalRows}
           language={language}
           sectionSlug="security"
-          showChevrons
         />
       ) : null}
     </div>

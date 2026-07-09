@@ -1,2 +1,2 @@
 export const PRODUCT_DESCRIPTION_CARD_CLASS =
-  'rounded-2xl border border-gray-100 bg-white p-6';
+  'rounded-2xl border border-gray-100 bg-white p-4 sm:p-6';

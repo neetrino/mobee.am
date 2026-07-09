@@ -10,7 +10,7 @@ const HeroSectionIcon = getProductSpecSectionIcon('general');
 const HERO_SECTION_ICON_CLASS = getProductSpecSectionIconClassName('general');
 
 const HERO_GRID_CLASS =
-  'grid grid-cols-[minmax(0,0.95fr)_minmax(0,1.55fr)] items-start gap-8 [direction:ltr]';
+  'grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.55fr)] sm:items-start sm:gap-8 [direction:ltr]';
 
 interface ProductHeroCardProps {
   imageAlt: string;
@@ -48,14 +48,14 @@ export function ProductHeroCard({ imageAlt, imageUrl, rows, language }: ProductH
         </div>
 
         {visibleRows.length > 0 ? (
-          <div className="col-start-2 row-start-1 min-w-0">
+          <div className="col-start-1 row-start-2 min-w-0 sm:col-start-2 sm:row-start-1">
             <header className="mb-4 flex items-center gap-2.5">
               <span
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${HERO_SECTION_ICON_CLASS}`}
               >
                 <HeroSectionIcon className="h-4 w-4" aria-hidden />
               </span>
-              <h3 className="text-base font-bold text-gray-900">
+              <h3 className="min-w-0 break-words text-base font-bold text-gray-900">
                 {t(language, 'product.specs.sections.general')}
               </h3>
             </header>

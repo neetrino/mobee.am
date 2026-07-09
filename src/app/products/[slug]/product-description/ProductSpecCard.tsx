@@ -1,5 +1,4 @@
 import { createElement } from 'react';
-import { ChevronRight } from 'lucide-react';
 import type { LanguageCode } from '@/lib/language';
 import { isAffirmativeSpecValue } from '@/lib/products/product-spec-value-i18n';
 import type { ProductDescriptionSpecRow } from '@/lib/products/extract-product-description-specs';
@@ -7,15 +6,14 @@ import { getProductSpecRowIcon, getProductSpecSectionIcon, getProductSpecSection
 import { PRODUCT_DESCRIPTION_CARD_CLASS } from './product-description.constants';
 
 const ROW_CLASS =
-  'flex items-center gap-3 border-b border-gray-100 py-3.5 last:border-b-0 last:pb-0 first:pt-0';
+  'flex flex-wrap items-start gap-x-3 gap-y-1 border-b border-gray-100 py-3.5 last:border-b-0 last:pb-0 first:pt-0';
 
 interface ProductSpecRowProps {
   row: ProductDescriptionSpecRow;
   language: LanguageCode;
-  showChevron?: boolean;
 }
 
-export function ProductSpecRow({ row, language, showChevron = false }: ProductSpecRowProps) {
+export function ProductSpecRow({ row, language }: ProductSpecRowProps) {
   const isPositive = isAffirmativeSpecValue(row.value, language);
 
   return (
@@ -24,19 +22,18 @@ export function ProductSpecRow({ row, language, showChevron = false }: ProductSp
         className: 'h-5 w-5 shrink-0 text-gray-400',
         'aria-hidden': true,
       })}
-      <span className="min-w-0 flex-1 text-sm text-gray-500">{row.label}</span>
+      <span className="min-w-0 flex-[1_1_8rem] break-words text-sm text-gray-500">
+        {row.label}
+      </span>
       <span
         className={
           isPositive
-            ? 'shrink-0 text-sm font-medium text-emerald-600'
-            : 'shrink-0 text-right text-sm font-medium text-gray-900'
+            ? 'min-w-0 max-w-full flex-[1_1_6rem] break-words text-sm font-medium text-emerald-600 sm:text-right'
+            : 'min-w-0 max-w-full flex-[1_1_6rem] break-words text-sm font-medium text-gray-900 sm:text-right'
         }
       >
         {row.value}
       </span>
-      {showChevron ? (
-        <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" aria-hidden />
-      ) : null}
     </div>
   );
 }
@@ -46,7 +43,6 @@ interface ProductSpecCardProps {
   rows: ProductDescriptionSpecRow[];
   language: LanguageCode;
   sectionSlug: string;
-  showChevrons?: boolean;
   className?: string;
 }
 
@@ -55,7 +51,6 @@ export function ProductSpecCard({
   rows,
   language,
   sectionSlug,
-  showChevrons = false,
   className = '',
 }: ProductSpecCardProps) {
   if (rows.length === 0) {
@@ -75,7 +70,7 @@ export function ProductSpecCard({
             'aria-hidden': true,
           })}
         </span>
-        <h3 className="text-base font-bold text-gray-900">{title}</h3>
+        <h3 className="min-w-0 break-words text-base font-bold text-gray-900">{title}</h3>
       </header>
       <div>
         {rows.map((row) => (
@@ -83,7 +78,6 @@ export function ProductSpecCard({
             key={`${row.labelKey ?? row.label}-${row.value}`}
             row={row}
             language={language}
-            showChevron={showChevrons}
           />
         ))}
       </div>
