@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { createElement, useEffect, useMemo } from 'react';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import type { CategoryTreeNode } from '@/lib/category-nav';
 import { categoryStripHref } from '@/lib/categoryStrip';
@@ -36,7 +36,6 @@ function CategoriesMenuFlyoutCard({
   onLinkHover: (href: string) => void;
 }) {
   const href = categoryStripHref(category);
-  const Icon = resolveCategoryMenuIcon(category);
 
   return (
     <Link
@@ -47,7 +46,11 @@ function CategoriesMenuFlyoutCard({
       className="group flex min-h-[52px] items-center gap-2.5 rounded-xl bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-colors hover:bg-[#fafbfc] active:bg-[#f4f5f7]"
     >
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eceef3]">
-        <Icon className="size-5 text-[#4b5563]" strokeWidth={2} aria-hidden />
+        {createElement(resolveCategoryMenuIcon(category), {
+          className: 'size-5 text-[#4b5563]',
+          strokeWidth: 2,
+          'aria-hidden': true,
+        })}
       </span>
       <span className="min-w-0 flex-1 text-[11px] font-bold uppercase leading-tight tracking-wide text-[#1a1a1a] [overflow-wrap:anywhere] line-clamp-2">
         {category.title}
