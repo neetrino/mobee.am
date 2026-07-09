@@ -39,7 +39,7 @@ function buildTopCategoriesCacheKey(
   limit: number,
   includeImages: boolean,
 ): string {
-  return `categories:top:${lang}:${limit}:${includeImages ? "img" : "noimg"}`;
+  return `categories:top:v2:${lang}:${limit}:${includeImages ? "img" : "noimg"}`;
 }
 
 /**
