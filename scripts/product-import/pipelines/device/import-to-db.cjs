@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 const path = require("path");
 const fs = require("fs");
@@ -20,7 +20,7 @@ const DEFAULT_STOCK = 10;
 const CATEGORY_LABELS = {
   "hair-dryers": {
     en: "Hair Dryers",
-    hy: "Ֆены",
+    hy: "Ֆեներ",
     ru: "Фены",
   },
   "game-consoles": {
