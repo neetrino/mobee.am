@@ -49,7 +49,8 @@ export function SiteBrandLogo({
       width={SITE_WORDMARK_WIDTH_PX}
       height={SITE_WORDMARK_HEIGHT_PX}
       priority={priority}
-      className={`bg-transparent max-h-full w-auto max-w-full object-contain ${heightClass} ${className}`.trim()}
+      unoptimized
+      className={`block max-h-full w-auto max-w-full border-0 object-contain ${heightClass} ${className}`.trim()}
     />
   );
 }

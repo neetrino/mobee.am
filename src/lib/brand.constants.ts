@@ -8,13 +8,16 @@ export const SITE_SHARE_TITLE = 'Mobee.am — Ժամանակակից էլեկտ�
 export const SITE_SHARE_DESCRIPTION =
   'Սմարթֆոններ, նոթբուքներ, գաջեթներ և աքսեսուարներ՝ հարմար ու վստահելի գնումների փորձով։';
 
-/** Wide MOBEE wordmark PNG (cyan on black) — header, auth, admin chrome, 404. Not used in the storefront footer. */
-export const SITE_WORDMARK_PATH = '/images/brand/mobee-wordmark.png';
+/** Mobee accent — matches `admin.500` / primary buttons (`#2DB2FF`). */
+export const SITE_BRAND_ACCENT_RGB = [45, 178, 255] as const;
+
+/** Wide MOBEE wordmark PNG (cyan, transparent) — header, auth, admin chrome, 404. Not used in the storefront footer. */
+export const SITE_WORDMARK_PATH = '/images/brand/mobee-wordmark.png?v=3';
 
 /** Intrinsic pixel size of `mobee-wordmark.png` under `public/`. */
-export const SITE_WORDMARK_WIDTH_PX = 1024;
+export const SITE_WORDMARK_WIDTH_PX = 1023;
 
-export const SITE_WORDMARK_HEIGHT_PX = 103;
+export const SITE_WORDMARK_HEIGHT_PX = 102;
 
 /**
  * Square mark for favicon / Apple touch icon only — tab icons need a compact asset, not the wide wordmark.
