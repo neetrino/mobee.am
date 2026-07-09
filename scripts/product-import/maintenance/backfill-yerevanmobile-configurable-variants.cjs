@@ -78,7 +78,7 @@ async function fetchSourceVariants(sourceUrl) {
 
 async function main() {
   loadEnv();
-  const { apply, dryRun, slug, sourceUrl } = parseArgs(process.argv.slice(2));
+  const { dryRun, slug, sourceUrl } = parseArgs(process.argv.slice(2));
   const { PrismaClient } = require("../../../shared/db/generated/client");
   const prisma = new PrismaClient();
 

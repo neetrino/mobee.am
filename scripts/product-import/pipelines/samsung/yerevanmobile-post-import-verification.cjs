@@ -307,6 +307,7 @@ async function main() {
         published_products: publishedOk,
         stock_ok_variants: stockOk,
         price_on_request_false_variants: priceOnRequestOk,
+        source_url_ok_variants: sourceUrlOk,
       },
       imported_products: importedRows,
       skipped_duplicates: skippedDuplicates,

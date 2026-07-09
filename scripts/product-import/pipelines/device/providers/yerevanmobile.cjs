@@ -6,7 +6,7 @@ const {
   YEREVANMOBILE_KNOWN_PRODUCT_URLS,
   buildSearchQueries,
 } = require("../targets.cjs");
-const { fetchHtml, stripTags } = require("../http.cjs");
+const { fetchHtml } = require("../http.cjs");
 const { parseMainProductPrice, parseTitle: parseYmTitle } = require("./yerevanmobile-price.cjs");
 const {
   cleanText,
@@ -271,7 +271,7 @@ async function searchYerevanMobile(targets = DEVICE_TARGETS) {
     try {
       const { text } = await fetchHtml(catUrl);
       extractProductLinks(text).forEach((url) => candidateUrls.add(url));
-    } catch (error) {
+    } catch {
       console.warn(`[yerevanmobile] category failed: ${catUrl}`);
     }
   }

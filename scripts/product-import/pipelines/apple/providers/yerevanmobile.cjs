@@ -2,7 +2,7 @@
 
 const { YEREVANMOBILE_CATEGORY_URLS, buildSearchQueries } = require("../targets.cjs");
 const { fetchHtml, stripTags } = require("../http.cjs");
-const { cleanText, parentModelKey, matchesTarget, isThirdPartyAccessory, slugify } = require("../normalize.cjs");
+const { parentModelKey, matchesTarget, isThirdPartyAccessory, slugify } = require("../normalize.cjs");
 
 const BASE = "https://www.yerevanmobile.am";
 
@@ -203,7 +203,7 @@ async function searchYerevanMobile(targets) {
     try {
       const { text } = await fetchHtml(catUrl);
       links = extractProductLinks(text);
-    } catch (e) {
+    } catch {
       console.warn(`[yerevanmobile] category failed: ${catUrl}`);
       continue;
     }

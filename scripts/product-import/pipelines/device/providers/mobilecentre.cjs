@@ -309,10 +309,6 @@ async function parseProductPage(productUrl, targets) {
   return { variant, links, error: null };
 }
 
-function sameVariableModel(seed, candidate) {
-  return normalizeParent(seed.normalized_model) === normalizeParent(candidate.normalized_model);
-}
-
 async function scrapeProductWithVariants(seedUrl, targets) {
   const seedCanonical = canonicalProductUrl(seedUrl);
   if (!seedCanonical) return [];
@@ -334,7 +330,7 @@ async function scrapeProductWithVariants(seedUrl, targets) {
     localSeenUrls.add(canonical);
     if (pid) localSeenPids.add(pid);
 
-    const { variant, links, error } = await parseProductPage(canonical, targets);
+    const { variant, links } = await parseProductPage(canonical, targets);
     if (!variant) continue;
 
     const alreadyHave = variants.some(
@@ -382,7 +378,7 @@ async function searchMobileCentre(targets = DEVICE_TARGETS) {
     try {
       const { text } = await fetchHtml(categoryUrl, { sleepMs: REQUEST_SLEEP_SEARCH });
       extractProductLinksFromHtml(text, categoryUrl).forEach((link) => seedUrls.add(link));
-    } catch (error) {
+    } catch {
       console.warn(`[mobilecentre] category failed: ${categoryUrl}`);
     }
   }
