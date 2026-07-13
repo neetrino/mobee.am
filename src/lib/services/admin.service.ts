@@ -42,6 +42,8 @@ class AdminService {
   updateSettings = adminSettingsService.updateSettings.bind(adminSettingsService);
   getPriceFilterSettings = adminSettingsService.getPriceFilterSettings.bind(adminSettingsService);
   updatePriceFilterSettings = adminSettingsService.updatePriceFilterSettings.bind(adminSettingsService);
+  getHomeHeroSettings = adminSettingsService.getHomeHeroSettings.bind(adminSettingsService);
+  updateHomeHeroSettings = adminSettingsService.updateHomeHeroSettings.bind(adminSettingsService);
 
   // Delivery methods
   getDeliverySettings = adminDeliveryService.getDeliverySettings.bind(adminDeliveryService);

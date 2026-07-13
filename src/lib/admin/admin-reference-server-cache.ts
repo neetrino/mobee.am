@@ -10,7 +10,8 @@ export type AdminReferenceServerCacheKey =
   | "brands"
   | "settings"
   | "delivery"
-  | "price-filter-settings";
+  | "price-filter-settings"
+  | "home-hero";
 
 function buildCacheKey(key: AdminReferenceServerCacheKey): string {
   return `${CACHE_KEY_PREFIX}${key}`;
