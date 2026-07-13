@@ -1,27 +1,103 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
+import { isValidHomeHeroHref, type HeroCarouselSlide } from '@/lib/home-hero';
 import {
   HERO_BANNER_ASPECT_RATIO,
   HERO_BANNER_SLIDE_GAP_PX,
   HERO_BANNER_TRANSITION_MS,
 } from './hero-banner-carousel.constants';
-import { HERO_BANNER_SLIDES } from './hero-banner-slides.constants';
 import { useHeroBannerAutoCarousel } from './useHeroBannerAutoCarousel';
 
 const montserrat = siteMontserrat;
 
 type HeroBannerAutoCarouselProps = {
+  slides: HeroCarouselSlide[];
+  /** Which image URL to show in this carousel instance. */
+  imageVariant: 'desktop' | 'mobile';
   className?: string;
 };
 
-export function HeroBannerAutoCarousel({ className = '' }: HeroBannerAutoCarouselProps) {
+function isExternalHref(href: string): boolean {
+  return href.startsWith('http://') || href.startsWith('https://');
+}
+
+function SlideVisual({
+  imageUrl,
+  priority,
+  isActive,
+}: {
+  imageUrl: string;
+  priority: boolean;
+  isActive: boolean;
+}) {
+  return (
+    <div
+      className="relative overflow-hidden rounded-[30px] bg-[#eceff3] shadow-sm transition-[transform,opacity] ease-out lg:rounded-[40px] motion-reduce:transition-none"
+      style={{
+        aspectRatio: String(HERO_BANNER_ASPECT_RATIO),
+        transitionDuration: `${HERO_BANNER_TRANSITION_MS}ms`,
+        transform: isActive ? 'scale(1)' : 'scale(0.96)',
+        opacity: isActive ? 1 : 0.72,
+      }}
+    >
+      <Image
+        src={imageUrl}
+        alt="Mobee homepage banner"
+        fill
+        className="object-cover object-center"
+        sizes="(max-width: 1024px) 88vw, 1200px"
+        priority={priority}
+        draggable={false}
+      />
+    </div>
+  );
+}
+
+function wrapSlide(node: ReactNode, href: string | null): ReactNode {
+  const trimmed = href?.trim() ?? '';
+  if (!trimmed || !isValidHomeHeroHref(trimmed)) {
+    return node;
+  }
+
+  if (isExternalHref(trimmed)) {
+    return (
+      <a
+        href={trimmed}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open featured promotion"
+        className="block"
+      >
+        {node}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={trimmed} aria-label="Open featured promotion" className="block">
+      {node}
+    </Link>
+  );
+}
+
+export function HeroBannerAutoCarousel({
+  slides,
+  imageVariant,
+  className = '',
+}: HeroBannerAutoCarouselProps) {
   const { t } = useTranslation();
-  const slideCount = HERO_BANNER_SLIDES.length;
+  const slideCount = slides.length;
   const { activeIndex, trackRef, registerSlideRef, goToSlide, pause, resume } =
     useHeroBannerAutoCarousel({ slideCount });
+
+  if (slideCount === 0) {
+    return null;
+  }
 
   return (
     <div
@@ -39,8 +115,10 @@ export function HeroBannerAutoCarousel({ className = '' }: HeroBannerAutoCarouse
         aria-roledescription="carousel"
         aria-label={t('home.hero_banner_carousel_aria_label')}
       >
-        {HERO_BANNER_SLIDES.map((slide, index) => {
+        {slides.map((slide, index) => {
           const isActive = index === activeIndex;
+          const imageUrl =
+            imageVariant === 'mobile' ? slide.mobileImageUrl : slide.desktopImageUrl;
 
           return (
             <div
@@ -52,25 +130,10 @@ export function HeroBannerAutoCarousel({ className = '' }: HeroBannerAutoCarouse
               aria-label={`${index + 1} / ${slideCount}`}
               aria-hidden={!isActive}
             >
-              <div
-                className="relative overflow-hidden rounded-[30px] bg-[#eceff3] shadow-sm transition-[transform,opacity] ease-out lg:rounded-[40px] motion-reduce:transition-none"
-                style={{
-                  aspectRatio: String(HERO_BANNER_ASPECT_RATIO),
-                  transitionDuration: `${HERO_BANNER_TRANSITION_MS}ms`,
-                  transform: isActive ? 'scale(1)' : 'scale(0.96)',
-                  opacity: isActive ? 1 : 0.72,
-                }}
-              >
-                <Image
-                  src={slide.imageSrc}
-                  alt={slide.alt}
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width: 1024px) 88vw, 1200px"
-                  priority={index === 0}
-                  draggable={false}
-                />
-              </div>
+              {wrapSlide(
+                <SlideVisual imageUrl={imageUrl} priority={index === 0} isActive={isActive} />,
+                slide.href,
+              )}
             </div>
           );
         })}
@@ -78,7 +141,7 @@ export function HeroBannerAutoCarousel({ className = '' }: HeroBannerAutoCarouse
 
       {slideCount > 1 ? (
         <div className="mt-4 flex justify-center gap-2" aria-hidden={false}>
-          {HERO_BANNER_SLIDES.map((slide, index) => {
+          {slides.map((slide, index) => {
             const isActive = index === activeIndex;
 
             return (

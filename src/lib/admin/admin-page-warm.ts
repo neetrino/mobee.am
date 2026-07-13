@@ -109,6 +109,7 @@ const WARM_BY_PATH: Record<string, WarmHandler> = {
   '/supersudo/settings': () => warmReferenceOnly('settings'),
   '/supersudo/delivery': () => warmReferenceOnly('delivery'),
   '/supersudo/price-filter-settings': () => warmReferenceOnly('price-filter-settings'),
+  '/supersudo/home-hero': () => warmReferenceOnly('home-hero'),
   '/supersudo/messages': warmMessages,
   '/supersudo/inventory': warmInventory,
 };

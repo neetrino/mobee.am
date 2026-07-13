@@ -1,12 +1,15 @@
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
 import { HeroCarousel } from '../components/HeroCarousel';
+import { HomeHeroManagedCarousel } from '../components/HomeHeroManagedCarousel';
 import { TopCategories } from '../components/TopCategories';
 import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
 import { HomeProductSectionsSection } from '../components/home/HomeProductSectionsSection';
 import { HomePagePartnerLogos } from '../components/HomePagePartnerLogos';
 import { readLanguageFromCookies } from '../lib/language';
 import { getCachedHomeCategoryStrip } from '../lib/services/categories-home-strip-cached';
+import { getPublicHomeHeroSettings } from '../lib/services/home-hero.service';
+import { toHeroCarouselSlides } from '../lib/home-hero';
 
 function HomeProductSectionsFallback() {
   return (
@@ -20,12 +23,21 @@ function HomeProductSectionsFallback() {
 export default async function HomePage() {
   const cookieStore = await cookies();
   const language = readLanguageFromCookies(cookieStore);
-  const { result: homeStrip } = await getCachedHomeCategoryStrip(language);
+  const [{ result: homeStrip }, homeHero] = await Promise.all([
+    getCachedHomeCategoryStrip(language),
+    getPublicHomeHeroSettings(),
+  ]);
+
+  const managedSlides = toHeroCarouselSlides(homeHero);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <section className="bg-white">
-        <HeroCarousel />
+        {managedSlides.length > 0 ? (
+          <HomeHeroManagedCarousel slides={managedSlides} />
+        ) : (
+          <HeroCarousel />
+        )}
       </section>
 
       <TopCategories initialItems={homeStrip.data} initialLocale={language} />

@@ -10,6 +10,7 @@ const ENDPOINT_BY_KEY: Record<AdminReferenceCacheKey, string> = {
   settings: '/api/v1/admin/settings',
   delivery: '/api/v1/admin/delivery',
   'price-filter-settings': '/api/v1/admin/settings/price-filter',
+  'home-hero': '/api/v1/admin/settings/home-hero',
 };
 
 /**

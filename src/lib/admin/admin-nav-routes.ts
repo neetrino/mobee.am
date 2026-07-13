@@ -12,6 +12,7 @@ export const ADMIN_NAV_ROUTES = [
   '/supersudo/settings',
   '/supersudo/delivery',
   '/supersudo/price-filter-settings',
+  '/supersudo/home-hero',
   '/supersudo/messages',
   '/supersudo/inventory',
   '/supersudo/quick-settings',

@@ -11,7 +11,8 @@ export type AdminReferenceCacheKey =
   | 'brands'
   | 'settings'
   | 'delivery'
-  | 'price-filter-settings';
+  | 'price-filter-settings'
+  | 'home-hero';
 
 interface CacheEntry<T> {
   value: T;
