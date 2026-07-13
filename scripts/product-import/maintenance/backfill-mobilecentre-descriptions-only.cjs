@@ -141,7 +141,7 @@ function assertUpdatePayloadSafe(data) {
 }
 
 async function main() {
-  const { input, confirm, dryRun } = parseArgs();
+  const { input, dryRun } = parseArgs();
 
   console.log("\n═══════════════════════════════════════════════");
   console.log("  MobileCentre Description-Only Backfill");

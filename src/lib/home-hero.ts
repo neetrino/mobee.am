@@ -4,6 +4,10 @@
  */
 
 import { nanoid } from 'nanoid';
+import {
+  HERO_BANNER_SLIDES,
+  type HeroBannerSlide,
+} from '@/components/hero-banner-slides.constants';
 
 export const HOME_HERO_SETTING_KEY = 'home-hero';
 
@@ -87,7 +91,7 @@ export function reorderHomeHeroSlides(
  * Convert legacy static banner entries into admin-compatible slides.
  */
 export function convertStaticHeroBannerSlides(
-  slides: readonly StaticHeroBannerSlide[],
+  slides: readonly StaticHeroBannerSlide[] | readonly HeroBannerSlide[] = HERO_BANNER_SLIDES,
 ): HomeHeroSlide[] {
   return slides.map((slide) => ({
     id: slide.id,
@@ -99,10 +103,9 @@ export function convertStaticHeroBannerSlides(
 
 /**
  * Initial slides when Settings are missing or empty (no DB write).
- * On this branch there is no static slide list — empty → public promo fallback.
  */
 export function getInitialHomeHeroSlides(): HomeHeroSlide[] {
-  return [];
+  return convertStaticHeroBannerSlides(HERO_BANNER_SLIDES);
 }
 
 function normalizeMedia(value: unknown): HomeHeroMedia | null {

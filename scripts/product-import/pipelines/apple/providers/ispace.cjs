@@ -1,6 +1,6 @@
 "use strict";
 
-const { ISPACE_CATEGORY_URLS, buildSearchQueries } = require("../targets.cjs");
+const { ISPACE_CATEGORY_URLS } = require("../targets.cjs");
 const { fetchHtml, decodeHtml, stripTags } = require("../http.cjs");
 const { cleanText, parentModelKey, matchesTarget, isThirdPartyAccessory } = require("../normalize.cjs");
 

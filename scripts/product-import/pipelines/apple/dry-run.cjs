@@ -84,7 +84,7 @@ async function runDryRun({ skipMobileCentre = false, allowNoPrice = false } = {}
     console.error("[yerevanmobile] FAILED:", e.message);
   }
 
-  const products = buildVariableProducts(flat, targets.map((t) => t.model));
+  const products = buildVariableProducts(flat);
   const catalog = await loadExistingCatalog();
   const annotated = annotateWithDbStatus(products, catalog, { allowNoPrice });
 

@@ -41,7 +41,8 @@
       "power": "Մարտկոց",
       "physical": "Ֆիզիկական բնութագրեր",
       "warranty": "Երաշխիք",
-      "other": "Այլ"
+      "other": "Այլ",
+      "security": "Անվտանգություն"
     },
     "labels": {
       "availableInStores": "Առկա է խանութներում",

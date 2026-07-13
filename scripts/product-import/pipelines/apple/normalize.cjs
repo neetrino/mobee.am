@@ -127,7 +127,6 @@ function extractUltraNumber(text) {
 
 function strictGenerationMatch(targetModel, candidateName, sourceUrl = "") {
   const blob = normalize(`${candidateName} ${sourceUrl}`);
-  const t = normalize(targetModel);
 
   if (/series\s*\d+/i.test(targetModel)) {
     const want = extractSeriesNumber(targetModel);

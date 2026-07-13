@@ -83,7 +83,6 @@ function hasSafePrefixBoundary(normTitle, normEntry) {
 }
 
 function classifyTs(title) {
-  const base = extractBaseProductName(title);
   const norm = normalizeProductName(title);
   const exact = tsMap.get(norm);
   if (exact) return { result: "keep", matched: exact, reason: "exact" };

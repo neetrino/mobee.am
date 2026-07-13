@@ -33,7 +33,7 @@ function mergeVariant(existing, incoming) {
   };
 }
 
-function buildVariableProducts(flatVariants, targetModels) {
+function buildVariableProducts(flatVariants) {
   const byParent = new Map();
 
   for (const v of flatVariants) {

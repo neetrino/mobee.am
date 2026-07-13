@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { HERO_BANNER_SLIDES } from '@/components/hero-banner-slides.constants';
 import {
   convertStaticHeroBannerSlides,
   createEmptyHomeHeroSlide,
@@ -147,9 +148,16 @@ describe('static conversion / initial defaults', () => {
     ]);
   });
 
-  it('returns empty slides when Settings are empty (promo fallback on public page)', () => {
-    expect(resolveHomeHeroSettingsForRead(null)).toEqual({ slides: [] });
-    expect(getInitialHomeHeroSlides()).toEqual([]);
+  it('returns all existing static banners when Settings are empty', () => {
+    const resolved = resolveHomeHeroSettingsForRead(null);
+    expect(resolved.slides).toHaveLength(HERO_BANNER_SLIDES.length);
+    expect(resolved.slides[0]).toEqual({
+      id: HERO_BANNER_SLIDES[0].id,
+      desktopImage: { url: HERO_BANNER_SLIDES[0].imageSrc },
+      mobileImage: null,
+      href: null,
+    });
+    expect(getInitialHomeHeroSlides()).toHaveLength(HERO_BANNER_SLIDES.length);
   });
 
   it('does not replace saved multi-slide settings with empty defaults', () => {
@@ -302,9 +310,11 @@ describe('toHeroCarouselSlides / homepage presentation', () => {
     ]);
   });
 
-  it('no DB slides → empty carousel list (public promo fallback)', () => {
+  it('no DB slides → converted static banners render via resolve + toHeroCarouselSlides', () => {
     const settings = resolveHomeHeroSettingsForRead(null);
-    expect(toHeroCarouselSlides(settings)).toEqual([]);
+    const carousel = toHeroCarouselSlides(settings);
+    expect(carousel.length).toBe(HERO_BANNER_SLIDES.length);
+    expect(carousel[0]?.desktopImageUrl).toBe(HERO_BANNER_SLIDES[0].imageSrc);
   });
 });
 

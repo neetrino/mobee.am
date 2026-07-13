@@ -2,7 +2,7 @@
 
 const path = require("path");
 const fs = require("fs");
-const { KEY_SLUGS, LOCALES, ROOT } = require("./constants.cjs");
+const { LOCALES, ROOT } = require("./constants.cjs");
 
 const CACHE_PREFIX = "products:detail:v1";
 

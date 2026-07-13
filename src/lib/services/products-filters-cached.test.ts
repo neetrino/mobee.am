@@ -53,7 +53,7 @@ describe("getCachedProductFilters", () => {
       colors: [],
       sizes: [],
       brands: [],
-      priceRange: { min: 0, max: 100, stepSize: null, stepSizePerCurrency: null },
+      priceRange: { min: 0, max: 100, hasProducts: true, stepSize: null, stepSizePerCurrency: null },
     };
     vi.mocked(cacheService.get).mockResolvedValue(JSON.stringify(payload));
 

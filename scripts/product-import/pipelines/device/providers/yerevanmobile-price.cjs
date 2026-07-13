@@ -1,6 +1,6 @@
 "use strict";
 
-const { fetchHtml, stripTags } = require("../http.cjs");
+const { stripTags } = require("../http.cjs");
 
 function extractProductInfoBlock(html) {
   const idx = html.indexOf('class="product-info-main"');

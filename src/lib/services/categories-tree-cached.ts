@@ -24,7 +24,7 @@ function isDatabaseConfigurationError(error: unknown): boolean {
 export async function getCachedCategoriesTree(
   lang: string,
 ): Promise<{ result: CategoriesTreePayload; cacheStatus: "HIT" | "MISS" | "BYPASS" }> {
-  const cacheKey = `categories:tree:${lang}`;
+  const cacheKey = `categories:tree:v2:${lang}`;
   const cached = await cacheService.get(cacheKey);
   if (cached !== null && cached !== undefined) {
     const data =
