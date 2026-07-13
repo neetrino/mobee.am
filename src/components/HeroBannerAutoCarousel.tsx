@@ -8,6 +8,7 @@ import { useTranslation } from '../lib/i18n-client';
 import { isValidHomeHeroHref, type HeroCarouselSlide } from '@/lib/home-hero';
 import {
   HERO_BANNER_ASPECT_RATIO,
+  HERO_BANNER_MOBILE_ASPECT_RATIO,
   HERO_BANNER_SLIDE_GAP_PX,
   HERO_BANNER_TRANSITION_MS,
 } from './hero-banner-carousel.constants';
@@ -30,30 +31,38 @@ function SlideVisual({
   imageUrl,
   priority,
   isActive,
+  aspectRatio,
 }: {
   imageUrl: string;
   priority: boolean;
   isActive: boolean;
+  aspectRatio: number;
 }) {
   return (
+    // Keep scale/opacity on the outer shell — Safari drops border-radius when
+    // transform + overflow:hidden share the same node during compositing.
     <div
-      className="relative overflow-hidden rounded-[30px] bg-[#eceff3] shadow-sm transition-[transform,opacity] ease-out lg:rounded-[40px] motion-reduce:transition-none"
+      className="transition-[transform,opacity] ease-out motion-reduce:transition-none"
       style={{
-        aspectRatio: String(HERO_BANNER_ASPECT_RATIO),
         transitionDuration: `${HERO_BANNER_TRANSITION_MS}ms`,
         transform: isActive ? 'scale(1)' : 'scale(0.96)',
         opacity: isActive ? 1 : 0.72,
       }}
     >
-      <Image
-        src={imageUrl}
-        alt="Mobee homepage banner"
-        fill
-        className="object-cover object-center"
-        sizes="(max-width: 1024px) 88vw, 1200px"
-        priority={priority}
-        draggable={false}
-      />
+      <div
+        className="relative overflow-hidden rounded-[24px] bg-[#eceff3] shadow-sm sm:rounded-[30px] lg:rounded-[40px]"
+        style={{ aspectRatio: String(aspectRatio) }}
+      >
+        <Image
+          src={imageUrl}
+          alt="Mobee homepage banner"
+          fill
+          className="rounded-[24px] object-cover object-center sm:rounded-[30px] lg:rounded-[40px]"
+          sizes="(max-width: 1024px) 100vw, 1400px"
+          priority={priority}
+          draggable={false}
+        />
+      </div>
     </div>
   );
 }
@@ -95,6 +104,14 @@ export function HeroBannerAutoCarousel({
   const { activeIndex, trackRef, registerSlideRef, goToSlide, pause, resume } =
     useHeroBannerAutoCarousel({ slideCount });
 
+  const slideAspectRatio =
+    imageVariant === 'mobile' ? HERO_BANNER_MOBILE_ASPECT_RATIO : HERO_BANNER_ASPECT_RATIO;
+  /** Mobile: full content width so edges align with featured products (`SITE_CONTENT_GUTTERS`). */
+  const slideWidthClass =
+    imageVariant === 'mobile'
+      ? 'w-full shrink-0 snap-center'
+      : 'w-[92%] shrink-0 snap-center first:ml-[4%] last:mr-[4%] sm:w-[90%] sm:first:ml-[5%] sm:last:mr-[5%]';
+
   if (slideCount === 0) {
     return null;
   }
@@ -124,14 +141,19 @@ export function HeroBannerAutoCarousel({
             <div
               key={slide.id}
               ref={(node) => registerSlideRef(index, node)}
-              className="w-[88%] shrink-0 snap-center first:ml-[6%] last:mr-[6%] sm:w-[84%] sm:first:ml-[8%] sm:last:mr-[8%]"
+              className={slideWidthClass}
               role="group"
               aria-roledescription="slide"
               aria-label={`${index + 1} / ${slideCount}`}
               aria-hidden={!isActive}
             >
               {wrapSlide(
-                <SlideVisual imageUrl={imageUrl} priority={index === 0} isActive={isActive} />,
+                <SlideVisual
+                  imageUrl={imageUrl}
+                  priority={index === 0}
+                  isActive={isActive}
+                  aspectRatio={slideAspectRatio}
+                />,
                 slide.href,
               )}
             </div>
@@ -140,7 +162,7 @@ export function HeroBannerAutoCarousel({
       </div>
 
       {slideCount > 1 ? (
-        <div className="mt-4 flex justify-center gap-2" aria-hidden={false}>
+        <div className="mt-7 flex justify-center gap-2" aria-hidden={false}>
           {slides.map((slide, index) => {
             const isActive = index === activeIndex;
 
