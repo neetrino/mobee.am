@@ -50,7 +50,7 @@ function SlideVisual({
         alt="Mobee homepage banner"
         fill
         className="object-cover object-center"
-        sizes="(max-width: 1024px) 88vw, 1200px"
+        sizes="(max-width: 1024px) 92vw, 1400px"
         priority={priority}
         draggable={false}
       />
@@ -124,7 +124,7 @@ export function HeroBannerAutoCarousel({
             <div
               key={slide.id}
               ref={(node) => registerSlideRef(index, node)}
-              className="w-[88%] shrink-0 snap-center first:ml-[6%] last:mr-[6%] sm:w-[84%] sm:first:ml-[8%] sm:last:mr-[8%]"
+              className="w-[92%] shrink-0 snap-center first:ml-[4%] last:mr-[4%] sm:w-[90%] sm:first:ml-[5%] sm:last:mr-[5%]"
               role="group"
               aria-roledescription="slide"
               aria-label={`${index + 1} / ${slideCount}`}
@@ -140,7 +140,7 @@ export function HeroBannerAutoCarousel({
       </div>
 
       {slideCount > 1 ? (
-        <div className="mt-4 flex justify-center gap-2" aria-hidden={false}>
+        <div className="mt-7 flex justify-center gap-2" aria-hidden={false}>
           {slides.map((slide, index) => {
             const isActive = index === activeIndex;
 

@@ -20,11 +20,11 @@ export function HomeHeroManagedCarousel({ slides }: HomeHeroManagedCarouselProps
 
   return (
     <section className={`bg-white ${montserrat.className}`}>
-      <div className={`pb-1 pt-4 sm:pt-5 lg:hidden ${HERO_MOBILE_CONTENT_GUTTERS_CLASS}`}>
+      <div className={`pb-1 pt-2 sm:pt-3 lg:hidden ${HERO_MOBILE_CONTENT_GUTTERS_CLASS}`}>
         <HeroBannerAutoCarousel slides={slides} imageVariant="mobile" />
       </div>
 
-      <div className={`hidden lg:block ${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-12 xl:pt-24`}>
+      <div className={`hidden lg:block ${SITE_CONTENT_GUTTERS_CLASS} pb-20 pt-8 xl:pt-16`}>
         <HeroBannerAutoCarousel slides={slides} imageVariant="desktop" />
       </div>
     </section>
