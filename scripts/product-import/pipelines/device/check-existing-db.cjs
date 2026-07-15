@@ -24,7 +24,7 @@ async function loadExistingCatalog() {
   loadEnv(path.join(__dirname, "../../../../.env"), fs);
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
 
-  const { PrismaClient } = require("../../shared/db/generated/client");
+  const { PrismaClient } = require("../../../../shared/db/generated/client");
   const prisma = new PrismaClient();
 
   try {

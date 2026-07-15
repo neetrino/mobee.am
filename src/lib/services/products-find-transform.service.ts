@@ -123,11 +123,19 @@ class ProductsFindTransformService {
         // First, try to get ALL color options from variant.options (not just the first one)
         const options = Array.isArray(v.options) ? v.options : [];
         const colorOptions = options.filter((opt: ProductWithRelations['variants'][number]['options'][number]) => {
-          // Support both new format (AttributeValue) and old format (attributeKey/value)
-          if ('attributeValue' in opt && opt.attributeValue) {
+          // Prefer attributeKey so listing still matches when AttributeValue.attribute is thin/omitted.
+          const legacy = opt as { attributeKey?: string | null; key?: string; attribute?: string };
+          if (
+            legacy.attributeKey === "color" ||
+            legacy.key === "color" ||
+            legacy.attribute === "color"
+          ) {
+            return true;
+          }
+          if ("attributeValue" in opt && opt.attributeValue) {
             return opt.attributeValue.attribute?.key === "color";
           }
-          return opt.attributeKey === "color";
+          return false;
         });
         
         // Process all color options from this variant
@@ -139,7 +147,7 @@ class ProductsFindTransformService {
           if ('attributeValue' in colorOption && colorOption.attributeValue) {
             // New format: get from translation or value
             const translation = colorOption.attributeValue.translations?.find((t: { locale: string }) => t.locale === lang) || colorOption.attributeValue.translations?.[0];
-            colorValue = translation?.label || colorOption.attributeValue.value || "";
+            colorValue = translation?.label || colorOption.attributeValue.value || colorOption.value || "";
             // Get imageUrl and colors from AttributeValue
             imageUrl = colorOption.attributeValue.imageUrl || null;
             const colorsValue = colorOption.attributeValue.colors;
@@ -157,13 +165,17 @@ class ProductsFindTransformService {
               colorValue
             ).trim();
             const linkValue = canonicalValue.toLowerCase();
-            // Store color with imageUrl and colors hex if not already stored or if we have better data
-            if (!colorMap.has(normalizedValue) || (imageUrl && !colorMap.get(normalizedValue)?.imageUrl)) {
+            const existing = colorMap.get(normalizedValue);
+            const shouldReplace =
+              !existing ||
+              (Boolean(colorsHex?.length) && !existing.colors?.length) ||
+              (Boolean(imageUrl) && !existing.imageUrl);
+            if (shouldReplace) {
               colorMap.set(normalizedValue, {
                 value: colorValue.trim(),
                 linkValue,
-                imageUrl: imageUrl || null,
-                colors: colorsHex || null,
+                imageUrl: imageUrl || existing?.imageUrl || null,
+                colors: colorsHex || existing?.colors || null,
               });
             }
           }

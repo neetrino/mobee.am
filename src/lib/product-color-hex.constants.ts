@@ -92,3 +92,38 @@ export function getProductColorHex(colorName: string): string {
 export function isKnownProductColor(colorName: string): boolean {
   return normalizeColorKey(colorName) in PRODUCT_COLOR_HEX;
 }
+
+/**
+ * CSS background for product color swatches.
+ * One HEX → solid; two+ → split dual-tone gradient.
+ */
+export function buildColorSwatchBackground(
+  colors: string[] | null | undefined,
+  fallbackHex: string = UNKNOWN_COLOR_FALLBACK,
+): string {
+  const hexes = (Array.isArray(colors) ? colors : [])
+    .map((value) => String(value || '').trim())
+    .filter(Boolean);
+
+  if (hexes.length >= 2) {
+    const primary = hexes[0];
+    const secondary = hexes[1];
+    return `linear-gradient(135deg, ${primary} 0%, ${primary} 48%, ${secondary} 52%, ${secondary} 100%)`;
+  }
+
+  if (hexes.length === 1) {
+    return hexes[0];
+  }
+
+  return fallbackHex;
+}
+
+/**
+ * React style object for a color swatch circle.
+ */
+export function buildColorSwatchStyle(
+  colors: string[] | null | undefined,
+  fallbackHex: string = UNKNOWN_COLOR_FALLBACK,
+): { background: string } {
+  return { background: buildColorSwatchBackground(colors, fallbackHex) };
+}

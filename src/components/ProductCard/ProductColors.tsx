@@ -1,6 +1,7 @@
 'use client';
 
 import { getColorHex } from '../../lib/colorMap';
+import { buildColorSwatchStyle } from '../../lib/product-color-hex.constants';
 import { resolveProductCardColorLinkValue, type ProductCardColorOption } from './useProductCardColorState';
 
 interface ColorData {
@@ -79,10 +80,10 @@ export function ProductColors({
         const linkValue = resolveProductCardColorLinkValue(colorOption);
         const isSelected = selectedLinkValue === linkValue;
 
-        const colorHex =
-          colorsHex && Array.isArray(colorsHex) && colorsHex.length > 0
-            ? colorsHex[0]
-            : getColorHex(colorValue);
+        const fallbackHex = getColorHex(colorValue);
+        const swatchStyle = imageUrl
+          ? undefined
+          : buildColorSwatchStyle(colorsHex, fallbackHex);
 
         const swatchContent = imageUrl ? (
           <img
@@ -92,14 +93,12 @@ export function ProductColors({
             loading="lazy"
             decoding="async"
             onError={(e) => {
-              const fallbackColor = colorHex || '#CCCCCC';
-              (e.target as HTMLImageElement).style.backgroundColor = fallbackColor;
+              const fallbackColor = fallbackHex || '#CCCCCC';
+              (e.target as HTMLImageElement).style.background = fallbackColor;
               (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
         ) : null;
-
-        const swatchStyle = imageUrl ? undefined : { backgroundColor: colorHex };
 
         if (interactive && onColorSelect) {
           return (

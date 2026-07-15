@@ -2,7 +2,8 @@ import type { ProductFilters } from "@/lib/services/products-find-query/types";
 
 const PRODUCTS_CACHE_TTL = 120;
 const FEATURED_CACHE_TTL = 600;
-const PRODUCT_LIST_CACHE_PREFIX = "products:v2";
+/** Bump when listing payload shape changes (e.g. color HEX on cards). */
+const PRODUCT_LIST_CACHE_PREFIX = "products:v3";
 
 /** Stable ordering for comma-separated URL params in cache keys (e.g. `category=a,b` vs `b,a`). */
 export function normalizeCommaListCacheValue(raw: string): string {

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 "use strict";
 
 const path = require("path");
@@ -6,10 +6,18 @@ const fs = require("fs");
 const {
   isDysonHardRejected,
   isPlayStationHardRejected,
-  isHairDryerProduct,
+  isDysonHairDevice,
   isPlayStationConsoleProduct,
+  categorySlugForParentModel,
+  normalizeDysonParentModel,
   normalize,
 } = require("./normalize.cjs");
+const { DYSON_HAIR_PARENT_MODELS } = require("./targets.cjs");
+
+function isSourceImageUrl(url) {
+  if (!url || typeof url !== "string") return false;
+  return /mobilecentre\.am|yerevanmobile\.am/i.test(url);
+}
 
 const ROOT = path.join(__dirname, "../../../..");
 const OUT_DIR = path.join(ROOT, "audit/product-import/device");
@@ -33,7 +41,7 @@ function loadEnv(filePath) {
 
 async function main() {
   loadEnv(path.join(ROOT, ".env"));
-  const { PrismaClient } = require("../../shared/db/generated/client");
+  const { PrismaClient } = require("../../../../shared/db/generated/client");
   const prisma = new PrismaClient();
 
   const importedModels = new Set();
@@ -54,7 +62,7 @@ async function main() {
               some: {
                 locale: "en",
                 OR: [
-                  { title: { contains: "Dyson Supersonic", mode: "insensitive" } },
+                  { title: { contains: "Dyson", mode: "insensitive" } },
                   { title: { contains: "PlayStation", mode: "insensitive" } },
                 ],
               },
@@ -91,12 +99,17 @@ async function main() {
         category.translations.map((translation) => translation.slug),
       );
       const isDyson = /\bdyson\b/i.test(title);
-      const expectedCategory = isDyson ? "hair-dryers" : "game-consoles";
+      const parentModel = isDyson ? normalizeDysonParentModel(title, title) || title : title;
+      const expectedCategory = isDyson
+        ? categorySlugForParentModel(parentModel) || "hair-dryers"
+        : "game-consoles";
       const categoryOk = categorySlugs.includes(expectedCategory);
       if (!categoryOk) wrongCategories += 1;
 
       const expectedBrand = isDyson ? "dyson" : "sony";
       const brandOk = product.brand?.slug === expectedBrand;
+      const descHtml = product.translations[0]?.descriptionHtml || "";
+      let sourceImageLeak = false;
 
       const variantPids = new Set();
       let productOk = true;
@@ -111,21 +124,37 @@ async function main() {
         const stockOk = variant.stock === 10;
         const porOk = variant.priceOnRequest === false;
         const imageOk = Boolean(variant.imageUrl) || (Array.isArray(variant.media) && variant.media.length > 0);
+        if (isSourceImageUrl(variant.imageUrl)) sourceImageLeak = true;
+        if (Array.isArray(variant.media)) {
+          for (const item of variant.media) {
+            const url = typeof item === "string" ? item : item?.url;
+            if (isSourceImageUrl(url)) sourceImageLeak = true;
+          }
+        }
         if (!imageOk) brokenImages += 1;
         if (!priceOk || !stockOk || !porOk || !imageOk) productOk = false;
       }
+      if (Array.isArray(product.media)) {
+        for (const item of product.media) {
+          const url = typeof item === "string" ? item : item?.url;
+          if (isSourceImageUrl(url)) sourceImageLeak = true;
+        }
+      }
+      if (sourceImageLeak) productOk = false;
 
       if (productOk && categoryOk && brandOk) productsOk += 1;
       else productsWithIssues += 1;
 
       const storage = new Set();
       const colors = new Set();
-      const editions = new Set();
+      const kits = new Set();
+      const hairTypes = new Set();
       for (const variant of product.variants) {
         const attrs = variant.attributes || {};
         if (attrs.storage) storage.add(attrs.storage);
         if (attrs.color) colors.add(attrs.color);
-        if (attrs.edition) editions.add(attrs.edition);
+        if (attrs.kit) kits.add(attrs.kit);
+        if (attrs.hair_type) hairTypes.add(attrs.hair_type);
       }
 
       rows.push({
@@ -142,25 +171,43 @@ async function main() {
           : "no",
         category: categorySlugs.join(", ") || "—",
         brand: product.brand?.slug || "—",
+        descLen: descHtml.length,
+        sourceLeak: sourceImageLeak ? "YES" : "no",
         result: productOk && categoryOk && brandOk ? "OK" : "ISSUE",
         storage: [...storage].join(", ") || "—",
         colors: [...colors].join(", ") || "—",
-        editions: [...editions].join(", ") || "—",
+        kits: [...kits].join(", ") || "—",
+        hairTypes: [...hairTypes].join(", ") || "—",
       });
 
-      if (isDyson && (isDysonHardRejected(title, title) || !isHairDryerProduct(title, title))) {
-        issues.push(`Invalid Dyson product imported: ${title}`);
+      if (isDyson) {
+        const allowed =
+          DYSON_HAIR_PARENT_MODELS.some((model) => normalize(model) === normalize(title)) ||
+          Boolean(normalizeDysonParentModel(title, title));
+        if (!allowed || isDysonHardRejected(title, title) || !isDysonHairDevice(title, title)) {
+          issues.push(`Invalid or disallowed Dyson product imported: ${title}`);
+        }
       }
       if (!isDyson && (isPlayStationHardRejected(title, title) || !isPlayStationConsoleProduct(title, title))) {
         issues.push(`Invalid PlayStation product imported: ${title}`);
       }
+      if (sourceImageLeak) issues.push(`Source image URL leakage: ${title}`);
     }
 
     const allTitles = products.map((product) => product.translations[0]?.title || "").join(" | ");
+    const dysonTitles = products
+      .filter((product) => /\bdyson\b/i.test(product.translations[0]?.title || ""))
+      .map((product) => product.translations[0]?.title || "");
+    const onlyApprovedHair = dysonTitles.every((title) => {
+      const parent = normalizeDysonParentModel(title, title);
+      return parent && DYSON_HAIR_PARENT_MODELS.includes(parent);
+    });
     const safety = {
-      "No Dyson Airwrap imported": /\bairwrap\b/i.test(allTitles) ? "FAIL" : "PASS",
-      "No Dyson Airstrait imported": /\bairstrait\b/i.test(allTitles) ? "FAIL" : "PASS",
+      "Only approved Dyson hair devices imported": onlyApprovedHair ? "PASS" : "FAIL",
+      "No vacuum/purifier/climate Dyson":
+        /\b(vacuum|purifier|humidif|gen5|hot.?cool|solarcycle|zone)\b/i.test(allTitles) ? "FAIL" : "PASS",
       "No PlayStation controllers imported": /\bcontroller\b|\bdualsense\b/i.test(allTitles) ? "FAIL" : "PASS",
+      "No source image leakage": rows.some((row) => row.sourceLeak === "YES") ? "FAIL" : "PASS",
       "All variants stock=10": products.every((product) => product.variants.every((variant) => variant.stock === 10))
         ? "PASS"
         : "FAIL",
@@ -201,21 +248,25 @@ async function main() {
     lines.push("");
     lines.push("## Imported Products");
     lines.push("");
-    lines.push("| Product | Type | DB ID | Variants | Stock | Price OK | Images OK | Category | Brand | Result |");
-    lines.push("| --- | --- | --- | ---: | ---: | --- | --- | --- | --- | --- |");
-    if (!rows.length) lines.push("| — | — | — | — | — | — | — | — | — | — |");
+    lines.push(
+      "| Product | Type | DB ID | Variants | Stock | Price OK | Images OK | Category | Brand | DescLen | SourceLeak | Result |",
+    );
+    lines.push("| --- | --- | --- | ---: | ---: | --- | --- | --- | --- | ---: | --- | --- |");
+    if (!rows.length) lines.push("| — | — | — | — | — | — | — | — | — | — | — | — |");
     for (const row of rows) {
       lines.push(
-        `| ${row.product} | ${row.type} | ${row.dbId} | ${row.variants} | ${row.stock} | ${row.priceOk} | ${row.imagesOk} | ${row.category} | ${row.brand} | ${row.result} |`,
+        `| ${row.product} | ${row.type} | ${row.dbId} | ${row.variants} | ${row.stock} | ${row.priceOk} | ${row.imagesOk} | ${row.category} | ${row.brand} | ${row.descLen} | ${row.sourceLeak} | ${row.result} |`,
       );
     }
     lines.push("");
     lines.push("## Variant Attributes");
     lines.push("");
-    lines.push("| Product | Variants | Storage | Colors | Editions |");
-    lines.push("| --- | ---: | --- | --- | --- |");
+    lines.push("| Product | Variants | Colors | Kits | Hair types | Storage |");
+    lines.push("| --- | ---: | --- | --- | --- | --- |");
     for (const row of rows) {
-      lines.push(`| ${row.product} | ${row.variants} | ${row.storage} | ${row.colors} | ${row.editions} |`);
+      lines.push(
+        `| ${row.product} | ${row.variants} | ${row.colors} | ${row.kits} | ${row.hairTypes} | ${row.storage} |`,
+      );
     }
     lines.push("");
     lines.push("## Safety Checks");

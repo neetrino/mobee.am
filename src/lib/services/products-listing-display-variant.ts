@@ -23,30 +23,31 @@ export function getVariantColorLinkValue(
   const options = Array.isArray(variant.options) ? variant.options : [];
 
   for (const opt of options) {
-    if ("attributeValue" in opt && opt.attributeValue) {
-      if (opt.attributeValue.attribute?.key !== "color") continue;
-      const raw = opt.attributeValue.value || opt.value;
-      if (typeof raw === "string" && raw.trim()) {
-        return raw.trim().toLowerCase();
-      }
-    }
-
     const legacy = opt as {
       attributeKey?: string | null;
       key?: string;
       attribute?: string;
       value?: string | null;
     };
-
-    if (
+    const isColorKey =
       legacy.attributeKey === "color" ||
       legacy.key === "color" ||
-      legacy.attribute === "color"
-    ) {
-      const label = getOptionColorValue(opt, lang);
-      const raw = legacy.value?.trim() || label;
-      if (raw) return raw.toLowerCase();
+      legacy.attribute === "color" ||
+      ("attributeValue" in opt &&
+        opt.attributeValue?.attribute?.key === "color");
+
+    if (!isColorKey) continue;
+
+    if ("attributeValue" in opt && opt.attributeValue) {
+      const raw = opt.attributeValue.value || opt.value;
+      if (typeof raw === "string" && raw.trim()) {
+        return raw.trim().toLowerCase();
+      }
     }
+
+    const label = getOptionColorValue(opt, lang);
+    const raw = legacy.value?.trim() || label;
+    if (raw) return raw.toLowerCase();
   }
 
   if (
@@ -74,21 +75,27 @@ export function getVariantColorLinkValue(
 function getOptionColorValue(opt: ListingOption, lang: string): string | null {
   if (!opt) return null;
 
-  if ("attributeValue" in opt && opt.attributeValue) {
-    if (opt.attributeValue.attribute?.key !== "color") return null;
-    const translation =
-      opt.attributeValue.translations?.find((t) => t.locale === lang) ||
-      opt.attributeValue.translations?.[0];
-    const value = translation?.label || opt.attributeValue.value || "";
-    return value.trim().toLowerCase() || null;
-  }
-
   const legacy = opt as {
     attributeKey?: string | null;
     key?: string;
     attribute?: string;
     value?: string | null;
   };
+  const isColorKey =
+    legacy.attributeKey === "color" ||
+    legacy.key === "color" ||
+    legacy.attribute === "color" ||
+    ("attributeValue" in opt && opt.attributeValue?.attribute?.key === "color");
+
+  if (!isColorKey) return null;
+
+  if ("attributeValue" in opt && opt.attributeValue) {
+    const translation =
+      opt.attributeValue.translations?.find((t) => t.locale === lang) ||
+      opt.attributeValue.translations?.[0];
+    const value = translation?.label || opt.attributeValue.value || legacy.value || "";
+    return value.trim().toLowerCase() || null;
+  }
 
   if (
     legacy.attributeKey === "color" ||

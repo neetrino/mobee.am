@@ -5,9 +5,19 @@ const fs = require("fs");
 const { S3Client } = require("@aws-sdk/client-s3");
 const { buildVariantMediaFromSource } = require("../../shared/mobilecentre-variant-media.cjs");
 const { buildDescriptionHtml } = require("../../shared/mobilecentre-description-html.cjs");
-const { slugify } = require("./normalize.cjs");
+const { slugify, categorySlugForParentModel } = require("./normalize.cjs");
 const { loadExistingCatalog, checkProductExists, checkVariantExists } = require("./check-existing-db.cjs");
 const { OUT_DIR } = require("./dry-run.cjs");
+const {
+  recoverDysonColorFromEvidence,
+} = require("../../shared/dyson-color-registry.cjs");
+const {
+  ensureColorAttribute,
+  ensureDysonAttributeValue,
+  ensureDysonVariantColorOption,
+  ensureDysonProductAttribute,
+  mergeAttributesColor,
+} = require("../../shared/dyson-color-attribute-sync.cjs");
 
 const { cache } = require("../../paths.cjs");
 
@@ -22,6 +32,16 @@ const CATEGORY_LABELS = {
     en: "Hair Dryers",
     hy: "Ֆեներ",
     ru: "Фены",
+  },
+  "hair-stylers": {
+    en: "Hair Stylers",
+    hy: "Մազերի հարդարման սարքեր",
+    ru: "Стайлеры для волос",
+  },
+  "hair-straighteners": {
+    en: "Hair Straighteners",
+    hy: "Մազերի ուղղիչներ",
+    ru: "Выпрямители для волос",
   },
   "game-consoles": {
     en: "Game Consoles",
@@ -58,6 +78,11 @@ function createR2Client() {
 }
 
 function categorySlugForProduct(product) {
+  const fromParent = categorySlugForParentModel(product.normalized_model || product.product_name);
+  if (fromParent) return fromParent;
+  if (product.category === "Hair Stylers") return "hair-stylers";
+  if (product.category === "Hair Straighteners") return "hair-straighteners";
+  if (product.category === "Hair Dryers") return "hair-dryers";
   return product.product_type === "dyson" ? "hair-dryers" : "game-consoles";
 }
 
@@ -142,7 +167,7 @@ async function runImport({ skipR2 = false } = {}) {
     throw new Error("R2 config missing. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME.");
   }
 
-  const { PrismaClient } = require("../../shared/db/generated/client");
+  const { PrismaClient } = require("../../../../shared/db/generated/client");
   const prisma = new PrismaClient();
   const catalog = await loadExistingCatalog();
   const bucket = process.env.R2_BUCKET_NAME;
@@ -153,31 +178,33 @@ async function runImport({ skipR2 = false } = {}) {
   const createdVariants = [];
   const skipped = [];
   const failed = [];
+  const missingDysonColorRegistry = [];
   let duplicates = 0;
+  let colorAttribute = null;
+
+  async function createVariantWithRetry(data, attempts = 3) {
+    let lastError;
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      try {
+        return await prisma.productVariant.create({ data });
+      } catch (error) {
+        lastError = error;
+        const message = String(error?.message || error);
+        if (!/closed the connection|Can't reach database|Connection reset/i.test(message) || attempt === attempts) {
+          throw error;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      }
+    }
+    throw lastError;
+  }
 
   try {
     for (const product of toImport) {
-      const dup = checkProductExists(catalog, product);
-      if (dup.exists) {
-        duplicates += 1;
-        skipped.push({
-          model: product.normalized_model,
-          reason: "duplicate_parent_in_db",
-          db_product_id: dup.product?.id,
-        });
-        continue;
-      }
-
+      const existingParent = checkProductExists(catalog, product);
       const brand = await ensureBrand(prisma, product);
       const category = await ensureCategory(prisma, product);
       const model = product.normalized_model;
-      const slugBase = slugify(model);
-      let slug = slugBase;
-      let suffix = 1;
-      while (await prisma.productTranslation.findFirst({ where: { slug, locale: "en" } })) {
-        slug = `${slugBase}-${suffix++}`;
-      }
-
       const descHtml =
         product.descriptionHtml || buildDescriptionHtml(product.description || product.specifications || null);
       const newVariants = product.variants.filter((variant) => variant.db_status === "new");
@@ -217,88 +244,205 @@ async function runImport({ skipR2 = false } = {}) {
       }
 
       if (!prepared.length) {
-        failed.push({ model, reason: "no_new_variants_after_dedupe" });
+        if (existingParent.exists) {
+          duplicates += 1;
+          skipped.push({
+            model,
+            reason: "parent_exists_no_new_variants",
+            db_product_id: existingParent.product?.id,
+          });
+        } else {
+          failed.push({ model, reason: "no_new_variants_after_dedupe" });
+        }
         continue;
       }
 
-      const defaultMedia = prepared.find((row) => row.media.length)?.media || [];
-      const created = await prisma.product.create({
-        data: {
-          brandId: brand.id,
-          media: defaultMedia,
-          published: true,
-          featured: false,
-          publishedAt: new Date(),
-          categoryIds: [category.id],
-          primaryCategoryId: category.id,
-          categories: { connect: [{ id: category.id }] },
-          translations: {
-            create: LOCALES.map((locale) => ({
-              locale,
-              title: model,
-              slug,
-              descriptionHtml: descHtml,
-            })),
+      let productId = existingParent.product?.id || null;
+      let slug = existingParent.product?.slug || "";
+
+      if (!productId) {
+        const slugBase = slugify(model);
+        slug = slugBase;
+        let suffix = 1;
+        while (await prisma.productTranslation.findFirst({ where: { slug, locale: "en" } })) {
+          slug = `${slugBase}-${suffix++}`;
+        }
+
+        const defaultMedia = prepared.find((row) => row.media.length)?.media || [];
+        const created = await prisma.product.create({
+          data: {
+            brandId: brand.id,
+            media: defaultMedia,
+            published: true,
+            featured: false,
+            publishedAt: new Date(),
+            categoryIds: [category.id],
+            primaryCategoryId: category.id,
+            categories: { connect: [{ id: category.id }] },
+            translations: {
+              create: LOCALES.map((locale) => ({
+                locale,
+                title: model,
+                slug,
+                descriptionHtml: descHtml,
+              })),
+            },
           },
-        },
-      });
+        });
+        productId = created.id;
+        createdProducts.push({
+          model,
+          product_type: product.product_type,
+          product_id: productId,
+          slug,
+          variants_created: 0,
+          source_urls: product.source_urls,
+          action: "created_parent",
+        });
+        catalog.push({
+          id: productId,
+          title: model,
+          slug,
+          normalized_model: model,
+          brandSlug: brand.slug,
+          variants: [],
+        });
+      } else if (descHtml) {
+        // Backfill empty descriptions on existing parent when safe.
+        const existing = await prisma.productTranslation.findFirst({
+          where: { productId, locale: "en" },
+        });
+        if (existing && !existing.descriptionHtml) {
+          await prisma.productTranslation.updateMany({
+            where: { productId },
+            data: { descriptionHtml: descHtml },
+          });
+        }
+      }
 
       let variantCount = 0;
+      const existingPosition =
+        existingParent.product?.variants?.length ||
+        (await prisma.productVariant.count({ where: { productId } }));
+
       for (const row of prepared) {
         const price = Math.round((Number(row.variant.price) / AMD_RATE) * 100) / 100;
-        const createdVariant = await prisma.productVariant.create({
-          data: {
-            productId: created.id,
+        try {
+          let attributes =
+            row.variant.options && Object.keys(row.variant.options).length
+              ? { ...row.variant.options }
+              : undefined;
+
+          let dysonColorEntry = null;
+          if (product.product_type === "dyson") {
+            const mediaAlt =
+              Array.isArray(row.media) && row.media[0] && typeof row.media[0] === "object"
+                ? row.media[0].alt || null
+                : null;
+            const recovered = recoverDysonColorFromEvidence({
+              rawColor: attributes?.color,
+              sku: row.variant.sku || `${row.variant.source}-${row.sourcePid}`,
+              sourceUrl: row.variant.source_url,
+              mediaAlt,
+              title: model,
+            });
+            if (recovered.status === "resolved") {
+              dysonColorEntry = recovered.entry;
+              attributes = mergeAttributesColor(attributes || {}, recovered.entry.canonicalName);
+            } else if (attributes?.color) {
+              missingDysonColorRegistry.push({
+                model,
+                sku: row.variant.sku || `${row.variant.source}-${row.sourcePid}`,
+                raw_color: attributes.color,
+                reason: recovered.status === "manual_review" ? recovered.reason : "empty",
+                source_url: row.variant.source_url,
+              });
+              // Keep JSON color name; do not assign gray HEX / silent fallback.
+            }
+          }
+
+          const createdVariant = await createVariantWithRetry({
+            productId,
             sku: row.variant.sku || `${row.variant.source}-${row.sourcePid}`,
             price,
             priceOnRequest: false,
             stock: DEFAULT_STOCK,
             imageUrl: row.imageUrl,
             media: row.media,
-            position: row.position,
+            position: existingPosition + row.position,
             published: true,
             source: row.variant.source,
             sourcePid: String(row.sourcePid),
             sourceUrl: row.variant.source_url,
-            attributes:
-              row.variant.options && Object.keys(row.variant.options).length ? row.variant.options : undefined,
-          },
-        });
-        variantCount += 1;
-        createdVariants.push({
-          product_model: model,
-          product_type: product.product_type,
-          product_id: created.id,
-          variant_id: createdVariant.id,
-          sku: createdVariant.sku,
-          source_pid: createdVariant.sourcePid,
-          price,
-          stock: createdVariant.stock,
-        });
+            attributes,
+          });
+
+          if (product.product_type === "dyson" && dysonColorEntry) {
+            if (!colorAttribute) {
+              colorAttribute = await ensureColorAttribute(prisma);
+            }
+            const avResult = await ensureDysonAttributeValue(prisma, colorAttribute.id, dysonColorEntry, {
+              apply: true,
+            });
+            if (!avResult.attributeValueId) {
+              throw new Error(`Dyson AttributeValue missing for ${dysonColorEntry.canonicalName}`);
+            }
+            const optionResult = await ensureDysonVariantColorOption(prisma, {
+              variantId: createdVariant.id,
+              attributeId: colorAttribute.id,
+              attributeValueId: avResult.attributeValueId,
+              canonicalName: dysonColorEntry.canonicalName,
+              apply: true,
+            });
+            if (optionResult.action === "manual_review") {
+              throw new Error(`Dyson color option conflict: ${optionResult.reason}`);
+            }
+            await ensureDysonProductAttribute(prisma, productId, colorAttribute.id, true);
+          }
+
+          variantCount += 1;
+          createdVariants.push({
+            product_model: model,
+            product_type: product.product_type,
+            product_id: productId,
+            variant_id: createdVariant.id,
+            sku: createdVariant.sku,
+            source_pid: createdVariant.sourcePid,
+            price,
+            stock: createdVariant.stock,
+            color: dysonColorEntry?.canonicalName || attributes?.color || null,
+          });
+          const catalogRow = catalog.find((rowItem) => rowItem.id === productId);
+          if (catalogRow) {
+            catalogRow.variants.push({
+              id: createdVariant.id,
+              source: row.variant.source,
+              sourcePid: String(row.sourcePid),
+              dedupe_key: row.variant.dedupe_key,
+            });
+          }
+        } catch (error) {
+          failed.push({
+            model,
+            variant: row.variant.name,
+            reason: `variant_create_failed: ${error.message}`,
+          });
+        }
       }
 
-      createdProducts.push({
-        model,
-        product_type: product.product_type,
-        product_id: created.id,
-        slug,
-        variants_created: variantCount,
-        source_urls: product.source_urls,
-      });
-
-      catalog.push({
-        id: created.id,
-        title: model,
-        slug,
-        normalized_model: model,
-        brandSlug: brand.slug,
-        variants: prepared.map((row) => ({
-          id: row.variant.id,
-          source: row.variant.source,
-          sourcePid: String(row.sourcePid),
-          dedupe_key: row.variant.dedupe_key,
-        })),
-      });
+      const createdMeta = createdProducts.find((row) => row.product_id === productId);
+      if (createdMeta) createdMeta.variants_created = variantCount;
+      else {
+        createdProducts.push({
+          model,
+          product_type: product.product_type,
+          product_id: productId,
+          slug,
+          variants_created: variantCount,
+          source_urls: product.source_urls,
+          action: "added_variants_to_existing_parent",
+        });
+      }
     }
 
     fs.writeFileSync(CACHE_FILE, JSON.stringify(imageCache, null, 2));
@@ -312,11 +456,13 @@ async function runImport({ skipR2 = false } = {}) {
         skipped: skipped.length,
         failed: failed.length,
         duplicates,
+        missing_dyson_color_registry: missingDysonColorRegistry.length,
       },
       created_products: createdProducts,
       created_variants: createdVariants,
       skipped,
       failed,
+      missing_dyson_color_registry: missingDysonColorRegistry,
     };
 
     fs.writeFileSync(path.join(OUT_DIR, "device-import-result.json"), JSON.stringify(result, null, 2), "utf8");

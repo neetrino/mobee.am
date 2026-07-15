@@ -22,7 +22,8 @@ function localeTranslationScope(lang: string) {
 }
 
 /**
- * Lightweight include for shop grid — skips productAttributes and deep attributeValue joins.
+ * Lightweight include for shop grid — skips productAttributes, but keeps
+ * AttributeValue.colors / imageUrl so product-card swatches can render HEX/gradients.
  */
 function getListingInclude(ctx: QueryExecutionContext) {
   const { lang, includeCompareDescriptions } = ctx;
@@ -44,7 +45,30 @@ function getListingInclude(ctx: QueryExecutionContext) {
       where: { published: true },
       select: {
         ...PRODUCT_VARIANT_DB_SELECT,
-        options: true,
+        options: {
+          include: {
+            attributeValue: {
+              select: {
+                id: true,
+                value: true,
+                colors: true,
+                imageUrl: true,
+                attribute: {
+                  select: {
+                    key: true,
+                  },
+                },
+                translations: {
+                  where: { locale: lang },
+                  select: {
+                    locale: true,
+                    label: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
     labels: true,
@@ -326,14 +350,22 @@ async function executeWithoutAttributeValue(
   ctx: QueryExecutionContext = { listingMode: false, lang: "en" },
 ): Promise<ProductWithRelations[]> {
   const orderBy = getOrderBy(sort);
-  const include = ctx.listingMode
-    ? getListingInclude(ctx)
-    : getBaseIncludeWithoutAttributeValue();
 
   if (ctx.listingMode) {
+    // Listing fallback must not re-include attributeValue (that is what failed).
+    const listingWithoutAttributeValue = {
+      ...getListingInclude(ctx),
+      variants: {
+        where: { published: true },
+        select: {
+          ...PRODUCT_VARIANT_DB_SELECT,
+          options: true,
+        },
+      },
+    };
     const products = await db.product.findMany({
       where,
-      include,
+      include: listingWithoutAttributeValue,
       orderBy,
       skip,
       take: limit,
