@@ -239,24 +239,26 @@ function ProfilePageContent() {
             handleChangePassword={handleChangePassword}
           />
 
-          {/* Mobile — алерты + модалка секций */}
+          {/* Mobile — модалка секций (алерты внутри попапа) */}
           <div className="flex w-full flex-col gap-4 lg:hidden">
-            {error && (
-              <div className="rounded-[15px] border border-red-200 bg-red-50 p-4">
+            {!profileSheetOpen && error ? (
+              <div className="rounded-[15px] border border-red-200 bg-red-50 p-4" role="alert">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
-            )}
-            {success && (
-              <div className="rounded-[15px] border border-green-200 bg-green-50 p-4">
+            ) : null}
+            {!profileSheetOpen && success ? (
+              <div className="rounded-[15px] border border-green-200 bg-green-50 p-4" role="status">
                 <p className="text-sm text-green-600">{success}</p>
               </div>
-            )}
+            ) : null}
             <ProfileSectionHost
               profileSheetOpen={profileSheetOpen}
               isDesktopLayout={false}
               modalTitle={modalTitle}
               onCloseSheet={closeProfileSheet}
               closeLabel={t('common.buttons.close')}
+              error={error}
+              success={success}
               {...sheetProps}
             />
           </div>

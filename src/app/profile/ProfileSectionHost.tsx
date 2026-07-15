@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { ProfileSectionModal } from './ProfileSectionModal';
 import { ProfileSheetBody } from './ProfileSheetBody';
 
@@ -12,7 +12,36 @@ export type ProfileSectionHostProps = ProfileSheetBodyProps & {
   modalTitle: string;
   onCloseSheet: () => void;
   closeLabel: string;
+  error?: string | null;
+  success?: string | null;
 };
+
+function ProfileAlerts({
+  error,
+  success,
+}: {
+  error?: string | null;
+  success?: string | null;
+}): ReactNode {
+  if (!error && !success) {
+    return null;
+  }
+
+  return (
+    <div className="mb-4 space-y-3">
+      {error ? (
+        <div className="rounded-[15px] border border-red-200 bg-red-50 p-4" role="alert">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      ) : null}
+      {success ? (
+        <div className="rounded-[15px] border border-green-200 bg-green-50 p-4" role="status">
+          <p className="text-sm text-green-600">{success}</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 /**
  * Desktop: section inline under the profile header. Mobile: {@link ProfileSectionModal}.
@@ -23,9 +52,16 @@ export function ProfileSectionHost({
   modalTitle,
   onCloseSheet,
   closeLabel,
+  error,
+  success,
   ...sheetBodyProps
 }: ProfileSectionHostProps) {
-  const body = <ProfileSheetBody {...sheetBodyProps} />;
+  const body = (
+    <>
+      <ProfileAlerts error={error} success={success} />
+      <ProfileSheetBody {...sheetBodyProps} />
+    </>
+  );
 
   if (isDesktopLayout) {
     if (!profileSheetOpen) {
