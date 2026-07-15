@@ -34,6 +34,18 @@ interface ProductImageGalleryProps {
 
 const THUMBNAILS_PER_VIEW = 3;
 
+/**
+ * Desktop thumbnail rail is `w-24` + gallery `gap-5` (6rem + 1.25rem).
+ * When the rail is hidden for a single image, keep the main frame that width smaller
+ * and align it to the rail’s former start so size does not grow.
+ */
+const PDP_SINGLE_IMAGE_MAIN_SLOT_CLASS =
+  "order-1 flex w-full shrink-0 justify-center product-2col:order-1 product-2col:block product-2col:min-w-0 product-2col:w-[calc(100%-7.25rem)] product-2col:max-w-[calc(100%-7.25rem)] product-2col:shrink-0 product-2col:self-start";
+
+const PDP_MULTI_IMAGE_MAIN_SLOT_CLASS =
+  "order-1 flex w-full shrink-0 justify-center product-2col:order-2 product-2col:block product-2col:min-w-0 product-2col:flex-1";
+
+
 export function ProductImageGallery({
   images,
   product,
@@ -164,7 +176,7 @@ export function ProductImageGallery({
   return (
     <>
       <div className="flex flex-col gap-4 product-2col:flex-row product-2col:items-start product-2col:gap-5">
-        {/* Thumbnails only when there is more than one image — a single photo stays full-width. */}
+        {/* Thumbnails: below main on mobile, left column on desktop — hidden when only one image */}
         {hasMultipleImages ? (
         <div className="group/thumbs order-2 flex w-full shrink-0 flex-col gap-2 product-2col:order-1 product-2col:w-24 product-2col:gap-3">
           <div className="flex min-w-0 flex-row items-center gap-2 product-2col:flex-col product-2col:items-stretch">
@@ -318,10 +330,16 @@ export function ProductImageGallery({
         </div>
         ) : null}
         
-        <div className="order-1 flex w-full shrink-0 justify-center product-2col:order-2 product-2col:block product-2col:min-w-0 product-2col:flex-1">
+        <div
+          className={
+            hasMultipleImages
+              ? PDP_MULTI_IMAGE_MAIN_SLOT_CLASS
+              : PDP_SINGLE_IMAGE_MAIN_SLOT_CLASS
+          }
+        >
           <div
-            className={`group relative mx-auto flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm ${
-              hasMultipleImages ? "max-w-sm product-2col:max-w-none" : "max-w-none"
+            className={`group relative flex aspect-square w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm product-2col:max-w-none ${
+              hasMultipleImages ? "mx-auto" : "mx-auto product-2col:mx-0"
             }`}
             data-pdp-cart-fly-source
           >
