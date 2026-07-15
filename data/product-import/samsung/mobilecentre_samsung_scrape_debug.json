@@ -1,0 +1,28 @@
+{
+  "filtered_by": "samsung_strict_whitelist",
+  "flat_variants_before": 96,
+  "flat_variants": 96,
+  "variable_products": 12,
+  "removed_variants": 0,
+  "categories": {
+    "Galaxy A": 15,
+    "Galaxy S": 65,
+    "Galaxy Z": 16
+  },
+  "whitelist_models": [
+    "Samsung Galaxy A07",
+    "Samsung Galaxy A17",
+    "Samsung Galaxy S25",
+    "Samsung Galaxy S25 FE",
+    "Samsung Galaxy S25 Ultra",
+    "Samsung Galaxy S25+",
+    "Samsung Galaxy S26",
+    "Samsung Galaxy S26 Ultra",
+    "Samsung Galaxy S26+",
+    "Samsung Galaxy Z Flip7",
+    "Samsung Galaxy Z Flip7 FE",
+    "Samsung Galaxy Z Fold7"
+  ],
+  "removed_models_top": [],
+  "removed_reasons": {}
+}

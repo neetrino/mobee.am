@@ -1,0 +1,272 @@
+[
+  {
+    "category": "Mac / MacBook Air",
+    "year": "",
+    "model": "MacBook Air 15-inch M4",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Mac / Desktop",
+    "year": "",
+    "model": "Mac mini M5",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Mac / Desktop",
+    "year": "2025",
+    "model": "Mac Studio 2025",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Mac / Desktop",
+    "year": "",
+    "model": "Mac Studio M5",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Mac / MacBook Pro",
+    "year": "",
+    "model": "MacBook Pro 14-inch M5 Max",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Mac / MacBook Pro",
+    "year": "",
+    "model": "MacBook Pro 16-inch M5 Max",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "iPad 2025",
+    "year": "2025",
+    "model": "iPad 11th Gen A16",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "iPad 2025",
+    "year": "2025",
+    "model": "iPad Air 11 M3",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "iPad 2025",
+    "year": "2025",
+    "model": "iPad Air 13 M3",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "iPad 2026",
+    "year": "2026",
+    "model": "iPad Air 13 M4",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "iPad 2025",
+    "year": "2025",
+    "model": "iPad Pro 11 M5",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "iPad 2025",
+    "year": "2025",
+    "model": "iPad Pro 13 M5",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "iPad 2026",
+    "year": "2026",
+    "model": "iPad A18",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "iPad 2026",
+    "year": "2026",
+    "model": "iPad mini OLED",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Apple Watch 2026",
+    "year": "2026",
+    "model": "Apple Watch Series 12",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Apple Watch 2026",
+    "year": "2026",
+    "model": "Apple Watch Ultra 4",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "AirPods 2026",
+    "year": "2026",
+    "model": "AirPods Max 2",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "AirPods 2026",
+    "year": "2026",
+    "model": "AirPods Ultra",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Vision",
+    "year": "",
+    "model": "Apple Vision Pro M5",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Home & TV 2026",
+    "year": "2026",
+    "model": "Apple TV 4K A17 Pro",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Home & TV 2026",
+    "year": "2026",
+    "model": "HomePod 3",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Home & TV 2026",
+    "year": "2026",
+    "model": "HomePod mini 2",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Home & TV 2026",
+    "year": "2026",
+    "model": "HomePad",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Home & TV 2026",
+    "year": "2026",
+    "model": "Apple Security Camera",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Home & TV 2026",
+    "year": "2026",
+    "model": "Apple Video Doorbell",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Accessories 2025",
+    "year": "2025",
+    "model": "Magic Keyboard for iPad Air",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Accessories 2025",
+    "year": "2025",
+    "model": "MagSafe Battery",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Accessories 2025",
+    "year": "2025",
+    "model": "MagSafe Charger 25W Qi2",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Accessories 2026",
+    "year": "2026",
+    "model": "Studio Display 2026",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  },
+  {
+    "category": "Accessories 2026",
+    "year": "2026",
+    "model": "Studio Display XDR",
+    "color": "",
+    "configs_raw": "",
+    "connectivity": "",
+    "note": ""
+  }
+]

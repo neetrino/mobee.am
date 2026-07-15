@@ -6,21 +6,58 @@ const { OUT_DIR } = require("./dry-run.cjs");
 const {
   isDysonHardRejected,
   isPlayStationHardRejected,
-  isHairDryerProduct,
+  isDysonHairDevice,
   isPlayStationConsoleProduct,
+  normalizeDysonProductFamily,
+  categorySlugForParentModel,
 } = require("./normalize.cjs");
+const { DYSON_HAIR_PARENT_MODELS } = require("./targets.cjs");
 
 function safetyCheck(payload) {
   const flat = payload.flat_variants || [];
+  const products = payload.products || [];
   const titles = flat.map((row) => row.name || "").join(" | ");
 
-  const hasAirwrap = /\bairwrap\b/i.test(titles);
-  const hasAirstrait = /\bairstrait\b/i.test(titles);
+  const hasNonHairReady = products.some((product) => {
+    if (product.product_type !== "dyson") return false;
+    return !DYSON_HAIR_PARENT_MODELS.includes(product.normalized_model);
+  });
+
+  const hasAccessory = flat.some((row) => {
+    const family = normalizeDysonProductFamily(row.name, row.model, row.source_url);
+    return family === "reject-accessory";
+  });
+
+  const hasUnknown = flat.some((row) => {
+    if (row.product_type !== "dyson") return false;
+    return normalizeDysonProductFamily(row.name, row.model, row.source_url) === "unknown-hair-device";
+  });
+
+  const mergedGenerations = products.some((product) => {
+    const models = new Set(
+      (product.variants || []).map((v) => (v.options?.model_code || "").toUpperCase()).filter(Boolean),
+    );
+    if (product.normalized_model?.includes("Airwrap") && models.size > 1) {
+      const gens = [...models].filter((m) => /^HS0[589]$/.test(m));
+      return gens.length > 1;
+    }
+    return false;
+  });
+
+  const wrongCategory = products.some((product) => {
+    if (product.product_type !== "dyson") return false;
+    const expected = categorySlugForParentModel(product.normalized_model);
+    if (!expected) return true;
+    if (expected === "hair-stylers" && /hair.?dryers/i.test(product.category || "")) return true;
+    if (expected === "hair-straighteners" && /hair.?dryers/i.test(product.category || "")) return true;
+    return false;
+  });
+
   const hasDysonAccessory = flat.some((row) => isDysonHardRejected(row.name, row.model, row.source_url));
   const hasNonHairDryerDyson = flat.some(
-    (row) => row.product_type === "dyson" && !isHairDryerProduct(row.name, row.model, row.source_url),
+    (row) => row.product_type === "dyson" && !isDysonHairDevice(row.name, row.model, row.source_url),
   );
-  const hasGames = /\bgame\b|\bdisc\b|\bgift card\b/i.test(titles);
+  const hasGames = /\bgift card\b/i.test(titles);
   const hasControllers = /\bcontroller\b|\bdualsense\b|\bdualshock\b/i.test(titles);
   const hasPsAccessory = flat.some(
     (row) => row.product_type === "playstation" && isPlayStationHardRejected(row.name, row.model, row.source_url),
@@ -31,20 +68,19 @@ function safetyCheck(payload) {
   );
   const pricesOk = flat.every((row) => Number(row.price) > 0);
   const imagesOk = flat.every((row) => Boolean(row.image_url || (row.gallery && row.gallery.length)));
-  const noDbDuplicates = (payload.already_exists_in_db || []).length === 0;
 
   return {
-    "No Dyson Airwrap imported": hasAirwrap ? "FAIL" : "PASS",
-    "No Dyson Airstrait imported": hasAirstrait ? "FAIL" : "PASS",
-    "No Dyson accessories imported": hasDysonAccessory ? "FAIL" : "PASS",
-    "Only Dyson hair dryers accepted": hasNonHairDryerDyson ? "FAIL" : "PASS",
-    "No PlayStation games imported": hasGames ? "FAIL" : "PASS",
+    "Only approved Dyson hair devices ready": hasNonHairReady || hasUnknown ? "FAIL" : "PASS",
+    "No standalone accessories ready": hasAccessory || hasDysonAccessory ? "FAIL" : "PASS",
+    "No non-hair Dyson ready": hasNonHairDryerDyson ? "FAIL" : "PASS",
+    "Airwrap generations not merged": mergedGenerations ? "FAIL" : "PASS",
+    "Correct Dyson categories": wrongCategory ? "FAIL" : "PASS",
+    "No PlayStation gift cards imported": hasGames ? "FAIL" : "PASS",
     "No PlayStation controllers imported": hasControllers ? "FAIL" : "PASS",
     "No PS accessories imported": hasPsAccessory ? "FAIL" : "PASS",
     "Only consoles accepted": hasNonConsolePs ? "FAIL" : "PASS",
     "Prices exist": pricesOk ? "PASS" : "FAIL",
     "Images exist": imagesOk ? "PASS" : "FAIL",
-    "No DB duplicates": noDbDuplicates ? "PASS" : "WARN",
   };
 }
 
@@ -66,7 +102,7 @@ function writeReport(payload, { mode = "dry-run", importResult = null, exitCode 
   lines.push("");
   lines.push("| Metric | Count |");
   lines.push("| ---------------------- | ----: |");
-  lines.push(`| Dyson targets | ${summary.dyson_targets ?? 4} |`);
+  lines.push(`| Dyson targets | ${summary.dyson_targets ?? DYSON_HAIR_PARENT_MODELS.length} |`);
   lines.push(`| PlayStation targets | ${summary.playstation_targets ?? 8} |`);
   lines.push(`| Found on MobileCentre | ${summary.found_on_mobilecentre ?? 0} |`);
   lines.push(`| Found on YerevanMobile | ${summary.found_on_yerevanmobile ?? 0} |`);
@@ -84,17 +120,30 @@ function writeReport(payload, { mode = "dry-run", importResult = null, exitCode 
 
   lines.push("## Ready To Import");
   lines.push("");
-  lines.push("| Product | Type | Variants | Source | Price range | Source URLs |");
-  lines.push("| ------- | ---- | -------: | ------ | ----------: | ----------- |");
-  if (!(payload.products || []).length) lines.push("| — | — | — | — | — | — |");
+  lines.push("| Product | Type | Category | Variants | Source | Price range | Source URLs |");
+  lines.push("| ------- | ---- | -------- | -------: | ------ | ----------: | ----------- |");
+  if (!(payload.products || []).length) lines.push("| — | — | — | — | — | — | — |");
   for (const product of payload.products || []) {
     const range =
       product.price_min != null && product.price_max != null
         ? `${product.price_min}-${product.price_max} AMD`
         : "—";
     lines.push(
-      `| ${product.normalized_model} | ${product.product_type} | ${product.variant_count} | ${product.primary_source} | ${range} | ${(product.source_urls || []).slice(0, 2).join("; ")} |`,
+      `| ${product.normalized_model} | ${product.product_type} | ${product.category || "—"} | ${product.variant_count} | ${product.primary_source} | ${range} | ${(product.source_urls || []).slice(0, 2).join("; ")} |`,
     );
+  }
+  lines.push("");
+
+  lines.push("## Variant Detail");
+  lines.push("");
+  lines.push("| Parent | Model | Color | Kit | Hair type | Price | Source | Images | Desc HTML | DB |");
+  lines.push("| ------ | ----- | ----- | --- | --------- | ----: | ------ | -----: | --------: | -- |");
+  for (const product of payload.products || []) {
+    for (const variant of product.variants || []) {
+      lines.push(
+        `| ${product.normalized_model} | ${variant.options?.model_code || "—"} | ${variant.options?.color || "—"} | ${variant.options?.kit || "—"} | ${variant.options?.hair_type || "—"} | ${variant.price || "—"} | ${variant.source} | ${(variant.gallery || []).length} | ${(variant.descriptionHtml || product.descriptionHtml || "").length} | ${variant.db_status || "—"} |`,
+      );
+    }
   }
   lines.push("");
 
@@ -123,19 +172,8 @@ function writeReport(payload, { mode = "dry-run", importResult = null, exitCode 
   lines.push("| Product | Source | URL | Reason |");
   lines.push("| ------- | ------ | --- | ------ |");
   if (!(payload.rejected || []).length) lines.push("| — | — | — | — |");
-  for (const row of (payload.rejected || []).slice(0, 80)) {
+  for (const row of (payload.rejected || []).slice(0, 120)) {
     lines.push(`| ${row.product || "—"} | ${row.source || "—"} | ${row.url || "—"} | ${row.reason} |`);
-  }
-  lines.push("");
-
-  lines.push("## Variant Summary");
-  lines.push("");
-  lines.push("| Product | Type | Variants | Attributes | Colors | Storage |");
-  lines.push("| ------- | ---- | -------: | ---------- | ------ | ------- |");
-  for (const product of payload.all_discovered_products || payload.products || []) {
-    lines.push(
-      `| ${product.normalized_model} | ${product.product_type || "—"} | ${product.variant_count || 0} | ${Object.keys(product.available_options || {}).join(", ") || "—"} | ${(product.available_options?.color || []).join(", ") || "—"} | ${(product.available_options?.storage || []).join(", ") || "—"} |`,
-    );
   }
   lines.push("");
 
@@ -151,9 +189,9 @@ function writeReport(payload, { mode = "dry-run", importResult = null, exitCode 
   lines.push("## Commands Used");
   lines.push("");
   lines.push("```bash");
-  lines.push(`node scripts/product-import/pipelines/device/run-device-source-import.cjs --dry-run  # exit ${exitCode}`);
+  lines.push(`node scripts/product-import/pipelines/device/run.cjs --dry-run  # exit ${exitCode}`);
   if (mode === "import") {
-    lines.push("node scripts/product-import/pipelines/device/run-device-source-import.cjs --import");
+    lines.push("node scripts/product-import/pipelines/device/run.cjs --import");
     lines.push("node scripts/product-import/pipelines/device/post-import-verification.cjs");
   }
   lines.push("```");
@@ -161,16 +199,14 @@ function writeReport(payload, { mode = "dry-run", importResult = null, exitCode 
 
   lines.push("## Final Recommendation");
   lines.push("");
-  lines.push(`- Dyson hair dryers ready: **${dysonReady}** parent products`);
+  lines.push(`- Dyson hair devices ready: **${dysonReady}** parent products`);
   lines.push(`- PlayStation consoles ready: **${psReady}** parent products`);
   lines.push(`- Ready variants total: **${summary.ready_variants ?? 0}**`);
   lines.push(`- Rejected/skipped: **${(summary.rejected ?? 0) + (summary.found_but_not_imported ?? 0)}**`);
 
   const canImport =
     (summary.ready_parent_products ?? 0) > 0 &&
-    Object.entries(safety)
-      .filter(([key]) => key !== "No DB duplicates")
-      .every(([, value]) => value === "PASS");
+    Object.values(safety).every((value) => value === "PASS");
 
   if (mode === "dry-run") {
     lines.push(

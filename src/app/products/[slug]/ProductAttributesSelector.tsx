@@ -1,6 +1,10 @@
 'use client';
 
-import { getProductColorHex, isKnownProductColor } from '../../../lib/product-color-hex.constants';
+import {
+  buildColorSwatchStyle,
+  getProductColorHex,
+  isKnownProductColor,
+} from '../../../lib/product-color-hex.constants';
 import type { ReactNode } from 'react';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { t, getAttributeLabel } from '../../../lib/i18n';
@@ -30,8 +34,7 @@ export interface ProductAttributesSelectorProps {
 }
 
 
-function resolveSwatchHex(value: string, label: string, colors?: string[] | null): string {
-  if (colors?.length) return colors[0];
+function resolveSwatchFallbackHex(value: string, label: string): string {
   if (isKnownProductColor(value)) return getProductColorHex(value);
   if (isKnownProductColor(label)) return getProductColorHex(label);
   return getProductColorHex(value);
@@ -107,7 +110,7 @@ function renderColorSwatch({
 }) {
   const processedImageUrl = imageUrl ? processImageUrl(imageUrl) : null;
   const hasImage = Boolean(processedImageUrl?.trim());
-  const colorHex = resolveSwatchHex(value, label, colors);
+  const fallbackHex = resolveSwatchFallbackHex(value, label);
   const borderClass =
     isSelected ? 'border-admin ring-2 ring-admin/25' : 'border-gray-200 hover:border-gray-400';
 
@@ -121,7 +124,7 @@ function renderColorSwatch({
     />
   ) : null;
 
-  const style = hasImage ? undefined : { backgroundColor: colorHex };
+  const style = hasImage ? undefined : buildColorSwatchStyle(colors, fallbackHex);
 
   if (onClick) {
     return (
@@ -276,8 +279,8 @@ export function ProductAttributesSelector({
                   const isSelected = selectedValue === optionValue || selectedValue === g.value;
                   const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
                   const hasImage = Boolean(processedImageUrl?.trim());
-                  const colorHex = g.colors?.[0] ?? null;
-                  const showColorDot = Boolean(colorHex) && !hasImage;
+                  const hasColors = Array.isArray(g.colors) && g.colors.length > 0;
+                  const showColorDot = hasColors && !hasImage;
                   const oos = g.stock <= 0;
                   return (
                     <button
@@ -289,7 +292,6 @@ export function ProductAttributesSelector({
                       }`}
                     >
                       {hasImage && processedImageUrl ? (
-                         
                         <img
                           src={processedImageUrl}
                           alt=""
@@ -298,7 +300,7 @@ export function ProductAttributesSelector({
                       ) : showColorDot ? (
                         <span
                           className="h-6 w-6 shrink-0 rounded-full border border-gray-300"
-                          style={{ backgroundColor: colorHex ?? undefined }}
+                          style={buildColorSwatchStyle(g.colors)}
                         />
                       ) : null}
                       <span>{getAttributeLabel(language, attrKey, g.value)}</span>

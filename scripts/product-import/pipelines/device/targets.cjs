@@ -7,6 +7,47 @@ const DYSON_HAIR_DRYER_PARENT_MODELS = [
   "Dyson Supersonic Travel",
 ];
 
+const DYSON_HAIR_STYLER_PARENT_MODELS = [
+  "Dyson Airwrap HS05",
+  "Dyson Airwrap i.d. HS08",
+  "Dyson Airwrap Co-anda2x HS09",
+];
+
+const DYSON_HAIR_STRAIGHTENER_PARENT_MODELS = [
+  "Dyson Airstrait",
+  "Dyson Corrale",
+];
+
+const DYSON_HAIR_PARENT_MODELS = [
+  ...DYSON_HAIR_DRYER_PARENT_MODELS,
+  ...DYSON_HAIR_STYLER_PARENT_MODELS,
+  ...DYSON_HAIR_STRAIGHTENER_PARENT_MODELS,
+];
+
+const DYSON_CATEGORY_BY_PARENT = {
+  "Dyson Supersonic": "Hair Dryers",
+  "Dyson Supersonic Nural": "Hair Dryers",
+  "Dyson Supersonic r": "Hair Dryers",
+  "Dyson Supersonic Travel": "Hair Dryers",
+  "Dyson Airwrap HS05": "Hair Stylers",
+  "Dyson Airwrap i.d. HS08": "Hair Stylers",
+  "Dyson Airwrap Co-anda2x HS09": "Hair Stylers",
+  "Dyson Airstrait": "Hair Straighteners",
+  "Dyson Corrale": "Hair Straighteners",
+};
+
+const DYSON_CATEGORY_SLUG_BY_PARENT = {
+  "Dyson Supersonic": "hair-dryers",
+  "Dyson Supersonic Nural": "hair-dryers",
+  "Dyson Supersonic r": "hair-dryers",
+  "Dyson Supersonic Travel": "hair-dryers",
+  "Dyson Airwrap HS05": "hair-stylers",
+  "Dyson Airwrap i.d. HS08": "hair-stylers",
+  "Dyson Airwrap Co-anda2x HS09": "hair-stylers",
+  "Dyson Airstrait": "hair-straighteners",
+  "Dyson Corrale": "hair-straighteners",
+};
+
 const PLAYSTATION_CONSOLE_PARENT_MODELS = [
   "Sony PlayStation 4",
   "Sony PlayStation 4 Slim",
@@ -19,10 +60,10 @@ const PLAYSTATION_CONSOLE_PARENT_MODELS = [
 ];
 
 const DEVICE_TARGETS = [
-  ...DYSON_HAIR_DRYER_PARENT_MODELS.map((model) => ({
+  ...DYSON_HAIR_PARENT_MODELS.map((model) => ({
     type: "dyson",
     model,
-    category: "Hair Dryers",
+    category: DYSON_CATEGORY_BY_PARENT[model],
   })),
   ...PLAYSTATION_CONSOLE_PARENT_MODELS.map((model) => ({
     type: "playstation",
@@ -31,35 +72,65 @@ const DEVICE_TARGETS = [
   })),
 ];
 
-const DYSON_HARD_REJECT_KEYWORDS = [
-  "airwrap",
-  "airstrait",
-  "corrale",
+/** Non-hair appliances / parts — always reject (contextual exceptions applied in normalize). */
+const DYSON_NON_HAIR_REJECT_KEYWORDS = [
   "v15",
   "v12",
   "v11",
   "v10",
+  "v8",
+  "v7",
   "gen5",
   "big ball",
+  "big+quiet",
+  "big quiet",
   "purifier",
+  "humidify",
   "humidifier",
+  "hot+cool",
+  "hot cool",
+  "cool",
+  "heater",
   "fan",
+  "vacuum",
+  "cleaner",
+  "washg1",
+  "wash",
+  "zone",
+  "solarcycle",
+  "headphone",
+  "headphones",
+  "lamp",
+  "lighting",
+];
+
+const DYSON_ACCESSORY_REJECT_KEYWORDS = [
   "filter",
   "brush",
   "comb",
   "attachment",
+  "barrel",
+  "diffuser",
+  "concentrator",
   "stand",
+  "wall mount",
   "case",
   "storage case",
+  "presentation case",
   "travel pouch",
-  "charger",
-  "battery",
-  "vacuum",
-  "straightener",
-  "styler",
   "storage bag",
+  "charger",
+  "dock",
+  "battery",
   "spare part",
-  "cleaner",
+  "replacement",
+  "cable",
+];
+
+/** @deprecated use DYSON_NON_HAIR_REJECT_KEYWORDS + accessory logic */
+const DYSON_HARD_REJECT_KEYWORDS = [
+  ...DYSON_NON_HAIR_REJECT_KEYWORDS,
+  ...DYSON_ACCESSORY_REJECT_KEYWORDS,
 ];
 
 const PLAYSTATION_HARD_REJECT_KEYWORDS = [
@@ -98,6 +169,28 @@ const DYSON_HAIR_DRYER_HINTS = [
   "fohn",
   "supersonic",
   "dryer",
+];
+
+const DYSON_HAIR_DEVICE_HINTS = [
+  ...DYSON_HAIR_DRYER_HINTS,
+  "airwrap",
+  "airstrait",
+  "corrale",
+  "hair styler",
+  "multi-styler",
+  "multistyler",
+  "straightener",
+  "co-anda",
+  "coanda",
+  "hs05",
+  "hs08",
+  "hs09",
+  "hs03",
+  "ht01",
+  "hd08",
+  "hd16",
+  "hd17",
+  "hd18",
 ];
 
 const PLAYSTATION_CONSOLE_HINTS = [
@@ -182,6 +275,13 @@ const MOBILECENTRE_CATEGORY_URLS = [
 
 const MOBILECENTRE_KNOWN_PRODUCT_URLS = [
   "https://www.mobilecentre.am/product/dyson-hair-dryer-hd08-supersonic-sg_my_hk_lr_lr_fu/33338/",
+  "https://www.mobilecentre.am/product/dyson-hs05-airwrap-multistyler-complete-hair-styler-_nickel-copper_/33786/",
+  "https://www.mobilecentre.am/product/dyson-hs08-hair-styler-prussian-blue/33789/",
+  "https://www.mobilecentre.am/product/dyson-hs08-hair-styler-amber-silk/33787/",
+  "https://www.mobilecentre.am/product/dyson-hs08-hair-styler-vinca-blue-topaz/33790/",
+  "https://www.mobilecentre.am/product/dyson-hs08-hair-styler-ceramic-pink/33788/",
+  "https://www.mobilecentre.am/product/dyson-hs09-hair-styler-_jasper-plum_/33793/",
+  "https://www.mobilecentre.am/product/dyson-hs09-hair-styler-_amber-silk_/33791/",
   "https://www.mobilecentre.am/product/sony-playstation-5-slim-_white_/30224/",
 ];
 
@@ -192,14 +292,47 @@ const YEREVANMOBILE_KNOWN_PRODUCT_URLS = [
   "https://www.yerevanmobile.am/en/sony-ps5-pro.html",
   "https://www.yerevanmobile.am/en/sony-ps5-slim-digital-edition-fifa-26.html",
   "https://www.yerevanmobile.am/en/dyson-hd18-supersonic-vinca-blue-topaz.html",
+  "https://www.yerevanmobile.am/en/dyson-airwrap-hs08-jasper-plum.html",
+  "https://www.yerevanmobile.am/en/dyson-hs08-airwrap-id-multi-styler-red-velvet-gold.html",
+  "https://www.yerevanmobile.am/en/dyson-airwrap-hs08-patina-topaz.html",
+  "https://www.yerevanmobile.am/en/dyson-airwrap-id-hs08-ceramic-apricot.html",
+  "https://www.yerevanmobile.am/en/dyson-airwrap-id-hs08-ceramic-amber-silk.html",
+  "https://www.yerevanmobile.am/en/dyson-airwrap-id-hs08-ceramic-prussian-blue.html",
+  "https://www.yerevanmobile.am/en/dyson-airwrap-id-hs08-ceramic-vinca-blue.html",
+  "https://www.yerevanmobile.am/en/dyson-airwrap-i-d-hs08-straight-wavy-kanzan-pink.html",
+  "https://www.yerevanmobile.am/en/dyson-hs09-airwrap-ceramic-pink.html",
+  "https://www.yerevanmobile.am/en/dyson-hs09-airwrap-jasper-plum.html",
+  "https://www.yerevanmobile.am/en/dyson-hs09-airwrap-amber-silk.html",
+  "https://www.yerevanmobile.am/en/dyson-hs09-airwrap-co-anda2x-straight-wavy-red-velvet.html",
+  "https://www.yerevanmobile.am/en/dyson-hs09-airwrap-co-anda2x-straight-wavy-apricot-topaz.html",
+  "https://www.yerevanmobile.am/en/dyson-hs09-airwrap-co-anda2x-curly-coily-amber-silk.html",
 ];
 
 const YEREVANMOBILE_CATEGORY_URLS = [
-  "https://www.yerevanmobile.am/en/beauty-and-health/dyson.html",
   "https://www.yerevanmobile.am/en/electronics/gaming/playstation.html",
   "https://www.yerevanmobile.am/en/electronics/gaming/consoles.html",
-  "https://www.yerevanmobile.am/am/electronics/gaming/playstation.html",
-  "https://www.yerevanmobile.am/ru/electronics/gaming/playstation.html",
+];
+
+const DYSON_EXTRA_SEARCH_QUERIES = [
+  "Dyson Supersonic",
+  "Dyson Supersonic Nural",
+  "Dyson Supersonic r",
+  "Dyson Supersonic Travel",
+  "Dyson Airwrap",
+  "Dyson Airwrap Complete",
+  "Dyson Airwrap Multi-Styler",
+  "Dyson Airwrap i.d.",
+  "Dyson Airwrap ID",
+  "Dyson HS05",
+  "Dyson HS08",
+  "Dyson HS09",
+  "Dyson Co-anda2x",
+  "Dyson Coanda 2x",
+  "Dyson Hair Styler",
+  "Dyson Airstrait",
+  "Dyson Corrale",
+  "Dyson Hair Straightener",
+  "Dyson HT01",
 ];
 
 function buildSearchQueries(target) {
@@ -210,6 +343,23 @@ function buildSearchQueries(target) {
     "Dyson Supersonic Nural": ["Dyson Supersonic Nural HD16", "Dyson Nural hair dryer"],
     "Dyson Supersonic r": ["Dyson Supersonic r hair dryer", "Dyson Supersonic r HD"],
     "Dyson Supersonic Travel": ["Dyson Supersonic Travel dryer", "Dyson Travel hair dryer"],
+    "Dyson Airwrap HS05": ["Dyson HS05", "Dyson Airwrap Complete", "Dyson Airwrap Multistyler", "Dyson Airwrap HS05"],
+    "Dyson Airwrap i.d. HS08": [
+      "Dyson HS08",
+      "Dyson Airwrap i.d.",
+      "Dyson Airwrap ID",
+      "Dyson Airwrap HS08",
+      "Dyson Hair Styler HS08",
+    ],
+    "Dyson Airwrap Co-anda2x HS09": [
+      "Dyson HS09",
+      "Dyson Co-anda2x",
+      "Dyson Coanda 2x",
+      "Dyson Airwrap HS09",
+      "Dyson Hair Styler HS09",
+    ],
+    "Dyson Airstrait": ["Dyson Airstrait", "Dyson HT01", "Dyson Hair Straightener"],
+    "Dyson Corrale": ["Dyson Corrale", "Dyson HS03", "Dyson straightener Corrale"],
     "Sony PlayStation 5": ["PS5 console", "PlayStation 5 console", "Sony PS5"],
     "Sony PlayStation 5 Digital Edition": ["PS5 Digital Edition", "PlayStation 5 Digital"],
     "Sony PlayStation 5 Slim": ["PS5 Slim console", "PlayStation 5 Slim", "Sony PlayStation 5 Slim White"],
@@ -232,11 +382,19 @@ function writeTargetsTsv(filePath, fs) {
 
 module.exports = {
   DYSON_HAIR_DRYER_PARENT_MODELS,
+  DYSON_HAIR_STYLER_PARENT_MODELS,
+  DYSON_HAIR_STRAIGHTENER_PARENT_MODELS,
+  DYSON_HAIR_PARENT_MODELS,
+  DYSON_CATEGORY_BY_PARENT,
+  DYSON_CATEGORY_SLUG_BY_PARENT,
   PLAYSTATION_CONSOLE_PARENT_MODELS,
   DEVICE_TARGETS,
   DYSON_HARD_REJECT_KEYWORDS,
+  DYSON_NON_HAIR_REJECT_KEYWORDS,
+  DYSON_ACCESSORY_REJECT_KEYWORDS,
   PLAYSTATION_HARD_REJECT_KEYWORDS,
   DYSON_HAIR_DRYER_HINTS,
+  DYSON_HAIR_DEVICE_HINTS,
   PLAYSTATION_CONSOLE_HINTS,
   PLAYSTATION_GAME_PATTERNS,
   PLAYSTATION_ACCESSORY_PATTERNS,
@@ -246,6 +404,7 @@ module.exports = {
   YEREVANMOBILE_KNOWN_PRODUCT_URLS,
   MOBILECENTRE_CATEGORY_URLS,
   YEREVANMOBILE_CATEGORY_URLS,
+  DYSON_EXTRA_SEARCH_QUERIES,
   buildSearchQueries,
   writeTargetsTsv,
 };

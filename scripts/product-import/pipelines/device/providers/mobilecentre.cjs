@@ -4,6 +4,7 @@ const {
   DEVICE_TARGETS,
   MOBILECENTRE_CATEGORY_URLS,
   MOBILECENTRE_KNOWN_PRODUCT_URLS,
+  DYSON_EXTRA_SEARCH_QUERIES,
   buildSearchQueries,
 } = require("../targets.cjs");
 const { fetchHtml, stripTags } = require("../http.cjs");
@@ -14,11 +15,13 @@ const {
   extractVariantOptions,
   isDysonHardRejected,
   isPlayStationHardRejected,
-  isHairDryerProduct,
+  isDysonHairDevice,
   isPlayStationConsoleProduct,
   isPlayStationGame,
   isPlayStationAccessoryProduct,
+  categoryForParentModel,
 } = require("../normalize.cjs");
+const { buildDescriptionHtml } = require("../../../shared/mobilecentre-description-html.cjs");
 
 const BASE_URL = "https://www.mobilecentre.am";
 const REQUEST_SLEEP_SEARCH = 200;
@@ -224,7 +227,7 @@ function isRelevantDevice(name, url) {
   const dyson = /\bdyson\b/.test(text);
   const ps = /\b(playstation|ps4|ps5|sony)\b/.test(text);
   if (!dyson && !ps) return false;
-  if (dyson && (isDysonHardRejected(name, name, url) || !isHairDryerProduct(name, name, url))) return false;
+  if (dyson && (isDysonHardRejected(name, name, url) || !isDysonHairDevice(name, name, url))) return false;
   if (ps) {
     if (isPlayStationHardRejected(name, name, url)) return false;
     if (isPlayStationGame(name, name, url)) return false;
@@ -232,6 +235,13 @@ function isRelevantDevice(name, url) {
     if (!isPlayStationConsoleProduct(name, name, url)) return false;
   }
   return true;
+}
+
+function extractStockStatus(html, price) {
+  const text = stripTags(html);
+  if (/Առկա չէ խանութներում|out of stock/i.test(html)) return "out_of_stock";
+  if (/Առկա է խանութներում|in stock/i.test(html)) return "in_stock";
+  return price ? "in_stock" : "unknown";
 }
 
 function productMatchesAnyTarget(name, url, targets) {
@@ -278,7 +288,12 @@ async function parseProductPage(productUrl, targets) {
   const price = extractPrice(text);
   const sourcePid = extractSourcePid(productUrl, pageText);
   const canonicalUrl = canonicalProductUrl(productUrl) || productUrl;
-  const options = extractVariantOptions(name, targetMatch.normalized);
+  const options = extractVariantOptions(name, targetMatch.normalized, canonicalUrl);
+  const description = extractDescription(pageHtml);
+  const descriptionHtml = description ? buildDescriptionHtml(description) : null;
+  const category =
+    categoryForParentModel(targetMatch.normalized) ||
+    (targetMatch.type === "dyson" ? "Hair Dryers" : "Game Consoles");
 
   const variant = {
     source: "mobilecentre",
@@ -291,13 +306,13 @@ async function parseProductPage(productUrl, targets) {
     normalized_model: targetMatch.normalized,
     target_model: targetMatch.target,
     product_type: targetMatch.type,
-    category: targetMatch.type === "dyson" ? "Hair Dryers" : "Game Consoles",
+    category,
     price,
     currency: "AMD",
-    stock_status: price ? "in_stock" : "unknown",
-    description: extractDescription(pageHtml),
-    descriptionHtml: null,
-    specifications: extractDescription(pageHtml),
+    stock_status: extractStockStatus(pageHtml, price),
+    description,
+    descriptionHtml,
+    specifications: description,
     options,
     image_url: imageUrl,
     gallery,
@@ -359,17 +374,23 @@ async function searchMobileCentre(targets = DEVICE_TARGETS) {
   const rejected = [];
   const failed = [];
 
+  const queries = new Set();
   for (const target of targets) {
-    for (const query of buildSearchQueries(target)) {
-      let links = [];
-      try {
-        links = await scrapeSearchResults(query);
-      } catch (error) {
-        failed.push({ target: target.model, source: "mobilecentre", query, error: error.message });
-        continue;
-      }
-      links.forEach((link) => seedUrls.add(link));
+    for (const query of buildSearchQueries(target)) queries.add(query);
+  }
+  if (targets.some((target) => target.type === "dyson")) {
+    DYSON_EXTRA_SEARCH_QUERIES.forEach((query) => queries.add(query));
+  }
+
+  for (const query of queries) {
+    let links = [];
+    try {
+      links = await scrapeSearchResults(query);
+    } catch (error) {
+      failed.push({ source: "mobilecentre", query, error: error.message });
+      continue;
     }
+    links.forEach((link) => seedUrls.add(link));
   }
 
   MOBILECENTRE_KNOWN_PRODUCT_URLS.forEach((url) => seedUrls.add(url));
