@@ -15,7 +15,7 @@ async function main() {
 
   console.log("Device Source Import Pipeline");
   console.log("Output dir:", OUT_DIR);
-  console.log("Scope: Dyson hair dryers + PlayStation consoles only");
+  console.log("Scope: Dyson hair care (dryers/stylers/straighteners) + PlayStation consoles");
   console.log("Sources: MobileCentre, YerevanMobile (no iSpace)");
 
   if (isDryRun) {

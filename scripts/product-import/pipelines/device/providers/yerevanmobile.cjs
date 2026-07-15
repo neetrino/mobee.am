@@ -4,10 +4,12 @@ const {
   DEVICE_TARGETS,
   YEREVANMOBILE_CATEGORY_URLS,
   YEREVANMOBILE_KNOWN_PRODUCT_URLS,
+  DYSON_EXTRA_SEARCH_QUERIES,
   buildSearchQueries,
 } = require("../targets.cjs");
 const { fetchHtml } = require("../http.cjs");
 const { parseMainProductPrice, parseTitle: parseYmTitle } = require("./yerevanmobile-price.cjs");
+const { parseYerevanMobileDescriptionHtml } = require("../../../shared/yerevanmobile-description.cjs");
 const {
   cleanText,
   parentModelKey,
@@ -17,10 +19,11 @@ const {
   normalize,
   isDysonHardRejected,
   isPlayStationHardRejected,
-  isHairDryerProduct,
+  isDysonHairDevice,
   isPlayStationConsoleProduct,
   isPlayStationGame,
   isPlayStationAccessoryProduct,
+  categoryForParentModel,
 } = require("../normalize.cjs");
 
 const BASE = "https://www.yerevanmobile.am";
@@ -48,19 +51,29 @@ function extractProductLinks(html) {
 
 function slugCandidatesForTarget(model) {
   const base = slugify(model.replace(/^(Dyson|Sony)\s+/i, ""));
-  const candidates = new Set([
-    `${BASE}/en/${base}.html`,
-    `${BASE}/en/dyson-${base}.html`,
-    `${BASE}/en/sony-${base}.html`,
-    `${BASE}/am/${base}.html`,
-    `${BASE}/ru/${base}.html`,
-  ]);
+  const candidates = new Set([`${BASE}/en/${base}.html`, `${BASE}/en/dyson-${base}.html`, `${BASE}/en/sony-${base}.html`]);
 
   const custom = {
     "Dyson Supersonic": ["dyson-supersonic-hair-dryer", "dyson-supersonic", "dyson-hair-dryer-supersonic"],
     "Dyson Supersonic Nural": ["dyson-supersonic-nural", "dyson-supersonic-nural-hair-dryer"],
     "Dyson Supersonic r": ["dyson-supersonic-r", "dyson-supersonic-r-hair-dryer"],
     "Dyson Supersonic Travel": ["dyson-supersonic-travel", "dyson-supersonic-travel-dryer"],
+    "Dyson Airwrap HS05": ["dyson-airwrap-hs05", "dyson-hs05-airwrap"],
+    "Dyson Airwrap i.d. HS08": [
+      "dyson-airwrap-hs08-jasper-plum",
+      "dyson-airwrap-id-hs08-ceramic-apricot",
+      "dyson-hs08-airwrap-id-multi-styler-red-velvet-gold",
+    ],
+    "Dyson Airwrap Co-anda2x HS09": [
+      "dyson-hs09-airwrap-jasper-plum",
+      "dyson-hs09-airwrap-co-anda2x-straight-wavy-red-velvet",
+    ],
+    "Dyson Airstrait": [
+      "dyson-ht01-airstrait-straightener-apricot-topaz",
+      "dyson-ht01-airstrait-straightener-ceramic-pink",
+      "dyson-airstrait",
+    ],
+    "Dyson Corrale": ["dyson-corrale", "dyson-corrale-straightener"],
     "Sony PlayStation 5": ["sony-playstation-5-console", "playstation-5-console", "ps5-console"],
     "Sony PlayStation 5 Digital Edition": ["playstation-5-digital-edition", "ps5-digital-edition"],
     "Sony PlayStation 5 Slim": ["playstation-5-slim", "ps5-slim-console", "sony-ps5-slim-eu", "sony-ps5-slim"],
@@ -79,8 +92,6 @@ function slugCandidatesForTarget(model) {
   if (custom[model]) {
     for (const slug of custom[model]) {
       candidates.add(`${BASE}/en/${slug}.html`);
-      candidates.add(`${BASE}/am/${slug}.html`);
-      candidates.add(`${BASE}/ru/${slug}.html`);
     }
   }
 
@@ -143,7 +154,7 @@ function isRelevantDevice(title, url) {
   const dyson = /\bdyson\b/.test(text);
   const ps = /\b(playstation|ps4|ps5|sony)\b/.test(text);
   if (!dyson && !ps) return false;
-  if (dyson && (isDysonHardRejected(title, title, url) || !isHairDryerProduct(title, title, url))) return false;
+  if (dyson && (isDysonHardRejected(title, title, url) || !isDysonHairDevice(title, title, url))) return false;
   if (ps) {
     if (isPlayStationHardRejected(title, title, url)) return false;
     if (isPlayStationGame(title, title, url)) return false;
@@ -153,11 +164,29 @@ function isRelevantDevice(title, url) {
   return true;
 }
 
+function extractProductInfoBlock(html) {
+  const idx = html.indexOf('class="product-info-main"');
+  if (idx >= 0) return html.slice(idx, idx + 60000);
+  return html.slice(0, 120000);
+}
+
+function parseStockStatus(html) {
+  if (/out of stock|product-info-stock-sku[\s\S]{0,200}unavailable|չկա առկայություն/i.test(html)) {
+    return "out_of_stock";
+  }
+  if (/in stock|առկա է/i.test(html)) return "in_stock";
+  return "unknown";
+}
+
 function parseConfigurableVariants(html, baseTitle, url, targetModel, productType) {
   const variants = [];
   const gallery = parseImages(html);
   const imageUrl = gallery[0] || null;
   const mainPrice = parseMainProductPrice(html);
+  const descriptionHtml = parseYerevanMobileDescriptionHtml(html);
+  const stockStatus = parseStockStatus(html);
+  const category =
+    categoryForParentModel(targetModel) || (productType === "dyson" ? "Hair Dryers" : "Game Consoles");
 
   const swatchBlock = extractProductInfoBlock(html);
   const swatches = [...swatchBlock.matchAll(/data-option-label="([^"]+)"[^>]*data-price-amount="(\d+)"/g)];
@@ -168,7 +197,7 @@ function parseConfigurableVariants(html, baseTitle, url, targetModel, productTyp
       const price = swatchPrice >= 50000 ? swatchPrice : mainPrice;
       if (!price || price <= 0) continue;
       const variantName = `${baseTitle} (${label})`;
-      const options = extractVariantOptions(variantName, targetModel);
+      const options = extractVariantOptions(variantName, targetModel, url);
       if (/gb|tb/i.test(label)) options.storage = label;
       else if (!options.color) options.color = label;
       variants.push({ name: variantName, options, price });
@@ -178,7 +207,7 @@ function parseConfigurableVariants(html, baseTitle, url, targetModel, productTyp
   if (!variants.length && mainPrice) {
     variants.push({
       name: baseTitle,
-      options: extractVariantOptions(baseTitle, targetModel),
+      options: extractVariantOptions(baseTitle, targetModel, url),
       price: mainPrice,
     });
   }
@@ -196,28 +225,23 @@ function parseConfigurableVariants(html, baseTitle, url, targetModel, productTyp
     normalized_model: targetModel,
     target_model: targetModel,
     product_type: productType,
-    category: productType === "dyson" ? "Hair Dryers" : "Game Consoles",
+    category,
     price: variant.price,
     currency: "AMD",
-    stock_status: /out of stock|չկա/i.test(html) ? "out_of_stock" : "in_stock",
+    stock_status: stockStatus,
     description: "",
-    descriptionHtml: null,
+    descriptionHtml,
     specifications: "",
     options: Object.fromEntries(Object.entries(variant.options || {}).filter(([, val]) => val)),
     image_url: imageUrl,
     gallery,
-    gallery_by_color: {},
+    gallery_by_color: variant.options?.color ? { [variant.options.color]: gallery } : {},
     variant_source_type: swatches.length ? "configurable_options" : "main_product_price",
   }));
 }
 
-function extractProductInfoBlock(html) {
-  const idx = html.indexOf('class="product-info-main"');
-  if (idx >= 0) return html.slice(idx, idx + 60000);
-  return html.slice(0, 120000);
-}
-
 async function parseProductPage(url, targets) {
+  if (!url.includes("/en/")) return null;
   const { text, status } = await fetchHtml(url);
   if (status >= 400 || text.length < 1000) return null;
   const title = parseTitle(text);
@@ -253,15 +277,21 @@ async function searchYerevanMobile(targets = DEVICE_TARGETS) {
   const triedSlugs = new Set();
   const candidateUrls = new Set();
 
+  const queries = new Set();
   for (const target of targets) {
-    for (const query of buildSearchQueries(target)) {
-      try {
-        const searchLinks = await searchCatalog(query);
-        searchLinks.forEach((url) => candidateUrls.add(url));
-      } catch (error) {
-        failed.push({ target: target.model, source: "yerevanmobile", query, error: error.message });
-      }
-      slugCandidatesForTarget(target.model).forEach((url) => candidateUrls.add(url));
+    for (const query of buildSearchQueries(target)) queries.add(query);
+    slugCandidatesForTarget(target.model).forEach((url) => candidateUrls.add(url));
+  }
+  if (targets.some((target) => target.type === "dyson")) {
+    DYSON_EXTRA_SEARCH_QUERIES.forEach((query) => queries.add(query));
+  }
+
+  for (const query of queries) {
+    try {
+      const searchLinks = await searchCatalog(query);
+      searchLinks.forEach((url) => candidateUrls.add(url));
+    } catch (error) {
+      failed.push({ source: "yerevanmobile", query, error: error.message });
     }
   }
 
@@ -320,6 +350,7 @@ async function searchYerevanMobile(targets = DEVICE_TARGETS) {
     for (const item of items) {
       item.target_model = match.normalized;
       item.normalized_model = match.normalized;
+      item.category = categoryForParentModel(match.normalized) || item.category;
       variants.push(item);
     }
   }

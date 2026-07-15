@@ -3,11 +3,11 @@
 const path = require("path");
 const fs = require("fs");
 const {
-  DYSON_HAIR_DRYER_PARENT_MODELS,
+  DYSON_HAIR_PARENT_MODELS,
   PLAYSTATION_CONSOLE_PARENT_MODELS,
   DEVICE_TARGETS,
 } = require("./targets.cjs");
-const { validateVariantForImport } = require("./normalize.cjs");
+const { validateVariantForImport, categoryForParentModel } = require("./normalize.cjs");
 const { searchMobileCentre } = require("./providers/mobilecentre.cjs");
 const { searchYerevanMobile } = require("./providers/yerevanmobile.cjs");
 const { buildVariableProducts } = require("./build-variable-products.cjs");
@@ -33,6 +33,7 @@ function filterAndValidateVariants(variants) {
     }
     variant.normalized_model = check.normalized;
     variant.product_type = check.type;
+    variant.category = check.category || categoryForParentModel(check.normalized) || variant.category;
     matched.push(variant);
   }
 
@@ -106,8 +107,10 @@ async function runDryRun({ skipMobileCentre = false, skipYerevanMobile = false }
       sources: ["mobilecentre", "yerevanmobile"].filter((source) =>
         source === "mobilecentre" ? !skipMobileCentre : !skipYerevanMobile,
       ),
-      dyson_targets: DYSON_HAIR_DRYER_PARENT_MODELS.length,
+      dyson_targets: DYSON_HAIR_PARENT_MODELS.length,
       playstation_targets: PLAYSTATION_CONSOLE_PARENT_MODELS.length,
+      dyson_ready_parents: readyProducts.filter((p) => p.product_type === "dyson").length,
+      playstation_ready_parents: readyProducts.filter((p) => p.product_type === "playstation").length,
       found_on_mobilecentre: foundBySource.mobilecentre,
       found_on_yerevanmobile: foundBySource.yerevanmobile,
       ready_parent_products: readyProducts.length,
