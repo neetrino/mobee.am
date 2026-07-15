@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button, Card } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
+import { resolveOrderShippingMethodKind } from '../../lib/order-shipping-method-label';
 import { useAnimatedModalDismiss } from '../../lib/useAnimatedModalDismiss';
 import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
@@ -276,7 +277,8 @@ export function OrderDetailsModal({
                           <div className="flex justify-between text-gray-600">
                             <span>{t('profile.orderDetails.shipping')}</span>
                             <span>
-                              {selectedOrderData.shippingMethod === 'pickup' 
+                              {resolveOrderShippingMethodKind(selectedOrderData.shippingMethod) ===
+                              'pickup'
                                 ? t('checkout.shipping.freePickup')
                                 : (() => {
                                     const shippingAMD = selectedOrderData.totals.shipping;
@@ -324,13 +326,26 @@ export function OrderDetailsModal({
                     <div className="text-gray-700 space-y-3">
                       <div>
                         <span className="font-medium">{t('profile.orderDetails.method')}: </span>
-                        <span className="capitalize">
-                          {selectedOrderData.shippingMethod === 'delivery' ? t('profile.orderDetails.delivery') : 
-                           selectedOrderData.shippingMethod === 'pickup' ? t('profile.orderDetails.pickup') : 
-                           selectedOrderData.shippingMethod || t('profile.orderDetails.notSpecified')}
+                        <span>
+                          {(() => {
+                            const kind = resolveOrderShippingMethodKind(
+                              selectedOrderData.shippingMethod,
+                            );
+                            if (kind === 'delivery') {
+                              return t('checkout.shipping.delivery');
+                            }
+                            if (kind === 'pickup') {
+                              return t('checkout.shipping.storePickup');
+                            }
+                            return (
+                              selectedOrderData.shippingMethod ||
+                              t('profile.orderDetails.notSpecified')
+                            );
+                          })()}
                         </span>
                       </div>
-                      {selectedOrderData.shippingMethod === 'delivery' && selectedOrderData.shippingAddress && (
+                      {resolveOrderShippingMethodKind(selectedOrderData.shippingMethod) ===
+                        'delivery' && selectedOrderData.shippingAddress && (
                         <div className="mt-3 pt-3 border-t border-gray-200">
                           <p className="font-medium text-gray-900 mb-2">{t('profile.orderDetails.deliveryAddress')}:</p>
                           <div className="text-gray-600">

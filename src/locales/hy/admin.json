@@ -738,7 +738,7 @@
       "shippingAddress": "Առաքման հասցե",
       "noShippingAddress": "Առաքման հասցե չկա",
       "shippingMethod": "Առաքման եղանակ:",
-      "pickup": "ինքնավերցում",
+      "pickup": "Խանութից վերցնել",
       "paymentInfo": "Վճարում",
       "method": "Եղանակ:",
       "amount": "Գումար:",
