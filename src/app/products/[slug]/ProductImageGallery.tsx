@@ -164,7 +164,8 @@ export function ProductImageGallery({
   return (
     <>
       <div className="flex flex-col gap-4 product-2col:flex-row product-2col:items-start product-2col:gap-5">
-        {/* Thumbnails: below main on mobile, left column on desktop */}
+        {/* Thumbnails only when there is more than one image — a single photo stays full-width. */}
+        {hasMultipleImages ? (
         <div className="group/thumbs order-2 flex w-full shrink-0 flex-col gap-2 product-2col:order-1 product-2col:w-24 product-2col:gap-3">
           <div className="flex min-w-0 flex-row items-center gap-2 product-2col:flex-col product-2col:items-stretch">
             {images.length > THUMBNAILS_PER_VIEW && (
@@ -315,10 +316,13 @@ export function ProductImageGallery({
             </div>
           )}
         </div>
+        ) : null}
         
         <div className="order-1 flex w-full shrink-0 justify-center product-2col:order-2 product-2col:block product-2col:min-w-0 product-2col:flex-1">
           <div
-            className="group relative mx-auto flex aspect-square w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm product-2col:max-w-none"
+            className={`group relative mx-auto flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm ${
+              hasMultipleImages ? "max-w-sm product-2col:max-w-none" : "max-w-none"
+            }`}
             data-pdp-cart-fly-source
           >
             {images.length > 0 ? (

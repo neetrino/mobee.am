@@ -10,6 +10,12 @@ import {
 import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import { useTranslation } from '../lib/i18n-client';
 import {
+  MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS,
+  MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS,
+  MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS,
+  MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS,
+} from './header-strip-layout';
+import {
   MOBILE_DRAWER_SHELL_BACKDROP_CLASS,
   MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS,
   MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS,
@@ -145,12 +151,13 @@ export function MobileFiltersDrawer({
               <button
                 type="button"
                 onClick={requestClose}
-                className="h-10 w-10 rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-admin-300 hover:bg-admin-50 hover:text-admin-600"
+                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
                 aria-label={t('products.mobileFilters.close')}
               >
-                <svg className="mx-auto h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <span className={MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS} aria-hidden>
+                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS} />
+                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS} />
+                </span>
               </button>
             </div>
 
