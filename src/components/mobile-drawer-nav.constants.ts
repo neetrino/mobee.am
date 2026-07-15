@@ -35,9 +35,9 @@ export const MOBILE_DRAWER_SHELL_ROOT_CLASS = 'fixed inset-0 z-50 lg:hidden';
 
 export const MOBILE_DRAWER_SHELL_BACKDROP_CLASS = 'absolute inset-0 bg-black/40';
 
-/** Drawer panel — same width as Header mobile menu (`w-[min(83vw,24rem)]`). */
+/** Drawer panel — same width as Header mobile menu (`w-[min(83vw,24rem)]`), rounded on the right. */
 export const MOBILE_DRAWER_SHELL_PANEL_CLASS =
-  'relative z-10 flex h-full min-h-screen min-w-[17rem] w-[min(83vw,24rem)] max-w-full flex-col bg-white shadow-2xl';
+  'relative z-10 flex h-full min-h-screen min-w-[17rem] w-[min(83vw,24rem)] max-w-full flex-col overflow-hidden rounded-tr-[28px] rounded-br-[28px] bg-white shadow-2xl';
 
 export const MOBILE_DRAWER_SHELL_TRANSITION_MS = 320;
 
