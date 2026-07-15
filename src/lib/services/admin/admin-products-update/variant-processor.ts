@@ -20,7 +20,7 @@ export interface ProcessedVariantOption {
 }
 
 /**
- * Process variant options and build attributes map
+ * Process variant options with bulk AttributeValue lookup (no N+1 findUnique).
  */
 export async function processVariantOptions(
   variant: {
@@ -32,94 +32,102 @@ export async function processVariantOptions(
   tx: Prisma.TransactionClient
 ): Promise<{
   options: ProcessedVariantOption[];
-  attributesMap: Record<string, Array<{ valueId: string; value: string; attributeKey: string }>>;
+  attributesMap: Record<
+    string,
+    Array<{ valueId: string; value: string; attributeKey: string }>
+  >;
 }> {
   const options: ProcessedVariantOption[] = [];
-  const attributesMap: Record<string, Array<{ valueId: string; value: string; attributeKey: string }>> = {};
-  
-  // Support both old format (color/size) and new format (options array)
-  if (variant.options && Array.isArray(variant.options) && variant.options.length > 0) {
-    // New format: use options array
-    for (const opt of variant.options) {
-      let valueId: string | null = null;
-      let attributeKey: string | null = null;
-      let value: string | null = null;
+  const attributesMap: Record<
+    string,
+    Array<{ valueId: string; value: string; attributeKey: string }>
+  > = {};
 
+  const pushAttribute = (
+    attributeKey: string,
+    valueId: string,
+    value: string
+  ) => {
+    if (!attributesMap[attributeKey]) {
+      attributesMap[attributeKey] = [];
+    }
+    if (!attributesMap[attributeKey].some((item) => item.valueId === valueId)) {
+      attributesMap[attributeKey].push({ valueId, value, attributeKey });
+    }
+  };
+
+  if (variant.options && Array.isArray(variant.options)) {
+    if (variant.options.length === 0) {
+      return { options, attributesMap };
+    }
+
+    const valueIds = variant.options
+      .map((opt) => opt.valueId)
+      .filter((id): id is string => Boolean(id));
+
+    const attrValues =
+      valueIds.length > 0
+        ? await tx.attributeValue.findMany({
+            where: { id: { in: valueIds } },
+            include: { attribute: true },
+          })
+        : [];
+
+    const byId = new Map(attrValues.map((attrValue) => [attrValue.id, attrValue]));
+
+    for (const opt of variant.options) {
       if (opt.valueId) {
-        valueId = opt.valueId;
-        const attrValue = await tx.attributeValue.findUnique({
-          where: { id: opt.valueId },
-          include: { attribute: true },
-        });
+        const attrValue = byId.get(opt.valueId);
         if (attrValue) {
-          attributeKey = attrValue.attribute.key;
-          value = attrValue.value;
+          pushAttribute(attrValue.attribute.key, opt.valueId, attrValue.value);
         }
         options.push({ valueId: opt.valueId });
-      } else if (opt.attributeKey && opt.value) {
-        const foundValueId = await findOrCreateAttributeValue(opt.attributeKey, opt.value, locale);
+        continue;
+      }
+
+      if (opt.attributeKey && opt.value) {
+        const foundValueId = await findOrCreateAttributeValue(
+          opt.attributeKey,
+          opt.value,
+          locale
+        );
         if (foundValueId) {
-          valueId = foundValueId;
-          attributeKey = opt.attributeKey;
-          value = opt.value;
+          pushAttribute(opt.attributeKey, foundValueId, opt.value);
           options.push({ valueId: foundValueId });
         } else {
-          attributeKey = opt.attributeKey;
-          value = opt.value;
           options.push({ attributeKey: opt.attributeKey, value: opt.value });
         }
       }
+    }
 
-      // Build attributes JSONB structure
-      if (attributeKey && valueId && value) {
-        if (!attributesMap[attributeKey]) {
-          attributesMap[attributeKey] = [];
-        }
-        if (!attributesMap[attributeKey].some(item => item.valueId === valueId)) {
-          attributesMap[attributeKey].push({
-            valueId,
-            value,
-            attributeKey,
-          });
-        }
-      }
+    return { options, attributesMap };
+  }
+
+  if (variant.color) {
+    const colorValueId = await findOrCreateAttributeValue(
+      "color",
+      variant.color,
+      locale
+    );
+    if (colorValueId) {
+      options.push({ valueId: colorValueId });
+      pushAttribute("color", colorValueId, variant.color);
+    } else {
+      options.push({ attributeKey: "color", value: variant.color });
     }
-  } else {
-    // Old format: Try to find or create AttributeValues for color and size
-    if (variant.color) {
-      const colorValueId = await findOrCreateAttributeValue("color", variant.color, locale);
-      if (colorValueId) {
-        options.push({ valueId: colorValueId });
-        if (!attributesMap["color"]) {
-          attributesMap["color"] = [];
-        }
-        attributesMap["color"].push({
-          valueId: colorValueId,
-          value: variant.color,
-          attributeKey: "color",
-        });
-      } else {
-        // Fallback to old format if AttributeValue not found
-        options.push({ attributeKey: "color", value: variant.color });
-      }
-    }
-    
-    if (variant.size) {
-      const sizeValueId = await findOrCreateAttributeValue("size", variant.size, locale);
-      if (sizeValueId) {
-        options.push({ valueId: sizeValueId });
-        if (!attributesMap["size"]) {
-          attributesMap["size"] = [];
-        }
-        attributesMap["size"].push({
-          valueId: sizeValueId,
-          value: variant.size,
-          attributeKey: "size",
-        });
-      } else {
-        // Fallback to old format if AttributeValue not found
-        options.push({ attributeKey: "size", value: variant.size });
-      }
+  }
+
+  if (variant.size) {
+    const sizeValueId = await findOrCreateAttributeValue(
+      "size",
+      variant.size,
+      locale
+    );
+    if (sizeValueId) {
+      options.push({ valueId: sizeValueId });
+      pushAttribute("size", sizeValueId, variant.size);
+    } else {
+      options.push({ attributeKey: "size", value: variant.size });
     }
   }
 
@@ -127,22 +135,33 @@ export async function processVariantOptions(
 }
 
 /**
- * Parse variant price, stock, and compareAtPrice
+ * Parse required price/stock for create / legacy replace.
  */
 export function parseVariantPrices(variant: {
   price: string | number;
-  compareAtPrice?: string | number;
+  compareAtPrice?: string | number | null;
   stock: string | number;
 }): {
   price: number;
   stock: number;
   compareAtPrice?: number;
 } {
-  const price = typeof variant.price === 'number' ? variant.price : parseFloat(String(variant.price));
-  const stock = typeof variant.stock === 'number' ? variant.stock : parseInt(String(variant.stock), 10);
-  const compareAtPrice = variant.compareAtPrice !== undefined && variant.compareAtPrice !== null && variant.compareAtPrice !== ''
-    ? (typeof variant.compareAtPrice === 'number' ? variant.compareAtPrice : parseFloat(String(variant.compareAtPrice)))
-    : undefined;
+  const price =
+    typeof variant.price === "number"
+      ? variant.price
+      : parseFloat(String(variant.price));
+  const stock =
+    typeof variant.stock === "number"
+      ? variant.stock
+      : parseInt(String(variant.stock), 10);
+  const compareAtPrice =
+    variant.compareAtPrice !== undefined &&
+    variant.compareAtPrice !== null &&
+    variant.compareAtPrice !== ""
+      ? typeof variant.compareAtPrice === "number"
+        ? variant.compareAtPrice
+        : parseFloat(String(variant.compareAtPrice))
+      : undefined;
 
   if (isNaN(price) || price < 0) {
     throw new Error(`Invalid price value: ${variant.price}`);
@@ -151,6 +170,56 @@ export function parseVariantPrices(variant: {
   return { price, stock, compareAtPrice };
 }
 
+/**
+ * Parse optional fields for partial variant update.
+ */
+export function parsePartialVariantFields(variant: {
+  price?: string | number;
+  compareAtPrice?: string | number | null;
+  stock?: string | number;
+}): {
+  price?: number;
+  stock?: number;
+  compareAtPrice?: number | null;
+  hasCompareAtPrice: boolean;
+} {
+  const result: {
+    price?: number;
+    stock?: number;
+    compareAtPrice?: number | null;
+    hasCompareAtPrice: boolean;
+  } = { hasCompareAtPrice: false };
 
+  if (variant.price !== undefined) {
+    const price =
+      typeof variant.price === "number"
+        ? variant.price
+        : parseFloat(String(variant.price));
+    if (isNaN(price) || price < 0) {
+      throw new Error(`Invalid price value: ${variant.price}`);
+    }
+    result.price = price;
+  }
 
+  if (variant.stock !== undefined) {
+    const stock =
+      typeof variant.stock === "number"
+        ? variant.stock
+        : parseInt(String(variant.stock), 10);
+    result.stock = isNaN(stock) ? 0 : stock;
+  }
 
+  if (variant.compareAtPrice !== undefined) {
+    result.hasCompareAtPrice = true;
+    if (variant.compareAtPrice === null || variant.compareAtPrice === "") {
+      result.compareAtPrice = null;
+    } else {
+      result.compareAtPrice =
+        typeof variant.compareAtPrice === "number"
+          ? variant.compareAtPrice
+          : parseFloat(String(variant.compareAtPrice));
+    }
+  }
+
+  return result;
+}

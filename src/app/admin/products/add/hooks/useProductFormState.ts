@@ -50,6 +50,7 @@ export function useProductFormState() {
     sku: '',
     quantity: '',
   });
+  const [simpleProductDatabaseVariantId, setSimpleProductDatabaseVariantId] = useState<string | undefined>(undefined);
   const [selectedAttributesForVariants, setSelectedAttributesForVariants] = useState<Set<string>>(new Set());
   const [selectedAttributeValueIds, setSelectedAttributeValueIds] = useState<Record<string, string[]>>({});
   const [openValueModal, setOpenValueModal] = useState<{ variantId: string; attributeId: string } | null>(null);
@@ -119,6 +120,8 @@ export function useProductFormState() {
     setProductType,
     simpleProductData,
     setSimpleProductData,
+    simpleProductDatabaseVariantId,
+    setSimpleProductDatabaseVariantId,
     // Variant builder states
     selectedAttributesForVariants,
     setSelectedAttributesForVariants,

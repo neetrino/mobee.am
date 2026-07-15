@@ -32,6 +32,7 @@ interface UseProductEditModeProps {
   setHasVariantsToLoad: (has: boolean) => void;
   setProductType: (type: 'simple' | 'variable') => void;
   setSimpleProductData: (data: any) => void;
+  setSimpleProductDatabaseVariantId: (id: string | undefined) => void;
 }
 
 export function useProductEditMode({
@@ -47,6 +48,7 @@ export function useProductEditMode({
   setHasVariantsToLoad,
   setProductType,
   setSimpleProductData,
+  setSimpleProductDatabaseVariantId,
 }: UseProductEditModeProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -228,7 +230,8 @@ export function useProductEditMode({
             setProductType('simple');
 
             if (hasVariants && variants.length > 0) {
-              const firstVariant = variants[0] as any;
+              const firstVariant = variants[0] as { id?: string; price?: number | string; compareAtPrice?: number | string; sku?: string; stock?: number | string };
+              setSimpleProductDatabaseVariantId(firstVariant.id);
               setSimpleProductData({
                 price: firstVariant.price
                   ? String(
@@ -256,6 +259,7 @@ export function useProductEditMode({
                 quantity: String(firstVariant.stock || 0),
               });
             } else {
+              setSimpleProductDatabaseVariantId(undefined);
               setSimpleProductData({
                 price: '',
                 compareAtPrice: '',
@@ -293,6 +297,7 @@ export function useProductEditMode({
     setHasVariantsToLoad,
     setProductType,
     setSimpleProductData,
+    setSimpleProductDatabaseVariantId,
     t,
   ]);
 }
