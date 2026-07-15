@@ -59,6 +59,7 @@ interface AddProductFormContentProps {
   defaultCurrency: CurrencyCode;
   isEditMode: boolean;
   loading: boolean;
+  isSnapshotReady?: boolean;
   imageUploadLoading: boolean;
   imageUploadError: string | null;
   categoriesExpanded: boolean;
@@ -124,6 +125,7 @@ export function AddProductFormContent({
   defaultCurrency,
   isEditMode,
   loading,
+  isSnapshotReady = true,
   imageUploadLoading,
   imageUploadError,
   categoriesExpanded,
@@ -298,7 +300,7 @@ export function AddProductFormContent({
           </div>
         </details>
 
-        <FormActions loading={loading} isEditMode={isEditMode} />
+        <FormActions loading={loading} isEditMode={isEditMode} isSnapshotReady={isSnapshotReady} />
       </form>
     </Card>
   );

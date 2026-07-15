@@ -17,6 +17,7 @@ import { useProductAttributeHelpers } from './hooks/useProductAttributeHelpers';
 import { useProductAttributeHandlers } from './hooks/useProductAttributeHandlers';
 import { useProductFormHandlers } from './hooks/useProductFormHandlers';
 import { useProductFormCallbacks } from './hooks/useProductFormCallbacks';
+import { useInitialProductSnapshot } from './hooks/useInitialProductSnapshot';
 import { isClothingCategory as checkIsClothingCategory, generateSlug } from './utils/productUtils';
 
 const AddProductFormContent = dynamic(
@@ -64,6 +65,7 @@ function AddProductPageContent() {
     setHasVariantsToLoad: formState.setHasVariantsToLoad,
     setProductType: formState.setProductType,
     setSimpleProductData: formState.setSimpleProductData,
+    setSimpleProductDatabaseVariantId: formState.setSimpleProductDatabaseVariantId,
   });
 
   useProductVariantConversion({
@@ -149,6 +151,19 @@ function AddProductPageContent() {
     getSizeAttribute,
   });
 
+  const { initialEditableProductRef, isSnapshotReady } = useInitialProductSnapshot({
+    isEditMode,
+    productId,
+    hasVariantsToLoad: formState.hasVariantsToLoad,
+    loadingProduct: formState.loadingProduct,
+    formData: formState.formData,
+    productType: formState.productType,
+    simpleProductData: formState.simpleProductData,
+    simpleProductDatabaseVariantId: formState.simpleProductDatabaseVariantId,
+    selectedAttributesForVariants: formState.selectedAttributesForVariants,
+    generatedVariants: formState.generatedVariants,
+  });
+
   const { handleSubmit } = useProductFormHandlers({
     formData: formState.formData,
     setFormData: formState.setFormData,
@@ -157,6 +172,7 @@ function AddProductPageContent() {
     setCategories: formState.setCategories,
     productType: formState.productType,
     simpleProductData: formState.simpleProductData,
+    simpleProductDatabaseVariantId: formState.simpleProductDatabaseVariantId,
     selectedAttributesForVariants: formState.selectedAttributesForVariants,
     generatedVariants: formState.generatedVariants,
     attributes: formState.attributes,
@@ -167,6 +183,7 @@ function AddProductPageContent() {
     newCategoryName: formState.newCategoryName,
     isEditMode,
     productId,
+    initialEditableProductRef,
     getColorAttribute,
     getSizeAttribute,
     isClothingCategory,
@@ -195,6 +212,7 @@ function AddProductPageContent() {
           defaultCurrency={formState.defaultCurrency}
           isEditMode={isEditMode}
           loading={formState.loading}
+          isSnapshotReady={isSnapshotReady}
           imageUploadLoading={formState.imageUploadLoading}
           imageUploadError={formState.imageUploadError}
           categoriesExpanded={formState.categoriesExpanded}

@@ -78,6 +78,7 @@ export function useVariantGeneration({
 
       const autoVariant: GeneratedVariant = {
         id: variantId,
+        databaseVariantId: existingAutoVariant?.databaseVariantId,
         selectedValueIds: allSelectedValueIds,
         price: existingAutoVariant?.price || '',
         compareAtPrice: existingAutoVariant?.compareAtPrice || '',
