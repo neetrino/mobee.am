@@ -1,8 +1,15 @@
 import { apiClient } from '@/lib/api-client';
 import { showToast } from '@/components/Toast';
+import { invalidateAdminSessionCacheByPrefix } from '@/lib/admin/admin-session-cache';
 import type { PartialProductUpdateInput } from '@/lib/schemas/admin-product-update.schema';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { hasPartialUpdateWork } from '../utils/productUpdateDiff';
+
+const ADMIN_PRODUCTS_LIST_CACHE_PREFIX = '/supersudo/products';
+
+function invalidateProductsListCache(): void {
+  invalidateAdminSessionCacheByPrefix(ADMIN_PRODUCTS_LIST_CACHE_PREFIX);
+}
 
 interface CreateAndSubmitPayloadProps {
   formData: {
@@ -79,6 +86,7 @@ export async function createAndSubmitPayload({
 
       const product = await apiClient.put(`/api/v1/admin/products/${productId}`, partialPayload);
       console.log('✅ [ADMIN] Product partially updated:', product);
+      invalidateProductsListCache();
       showToast(`${baseMessage}${extra}`, 'success', toastDuration);
       router.push('/supersudo/products');
       return;
@@ -123,6 +131,7 @@ export async function createAndSubmitPayload({
       console.log('✅ [ADMIN] Product created:', product);
     }
 
+    invalidateProductsListCache();
     showToast(`${baseMessage}${extra}`, 'success', toastDuration);
     router.push('/supersudo/products');
   } catch (err: unknown) {
