@@ -33,7 +33,8 @@ export function useTranslation() {
   const isAdminRoute =
     pathname?.startsWith('/supersudo') === true || pathname?.startsWith('/admin') === true;
 
-  useSyncExternalStore(
+  // Include revision in hook value deps so memoized `t(...)` callers recompute after lazy loads.
+  const translationRevision = useSyncExternalStore(
     subscribeLazyTranslations,
     getLazyTranslationRevision,
     getLazyTranslationRevision,
@@ -56,7 +57,7 @@ export function useTranslation() {
       }
       return clientT(lang, path);
     },
-    [lang],
+    [lang, translationRevision],
   );
 
   const getProduct = useCallback(
@@ -66,7 +67,7 @@ export function useTranslation() {
       }
       return syncGetProductText(lang, productId, field);
     },
-    [lang],
+    [lang, translationRevision],
   );
 
   const getAttribute = useCallback(
@@ -76,7 +77,7 @@ export function useTranslation() {
       }
       return syncGetAttributeLabel(lang, type, value);
     },
-    [lang],
+    [lang, translationRevision],
   );
 
   return useMemo(
@@ -98,7 +99,7 @@ export type { ProductField } from './i18n-types';
 export function useAdminTranslation() {
   const lang = useUiLanguage();
 
-  useSyncExternalStore(
+  const translationRevision = useSyncExternalStore(
     subscribeLazyTranslations,
     getLazyTranslationRevision,
     getLazyTranslationRevision,
@@ -118,7 +119,7 @@ export function useAdminTranslation() {
       }
       return clientT(lang, path);
     },
-    [lang],
+    [lang, translationRevision],
   );
 
   return useMemo(
