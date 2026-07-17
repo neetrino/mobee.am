@@ -96,8 +96,11 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
   const productsDataRef = useRef(productsData);
-  productsDataRef.current = productsData;
   const requestIdRef = useRef(0);
+
+  useEffect(() => {
+    productsDataRef.current = productsData;
+  }, [productsData]);
 
   useEffect(() => {
     if (initialPayload && initialFiltersKey) {
