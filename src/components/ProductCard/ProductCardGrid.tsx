@@ -165,7 +165,7 @@ export function ProductCardGrid({
       : 'text-[0.83125rem]';
 
   const infoPricePad = homeProductGridCard
-    ? 'px-3 pb-2 max-lg:pt-1 lg:px-5 lg:pb-3'
+    ? 'px-3 pb-2 max-lg:pb-1.5 max-lg:pt-1 lg:px-5 lg:pb-3'
     : isCompact
       ? 'px-3 pb-2'
       : 'px-5 pb-3';
@@ -235,7 +235,7 @@ export function ProductCardGrid({
           colorsInteractive={colorsInteractive}
           onCardColorSelect={onCardColorSelect}
         />
-        <div className={infoPricePad}>
+        <div className={`mt-auto ${infoPricePad}`}>
           <ProductCardPriceBlock
             price={product.price}
             hasPrice={productHasPrice}
@@ -248,12 +248,11 @@ export function ProductCardGrid({
             showStrike={showStrike}
           />
         </div>
-        <div className="min-h-0 flex-1" aria-hidden />
       </div>
 
       <div
-        className={`shrink-0 flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-3 ${footerPad} ${
-          homeProductGridCard ? 'max-lg:gap-2' : ''
+        className={`shrink-0 flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-2 ${footerPad} ${
+          homeProductGridCard ? 'max-lg:gap-1.5' : ''
         }`}
       >
         <div className="flex items-center justify-between gap-2">
