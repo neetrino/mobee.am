@@ -43,11 +43,11 @@ function CategoriesMenuFlyoutCard({
       prefetch
       onMouseEnter={() => onLinkHover(href)}
       onClick={onItemNavigate}
-      className="group flex min-h-[52px] items-center gap-2.5 rounded-xl bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-colors hover:bg-[#fafbfc] active:bg-[#f4f5f7]"
+      className="group flex min-h-[52px] items-center gap-2.5 rounded-xl border border-transparent bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-[border-color,background-color,transform] duration-150 hover:-translate-y-px hover:border-[#dbeafe] hover:bg-[#f8fbff] active:translate-y-0 active:bg-[#f1f7fc]"
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eceef3]">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eef2f7] text-[#4b5563] transition-colors duration-150 group-hover:bg-[#2db2ff] group-hover:text-white">
         {createElement(resolveCategoryMenuIcon(category), {
-          className: 'size-5 text-[#4b5563]',
+          className: 'size-5',
           strokeWidth: 2,
           'aria-hidden': true,
         })}
@@ -55,7 +55,11 @@ function CategoriesMenuFlyoutCard({
       <span className="min-w-0 flex-1 text-[11px] font-bold uppercase leading-tight tracking-wide text-[#1a1a1a] [overflow-wrap:anywhere] line-clamp-2">
         {category.title}
       </span>
-      <ChevronRight className="size-4 shrink-0 text-[#c5c9d0]" strokeWidth={2} aria-hidden />
+      <ChevronRight
+        className="size-4 shrink-0 text-[#d1d5db]"
+        strokeWidth={2}
+        aria-hidden
+      />
     </Link>
   );
 }
@@ -98,14 +102,14 @@ export function CategoriesMenuFlyout({
       <div className="absolute left-0 top-full z-[55] h-2 w-full" aria-hidden />
       <div className={`absolute left-0 top-full z-[55] pt-2 ${montserrat.className}`}>
         <div
-          className={`w-[min(56rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-2xl ${getHeaderDropdownPanelMotionClass(menuEntered)}`}
+          className={`w-[min(56rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#e5e7eb]/90 bg-white shadow-[0_22px_48px_-20px_rgba(15,23,42,0.32)] ${getHeaderDropdownPanelMotionClass(menuEntered)}`}
         >
           {loading ? (
             <div className="px-5 py-4 text-sm text-gray-500">{loadingLabel}</div>
           ) : (
-            <div className="max-h-[min(28rem,calc(100vh-6rem))] overflow-y-auto overscroll-y-contain bg-[#f3f4f6] p-4 [scrollbar-gutter:stable]">
+            <div className="max-h-[min(28rem,calc(100vh-6rem))] overflow-y-auto overscroll-y-contain bg-gradient-to-b from-[#f4f6f8] to-[#eef1f4] p-4 [scrollbar-gutter:stable]">
               <div
-                className="grid gap-3"
+                className="grid gap-2.5"
                 style={{ gridTemplateColumns: `repeat(${FLYOUT_GRID_COLUMNS}, minmax(0, 1fr))` }}
               >
                 {displayItems.map((category) => (
