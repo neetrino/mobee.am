@@ -310,13 +310,11 @@ export function ProductCardGrid({
             <InstallmentPriceButton onClick={handleInstallmentClick} />
           ) : null}
         </div>
-        {homeProductGridCard ? (
-          <div className="hidden min-h-[22px] max-lg:flex max-lg:items-center">
-            {mobileDiscountLabel ? (
-              <span className="inline-flex h-[22px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold leading-none text-[#ff383c]">
-                {mobileDiscountLabel}
-              </span>
-            ) : null}
+        {homeProductGridCard && mobileDiscountLabel ? (
+          <div className="hidden max-lg:flex max-lg:items-center">
+            <span className="inline-flex h-[22px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold leading-none text-[#ff383c]">
+              {mobileDiscountLabel}
+            </span>
           </div>
         ) : null}
       </div>
