@@ -9,41 +9,73 @@ interface InstallmentPriceButtonProps {
   className?: string;
   /** `md` matches PDP secondary links (e.g. «Ավելի մանրամասն»). */
   size?: 'sm' | 'md';
+  /** Force two-line label (e.g. related products desktop). */
+  stackLabel?: boolean;
 }
 
 const SIZE_STYLES = {
   sm: {
     button: 'gap-1.5',
     icon: 18,
-    label: 'text-xs leading-none',
+    stackedLabelClass:
+      'text-left text-xs leading-tight inline-flex flex-col items-start',
+    responsiveLabelClass:
+      'text-left text-xs leading-tight max-sm:inline-flex max-sm:flex-col max-sm:items-start sm:whitespace-nowrap sm:leading-none',
   },
   md: {
     button: 'gap-2',
     icon: 16,
-    label: 'text-sm',
+    stackedLabelClass:
+      'text-left text-sm leading-tight inline-flex flex-col items-start',
+    /** PDP (incl. mobile): always one line. */
+    responsiveLabelClass: 'whitespace-nowrap text-left text-sm leading-normal',
   },
 } as const;
+
+function splitButtonLabel(label: string): { line1: string; line2: string } {
+  const spaceIndex = label.indexOf(' ');
+  if (spaceIndex === -1) {
+    return { line1: label, line2: '' };
+  }
+  return {
+    line1: label.slice(0, spaceIndex),
+    line2: label.slice(spaceIndex + 1),
+  };
+}
 
 export function InstallmentPriceButton({
   onClick,
   className = '',
   size = 'sm',
+  stackLabel = false,
 }: InstallmentPriceButtonProps) {
   const { t } = useTranslation();
   const styles = SIZE_STYLES[size];
+  const buttonLabel = t('product.aparik.buttonLabel');
+  const { line1, line2 } = splitButtonLabel(buttonLabel);
 
   return (
     <button
       type="button"
       onClick={onClick}
       className={`group inline-flex shrink-0 items-center justify-center font-medium text-[#2db2ff] transition-colors hover:text-[#2db2ff] ${styles.button} ${className}`}
-      aria-label={t('product.aparik.buttonLabel')}
+      aria-label={buttonLabel}
     >
       <Calculator size={styles.icon} strokeWidth={2} aria-hidden className="shrink-0" />
       <span
-        className={`whitespace-nowrap no-underline group-hover:underline group-hover:decoration-[#2db2ff] group-hover:underline-offset-2 ${styles.label}`}
+        className={`no-underline group-hover:underline group-hover:decoration-[#2db2ff] group-hover:underline-offset-2 ${
+          stackLabel ? styles.stackedLabelClass : styles.responsiveLabelClass
+        }`}
       >
-        {t('product.aparik.buttonLabel')}
+        <span>{line1}</span>
+        {line2 ? (
+          <>
+            <span className={stackLabel ? 'hidden' : size === 'md' ? undefined : 'max-sm:hidden'}>
+              {' '}
+            </span>
+            <span>{line2}</span>
+          </>
+        ) : null}
       </span>
     </button>
   );

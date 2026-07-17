@@ -409,7 +409,7 @@ export function RelatedProducts({ currentProductSlug, relatedContext }: RelatedP
                   {products.map((product) => (
                     <div
                       key={product.id}
-                      className="h-full flex-shrink-0 px-3"
+                      className="flex min-h-[583px] shrink-0 flex-col self-stretch px-3"
                       style={{ width: `${100 / visibleCards}%` }}
                       onClickCapture={(event) => {
                         if (hasMoved) {
@@ -418,10 +418,11 @@ export function RelatedProducts({ currentProductSlug, relatedContext }: RelatedP
                         }
                       }}
                     >
-                      <div className={HOME_BEST_CHOICE_CARD_WIDTH}>
+                      <div className={`${HOME_BEST_CHOICE_CARD_WIDTH} flex min-h-0 flex-1 flex-col`}>
                         <ProductCard
                           product={mapRelatedProductToHomeGridCardProduct(product)}
                           viewMode="grid-2"
+                          stackInstallmentLabel
                           {...homeDesktopCardProps}
                         />
                       </div>

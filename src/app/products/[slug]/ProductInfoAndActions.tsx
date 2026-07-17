@@ -219,11 +219,11 @@ export function ProductInfoAndActions({
         getOptionValue={getOptionValue}
       />
 
-      <div className="mt-8 flex w-full min-w-0 flex-col items-start gap-2 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
+      <div className="mt-8 flex w-full min-w-0 flex-row flex-wrap items-center justify-between gap-2 text-sm sm:gap-3">
         <button
           type="button"
           onClick={onScrollToDetails}
-          className="order-2 inline-flex max-w-full items-center gap-2 font-medium text-admin hover:underline sm:order-1"
+          className="inline-flex max-w-full items-center gap-2 font-medium text-admin hover:underline"
         >
           <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
           {t(language, 'product.moreDetails')}
@@ -232,7 +232,7 @@ export function ProductInfoAndActions({
           <InstallmentPriceButton
             onClick={handleInstallmentClick}
             size="md"
-            className="order-1 max-sm:w-full max-sm:justify-start sm:order-2"
+            className="shrink-0"
           />
         ) : null}
       </div>

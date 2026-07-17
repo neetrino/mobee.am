@@ -30,7 +30,16 @@ export function ProductCardPriceBlock({
   }
 
   return (
-    <div className="min-w-0 flex flex-col gap-0.5">
+    <div
+      className={`min-w-0 flex flex-col gap-0.5 ${
+        homeProductGridCard ? 'max-lg:min-h-[2.125rem] max-lg:justify-end' : ''
+      }`}
+    >
+      {homeProductGridCard && showStrike && listPrice != null ? (
+        <span className="hidden text-[10px] font-normal italic leading-tight text-[#8e8e93] line-through max-lg:block">
+          {formatPrice(listPrice, currency)}
+        </span>
+      ) : null}
       <div className="flex flex-wrap items-center gap-2">
         <span className={`whitespace-nowrap font-bold tabular-nums text-gray-900 ${priceClass}`}>
           {formatPrice(price, currency)}
@@ -45,17 +54,6 @@ export function ProductCardPriceBlock({
           </span>
         ) : null}
       </div>
-      {homeProductGridCard ? (
-        <div className="hidden min-h-[14px] max-lg:block" aria-hidden={!showStrike}>
-          {showStrike && listPrice != null ? (
-            <span className="text-[10px] font-normal italic leading-tight text-[#8e8e93] line-through">
-              {formatPrice(listPrice, currency)}
-            </span>
-          ) : (
-            <span className="invisible block text-[10px] leading-tight">&nbsp;</span>
-          )}
-        </div>
-      ) : null}
     </div>
   );
 }
