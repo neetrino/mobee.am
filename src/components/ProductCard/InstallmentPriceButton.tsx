@@ -27,8 +27,8 @@ const SIZE_STYLES = {
     icon: 16,
     stackedLabelClass:
       'text-left text-sm leading-tight inline-flex flex-col items-start',
-    responsiveLabelClass:
-      'text-left text-sm leading-tight max-sm:inline-flex max-sm:flex-col max-sm:items-start sm:whitespace-nowrap sm:leading-normal',
+    /** PDP (incl. mobile): always one line. */
+    responsiveLabelClass: 'whitespace-nowrap text-left text-sm leading-normal',
   },
 } as const;
 
@@ -70,7 +70,9 @@ export function InstallmentPriceButton({
         <span>{line1}</span>
         {line2 ? (
           <>
-            <span className={stackLabel ? 'hidden' : 'max-sm:hidden'}> </span>
+            <span className={stackLabel ? 'hidden' : size === 'md' ? undefined : 'max-sm:hidden'}>
+              {' '}
+            </span>
             <span>{line2}</span>
           </>
         ) : null}

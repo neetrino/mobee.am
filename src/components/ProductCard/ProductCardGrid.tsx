@@ -133,8 +133,8 @@ export function ProductCardGrid({
     : product.inStock && productHasPrice && !isAddingToCart;
 
   const cardShellClass = homeProductGridCard
-    ? 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:hover:shadow-none lg:min-h-[583px]'
-    : 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[583px]';
+    ? 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] lg:min-h-[583px]'
+    : 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] lg:min-h-[583px]';
 
   /** Mobile: reserve in-flow height so absolutely positioned image/actions do not overlap the title. */
   const imageStackClass = homeProductGridCard
