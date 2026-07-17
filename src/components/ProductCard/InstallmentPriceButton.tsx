@@ -9,18 +9,26 @@ interface InstallmentPriceButtonProps {
   className?: string;
   /** `md` matches PDP secondary links (e.g. «Ավելի մանրամասն»). */
   size?: 'sm' | 'md';
+  /** Force two-line label (e.g. related products desktop). */
+  stackLabel?: boolean;
 }
 
 const SIZE_STYLES = {
   sm: {
     button: 'gap-1.5',
     icon: 18,
-    label: 'text-xs leading-tight sm:leading-none',
+    stackedLabelClass:
+      'text-left text-xs leading-tight inline-flex flex-col items-start',
+    responsiveLabelClass:
+      'text-left text-xs leading-tight max-sm:inline-flex max-sm:flex-col max-sm:items-start sm:whitespace-nowrap sm:leading-none',
   },
   md: {
     button: 'gap-2',
     icon: 16,
-    label: 'text-sm leading-tight sm:leading-normal',
+    stackedLabelClass:
+      'text-left text-sm leading-tight inline-flex flex-col items-start',
+    responsiveLabelClass:
+      'text-left text-sm leading-tight max-sm:inline-flex max-sm:flex-col max-sm:items-start sm:whitespace-nowrap sm:leading-normal',
   },
 } as const;
 
@@ -39,6 +47,7 @@ export function InstallmentPriceButton({
   onClick,
   className = '',
   size = 'sm',
+  stackLabel = false,
 }: InstallmentPriceButtonProps) {
   const { t } = useTranslation();
   const styles = SIZE_STYLES[size];
@@ -54,12 +63,14 @@ export function InstallmentPriceButton({
     >
       <Calculator size={styles.icon} strokeWidth={2} aria-hidden className="shrink-0" />
       <span
-        className={`text-left no-underline group-hover:underline group-hover:decoration-[#2db2ff] group-hover:underline-offset-2 max-sm:inline-flex max-sm:flex-col max-sm:items-start sm:whitespace-nowrap ${styles.label}`}
+        className={`no-underline group-hover:underline group-hover:decoration-[#2db2ff] group-hover:underline-offset-2 ${
+          stackLabel ? styles.stackedLabelClass : styles.responsiveLabelClass
+        }`}
       >
         <span>{line1}</span>
         {line2 ? (
           <>
-            <span className="max-sm:hidden"> </span>
+            <span className={stackLabel ? 'hidden' : 'max-sm:hidden'}> </span>
             <span>{line2}</span>
           </>
         ) : null}

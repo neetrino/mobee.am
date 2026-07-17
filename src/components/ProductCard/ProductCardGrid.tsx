@@ -59,6 +59,8 @@ interface ProductCardGridProps {
   selectedCardLinkColor?: string | null;
   colorsInteractive?: boolean;
   onCardColorSelect?: (color: { value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }) => void;
+  /** Stack installment CTA label on two lines. */
+  stackInstallmentLabel?: boolean;
 }
 
 /**
@@ -87,6 +89,7 @@ export function ProductCardGrid({
   selectedCardLinkColor = null,
   colorsInteractive = false,
   onCardColorSelect,
+  stackInstallmentLabel = false,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
@@ -306,7 +309,10 @@ export function ProductCardGrid({
             )}
           </button>
           {productHasPrice ? (
-            <InstallmentPriceButton onClick={handleInstallmentClick} />
+            <InstallmentPriceButton
+              onClick={handleInstallmentClick}
+              stackLabel={stackInstallmentLabel}
+            />
           ) : null}
         </div>
         {homeProductGridCard && mobileDiscountLabel ? (
