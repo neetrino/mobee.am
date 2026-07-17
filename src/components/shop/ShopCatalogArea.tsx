@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, type MouseEvent, type ReactNode } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ProductsHeader } from '@/components/ProductsHeader';
 import { ProductsGrid } from '@/components/ProductsGrid';
@@ -19,6 +19,7 @@ import {
 } from '@/lib/pagination/get-pagination-pages';
 import { warmShopPaginationNavigation } from '@/lib/navigation/storefront-prefetch';
 import { useShopCatalog, type ShopCatalogProduct } from './useShopCatalog';
+import { useSmoothScrollToTopOnPageChange } from './useSmoothScrollToTopOnPageChange';
 
 type ShopPaginationPageItemsProps = {
   items: PaginationPageItem[];
@@ -93,11 +94,36 @@ function ShopPaginationLink({
     warmShopPaginationNavigation(router, searchParamsRecord, pageNum, getStoredLanguage());
   };
 
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    warm();
+
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current !== href) {
+      window.history.pushState(null, '', href);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <Link
       href={href}
       prefetch
+      scroll={false}
       className={className}
+      onClick={handleClick}
       onPointerDown={warm}
       onMouseEnter={warm}
       onFocus={warm}
@@ -143,6 +169,8 @@ export function ShopCatalogArea({
   const page = parseInt(searchParams.get('page') || '1', 10);
   const sort = parseProductSortOption(searchParams.get('sort') ?? undefined);
   const selectedFilterColors = parseListingColorFilter(searchParams.get('colors'));
+
+  useSmoothScrollToTopOnPageChange(page);
 
   const searchParamsRecord = useMemo(() => {
     const record: Record<string, string | undefined> = {};

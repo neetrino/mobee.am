@@ -1,7 +1,13 @@
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { ProductFilters } from '@/lib/services/products-find-query/types';
 import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-product-filters';
+import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
+import {
+  getProductListClientCache,
+  setProductListClientCache,
+} from '@/lib/shop/product-list-client-cache';
+import type { ProductListPayload } from '@/lib/services/products-list-cached';
 import type { LanguageCode } from '@/lib/language';
 
 const warmedRoutes = new Set<string>();
@@ -55,9 +61,21 @@ function buildProductListApiUrl(filters: ProductFilters): string {
   return `/api/v1/products?${qs}`;
 }
 
-/** Warm GET /api/v1/products for shop filters (shared Redis cache with RSC). */
+function isProductListPayload(value: unknown): value is ProductListPayload {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  return Array.isArray((value as ProductListPayload).data);
+}
+
+/** Warm GET /api/v1/products into the browser memory cache (and HTTP cache). */
 export function warmShopProductListApi(filters: ProductFilters): void {
   if (!shouldAllowStorefrontPrefetch()) {
+    return;
+  }
+
+  const cacheKey = buildProductListCacheKey(filters);
+  if (getProductListClientCache(cacheKey)) {
     return;
   }
 
@@ -67,9 +85,20 @@ export function warmShopProductListApi(filters: ProductFilters): void {
   }
 
   warmedApis.add(url);
-  void fetch(url, { method: 'GET', credentials: 'same-origin', cache: 'default' }).catch(() => {
-    warmedApis.delete(url);
-  });
+  void fetch(url, { method: 'GET', credentials: 'same-origin', cache: 'default' })
+    .then(async (response) => {
+      if (!response.ok) {
+        warmedApis.delete(url);
+        return;
+      }
+      const json: unknown = await response.json();
+      if (isProductListPayload(json)) {
+        setProductListClientCache(cacheKey, json);
+      }
+    })
+    .catch(() => {
+      warmedApis.delete(url);
+    });
 }
 
 export function warmShopFromSearchParams(
