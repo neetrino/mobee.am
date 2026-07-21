@@ -9,6 +9,7 @@
 const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { withIpv4FirstDnsEnv } = require('../../../scripts/force-ipv4-dns.cjs');
 
 const dbRoot = path.join(__dirname, '..');
 const rootEnvPath = path.join(dbRoot, '..', '..', '.env');
@@ -62,7 +63,7 @@ const prismaBin = path.join(
 const child = spawnSync(process.execPath, [prismaBin, ...prismaArgs], {
   cwd: dbRoot,
   stdio: 'inherit',
-  env: process.env,
+  env: withIpv4FirstDnsEnv(process.env),
 });
 
 if (child.error) {
