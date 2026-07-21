@@ -15,8 +15,8 @@ export type HomeCategoryStripPayload = {
 };
 
 function buildHomeStripCacheKey(lang: string): string {
-  // v3: bust stale cache after hair-dryers hy title fix (20260709160000).
-  return `categories:home-strip:v3:${lang}`;
+  // v4: watches strip uses curated local PNG (R2 upload was 128²).
+  return `categories:home-strip:v4:${lang}`;
 }
 
 /**
