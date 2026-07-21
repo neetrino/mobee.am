@@ -190,10 +190,11 @@ export function MobileHeaderToolbar({
             ) : null}
           </form>
 
+          {/* Phones only: on md+ (iPad mini / Air) compare lives in the bottom nav. */}
           <Link
             href="/compare"
             prefetch
-            className={MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS}
+            className={`${MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS} md:hidden`}
             aria-label={compareAria}
             aria-current={isOnComparePage ? 'page' : undefined}
           >
