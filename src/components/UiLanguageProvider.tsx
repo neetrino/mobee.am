@@ -44,10 +44,13 @@ export function UiLanguageProvider({
   const router = useRouter();
   const [lang, setLang] = useState<LanguageCode>(initialLanguage);
   const langRef = useRef(lang);
-  langRef.current = lang;
 
   // Sync seed only (no listener notify) so translations exist before paint.
   seedStorefrontLocale(lang);
+
+  useEffect(() => {
+    langRef.current = lang;
+  }, [lang]);
 
   useEffect(() => {
     const stored = getStoredLanguage();
