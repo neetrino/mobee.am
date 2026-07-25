@@ -46,7 +46,10 @@ export function getLazyTranslationRevision(): number {
 
 function notifyListeners(): void {
   translationRevision += 1;
-  listeners.forEach((listener) => listener());
+  // Defer so subscribers (useSyncExternalStore) never setState during another component's render.
+  queueMicrotask(() => {
+    listeners.forEach((listener) => listener());
+  });
 }
 
 /**
