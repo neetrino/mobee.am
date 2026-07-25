@@ -121,13 +121,17 @@ export function upsertGuestCartItem(item: GuestCartItem): void {
   localStorage.setItem(GUEST_CART_STORAGE_KEY, JSON.stringify(cart));
 }
 
-export function updateGuestCartItemQuantity(variantId: string, quantity: number): void {
+export function updateGuestCartItemQuantity(
+  variantId: string,
+  quantity: number,
+  options?: { emitEvent?: boolean },
+): void {
   if (typeof window === "undefined") {
     return;
   }
 
   if (quantity < 1) {
-    removeGuestCartItem(variantId);
+    removeGuestCartItem(variantId, options);
     return;
   }
 
@@ -139,10 +143,15 @@ export function updateGuestCartItemQuantity(variantId: string, quantity: number)
 
   existingItem.quantity = quantity;
   localStorage.setItem(GUEST_CART_STORAGE_KEY, JSON.stringify(cart));
-  window.dispatchEvent(new Event("cart-updated"));
+  if (options?.emitEvent !== false) {
+    window.dispatchEvent(new Event("cart-updated"));
+  }
 }
 
-export function removeGuestCartItem(variantId: string): void {
+export function removeGuestCartItem(
+  variantId: string,
+  options?: { emitEvent?: boolean },
+): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -150,7 +159,9 @@ export function removeGuestCartItem(variantId: string): void {
   const cart = readGuestCart();
   const updated = cart.filter((item) => item.variantId !== variantId);
   localStorage.setItem(GUEST_CART_STORAGE_KEY, JSON.stringify(updated));
-  window.dispatchEvent(new Event("cart-updated"));
+  if (options?.emitEvent !== false) {
+    window.dispatchEvent(new Event("cart-updated"));
+  }
 }
 
 export function clearGuestCart(): void {

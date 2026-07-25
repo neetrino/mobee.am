@@ -7,6 +7,8 @@ import { useTranslation } from '../../lib/i18n-client';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import type { CartFlyContext } from '../../lib/cart/cart-fly-animation.types';
 import { readGuestCart, upsertGuestCartItem } from '../../lib/cart/guest-cart';
+import { dispatchCartUpdated } from '../../lib/cart/dispatch-cart-updated';
+import { clearLoggedInCartCache } from '../../app/cart/cart-cache';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { showToast } from '../Toast';
 import { hasDisplayPrice } from '../../lib/products/variant-price-display';
@@ -129,7 +131,7 @@ export function useAddToCart({
                   }
                 : undefined,
           });
-          window.dispatchEvent(new Event('cart-updated'));
+          dispatchCartUpdated();
           triggerFly(fly);
         } catch (error: unknown) {
           console.error('❌ [PRODUCT CARD] Error adding to guest cart:', error);
@@ -149,11 +151,11 @@ export function useAddToCart({
     inFlightRef.current = true;
     const unitPrice = propPrice != null && propPrice > 0 ? propPrice : 0;
     if (unitPrice > 0) {
-      window.dispatchEvent(
-        new CustomEvent('cart-updated', {
-          detail: { optimisticAdd: { quantity: 1, price: unitPrice } },
-        }),
-      );
+      dispatchCartUpdated({
+        optimisticAdd: { quantity: 1, price: unitPrice },
+      });
+    } else {
+      clearLoggedInCartCache();
     }
     triggerFly(fly);
 
@@ -168,13 +170,13 @@ export function useAddToCart({
           const productDetails = await fetchProductBySlugWithLang<ProductDetails>(encodedSlug);
           if (!productDetails.variants || productDetails.variants.length === 0) {
             showToast(t('common.alerts.noVariantsAvailable'), 'warning');
-            window.dispatchEvent(new Event('cart-updated'));
+            dispatchCartUpdated();
             return;
           }
           const firstVariant = productDetails.variants[0];
           if (!hasDisplayPrice(firstVariant)) {
             showToast(t('common.alerts.failedToAddToCart'), 'warning');
-            window.dispatchEvent(new Event('cart-updated'));
+            dispatchCartUpdated();
             return;
           }
           variantId = firstVariant.id;
@@ -187,11 +189,11 @@ export function useAddToCart({
           quantity: 1,
         });
 
-        window.dispatchEvent(
-          new CustomEvent('cart-updated', {
-            detail: response.cartSummary ?? null,
-          }),
-        );
+        if (response.cartSummary) {
+          dispatchCartUpdated(response.cartSummary);
+        } else {
+          dispatchCartUpdated();
+        }
       } catch (error: unknown) {
         console.error('❌ [PRODUCT CARD] Error adding to cart:', error);
 
@@ -214,6 +216,7 @@ export function useAddToCart({
           err?.statusCode === 404
         ) {
           showToast(t('common.alerts.productNotFound'), 'error');
+          dispatchCartUpdated();
           return;
         }
 
@@ -223,6 +226,7 @@ export function useAddToCart({
           err.response?.data?.title === 'Insufficient stock'
         ) {
           showToast(t('common.alerts.noMoreStockAvailable'), 'warning');
+          dispatchCartUpdated();
           return;
         }
 
@@ -231,11 +235,12 @@ export function useAddToCart({
           err.response?.data?.detail?.includes('not available for purchase')
         ) {
           showToast(t('common.alerts.failedToAddToCart'), 'warning');
+          dispatchCartUpdated();
           return;
         }
 
         showToast(t('common.alerts.failedToAddToCart'), 'error');
-        window.dispatchEvent(new Event('cart-updated'));
+        dispatchCartUpdated();
       } finally {
         inFlightRef.current = false;
       }
