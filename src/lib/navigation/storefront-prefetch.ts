@@ -8,10 +8,11 @@ import {
   setProductListClientCache,
 } from '@/lib/shop/product-list-client-cache';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
-import type { LanguageCode } from '@/lib/language';
+import { getStoredLanguage, type LanguageCode } from '@/lib/language';
 
 const warmedRoutes = new Set<string>();
 const warmedApis = new Set<string>();
+const warmedProductApis = new Set<string>();
 
 type NavigatorConnection = {
   saveData?: boolean;
@@ -52,6 +53,56 @@ export function prefetchStorefrontRoute(router: AppRouterInstance, href: string)
     router.prefetch(normalized);
   } catch {
     warmedRoutes.delete(normalized);
+  }
+}
+
+function warmProductDetailApi(slug: string, lang: LanguageCode): void {
+  if (!shouldAllowStorefrontPrefetch()) {
+    return;
+  }
+
+  const url = `/api/v1/products/${encodeURIComponent(slug)}?lang=${encodeURIComponent(lang)}`;
+  if (warmedProductApis.has(url)) {
+    return;
+  }
+
+  warmedProductApis.add(url);
+  void fetch(url, { method: 'GET', credentials: 'same-origin', cache: 'default' }).catch(() => {
+    warmedProductApis.delete(url);
+  });
+}
+
+/**
+ * Prefetch a storefront route and warm shop/product APIs so navigation paints quickly.
+ */
+export function warmStorefrontHref(router: AppRouterInstance, href: string): void {
+  const normalized = href.trim();
+  if (!normalized.startsWith('/') || normalized.startsWith('//')) {
+    return;
+  }
+
+  prefetchStorefrontRoute(router, normalized);
+
+  try {
+    const url = new URL(normalized, 'http://localhost');
+    const lang = getStoredLanguage();
+
+    if (url.pathname === '/shop' || url.pathname.startsWith('/shop/')) {
+      const record: Record<string, string | undefined> = {};
+      url.searchParams.forEach((value, key) => {
+        record[key] = value;
+      });
+      warmShopFromSearchParams(record, lang);
+      return;
+    }
+
+    const productMatch = /^\/products\/([^/]+)/.exec(url.pathname);
+    const slug = productMatch?.[1];
+    if (slug) {
+      warmProductDetailApi(decodeURIComponent(slug), lang);
+    }
+  } catch {
+    // ignore malformed href
   }
 }
 
@@ -179,4 +230,5 @@ export function warmShopPaginationNavigation(
 export function clearStorefrontPrefetchDedupForTests(): void {
   warmedRoutes.clear();
   warmedApis.clear();
+  warmedProductApis.clear();
 }

@@ -2,13 +2,20 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  startTransition,
+  useEffect,
+  type MouseEvent,
+  type ReactNode,
+} from 'react';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
-import { useTranslation } from '../lib/i18n-client';
+import { warmStorefrontHref } from '@/lib/navigation/storefront-prefetch';
 import {
   resolveHomeHeroNavigationTarget,
   type HeroCarouselSlide,
 } from '@/lib/home-hero';
+import { useTranslation } from '../lib/i18n-client';
 import {
   HERO_BANNER_ASPECT_RATIO,
   HERO_BANNER_MOBILE_ASPECT_RATIO,
@@ -25,6 +32,13 @@ type HeroBannerAutoCarouselProps = {
   imageVariant: 'desktop' | 'mobile';
   className?: string;
 };
+
+function resolveInternalHref(href: string | null): string | null {
+  const currentOrigin =
+    typeof window !== 'undefined' ? window.location.origin : undefined;
+  const target = resolveHomeHeroNavigationTarget(href ?? '', { currentOrigin });
+  return target?.mode === 'internal' ? target.href : null;
+}
 
 function SlideVisual({
   imageUrl,
@@ -66,6 +80,51 @@ function SlideVisual({
   );
 }
 
+function HeroBannerSlideLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  const router = useRouter();
+  const warm = () => warmStorefrontHref(router, href);
+
+  const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    warm();
+    startTransition(() => {
+      router.push(href);
+    });
+  };
+
+  return (
+    <Link
+      href={href}
+      prefetch
+      aria-label="Open featured promotion"
+      className="block"
+      onMouseEnter={warm}
+      onFocus={warm}
+      onPointerDown={warm}
+      onClick={onClick}
+    >
+      {children}
+    </Link>
+  );
+}
+
 function wrapSlide(node: ReactNode, href: string | null): ReactNode {
   const currentOrigin =
     typeof window !== 'undefined' ? window.location.origin : undefined;
@@ -77,7 +136,6 @@ function wrapSlide(node: ReactNode, href: string | null): ReactNode {
     return node;
   }
 
-  // Same-site destinations stay in-app (Next.js Link). External only for other domains.
   if (target.mode === 'external') {
     return (
       <a href={target.href} aria-label="Open featured promotion" className="block">
@@ -86,11 +144,7 @@ function wrapSlide(node: ReactNode, href: string | null): ReactNode {
     );
   }
 
-  return (
-    <Link href={target.href} aria-label="Open featured promotion" className="block">
-      {node}
-    </Link>
-  );
+  return <HeroBannerSlideLink href={target.href}>{node}</HeroBannerSlideLink>;
 }
 
 export function HeroBannerAutoCarousel({
@@ -99,6 +153,7 @@ export function HeroBannerAutoCarousel({
   className = '',
 }: HeroBannerAutoCarouselProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const slideCount = slides.length;
   const { activeIndex, trackRef, registerSlideRef, goToSlide, pause, resume } =
     useHeroBannerAutoCarousel({ slideCount });
@@ -110,6 +165,21 @@ export function HeroBannerAutoCarousel({
     imageVariant === 'mobile'
       ? 'w-full shrink-0 snap-center'
       : 'w-[92%] shrink-0 snap-center first:ml-[4%] last:mr-[4%] sm:w-[90%] sm:first:ml-[5%] sm:last:mr-[5%]';
+
+  // Prefetch active + next slide destinations so click opens instantly.
+  useEffect(() => {
+    if (slideCount === 0) {
+      return;
+    }
+
+    const indexes = [activeIndex, (activeIndex + 1) % slideCount];
+    for (const index of indexes) {
+      const internalHref = resolveInternalHref(slides[index]?.href ?? null);
+      if (internalHref) {
+        warmStorefrontHref(router, internalHref);
+      }
+    }
+  }, [activeIndex, router, slideCount, slides]);
 
   if (slideCount === 0) {
     return null;
