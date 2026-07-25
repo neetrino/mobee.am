@@ -235,14 +235,13 @@ export function ProductAttributesSelector({
             );
           }
 
+          // Size / storage / SIM / etc. — text pills only (images belong on color swatches).
           if (isSize) {
             return (
               <SpecRow key={attrKey} label={label} unavailable={isUnavailable}>
                 <div className="flex flex-wrap gap-2">
                   {attrGroups.map((g) => {
                     const isSelected = selectedSize === g.value.toLowerCase().trim();
-                    const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
-                    const hasImage = Boolean(processedImageUrl?.trim());
                     const oos = g.stock <= 0;
                     return (
                       <button
@@ -253,14 +252,6 @@ export function ProductAttributesSelector({
                           isSelected ? selectedPillClass : oos ? oosPillClass : idlePillClass
                         }`}
                       >
-                        {hasImage && processedImageUrl ? (
-                           
-                          <img
-                            src={processedImageUrl}
-                            alt=""
-                            className="h-6 w-6 rounded object-cover"
-                          />
-                        ) : null}
                         <span>{getAttributeLabel(language, attrKey, g.value)}</span>
                       </button>
                     );
@@ -277,10 +268,6 @@ export function ProductAttributesSelector({
                   const selectedValue = selectedAttributeValues.get(attrKey);
                   const optionValue = g.valueId || g.value;
                   const isSelected = selectedValue === optionValue || selectedValue === g.value;
-                  const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
-                  const hasImage = Boolean(processedImageUrl?.trim());
-                  const hasColors = Array.isArray(g.colors) && g.colors.length > 0;
-                  const showColorDot = hasColors && !hasImage;
                   const oos = g.stock <= 0;
                   return (
                     <button
@@ -291,18 +278,6 @@ export function ProductAttributesSelector({
                         isSelected ? selectedPillClass : oos ? oosPillClass : idlePillClass
                       }`}
                     >
-                      {hasImage && processedImageUrl ? (
-                        <img
-                          src={processedImageUrl}
-                          alt=""
-                          className="h-6 w-6 rounded object-cover"
-                        />
-                      ) : showColorDot ? (
-                        <span
-                          className="h-6 w-6 shrink-0 rounded-full border border-gray-300"
-                          style={buildColorSwatchStyle(g.colors)}
-                        />
-                      ) : null}
                       <span>{getAttributeLabel(language, attrKey, g.value)}</span>
                     </button>
                   );
