@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { apiClient } from '../lib/api-client';
 import { type LanguageCode } from '../lib/language';
-import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
 import { t } from '../lib/i18n';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
+import { useUiLanguage } from './UiLanguageProvider';
 import {
   buildHomeSpecialOffersProductFilters,
   HOME_PRODUCTS_PER_PAGE,
@@ -55,8 +55,9 @@ async function fetchSpecialOffersHomePage(
 }
 
 export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProductsOptions = {}) {
-  const { initialProducts, initialFiltersKey, serverLanguage } = options;
-  const language = useClientSyncedLanguage();
+  const { initialProducts, initialFiltersKey } = options;
+  // Same source as header/shop cards — not useClientSyncedLanguage (SSR snapshot is always `hy`).
+  const language = useUiLanguage();
   const [products, setProducts] = useState<FeaturedHomeProduct[]>(() => initialProducts ?? []);
   const [loading, setLoading] = useState(
     () => !(initialProducts && initialFiltersKey),
@@ -64,9 +65,8 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
   const [error, setError] = useState<string | null>(null);
 
   const filtersKey = useMemo(
-    () =>
-      buildProductListCacheKey(buildHomeSpecialOffersProductFilters(serverLanguage ?? language)),
-    [language, serverLanguage],
+    () => buildProductListCacheKey(buildHomeSpecialOffersProductFilters(language)),
+    [language],
   );
 
   const fetchProducts = useCallback(
@@ -74,16 +74,16 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
       try {
         setLoading(true);
         setError(null);
-        setProducts(await fetchSpecialOffersHomePage(serverLanguage ?? language, filter));
+        setProducts(await fetchSpecialOffersHomePage(language, filter));
       } catch (err) {
         console.error('[SpecialOffersHome] Error:', err);
-        setError(t(serverLanguage ?? language, 'home.featured_products.errorLoading'));
+        setError(t(language, 'home.featured_products.errorLoading'));
         setProducts([]);
       } finally {
         setLoading(false);
       }
     },
-    [language, serverLanguage],
+    [language],
   );
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
   }, [fetchProducts, filtersKey, initialFiltersKey, initialProducts]);
 
   return {
-    language: serverLanguage ?? language,
+    language,
     products,
     loading,
     error,

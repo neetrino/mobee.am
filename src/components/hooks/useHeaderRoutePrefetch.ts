@@ -9,7 +9,7 @@ import {
 import { getStoredLanguage } from '@/lib/language';
 import {
   prefetchStorefrontRoute,
-  warmShopFromSearchParams,
+  warmStorefrontHref,
 } from '@/lib/navigation/storefront-prefetch';
 
 type UseHeaderRoutePrefetchOptions = {
@@ -64,18 +64,5 @@ export function useHeaderRoutePrefetch(
  * Prefetch a single href — use on category mega-menu hover.
  */
 export function prefetchHeaderHref(router: AppRouterInstance, href: string): void {
-  prefetchStorefrontRoute(router, href);
-
-  if (href.startsWith('/shop')) {
-    try {
-      const url = new URL(href, 'http://localhost');
-      const record: Record<string, string | undefined> = {};
-      url.searchParams.forEach((value, key) => {
-        record[key] = value;
-      });
-      warmShopFromSearchParams(record, getStoredLanguage());
-    } catch {
-      // ignore malformed href
-    }
-  }
+  warmStorefrontHref(router, href);
 }

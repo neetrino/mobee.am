@@ -589,12 +589,14 @@ export function Header() {
         setCartTotal((t) => t + (detail.optimisticAdd.price ?? 0) * (detail.optimisticAdd.quantity ?? 1));
         return;
       }
-      if (detail?.itemsCount !== undefined && detail?.total !== undefined) {
+      if (detail?.itemsCount !== undefined) {
         setCartCount(detail.itemsCount);
-        setCartTotal(detail.total);
+        if (detail?.total !== undefined) {
+          setCartTotal(detail.total);
+        }
         return;
       }
-      fetchCart();
+      void fetchCart();
     };
 
     window.addEventListener('wishlist-updated', handleWishlistUpdate);

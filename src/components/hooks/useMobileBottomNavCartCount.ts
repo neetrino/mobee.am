@@ -39,7 +39,7 @@ export function useMobileBottomNavCartCount(): number {
         setCartCount((c) => c + (optimistic.quantity ?? 1));
         return;
       }
-      if (detail?.itemsCount !== undefined && detail?.total !== undefined) {
+      if (detail?.itemsCount !== undefined) {
         setCartCount(detail.itemsCount);
         return;
       }

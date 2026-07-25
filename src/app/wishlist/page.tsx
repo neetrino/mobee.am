@@ -9,6 +9,7 @@ import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
+import { dispatchCartUpdated } from '../../lib/cart/dispatch-cart-updated';
 import { EmptyWishlist } from './empty-wishlist';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { SITE_CONTENT_GUTTERS_CLASS } from '../../components/header-strip-layout';
@@ -177,7 +178,7 @@ export default function WishlistPage() {
             variantId,
             quantity: 1,
           });
-          window.dispatchEvent(new Event('cart-updated'));
+          dispatchCartUpdated();
           dispatchCartFlyAnimation(flyUrl, flySource);
         } catch (error: unknown) {
           console.error('Error adding to guest cart:', error);
@@ -189,11 +190,9 @@ export default function WishlistPage() {
       return;
     }
 
-    window.dispatchEvent(
-      new CustomEvent('cart-updated', {
-        detail: { optimisticAdd: { quantity: 1, price: product.price } },
-      }),
-    );
+    dispatchCartUpdated({
+      optimisticAdd: { quantity: 1, price: product.price ?? 0 },
+    });
     dispatchCartFlyAnimation(flyUrl, flySource);
 
     addToCartInFlightRef.current.add(product.id);
@@ -222,7 +221,7 @@ export default function WishlistPage() {
 
           if (!productDetails.variants || productDetails.variants.length === 0) {
             showToast(t('common.alerts.noVariantsAvailable'), 'warning');
-            window.dispatchEvent(new Event('cart-updated'));
+            dispatchCartUpdated();
             return;
           }
 
@@ -239,14 +238,14 @@ export default function WishlistPage() {
           },
         );
 
-        window.dispatchEvent(
-          new CustomEvent('cart-updated', {
-            detail: response.cartSummary ?? null,
-          }),
-        );
+        if (response.cartSummary) {
+          dispatchCartUpdated(response.cartSummary);
+        } else {
+          dispatchCartUpdated();
+        }
       } catch (error: unknown) {
         console.error('Error adding to cart:', error);
-        window.dispatchEvent(new Event('cart-updated'));
+        dispatchCartUpdated();
         showToast(t('common.alerts.failedToAddToCart'), 'error');
       } finally {
         addToCartInFlightRef.current.delete(product.id);

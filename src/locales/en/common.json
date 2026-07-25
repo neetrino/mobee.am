@@ -215,6 +215,11 @@
   "defaults": {
     "category": "Grocery"
   },
+  "productLabels": {
+    "new": "New",
+    "sale": "Sale",
+    "hot": "Hot"
+  },
   "footer": {
     "visitUs": "Visit us",
     "locationHeading": "Our location",

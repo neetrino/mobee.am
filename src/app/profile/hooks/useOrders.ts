@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, type MouseEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
+import { dispatchCartUpdated } from '../../../lib/cart/dispatch-cart-updated';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getLoginRedirectToProfileOrdersPath, getProfileOrdersPath } from '../profile-orders-path';
 import { orderListItemToDetailsPlaceholder, orderNumberToDetailsPlaceholder } from '../utils';
@@ -141,7 +142,7 @@ export function useOrders({
       const addedCount = result.added;
       const skippedCount = result.skipped;
 
-      window.dispatchEvent(new Event('cart-updated'));
+      dispatchCartUpdated();
       
       if (addedCount > 0) {
         const skippedText = skippedCount > 0 ? `, ${skippedCount} ${t('profile.orderDetails.skipped')}` : '';

@@ -9,6 +9,7 @@ import {
   normalizeHomeHeroHref,
   normalizeHomeHeroSettings,
   reorderHomeHeroSlides,
+  resolveHomeHeroNavigationTarget,
   resolveHomeHeroSettingsForRead,
   toHeroCarouselSlides,
   validateHomeHeroSettingsInput,
@@ -200,6 +201,47 @@ describe('isValidHomeHeroHref / normalizeHomeHeroHref', () => {
   ])('rejects %s', (href) => {
     expect(isValidHomeHeroHref(href)).toBe(false);
     expect(normalizeHomeHeroHref(href)).toBeNull();
+  });
+});
+
+describe('resolveHomeHeroNavigationTarget', () => {
+  it('keeps relative paths as internal navigation', () => {
+    expect(resolveHomeHeroNavigationTarget('/shop?brand=apple')).toEqual({
+      mode: 'internal',
+      href: '/shop?brand=apple',
+    });
+  });
+
+  it('rewrites same-site absolute URLs to internal paths', () => {
+    expect(
+      resolveHomeHeroNavigationTarget('https://mobee.am/products/iphone-17', {
+        currentOrigin: 'https://mobee.am',
+      }),
+    ).toEqual({
+      mode: 'internal',
+      href: '/products/iphone-17',
+    });
+
+    expect(
+      resolveHomeHeroNavigationTarget('https://www.mobee.am/shop', {
+        currentOrigin: 'https://mobee.am',
+      }),
+    ).toEqual({
+      mode: 'internal',
+      href: '/shop',
+    });
+  });
+
+  it('treats other domains as external (same-tab)', () => {
+    expect(resolveHomeHeroNavigationTarget('https://partner.example/deal')).toEqual({
+      mode: 'external',
+      href: 'https://partner.example/deal',
+    });
+  });
+
+  it('returns null for empty or invalid href', () => {
+    expect(resolveHomeHeroNavigationTarget('')).toBeNull();
+    expect(resolveHomeHeroNavigationTarget('javascript:alert(1)')).toBeNull();
   });
 });
 

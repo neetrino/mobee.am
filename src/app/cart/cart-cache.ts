@@ -79,3 +79,16 @@ export function clearLoggedInCartCache(): void {
 
   sessionStorage.removeItem(CART_PAGE_CACHE_KEY);
 }
+
+/**
+ * Update the existing session cart snapshot in place (same userId).
+ * Used for optimistic cart-page edits so refresh does not flash stale lines.
+ */
+export function patchLoggedInCartCache(cart: Cart): void {
+  const entry = readCacheEntry();
+  if (!entry) {
+    return;
+  }
+
+  writeLoggedInCartCache(entry.userId, cart);
+}

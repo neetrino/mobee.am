@@ -10,6 +10,7 @@ import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
+import { dispatchCartUpdated } from '../../lib/cart/dispatch-cart-updated';
 import { showToast } from '../../components/Toast';
 import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
 import { buildCompareSpecTableRows } from '../../lib/products/extract-compare-product-specs';
@@ -175,7 +176,7 @@ const CompareGroupTableComponent = ({
               variantId: resolved.variantId,
               quantity: 1,
             });
-            window.dispatchEvent(new Event('cart-updated'));
+            dispatchCartUpdated();
             dispatchCartFlyAnimation(flyUrl, flySource);
           } catch (error: unknown) {
             console.error('Error adding to guest cart:', error);
@@ -187,11 +188,9 @@ const CompareGroupTableComponent = ({
         return;
       }
 
-      window.dispatchEvent(
-        new CustomEvent('cart-updated', {
-          detail: { optimisticAdd: { quantity: 1, price: product.price } },
-        }),
-      );
+      dispatchCartUpdated({
+        optimisticAdd: { quantity: 1, price: product.price },
+      });
       dispatchCartFlyAnimation(flyUrl, flySource);
       addToCartInFlightRef.current.add(product.id);
 
@@ -200,7 +199,7 @@ const CompareGroupTableComponent = ({
           const resolved = await resolveVariantForCart(product);
           if (!resolved) {
             showToast(t('common.alerts.noVariantsAvailable'), 'warning');
-            window.dispatchEvent(new Event('cart-updated'));
+            dispatchCartUpdated();
             return;
           }
 
@@ -213,14 +212,14 @@ const CompareGroupTableComponent = ({
             },
           );
 
-          window.dispatchEvent(
-            new CustomEvent('cart-updated', {
-              detail: response.cartSummary ?? null,
-            }),
-          );
+          if (response.cartSummary) {
+            dispatchCartUpdated(response.cartSummary);
+          } else {
+            dispatchCartUpdated();
+          }
         } catch (error: unknown) {
           console.error('Error adding to cart:', error);
-          window.dispatchEvent(new Event('cart-updated'));
+          dispatchCartUpdated();
           showToast(t('common.alerts.failedToAddToCart'), 'error');
         } finally {
           addToCartInFlightRef.current.delete(product.id);
