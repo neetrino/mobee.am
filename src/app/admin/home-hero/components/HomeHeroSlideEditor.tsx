@@ -179,7 +179,7 @@ export function HomeHeroSlideEditor({
               CTA href
             </label>
             <p className="mb-3 text-sm text-gray-500">
-              The full slide becomes clickable when a destination is provided.
+              Prefer an in-site path (e.g. /shop). Full mobee.am URLs also stay inside the site.
             </p>
             <Input
               id={`home-hero-href-${slide.id}`}
@@ -191,7 +191,7 @@ export function HomeHeroSlideEditor({
                   href: event.target.value,
                 })
               }
-              placeholder="/shop or https://example.com"
+              placeholder="/shop?brand=apple (prefer in-site path)"
               disabled={disabled}
               className="max-w-xl"
             />

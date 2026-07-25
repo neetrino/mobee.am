@@ -5,7 +5,10 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
-import { isValidHomeHeroHref, type HeroCarouselSlide } from '@/lib/home-hero';
+import {
+  resolveHomeHeroNavigationTarget,
+  type HeroCarouselSlide,
+} from '@/lib/home-hero';
 import {
   HERO_BANNER_ASPECT_RATIO,
   HERO_BANNER_MOBILE_ASPECT_RATIO,
@@ -22,10 +25,6 @@ type HeroBannerAutoCarouselProps = {
   imageVariant: 'desktop' | 'mobile';
   className?: string;
 };
-
-function isExternalHref(href: string): boolean {
-  return href.startsWith('http://') || href.startsWith('https://');
-}
 
 function SlideVisual({
   imageUrl,
@@ -68,27 +67,27 @@ function SlideVisual({
 }
 
 function wrapSlide(node: ReactNode, href: string | null): ReactNode {
-  const trimmed = href?.trim() ?? '';
-  if (!trimmed || !isValidHomeHeroHref(trimmed)) {
+  const currentOrigin =
+    typeof window !== 'undefined' ? window.location.origin : undefined;
+  const target = resolveHomeHeroNavigationTarget(href ?? '', {
+    currentOrigin,
+  });
+
+  if (!target) {
     return node;
   }
 
-  if (isExternalHref(trimmed)) {
+  // Same-site destinations stay in-app (Next.js Link). External only for other domains.
+  if (target.mode === 'external') {
     return (
-      <a
-        href={trimmed}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Open featured promotion"
-        className="block"
-      >
+      <a href={target.href} aria-label="Open featured promotion" className="block">
         {node}
       </a>
     );
   }
 
   return (
-    <Link href={trimmed} aria-label="Open featured promotion" className="block">
+    <Link href={target.href} aria-label="Open featured promotion" className="block">
       {node}
     </Link>
   );
