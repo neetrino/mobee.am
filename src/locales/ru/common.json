@@ -215,6 +215,11 @@
   "defaults": {
     "category": "Бакалея"
   },
+  "productLabels": {
+    "new": "Новинка",
+    "sale": "Скидка",
+    "hot": "Хит"
+  },
   "footer": {
     "visitUs": "Посетите нас",
     "locationHeading": "Наш адрес",

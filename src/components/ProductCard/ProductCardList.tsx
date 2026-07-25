@@ -71,8 +71,8 @@ export function ProductCardList({
   colorsInteractive = false,
   onCardColorSelect,
 }: ProductCardListProps) {
-  const { t } = useTranslation();
-  const categoryLine = getProductCardCategoryLineLabel(product);
+  const { t, lang } = useTranslation();
+  const categoryLine = getProductCardCategoryLineLabel(product, lang);
   const imageSrc = resolveProductCardImageSrc(product.image);
   const listingCacheSource = buildProductCardCachePayload(product);
   const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';

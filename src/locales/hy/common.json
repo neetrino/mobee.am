@@ -213,6 +213,11 @@
   "defaults": {
     "category": "Մթերք"
   },
+  "productLabels": {
+    "new": "Նոր",
+    "sale": "Զեղչ",
+    "hot": "Տաք"
+  },
   "footer": {
     "visitUs": "Այցելիր մեզ",
     "locationHeading": "Մեր գտնվելու վայրը",

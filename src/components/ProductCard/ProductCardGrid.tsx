@@ -91,9 +91,9 @@ export function ProductCardGrid({
   onCardColorSelect,
   stackInstallmentLabel = false,
 }: ProductCardGridProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
-  const categoryLine = getProductCardCategoryLineLabel(product);
+  const categoryLine = getProductCardCategoryLineLabel(product, lang);
   const footerPriceClass = (() => {
     if (smallerFooterPrice) {
       return isCompact

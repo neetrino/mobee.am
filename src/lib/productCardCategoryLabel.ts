@@ -1,3 +1,7 @@
+import { containsArmenianScript } from './pickCategoryTranslation';
+import { localizeCategoryTitle } from './category-title-i18n';
+import type { LanguageCode } from './language';
+
 /** Minimal product row fields needed for the category line under the title. */
 export type ProductCardCategorySource = {
   primaryCategoryId?: string | null;
@@ -8,18 +12,26 @@ export type ProductCardCategorySource = {
  * Localized category line for product cards: primary category title when set,
  * otherwise non-empty category titles joined with ", ".
  */
-export function getProductCardCategoryLineLabel(product: ProductCardCategorySource): string | null {
+export function getProductCardCategoryLineLabel(
+  product: ProductCardCategorySource,
+  language: LanguageCode = 'hy',
+): string | null {
   const categories = product.categories;
   if (!categories || categories.length === 0) {
     return null;
   }
 
   const titled = categories
-    .map((c) => ({
-      id: c.id,
-      title: typeof c.title === 'string' ? c.title.trim() : '',
-    }))
-    .filter((c) => c.title.length > 0);
+    .map((c) => {
+      const raw = typeof c.title === 'string' ? c.title.trim() : '';
+      const localized = localizeCategoryTitle(raw, language);
+      return {
+        id: c.id,
+        title: localized,
+      };
+    })
+    .filter((c) => c.title.length > 0)
+    .filter((c) => language === 'hy' || !containsArmenianScript(c.title));
 
   if (titled.length === 0) {
     return null;

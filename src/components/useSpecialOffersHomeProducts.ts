@@ -55,7 +55,7 @@ async function fetchSpecialOffersHomePage(
 }
 
 export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProductsOptions = {}) {
-  const { initialProducts, initialFiltersKey, serverLanguage } = options;
+  const { initialProducts, initialFiltersKey } = options;
   const language = useClientSyncedLanguage();
   const [products, setProducts] = useState<FeaturedHomeProduct[]>(() => initialProducts ?? []);
   const [loading, setLoading] = useState(
@@ -64,9 +64,8 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
   const [error, setError] = useState<string | null>(null);
 
   const filtersKey = useMemo(
-    () =>
-      buildProductListCacheKey(buildHomeSpecialOffersProductFilters(serverLanguage ?? language)),
-    [language, serverLanguage],
+    () => buildProductListCacheKey(buildHomeSpecialOffersProductFilters(language)),
+    [language],
   );
 
   const fetchProducts = useCallback(
@@ -74,16 +73,16 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
       try {
         setLoading(true);
         setError(null);
-        setProducts(await fetchSpecialOffersHomePage(serverLanguage ?? language, filter));
+        setProducts(await fetchSpecialOffersHomePage(language, filter));
       } catch (err) {
         console.error('[SpecialOffersHome] Error:', err);
-        setError(t(serverLanguage ?? language, 'home.featured_products.errorLoading'));
+        setError(t(language, 'home.featured_products.errorLoading'));
         setProducts([]);
       } finally {
         setLoading(false);
       }
     },
-    [language, serverLanguage],
+    [language],
   );
 
   useEffect(() => {
@@ -97,7 +96,7 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
   }, [fetchProducts, filtersKey, initialFiltersKey, initialProducts]);
 
   return {
-    language: serverLanguage ?? language,
+    language,
     products,
     loading,
     error,

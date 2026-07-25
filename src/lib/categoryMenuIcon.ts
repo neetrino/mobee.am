@@ -87,7 +87,7 @@ function resolveAccessoryIcon(category: CategoryIconSource): LucideIcon | null {
 function resolvePrimaryIcon(category: CategoryIconSource): LucideIcon | null {
   if (
     matchesSlugParts(category, HAIR_DRYER_SLUG_PARTS) ||
-    titleIncludes(category, ['ֆեն', 'фен', 'hair dryer'])
+    titleIncludes(category, ['ֆեն', 'фен', 'hair dryer', 'վարսահարդարիչ'])
   ) {
     return Wind;
   }

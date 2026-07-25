@@ -1,5 +1,12 @@
+'use client';
+
 import React from 'react';
-import { shouldHideOutOfStockProductLabel } from '../lib/product-label-display.constants';
+import {
+  getProductLabelDisplayI18nKey,
+  resolveKnownProductLabelKind,
+  shouldHideOutOfStockProductLabel,
+} from '../lib/product-label-display.constants';
+import { useTranslation } from '../lib/i18n-client';
 
 export type ProductLabelPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
@@ -16,14 +23,10 @@ interface ProductLabelsProps {
 }
 
 /**
- * ProductLabels
- *
- * UI-комպոնենտ, որը corner-երով խմբավորում է product-ի labels-ը
- * և նույն position ունեցող labels-ը ցուցադրում է vertical stack-ով։
- * Սա ապահովում է, որ միաժամանակ մի քանի label ունենալու դեպքում
- * դրանք իրար վրա չեն նստում, այլ ունեն հստակ вертикալ հեռավորություն։
+ * Corner badges on product cards — known labels (New / Sale / Hot) follow the UI language.
  */
 export const ProductLabels: React.FC<ProductLabelsProps> = ({ labels }) => {
+  const { t } = useTranslation();
   const visibleLabels = labels.filter((label) => !shouldHideOutOfStockProductLabel(label));
   if (visibleLabels.length === 0) return null;
 
@@ -38,14 +41,14 @@ export const ProductLabels: React.FC<ProductLabelsProps> = ({ labels }) => {
       return 'bg-red-600 text-white';
     }
 
-    const value = label.value.toLowerCase();
-    if (value.includes('new') || value.includes('նոր')) {
+    const kind = resolveKnownProductLabelKind(label.value);
+    if (kind === 'new') {
       return 'bg-green-600 text-white';
     }
-    if (value.includes('hot') || value.includes('տաք')) {
+    if (kind === 'hot') {
       return 'bg-orange-600 text-white';
     }
-    if (value.includes('sale') || value.includes('զեղչ')) {
+    if (kind === 'sale') {
       return 'bg-red-600 text-white';
     }
 
@@ -67,6 +70,15 @@ export const ProductLabels: React.FC<ProductLabelsProps> = ({ labels }) => {
     }
   };
 
+  const resolveLabelText = (label: ProductLabel): string => {
+    if (label.type === 'percentage') {
+      return `${label.value}%`;
+    }
+
+    const i18nKey = getProductLabelDisplayI18nKey(label.value);
+    return i18nKey ? t(i18nKey) : label.value;
+  };
+
   return (
     <div className="absolute inset-0 pointer-events-none z-20">
       {positions.map((position) => {
@@ -86,7 +98,7 @@ export const ProductLabels: React.FC<ProductLabelsProps> = ({ labels }) => {
                 )}`}
                 style={label.color ? { backgroundColor: label.color, color: 'white' } : undefined}
               >
-                {label.type === 'percentage' ? `${label.value}%` : label.value}
+                {resolveLabelText(label)}
               </div>
             ))}
           </div>
@@ -95,9 +107,3 @@ export const ProductLabels: React.FC<ProductLabelsProps> = ({ labels }) => {
     </div>
   );
 };
-
-
-
-
-
-

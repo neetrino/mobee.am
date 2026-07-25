@@ -8,6 +8,9 @@ import {
 import { logger } from "../../utils/logger";
 import type { ProductWithFullRelations, ProductVariantWithOptions } from "./types";
 import { hasDisplayPrice } from "../../products/variant-price-display";
+import { pickCategoryTranslation } from "../../pickCategoryTranslation";
+import { localizeCategoryTitle } from "../../category-title-i18n";
+import type { LanguageCode } from "../../language";
 
 function normalizeAttributeValueColors(colors: unknown): string[] | null {
   if (Array.isArray(colors)) {
@@ -456,11 +459,16 @@ export async function transformProduct(
   // Transform categories
   const categories = Array.isArray(product.categories) ? product.categories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
     const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
-    const catTranslation = catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
+    const catTranslation = pickCategoryTranslation(catTranslations, lang) ?? null;
+    const hyTitle =
+      catTranslations.find((entry) => entry.locale === "hy")?.title ||
+      catTranslations[0]?.title ||
+      "";
+    const sourceTitle = catTranslation?.title || hyTitle;
     return {
       id: cat.id,
       slug: catTranslation?.slug || "",
-      title: catTranslation?.title || "",
+      title: localizeCategoryTitle(sourceTitle, lang as LanguageCode),
     };
   }) : [];
 
