@@ -39,6 +39,8 @@ const localeStores: Partial<Record<LanguageCode, LocaleStore>> = {
 const inflightLoads = new Map<string, Promise<void>>();
 const listeners = new Set<() => void>();
 let translationRevision = 0;
+/** Bumped on clear so in-flight lazy imports do not write into a wiped store. */
+let storeGeneration = 0;
 
 export function getLazyTranslationRevision(): number {
   return translationRevision;
@@ -46,7 +48,7 @@ export function getLazyTranslationRevision(): number {
 
 function notifyListeners(): void {
   translationRevision += 1;
-  // Defer so subscribers (useSyncExternalStore) never setState during another component's render.
+  // Defer so subscribers never setState during another component's render.
   queueMicrotask(() => {
     listeners.forEach((listener) => listener());
   });
@@ -75,6 +77,7 @@ export function subscribeLazyTranslations(listener: () => void): () => void {
 }
 
 export function clearLazyTranslationStore(): void {
+  storeGeneration += 1;
   inflightLoads.clear();
   for (const lang of Object.keys(localeStores) as LanguageCode[]) {
     const seed = STOREFRONT_SEED_BY_LANG[lang];
@@ -201,9 +204,13 @@ export async function ensureNamespace(lang: LanguageCode, namespace: Namespace):
     return;
   }
 
+  const generationAtStart = storeGeneration;
   const loadPromise = (async () => {
     const loader = getNamespaceLoader(lang, namespace);
     const loadedModule = await loader();
+    if (generationAtStart !== storeGeneration) {
+      return;
+    }
     if (!localeStores[lang]) {
       localeStores[lang] = {};
     }
@@ -215,7 +222,9 @@ export async function ensureNamespace(lang: LanguageCode, namespace: Namespace):
   try {
     await loadPromise;
   } finally {
-    inflightLoads.delete(key);
+    if (inflightLoads.get(key) === loadPromise) {
+      inflightLoads.delete(key);
+    }
   }
 }
 

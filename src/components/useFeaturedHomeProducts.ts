@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { apiClient } from '../lib/api-client';
 import { type LanguageCode } from '../lib/language';
-import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
 import { t } from '../lib/i18n';
 import type { ProductLabel } from './ProductLabels';
+import { useUiLanguage } from './UiLanguageProvider';
 import {
   buildHomeFeaturedProductFilters,
   HOME_FEATURED_FILTER,
@@ -82,7 +82,8 @@ async function fetchFeaturedHomePage(
 
 export function useFeaturedHomeProducts(options: UseFeaturedHomeProductsOptions = {}) {
   const { initialProducts, initialFiltersKey } = options;
-  const language = useClientSyncedLanguage();
+  // Same source as header/shop cards — not useClientSyncedLanguage (SSR snapshot is always `hy`).
+  const language = useUiLanguage();
   const [products, setProducts] = useState<FeaturedHomeProduct[]>(() => initialProducts ?? []);
   const [loading, setLoading] = useState(
     () => !(initialProducts && initialFiltersKey),

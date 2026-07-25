@@ -1,7 +1,8 @@
 import { db } from '@white-shop/db';
 import type { CategoryTreeNode } from '@/lib/category-nav';
 import { pickHomeStripCategories } from '@/lib/categoryHomeStripOrder';
-import { pickCategoryTranslation } from '@/lib/pickCategoryTranslation';
+import { resolveLocalizedCategoryFields } from '@/lib/category-title-i18n';
+import type { LanguageCode } from '@/lib/language';
 import { cacheService } from '@/lib/services/cache.service';
 
 const CACHE_TTL_SECONDS = 300;
@@ -15,8 +16,8 @@ export type HomeCategoryStripPayload = {
 };
 
 function buildHomeStripCacheKey(lang: string): string {
-  // v4: watches strip uses curated local PNG (R2 upload was 128²).
-  return `categories:home-strip:v4:${lang}`;
+  // v5: localize titles via dictionary when DB en/ru rows are missing/Armenian.
+  return `categories:home-strip:v5:${lang}`;
 }
 
 /**
@@ -58,6 +59,7 @@ export async function getCachedHomeCategoryStrip(
   );
 
   const categoryById = new Map(categories.map((category) => [category.id, category]));
+  const locale = lang as LanguageCode;
 
   const data = orderedCategories.flatMap((orderedCategory, index): HomeStripCategoryItem[] => {
     const category = categoryById.get(orderedCategory.id);
@@ -65,17 +67,17 @@ export async function getCachedHomeCategoryStrip(
       return [];
     }
 
-    const translation = pickCategoryTranslation(category.translations, lang);
-    if (!translation) {
+    const localized = resolveLocalizedCategoryFields(category.translations, locale);
+    if (!localized || !localized.slug) {
       return [];
     }
 
     return [
       {
         id: category.id,
-        slug: translation.slug,
-        title: translation.title,
-        fullPath: translation.fullPath,
+        slug: localized.slug,
+        title: localized.title,
+        fullPath: localized.fullPath || localized.slug,
         media: category.media ?? [],
         children: [],
         position: index,
