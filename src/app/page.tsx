@@ -5,7 +5,6 @@ import { HomeHeroManagedCarousel } from '../components/HomeHeroManagedCarousel';
 import { TopCategories } from '../components/TopCategories';
 import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
 import { HomeProductSectionsSection } from '../components/home/HomeProductSectionsSection';
-import { HomePagePartnerLogos } from '../components/HomePagePartnerLogos';
 import { readLanguageFromCookies } from '../lib/language';
 import { getCachedHomeCategoryStrip } from '../lib/services/categories-home-strip-cached';
 import { getPublicHomeHeroSettings } from '../lib/services/home-hero.service';
@@ -47,8 +46,6 @@ export default async function HomePage() {
       <Suspense fallback={<HomeProductSectionsFallback />}>
         <HomeProductSectionsSection language={language} />
       </Suspense>
-
-      <HomePagePartnerLogos />
     </div>
   );
 }
