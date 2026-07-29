@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { siteInter } from '../lib/fonts/site-fonts';
 import type { ReactNode } from 'react';
 import { useTranslation } from '../lib/i18n-client';
@@ -16,6 +15,7 @@ import {
   FooterSocialTelegramGlyph,
   FooterSocialWhatsAppGlyph,
 } from './footer/footerSocialGlyphs';
+import { FooterPoliciesNav } from './footer/FooterPoliciesNav';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
 import { ContactMapEmbed } from './ContactMapEmbed';
@@ -64,26 +64,6 @@ const FOOTER_MAP_MARGIN_TOP_CLASS = 'lg:max-xl:mt-[calc(1.5rem+10px)] xl:mt-[19p
 
 const FOOTER_NAV_LINK_CLASS =
   'px-6 py-2.5 text-[14px] font-bold leading-7 tracking-[0.2px] text-black transition-colors hover:text-[#00a1ff]';
-
-const FOOTER_POLICY_LINK_CLASS =
-  'whitespace-nowrap text-[14px] font-medium text-black transition-opacity hover:opacity-70';
-
-const FOOTER_POLICIES_NAV_ROW_CLASS =
-  'flex flex-wrap items-center gap-x-8 gap-y-3 lg:justify-end';
-
-/** RU: 2×2 grid; row-major — row1: delivery | refund, row2: terms | privacy; cells start-aligned. */
-const FOOTER_POLICIES_NAV_GRID_RU_CLASS =
-  'grid grid-cols-2 gap-x-8 gap-y-3 lg:ml-auto lg:justify-items-start';
-
-/** HY: same 2x2 grid; policy labels in each column share the same start edge. */
-const FOOTER_POLICIES_NAV_GRID_HY_CLASS =
-  'grid grid-cols-2 gap-x-[17px] gap-y-3 ml-auto justify-items-start';
-
-const FOOTER_REFUND_POLICY_HREF = '/refund-policy';
-
-const FOOTER_POLICY_LINKS_HIDDEN_ON_CART = new Set(['/delivery-terms', FOOTER_REFUND_POLICY_HREF]);
-
-const CART_ROUTE_PATH = '/cart';
 
 /** 24px tap target; glyph draws at 22px inside (see footerSocialGlyphs GLYPH_CLASS). */
 const FOOTER_SOCIAL_ICON_SLOT_CLASS =
@@ -264,17 +244,7 @@ function FooterNavAndSocialRow() {
 }
 
 function FooterCopyrightPoliciesRow() {
-  const { t, lang } = useTranslation();
-  const pathname = usePathname();
-
-  const policyLinks = [
-    { href: '/delivery-terms', label: t('common.footer.policiesRow.delivery') },
-    { href: FOOTER_REFUND_POLICY_HREF, label: t('common.footer.policiesRow.refund') },
-    { href: '/terms', label: t('common.footer.policiesRow.terms') },
-    { href: '/privacy', label: t('common.footer.policiesRow.privacy') },
-  ].filter((link) => (
-    pathname === CART_ROUTE_PATH ? !FOOTER_POLICY_LINKS_HIDDEN_ON_CART.has(link.href) : true
-  ));
+  const { t } = useTranslation();
 
   const year = new Date().getFullYear();
   const copyrightLead = t('common.footer.copyrightIntro').replace('{year}', String(year));
@@ -294,26 +264,7 @@ function FooterCopyrightPoliciesRow() {
         <span>{' '}</span>
         <span>{t('common.footer.allRightsReserved')}</span>
       </p>
-      <nav
-        className={
-          lang === 'ru' ? FOOTER_POLICIES_NAV_GRID_RU_CLASS : lang === 'hy' ? FOOTER_POLICIES_NAV_GRID_HY_CLASS : FOOTER_POLICIES_NAV_ROW_CLASS
-        }
-        aria-label={t('common.footer.legalBar.policiesNavLabel')}
-      >
-        {policyLinks.map((link) => {
-          const gridPolicyLinkClass =
-            lang === 'ru' || lang === 'hy' ? ' !whitespace-normal text-left' : '';
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`${FOOTER_POLICY_LINK_CLASS}${gridPolicyLinkClass}`}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
+      <FooterPoliciesNav />
     </div>
   );
 }

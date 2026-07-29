@@ -2,10 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { LazyWhenVisible } from './LazyWhenVisible';
-import {
-  LAZY_VISIBLE_DEFAULT_ROOT_MARGIN,
-  LAZY_VISIBLE_HOME_SECTIONS_ROOT_MARGIN,
-} from '@/lib/performance/lazy-visible.constants';
+import { LAZY_VISIBLE_HOME_SECTIONS_ROOT_MARGIN } from '@/lib/performance/lazy-visible.constants';
 
 const FeaturedIntroHeading = dynamic(
   () =>
@@ -24,16 +21,6 @@ const HomeProductSections = dynamic(
     })),
   {
     loading: () => <HomeProductSectionsPlaceholder />,
-  },
-);
-
-const PartnerLogosSection = dynamic(
-  () =>
-    import('./PartnerLogosSection').then((module) => ({
-      default: module.PartnerLogosSection,
-    })),
-  {
-    loading: () => <PartnerLogosPlaceholder />,
   },
 );
 
@@ -57,15 +44,6 @@ function HomeProductSectionsPlaceholder() {
   );
 }
 
-function PartnerLogosPlaceholder() {
-  return (
-    <div
-      className="mx-auto h-24 w-full max-w-6xl animate-pulse rounded-lg bg-gray-100"
-      aria-hidden
-    />
-  );
-}
-
 /** Below-the-fold home blocks — code-split and viewport-deferred. */
 export function HomePageDeferredSections() {
   return (
@@ -80,13 +58,6 @@ export function HomePageDeferredSections() {
         rootMargin={LAZY_VISIBLE_HOME_SECTIONS_ROOT_MARGIN}
       >
         <HomeProductSections />
-      </LazyWhenVisible>
-
-      <LazyWhenVisible
-        fallback={<PartnerLogosPlaceholder />}
-        rootMargin={LAZY_VISIBLE_DEFAULT_ROOT_MARGIN}
-      >
-        <PartnerLogosSection />
       </LazyWhenVisible>
     </>
   );

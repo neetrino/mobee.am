@@ -6,7 +6,8 @@ export async function register(): Promise<void> {
     return;
   }
 
-  const dns = await import('node:dns');
+  // webpackIgnore: do not let webpack resolve the `node:` scheme into the client graph.
+  const dns = await import(/* webpackIgnore: true */ 'node:dns');
   try {
     dns.setDefaultResultOrder('ipv4first');
   } catch {

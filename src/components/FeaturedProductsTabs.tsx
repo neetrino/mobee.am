@@ -7,6 +7,7 @@ import { SpecialOffersSectionHeading } from './SpecialOffersSectionHeading';
 import { WhyChooseUsSection } from './WhyChooseUsSection';
 import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
 import { HomeMobileSaleBanner } from './HomeMobileSaleBanner';
+import { HomePagePartnerLogos } from './HomePagePartnerLogos';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import {
   HOME_CURATED_SECTION_MOBILE_TITLE_CLASS,
@@ -256,6 +257,8 @@ export function HomeProductSections({
       <div className="hidden lg:block">
         <WhyChooseUsSection />
       </div>
+
+      <HomePagePartnerLogos />
 
       <HomeMobileSaleBanner />
     </section>
