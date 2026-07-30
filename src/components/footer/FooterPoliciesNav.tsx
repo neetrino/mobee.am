@@ -77,7 +77,7 @@ export function FooterPoliciesNav({ className, layout = 'footer' }: FooterPolici
       href={link.href}
       className={
         isMobileHome
-          ? 'flex w-full items-center rounded-2xl border border-[#eeeef0] bg-[#f7f8fa] px-4 py-3.5 text-left text-[14px] font-medium leading-5 text-black transition-opacity hover:opacity-70'
+          ? 'flex w-full items-center rounded-2xl border border-[#eeeef0] bg-[#f7f8fa] px-4 py-3.5 text-left text-[14px] font-medium leading-5 text-black transition-opacity hover:opacity-70 break-words'
           : `${FOOTER_POLICY_LINK_CLASS}${useColumnLayout || isMobileHome ? ' !whitespace-normal text-left' : ''}`
       }
     >
