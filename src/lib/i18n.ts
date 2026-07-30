@@ -27,7 +27,7 @@ import enFaq from '../locales/en/faq.json';
 import enLogin from '../locales/en/login.json';
 import enCookies from '../locales/en/cookies.json';
 import enDeliveryTerms from '../locales/en/delivery-terms.json';
-import enCreditTerms from '../locales/en/credit-terms.json';
+import enCredit from '../locales/en/credit.json';
 import enTerms from '../locales/en/terms.json';
 import enPrivacy from '../locales/en/privacy.json';
 import enSupport from '../locales/en/support.json';
@@ -53,7 +53,7 @@ import hyFaq from '../locales/hy/faq.json';
 import hyLogin from '../locales/hy/login.json';
 import hyCookies from '../locales/hy/cookies.json';
 import hyDeliveryTerms from '../locales/hy/delivery-terms.json';
-import hyCreditTerms from '../locales/hy/credit-terms.json';
+import hyCredit from '../locales/hy/credit.json';
 import hyTerms from '../locales/hy/terms.json';
 import hyPrivacy from '../locales/hy/privacy.json';
 import hySupport from '../locales/hy/support.json';
@@ -79,7 +79,7 @@ import ruFaq from '../locales/ru/faq.json';
 import ruLogin from '../locales/ru/login.json';
 import ruCookies from '../locales/ru/cookies.json';
 import ruDeliveryTerms from '../locales/ru/delivery-terms.json';
-import ruCreditTerms from '../locales/ru/credit-terms.json';
+import ruCredit from '../locales/ru/credit.json';
 import ruTerms from '../locales/ru/terms.json';
 import ruPrivacy from '../locales/ru/privacy.json';
 import ruSupport from '../locales/ru/support.json';
@@ -109,7 +109,7 @@ const translations: Partial<Record<LanguageCode, Record<Namespace, any>>> = {
     login: enLogin,
     cookies: enCookies,
     'delivery-terms': enDeliveryTerms,
-    'credit-terms': enCreditTerms,
+    credit: enCredit,
     terms: enTerms,
     privacy: enPrivacy,
     support: enSupport,
@@ -136,7 +136,7 @@ const translations: Partial<Record<LanguageCode, Record<Namespace, any>>> = {
     login: hyLogin,
     cookies: hyCookies,
     'delivery-terms': hyDeliveryTerms,
-    'credit-terms': hyCreditTerms,
+    credit: hyCredit,
     terms: hyTerms,
     privacy: hyPrivacy,
     support: hySupport,
@@ -163,7 +163,7 @@ const translations: Partial<Record<LanguageCode, Record<Namespace, any>>> = {
     login: ruLogin,
     cookies: ruCookies,
     'delivery-terms': ruDeliveryTerms,
-    'credit-terms': ruCreditTerms,
+    credit: ruCredit,
     terms: ruTerms,
     privacy: ruPrivacy,
     support: ruSupport,
@@ -514,7 +514,7 @@ export function clearTranslationCache(): void {
  * Get all available namespaces
  */
 export function getAvailableNamespaces(): Namespace[] {
-  return ['common', 'home', 'product', 'products', 'attributes', 'delivery', 'about', 'contact', 'faq', 'login', 'cookies', 'delivery-terms', 'credit-terms', 'terms', 'privacy', 'support', 'stores', 'returns', 'refund-policy', 'profile', 'checkout', 'register', 'categories', 'orders'];
+  return ['common', 'home', 'product', 'products', 'attributes', 'delivery', 'about', 'contact', 'faq', 'login', 'cookies', 'delivery-terms', 'credit', 'terms', 'privacy', 'support', 'stores', 'returns', 'refund-policy', 'profile', 'checkout', 'register', 'categories', 'orders'];
 }
 
 /**

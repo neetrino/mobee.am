@@ -11,7 +11,7 @@ export type Namespace =
   | 'login'
   | 'cookies'
   | 'delivery-terms'
-  | 'credit-terms'
+  | 'credit'
   | 'terms'
   | 'privacy'
   | 'support'
@@ -40,7 +40,7 @@ export const VALID_NAMESPACES: Namespace[] = [
   'login',
   'cookies',
   'delivery-terms',
-  'credit-terms',
+  'credit',
   'terms',
   'privacy',
   'support',
