@@ -347,7 +347,7 @@ const CompareGroupTableComponent = ({
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="sticky left-0 z-10 min-w-[150px] bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                <th className="min-w-[150px] bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700">
                   {t('common.compare.characteristic')}
                 </th>
                 {products.map((product) => (
@@ -358,7 +358,7 @@ const CompareGroupTableComponent = ({
             <tbody className="divide-y divide-gray-200">
               {allRows.map((row) => (
                 <tr key={row.id} className="transition-colors hover:bg-gray-50">
-                  <td className="sticky left-0 z-10 bg-gray-50 px-4 py-4 text-sm font-medium text-gray-700">
+                  <td className="bg-gray-50 px-4 py-4 text-sm font-medium text-gray-700">
                     {row.label}
                   </td>
                   {products.map((product) => (

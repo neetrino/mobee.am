@@ -362,6 +362,10 @@
   margin-right: auto;
   padding-left: 1rem;  /* px-4 */
   padding-right: 1rem;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 @media (min-width: 640px) {
@@ -379,13 +383,14 @@
 }
 
 .policy-page-inner {
-  padding-top: 3rem;   /* pt-12 */
-  padding-bottom: 4rem; /* pb-16 */
+  padding-top: 1.5rem;   /* mobile: tighter under header */
+  padding-bottom: 2rem;
 }
 
 @media (min-width: 768px) {
   .policy-page-inner {
     padding-top: 4rem; /* md:pt-16 */
+    padding-bottom: 4rem; /* pb-16 */
   }
 }
 
@@ -393,8 +398,18 @@
 .policy-page-inner h1,
 .policy-page-inner h2,
 .policy-page-inner h3 {
-  margin-top: 2.5rem;   /* space from previous block */
-  margin-bottom: 1rem;  /* space before paragraph */
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.25;
+}
+
+@media (min-width: 768px) {
+  .policy-page-inner h1,
+  .policy-page-inner h2,
+  .policy-page-inner h3 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
 }
 
 .policy-page-inner h1:first-of-type {
@@ -403,7 +418,14 @@
 
 .policy-page-inner h2:first-of-type,
 .policy-page-inner h3:first-of-type {
-  margin-top: 1.75rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .policy-page-inner h2:first-of-type,
+  .policy-page-inner h3:first-of-type {
+    margin-top: 1.75rem;
+  }
 }
 
 /* Paragraphs: clear space from heading */
