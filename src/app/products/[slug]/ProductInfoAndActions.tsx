@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, type MouseEvent } from 'react';
-import { FileText, Heart } from 'lucide-react';
+import { CheckCircle2, FileText, Heart, XCircle } from 'lucide-react';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
@@ -103,6 +103,13 @@ export function ProductInfoAndActions({
     [selectedColor, attributeGroups, language, currentVariant, selectedSize]
   );
 
+  const isStockAvailable = useMemo(() => {
+    if (isVariationRequired) {
+      return (product.variants ?? []).some((variant) => (variant.stock ?? 0) > 0);
+    }
+    return Boolean(currentVariant && currentVariant.stock > 0);
+  }, [isVariationRequired, product.variants, currentVariant]);
+
   const handleInstallmentClick = (event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -112,7 +119,28 @@ export function ProductInfoAndActions({
   return (
     <div className="flex min-w-0 w-full flex-col">
       {product.brand && <p className="mb-1 text-sm text-gray-500">{product.brand.name}</p>}
-      <h1 className="text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">{title}</h1>
+      <div className="flex items-start justify-between gap-3">
+        <h1 className="min-w-0 flex-1 text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">
+          {title}
+        </h1>
+        <span
+          className={`mt-1 inline-flex shrink-0 items-center gap-1.5 text-sm font-medium ${
+            isStockAvailable ? 'text-emerald-600' : 'text-red-600'
+          }`}
+          aria-live="polite"
+        >
+          {isStockAvailable ? (
+            <CheckCircle2 className="h-5 w-5" strokeWidth={2} aria-hidden />
+          ) : (
+            <XCircle className="h-5 w-5" strokeWidth={2} aria-hidden />
+          )}
+          <span>
+            {isStockAvailable
+              ? t(language, 'common.stock.inStock')
+              : t(language, 'common.stock.outOfStock')}
+          </span>
+        </span>
+      </div>
 
       {currentVariant?.sku && (
         <div className="mt-3">
