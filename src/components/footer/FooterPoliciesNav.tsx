@@ -39,6 +39,7 @@ export function FooterPoliciesNav({ className, layout = 'footer' }: FooterPolici
   const policyLinks = [
     { href: '/delivery-terms', label: t('common.footer.policiesRow.delivery') },
     { href: FOOTER_REFUND_POLICY_HREF, label: t('common.footer.policiesRow.refund') },
+    { href: '/credit', label: t('common.footer.policiesRow.credit') },
     { href: '/terms', label: t('common.footer.policiesRow.terms') },
     { href: '/privacy', label: t('common.footer.policiesRow.privacy') },
   ].filter((link) =>

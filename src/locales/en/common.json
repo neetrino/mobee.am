@@ -240,6 +240,7 @@
     "policiesRow": {
       "refund": "Return & Exchange Policy",
       "delivery": "Delivery Policy",
+      "credit": "Installment Terms",
       "terms": "Terms of Service",
       "privacy": "Privacy Policy"
     },
