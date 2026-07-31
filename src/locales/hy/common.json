@@ -256,6 +256,14 @@
       "paymentMethodsLabel": "Ընդունված վճարման եղանակներ"
     }
   },
+  "stickyContact": {
+    "openMenu": "Բացել կապի տարբերակները",
+    "closeMenu": "Փակել կապի տարբերակները",
+    "menuLabel": "Կապի տարբերակներ",
+    "yandexMaps": "Բացել Yandex Maps-ում",
+    "whatsapp": "WhatsApp",
+    "callNow": "Զանգահարել"
+  },
   "product": {
     "product": "ապրանք",
     "products": "ապրանք"

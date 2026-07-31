@@ -258,6 +258,14 @@
       "paymentMethodsLabel": "Способы оплаты"
     }
   },
+  "stickyContact": {
+    "openMenu": "Открыть варианты связи",
+    "closeMenu": "Закрыть варианты связи",
+    "menuLabel": "Варианты связи",
+    "yandexMaps": "Открыть в Яндекс Картах",
+    "whatsapp": "WhatsApp",
+    "callNow": "Позвонить"
+  },
   "product": {
     "product": "товар",
     "products": "товаров"

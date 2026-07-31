@@ -258,6 +258,14 @@
       "paymentMethodsLabel": "Accepted payment methods"
     }
   },
+  "stickyContact": {
+    "openMenu": "Open contact options",
+    "closeMenu": "Close contact options",
+    "menuLabel": "Contact options",
+    "yandexMaps": "Open in Yandex Maps",
+    "whatsapp": "WhatsApp",
+    "callNow": "Call now"
+  },
   "product": {
     "product": "product",
     "products": "products"
