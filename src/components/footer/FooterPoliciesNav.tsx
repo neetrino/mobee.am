@@ -13,6 +13,10 @@ const CART_ROUTE_PATH = '/cart';
 const FOOTER_POLICY_LINK_CLASS =
   'whitespace-nowrap text-[14px] font-medium text-black transition-opacity hover:opacity-70';
 
+/** Desktop footer Terms column — Figma 1:1477. */
+const FOOTER_POLICY_STACK_LINK_CLASS =
+  'text-[14px] leading-[30px] text-[#6b7280] transition-colors hover:text-[#2db2ff]';
+
 /** EN: wrap row. */
 const FOOTER_POLICIES_NAV_ROW_CLASS =
   'flex flex-wrap items-center gap-x-8 gap-y-3 lg:justify-end';
@@ -26,6 +30,8 @@ const FOOTER_POLICIES_NAV_GRID_HY_CLASS =
 
 const FOOTER_POLICIES_COLUMN_CLASS = 'flex flex-col gap-y-3';
 
+const FOOTER_POLICIES_STACK_CLASS = 'flex flex-col items-start';
+
 type PolicyLink = {
   href: string;
   label: string;
@@ -33,8 +39,12 @@ type PolicyLink = {
 
 type FooterPoliciesNavProps = {
   className?: string;
-  /** Mobile home under SALE card — stacked framed links. */
-  layout?: 'footer' | 'mobileHome';
+  /**
+   * `footer` — legacy legal bar (row / 2-col).
+   * `footerStack` — Figma Terms column (single vertical list).
+   * `mobileHome` — stacked framed links under SALE card.
+   */
+  layout?: 'footer' | 'footerStack' | 'mobileHome';
 };
 
 /**
@@ -61,29 +71,36 @@ export function FooterPoliciesNav({ className, layout = 'footer' }: FooterPolici
 
   const allPolicyLinks = [...leftColumnLinks, ...rightColumnLinks];
   const isMobileHome = layout === 'mobileHome';
-  const useColumnLayout = !isMobileHome && (lang === 'ru' || lang === 'hy');
+  const isFooterStack = layout === 'footerStack';
+  const useColumnLayout = !isMobileHome && !isFooterStack && (lang === 'ru' || lang === 'hy');
 
   const navClassName = isMobileHome
     ? 'flex w-full flex-col gap-y-3'
-    : lang === 'ru'
-      ? FOOTER_POLICIES_NAV_GRID_RU_CLASS
-      : lang === 'hy'
-        ? FOOTER_POLICIES_NAV_GRID_HY_CLASS
-        : FOOTER_POLICIES_NAV_ROW_CLASS;
+    : isFooterStack
+      ? FOOTER_POLICIES_STACK_CLASS
+      : lang === 'ru'
+        ? FOOTER_POLICIES_NAV_GRID_RU_CLASS
+        : lang === 'hy'
+          ? FOOTER_POLICIES_NAV_GRID_HY_CLASS
+          : FOOTER_POLICIES_NAV_ROW_CLASS;
 
-  const renderLink = (link: PolicyLink) => (
-    <Link
-      key={link.href}
-      href={link.href}
-      className={
-        isMobileHome
-          ? 'flex w-full items-center rounded-2xl border border-[#eeeef0] bg-[#f7f8fa] px-4 py-3.5 text-left text-[14px] font-medium leading-5 text-black transition-opacity hover:opacity-70 break-words'
-          : `${FOOTER_POLICY_LINK_CLASS}${useColumnLayout || isMobileHome ? ' !whitespace-normal text-left' : ''}`
-      }
-    >
-      {link.label}
-    </Link>
-  );
+  const renderLink = (link: PolicyLink) => {
+    let linkClassName = FOOTER_POLICY_LINK_CLASS;
+    if (isMobileHome) {
+      linkClassName =
+        'flex w-full items-center break-words rounded-2xl border border-[#eeeef0] bg-[#f7f8fa] px-4 py-3.5 text-left text-[14px] font-medium leading-5 text-black transition-opacity hover:opacity-70';
+    } else if (isFooterStack) {
+      linkClassName = FOOTER_POLICY_STACK_LINK_CLASS;
+    } else if (useColumnLayout) {
+      linkClassName = `${FOOTER_POLICY_LINK_CLASS} !whitespace-normal text-left`;
+    }
+
+    return (
+      <Link key={link.href} href={link.href} className={linkClassName}>
+        {link.label}
+      </Link>
+    );
+  };
 
   return (
     <nav

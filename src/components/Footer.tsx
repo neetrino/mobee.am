@@ -1,85 +1,56 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
-import { siteInter } from '../lib/fonts/site-fonts';
-import type { ReactNode } from 'react';
+import { siteMontserrat } from '../lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
-import {
-  FooterContactLocationGlyph,
-  FooterContactMailGlyph,
-  FooterContactPhoneGlyph,
-} from './footer/footerContactGlyphs';
-import {
-  FooterSocialFacebookGlyph,
-  FooterSocialInstagramGlyph,
-  FooterSocialTelegramGlyph,
-  FooterSocialWhatsAppGlyph,
-} from './footer/footerSocialGlyphs';
-import { FooterPoliciesNav } from './footer/FooterPoliciesNav';
-import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import { FOOTER_SOCIAL_BUTTON_SRC } from '../lib/constants/ui-icons.constants';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
+import { FooterPoliciesNav } from './footer/FooterPoliciesNav';
+import { FooterPaymentMethodsRow } from './FooterPaymentMethodsRow';
+import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import { ContactMapEmbed } from './ContactMapEmbed';
 
-const inter = siteInter;
+const montserrat = siteMontserrat;
 
 /** Footer credit company name links to Neetrino site. */
 const FOOTER_CREDIT_COMPANY_HREF = 'https://neetrino.com/';
 
-/** Address lines sit slightly below the location icon baseline. */
-const FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS = 'pt-[8px]';
+/** Figma mobee-new footer info (1:1477) — column heading. */
+const FOOTER_COLUMN_HEADING_CLASS =
+  'text-[16px] font-bold uppercase leading-[16.5px] tracking-[0.55px] text-black';
 
-/** Phone / mail / address text columns — same left nudge next to icons. */
-const FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS = 'lg:-translate-x-[13px]';
+/** Section / policy link body — Figma gray. */
+const FOOTER_SECTION_LINK_CLASS =
+  'text-[14px] leading-5 text-[#6b7280] transition-colors hover:text-[#2db2ff]';
 
-/** Phone + email body only — shift text right (px); icons unchanged. */
-const FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS = 'pl-[5px]';
+const FOOTER_MAP_SHELL_CLASS =
+  'relative block h-[120px] w-full min-w-0 overflow-hidden rounded-xl bg-[#e2e8f0]';
 
-/** At `xl+` only — address column sits beside phone+mail (Figma); nudge toward map. */
-const FOOTER_ADDRESS_ROW_NUDGE_XL_CLASS = 'xl:-translate-x-[20px]';
+const FOOTER_SOCIAL_BUTTON_SIZE_PX = 40;
 
-/** Desktop (`xl+`): raise address block 10px (margin avoids transform conflicts with nested nudges). */
-const FOOTER_ADDRESS_COLUMN_OFFSET_UP_XL_CLASS = 'xl:-mt-[6px]';
+const FOOTER_SOCIAL_PHONE_BG_CLASS =
+  'inline-flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#2db2ff] transition-opacity hover:opacity-80';
 
-/** Space under location title block before phone / mail / address (Figma-tuned). */
-const FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS = 'gap-20 lg:gap-24';
-
-/** Location block title — default (en/ru), Figma mobee-new. */
-const FOOTER_LOCATION_HEADING_SIZE_DEFAULT_CLASS =
-  'text-3xl font-black uppercase leading-none text-black md:text-4xl lg:text-[52px]';
-
-/** HY: smaller on tablet / iPad Pro (`lg`–`max-xl`); full size from `xl` (Figma). */
-const FOOTER_LOCATION_HEADING_SIZE_HY_CLASS =
-  '-translate-x-[5px] text-[1.375rem] font-black uppercase leading-none tracking-[-0.025em] text-black sm:text-2xl md:text-[1.875rem] lg:text-[2rem] xl:text-[42px]';
-
-/** Location card + map shell — light gray (Figma mobee-new footer reference). */
-const FOOTER_LOCATION_SURFACE_BG_CLASS = 'bg-[#f9f9f9]';
-
-/** Outer border matches product grid cards (`border-[#f3f4f6]`); no shadow per design. */
-const FOOTER_CARD_CLASS = `rounded-[40px] border border-[#f3f4f6] ${FOOTER_LOCATION_SURFACE_BG_CLASS} p-6 md:p-8 lg:flex lg:items-stretch lg:gap-10 lg:p-4 lg:pl-14 xl:pl-16`;
-
-const FOOTER_MAP_EMBED_SHELL_BASE_CLASS = `relative mt-8 block h-[220px] w-full min-w-0 shrink-0 overflow-hidden rounded-[26px] ${FOOTER_LOCATION_SURFACE_BG_CLASS} lg:h-[262px] lg:w-[min(100%,707px)] lg:max-w-[52%] lg:max-xl:-translate-x-[39px] xl:-translate-x-[45px]`;
-
-/** Map top spacing — same for all locales (previously HY-only tune). */
-const FOOTER_MAP_MARGIN_TOP_CLASS = 'lg:max-xl:mt-[calc(1.5rem+10px)] xl:mt-[19px]';
-
-const FOOTER_NAV_LINK_CLASS =
-  'px-6 py-2.5 text-[14px] font-bold leading-7 tracking-[0.2px] text-black transition-colors hover:text-[#00a1ff]';
-
-/** 24px tap target; glyph draws at 22px inside (see footerSocialGlyphs GLYPH_CLASS). */
-const FOOTER_SOCIAL_ICON_SLOT_CLASS =
-  'inline-flex h-6 w-6 shrink-0 items-center justify-center overflow-visible';
-
-type SocialIconLinkProps = {
+type SocialImageLinkProps = {
   readonly href: string;
   readonly label: string;
-  readonly icon: ReactNode;
+  readonly src: string;
 };
 
-function SocialIconLink({ href, label, icon }: SocialIconLinkProps) {
+function SocialImageLink({ href, label, src }: SocialImageLinkProps) {
   if (!href || href.startsWith('contact.')) {
     return (
-      <span className="inline-flex text-black/35" aria-label={label}>
-        <span className={FOOTER_SOCIAL_ICON_SLOT_CLASS}>{icon}</span>
+      <span className="inline-flex size-10 opacity-35" aria-label={label}>
+        <Image
+          src={src}
+          alt=""
+          width={FOOTER_SOCIAL_BUTTON_SIZE_PX}
+          height={FOOTER_SOCIAL_BUTTON_SIZE_PX}
+          className="size-10"
+          unoptimized
+          aria-hidden
+        />
       </span>
     );
   }
@@ -90,121 +61,60 @@ function SocialIconLink({ href, label, icon }: SocialIconLinkProps) {
       href={href}
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener noreferrer' : undefined}
-      className="inline-flex overflow-visible text-black transition-opacity hover:opacity-70"
+      className="inline-flex size-10 shrink-0 transition-opacity hover:opacity-80"
       aria-label={label}
     >
-      <span className={FOOTER_SOCIAL_ICON_SLOT_CLASS}>{icon}</span>
+      <Image
+        src={src}
+        alt=""
+        width={FOOTER_SOCIAL_BUTTON_SIZE_PX}
+        height={FOOTER_SOCIAL_BUTTON_SIZE_PX}
+        className="size-10"
+        unoptimized
+        aria-hidden
+      />
     </Link>
   );
 }
 
-type ContactBlockProps = {
-  readonly icon: ReactNode;
-  readonly children: ReactNode;
-  readonly className?: string;
-  /** Multiline body (e.g. address) — top-align icon with first line. */
-  readonly alignIconTop?: boolean;
-  /** Extra classes on the text column (e.g. address vertical nudge). */
-  readonly bodyClassName?: string;
-};
-
-function ContactIconBlock({ icon, children, className, alignIconTop = false, bodyClassName }: ContactBlockProps) {
-  const rowAlign = alignIconTop ? 'items-start' : 'items-center';
+function FooterVisitColumn({ addressText }: { readonly addressText: string }) {
+  const { t } = useTranslation();
 
   return (
-    <div className={`flex min-w-0 gap-3 ${rowAlign} ${className ?? ''}`}>
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-visible rounded-[5px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] text-black">
-        {icon}
-      </div>
-      <div
-        className={`min-w-0 text-[16px] leading-6 tracking-[-0.3125px] text-[#070707] ${bodyClassName ?? ''}`}
-      >
-        {children}
-      </div>
+    <div className="flex w-full max-w-[427px] flex-col items-start gap-6">
+      <h2 className={FOOTER_COLUMN_HEADING_CLASS}>{t('common.footer.visitUs')}</h2>
+      <ContactMapEmbed addressText={addressText} shellClassName={FOOTER_MAP_SHELL_CLASS} />
+      <p className="whitespace-nowrap text-[16px] leading-6 text-[#64748b]">{addressText}</p>
     </div>
   );
 }
 
-function FooterMapEmbed({ addressText }: { readonly addressText: string }) {
-  return (
-    <ContactMapEmbed
-      addressText={addressText}
-      shellClassName={`${FOOTER_MAP_EMBED_SHELL_BASE_CLASS} ${FOOTER_MAP_MARGIN_TOP_CLASS}`}
-    />
-  );
-}
+function FooterSectionsColumn() {
+  const { t } = useTranslation();
 
-function FooterLocationCard(props: {
-  readonly addressText: string;
-  readonly phoneLines: readonly string[];
-  readonly email: string;
-}) {
-  const { t, lang } = useTranslation();
-  const { addressText, phoneLines, email } = props;
-  const mailHref = `mailto:${email}`;
+  const sectionLinks = [
+    { href: '/about', label: t('common.navigation.about') },
+    { href: '/shop', label: t('common.footer.shop') },
+    { href: '/contact', label: t('common.footer.sectionsContact') },
+  ];
 
   return (
-    <div className={FOOTER_CARD_CLASS}>
-      <div className={`flex min-w-0 flex-1 flex-col lg:py-4 ${FOOTER_LOCATION_HEADING_TO_CONTACTS_GAP_CLASS}`}>
-        <div>
-          <h2
-            className={
-              lang === 'hy' ? FOOTER_LOCATION_HEADING_SIZE_HY_CLASS : FOOTER_LOCATION_HEADING_SIZE_DEFAULT_CLASS
-            }
-          >
-            {t('common.footer.locationHeading')}
-          </h2>
-          <p className="mt-2 text-[14px] leading-5 text-black">{t('common.footer.locationSubtitle')}</p>
-        </div>
-
-        {/*
-          Below `xl`: single column — phone, email, address (iPad Pro gets address under email).
-          `xl+`: Figma 582 — phone + mail column; address row-span beside.
-        */}
-        <div className="grid grid-cols-1 gap-y-3.5 xl:grid-cols-[auto_1fr] xl:grid-rows-[auto_auto] xl:gap-x-14 xl:gap-y-3.5 xl:-translate-x-2.5">
-          <ContactIconBlock
-            className="xl:col-start-1 xl:row-start-1"
-            bodyClassName={`${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS} ${FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS}`}
-            icon={<FooterContactPhoneGlyph />}
-          >
-            <div className="flex flex-col gap-0.5 tabular-nums">
-              {phoneLines.map((line) => (
-                <Link
-                  key={line}
-                  href={phoneDisplayToTelHref(line)}
-                  className="block text-[16px] leading-6 tracking-[-0.3125px] hover:underline"
-                >
-                  {line}
-                </Link>
-              ))}
-            </div>
-          </ContactIconBlock>
-          <ContactIconBlock
-            className="xl:col-start-1 xl:row-start-2"
-            bodyClassName={`${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS} ${FOOTER_PHONE_EMAIL_TEXT_NUDGE_RIGHT_CLASS}`}
-            icon={<FooterContactMailGlyph />}
-          >
-            <Link href={mailHref} className="hover:underline">
-              {email}
+    <nav className="flex min-w-[129px] flex-col items-start gap-[27px]" aria-label={t('common.footer.footerNavAriaLabel')}>
+      <h2 className={FOOTER_COLUMN_HEADING_CLASS}>{t('common.footer.sectionsHeading')}</h2>
+      <ul className="flex flex-col items-start gap-3">
+        {sectionLinks.map((link) => (
+          <li key={link.href}>
+            <Link href={link.href} className={FOOTER_SECTION_LINK_CLASS}>
+              {link.label}
             </Link>
-          </ContactIconBlock>
-          <ContactIconBlock
-            alignIconTop
-            bodyClassName={`${FOOTER_ADDRESS_BODY_TOP_OFFSET_CLASS} ${FOOTER_CONTACT_TEXT_NUDGE_LEFT_CLASS} max-xl:pl-[5px]`}
-            className={`xl:col-start-2 xl:row-span-2 xl:row-start-1 ${FOOTER_ADDRESS_COLUMN_OFFSET_UP_XL_CLASS} ${FOOTER_ADDRESS_ROW_NUDGE_XL_CLASS}`}
-            icon={<FooterContactLocationGlyph className="size-6" />}
-          >
-            <p className="whitespace-pre-line">{addressText}</p>
-          </ContactIconBlock>
-        </div>
-      </div>
-
-      <FooterMapEmbed addressText={addressText} />
-    </div>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
-function FooterNavAndSocialRow() {
+function FooterTermsAndSocialColumn({ phoneHref }: { readonly phoneHref: string }) {
   const { t } = useTranslation();
 
   const social = {
@@ -214,89 +124,106 @@ function FooterNavAndSocialRow() {
     whatsapp: t('contact.social.whatsapp'),
   };
 
-  const primaryLinks = [
-    { href: '/', label: t('common.navigation.home') },
-    { href: '/shop', label: t('common.navigation.products') },
-    { href: '/about', label: t('common.navigation.about') },
-    { href: '/contact', label: t('common.navigation.contact') },
-  ];
-
   return (
-    <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-center">
-      <nav
-        className="flex flex-wrap justify-center gap-1 md:justify-start lg:-translate-x-[23px]"
-        aria-label={t('common.footer.footerNavAriaLabel')}
-      >
-        {primaryLinks.map((link) => (
-          <Link key={link.href} href={link.href} className={FOOTER_NAV_LINK_CLASS}>
-            {link.label}
-          </Link>
-        ))}
-      </nav>
-      <div className="flex items-center gap-10" aria-label={t('common.footer.socialNavAriaLabel')}>
-        <SocialIconLink href={social.facebook} label="Facebook" icon={<FooterSocialFacebookGlyph />} />
-        <SocialIconLink href={social.instagram} label="Instagram" icon={<FooterSocialInstagramGlyph />} />
-        <SocialIconLink href={social.telegram} label="Telegram" icon={<FooterSocialTelegramGlyph />} />
-        <SocialIconLink href={social.whatsapp} label="WhatsApp" icon={<FooterSocialWhatsAppGlyph />} />
+    <div className="flex flex-col items-start gap-10 lg:ml-auto lg:max-w-[389px]">
+      <div className="flex w-full flex-col items-start gap-[27px]">
+        <h2 className={FOOTER_COLUMN_HEADING_CLASS}>{t('common.footer.termsHeading')}</h2>
+        <FooterPoliciesNav layout="footerStack" />
+      </div>
+
+      <div className="flex items-center gap-4" aria-label={t('common.footer.socialNavAriaLabel')}>
+        <SocialImageLink
+          href={social.instagram}
+          label="Instagram"
+          src={FOOTER_SOCIAL_BUTTON_SRC.instagram}
+        />
+        <SocialImageLink
+          href={social.facebook}
+          label="Facebook"
+          src={FOOTER_SOCIAL_BUTTON_SRC.facebook}
+        />
+        <SocialImageLink
+          href={social.telegram}
+          label="Telegram"
+          src={FOOTER_SOCIAL_BUTTON_SRC.telegram}
+        />
+        <SocialImageLink
+          href={social.whatsapp}
+          label="WhatsApp"
+          src={FOOTER_SOCIAL_BUTTON_SRC.whatsapp}
+        />
+        <Link href={phoneHref} className={FOOTER_SOCIAL_PHONE_BG_CLASS} aria-label="Phone">
+          <Image
+            src={FOOTER_SOCIAL_BUTTON_SRC.phoneGlyph}
+            alt=""
+            width={20}
+            height={22}
+            className="h-[22px] w-5"
+            unoptimized
+            aria-hidden
+          />
+        </Link>
       </div>
     </div>
   );
 }
 
-function FooterCopyrightPoliciesRow() {
+/**
+ * Bottom legal bar — Figma mobee-new HorizontalBorder (node 1:1509).
+ * MOBEE + copyright · payment logos.
+ */
+function FooterLegalBar() {
   const { t } = useTranslation();
-
   const year = new Date().getFullYear();
-  const copyrightLead = t('common.footer.copyrightIntro').replace('{year}', String(year));
+  const copyrightLead = t('common.footer.legalBar.copyrightLead').replace('{year}', String(year));
 
   return (
-    <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
-      <p className="max-w-xl text-[16px] leading-5 text-black/75">
-        <span>{copyrightLead} </span>
-        <Link
-          href={FOOTER_CREDIT_COMPANY_HREF}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[18px] font-black text-[#00a1ff] underline-offset-2 transition-opacity hover:opacity-80 hover:underline"
-        >
-          {t('common.footer.legalBar.creditCompany')}.
-        </Link>
-        <span>{' '}</span>
-        <span>{t('common.footer.allRightsReserved')}</span>
-      </p>
-      <FooterPoliciesNav />
+    <div className="border-t border-[#eeeef0] pt-[33px]">
+      <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-6">
+        <div className="flex min-w-0 flex-wrap items-center gap-[17px]">
+          <p className="shrink-0 text-[18px] font-black leading-7 text-black">
+            {t('common.footer.legalBar.brand')}
+          </p>
+          <p className="min-w-0 text-[16px] leading-5 text-[#a1a1aa]">
+            <span>{copyrightLead} </span>
+            <span>{t('common.footer.legalBar.createdBy')} </span>
+            <Link
+              href={FOOTER_CREDIT_COMPANY_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[#a1a1aa] transition-opacity hover:opacity-80"
+            >
+              {t('common.footer.legalBar.creditCompany')}
+            </Link>
+          </p>
+        </div>
+        <FooterPaymentMethodsRow />
+      </div>
     </div>
   );
 }
 
-function FooterMetaSection() {
-  return (
-    <div>
-      <FooterNavAndSocialRow />
-      <div className="my-10 h-px w-full bg-[#e8e8e8] md:my-12" />
-      <FooterCopyrightPoliciesRow />
-    </div>
-  );
-}
-
+/**
+ * Desktop storefront footer — Figma mobee-new «footer info» (1:1477) + legal bar (1:1509).
+ */
 export function Footer() {
   const { t } = useTranslation();
 
   const addressText = t('contact.address');
   const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
-  const email = t('contact.email');
+  const phoneHref = phoneLines[0] ? phoneDisplayToTelHref(phoneLines[0]) : 'tel:';
 
   return (
     <footer
-      className={`${inter.className} hidden border-t border-[#eee] bg-white pb-10 pt-10 md:pb-14 md:pt-12 lg:block lg:pb-16 lg:pt-14`}
+      className={`${montserrat.className} hidden border-t border-[#eee] bg-white pb-8 pt-8 lg:block`}
     >
-      <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-12 lg:gap-16`}>
-        <FooterLocationCard
-          addressText={addressText}
-          phoneLines={phoneLines}
-          email={email}
-        />
-        <FooterMetaSection />
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-8`}>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1.15fr)] items-start gap-x-12 gap-y-10 xl:gap-x-20">
+          <FooterVisitColumn addressText={addressText} />
+          <FooterSectionsColumn />
+          <FooterTermsAndSocialColumn phoneHref={phoneHref} />
+        </div>
+        <FooterLegalBar />
       </div>
     </footer>
   );

@@ -20,6 +20,15 @@ export const DEFAULT_USER_AVATAR_SRC = '/images/default-profile-avatar.svg';
 
 export const FOOTER_SOCIAL_FACEBOOK_ICON_SRC = `${UI_ICONS_BASE}/footer/social-facebook.webp`;
 
+/** Figma mobee-new footer info (1:1477) — cyan circular social buttons. */
+export const FOOTER_SOCIAL_BUTTON_SRC = {
+  instagram: '/images/footer/social/instagram.svg',
+  facebook: '/images/footer/social/facebook.svg',
+  telegram: '/images/footer/social/telegram.svg',
+  whatsapp: '/images/footer/social/whatsapp.svg',
+  phoneGlyph: '/images/footer/social/phone-glyph.svg',
+} as const;
+
 export const WHY_CHOOSE_US_ICON_SRC = {
   warranty: `${UI_ICONS_BASE}/home/why-choose-us/warranty.webp`,
   delivery: `${UI_ICONS_BASE}/home/why-choose-us/delivery.webp`,
