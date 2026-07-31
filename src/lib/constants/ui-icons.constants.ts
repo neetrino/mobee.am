@@ -18,9 +18,6 @@ export const HEADER_PHONE_ICON_SRC = `${UI_ICONS_BASE}/header/phone-call-round.w
 
 export const DEFAULT_USER_AVATAR_SRC = '/images/default-profile-avatar.svg';
 
-export const FOOTER_SOCIAL_FACEBOOK_ICON_SRC = `${UI_ICONS_BASE}/footer/social-facebook.webp`;
-
-/** Figma mobee-new footer info (1:1477) — cyan circular social buttons. */
 export const FOOTER_SOCIAL_BUTTON_SRC = {
   instagram: '/images/footer/social/instagram.svg',
   facebook: '/images/footer/social/facebook.svg',
@@ -40,6 +37,7 @@ export const PAYMENT_ICON_SRC = {
   arca: `${UI_ICONS_BASE}/payments/arca.webp`,
   aparik: `${UI_ICONS_BASE}/payments/aparik.webp`,
   cashOnDelivery: `${UI_ICONS_BASE}/payments/cash-on-delivery.webp`,
+  fastshift: `${UI_ICONS_BASE}/payments/fastshift.webp`,
   idram: `${UI_ICONS_BASE}/payments/idram.webp`,
   mastercard: `${UI_ICONS_BASE}/payments/mastercard.webp`,
   visa: `${UI_ICONS_BASE}/payments/visa.webp`,
