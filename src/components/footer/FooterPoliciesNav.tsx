@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n-client';
+import {
+  MOBILE_DRAWER_NAV_BUTTON_CLASS,
+  MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
+} from '@/components/mobile-drawer-nav.constants';
 
 const FOOTER_REFUND_POLICY_HREF = '/refund-policy';
 
@@ -12,6 +16,10 @@ const CART_ROUTE_PATH = '/cart';
 
 const FOOTER_POLICY_LINK_CLASS =
   'whitespace-nowrap text-[14px] font-medium text-black transition-opacity hover:opacity-70';
+
+/** Desktop footer Terms column — Figma 1:1477. */
+const FOOTER_POLICY_STACK_LINK_CLASS =
+  'text-[14px] leading-[30px] text-[#6b7280] transition-colors hover:text-[#2db2ff]';
 
 /** EN: wrap row. */
 const FOOTER_POLICIES_NAV_ROW_CLASS =
@@ -26,6 +34,12 @@ const FOOTER_POLICIES_NAV_GRID_HY_CLASS =
 
 const FOOTER_POLICIES_COLUMN_CLASS = 'flex flex-col gap-y-3';
 
+const FOOTER_POLICIES_STACK_CLASS = 'flex flex-col items-start';
+
+const FOOTER_POLICIES_DRAWER_CLASS = 'flex w-full flex-col gap-2';
+
+const FOOTER_POLICY_DRAWER_LINK_CLASS = `${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-800 hover:!border-admin-300 hover:!bg-admin-50 hover:!text-[#00a1ff]`;
+
 type PolicyLink = {
   href: string;
   label: string;
@@ -33,15 +47,24 @@ type PolicyLink = {
 
 type FooterPoliciesNavProps = {
   className?: string;
-  /** Mobile home under SALE card — stacked framed links. */
-  layout?: 'footer' | 'mobileHome';
+  /**
+   * `footer` — legacy legal bar (row / 2-col).
+   * `footerStack` — Figma Terms column (single vertical list).
+   * `mobileDrawer` — Header mobile side menu.
+   */
+  layout?: 'footer' | 'footerStack' | 'mobileDrawer';
+  /** Called when a policy link is activated (e.g. close mobile drawer). */
+  onNavigate?: () => void;
 };
 
 /**
- * Legal / policy links shared by desktop footer and mobile home (under SALE card).
- * Desktop RU/HY: left column 2 links, right column 3 links (incl. credit).
+ * Legal / policy links — desktop footer Terms column and mobile drawer.
  */
-export function FooterPoliciesNav({ className, layout = 'footer' }: FooterPoliciesNavProps) {
+export function FooterPoliciesNav({
+  className,
+  layout = 'footer',
+  onNavigate,
+}: FooterPoliciesNavProps) {
   const { t, lang } = useTranslation();
   const pathname = usePathname();
 
@@ -60,30 +83,45 @@ export function FooterPoliciesNav({ className, layout = 'footer' }: FooterPolici
   ].filter((link) => isVisibleOnCurrentRoute(link.href));
 
   const allPolicyLinks = [...leftColumnLinks, ...rightColumnLinks];
-  const isMobileHome = layout === 'mobileHome';
-  const useColumnLayout = !isMobileHome && (lang === 'ru' || lang === 'hy');
+  const isMobileDrawer = layout === 'mobileDrawer';
+  const isFooterStack = layout === 'footerStack';
+  const useColumnLayout = !isMobileDrawer && !isFooterStack && (lang === 'ru' || lang === 'hy');
 
-  const navClassName = isMobileHome
-    ? 'flex w-full flex-col gap-y-3'
-    : lang === 'ru'
-      ? FOOTER_POLICIES_NAV_GRID_RU_CLASS
-      : lang === 'hy'
-        ? FOOTER_POLICIES_NAV_GRID_HY_CLASS
-        : FOOTER_POLICIES_NAV_ROW_CLASS;
+  const navClassName = isMobileDrawer
+    ? FOOTER_POLICIES_DRAWER_CLASS
+    : isFooterStack
+      ? FOOTER_POLICIES_STACK_CLASS
+      : lang === 'ru'
+        ? FOOTER_POLICIES_NAV_GRID_RU_CLASS
+        : lang === 'hy'
+          ? FOOTER_POLICIES_NAV_GRID_HY_CLASS
+          : FOOTER_POLICIES_NAV_ROW_CLASS;
 
-  const renderLink = (link: PolicyLink) => (
-    <Link
-      key={link.href}
-      href={link.href}
-      className={
-        isMobileHome
-          ? 'flex w-full items-center rounded-2xl border border-[#eeeef0] bg-[#f7f8fa] px-4 py-3.5 text-left text-[14px] font-medium leading-5 text-black transition-opacity hover:opacity-70 break-words'
-          : `${FOOTER_POLICY_LINK_CLASS}${useColumnLayout || isMobileHome ? ' !whitespace-normal text-left' : ''}`
-      }
-    >
-      {link.label}
-    </Link>
-  );
+  const renderLink = (link: PolicyLink) => {
+    let linkClassName = FOOTER_POLICY_LINK_CLASS;
+    if (isMobileDrawer) {
+      linkClassName = FOOTER_POLICY_DRAWER_LINK_CLASS;
+    } else if (isFooterStack) {
+      linkClassName = FOOTER_POLICY_STACK_LINK_CLASS;
+    } else if (useColumnLayout) {
+      linkClassName = `${FOOTER_POLICY_LINK_CLASS} !whitespace-normal text-left`;
+    }
+
+    return (
+      <Link
+        key={link.href}
+        href={link.href}
+        className={linkClassName}
+        onClick={onNavigate}
+      >
+        {isMobileDrawer ? (
+          <span className={`${MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS} text-left`}>{link.label}</span>
+        ) : (
+          link.label
+        )}
+      </Link>
+    );
+  };
 
   return (
     <nav

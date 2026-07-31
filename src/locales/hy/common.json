@@ -230,6 +230,7 @@
     "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Ապրանք",
     "sectionsHeading": "Բաժիններ",
+    "sectionsContact": "Հետադարձ կապ",
     "termsHeading": "Պայմաններ",
     "policiesHeading": "Քաղաքականություն",
     "connectHeading": "Կապ",
@@ -254,6 +255,14 @@
       "policiesNavLabel": "Իրավական և քաղաքականություն",
       "paymentMethodsLabel": "Ընդունված վճարման եղանակներ"
     }
+  },
+  "stickyContact": {
+    "openMenu": "Բացել կապի տարբերակները",
+    "closeMenu": "Փակել կապի տարբերակները",
+    "menuLabel": "Կապի տարբերակներ",
+    "yandexMaps": "Բացել Yandex Maps-ում",
+    "whatsapp": "WhatsApp",
+    "callNow": "Զանգահարել"
   },
   "product": {
     "product": "ապրանք",

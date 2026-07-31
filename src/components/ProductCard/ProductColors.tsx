@@ -1,8 +1,13 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { getColorHex } from '../../lib/colorMap';
 import { buildColorSwatchStyle } from '../../lib/product-color-hex.constants';
+import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../../lib/layout-breakpoints.constants';
 import { resolveProductCardColorLinkValue, type ProductCardColorOption } from './useProductCardColorState';
+
+const PRODUCT_COLORS_MOBILE_MAX_VISIBLE = 4;
+const PRODUCT_COLORS_DESKTOP_MAX_VISIBLE = 6;
 
 interface ColorData {
   value: string;
@@ -14,6 +19,7 @@ interface ColorData {
 interface ProductColorsProps {
   colors: Array<string | ColorData>;
   isCompact?: boolean;
+  /** Desktop max swatches; mobile always shows {@link PRODUCT_COLORS_MOBILE_MAX_VISIBLE}. */
   maxVisible?: number;
   interactive?: boolean;
   selectedLinkValue?: string | null;
@@ -51,17 +57,37 @@ function orderColorsForDisplay(
   return reordered;
 }
 
+function useProductColorsVisibleLimit(desktopMax: number): number {
+  const [visibleLimit, setVisibleLimit] = useState(PRODUCT_COLORS_MOBILE_MAX_VISIBLE);
+
+  useEffect(() => {
+    const mq = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
+    const sync = () => {
+      setVisibleLimit(mq.matches ? desktopMax : PRODUCT_COLORS_MOBILE_MAX_VISIBLE);
+    };
+    sync();
+    mq.addEventListener('change', sync);
+    return () => {
+      mq.removeEventListener('change', sync);
+    };
+  }, [desktopMax]);
+
+  return visibleLimit;
+}
+
 /**
  * Component for displaying product color options
  */
 export function ProductColors({
   colors,
   isCompact = false,
-  maxVisible = 6,
+  maxVisible = PRODUCT_COLORS_DESKTOP_MAX_VISIBLE,
   interactive = false,
   selectedLinkValue = null,
   onColorSelect,
 }: ProductColorsProps) {
+  const visibleLimit = useProductColorsVisibleLimit(maxVisible);
+
   if (!colors || colors.length === 0) {
     return null;
   }
@@ -71,8 +97,8 @@ export function ProductColors({
   const orderedColors = orderColorsForDisplay(colors, selectedLinkValue);
 
   return (
-    <div className={`flex items-center gap-1.5 ${isCompact ? 'mb-1' : 'mb-2'} flex-wrap`}>
-      {orderedColors.slice(0, maxVisible).map((colorData, index) => {
+    <div className={`flex flex-nowrap items-center gap-1.5 ${isCompact ? 'mb-1' : 'mb-2'}`}>
+      {orderedColors.slice(0, visibleLimit).map((colorData, index) => {
         const colorOption = toColorOption(colorData);
         const colorValue = colorOption.value;
         const imageUrl = colorOption.imageUrl ?? null;
@@ -134,9 +160,9 @@ export function ProductColors({
           </div>
         );
       })}
-      {colors.length > maxVisible && (
-        <span className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-500`}>
-          +{colors.length - maxVisible}
+      {colors.length > visibleLimit && (
+        <span className={`shrink-0 whitespace-nowrap ${isCompact ? 'text-xs' : 'text-sm'} text-gray-500`}>
+          +{colors.length - visibleLimit}
         </span>
       )}
     </div>

@@ -39,7 +39,6 @@ import { useCategoriesTree } from './CategoriesTreeContext';
 import { CategoriesMenuFlyout } from './CategoriesMenuFlyout';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 import {
-  MOBILE_DRAWER_NAV_BUTTON_CLASS,
   MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
   MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS,
   MOBILE_DRAWER_SHELL_BACKDROP_CLASS,
@@ -52,13 +51,14 @@ import {
   MOBILE_DRAWER_SHELL_TRANSITION_MS,
 } from './mobile-drawer-nav.constants';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
+import { FooterPoliciesNav } from './footer/FooterPoliciesNav';
 
-/** Desktop navbar strip only; drawer + contact + footer keep `contact.phone` i18n. */
+/** Desktop navbar strip only; contact + footer keep `contact.phone` i18n. */
 const NAVBAR_SUPPORT_PHONE_DISPLAY = '055-81-11-81';
 
-/** Handset glyph — horizontal nudge next to numbers (navbar + mobile drawer). */
+/** Handset glyph — horizontal nudge next to numbers (navbar). */
 const HEADER_SUPPORT_PHONE_ICON_OFFSET_CLASS = 'translate-x-[2px]';
-/** Phone digits — slight right nudge relative to icon (navbar + mobile drawer). */
+/** Phone digits — slight right nudge relative to icon (navbar). */
 const HEADER_SUPPORT_PHONE_NUMBER_OFFSET_CLASS = 'translate-x-[3px]';
 
 /** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
@@ -181,44 +181,6 @@ function HeaderPhoneLangCluster({
       </div>
       {showLanguageSwitcher ? <LanguageSwitcherPill /> : null}
     </div>
-  );
-}
-
-/** Support numbers in mobile drawer — one tappable row per line from `contact.phone`, each with its own handset icon. */
-function MobileDrawerSupportPhoneButtons() {
-  const { t } = useTranslation();
-  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
-
-  return (
-    <>
-      {phoneLines.map((line) => (
-        <a
-          key={line}
-          href={phoneDisplayToTelHref(line)}
-          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
-          aria-label={`${t('common.header.supportPhoneAria')}: ${line}`}
-        >
-          <span className="flex min-w-0 flex-1 items-center gap-2">
-            <span className={`relative size-6 shrink-0 ${HEADER_SUPPORT_PHONE_ICON_OFFSET_CLASS}`}>
-              <img
-                src={HEADER_FIGMA_ASSETS.phoneIcon}
-                alt=""
-                width={24}
-                height={24}
-                className="absolute inset-0 block size-6 max-w-none"
-                decoding="async"
-                loading="lazy"
-              />
-            </span>
-            <span
-              className={`min-w-0 text-sm font-semibold tabular-nums text-[#374151] ${HEADER_SUPPORT_PHONE_NUMBER_OFFSET_CLASS}`}
-            >
-              {line}
-            </span>
-          </span>
-        </a>
-      ))}
-    </>
   );
 }
 
@@ -1074,7 +1036,12 @@ export function Header() {
                     </Link>
                   ))}
 
-                  <MobileDrawerSupportPhoneButtons />
+                  <div className="my-1 h-px w-full shrink-0 bg-[#eeeef0]" aria-hidden />
+
+                  <p className="px-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    {t('common.footer.policiesHeading')}
+                  </p>
+                  <FooterPoliciesNav layout="mobileDrawer" onNavigate={closeMobileMenu} />
                 </div>
               </nav>
             </div>
