@@ -14,7 +14,7 @@ const FAB_ACTION_SIZE_CLASS = 'size-12';
  * Outer node is ONLY `fixed` (never combine with `relative` — Tailwind order can drop `fixed`).
  */
 const FAB_FIXED_CLASS =
-  'fixed right-4 z-50 max-lg:bottom-[calc(80px+env(safe-area-inset-bottom,0px))] lg:bottom-6 lg:right-6';
+  'fixed right-4 z-50 max-lg:bottom-[calc(96px+env(safe-area-inset-bottom,0px))] lg:bottom-6 lg:right-6';
 
 type FabAction = {
   readonly id: string;
