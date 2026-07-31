@@ -51,6 +51,7 @@ import {
   MOBILE_DRAWER_SHELL_TRANSITION_MS,
 } from './mobile-drawer-nav.constants';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
+import { FooterPoliciesNav } from './footer/FooterPoliciesNav';
 
 /** Desktop navbar strip only; contact + footer keep `contact.phone` i18n. */
 const NAVBAR_SUPPORT_PHONE_DISPLAY = '055-81-11-81';
@@ -1034,6 +1035,13 @@ export function Header() {
                       </svg>
                     </Link>
                   ))}
+
+                  <div className="my-1 h-px w-full shrink-0 bg-[#eeeef0]" aria-hidden />
+
+                  <p className="px-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    {t('common.footer.policiesHeading')}
+                  </p>
+                  <FooterPoliciesNav layout="mobileDrawer" onNavigate={closeMobileMenu} />
                 </div>
               </nav>
             </div>
