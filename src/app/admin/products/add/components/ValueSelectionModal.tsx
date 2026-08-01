@@ -1,5 +1,7 @@
 ﻿'use client';
 
+import { useEffect, useState } from 'react';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { getColorHex } from '../../../../../lib/colorMap';
@@ -15,6 +17,12 @@ interface ValueSelectionModalProps {
   selectedAttributeValueIds: Record<string, string[]>;
 }
 
+interface ModalSnapshot {
+  openValueModal: { variantId: string; attributeId: string };
+  variant: GeneratedVariant;
+  attribute: Attribute;
+}
+
 export function ValueSelectionModal({
   openValueModal,
   variant,
@@ -25,69 +33,74 @@ export function ValueSelectionModal({
   selectedAttributeValueIds,
 }: ValueSelectionModalProps) {
   const { t } = useTranslation();
+  const [snapshot, setSnapshot] = useState<ModalSnapshot | null>(null);
+  const isOpen = openValueModal !== null && variant !== undefined && attribute !== undefined;
 
-  if (!openValueModal || !variant || !attribute) return null;
+  useEffect(() => {
+    if (openValueModal && variant && attribute) {
+      setSnapshot({ openValueModal, variant, attribute });
+    }
+  }, [openValueModal, variant, attribute]);
 
-  const isColor = attribute.key === 'color';
-  const selectedValueIds = variant.selectedValueIds.filter((id) => {
-    return attribute.values.some((v) => v.id === id);
-  });
+  const active =
+    openValueModal && variant && attribute
+      ? { openValueModal, variant, attribute }
+      : snapshot;
 
   const handleSelectAll = (checked: boolean) => {
-    const isAutoVariant = variant.id === 'variant-all';
+    if (!active) {
+      return;
+    }
+    const { variant: activeVariant, attribute: activeAttribute, openValueModal: activeModal } = active;
+    const isAutoVariant = activeVariant.id === 'variant-all';
 
     if (checked) {
-      // Select all values
-      const allValueIds = attribute.values.map((v) => v.id);
-      // Add to variant's selectedValueIds (merge with existing)
-      const currentIds = variant.selectedValueIds;
+      const allValueIds = activeAttribute.values.map((v) => v.id);
+      const currentIds = activeVariant.selectedValueIds;
       const newIds = [...new Set([...currentIds, ...allValueIds])];
 
-      // Update variant - merge with existing selectedValueIds
-      onVariantUpdate((prev) => prev.map((v) => (v.id === variant.id ? { ...v, selectedValueIds: newIds } : v)));
+      onVariantUpdate((prev) => prev.map((v) => (v.id === activeVariant.id ? { ...v, selectedValueIds: newIds } : v)));
 
-      // Only update selectedAttributeValueIds for auto-generated variant
       if (isAutoVariant) {
         onAttributeValueIdsUpdate((prev) => ({
           ...prev,
-          [openValueModal.attributeId]: allValueIds,
+          [activeModal.attributeId]: allValueIds,
         }));
       }
     } else {
-      // Deselect all values for this attribute
-      const valueIdsToRemove = attribute.values.map((v) => v.id);
-      const newIds = variant.selectedValueIds.filter((id) => !valueIdsToRemove.includes(id));
+      const valueIdsToRemove = activeAttribute.values.map((v) => v.id);
+      const newIds = activeVariant.selectedValueIds.filter((id) => !valueIdsToRemove.includes(id));
 
-      onVariantUpdate((prev) => prev.map((v) => (v.id === variant.id ? { ...v, selectedValueIds: newIds } : v)));
+      onVariantUpdate((prev) => prev.map((v) => (v.id === activeVariant.id ? { ...v, selectedValueIds: newIds } : v)));
 
-      // Only update selectedAttributeValueIds for auto-generated variant
       if (isAutoVariant) {
         onAttributeValueIdsUpdate((prev) => ({
           ...prev,
-          [openValueModal.attributeId]: [],
+          [activeModal.attributeId]: [],
         }));
       }
     }
   };
 
   const handleValueToggle = (valueId: string, checked: boolean) => {
-    const isAutoVariant = variant.id === 'variant-all';
-    const currentIds = variant.selectedValueIds;
+    if (!active) {
+      return;
+    }
+    const { variant: activeVariant, openValueModal: activeModal } = active;
+    const isAutoVariant = activeVariant.id === 'variant-all';
+    const currentIds = activeVariant.selectedValueIds;
     let newIds: string[];
 
     if (checked) {
-      // Add value if not already selected
       newIds = [...currentIds, valueId];
     } else {
-      // Remove value
       newIds = currentIds.filter((id) => id !== valueId);
     }
 
-    // Update variant first (to preserve dropdown state)
     onVariantUpdate((prev) => {
-      const updated = prev.map((v) => (v.id === variant.id ? { ...v, selectedValueIds: newIds } : v));
+      const updated = prev.map((v) => (v.id === activeVariant.id ? { ...v, selectedValueIds: newIds } : v));
       console.log('✅ [VARIANT BUILDER] Value selection updated:', {
-        variantId: variant.id,
+        variantId: activeVariant.id,
         isAutoVariant,
         valueId,
         action: checked ? 'added' : 'removed',
@@ -97,9 +110,8 @@ export function ValueSelectionModal({
       return updated;
     });
 
-    // Only update selectedAttributeValueIds for auto-generated variant
     if (isAutoVariant) {
-      const currentAttrIds = selectedAttributeValueIds[openValueModal.attributeId] || [];
+      const currentAttrIds = selectedAttributeValueIds[activeModal.attributeId] || [];
       let newAttrIds: string[];
       if (checked) {
         newAttrIds = [...currentAttrIds, valueId];
@@ -109,106 +121,119 @@ export function ValueSelectionModal({
 
       onAttributeValueIdsUpdate((prev) => ({
         ...prev,
-        [openValueModal.attributeId]: newAttrIds,
+        [activeModal.attributeId]: newAttrIds,
       }));
     }
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeAriaLabel="Close"
+      labelledBy="value-selection-modal-title"
+      dialogFrameClassName="fixed left-1/2 top-1/2 z-10 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 px-4"
+      panelClassName="max-h-[90vh] w-full overflow-y-auto rounded-supersudo bg-white shadow-xl"
     >
-      <div
-        className="bg-white rounded-supersudo shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
-          <h3 className="text-xl font-semibold text-gray-900">
-            {t('admin.products.add.selectValues')} {attribute.name}
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 transition-colors hover:text-admin-600"
-            aria-label="Close"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+      {({ requestClose }) => {
+        if (!active) {
+          return null;
+        }
 
-        {/* Content */}
-        <div className="p-6">
-          {/* "All" option */}
-          <label className="flex items-center gap-2 p-2 rounded-supersudo cursor-pointer hover:bg-gray-50 mb-3 border border-gray-200">
-            <input
-              type="checkbox"
-              checked={attribute.values.length > 0 && selectedValueIds.length === attribute.values.length}
-              onChange={(e) => handleSelectAll(e.target.checked)}
-              className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin"
-            />
-            <span className="text-sm font-medium text-gray-900">All</span>
-          </label>
+        const { variant: activeVariant, attribute: activeAttribute } = active;
+        const isColor = activeAttribute.key === 'color';
+        const selectedValueIds = activeVariant.selectedValueIds.filter((id) => {
+          return activeAttribute.values.some((v) => v.id === id);
+        });
 
-          <div className="border-t border-gray-200 my-3"></div>
+        return (
+          <>
+            {/* Header */}
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white p-6">
+              <h3 id="value-selection-modal-title" className="text-xl font-semibold text-gray-900">
+                {t('admin.products.add.selectValues')} {activeAttribute.name}
+              </h3>
+              <button
+                type="button"
+                onClick={requestClose}
+                className="text-gray-400 transition-colors hover:text-admin-600"
+                aria-label="Close"
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-          {/* Individual value checkboxes - grid layout */}
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
-            {attribute.values.map((value) => {
-              const isSelected = variant.selectedValueIds.includes(value.id);
-              const valueColorHex =
-                isColor && value.colors && value.colors.length > 0
-                  ? value.colors[0]
-                  : isColor
-                    ? getColorHex(value.label)
-                    : null;
+            {/* Content */}
+            <div className="p-6">
+              {/* "All" option */}
+              <label className="mb-3 flex cursor-pointer items-center gap-2 rounded-supersudo border border-gray-200 p-2 hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  checked={activeAttribute.values.length > 0 && selectedValueIds.length === activeAttribute.values.length}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                  className="h-4 w-4 rounded-supersudo border-gray-300 text-admin-600 focus:ring-admin"
+                />
+                <span className="text-sm font-medium text-gray-900">All</span>
+              </label>
 
-              return (
-                <label
-                  key={value.id}
-                  className={`flex flex-col items-center gap-1.5 p-2 rounded-supersudo cursor-pointer transition-all border-2 ${
-                    isSelected
-                      ? 'bg-admin-50 border-admin-600'
-                      : 'bg-gray-50 border-transparent hover:bg-gray-100 hover:border-gray-300'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={(e) => handleValueToggle(value.id, e.target.checked)}
-                    className="w-4 h-4 text-admin-600 border-gray-300 rounded-supersudo focus:ring-admin flex-shrink-0"
-                  />
-                  {/* Display image, color, or nothing */}
-                  {value.imageUrl ? (
-                    <img
-                      src={value.imageUrl}
-                      alt={value.label}
-                      className="w-8 h-8 object-cover rounded-supersudo border border-gray-300 flex-shrink-0"
-                    />
-                  ) : isColor && valueColorHex ? (
-                    <span
-                      className="inline-block w-6 h-6 rounded-full border-2 border-gray-300 shadow-sm flex-shrink-0"
-                      style={{ backgroundColor: valueColorHex }}
-                    />
-                  ) : null}
-                  <span className="text-xs font-medium text-gray-900 text-center">{value.label}</span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
+              <div className="my-3 border-t border-gray-200"></div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 sticky bottom-0 bg-white">
-          <Button type="button" variant="outline" onClick={onClose}>
-            {t('admin.common.close')}
-          </Button>
-        </div>
-      </div>
-    </div>
+              {/* Individual value checkboxes - grid layout */}
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+                {activeAttribute.values.map((value) => {
+                  const isSelected = activeVariant.selectedValueIds.includes(value.id);
+                  const valueColorHex =
+                    isColor && value.colors && value.colors.length > 0
+                      ? value.colors[0]
+                      : isColor
+                        ? getColorHex(value.label)
+                        : null;
+
+                  return (
+                    <label
+                      key={value.id}
+                      className={`flex cursor-pointer flex-col items-center gap-1.5 rounded-supersudo border-2 p-2 transition-all ${
+                        isSelected
+                          ? 'border-admin-600 bg-admin-50'
+                          : 'border-transparent bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={(e) => handleValueToggle(value.id, e.target.checked)}
+                        className="h-4 w-4 flex-shrink-0 rounded-supersudo border-gray-300 text-admin-600 focus:ring-admin"
+                      />
+                      {value.imageUrl ? (
+                        <img
+                          src={value.imageUrl}
+                          alt={value.label}
+                          className="h-8 w-8 flex-shrink-0 rounded-supersudo border border-gray-300 object-cover"
+                        />
+                      ) : isColor && valueColorHex ? (
+                        <span
+                          className="inline-block h-6 w-6 flex-shrink-0 rounded-full border-2 border-gray-300 shadow-sm"
+                          style={{ backgroundColor: valueColorHex }}
+                        />
+                      ) : null}
+                      <span className="text-center text-xs font-medium text-gray-900">{value.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-gray-200 bg-white p-6">
+              <Button type="button" variant="outline" onClick={requestClose}>
+                {t('admin.common.close')}
+              </Button>
+            </div>
+          </>
+        );
+      }}
+    </AnimatedModalPortal>
   );
 }
-
-

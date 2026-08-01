@@ -1,13 +1,74 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from 'react';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
+import { STOREFRONT_MODAL_TRANSITION_MS } from '../lib/storefront-modal-motion.constants';
+import { STOREFRONT_NESTED_DIALOG_ROOT_Z_INDEX_CLASS } from '../lib/storefront-overlay-layer.constants';
 import { useTranslation } from '../lib/i18n-client';
-import { useAnimatedModalDismiss } from '../lib/useAnimatedModalDismiss';
 
 /** Mobee-styled confirm (aligns with Toast / primary #2DB2FF). */
-const CONFIRM_DIALOG_ROOT_CLASS = 'fixed inset-0 z-[110] flex items-center justify-center p-4' as const;
 const CONFIRM_DIALOG_PANEL_CLASS =
   'w-full max-w-md rounded-[14px] border border-[#2DB2FF]/35 bg-white p-6 shadow-xl ring-1 ring-[#2DB2FF]/15' as const;
+
+function ConfirmDialogPanel({
+  title,
+  message,
+  cancelText,
+  confirmText,
+  confirmButtonClass,
+  requestClose,
+  requestCloseRef,
+  onCancel,
+  onConfirm,
+}: {
+  title?: string;
+  message: string;
+  cancelText: string;
+  confirmText: string;
+  confirmButtonClass: string;
+  requestClose: () => void;
+  requestCloseRef: MutableRefObject<() => void>;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  useEffect(() => {
+    requestCloseRef.current = requestClose;
+  }, [requestClose, requestCloseRef]);
+
+  return (
+    <>
+      {title ? (
+        <h2 id="confirm-dialog-title" className="text-lg font-semibold text-gray-900">
+          {title}
+        </h2>
+      ) : null}
+      <p
+        id="confirm-dialog-message"
+        className={`text-sm leading-relaxed text-gray-700 ${title ? 'mt-3' : ''}`}
+      >
+        {message}
+      </p>
+      <div className="mt-6 flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-[14px] border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2DB2FF]/30"
+        >
+          {cancelText}
+        </button>
+        <button type="button" onClick={onConfirm} className={confirmButtonClass}>
+          {confirmText}
+        </button>
+      </div>
+    </>
+  );
+}
 
 export interface ConfirmDialogOptions {
   message: string;
@@ -47,6 +108,7 @@ export function ConfirmDialogContainer() {
   const [active, setActive] = useState<Queued | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const isClosingRef = useRef(false);
+  const requestCloseRef = useRef<() => void>(() => {});
 
   const pump = useCallback(() => {
     setActive((prev) => {
@@ -69,19 +131,6 @@ export function ConfirmDialogContainer() {
     };
   }, [pump]);
 
-  const {
-    isVisible,
-    requestClose,
-    handlePanelAnimationEnd,
-    backdropMotionClass,
-    panelMotionClass,
-  } = useAnimatedModalDismiss({
-    isOpen,
-    onClose: () => setIsOpen(false),
-    lockBodyScroll: true,
-    panelMotionVariant: 'dialog',
-  });
-
   const advanceQueueAfterClose = useCallback(() => {
     isClosingRef.current = false;
     setActive((prev) => {
@@ -97,28 +146,41 @@ export function ConfirmDialogContainer() {
   }, []);
 
   useEffect(() => {
-    if (isVisible || !isClosingRef.current) {
+    if (isOpen || !isClosingRef.current) {
       return;
     }
-    advanceQueueAfterClose();
-  }, [isVisible, advanceQueueAfterClose]);
+    const timeoutId = window.setTimeout(() => {
+      advanceQueueAfterClose();
+    }, STOREFRONT_MODAL_TRANSITION_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [isOpen, advanceQueueAfterClose]);
 
-  const finish = useCallback(
-    (result: boolean) => {
-      setActive((prev) => {
-        if (prev) {
-          prev.resolve(result);
-        }
-        return prev;
-      });
-      isClosingRef.current = true;
-      requestClose();
-    },
-    [requestClose],
-  );
+  const handlePortalClose = useCallback(() => {
+    setActive((prev) => {
+      if (prev && !isClosingRef.current) {
+        prev.resolve(false);
+      }
+      return prev;
+    });
+    isClosingRef.current = true;
+    setIsOpen(false);
+  }, []);
+
+  const finish = useCallback((result: boolean) => {
+    setActive((prev) => {
+      if (prev) {
+        prev.resolve(result);
+      }
+      return prev;
+    });
+    isClosingRef.current = true;
+    requestCloseRef.current();
+    // Fallback if portal render-prop has not assigned requestClose yet.
+    setIsOpen(false);
+  }, []);
 
   useEffect(() => {
-    if (!isVisible) {
+    if (!isOpen || !active) {
       return;
     }
     const onKeyDown = (event: KeyboardEvent) => {
@@ -128,9 +190,9 @@ export function ConfirmDialogContainer() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isVisible, finish]);
+  }, [isOpen, active, finish]);
 
-  if (!isVisible || !active) {
+  if (!active) {
     return null;
   }
 
@@ -144,46 +206,30 @@ export function ConfirmDialogContainer() {
     : 'rounded-[14px] bg-[#2DB2FF] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2DB2FF]/40';
 
   return (
-    <div className={CONFIRM_DIALOG_ROOT_CLASS} role="presentation">
-      <button
-        type="button"
-        className={`absolute inset-0 cursor-default bg-black/40 ${backdropMotionClass}`}
-        aria-label={cancelText}
-        onClick={() => finish(false)}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        {...(options.title ? { 'aria-labelledby': 'confirm-dialog-title' } : {})}
-        aria-describedby="confirm-dialog-message"
-        className={`relative ${CONFIRM_DIALOG_PANEL_CLASS} ${panelMotionClass}`}
-        onClick={(e) => e.stopPropagation()}
-        onAnimationEnd={handlePanelAnimationEnd}
-      >
-        {options.title ? (
-          <h2 id="confirm-dialog-title" className="text-lg font-semibold text-gray-900">
-            {options.title}
-          </h2>
-        ) : null}
-        <p
-          id="confirm-dialog-message"
-          className={`text-sm leading-relaxed text-gray-700 ${options.title ? 'mt-3' : ''}`}
-        >
-          {options.message}
-        </p>
-        <div className="mt-6 flex flex-wrap justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => finish(false)}
-            className="rounded-[14px] border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2DB2FF]/30"
-          >
-            {cancelText}
-          </button>
-          <button type="button" onClick={() => finish(true)} className={confirmButtonClass}>
-            {confirmText}
-          </button>
-        </div>
-      </div>
-    </div>
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={handlePortalClose}
+      closeAriaLabel={cancelText}
+      listenEscape={false}
+      rootZIndexClass={STOREFRONT_NESTED_DIALOG_ROOT_Z_INDEX_CLASS}
+      labelledBy={options.title ? 'confirm-dialog-title' : undefined}
+      describedBy="confirm-dialog-message"
+      backdropClassName="absolute inset-0 cursor-default bg-black/40"
+      panelClassName={CONFIRM_DIALOG_PANEL_CLASS}
+    >
+      {({ requestClose }) => (
+        <ConfirmDialogPanel
+          title={options.title}
+          message={options.message}
+          cancelText={cancelText}
+          confirmText={confirmText}
+          confirmButtonClass={confirmButtonClass}
+          requestClose={requestClose}
+          requestCloseRef={requestCloseRef}
+          onCancel={() => finish(false)}
+          onConfirm={() => finish(true)}
+        />
+      )}
+    </AnimatedModalPortal>
   );
 }

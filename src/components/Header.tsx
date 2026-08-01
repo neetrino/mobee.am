@@ -5,6 +5,8 @@ import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
 import type { AnimationEvent, FormEvent } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage } from '../lib/language';
@@ -198,6 +200,7 @@ export function Header() {
   showSearchModalRef.current = showSearchModal;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileMenuExiting, setMobileMenuExiting] = useState(false);
+  const [isOverlayPortalReady, setIsOverlayPortalReady] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [categoriesMenuEntered, setCategoriesMenuEntered] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
@@ -423,6 +426,10 @@ export function Header() {
   }, []);
 
   const mobileMenuVisible = mobileMenuOpen || mobileMenuExiting;
+
+  useEffect(() => {
+    setIsOverlayPortalReady(true);
+  }, []);
 
   useEffect(() => {
     if (!desktopPrimaryPeekActive) {
@@ -970,94 +977,96 @@ export function Header() {
         onLogout={logout}
       />
 
-      {/* Mobile Menu */}
-      {mobileMenuVisible ? (
-        <div
-          className={MOBILE_DRAWER_SHELL_ROOT_CLASS}
-          role="dialog"
-          aria-modal="true"
-        >
-          <button
-            type="button"
-            className={`${MOBILE_DRAWER_SHELL_BACKDROP_CLASS} ${
-              mobileMenuExiting
-                ? MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS
-                : MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS
-            }`}
-            aria-label={t('common.ariaLabels.closeMenu')}
-            onClick={closeMobileMenu}
-          />
-          <div
-            className={`${MOBILE_DRAWER_SHELL_PANEL_CLASS} ${
-              mobileMenuExiting
-                ? MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS
-                : MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS
-            }`}
-            onClick={(event) => event.stopPropagation()}
-            onAnimationEnd={handleMobileMenuPanelAnimationEnd}
-          >
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
-              <Link
-                href="/"
-                onClick={closeMobileMenu}
-                aria-label={t('common.navigation.home')}
-                className="flex min-w-0 max-w-[min(200px,70%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
-              >
-                <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
-              </Link>
+      {/* Mobile Menu — portaled so chrome (FAB / sticky header) cannot stack above it */}
+      {isOverlayPortalReady && mobileMenuVisible
+        ? createPortal(
+            <div className={MOBILE_DRAWER_SHELL_ROOT_CLASS} role="dialog" aria-modal="true">
               <button
                 type="button"
-                onClick={closeMobileMenu}
-                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
+                className={`${MOBILE_DRAWER_SHELL_BACKDROP_CLASS} ${
+                  mobileMenuExiting
+                    ? MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS
+                    : MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS
+                }`}
                 aria-label={t('common.ariaLabels.closeMenu')}
+                onClick={closeMobileMenu}
+              />
+              <div
+                className={`${MOBILE_DRAWER_SHELL_PANEL_CLASS} ${
+                  mobileMenuExiting
+                    ? MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS
+                    : MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS
+                }`}
+                onClick={(event) => event.stopPropagation()}
+                onAnimationEnd={handleMobileMenuPanelAnimationEnd}
               >
-                <span className={MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS} aria-hidden>
-                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS} />
-                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS} />
-                </span>
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-hidden min-h-0">
-              <nav className="flex h-full flex-col bg-white">
-                <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
-                  {primaryNavLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      prefetch
-                      onClick={closeMobileMenu}
-                      className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
-                    >
-                      <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
-                      <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  ))}
-
-                  <div className="my-1 h-px w-full shrink-0 bg-[#eeeef0]" aria-hidden />
-
-                  <p className="px-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    {t('common.footer.policiesHeading')}
-                  </p>
-                  <FooterPoliciesNav layout="mobileDrawer" onNavigate={closeMobileMenu} />
+                <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
+                  <Link
+                    href="/"
+                    onClick={closeMobileMenu}
+                    aria-label={t('common.navigation.home')}
+                    className="flex min-w-0 max-w-[min(200px,70%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
+                  >
+                    <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={closeMobileMenu}
+                    className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
+                    aria-label={t('common.ariaLabels.closeMenu')}
+                  >
+                    <span className={MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS} aria-hidden>
+                      <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS} />
+                      <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS} />
+                    </span>
+                  </button>
                 </div>
-              </nav>
-            </div>
-          </div>
-        </div>
-      ) : null}
 
-      {/* Search Modal */}
-      {showSearchModal && (
-        <div className="fixed inset-0 bg-black/20 z-50 flex items-start justify-center pt-20 px-4">
-          <div 
-            ref={searchModalRef}
-            className="w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-gray-200/80 p-4 animate-in fade-in slide-in-from-top-2 duration-200 relative"
-          >
+                <div className="flex-1 overflow-hidden min-h-0">
+                  <nav className="flex h-full flex-col bg-white">
+                    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
+                      {primaryNavLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          prefetch
+                          onClick={closeMobileMenu}
+                          className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
+                        >
+                          <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
+                          <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </Link>
+                      ))}
+
+                      <div className="my-1 h-px w-full shrink-0 bg-[#eeeef0]" aria-hidden />
+
+                      <p className="px-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        {t('common.footer.policiesHeading')}
+                      </p>
+                      <FooterPoliciesNav layout="mobileDrawer" onNavigate={closeMobileMenu} />
+                    </div>
+                  </nav>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+
+      <AnimatedModalPortal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        closeAriaLabel={t('common.ariaLabels.closeMenu')}
+        listenEscape={false}
+        backdropClassName="absolute inset-0 bg-black/20"
+        dialogFrameClassName="fixed left-1/2 top-20 z-10 w-full max-w-2xl -translate-x-1/2 px-4"
+        panelClassName="w-full rounded-xl border border-gray-200/80 bg-white p-4 shadow-2xl"
+      >
+        {({ requestClose }) => (
+          <div ref={searchModalRef}>
             <form onSubmit={handleSearch} className="flex items-center gap-2">
-              {/* Search Input */}
               <input
                 ref={searchInputRef}
                 type="text"
@@ -1066,7 +1075,9 @@ export function Header() {
                   setSearchQuery(e.target.value);
                   if (e.target.value.trim().length >= 1) setSearchDropdownOpen(true);
                 }}
-                onFocus={() => { if (searchQuery.trim().length >= 1) setSearchDropdownOpen(true); }}
+                onFocus={() => {
+                  if (searchQuery.trim().length >= 1) setSearchDropdownOpen(true);
+                }}
                 onKeyDown={searchHandleKeyDown}
                 placeholder={t('common.placeholders.search')}
                 className={`flex-1 h-11 px-4 border-2 border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent ${MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS} placeholder:text-gray-400`}
@@ -1074,11 +1085,9 @@ export function Header() {
                 aria-expanded={searchDropdownOpen && searchResults.length > 0}
                 aria-autocomplete="list"
               />
-              
-              {/* Search Button */}
               <button
                 type="submit"
-                className="h-11 px-6 bg-gray-900 text-white rounded-r-lg hover:bg-gray-800 transition-colors flex items-center justify-center"
+                className="flex h-11 items-center justify-center rounded-r-lg bg-gray-900 px-6 text-white transition-colors hover:bg-gray-800"
               >
                 <SearchIcon />
               </button>
@@ -1093,15 +1102,15 @@ export function Header() {
               query={searchQuery}
               onResultClick={(result) => {
                 router.push(`/products/${result.slug}`);
-                setShowSearchModal(false);
+                requestClose();
                 clearSearch();
               }}
               onClose={() => setSearchDropdownOpen(false)}
-              onSeeAllClick={() => setShowSearchModal(false)}
+              onSeeAllClick={requestClose}
             />
           </div>
-        </div>
-      )}
+        )}
+      </AnimatedModalPortal>
     </div>
   );
 }

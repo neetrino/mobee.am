@@ -2,6 +2,7 @@
 
 import { Button, Input } from '@shop/ui';
 import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ContactInformation } from './ContactInformation';
 import { ShippingCitySelect } from './ShippingCitySelect';
@@ -60,10 +61,6 @@ export function ShippingAddressModal({
 }: ShippingAddressModalProps) {
   const { t } = useTranslation();
 
-  if (!isOpen) {
-    return null;
-  }
-
   const handleValidationError = (validationErrors: FieldErrors<CheckoutFormData>) => {
     const firstErrorField = Object.keys(validationErrors)[0];
     if (firstErrorField) {
@@ -75,16 +72,16 @@ export function ShippingAddressModal({
   };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4"
-      onClick={onClose}
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeAriaLabel={t('checkout.modals.closeModal')}
+      blockClose={isSubmitting}
+      panelClassName={`max-h-[90vh] w-full overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+      panelProps={{ lang: FORM_INPUT_LATIN_LANG }}
     >
-      <div
-        lang={FORM_INPUT_LATIN_LANG}
-        className={`max-h-[90vh] w-full max-w-lg overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
-        onClick={(e) => e.stopPropagation()}
-        style={{ zIndex: 10000 }}
-      >
+      {({ requestClose }) => (
+        <>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
             {shippingMethod === 'delivery' 
@@ -93,11 +90,11 @@ export function ShippingAddressModal({
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={requestClose}
             className="rounded-full p-1 text-gray-400 transition-colors hover:text-admin-600"
             aria-label={t('checkout.modals.closeModal')}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
               <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
@@ -263,7 +260,7 @@ export function ShippingAddressModal({
             type="button"
             variant="outline"
             className="flex-1 !rounded-full"
-            onClick={onClose}
+            onClick={requestClose}
             disabled={isSubmitting}
           >
             {t('checkout.buttons.cancel')}
@@ -274,7 +271,7 @@ export function ShippingAddressModal({
             className="flex-1 !rounded-full"
             onClick={handleSubmit(
               (data) => {
-                onClose();
+                requestClose();
                 onSubmit(data);
               },
               handleValidationError
@@ -287,8 +284,9 @@ export function ShippingAddressModal({
             {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
           </Button>
         </div>
-      </div>
-    </div>
+        </>
+      )}
+    </AnimatedModalPortal>
   );
 }
 

@@ -6,6 +6,7 @@ import { apiClient } from '../../../lib/api-client';
 import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
 import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
 
@@ -251,19 +252,27 @@ function BrandsSection() {
         </>
       )}
 
-      {/* Add/Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-supersudo shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+      <AnimatedModalPortal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        closeAriaLabel={t('admin.brands.cancel')}
+        blockClose={submitting}
+        labelledBy="brand-modal-title"
+        panelClassName="w-full max-w-md rounded-supersudo bg-white p-6 shadow-xl"
+      >
+        {({ requestClose }) => (
+          <>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 id="brand-modal-title" className="text-lg font-semibold text-gray-900">
                 {editingBrand ? t('admin.brands.editBrand') : t('admin.brands.addNewBrand')}
               </h3>
               <button
-                onClick={handleCloseModal}
+                type="button"
+                onClick={requestClose}
                 className="text-gray-400 transition-colors hover:text-admin-600"
+                aria-label={t('admin.brands.cancel')}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -271,7 +280,7 @@ function BrandsSection() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="brand-name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="brand-name" className="mb-1 block text-sm font-medium text-gray-700">
                   {t('admin.brands.brandName')}
                 </label>
                 <input
@@ -279,7 +288,7 @@ function BrandsSection() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:ring-2 focus:ring-admin focus:border-transparent"
+                  className="w-full rounded-supersudo border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-admin"
                   placeholder={t('admin.brands.enterBrandName')}
                   required
                 />
@@ -289,7 +298,7 @@ function BrandsSection() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handleCloseModal}
+                  onClick={requestClose}
                   disabled={submitting}
                 >
                   {t('admin.brands.cancel')}
@@ -303,9 +312,9 @@ function BrandsSection() {
                 </Button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </AnimatedModalPortal>
     </>
   );
 }

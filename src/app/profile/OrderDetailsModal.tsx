@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Button, Card } from '@shop/ui';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { resolveOrderShippingMethodKind } from '../../lib/order-shipping-method-label';
-import { useAnimatedModalDismiss } from '../../lib/useAnimatedModalDismiss';
 import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
 import type { OrderDetails } from './types';
@@ -39,32 +39,19 @@ export function OrderDetailsModal({
     }
   }, [selectedOrder]);
 
-  const {
-    isVisible,
-    requestClose,
-    handlePanelAnimationEnd,
-    backdropMotionClass,
-    panelMotionClass,
-  } = useAnimatedModalDismiss({
-    isOpen,
-    onClose,
-    lockBodyScroll: true,
-    panelMotionVariant: 'dialog',
-  });
-
   const getAttributeLabel = (key: string): string => {
     if (key === 'color' || key === 'colour') return t('profile.orderDetails.color');
     if (key === 'size') return t('profile.orderDetails.size');
     return key.charAt(0).toUpperCase() + key.slice(1);
   };
 
-  const getColorsArray = (colors: any): string[] => {
+  const getColorsArray = (colors: unknown): string[] => {
     if (!colors) return [];
-    if (Array.isArray(colors)) return colors;
+    if (Array.isArray(colors)) return colors as string[];
     if (typeof colors === 'string') {
       try {
-        const parsed = JSON.parse(colors);
-        return Array.isArray(parsed) ? parsed : [];
+        const parsed: unknown = JSON.parse(colors);
+        return Array.isArray(parsed) ? (parsed as string[]) : [];
       } catch {
         return [];
       }
@@ -72,32 +59,29 @@ export function OrderDetailsModal({
     return [];
   };
 
-  if (!isVisible || !orderSnapshot) {
-    return null;
-  }
-
-  const selectedOrderData = orderSnapshot;
-
   return (
-    <div className="fixed inset-0 z-[70] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        className={`fixed inset-0 bg-gray-500/75 ${backdropMotionClass}`}
-        aria-label={t('profile.orderDetails.close')}
-        onClick={requestClose}
-      />
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeAriaLabel={t('profile.orderDetails.close')}
+      labelledBy="modal-title"
+      backdropClassName="absolute inset-0 bg-gray-500/75"
+      dialogFrameClassName="fixed left-1/2 top-1/2 z-10 w-full max-w-6xl -translate-x-1/2 -translate-y-1/2 px-4"
+      panelClassName="max-h-[90vh] w-full overflow-y-auto rounded-[15px] bg-white shadow-xl"
+    >
+      {({ requestClose }) => {
+        if (!orderSnapshot) {
+          return null;
+        }
+        const selectedOrderData = orderSnapshot;
 
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div
-          className={`relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-[15px] bg-white shadow-xl ${panelMotionClass}`}
-          onClick={(event) => event.stopPropagation()}
-          onAnimationEnd={handlePanelAnimationEnd}
-        >
+        return (
+          <>
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">{t('profile.orderDetails.title')}{selectedOrderData.number}</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 id="modal-title" className="text-2xl font-bold text-gray-900">{t('profile.orderDetails.title')}{selectedOrderData.number}</h2>
+              <p className="mt-1 text-sm text-gray-600">
                 {t('profile.orderDetails.placedOn')} {new Date(selectedOrderData.createdAt).toLocaleDateString()}
               </p>
             </div>
@@ -358,11 +342,10 @@ export function OrderDetailsModal({
               </div>
             )}
           </div>
-        </div>
-      </div>
-    </div>
+          </>
+        );
+      }}
+    </AnimatedModalPortal>
   );
 }
-
-
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Maximize2, Minus, Plus, X } from "lucide-react";
+import { AnimatedModalPortal } from "@/components/AnimatedModalPortal";
 import { ProductLabels } from "../../../components/ProductLabels";
 import { ProductImagePlaceholder } from "../../../components/ProductImagePlaceholder";
 import { t } from "../../../lib/i18n";
@@ -447,108 +448,119 @@ export function ProductImageGallery({
         </div>
       </div>
 
-      {/* Zoom Modal */}
-      {showZoom && images.length > 0 && !failedIndices.has(currentImageIndex) && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" onClick={() => setShowZoom(false)}>
-          <div
-            className="relative w-full h-full flex items-center justify-center"
-            onTouchStart={(event) => {
-              setTouchStartX(event.changedTouches[0]?.clientX ?? null);
-            }}
-            onTouchEnd={(event) => {
-              if (touchStartX === null || !hasMultipleImages) {
-                return;
-              }
-
-              const endX = event.changedTouches[0]?.clientX ?? touchStartX;
-              const swipeDirection = detectSwipeDirection(endX - touchStartX);
-
-              if (swipeDirection === "next") {
-                goToNextImage();
-              } else if (swipeDirection === "previous") {
-                goToPreviousImage();
-              }
-
-              setTouchStartX(null);
-            }}
-          >
-            <img
-              src={currentSrc}
-              alt=""
-              className="max-w-full max-h-full object-contain transition-transform duration-150"
-              style={{ transform: `scale(${zoomScale})` }}
-              onWheel={(event) => {
-                event.preventDefault();
-                setZoomScale((prev) => (event.deltaY < 0 ? zoomIn(prev) : zoomOut(prev)));
+      <AnimatedModalPortal
+        isOpen={showZoom && images.length > 0 && !failedIndices.has(currentImageIndex)}
+        onClose={() => {
+          setZoomScale(1);
+          setShowZoom(false);
+        }}
+        closeAriaLabel={t(language, "common.buttons.close")}
+        backdropClassName="absolute inset-0 bg-black/90"
+        dialogFrameClassName="fixed inset-0 z-10 flex items-center justify-center p-4"
+        panelClassName="relative flex h-full w-full items-center justify-center bg-transparent"
+      >
+        {({ requestClose }) => (
+          <>
+            <div
+              className="relative flex h-full w-full items-center justify-center"
+              onTouchStart={(event) => {
+                setTouchStartX(event.changedTouches[0]?.clientX ?? null);
               }}
-            />
+              onTouchEnd={(event) => {
+                if (touchStartX === null || !hasMultipleImages) {
+                  return;
+                }
 
-            {hasMultipleImages && (
-              <>
+                const endX = event.changedTouches[0]?.clientX ?? touchStartX;
+                const swipeDirection = detectSwipeDirection(endX - touchStartX);
+
+                if (swipeDirection === "next") {
+                  goToNextImage();
+                } else if (swipeDirection === "previous") {
+                  goToPreviousImage();
+                }
+
+                setTouchStartX(null);
+              }}
+            >
+              <img
+                src={currentSrc}
+                alt=""
+                className="max-h-full max-w-full object-contain transition-transform duration-150"
+                style={{ transform: `scale(${zoomScale})` }}
+                onWheel={(event) => {
+                  event.preventDefault();
+                  setZoomScale((prev) => (event.deltaY < 0 ? zoomIn(prev) : zoomOut(prev)));
+                }}
+              />
+
+              {hasMultipleImages && (
+                <>
+                  <button
+                    type="button"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-black/60"
+                    aria-label={t(language, "common.ariaLabels.previousImage")}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      goToPreviousImage();
+                    }}
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    type="button"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-black/60"
+                    aria-label={t(language, "common.ariaLabels.nextImage")}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      goToNextImage();
+                    }}
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </>
+              )}
+
+              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/45 px-3 py-2">
                 <button
                   type="button"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-black/40 hover:bg-black/60 rounded-full p-2"
-                  aria-label={t(language, "common.ariaLabels.previousImage")}
+                  aria-label="Zoom out"
+                  className="rounded p-1 text-white hover:bg-white/20"
                   onClick={(event) => {
                     event.stopPropagation();
-                    goToPreviousImage();
+                    setZoomScale((prev) => zoomOut(prev));
                   }}
                 >
-                  <ChevronLeft className="w-6 h-6" />
+                  <Minus className="h-4 w-4" />
                 </button>
+                <span className="min-w-12 text-center text-xs text-white">{Math.round(zoomScale * 100)}%</span>
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-black/40 hover:bg-black/60 rounded-full p-2"
-                  aria-label={t(language, "common.ariaLabels.nextImage")}
+                  aria-label="Zoom in"
+                  className="rounded p-1 text-white hover:bg-white/20"
                   onClick={(event) => {
                     event.stopPropagation();
-                    goToNextImage();
+                    setZoomScale((prev) => zoomIn(prev));
                   }}
                 >
-                  <ChevronRight className="w-6 h-6" />
+                  <Plus className="h-4 w-4" />
                 </button>
-              </>
-            )}
-
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/45 rounded-full px-3 py-2">
-              <button
-                type="button"
-                aria-label="Zoom out"
-                className="text-white p-1 rounded hover:bg-white/20"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setZoomScale((prev) => zoomOut(prev));
-                }}
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="text-white text-xs min-w-12 text-center">{Math.round(zoomScale * 100)}%</span>
-              <button
-                type="button"
-                aria-label="Zoom in"
-                className="text-white p-1 rounded hover:bg-white/20"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setZoomScale((prev) => zoomIn(prev));
-                }}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              </div>
             </div>
-          </div>
-          <button 
-            className="absolute top-4 right-4 text-white"
-            aria-label={t(language, 'common.buttons.close')}
-            onClick={(e) => {
-              e.stopPropagation();
-              setZoomScale(1);
-              setShowZoom(false);
-            }}
-          >
-            <X className="w-8 h-8" />
-          </button>
-        </div>
-      )}
+            <button
+              type="button"
+              className="absolute right-4 top-4 text-white"
+              aria-label={t(language, "common.buttons.close")}
+              onClick={(event) => {
+                event.stopPropagation();
+                requestClose();
+              }}
+            >
+              <X className="h-8 w-8" />
+            </button>
+          </>
+        )}
+      </AnimatedModalPortal>
     </>
   );
 }
