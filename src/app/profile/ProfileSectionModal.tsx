@@ -1,6 +1,8 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { STOREFRONT_OVERLAY_ROOT_Z_INDEX_CLASS } from '../../lib/storefront-overlay-layer.constants';
 import { useAnimatedModalDismiss } from '../../lib/useAnimatedModalDismiss';
 
 interface ProfileSectionModalProps {
@@ -15,6 +17,7 @@ interface ProfileSectionModalProps {
 
 /**
  * Full-screen style sheet on small viewports, centered panel on `sm+`.
+ * Portaled to `document.body` so site chrome cannot stack above it.
  */
 export function ProfileSectionModal({
   open,
@@ -24,6 +27,7 @@ export function ProfileSectionModal({
   children,
   lockBodyScroll = true,
 }: ProfileSectionModalProps) {
+  const [isOverlayPortalReady, setIsOverlayPortalReady] = useState(false);
   const {
     isVisible,
     requestClose,
@@ -37,12 +41,18 @@ export function ProfileSectionModal({
     panelMotionVariant: 'sheet',
   });
 
-  if (!isVisible) {
+  useEffect(() => {
+    setIsOverlayPortalReady(true);
+  }, []);
+
+  if (!isVisible || !isOverlayPortalReady) {
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-[55] flex flex-col justify-end sm:justify-center sm:p-4">
+  return createPortal(
+    <div
+      className={`fixed inset-0 ${STOREFRONT_OVERLAY_ROOT_Z_INDEX_CLASS} flex flex-col justify-end sm:justify-center sm:p-4`}
+    >
       <button
         type="button"
         className={`absolute inset-0 bg-black/50 ${backdropMotionClass}`}
@@ -76,6 +86,7 @@ export function ProfileSectionModal({
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

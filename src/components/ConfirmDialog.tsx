@@ -1,11 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { STOREFRONT_NESTED_DIALOG_ROOT_Z_INDEX_CLASS } from '../lib/storefront-overlay-layer.constants';
 import { useTranslation } from '../lib/i18n-client';
 import { useAnimatedModalDismiss } from '../lib/useAnimatedModalDismiss';
 
 /** Mobee-styled confirm (aligns with Toast / primary #2DB2FF). */
-const CONFIRM_DIALOG_ROOT_CLASS = 'fixed inset-0 z-[110] flex items-center justify-center p-4' as const;
+const CONFIRM_DIALOG_ROOT_CLASS =
+  `fixed inset-0 ${STOREFRONT_NESTED_DIALOG_ROOT_Z_INDEX_CLASS} flex items-center justify-center p-4` as const;
 const CONFIRM_DIALOG_PANEL_CLASS =
   'w-full max-w-md rounded-[14px] border border-[#2DB2FF]/35 bg-white p-6 shadow-xl ring-1 ring-[#2DB2FF]/15' as const;
 

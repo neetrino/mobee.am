@@ -1,3 +1,5 @@
+import { STOREFRONT_OVERLAY_ROOT_Z_INDEX_CLASS } from '../lib/storefront-overlay-layer.constants';
+
 /**
  * Shared mobile drawer navigation chrome (Header main menu + supersudo admin drawer).
  * Keep in sync when adjusting Figma / Header mobile menu.
@@ -31,7 +33,7 @@ export const MOBILE_DRAWER_ADMIN_SUBMENU_HORIZONTAL_TRIM_CLASS =
   'ml-auto min-w-0 !w-[calc(100%-20px)] max-w-full';
 
 /** Drawer shell — fixed root + scrim + sliding panel (Header mobile menu). */
-export const MOBILE_DRAWER_SHELL_ROOT_CLASS = 'fixed inset-0 z-50 lg:hidden';
+export const MOBILE_DRAWER_SHELL_ROOT_CLASS = `fixed inset-0 ${STOREFRONT_OVERLAY_ROOT_Z_INDEX_CLASS} lg:hidden`;
 
 export const MOBILE_DRAWER_SHELL_BACKDROP_CLASS = 'absolute inset-0 bg-black/40';
 

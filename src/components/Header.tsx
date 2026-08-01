@@ -5,6 +5,7 @@ import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
 import type { AnimationEvent, FormEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage } from '../lib/language';
@@ -198,6 +199,7 @@ export function Header() {
   showSearchModalRef.current = showSearchModal;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileMenuExiting, setMobileMenuExiting] = useState(false);
+  const [isOverlayPortalReady, setIsOverlayPortalReady] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
   const [categoriesMenuEntered, setCategoriesMenuEntered] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
@@ -423,6 +425,10 @@ export function Header() {
   }, []);
 
   const mobileMenuVisible = mobileMenuOpen || mobileMenuExiting;
+
+  useEffect(() => {
+    setIsOverlayPortalReady(true);
+  }, []);
 
   useEffect(() => {
     if (!desktopPrimaryPeekActive) {
@@ -970,84 +976,83 @@ export function Header() {
         onLogout={logout}
       />
 
-      {/* Mobile Menu */}
-      {mobileMenuVisible ? (
-        <div
-          className={MOBILE_DRAWER_SHELL_ROOT_CLASS}
-          role="dialog"
-          aria-modal="true"
-        >
-          <button
-            type="button"
-            className={`${MOBILE_DRAWER_SHELL_BACKDROP_CLASS} ${
-              mobileMenuExiting
-                ? MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS
-                : MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS
-            }`}
-            aria-label={t('common.ariaLabels.closeMenu')}
-            onClick={closeMobileMenu}
-          />
-          <div
-            className={`${MOBILE_DRAWER_SHELL_PANEL_CLASS} ${
-              mobileMenuExiting
-                ? MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS
-                : MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS
-            }`}
-            onClick={(event) => event.stopPropagation()}
-            onAnimationEnd={handleMobileMenuPanelAnimationEnd}
-          >
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
-              <Link
-                href="/"
-                onClick={closeMobileMenu}
-                aria-label={t('common.navigation.home')}
-                className="flex min-w-0 max-w-[min(200px,70%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
-              >
-                <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
-              </Link>
+      {/* Mobile Menu — portaled so chrome (FAB / sticky header) cannot stack above it */}
+      {isOverlayPortalReady && mobileMenuVisible
+        ? createPortal(
+            <div className={MOBILE_DRAWER_SHELL_ROOT_CLASS} role="dialog" aria-modal="true">
               <button
                 type="button"
-                onClick={closeMobileMenu}
-                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
+                className={`${MOBILE_DRAWER_SHELL_BACKDROP_CLASS} ${
+                  mobileMenuExiting
+                    ? MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS
+                    : MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS
+                }`}
                 aria-label={t('common.ariaLabels.closeMenu')}
+                onClick={closeMobileMenu}
+              />
+              <div
+                className={`${MOBILE_DRAWER_SHELL_PANEL_CLASS} ${
+                  mobileMenuExiting
+                    ? MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS
+                    : MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS
+                }`}
+                onClick={(event) => event.stopPropagation()}
+                onAnimationEnd={handleMobileMenuPanelAnimationEnd}
               >
-                <span className={MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS} aria-hidden>
-                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS} />
-                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS} />
-                </span>
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-hidden min-h-0">
-              <nav className="flex h-full flex-col bg-white">
-                <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
-                  {primaryNavLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      prefetch
-                      onClick={closeMobileMenu}
-                      className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
-                    >
-                      <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
-                      <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  ))}
-
-                  <div className="my-1 h-px w-full shrink-0 bg-[#eeeef0]" aria-hidden />
-
-                  <p className="px-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    {t('common.footer.policiesHeading')}
-                  </p>
-                  <FooterPoliciesNav layout="mobileDrawer" onNavigate={closeMobileMenu} />
+                <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
+                  <Link
+                    href="/"
+                    onClick={closeMobileMenu}
+                    aria-label={t('common.navigation.home')}
+                    className="flex min-w-0 max-w-[min(200px,70%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
+                  >
+                    <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={closeMobileMenu}
+                    className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
+                    aria-label={t('common.ariaLabels.closeMenu')}
+                  >
+                    <span className={MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS} aria-hidden>
+                      <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS} />
+                      <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS} />
+                    </span>
+                  </button>
                 </div>
-              </nav>
-            </div>
-          </div>
-        </div>
-      ) : null}
+
+                <div className="flex-1 overflow-hidden min-h-0">
+                  <nav className="flex h-full flex-col bg-white">
+                    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
+                      {primaryNavLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          prefetch
+                          onClick={closeMobileMenu}
+                          className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
+                        >
+                          <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
+                          <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </Link>
+                      ))}
+
+                      <div className="my-1 h-px w-full shrink-0 bg-[#eeeef0]" aria-hidden />
+
+                      <p className="px-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        {t('common.footer.policiesHeading')}
+                      </p>
+                      <FooterPoliciesNav layout="mobileDrawer" onNavigate={closeMobileMenu} />
+                    </div>
+                  </nav>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
 
       {/* Search Modal */}
       {showSearchModal && (
