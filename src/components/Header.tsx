@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
 import type { AnimationEvent, FormEvent } from 'react';
 import { createPortal } from 'react-dom';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { getStoredLanguage } from '../lib/language';
@@ -1054,15 +1055,18 @@ export function Header() {
           )
         : null}
 
-      {/* Search Modal */}
-      {showSearchModal && (
-        <div className="fixed inset-0 bg-black/20 z-50 flex items-start justify-center pt-20 px-4">
-          <div 
-            ref={searchModalRef}
-            className="w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-gray-200/80 p-4 animate-in fade-in slide-in-from-top-2 duration-200 relative"
-          >
+      <AnimatedModalPortal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        closeAriaLabel={t('common.ariaLabels.closeMenu')}
+        listenEscape={false}
+        backdropClassName="absolute inset-0 bg-black/20"
+        dialogFrameClassName="fixed left-1/2 top-20 z-10 w-full max-w-2xl -translate-x-1/2 px-4"
+        panelClassName="w-full rounded-xl border border-gray-200/80 bg-white p-4 shadow-2xl"
+      >
+        {({ requestClose }) => (
+          <div ref={searchModalRef}>
             <form onSubmit={handleSearch} className="flex items-center gap-2">
-              {/* Search Input */}
               <input
                 ref={searchInputRef}
                 type="text"
@@ -1071,7 +1075,9 @@ export function Header() {
                   setSearchQuery(e.target.value);
                   if (e.target.value.trim().length >= 1) setSearchDropdownOpen(true);
                 }}
-                onFocus={() => { if (searchQuery.trim().length >= 1) setSearchDropdownOpen(true); }}
+                onFocus={() => {
+                  if (searchQuery.trim().length >= 1) setSearchDropdownOpen(true);
+                }}
                 onKeyDown={searchHandleKeyDown}
                 placeholder={t('common.placeholders.search')}
                 className={`flex-1 h-11 px-4 border-2 border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent ${MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS} placeholder:text-gray-400`}
@@ -1079,11 +1085,9 @@ export function Header() {
                 aria-expanded={searchDropdownOpen && searchResults.length > 0}
                 aria-autocomplete="list"
               />
-              
-              {/* Search Button */}
               <button
                 type="submit"
-                className="h-11 px-6 bg-gray-900 text-white rounded-r-lg hover:bg-gray-800 transition-colors flex items-center justify-center"
+                className="flex h-11 items-center justify-center rounded-r-lg bg-gray-900 px-6 text-white transition-colors hover:bg-gray-800"
               >
                 <SearchIcon />
               </button>
@@ -1098,15 +1102,15 @@ export function Header() {
               query={searchQuery}
               onResultClick={(result) => {
                 router.push(`/products/${result.slug}`);
-                setShowSearchModal(false);
+                requestClose();
                 clearSearch();
               }}
               onClose={() => setSearchDropdownOpen(false)}
-              onSeeAllClick={() => setShowSearchModal(false)}
+              onSeeAllClick={requestClose}
             />
           </div>
-        </div>
-      )}
+        )}
+      </AnimatedModalPortal>
     </div>
   );
 }

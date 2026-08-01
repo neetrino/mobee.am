@@ -1,10 +1,8 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { CurrencyCode } from '../../../../lib/currency';
-import { useAnimatedModalDismiss } from '../../../../lib/useAnimatedModalDismiss';
 import { OrderDetailsSummary } from './OrderDetailsSummary';
 import { OrderDetailsAddresses } from './OrderDetailsAddresses';
 import { OrderDetailsTotals } from './OrderDetailsTotals';
@@ -32,51 +30,22 @@ export function OrderDetailsModal({
   formatCurrency,
 }: OrderDetailsModalProps) {
   const { t } = useTranslation();
-  const [isMounted, setIsMounted] = useState(false);
-
-  const {
-    isVisible,
-    requestClose,
-    handlePanelAnimationEnd,
-    backdropMotionClass,
-    panelMotionClass,
-  } = useAnimatedModalDismiss({
-    isOpen,
-    onClose,
-    lockBodyScroll: true,
-    panelMotionVariant: 'dialog',
-  });
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isVisible || !isMounted) {
-    return null;
-  }
-
   const closeLabel = t('admin.common.close');
   const title = orderDetails
     ? `${t('admin.orders.orderDetails.title')} #${orderDetails.number}`
     : t('admin.orders.orderDetails.title');
 
-  const modal = (
-    <div className="fixed inset-0 z-[110]">
-      <button
-        type="button"
-        className={`absolute inset-0 bg-black/50 ${backdropMotionClass}`}
-        aria-label={closeLabel}
-        onClick={requestClose}
-      />
-      <div className="fixed left-1/2 top-1/2 z-10 w-[min(calc(100vw-2rem),50vw)] min-w-[min(100%,20rem)] -translate-x-1/2 -translate-y-1/2">
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="admin-order-details-title"
-          className={`flex max-h-[min(85dvh,720px)] w-full flex-col overflow-hidden rounded-[20px] border border-admin-100 bg-white shadow-2xl ${panelMotionClass}`}
-          onClick={(e) => e.stopPropagation()}
-          onAnimationEnd={handlePanelAnimationEnd}
-        >
+  return (
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeAriaLabel={closeLabel}
+      labelledBy="admin-order-details-title"
+      dialogFrameClassName="fixed left-1/2 top-1/2 z-10 w-[min(calc(100vw-2rem),50vw)] min-w-[min(100%,20rem)] -translate-x-1/2 -translate-y-1/2"
+      panelClassName="flex max-h-[min(85dvh,720px)] w-full flex-col overflow-hidden rounded-[20px] border border-admin-100 bg-white shadow-2xl"
+    >
+      {({ requestClose }) => (
+        <>
           <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-4 py-3 sm:px-5">
             <h2
               id="admin-order-details-title"
@@ -123,10 +92,8 @@ export function OrderDetailsModal({
               </div>
             )}
           </div>
-        </div>
-      </div>
-    </div>
+        </>
+      )}
+    </AnimatedModalPortal>
   );
-
-  return createPortal(modal, document.body);
 }

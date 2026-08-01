@@ -1,13 +1,13 @@
 'use client';
 
-import { createPortal } from 'react-dom';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Input } from '@shop/ui';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { useTranslation } from '../../lib/i18n-client';
 import { apiClient } from '../../lib/api-client';
 import { isValidEmail } from '../../lib/utils/email';
 import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
-import { useAnimatedModalDismiss } from '../../lib/useAnimatedModalDismiss';
+import { STOREFRONT_MODAL_TRANSITION_MS } from '../../lib/storefront-modal-motion.constants';
 import type { CurrencyCode } from '../../lib/currency';
 
 interface InstallmentRequestModalProps {
@@ -49,9 +49,6 @@ const EMPTY_FORM: FormState = {
 
 const PHONE_DIGITS_MIN = 8;
 const PHONE_DIGITS_MAX = 15;
-
-/** Above header, bottom nav, toasts, and other storefront overlays. */
-const INSTALLMENT_MODAL_Z_INDEX_CLASS = 'z-[10000]' as const;
 
 function sanitizePhoneDigits(value: string): string {
   let digits = '';
@@ -140,34 +137,18 @@ export function InstallmentRequestModal({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-
-  const {
-    isVisible,
-    requestClose,
-    handlePanelAnimationEnd,
-    backdropMotionClass,
-    panelMotionClass,
-  } = useAnimatedModalDismiss({
-    isOpen,
-    onClose,
-    blockClose: isSubmitting,
-    lockBodyScroll: true,
-    panelMotionVariant: 'sheet',
-  });
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (isVisible) {
+    if (isOpen) {
       return;
     }
-    setForm(EMPTY_FORM);
-    setErrors({});
-    setIsSuccess(false);
-  }, [isVisible]);
+    const timeoutId = window.setTimeout(() => {
+      setForm(EMPTY_FORM);
+      setErrors({});
+      setIsSuccess(false);
+    }, STOREFRONT_MODAL_TRANSITION_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [isOpen]);
 
   const handleFieldChange = (field: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -215,133 +196,122 @@ export function InstallmentRequestModal({
     }
   };
 
-  if (!isVisible || !isMounted) {
-    return null;
-  }
-
-  const modal = (
-    <div
-      className={`fixed inset-0 ${INSTALLMENT_MODAL_Z_INDEX_CLASS} flex flex-col justify-end sm:justify-center sm:p-4`}
+  return (
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeAriaLabel={t('checkout.modals.closeModal')}
+      panelMotionVariant="sheet"
+      blockClose={isSubmitting}
+      labelledBy="installment-request-modal-title"
+      panelClassName="flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-2xl"
+      panelProps={{ lang: FORM_INPUT_LATIN_LANG }}
     >
-      <button
-        type="button"
-        className={`absolute inset-0 bg-black/50 ${backdropMotionClass}`}
-        aria-label={t('checkout.modals.closeModal')}
-        onClick={requestClose}
-      />
-      <div
-        lang={FORM_INPUT_LATIN_LANG}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="installment-request-modal-title"
-        className={`relative z-10 flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-2xl ${panelMotionClass}`}
-        onClick={(event) => event.stopPropagation()}
-        onAnimationEnd={handlePanelAnimationEnd}
-      >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-100 px-4 py-4 sm:px-6">
-          {!isSuccess ? (
-            <div className="min-w-0 pr-2 text-left">
-              <h2
-                id="installment-request-modal-title"
-                className="text-lg font-semibold text-gray-900"
-              >
+      {({ requestClose }) => (
+        <>
+          <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-100 px-4 py-4 sm:px-6">
+            {!isSuccess ? (
+              <div className="min-w-0 pr-2 text-left">
+                <h2
+                  id="installment-request-modal-title"
+                  className="text-lg font-semibold text-gray-900"
+                >
+                  {t('product.aparik.modalTitle')}
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                  {t('product.aparik.modalIntro')}
+                </p>
+              </div>
+            ) : (
+              <h2 id="installment-request-modal-title" className="sr-only">
                 {t('product.aparik.modalTitle')}
               </h2>
-              <p className="mt-2 text-sm leading-relaxed text-gray-700">
-                {t('product.aparik.modalIntro')}
-              </p>
-            </div>
-          ) : (
-            <h2 id="installment-request-modal-title" className="sr-only">
-              {t('product.aparik.modalTitle')}
-            </h2>
-          )}
-          <button
-            type="button"
-            onClick={requestClose}
-            className="shrink-0 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
-            aria-label={t('checkout.modals.closeModal')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M18 6L6 18M6 6l12 12"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        </div>
+            )}
+            <button
+              type="button"
+              onClick={requestClose}
+              className="shrink-0 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
+              aria-label={t('checkout.modals.closeModal')}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M18 6L6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 sm:pb-6">
-          {isSuccess ? (
-            <InstallmentRequestSuccessView message={t('product.aparik.submitSuccess')} />
-          ) : (
-            <form onSubmit={handleSubmit} noValidate className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                <div className="min-w-0">
-                  <Input
-                    label={t('checkout.form.firstName')}
-                    value={form.firstName}
-                    onChange={(event) => handleFieldChange('firstName', event.target.value)}
-                    error={errors.firstName}
-                    disabled={isSubmitting}
-                    required
-                  />
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 sm:pb-6">
+            {isSuccess ? (
+              <InstallmentRequestSuccessView message={t('product.aparik.submitSuccess')} />
+            ) : (
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="min-w-0">
+                    <Input
+                      label={t('checkout.form.firstName')}
+                      value={form.firstName}
+                      onChange={(event) => handleFieldChange('firstName', event.target.value)}
+                      error={errors.firstName}
+                      disabled={isSubmitting}
+                      required
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <Input
+                      label={t('checkout.form.lastName')}
+                      value={form.lastName}
+                      onChange={(event) => handleFieldChange('lastName', event.target.value)}
+                      error={errors.lastName}
+                      disabled={isSubmitting}
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <Input
-                    label={t('checkout.form.lastName')}
-                    value={form.lastName}
-                    onChange={(event) => handleFieldChange('lastName', event.target.value)}
-                    error={errors.lastName}
-                    disabled={isSubmitting}
-                    required
-                  />
-                </div>
-              </div>
-              <Input
-                label={t('checkout.form.email')}
-                type="email"
-                value={form.email}
-                onChange={(event) => handleFieldChange('email', event.target.value)}
-                error={errors.email}
-                disabled={isSubmitting}
-                required
-              />
-              <Input
-                label={t('checkout.form.phone')}
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel-national"
-                placeholder="+374 XX XXX XXX"
-                value={form.phone}
-                onChange={(event) => handlePhoneChange(event.target.value)}
-                error={errors.phone}
-                disabled={isSubmitting}
-                maxLength={PHONE_DIGITS_MAX}
-                required
-              />
+                <Input
+                  label={t('checkout.form.email')}
+                  type="email"
+                  value={form.email}
+                  onChange={(event) => handleFieldChange('email', event.target.value)}
+                  error={errors.email}
+                  disabled={isSubmitting}
+                  required
+                />
+                <Input
+                  label={t('checkout.form.phone')}
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel-national"
+                  placeholder="+374 XX XXX XXX"
+                  value={form.phone}
+                  onChange={(event) => handlePhoneChange(event.target.value)}
+                  error={errors.phone}
+                  disabled={isSubmitting}
+                  maxLength={PHONE_DIGITS_MAX}
+                  required
+                />
 
-              {errors.submit ? (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                  {errors.submit}
-                </div>
-              ) : null}
+                {errors.submit ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                    {errors.submit}
+                  </div>
+                ) : null}
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full rounded-xl bg-[#2db2ff] px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isSubmitting ? t('product.aparik.submitting') : t('common.buttons.submit')}
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full rounded-xl bg-[#2db2ff] px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSubmitting ? t('product.aparik.submitting') : t('common.buttons.submit')}
+                </button>
+              </form>
+            )}
+          </div>
+        </>
+      )}
+    </AnimatedModalPortal>
   );
-
-  return createPortal(modal, document.body);
 }

@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { useTranslation } from '../../../../lib/i18n-client';
-import { useAnimatedModalDismiss } from '../../../../lib/useAnimatedModalDismiss';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { Button } from '@/app/admin/lib/adminShopUi';
+import { useTranslation } from '../../../../lib/i18n-client';
 
 export interface BulkDeleteConfirmSheetProps {
   isOpen: boolean;
@@ -27,53 +25,19 @@ export function BulkDeleteConfirmSheet({
   onConfirm,
 }: BulkDeleteConfirmSheetProps) {
   const { t } = useTranslation();
-  const [isMounted, setIsMounted] = useState(false);
-
-  const {
-    isVisible,
-    requestClose,
-    handlePanelAnimationEnd,
-    backdropMotionClass,
-    panelMotionClass,
-  } = useAnimatedModalDismiss({
-    isOpen,
-    onClose: onCancel,
-    blockClose: bulkDeleting,
-    lockBodyScroll: true,
-    panelMotionVariant: 'dialog',
-  });
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isVisible || !isMounted) {
-    return null;
-  }
-
   const confirmMessage = t('admin.orders.deleteConfirm').replace('{count}', String(selectedCount));
 
-  const modal = (
-    <div className="fixed inset-0 z-[110]">
-      <button
-        type="button"
-        className={`absolute inset-0 bg-black/50 ${backdropMotionClass} ${bulkDeleting ? 'pointer-events-none cursor-wait' : ''}`}
-        aria-label={closeLabel}
-        onClick={() => {
-          if (!bulkDeleting) {
-            requestClose();
-          }
-        }}
-      />
-      <div className="fixed left-1/2 top-1/2 z-10 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 px-4">
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="bulk-delete-sheet-title"
-          className={`flex w-full flex-col overflow-hidden rounded-[20px] border border-admin-100 bg-white shadow-2xl ${panelMotionClass}`}
-          onClick={(e) => e.stopPropagation()}
-          onAnimationEnd={handlePanelAnimationEnd}
-        >
+  return (
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onCancel}
+      closeAriaLabel={closeLabel}
+      blockClose={bulkDeleting}
+      labelledBy="bulk-delete-sheet-title"
+      panelClassName="flex w-full flex-col overflow-hidden rounded-[20px] border border-admin-100 bg-white shadow-2xl"
+    >
+      {({ requestClose }) => (
+        <>
           <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-4 py-3 sm:px-5">
             <h2 id="bulk-delete-sheet-title" className="min-w-0 truncate text-lg font-semibold text-gray-900">
               {title}
@@ -115,10 +79,8 @@ export function BulkDeleteConfirmSheet({
               </Button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </>
+      )}
+    </AnimatedModalPortal>
   );
-
-  return createPortal(modal, document.body);
 }

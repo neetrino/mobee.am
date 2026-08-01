@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import { STOREFRONT_OVERLAY_ROOT_Z_INDEX_CLASS } from '../../lib/storefront-overlay-layer.constants';
-import { useAnimatedModalDismiss } from '../../lib/useAnimatedModalDismiss';
+import type { ReactNode } from 'react';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 
 interface ProfileSectionModalProps {
   open: boolean;
@@ -27,66 +25,38 @@ export function ProfileSectionModal({
   children,
   lockBodyScroll = true,
 }: ProfileSectionModalProps) {
-  const [isOverlayPortalReady, setIsOverlayPortalReady] = useState(false);
-  const {
-    isVisible,
-    requestClose,
-    handlePanelAnimationEnd,
-    backdropMotionClass,
-    panelMotionClass,
-  } = useAnimatedModalDismiss({
-    isOpen: open,
-    onClose,
-    lockBodyScroll,
-    panelMotionVariant: 'sheet',
-  });
-
-  useEffect(() => {
-    setIsOverlayPortalReady(true);
-  }, []);
-
-  if (!isVisible || !isOverlayPortalReady) {
-    return null;
-  }
-
-  return createPortal(
-    <div
-      className={`fixed inset-0 ${STOREFRONT_OVERLAY_ROOT_Z_INDEX_CLASS} flex flex-col justify-end sm:justify-center sm:p-4`}
+  return (
+    <AnimatedModalPortal
+      isOpen={open}
+      onClose={onClose}
+      closeAriaLabel={closeLabel}
+      panelMotionVariant="sheet"
+      lockBodyScroll={lockBodyScroll}
+      labelledBy="profile-section-title"
+      panelClassName="flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] border border-admin-100 bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-[20px]"
     >
-      <button
-        type="button"
-        className={`absolute inset-0 bg-black/50 ${backdropMotionClass}`}
-        aria-label={closeLabel}
-        onClick={requestClose}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="profile-section-title"
-        className={`relative z-10 flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] border border-admin-100 bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-[20px] ${panelMotionClass}`}
-        onClick={(event) => event.stopPropagation()}
-        onAnimationEnd={handlePanelAnimationEnd}
-      >
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-4 py-3 sm:px-5">
-          <h2 id="profile-section-title" className="min-w-0 truncate text-lg font-semibold text-gray-900">
-            {title}
-          </h2>
-          <button
-            type="button"
-            onClick={requestClose}
-            className="shrink-0 rounded-full p-2 text-gray-500 transition-colors hover:bg-admin-50 hover:text-admin-700 focus:outline-none focus:ring-2 focus:ring-admin-400"
-            aria-label={closeLabel}
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5 sm:py-5">
-          {children}
-        </div>
-      </div>
-    </div>,
-    document.body,
+      {({ requestClose }) => (
+        <>
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-4 py-3 sm:px-5">
+            <h2 id="profile-section-title" className="min-w-0 truncate text-lg font-semibold text-gray-900">
+              {title}
+            </h2>
+            <button
+              type="button"
+              onClick={requestClose}
+              className="shrink-0 rounded-full p-2 text-gray-500 transition-colors hover:bg-admin-50 hover:text-admin-700 focus:outline-none focus:ring-2 focus:ring-admin-400"
+              aria-label={closeLabel}
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5 sm:py-5">
+            {children}
+          </div>
+        </>
+      )}
+    </AnimatedModalPortal>
   );
 }
