@@ -38,7 +38,9 @@ export function ProfileOrders({
   if (ordersLoading) {
     return (
       <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
+        {!embeddedInSheet ? (
+          <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+        ) : null}
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="animate-pulse">
@@ -53,9 +55,11 @@ export function ProfileOrders({
   if (orders.length === 0) {
     return (
       <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
-        <div className="text-center py-12">
-          <p className="text-gray-600 mb-4">{t('profile.orders.noOrders')}</p>
+        {!embeddedInSheet ? (
+          <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+        ) : null}
+        <div className="py-12 text-center">
+          <p className="mb-4 text-gray-600">{t('profile.orders.noOrders')}</p>
           <Link href="/products">
             <Button variant="brand" className={PROFILE_PILL_BUTTON_CLASS}>
               {t('profile.dashboard.startShopping')}
@@ -68,7 +72,9 @@ export function ProfileOrders({
 
   return (
     <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
+      {!embeddedInSheet ? (
+        <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+      ) : null}
       <div className="space-y-4">
         {orders.map((order) => (
           <Link

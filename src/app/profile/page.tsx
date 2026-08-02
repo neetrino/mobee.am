@@ -7,6 +7,7 @@ import { useProfilePage } from './useProfilePage';
 import { ProfileHeader } from './ProfileHeader';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { ProfileDesktopMain } from './ProfileDesktopMain';
+import { ProfileFlashAlert } from './ProfileFlashAlert';
 import { ProfileSectionHost } from './ProfileSectionHost';
 import type { ProfileTabConfig } from './types';
 
@@ -18,6 +19,8 @@ function ProfilePageContent() {
     loading,
     error,
     success,
+    setError,
+    setSuccess,
     profile,
     activeTab,
     handleTabChange,
@@ -206,6 +209,8 @@ function ProfilePageContent() {
           <ProfileDesktopMain
             error={error}
             success={success}
+            onDismissError={() => setError(null)}
+            onDismissSuccess={() => setSuccess(null)}
             activeTab={activeTab}
             dashboardData={dashboardData}
             dashboardLoading={dashboardLoading}
@@ -244,15 +249,19 @@ function ProfilePageContent() {
               a hidden open sheet still acquires body scroll lock and freezes the page. */}
           {!isDesktopProfileLayout ? (
             <div className="flex w-full flex-col gap-4">
-              {!profileSheetOpen && error ? (
-                <div className="rounded-[15px] border border-red-200 bg-red-50 p-4" role="alert">
-                  <p className="text-sm text-red-600">{error}</p>
-                </div>
-              ) : null}
-              {!profileSheetOpen && success ? (
-                <div className="rounded-[15px] border border-green-200 bg-green-50 p-4" role="status">
-                  <p className="text-sm text-green-600">{success}</p>
-                </div>
+              {!profileSheetOpen ? (
+                <>
+                  <ProfileFlashAlert
+                    message={error}
+                    variant="error"
+                    onDismiss={() => setError(null)}
+                  />
+                  <ProfileFlashAlert
+                    message={success}
+                    variant="success"
+                    onDismiss={() => setSuccess(null)}
+                  />
+                </>
               ) : null}
               <ProfileSectionHost
                 profileSheetOpen={profileSheetOpen}
@@ -262,6 +271,8 @@ function ProfilePageContent() {
                 closeLabel={t('common.buttons.close')}
                 error={error}
                 success={success}
+                onDismissError={() => setError(null)}
+                onDismissSuccess={() => setSuccess(null)}
                 {...sheetProps}
               />
             </div>
