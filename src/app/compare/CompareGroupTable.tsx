@@ -336,11 +336,11 @@ const CompareGroupTableComponent = ({
 
   return (
     <section className="mb-10 last:mb-0" aria-labelledby={sectionDomId}>
-      <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-        <h2 id={sectionDomId} className="text-lg font-semibold text-gray-900">
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <h2 id={sectionDomId} className="min-w-0 text-lg font-semibold text-gray-900">
           {categoryHeading}
         </h2>
-        <p className="text-sm text-gray-600">{compareSummaryLine}</p>
+        <p className="shrink-0 text-sm text-gray-600">{compareSummaryLine}</p>
       </div>
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="overflow-x-auto">

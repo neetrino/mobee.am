@@ -64,10 +64,9 @@ export function OrderDetailsModal({
       isOpen={isOpen}
       onClose={onClose}
       closeAriaLabel={t('profile.orderDetails.close')}
+      panelMotionVariant="sheet"
       labelledBy="modal-title"
-      backdropClassName="absolute inset-0 bg-gray-500/75"
-      dialogFrameClassName="fixed left-1/2 top-1/2 z-10 w-full max-w-6xl -translate-x-1/2 -translate-y-1/2 px-4"
-      panelClassName="max-h-[90vh] w-full overflow-y-auto rounded-[15px] bg-white shadow-xl"
+      panelClassName="flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] border border-admin-100 bg-white shadow-2xl sm:mx-auto sm:max-w-6xl sm:rounded-[20px]"
     >
       {({ requestClose }) => {
         if (!orderSnapshot) {
@@ -77,15 +76,17 @@ export function OrderDetailsModal({
 
         return (
           <>
-          {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
-            <div>
-              <h2 id="modal-title" className="text-2xl font-bold text-gray-900">{t('profile.orderDetails.title')}{selectedOrderData.number}</h2>
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-4 py-3 sm:px-6 sm:py-4">
+            <div className="min-w-0">
+              <h2 id="modal-title" className="truncate text-lg font-semibold text-gray-900 sm:text-2xl sm:font-bold">
+                {t('profile.orderDetails.title')}
+                {selectedOrderData.number}
+              </h2>
               <p className="mt-1 text-sm text-gray-600">
                 {t('profile.orderDetails.placedOn')} {new Date(selectedOrderData.createdAt).toLocaleDateString()}
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               <Button
                 onClick={onReOrder}
                 disabled={isReordering}
@@ -98,18 +99,17 @@ export function OrderDetailsModal({
               <button
                 type="button"
                 onClick={requestClose}
-                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-admin-50 hover:text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-2"
+                className="shrink-0 rounded-full p-2 text-gray-500 transition-colors hover:bg-admin-50 hover:text-admin-700 focus:outline-none focus:ring-2 focus:ring-admin-400"
                 aria-label={t('profile.orderDetails.close')}
               >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="px-6 py-6">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-6">
             {orderDetailsLoading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>

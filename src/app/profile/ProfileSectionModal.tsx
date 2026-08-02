@@ -37,7 +37,7 @@ export function ProfileSectionModal({
     >
       {({ requestClose }) => (
         <>
-          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-4 py-3 sm:px-5">
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-6 py-3 sm:px-7">
             <h2 id="profile-section-title" className="min-w-0 truncate text-lg font-semibold text-gray-900">
               {title}
             </h2>
@@ -52,7 +52,7 @@ export function ProfileSectionModal({
               </svg>
             </button>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5 sm:py-5">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-6 sm:px-7 sm:py-7">
             {children}
           </div>
         </>

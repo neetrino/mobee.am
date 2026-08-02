@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react';
-import { Button, Input, Card } from '@shop/ui';
+import { Button, Input } from '@shop/ui';
 import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
+import { ProfileSectionCard } from './ProfileSectionCard';
 
 interface ProfilePasswordProps {
   passwordForm: {
@@ -12,6 +13,8 @@ interface ProfilePasswordProps {
   savingPassword: boolean;
   onSave: (e: FormEvent) => void;
   t: (key: string) => string;
+  /** When true, omit outer Card — modal/sheet already provides the frame. */
+  embeddedInSheet?: boolean;
 }
 
 export function ProfilePassword({
@@ -20,11 +23,14 @@ export function ProfilePassword({
   savingPassword,
   onSave,
   t,
+  embeddedInSheet = false,
 }: ProfilePasswordProps) {
   return (
-    <Card className="rounded-[15px] p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.password.title')}</h2>
-      <form onSubmit={onSave} className="space-y-4 max-w-2xl">
+    <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
+      {!embeddedInSheet ? (
+        <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.password.title')}</h2>
+      ) : null}
+      <form onSubmit={onSave} className="max-w-2xl space-y-4">
         <Input
           label={t('profile.password.currentPassword')}
           type="password"
@@ -55,9 +61,6 @@ export function ProfilePassword({
           </Button>
         </div>
       </form>
-    </Card>
+    </ProfileSectionCard>
   );
 }
-
-
-

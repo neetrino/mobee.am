@@ -25,7 +25,7 @@ const FOOTER_SECTION_LINK_CLASS =
   'text-[14px] leading-5 text-[#6b7280] transition-colors hover:text-[#2db2ff]';
 
 const FOOTER_MAP_SHELL_CLASS =
-  'relative block h-[120px] w-full min-w-0 overflow-hidden rounded-xl bg-[#e2e8f0]';
+  'relative block min-h-[160px] w-full min-w-0 flex-1 overflow-hidden rounded-xl bg-[#e2e8f0]';
 
 const FOOTER_SOCIAL_BUTTON_SIZE_PX = 40;
 
@@ -81,7 +81,7 @@ function FooterVisitColumn({ addressText }: { readonly addressText: string }) {
   const { t } = useTranslation();
 
   return (
-    <div className="flex w-full max-w-[427px] flex-col items-start gap-6">
+    <div className="flex h-full w-full max-w-[427px] flex-col items-stretch gap-6">
       <h2 className={FOOTER_COLUMN_HEADING_CLASS}>{t('common.footer.visitUs')}</h2>
       <ContactMapEmbed addressText={addressText} shellClassName={FOOTER_MAP_SHELL_CLASS} />
       <p className="whitespace-nowrap text-[16px] leading-6 text-[#64748b]">{addressText}</p>
@@ -99,7 +99,10 @@ function FooterSectionsColumn() {
   ];
 
   return (
-    <nav className="flex min-w-[129px] flex-col items-start gap-[27px]" aria-label={t('common.footer.footerNavAriaLabel')}>
+    <nav
+      className="flex min-w-[129px] justify-self-center flex-col items-start gap-[27px]"
+      aria-label={t('common.footer.footerNavAriaLabel')}
+    >
       <h2 className={FOOTER_COLUMN_HEADING_CLASS}>{t('common.footer.sectionsHeading')}</h2>
       <ul className="flex flex-col items-start gap-3">
         {sectionLinks.map((link) => (
@@ -125,13 +128,16 @@ function FooterTermsAndSocialColumn({ phoneHref }: { readonly phoneHref: string 
   };
 
   return (
-    <div className="flex flex-col items-start gap-10 lg:ml-auto lg:max-w-[389px]">
+    <div className="flex h-full flex-col items-start gap-10 lg:ml-auto lg:max-w-[389px]">
       <div className="flex w-full flex-col items-start gap-[27px]">
         <h2 className={FOOTER_COLUMN_HEADING_CLASS}>{t('common.footer.termsHeading')}</h2>
         <FooterPoliciesNav layout="footerStack" />
       </div>
 
-      <div className="flex items-center gap-4" aria-label={t('common.footer.socialNavAriaLabel')}>
+      <div
+        className="mt-auto flex items-center gap-4"
+        aria-label={t('common.footer.socialNavAriaLabel')}
+      >
         <SocialImageLink
           href={social.instagram}
           label="Instagram"
@@ -218,7 +224,7 @@ export function Footer() {
       className={`${montserrat.className} hidden border-t border-[#eee] bg-white pb-8 pt-8 lg:block`}
     >
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-8`}>
-        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1.15fr)] items-start gap-x-12 gap-y-10 xl:gap-x-20">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-x-12 gap-y-10 xl:gap-x-20">
           <FooterVisitColumn addressText={addressText} />
           <FooterSectionsColumn />
           <FooterTermsAndSocialColumn phoneHref={phoneHref} />
