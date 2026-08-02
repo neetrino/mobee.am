@@ -123,14 +123,14 @@ export function ProfileAddresses({
         )}
 
         {/* Addresses List — default address always first */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {profile?.addresses && profile.addresses.length > 0 ? (
             [...profile.addresses]
               .sort((left, right) => Number(Boolean(right.isDefault)) - Number(Boolean(left.isDefault)))
               .map((address, index) => (
               <div
                 key={address.id || address._id || index}
-                className="relative rounded-[15px] border border-gray-200 p-4 pr-20 transition-colors hover:border-gray-300"
+                className="relative h-full rounded-[15px] border border-gray-200 p-4 pr-20 transition-colors hover:border-gray-300"
               >
                 <div className="absolute right-2 top-2 flex items-center gap-0.5">
                   <button
@@ -178,7 +178,7 @@ export function ProfileAddresses({
               </div>
             ))
           ) : (
-            <p className="text-gray-500 text-center py-8">{t('profile.addresses.noAddresses')}</p>
+            <p className="col-span-full py-8 text-center text-gray-500">{t('profile.addresses.noAddresses')}</p>
           )}
         </div>
     </ProfileSectionCard>

@@ -43,7 +43,7 @@ export function ProfileDashboard({
   return (
     <div className="space-y-6 lg:w-full lg:min-w-0">
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 items-stretch gap-3 sm:gap-4 lg:grid-cols-2 lg:gap-6 xl:grid-cols-4">
+      <div className="grid grid-cols-1 items-stretch gap-3 sm:gap-4 lg:grid-cols-2 lg:gap-6">
         <Card className="flex h-full flex-col rounded-[15px] p-5 sm:p-6">
           <div className="flex flex-1 items-center justify-between gap-3">
             <div className="min-w-0">
