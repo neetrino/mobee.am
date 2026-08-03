@@ -28,7 +28,7 @@ import {
 
 /** Slightly wider than the main mobile menu, with right-side rounded corners. */
 const MOBILE_FILTERS_DRAWER_PANEL_CLASS =
-  'relative z-10 flex h-full min-h-dvh min-w-[18rem] w-[min(88vw,26rem)] max-w-full flex-col overflow-hidden rounded-tr-[28px] rounded-br-[28px] bg-white shadow-2xl';
+  'relative z-10 flex h-dvh max-h-dvh min-w-[18rem] w-[min(88vw,26rem)] max-w-full flex-col overflow-hidden rounded-tr-[28px] rounded-br-[28px] bg-white shadow-2xl';
 
 interface MobileFiltersDrawerProps {
   title?: string;
