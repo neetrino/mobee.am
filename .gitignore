@@ -38,3 +38,8 @@ data/product-import/cache/
 mobilecentre_apple_variable_products.json
 audit/
 backups/
+
+# Marco import temporary files
+scripts/tmp-*.cjs
+scripts/tmp-*.json
+scripts/*.dry-run.json
