@@ -6,6 +6,8 @@ import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
 type PartnerLogoId = 'apple' | 'lg' | 'samsung' | 'xiaomi';
 
+const PARTNER_LOGOS_PER_MOBILE_PAGE = 2;
+
 const PARTNER_LOGOS: readonly {
   id: PartnerLogoId;
   src: string;
@@ -28,7 +30,7 @@ const PARTNER_LOGOS: readonly {
     src: '/images/home/partner-logos/lg.svg',
     width: 121,
     height: 53,
-    mobileWrapperClass: 'h-[54px] w-[123px]',
+    mobileWrapperClass: 'h-[54px] w-[123px] max-w-full',
     desktopWrapperClass: 'h-[53px] w-[121px]',
   },
   {
@@ -36,7 +38,7 @@ const PARTNER_LOGOS: readonly {
     src: '/images/home/partner-logos/samsung.svg',
     width: 211,
     height: 33,
-    mobileWrapperClass: 'h-[34px] w-[218px] max-w-full',
+    mobileWrapperClass: 'h-[24px] w-[150px] max-w-[85%]',
     desktopWrapperClass: 'h-[33px] w-[211px]',
   },
   {
@@ -44,21 +46,30 @@ const PARTNER_LOGOS: readonly {
     src: '/images/home/partner-logos/xiaomi.svg',
     width: 83,
     height: 53,
-    mobileWrapperClass: 'h-[54px] w-[85px]',
+    mobileWrapperClass: 'h-[38px] w-[60px]',
     desktopWrapperClass: 'h-[53px] w-[83px]',
   },
 ];
 
-/** Mobile: one logo per snap page; swipe for the next. */
+/** Mobile: horizontal snap — 2 brand cards per page. */
 const PARTNER_MOBILE_TRACK_CLASS =
   'flex [touch-action:pan-x] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
 
+function chunkPartnerLogosForMobilePages<T>(items: readonly T[], pageSize: number): T[][] {
+  const pages: T[][] = [];
+  for (let index = 0; index < items.length; index += pageSize) {
+    pages.push([...items.slice(index, index + pageSize)]);
+  }
+  return pages;
+}
+
 /**
  * Partner brand strip — matches Figma “Partner Logos” (node 1:248).
- * Mobile: 1 logo per scroll snap; desktop: flat logo row.
+ * Mobile: scroll snap by 2 logos; desktop: flat logo row.
  */
 export function PartnerLogosSection() {
   const { t } = useTranslation();
+  const mobilePages = chunkPartnerLogosForMobilePages(PARTNER_LOGOS, PARTNER_LOGOS_PER_MOBILE_PAGE);
 
   return (
     <section className="bg-white" aria-labelledby="partner-logos-heading">
@@ -72,25 +83,30 @@ export function PartnerLogosSection() {
           aria-roledescription="carousel"
           aria-label={t('home.partner_logos.heading')}
         >
-          {PARTNER_LOGOS.map((item) => (
+          {mobilePages.map((pageItems) => (
             <div
-              key={item.id}
-              className="flex w-full shrink-0 snap-center items-center justify-center px-3"
+              key={pageItems.map((item) => item.id).join('-')}
+              className="grid w-full shrink-0 snap-center grid-cols-2 gap-3 px-3"
             >
-              <div className="flex h-[132px] w-full items-center justify-center rounded-2xl border border-[#eeeef0] bg-[#f7f8fa] px-5">
+              {pageItems.map((item) => (
                 <div
-                  className={`relative flex shrink-0 items-center justify-center ${item.mobileWrapperClass}`}
+                  key={item.id}
+                  className="flex h-[120px] w-full items-center justify-center rounded-2xl border border-[#eeeef0] bg-[#f7f8fa] px-4"
                 >
-                  <Image
-                    src={item.src}
-                    alt={t(`home.partner_logos.${item.id}`)}
-                    width={item.width}
-                    height={item.height}
-                    className="h-full w-full object-contain object-center"
-                    unoptimized
-                  />
+                  <div
+                    className={`relative flex max-w-full shrink-0 items-center justify-center ${item.mobileWrapperClass}`}
+                  >
+                    <Image
+                      src={item.src}
+                      alt={t(`home.partner_logos.${item.id}`)}
+                      width={item.width}
+                      height={item.height}
+                      className="h-full w-full object-contain object-center"
+                      unoptimized
+                    />
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           ))}
         </div>
