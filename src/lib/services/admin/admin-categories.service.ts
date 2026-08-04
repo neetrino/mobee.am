@@ -14,6 +14,14 @@ async function clearCategoriesCache(): Promise<void> {
   await cacheService.deletePattern("categories:*");
 }
 
+function resolveCategorySlug(explicitSlug: string | undefined, title: string): string {
+  const fromExplicit = explicitSlug !== undefined ? toSlug(explicitSlug) : "";
+  if (fromExplicit) {
+    return fromExplicit;
+  }
+  return toSlug(title);
+}
+
 class AdminCategoriesService {
   /**
    * Get categories for admin
@@ -81,6 +89,7 @@ class AdminCategoriesService {
    */
   async createCategory(data: {
     title: string;
+    slug?: string;
     locale?: string;
     parentId?: string;
     requiresSizes?: boolean;
@@ -104,8 +113,17 @@ class AdminCategoriesService {
       }
     }
     
-    // Generate slug from title (ReDoS-safe)
-    const slug = toSlug(data.title);
+    const slug = resolveCategorySlug(data.slug, data.title);
+    if (!slug) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/bad-request",
+        title: "Invalid slug",
+        detail: "Category slug is required. Use Latin letters, numbers, and hyphens.",
+      };
+    }
+
+    await this.assertSlugAvailable(slug, locale);
 
     const nextPosition = await this.getNextSiblingPosition(data.parentId ?? null);
 
@@ -211,6 +229,7 @@ class AdminCategoriesService {
    */
   async updateCategory(categoryId: string, data: {
     title?: string;
+    slug?: string;
     locale?: string;
     parentId?: string | null;
     requiresSizes?: boolean;
@@ -335,28 +354,56 @@ class AdminCategoriesService {
     }
 
     // Keep all locale rows in sync so storefront language switches stay consistent.
-    if (data.title) {
-      const slug = toSlug(data.title);
-
+    if (data.title !== undefined || data.slug !== undefined) {
       const categoryTranslations = Array.isArray(category.translations) ? category.translations : [];
+      const existingTranslation =
+        categoryTranslations.find((t: { locale: string }) => t.locale === locale) ||
+        categoryTranslations[0] ||
+        null;
+
+      const nextTitle = data.title?.trim() || existingTranslation?.title || "";
+      if (!nextTitle) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/bad-request",
+          title: "Invalid title",
+          detail: "Category title is required",
+        };
+      }
+
+      const nextSlug =
+        data.slug !== undefined
+          ? resolveCategorySlug(data.slug, nextTitle)
+          : existingTranslation?.slug || resolveCategorySlug(undefined, nextTitle);
+
+      if (!nextSlug) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/bad-request",
+          title: "Invalid slug",
+          detail: "Category slug is required. Use Latin letters, numbers, and hyphens.",
+        };
+      }
+
+      await this.assertSlugAvailable(nextSlug, locale, categoryId);
 
       if (categoryTranslations.length === 0) {
         await db.categoryTranslation.create({
           data: {
             categoryId: category.id,
             locale,
-            title: data.title,
-            slug,
-            fullPath: slug,
+            title: nextTitle,
+            slug: nextSlug,
+            fullPath: nextSlug,
           },
         });
       } else {
         await db.categoryTranslation.updateMany({
           where: { categoryId: category.id },
           data: {
-            title: data.title,
-            slug,
-            fullPath: slug,
+            title: nextTitle,
+            slug: nextSlug,
+            fullPath: nextSlug,
           },
         });
       }
@@ -421,6 +468,35 @@ class AdminCategoriesService {
     await clearCategoriesCache();
 
     return { data: { showOnHomePage: true } };
+  }
+
+  private async assertSlugAvailable(
+    slug: string,
+    locale: string,
+    excludeCategoryId?: string,
+  ): Promise<void> {
+    const existing = await db.categoryTranslation.findFirst({
+      where: {
+        slug,
+        locale,
+        ...(excludeCategoryId
+          ? { categoryId: { not: excludeCategoryId } }
+          : {}),
+        category: {
+          deletedAt: null,
+        },
+      },
+      select: { categoryId: true },
+    });
+
+    if (existing) {
+      throw {
+        status: 409,
+        type: "https://api.shop.am/problems/conflict",
+        title: "Slug already exists",
+        detail: `Category slug '${slug}' is already used`,
+      };
+    }
   }
 
   /**
