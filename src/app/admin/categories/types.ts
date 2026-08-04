@@ -17,6 +17,7 @@ export interface CategoryWithLevel extends Category {
 
 export interface CategoryFormData {
   title: string;
+  slug: string;
   parentId: string;
   requiresSizes: boolean;
   subcategoryIds: string[];

@@ -81,6 +81,19 @@ export function EditCategoryModal({
                 />
               </div>
               <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  {t('admin.categories.categorySlug')} *
+                </label>
+                <Input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => onFormDataChange({ ...formData, slug: e.target.value })}
+                  placeholder={t('admin.categories.categorySlugPlaceholder')}
+                  className="w-full"
+                />
+                <p className="mt-1 text-xs text-gray-500">{t('admin.categories.categorySlugHint')}</p>
+              </div>
+              <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="edit-category-parent-trigger">
                   {t('admin.categories.parentCategory')}
                 </label>
@@ -157,7 +170,7 @@ export function EditCategoryModal({
               <Button
                 variant="admin"
                 onClick={onSubmit}
-                disabled={saving || !formData.title.trim()}
+                disabled={saving || !formData.title.trim() || !formData.slug.trim()}
                 className="flex-1"
               >
                 {saving ? t('admin.categories.updating') : t('admin.categories.updateCategory')}

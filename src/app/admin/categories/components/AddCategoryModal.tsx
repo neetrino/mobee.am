@@ -63,6 +63,19 @@ export function AddCategoryModal({
               />
             </div>
             <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                {t('admin.categories.categorySlug')}
+              </label>
+              <Input
+                type="text"
+                value={formData.slug}
+                onChange={(e) => onFormDataChange({ ...formData, slug: e.target.value })}
+                placeholder={t('admin.categories.categorySlugPlaceholder')}
+                className="w-full"
+              />
+              <p className="mt-1 text-xs text-gray-500">{t('admin.categories.categorySlugHint')}</p>
+            </div>
+            <div>
               <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="add-category-parent-trigger">
                 {t('admin.categories.parentCategory')}
               </label>
