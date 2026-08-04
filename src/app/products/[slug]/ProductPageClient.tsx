@@ -17,6 +17,7 @@ import { dispatchCartFlyAnimation } from '@/lib/cart/dispatchCartFlyAnimation';
 import { resolveCartLineProductImageUrl } from '@/lib/cart/resolveCartLineProductImage';
 import { PRODUCT_CARD_DISPLAY_IMAGE_SRC, resolveProductCardImageSrc } from '@/lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
+import { dispatchCartUpdated } from '@/lib/cart/dispatch-cart-updated';
 import { formatPriceInCurrency } from '@/lib/currency';
 import { buildRelatedProductsContextFromProduct } from '@/lib/products/build-related-context';
 import {
@@ -147,17 +148,15 @@ export function ProductPageClient({
           stock: currentVariant.stock,
         },
       });
-      window.dispatchEvent(new Event('cart-updated'));
+      dispatchCartUpdated();
       dispatchCartFlyAnimation(flyUrl, flyEl);
       return;
     }
 
     addToCartInFlightRef.current = true;
-    window.dispatchEvent(
-      new CustomEvent('cart-updated', {
-        detail: { optimisticAdd: { quantity, price: price ?? 0 } },
-      }),
-    );
+    dispatchCartUpdated({
+      optimisticAdd: { quantity, price: price ?? 0 },
+    });
     dispatchCartFlyAnimation(flyUrl, flyEl);
 
     void (async () => {
@@ -169,13 +168,13 @@ export function ProductPageClient({
           variantId: currentVariant.id,
           quantity,
         });
-        window.dispatchEvent(
-          new CustomEvent('cart-updated', {
-            detail: response.cartSummary ?? null,
-          }),
-        );
+        if (response.cartSummary) {
+          dispatchCartUpdated(response.cartSummary);
+        } else {
+          dispatchCartUpdated();
+        }
       } catch {
-        window.dispatchEvent(new Event('cart-updated'));
+        dispatchCartUpdated();
         showToast(t(language, 'product.errorAddingToCart'), 'error');
       } finally {
         addToCartInFlightRef.current = false;

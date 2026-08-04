@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { pickCategoryTranslation } from "../pickCategoryTranslation";
 
 class CategoriesService {
   /**
@@ -33,9 +34,7 @@ class CategoriesService {
       media: unknown;
       translations: Array<{ locale: string; slug: string; title: string; fullPath: string }>;
     }) => {
-      const translation =
-        category.translations.find((t: { locale: string }) => t.locale === lang) ||
-        category.translations[0];
+      const translation = pickCategoryTranslation(category.translations, lang);
       if (!translation) return;
 
       const categoryData = {
@@ -107,12 +106,9 @@ class CategoriesService {
       };
     }
 
-    const translation =
-      category.translations.find((t: { locale: string }) => t.locale === lang) ||
-      category.translations[0];
+    const translation = pickCategoryTranslation(category.translations, lang);
     const parentTranslation = category.parent
-      ? category.parent.translations.find((t: { locale: string }) => t.locale === lang) ||
-        category.parent.translations[0]
+      ? pickCategoryTranslation(category.parent.translations, lang)
       : null;
 
     return {

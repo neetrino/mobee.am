@@ -85,7 +85,7 @@
     }
   },
   "aparik": {
-    "buttonLabel": "Installment price",
+    "buttonLabel": "Online installment",
     "modalTitle": "Installment Inquiry",
     "modalIntro": "Fill in the details below to send an installment request. Our specialist will review your application and contact you as soon as possible to present the terms and answer your questions.",
     "submitting": "Sending...",

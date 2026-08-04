@@ -213,6 +213,11 @@
   "defaults": {
     "category": "Մթերք"
   },
+  "productLabels": {
+    "new": "Նոր",
+    "sale": "Զեղչ",
+    "hot": "Տաք"
+  },
   "footer": {
     "visitUs": "Այցելիր մեզ",
     "locationHeading": "Մեր գտնվելու վայրը",
@@ -225,13 +230,16 @@
     "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Ապրանք",
     "sectionsHeading": "Բաժիններ",
+    "sectionsContact": "Հետադարձ կապ",
     "termsHeading": "Պայմաններ",
+    "policiesHeading": "Քաղաքականություն",
     "connectHeading": "Կապ",
     "shop": "Խանութ",
     "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
       "refund": "Վերադարձի և փոխանակման քաղաքականություն",
       "delivery": "Առաքման քաղաքականություն",
+      "credit": "Ապառիկի պայմաններ",
       "terms": "Ծառայությունների մասին պայմաններ",
       "privacy": "Գաղտնիության քաղաքականություն"
     },
@@ -247,6 +255,14 @@
       "policiesNavLabel": "Իրավական և քաղաքականություն",
       "paymentMethodsLabel": "Ընդունված վճարման եղանակներ"
     }
+  },
+  "stickyContact": {
+    "openMenu": "Բացել կապի տարբերակները",
+    "closeMenu": "Փակել կապի տարբերակները",
+    "menuLabel": "Կապի տարբերակներ",
+    "yandexMaps": "Բացել Yandex Maps-ում",
+    "whatsapp": "WhatsApp",
+    "callNow": "Զանգահարել"
   },
   "product": {
     "product": "ապրանք",

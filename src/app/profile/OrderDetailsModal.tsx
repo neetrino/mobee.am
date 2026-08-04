@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Button, Card } from '@shop/ui';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
-import { useAnimatedModalDismiss } from '../../lib/useAnimatedModalDismiss';
+import { resolveOrderShippingMethodKind } from '../../lib/order-shipping-method-label';
 import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
 import type { OrderDetails } from './types';
@@ -38,32 +39,19 @@ export function OrderDetailsModal({
     }
   }, [selectedOrder]);
 
-  const {
-    isVisible,
-    requestClose,
-    handlePanelAnimationEnd,
-    backdropMotionClass,
-    panelMotionClass,
-  } = useAnimatedModalDismiss({
-    isOpen,
-    onClose,
-    lockBodyScroll: true,
-    panelMotionVariant: 'dialog',
-  });
-
   const getAttributeLabel = (key: string): string => {
     if (key === 'color' || key === 'colour') return t('profile.orderDetails.color');
     if (key === 'size') return t('profile.orderDetails.size');
     return key.charAt(0).toUpperCase() + key.slice(1);
   };
 
-  const getColorsArray = (colors: any): string[] => {
+  const getColorsArray = (colors: unknown): string[] => {
     if (!colors) return [];
-    if (Array.isArray(colors)) return colors;
+    if (Array.isArray(colors)) return colors as string[];
     if (typeof colors === 'string') {
       try {
-        const parsed = JSON.parse(colors);
-        return Array.isArray(parsed) ? parsed : [];
+        const parsed: unknown = JSON.parse(colors);
+        return Array.isArray(parsed) ? (parsed as string[]) : [];
       } catch {
         return [];
       }
@@ -71,36 +59,34 @@ export function OrderDetailsModal({
     return [];
   };
 
-  if (!isVisible || !orderSnapshot) {
-    return null;
-  }
-
-  const selectedOrderData = orderSnapshot;
-
   return (
-    <div className="fixed inset-0 z-[70] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        className={`fixed inset-0 bg-gray-500/75 ${backdropMotionClass}`}
-        aria-label={t('profile.orderDetails.close')}
-        onClick={requestClose}
-      />
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeAriaLabel={t('profile.orderDetails.close')}
+      panelMotionVariant="sheet"
+      labelledBy="modal-title"
+      panelClassName="flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] border border-admin-100 bg-white shadow-2xl sm:mx-auto sm:max-w-6xl sm:rounded-[20px]"
+    >
+      {({ requestClose }) => {
+        if (!orderSnapshot) {
+          return null;
+        }
+        const selectedOrderData = orderSnapshot;
 
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div
-          className={`relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-[15px] bg-white shadow-xl ${panelMotionClass}`}
-          onClick={(event) => event.stopPropagation()}
-          onAnimationEnd={handlePanelAnimationEnd}
-        >
-          {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{t('profile.orderDetails.title')}{selectedOrderData.number}</h2>
-              <p className="text-sm text-gray-600 mt-1">
+        return (
+          <>
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-admin-100 px-4 py-3 sm:px-6 sm:py-4">
+            <div className="min-w-0">
+              <h2 id="modal-title" className="truncate text-lg font-semibold text-gray-900 sm:text-2xl sm:font-bold">
+                {t('profile.orderDetails.title')}
+                {selectedOrderData.number}
+              </h2>
+              <p className="mt-1 text-sm text-gray-600">
                 {t('profile.orderDetails.placedOn')} {new Date(selectedOrderData.createdAt).toLocaleDateString()}
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               <Button
                 onClick={onReOrder}
                 disabled={isReordering}
@@ -113,18 +99,17 @@ export function OrderDetailsModal({
               <button
                 type="button"
                 onClick={requestClose}
-                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-admin-50 hover:text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-2"
+                className="shrink-0 rounded-full p-2 text-gray-500 transition-colors hover:bg-admin-50 hover:text-admin-700 focus:outline-none focus:ring-2 focus:ring-admin-400"
                 aria-label={t('profile.orderDetails.close')}
               >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="px-6 py-6">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-6">
             {orderDetailsLoading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
@@ -138,9 +123,9 @@ export function OrderDetailsModal({
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
                 {/* Order Details */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="space-y-6 lg:col-span-2">
                   {/* Status */}
                   <Card className="rounded-[15px] p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.orderDetails.orderStatus')}</h3>
@@ -245,92 +230,93 @@ export function OrderDetailsModal({
                 </div>
 
                 {/* Order Summary + Shipping */}
-                <div className="space-y-4">
-                  <Card className="sticky top-4 rounded-[15px] p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('profile.orderDetails.orderSummary')}</h3>
-                    <div className="space-y-4 mb-6">
-                      {selectedOrderData.totals ? (
-                        <>
+                <Card className="sticky top-4 flex h-full flex-col rounded-[15px] p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('profile.orderDetails.orderSummary')}</h3>
+                  <div className="space-y-4">
+                    {selectedOrderData.totals ? (
+                      <>
+                        <div className="flex justify-between text-gray-600">
+                          <span>{t('profile.orderDetails.subtotal')}</span>
+                          <span>
+                            {(() => {
+                              const subtotalAMD = convertPrice(selectedOrderData.totals.subtotal, 'USD', 'AMD');
+                              const subtotalDisplay = currency === 'AMD' ? subtotalAMD : convertPrice(subtotalAMD, 'AMD', currency);
+                              return formatPriceInCurrency(subtotalDisplay, currency);
+                            })()}
+                          </span>
+                        </div>
+                        {selectedOrderData.totals.discount > 0 && (
                           <div className="flex justify-between text-gray-600">
-                            <span>{t('profile.orderDetails.subtotal')}</span>
+                            <span>{t('profile.orderDetails.discount')}</span>
+                            <span>
+                              -{(() => {
+                                const discountAMD = convertPrice(selectedOrderData.totals.discount, 'USD', 'AMD');
+                                const discountDisplay = currency === 'AMD' ? discountAMD : convertPrice(discountAMD, 'AMD', currency);
+                                return formatPriceInCurrency(discountDisplay, currency);
+                              })()}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-gray-600">
+                          <span>{t('profile.orderDetails.shipping')}</span>
+                          <span>
+                            {resolveOrderShippingMethodKind(selectedOrderData.shippingMethod) ===
+                            'pickup'
+                              ? t('checkout.shipping.freePickup')
+                              : (() => {
+                                  const shippingAMD = selectedOrderData.totals.shipping;
+                                  const shippingDisplay = currency === 'AMD' ? shippingAMD : convertPrice(shippingAMD, 'AMD', currency);
+                                  return formatPriceInCurrency(shippingDisplay, currency) + (selectedOrderData.shippingAddress?.city ? ` (${selectedOrderData.shippingAddress.city})` : '');
+                                })()}
+                          </span>
+                        </div>
+                        <div className="border-t border-gray-200 pt-4">
+                          <div className="flex justify-between text-lg font-bold text-gray-900">
+                            <span>{t('profile.orderDetails.total')}</span>
                             <span>
                               {(() => {
                                 const subtotalAMD = convertPrice(selectedOrderData.totals.subtotal, 'USD', 'AMD');
-                                const subtotalDisplay = currency === 'AMD' ? subtotalAMD : convertPrice(subtotalAMD, 'AMD', currency);
-                                return formatPriceInCurrency(subtotalDisplay, currency);
-                              })()}
-                            </span>
-                          </div>
-                          {selectedOrderData.totals.discount > 0 && (
-                            <div className="flex justify-between text-gray-600">
-                              <span>{t('profile.orderDetails.discount')}</span>
-                              <span>
-                                -{(() => {
-                                  const discountAMD = convertPrice(selectedOrderData.totals.discount, 'USD', 'AMD');
-                                  const discountDisplay = currency === 'AMD' ? discountAMD : convertPrice(discountAMD, 'AMD', currency);
-                                  return formatPriceInCurrency(discountDisplay, currency);
-                                })()}
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex justify-between text-gray-600">
-                            <span>{t('profile.orderDetails.shipping')}</span>
-                            <span>
-                              {selectedOrderData.shippingMethod === 'pickup' 
-                                ? t('checkout.shipping.freePickup')
-                                : (() => {
-                                    const shippingAMD = selectedOrderData.totals.shipping;
-                                    const shippingDisplay = currency === 'AMD' ? shippingAMD : convertPrice(shippingAMD, 'AMD', currency);
-                                    return formatPriceInCurrency(shippingDisplay, currency) + (selectedOrderData.shippingAddress?.city ? ` (${selectedOrderData.shippingAddress.city})` : '');
-                                  })()}
-                            </span>
-                          </div>
-                          <div className="flex justify-between text-gray-600">
-                            <span>{t('profile.orderDetails.tax')}</span>
-                            <span>
-                              {(() => {
+                                const discountAMD = convertPrice(selectedOrderData.totals.discount, 'USD', 'AMD');
+                                const shippingAMD = selectedOrderData.totals.shipping;
                                 const taxAMD = convertPrice(selectedOrderData.totals.tax, 'USD', 'AMD');
-                                const taxDisplay = currency === 'AMD' ? taxAMD : convertPrice(taxAMD, 'AMD', currency);
-                                return formatPriceInCurrency(taxDisplay, currency);
+                                const totalAMD = subtotalAMD - discountAMD + shippingAMD + taxAMD;
+                                const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency);
+                                return formatPriceInCurrency(totalDisplay, currency);
                               })()}
                             </span>
                           </div>
-                          <div className="border-t border-gray-200 pt-4">
-                            <div className="flex justify-between text-lg font-bold text-gray-900">
-                              <span>{t('profile.orderDetails.total')}</span>
-                              <span>
-                                {(() => {
-                                  const subtotalAMD = convertPrice(selectedOrderData.totals.subtotal, 'USD', 'AMD');
-                                  const discountAMD = convertPrice(selectedOrderData.totals.discount, 'USD', 'AMD');
-                                  const shippingAMD = selectedOrderData.totals.shipping;
-                                  const taxAMD = convertPrice(selectedOrderData.totals.tax, 'USD', 'AMD');
-                                  const totalAMD = subtotalAMD - discountAMD + shippingAMD + taxAMD;
-                                  const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency);
-                                  return formatPriceInCurrency(totalDisplay, currency);
-                                })()}
-                              </span>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-gray-600">{t('profile.orderDetails.loadingTotals')}</div>
-                      )}
-                    </div>
-                  </Card>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-gray-600">{t('profile.orderDetails.loadingTotals')}</div>
+                    )}
+                  </div>
 
-                  {/* Shipping Method */}
-                  <Card className="rounded-[15px] p-6">
+                  <div className="mt-6 border-t border-gray-200 pt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.orderDetails.shippingMethod')}</h3>
                     <div className="text-gray-700 space-y-3">
                       <div>
                         <span className="font-medium">{t('profile.orderDetails.method')}: </span>
-                        <span className="capitalize">
-                          {selectedOrderData.shippingMethod === 'delivery' ? t('profile.orderDetails.delivery') : 
-                           selectedOrderData.shippingMethod === 'pickup' ? t('profile.orderDetails.pickup') : 
-                           selectedOrderData.shippingMethod || t('profile.orderDetails.notSpecified')}
+                        <span>
+                          {(() => {
+                            const kind = resolveOrderShippingMethodKind(
+                              selectedOrderData.shippingMethod,
+                            );
+                            if (kind === 'delivery') {
+                              return t('checkout.shipping.delivery');
+                            }
+                            if (kind === 'pickup') {
+                              return t('checkout.shipping.storePickup');
+                            }
+                            return (
+                              selectedOrderData.shippingMethod ||
+                              t('profile.orderDetails.notSpecified')
+                            );
+                          })()}
                         </span>
                       </div>
-                      {selectedOrderData.shippingMethod === 'delivery' && selectedOrderData.shippingAddress && (
+                      {resolveOrderShippingMethodKind(selectedOrderData.shippingMethod) ===
+                        'delivery' && selectedOrderData.shippingAddress && (
                         <div className="mt-3 pt-3 border-t border-gray-200">
                           <p className="font-medium text-gray-900 mb-2">{t('profile.orderDetails.deliveryAddress')}:</p>
                           <div className="text-gray-600">
@@ -351,16 +337,15 @@ export function OrderDetailsModal({
                         </div>
                       )}
                     </div>
-                  </Card>
-                </div>
+                  </div>
+                </Card>
               </div>
             )}
           </div>
-        </div>
-      </div>
-    </div>
+          </>
+        );
+      }}
+    </AnimatedModalPortal>
   );
 }
-
-
 

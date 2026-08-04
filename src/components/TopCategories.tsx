@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useMemo } from 'react';
-import { extractCategoryImageUrl } from '../lib/categoryMedia';
 import {
   categoryStripCardAspectClass,
   categoryStripHref,
   categoryStripInnerHeightClass,
   getCategoryStripTitleTranslateClass,
   getCategoryStripVisual,
+  resolveCategoryStripImageForItem,
   resolveCategoryStripSlotKey,
   type CategoryStripSlotKey,
 } from '../lib/categoryStrip';
@@ -32,53 +32,53 @@ const montserrat = siteMontserrat;
 const CATEGORY_STRIP_LOADING_SKELETON_COUNT = 3;
 const CATEGORY_STRIP_SCROLL_ROW_CLASS =
   'flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide xl:gap-3';
+/** Default Next/Image quality for strip tiles. */
+const CATEGORY_STRIP_IMAGE_QUALITY = 75;
+/** Watches use rotate + CSS scale — higher encode quality keeps edges sharper on desktop. */
+const CATEGORY_STRIP_WATCHES_IMAGE_QUALITY = 92;
 
 function CategoryStripDesktopImage({
   slotKey,
   imageSrc,
 }: {
   slotKey: CategoryStripSlotKey;
-  imageSrc: string | null;
+  imageSrc: string;
 }) {
   const visual = getCategoryStripVisual(slotKey);
   const innerH = categoryStripInnerHeightClass(visual);
+  /** Extra CSS px so rotate/scale on watches still looks sharp on retina. */
+  const imageSizes =
+    slotKey === 'watches'
+      ? '(max-width: 1279px) 180px, 220px'
+      : '(max-width: 1279px) 17vw, 197px';
 
   return (
     <div
       className={`category-strip-tile-art absolute left-1/2 top-0 z-0 w-[197px] origin-top will-change-transform ${innerH}`}
     >
       <div className={`pointer-events-none z-[1] ${visual.imageWrapperClassName}`}>
-        {!imageSrc ? (
-          <div className="size-full rounded-lg bg-[#e4e7eb]" />
-        ) : slotKey === 'watches' ? (
-          <div className="flex size-full items-center justify-center">
-            <div className="flex-none -rotate-[5.85deg]">
-              <div className="relative size-[140px]">
-                <Image
-                  src={imageSrc}
-                  alt=""
-                  width={visual.imageWidth}
-                  height={visual.imageHeight}
-                  className={`size-full max-w-none ${visual.imageClassName}`}
-                />
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div
-            className={
-              slotKey === 'computers' ? 'relative size-full -scale-x-100' : 'relative size-full'
+        <div
+          className={
+            slotKey === 'watches'
+              ? 'relative size-full -rotate-[5.85deg]'
+              : slotKey === 'computers'
+                ? 'relative size-full -scale-x-100'
+                : 'relative size-full'
+          }
+        >
+          <Image
+            src={imageSrc}
+            alt=""
+            fill
+            sizes={imageSizes}
+            quality={
+              slotKey === 'watches'
+                ? CATEGORY_STRIP_WATCHES_IMAGE_QUALITY
+                : CATEGORY_STRIP_IMAGE_QUALITY
             }
-          >
-            <Image
-              src={imageSrc}
-              alt=""
-              fill
-              sizes="(max-width: 1279px) 17vw, 197px"
-              className={visual.imageClassName}
-            />
-          </div>
-        )}
+            className={visual.imageClassName}
+          />
+        </div>
       </div>
     </div>
   );
@@ -143,7 +143,7 @@ export function TopCategories({ initialItems, initialLocale }: TopCategoriesProp
         <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} lg:hidden`}>
           {mobileSortedItems.map((category) => {
             const slotKey = resolveStripSlotKey(category, category.position);
-            const imageSrc = extractCategoryImageUrl(category.media);
+            const imageSrc = resolveCategoryStripImageForItem(category.media, slotKey);
 
             return (
               <CategoryStripLink
@@ -164,7 +164,7 @@ export function TopCategories({ initialItems, initialLocale }: TopCategoriesProp
           {sortedItems.map((category, index) => {
             const slotKey = resolveStripSlotKey(category, index);
             const visual = getCategoryStripVisual(slotKey);
-            const imageSrc = extractCategoryImageUrl(category.media);
+            const imageSrc = resolveCategoryStripImageForItem(category.media, slotKey);
 
             return (
               <CategoryStripLink

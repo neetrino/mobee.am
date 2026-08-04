@@ -106,11 +106,11 @@ export default function ContactPage() {
   return (
     <div className="bg-white">
       {/* Top Section: Contact Info and Form */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 lg:px-16">
         <div className={CONTACT_PAGE_IPAD_MINI_SHIFT_RIGHT_CLASS}>
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          {/* Left Side: Contact Information */}
-          <div className="space-y-8">
+          {/* Left Side: Contact Information — stretch to form height on desktop */}
+          <div className="flex h-full flex-col justify-between gap-8 lg:gap-0">
             {/* Call to Us */}
             <div>
               <div className="flex items-center gap-3 mb-3">
@@ -277,7 +277,7 @@ export default function ContactPage() {
       </div>
 
       <div
-        className={`lg:hidden max-w-7xl mx-auto px-4 sm:px-6 pb-12 ${CONTACT_PAGE_IPAD_MINI_SHIFT_RIGHT_CLASS}`}
+        className={`mx-auto max-w-7xl px-6 pb-12 sm:px-10 lg:hidden ${CONTACT_PAGE_IPAD_MINI_SHIFT_RIGHT_CLASS}`}
       >
         <ContactMapEmbed addressText={t('contact.address')} />
       </div>

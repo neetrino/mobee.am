@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, type MouseEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { acquireBodyScrollLock } from '../../../lib/body-scroll-lock';
 import { apiClient } from '../../../lib/api-client';
+import { dispatchCartUpdated } from '../../../lib/cart/dispatch-cart-updated';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getLoginRedirectToProfileOrdersPath, getProfileOrdersPath } from '../profile-orders-path';
 import { orderListItemToDetailsPlaceholder, orderNumberToDetailsPlaceholder } from '../utils';
@@ -46,11 +46,6 @@ export function useOrders({
   const [orderDetailsLoading, setOrderDetailsLoading] = useState(false);
   const [orderDetailsError, setOrderDetailsError] = useState<string | null>(null);
   const [isReordering, setIsReordering] = useState(false);
-
-  useEffect(() => {
-    if (!selectedOrder) return;
-    return acquireBodyScrollLock();
-  }, [selectedOrder]);
 
   const loadOrders = useCallback(async () => {
     try {
@@ -147,7 +142,7 @@ export function useOrders({
       const addedCount = result.added;
       const skippedCount = result.skipped;
 
-      window.dispatchEvent(new Event('cart-updated'));
+      dispatchCartUpdated();
       
       if (addedCount > 0) {
         const skippedText = skippedCount > 0 ? `, ${skippedCount} ${t('profile.orderDetails.skipped')}` : '';
@@ -166,6 +161,14 @@ export function useOrders({
     }
   };
 
+  const closeOrderDetails = useCallback(() => {
+    setSelectedOrder(null);
+    orderFromUrlHandledRef.current = null;
+    if (searchParams.get('order')) {
+      router.replace(getProfileOrdersPath(), { scroll: false });
+    }
+  }, [router, searchParams]);
+
   return {
     orders,
     ordersLoading,
@@ -174,6 +177,7 @@ export function useOrders({
     ordersMeta,
     selectedOrder,
     setSelectedOrder,
+    closeOrderDetails,
     orderDetailsLoading,
     orderDetailsError,
     isReordering,

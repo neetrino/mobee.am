@@ -62,6 +62,8 @@ interface ProductCardProps {
   addButtonNavigatesToProduct?: boolean;
   /** Active shop color filter to pre-select on PDP. */
   linkColor?: string | null;
+  /** Stack «Օնլայն Ապառիկ» on two lines (related products desktop). */
+  stackInstallmentLabel?: boolean;
 }
 
 interface ProductCardBodyProps extends ProductCardProps {
@@ -89,6 +91,7 @@ function ProductCardBody({
   homeProductGridCard = false,
   imageLoadPriority = false,
   addButtonNavigatesToProduct = false,
+  stackInstallmentLabel = false,
   currency,
   isInWishlist,
   isInCompare,
@@ -153,6 +156,7 @@ function ProductCardBody({
       selectedCardLinkColor={selectedCardLinkColor}
       colorsInteractive={colorsInteractive}
       onCardColorSelect={onCardColorSelect}
+      stackInstallmentLabel={stackInstallmentLabel}
     />
   );
 }

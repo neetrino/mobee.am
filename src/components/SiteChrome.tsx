@@ -7,6 +7,7 @@ import { Header } from './Header';
 import { CartFlyAnimationLayer } from './CartFlyAnimationLayer';
 import { MOBILE_BOTTOM_NAV_BODY_PADDING_BOTTOM_CLASS } from './mobile-bottom-nav.constants';
 import { MobileBottomNav } from './MobileBottomNav';
+import { StickyContactFab } from './StickyContactFab';
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -29,6 +30,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <CartFlyAnimationLayer />
       <main className="flex min-h-0 w-full min-w-0 flex-1 flex-col">{children}</main>
       <DeferredFooter />
+      <StickyContactFab />
       <MobileBottomNav />
     </div>
   );

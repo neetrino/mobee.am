@@ -4,6 +4,7 @@ import type { CurrencyCode } from '../../lib/currency';
 import type { FormEvent, MouseEvent } from 'react';
 import type { Address, DashboardData, OrderListItem, ProfileTab, UserProfile } from './types';
 import { ProfileDashboard } from './ProfileDashboard';
+import { ProfileFlashAlert } from './ProfileFlashAlert';
 import { ProfilePersonalInfo } from './ProfilePersonalInfo';
 import { ProfileAddresses } from './ProfileAddresses';
 import { ProfileOrders } from './ProfileOrders';
@@ -12,6 +13,8 @@ import { ProfilePassword } from './ProfilePassword';
 interface ProfileDesktopMainProps {
   error: string | null;
   success: string | null;
+  onDismissError: () => void;
+  onDismissSuccess: () => void;
   activeTab: ProfileTab;
   dashboardData: DashboardData | null;
   dashboardLoading: boolean;
@@ -62,20 +65,22 @@ interface ProfileDesktopMainProps {
 
 /** Desktop profile: alerts + active tab panel (commit layout). */
 export function ProfileDesktopMain(props: ProfileDesktopMainProps) {
-  const { error, success, activeTab, t } = props;
+  const { error, success, onDismissError, onDismissSuccess, activeTab, t } = props;
 
   return (
     <div className="hidden min-w-0 w-full lg:block">
-      {error && (
-        <div className="mb-6 rounded-[15px] border border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
-      )}
-      {success && (
-        <div className="mb-6 rounded-[15px] border border-green-200 bg-green-50 p-4">
-          <p className="text-sm text-green-600">{success}</p>
-        </div>
-      )}
+      <ProfileFlashAlert
+        message={error}
+        variant="error"
+        onDismiss={onDismissError}
+        className="mb-6"
+      />
+      <ProfileFlashAlert
+        message={success}
+        variant="success"
+        onDismiss={onDismissSuccess}
+        className="mb-6"
+      />
 
       {activeTab === 'dashboard' && (
         <ProfileDashboard

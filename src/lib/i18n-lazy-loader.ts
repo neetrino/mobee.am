@@ -39,6 +39,8 @@ const localeStores: Partial<Record<LanguageCode, LocaleStore>> = {
 const inflightLoads = new Map<string, Promise<void>>();
 const listeners = new Set<() => void>();
 let translationRevision = 0;
+/** Bumped on clear so in-flight lazy imports do not write into a wiped store. */
+let storeGeneration = 0;
 
 export function getLazyTranslationRevision(): number {
   return translationRevision;
@@ -46,7 +48,10 @@ export function getLazyTranslationRevision(): number {
 
 function notifyListeners(): void {
   translationRevision += 1;
-  listeners.forEach((listener) => listener());
+  // Defer so subscribers never setState during another component's render.
+  queueMicrotask(() => {
+    listeners.forEach((listener) => listener());
+  });
 }
 
 /**
@@ -72,6 +77,7 @@ export function subscribeLazyTranslations(listener: () => void): () => void {
 }
 
 export function clearLazyTranslationStore(): void {
+  storeGeneration += 1;
   inflightLoads.clear();
   for (const lang of Object.keys(localeStores) as LanguageCode[]) {
     const seed = STOREFRONT_SEED_BY_LANG[lang];
@@ -107,6 +113,7 @@ function getNamespaceLoader(lang: LanguageCode, namespace: Namespace): () => Pro
         case 'login': return () => import('../locales/en/login.json');
         case 'cookies': return () => import('../locales/en/cookies.json');
         case 'delivery-terms': return () => import('../locales/en/delivery-terms.json');
+        case 'credit': return () => import('../locales/en/credit.json');
         case 'terms': return () => import('../locales/en/terms.json');
         case 'privacy': return () => import('../locales/en/privacy.json');
         case 'support': return () => import('../locales/en/support.json');
@@ -135,6 +142,7 @@ function getNamespaceLoader(lang: LanguageCode, namespace: Namespace): () => Pro
         case 'login': return () => import('../locales/hy/login.json');
         case 'cookies': return () => import('../locales/hy/cookies.json');
         case 'delivery-terms': return () => import('../locales/hy/delivery-terms.json');
+        case 'credit': return () => import('../locales/hy/credit.json');
         case 'terms': return () => import('../locales/hy/terms.json');
         case 'privacy': return () => import('../locales/hy/privacy.json');
         case 'support': return () => import('../locales/hy/support.json');
@@ -163,6 +171,7 @@ function getNamespaceLoader(lang: LanguageCode, namespace: Namespace): () => Pro
         case 'login': return () => import('../locales/ru/login.json');
         case 'cookies': return () => import('../locales/ru/cookies.json');
         case 'delivery-terms': return () => import('../locales/ru/delivery-terms.json');
+        case 'credit': return () => import('../locales/ru/credit.json');
         case 'terms': return () => import('../locales/ru/terms.json');
         case 'privacy': return () => import('../locales/ru/privacy.json');
         case 'support': return () => import('../locales/ru/support.json');
@@ -198,9 +207,13 @@ export async function ensureNamespace(lang: LanguageCode, namespace: Namespace):
     return;
   }
 
+  const generationAtStart = storeGeneration;
   const loadPromise = (async () => {
     const loader = getNamespaceLoader(lang, namespace);
     const loadedModule = await loader();
+    if (generationAtStart !== storeGeneration) {
+      return;
+    }
     if (!localeStores[lang]) {
       localeStores[lang] = {};
     }
@@ -212,7 +225,9 @@ export async function ensureNamespace(lang: LanguageCode, namespace: Namespace):
   try {
     await loadPromise;
   } finally {
-    inflightLoads.delete(key);
+    if (inflightLoads.get(key) === loadPromise) {
+      inflightLoads.delete(key);
+    }
   }
 }
 

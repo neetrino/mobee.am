@@ -1,6 +1,7 @@
 'use client';
 
 import type { ComponentProps, ReactNode } from 'react';
+import { ProfileFlashAlert } from './ProfileFlashAlert';
 import { ProfileSectionModal } from './ProfileSectionModal';
 import { ProfileSheetBody } from './ProfileSheetBody';
 
@@ -14,32 +15,36 @@ export type ProfileSectionHostProps = ProfileSheetBodyProps & {
   closeLabel: string;
   error?: string | null;
   success?: string | null;
+  onDismissError?: () => void;
+  onDismissSuccess?: () => void;
 };
 
 function ProfileAlerts({
   error,
   success,
+  onDismissError,
+  onDismissSuccess,
 }: {
   error?: string | null;
   success?: string | null;
+  onDismissError?: () => void;
+  onDismissSuccess?: () => void;
 }): ReactNode {
-  if (!error && !success) {
-    return null;
-  }
-
   return (
-    <div className="mb-4 space-y-3">
-      {error ? (
-        <div className="rounded-[15px] border border-red-200 bg-red-50 p-4" role="alert">
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
-      ) : null}
-      {success ? (
-        <div className="rounded-[15px] border border-green-200 bg-green-50 p-4" role="status">
-          <p className="text-sm text-green-600">{success}</p>
-        </div>
-      ) : null}
-    </div>
+    <>
+      <ProfileFlashAlert
+        message={error}
+        variant="error"
+        onDismiss={() => onDismissError?.()}
+        className="mb-4"
+      />
+      <ProfileFlashAlert
+        message={success}
+        variant="success"
+        onDismiss={() => onDismissSuccess?.()}
+        className="mb-4"
+      />
+    </>
   );
 }
 
@@ -54,11 +59,18 @@ export function ProfileSectionHost({
   closeLabel,
   error,
   success,
+  onDismissError,
+  onDismissSuccess,
   ...sheetBodyProps
 }: ProfileSectionHostProps) {
   const body = (
     <>
-      <ProfileAlerts error={error} success={success} />
+      <ProfileAlerts
+        error={error}
+        success={success}
+        onDismissError={onDismissError}
+        onDismissSuccess={onDismissSuccess}
+      />
       <ProfileSheetBody {...sheetBodyProps} />
     </>
   );

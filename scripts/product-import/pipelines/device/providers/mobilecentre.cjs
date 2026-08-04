@@ -239,8 +239,8 @@ function isRelevantDevice(name, url) {
 
 function extractStockStatus(html, price) {
   const text = stripTags(html);
-  if (/Առկա չէ խանութներում|out of stock/i.test(html)) return "out_of_stock";
-  if (/Առկա է խանութներում|in stock/i.test(html)) return "in_stock";
+  if (/Առկա չէ խանութներում|out of stock/i.test(text)) return "out_of_stock";
+  if (/Առկա է խանութներում|in stock/i.test(text)) return "in_stock";
   return price ? "in_stock" : "unknown";
 }
 

@@ -1,11 +1,18 @@
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { ProductFilters } from '@/lib/services/products-find-query/types';
 import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-product-filters';
+import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
-import type { LanguageCode } from '@/lib/language';
+import {
+  getProductListClientCache,
+  setProductListClientCache,
+} from '@/lib/shop/product-list-client-cache';
+import type { ProductListPayload } from '@/lib/services/products-list-cached';
+import { getStoredLanguage, type LanguageCode } from '@/lib/language';
 
 const warmedRoutes = new Set<string>();
 const warmedApis = new Set<string>();
+const warmedProductApis = new Set<string>();
 
 type NavigatorConnection = {
   saveData?: boolean;
@@ -49,15 +56,77 @@ export function prefetchStorefrontRoute(router: AppRouterInstance, href: string)
   }
 }
 
+function warmProductDetailApi(slug: string, lang: LanguageCode): void {
+  if (!shouldAllowStorefrontPrefetch()) {
+    return;
+  }
+
+  const url = `/api/v1/products/${encodeURIComponent(slug)}?lang=${encodeURIComponent(lang)}`;
+  if (warmedProductApis.has(url)) {
+    return;
+  }
+
+  warmedProductApis.add(url);
+  void fetch(url, { method: 'GET', credentials: 'same-origin', cache: 'default' }).catch(() => {
+    warmedProductApis.delete(url);
+  });
+}
+
+/**
+ * Prefetch a storefront route and warm shop/product APIs so navigation paints quickly.
+ */
+export function warmStorefrontHref(router: AppRouterInstance, href: string): void {
+  const normalized = href.trim();
+  if (!normalized.startsWith('/') || normalized.startsWith('//')) {
+    return;
+  }
+
+  prefetchStorefrontRoute(router, normalized);
+
+  try {
+    const url = new URL(normalized, 'http://localhost');
+    const lang = getStoredLanguage();
+
+    if (url.pathname === '/shop' || url.pathname.startsWith('/shop/')) {
+      const record: Record<string, string | undefined> = {};
+      url.searchParams.forEach((value, key) => {
+        record[key] = value;
+      });
+      warmShopFromSearchParams(record, lang);
+      return;
+    }
+
+    const productMatch = /^\/products\/([^/]+)/.exec(url.pathname);
+    const slug = productMatch?.[1];
+    if (slug) {
+      warmProductDetailApi(decodeURIComponent(slug), lang);
+    }
+  } catch {
+    // ignore malformed href
+  }
+}
+
 function buildProductListApiUrl(filters: ProductFilters): string {
   const params = productFiltersToApiParams(filters);
   const qs = new URLSearchParams(params).toString();
   return `/api/v1/products?${qs}`;
 }
 
-/** Warm GET /api/v1/products for shop filters (shared Redis cache with RSC). */
+function isProductListPayload(value: unknown): value is ProductListPayload {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  return Array.isArray((value as ProductListPayload).data);
+}
+
+/** Warm GET /api/v1/products into the browser memory cache (and HTTP cache). */
 export function warmShopProductListApi(filters: ProductFilters): void {
   if (!shouldAllowStorefrontPrefetch()) {
+    return;
+  }
+
+  const cacheKey = buildProductListCacheKey(filters);
+  if (getProductListClientCache(cacheKey)) {
     return;
   }
 
@@ -67,9 +136,20 @@ export function warmShopProductListApi(filters: ProductFilters): void {
   }
 
   warmedApis.add(url);
-  void fetch(url, { method: 'GET', credentials: 'same-origin', cache: 'default' }).catch(() => {
-    warmedApis.delete(url);
-  });
+  void fetch(url, { method: 'GET', credentials: 'same-origin', cache: 'default' })
+    .then(async (response) => {
+      if (!response.ok) {
+        warmedApis.delete(url);
+        return;
+      }
+      const json: unknown = await response.json();
+      if (isProductListPayload(json)) {
+        setProductListClientCache(cacheKey, json);
+      }
+    })
+    .catch(() => {
+      warmedApis.delete(url);
+    });
 }
 
 export function warmShopFromSearchParams(
@@ -150,4 +230,5 @@ export function warmShopPaginationNavigation(
 export function clearStorefrontPrefetchDedupForTests(): void {
   warmedRoutes.clear();
   warmedApis.clear();
+  warmedProductApis.clear();
 }

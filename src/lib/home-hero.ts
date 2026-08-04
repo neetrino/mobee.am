@@ -169,6 +169,76 @@ export function isValidHomeHeroHref(href: string): boolean {
   return false;
 }
 
+export type HomeHeroNavigationTarget =
+  | { mode: 'internal'; href: string }
+  | { mode: 'external'; href: string };
+
+const KNOWN_SITE_HOSTS = new Set(['mobee.am', 'www.mobee.am']);
+
+function normalizeHostname(hostname: string): string {
+  return hostname.trim().toLowerCase().replace(/^www\./, '');
+}
+
+function collectAppHostnames(currentOrigin?: string): Set<string> {
+  const hosts = new Set<string>();
+
+  for (const host of KNOWN_SITE_HOSTS) {
+    hosts.add(normalizeHostname(host));
+  }
+
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || process.env.APP_URL?.trim();
+  if (envUrl) {
+    try {
+      hosts.add(normalizeHostname(new URL(envUrl).hostname));
+    } catch {
+      // ignore invalid env URL
+    }
+  }
+
+  if (currentOrigin) {
+    try {
+      hosts.add(normalizeHostname(new URL(currentOrigin).hostname));
+    } catch {
+      // ignore invalid origin
+    }
+  }
+
+  return hosts;
+}
+
+/**
+ * Resolve CTA href for click navigation.
+ * Same-site absolute URLs become internal paths so Next.js Link stays in-app.
+ */
+export function resolveHomeHeroNavigationTarget(
+  href: string,
+  options?: { currentOrigin?: string },
+): HomeHeroNavigationTarget | null {
+  const trimmed = href.trim();
+  if (!trimmed || !isValidHomeHeroHref(trimmed)) {
+    return null;
+  }
+
+  if (trimmed.startsWith('/') && !trimmed.startsWith('//')) {
+    return { mode: 'internal', href: trimmed };
+  }
+
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return null;
+  }
+
+  const appHosts = collectAppHostnames(options?.currentOrigin);
+  if (appHosts.has(normalizeHostname(url.hostname))) {
+    const path = `${url.pathname}${url.search}${url.hash}` || '/';
+    return { mode: 'internal', href: path };
+  }
+
+  return { mode: 'external', href: trimmed };
+}
+
 function allocateUniqueSlideId(preferred: string | null, usedIds: Set<string>): string {
   const base = preferred && preferred.trim() ? preferred.trim() : nanoid();
   if (!usedIds.has(base)) {

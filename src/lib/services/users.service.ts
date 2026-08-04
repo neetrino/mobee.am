@@ -22,7 +22,9 @@ class UsersService {
         lastName: true,
         locale: true,
         roles: true,
-        addresses: true,
+        addresses: {
+          orderBy: { isDefault: 'desc' },
+        },
       },
     });
 

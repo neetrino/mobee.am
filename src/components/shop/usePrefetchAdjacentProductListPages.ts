@@ -9,28 +9,8 @@ type ListMeta = {
   totalPages: number;
 };
 
-function scheduleIdleWarm(run: () => void): () => void {
-  let idleId: number | undefined;
-  let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
-  if (typeof requestIdleCallback !== 'undefined') {
-    idleId = requestIdleCallback(run, { timeout: 2500 });
-  } else {
-    timeoutId = setTimeout(run, 600);
-  }
-
-  return () => {
-    if (idleId !== undefined && typeof cancelIdleCallback !== 'undefined') {
-      cancelIdleCallback(idleId);
-    }
-    if (timeoutId !== undefined) {
-      clearTimeout(timeoutId);
-    }
-  };
-}
-
 /**
- * Warms adjacent catalog pages (page±1) during idle time.
+ * Warms adjacent catalog pages (page±1) soon after the current list is ready.
  */
 export function usePrefetchAdjacentProductListPages(
   filters: ProductFilters,
@@ -59,7 +39,9 @@ export function usePrefetchAdjacentProductListPages(
       }
     };
 
-    return scheduleIdleWarm(run);
+    // Prefer a short delay so first paint wins, then warm neighbors for instant pagination.
+    const timeoutId = window.setTimeout(run, 100);
+    return () => window.clearTimeout(timeoutId);
   }, [filters, meta]);
 }
 

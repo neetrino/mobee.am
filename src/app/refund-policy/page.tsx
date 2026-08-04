@@ -64,20 +64,20 @@ export default function RefundPolicyPage() {
   return (
     <div className="policy-page">
       <div className="policy-page-inner">
-        <h1 className="text-4xl font-bold text-gray-900">{t('refund-policy.title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">{t('refund-policy.title')}</h1>
         <p className="text-gray-600">
           {t('refund-policy.lastUpdated')}{' '}
           {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
         </p>
 
         <div className="mt-8 space-y-6">
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <p className="text-gray-600">{t('refund-policy.intro')}</p>
 
             <div className="mt-6 space-y-6">
               {REFUND_POLICY_SECTIONS.map((section, index) => (
                 <section key={section} className="space-y-3">
-                  <h2 className="text-2xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
                     {index + 1}. {t(`refund-policy.sections.${section}.title`)}
                   </h2>
                   <p className="text-gray-600">{t(`refund-policy.sections.${section}.description`)}</p>
@@ -101,7 +101,7 @@ export default function RefundPolicyPage() {
               ))}
 
               <section className="space-y-3">
-                <h2 className="text-2xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
                   {t('refund-policy.specialNote.title')}
                 </h2>
                 <p className="text-gray-600">{t('refund-policy.specialNote.description')}</p>

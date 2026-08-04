@@ -3,6 +3,8 @@ import { logger } from '../../lib/utils/logger';
 import { showToast } from '@/components/Toast';
 import type { Cart, CartItem } from './types';
 import { removeGuestCartItem, updateGuestCartItemQuantity } from '../../lib/cart/guest-cart';
+import { dispatchCartUpdated } from '../../lib/cart/dispatch-cart-updated';
+import { patchLoggedInCartCache } from './cart-cache';
 
 /**
  * Calculate cart totals
@@ -23,7 +25,7 @@ function removeFromGuestCart(itemId: string): void {
   if (typeof window === 'undefined') return;
   const variantId = getVariantIdFromCartItemId(itemId);
   if (!variantId) return;
-  removeGuestCartItem(variantId);
+  removeGuestCartItem(variantId, { emitEvent: false });
 }
 
 /**
@@ -33,7 +35,7 @@ function updateGuestCartQuantity(itemId: string, quantity: number): void {
   if (typeof window === 'undefined') return;
   const variantId = getVariantIdFromCartItemId(itemId);
   if (!variantId) return;
-  updateGuestCartItemQuantity(variantId, quantity);
+  updateGuestCartItemQuantity(variantId, quantity, { emitEvent: false });
 }
 
 function getVariantIdFromCartItemId(itemId: string): string | null {
@@ -42,6 +44,16 @@ function getVariantIdFromCartItemId(itemId: string): string | null {
     return null;
   }
   return parts.slice(1, -1).join('-');
+}
+
+function publishOptimisticCart(nextCart: Cart, setCart: (cart: Cart | null) => void): void {
+  setCart(nextCart);
+  patchLoggedInCartCache(nextCart);
+  dispatchCartUpdated({
+    itemsCount: nextCart.itemsCount,
+    total: nextCart.totals.total,
+    keepPageCache: true,
+  });
 }
 
 /**
@@ -57,17 +69,16 @@ export async function handleRemoveItem(
   const itemToRemove = cart.items.find(item => item.id === itemId);
   if (!itemToRemove) return;
 
-  // Calculate new totals
   const updatedItems = cart.items.filter(item => item.id !== itemId);
   const newItemsCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
-
-  // Update UI immediately (optimistic update)
-  setCart({
+  const nextCart: Cart = {
     ...cart,
     items: updatedItems,
     totals: calculateCartTotals(updatedItems, cart.totals),
     itemsCount: newItemsCount,
-  });
+  };
+
+  publishOptimisticCart(nextCart, setCart);
 
   try {
     if (!isLoggedIn) {
@@ -75,13 +86,11 @@ export async function handleRemoveItem(
       return;
     }
 
-    // For logged-in users, delete from API
     await apiClient.delete(`/api/v1/cart/items/${itemId}`);
-    window.dispatchEvent(new Event('cart-updated'));
   } catch (error: unknown) {
     logger.error('Error removing item', { error, itemId });
-    // Revert optimistic update on error
     await fetchCart();
+    dispatchCartUpdated();
   }
 }
 
@@ -105,7 +114,6 @@ export async function handleUpdateQuantity(
     return;
   }
 
-  // Find the cart item to check stock
   const cartItem = cart?.items.find(item => item.id === itemId);
   if (!cartItem) return;
 
@@ -119,21 +127,23 @@ export async function handleUpdateQuantity(
     }
   }
 
-  // Optimistic update: update UI immediately
   if (cart) {
-    const updatedItems = cart.items.map(item => 
-      item.id === itemId 
+    const updatedItems = cart.items.map(item =>
+      item.id === itemId
         ? { ...item, quantity, total: item.price * quantity }
         : item
     );
     const newItemsCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    setCart({
-      ...cart,
-      items: updatedItems,
-      totals: calculateCartTotals(updatedItems, cart.totals),
-      itemsCount: newItemsCount,
-    });
+    publishOptimisticCart(
+      {
+        ...cart,
+        items: updatedItems,
+        totals: calculateCartTotals(updatedItems, cart.totals),
+        itemsCount: newItemsCount,
+      },
+      setCart,
+    );
   }
 
   setUpdatingItems(prev => new Set(prev).add(itemId));
@@ -142,14 +152,13 @@ export async function handleUpdateQuantity(
     if (!isLoggedIn) {
       if (typeof window === 'undefined') return;
 
-      // Check stock for guest cart
       if (cartItem.variant.stock !== undefined && quantity > cartItem.variant.stock) {
         showToast(
           `Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`,
           'warning',
         );
-        // Revert optimistic update
         await fetchCart();
+        dispatchCartUpdated();
         setUpdatingItems(prev => {
           const next = new Set(prev);
           next.delete(itemId);
@@ -157,7 +166,7 @@ export async function handleUpdateQuantity(
         });
         return;
       }
-      
+
       updateGuestCartQuantity(itemId, quantity);
       setUpdatingItems(prev => {
         const next = new Set(prev);
@@ -167,20 +176,16 @@ export async function handleUpdateQuantity(
       return;
     }
 
-    // For logged-in users, update via API
     await apiClient.patch(
       `/api/v1/cart/items/${itemId}`,
       { quantity }
     );
-
-    window.dispatchEvent(new Event('cart-updated'));
   } catch (error: unknown) {
     const errorObj = error as { detail?: string; message?: string };
     logger.error('Error updating quantity', { error, itemId });
-    // Revert optimistic update on error
     await fetchCart();
-    
-    // Show user-friendly error message
+    dispatchCartUpdated();
+
     const errorMessage = errorObj?.detail || errorObj?.message || t('common.messages.failedToUpdateQuantity');
     if (errorMessage.includes('stock') || errorMessage.includes('exceeds')) {
       showToast(t('common.alerts.stockInsufficient').replace('{message}', errorMessage), 'warning');
@@ -195,7 +200,3 @@ export async function handleUpdateQuantity(
     });
   }
 }
-
-
-
-

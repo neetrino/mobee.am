@@ -10,6 +10,9 @@ import {
   hasDisplayPrice,
   pickListingPriceVariant,
 } from "../products/variant-price-display";
+import { pickCategoryTranslation } from "../pickCategoryTranslation";
+import { localizeCategoryTitle } from "../category-title-i18n";
+import type { LanguageCode } from "../language";
 
 export type ProductListingTransformContext = {
   colors?: string;
@@ -285,14 +288,19 @@ class ProductsFindTransformService {
         finalPrice = originalPrice * (1 - appliedDiscount / 100);
       }
 
-      // Get categories with translations
+      // Get categories with translations; dictionary fills en/ru when DB still has Armenian copy.
       const categories = Array.isArray(product.categories) ? product.categories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
         const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
-        const catTranslation = catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
+        const catTranslation = pickCategoryTranslation(catTranslations, lang) ?? null;
+        const hyTitle =
+          catTranslations.find((entry) => entry.locale === "hy")?.title ||
+          catTranslations[0]?.title ||
+          "";
+        const sourceTitle = catTranslation?.title || hyTitle;
         return {
           id: cat.id,
           slug: catTranslation?.slug || "",
-          title: catTranslation?.title || "",
+          title: localizeCategoryTitle(sourceTitle, lang as LanguageCode),
         };
       }) : [];
 

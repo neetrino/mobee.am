@@ -7,7 +7,6 @@ import type { EditableProductSnapshot } from '../utils/editableProductSnapshot';
 import { buildEditableProductSnapshot } from '../utils/editableProductSnapshot';
 import {
   buildPartialProductUpdatePayload,
-  hasPartialUpdateWork,
   type ProcessedVariantForSubmit,
 } from '../utils/productUpdateDiff';
 import { resolveVariantSku, ensureUniqueSku } from '../utils/variantSku';

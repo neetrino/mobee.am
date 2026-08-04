@@ -1,6 +1,7 @@
 import { db } from "@white-shop/db";
 import { cacheService } from "@/lib/services/cache.service";
 import { processImageUrl } from "@/lib/utils/image-utils";
+import { pickCategoryTranslation } from "@/lib/pickCategoryTranslation";
 
 const CACHE_TTL_SECONDS = 300;
 export const DEFAULT_TOP_CATEGORY_LIMIT = 5;
@@ -120,8 +121,7 @@ export async function getCachedTopCategories(
   }
 
   const allCats = categories.flatMap((cat) => {
-    const translation =
-      cat.translations.find((tr) => tr.locale === lang) || cat.translations[0];
+    const translation = pickCategoryTranslation(cat.translations, lang);
     const parentCount = countMap.get(cat.id) || 0;
     const childrenCount = cat.children.reduce(
       (sum, child) => sum + (countMap.get(child.id) || 0),
@@ -135,8 +135,7 @@ export async function getCachedTopCategories(
         productCount: parentCount + childrenCount,
       },
       ...cat.children.map((child) => {
-        const childTranslation =
-          child.translations.find((tr) => tr.locale === lang) || child.translations[0];
+        const childTranslation = pickCategoryTranslation(child.translations, lang);
         return {
           id: child.id,
           slug: childTranslation?.slug || "",

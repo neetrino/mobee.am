@@ -8,6 +8,10 @@ import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-p
 import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
+import {
+  getProductListClientCache,
+  setProductListClientCache,
+} from '@/lib/shop/product-list-client-cache';
 import { usePrefetchAdjacentProductListPages } from './usePrefetchAdjacentProductListPages';
 
 export interface ShopCatalogProduct {
@@ -84,13 +88,25 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
   const searchParams = useSearchParams();
   const [language, setLanguage] = useState<LanguageCode>(() => serverLanguage ?? getStoredLanguage());
   const [productsData, setProductsData] = useState<ProductsResponse | null>(() =>
-    initialPayload && initialFiltersKey ? payloadToResponse(initialPayload, initialPayload.meta?.limit ?? 12) : null,
+    initialPayload && initialFiltersKey
+      ? payloadToResponse(initialPayload, initialPayload.meta?.limit ?? 12)
+      : null,
   );
   const [loading, setLoading] = useState(() => !(initialPayload && initialFiltersKey));
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
   const productsDataRef = useRef(productsData);
-  productsDataRef.current = productsData;
+  const requestIdRef = useRef(0);
+
+  useEffect(() => {
+    productsDataRef.current = productsData;
+  }, [productsData]);
+
+  useEffect(() => {
+    if (initialPayload && initialFiltersKey) {
+      setProductListClientCache(initialFiltersKey, initialPayload);
+    }
+  }, [initialFiltersKey, initialPayload]);
 
   useEffect(() => {
     const onLanguageUpdate = () => setLanguage(getStoredLanguage());
@@ -105,7 +121,22 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
 
   const filtersKey = useMemo(() => buildProductListCacheKey(filters), [filters]);
 
+  const applyPayload = useCallback((payload: ProductListPayload, limit: number) => {
+    setProductListClientCache(filtersKey, payload);
+    setProductsData(payloadToResponse(payload, limit));
+    setLoading(false);
+    setRefreshing(false);
+    setError(false);
+  }, [filtersKey]);
+
   const fetchList = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
+    const cached = getProductListClientCache(filtersKey);
+    if (cached) {
+      applyPayload(cached, filters.limit ?? 12);
+      return;
+    }
+
     const hasVisibleRows = (productsDataRef.current?.data?.length ?? 0) > 0;
     if (hasVisibleRows) {
       setRefreshing(true);
@@ -117,7 +148,10 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
     try {
       const params = productFiltersToApiParams(filters);
       const result = await apiClient.get<ProductsResponse>('/api/v1/products', { params });
-      setProductsData({
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+      const payload: ProductListPayload = {
         data: result.data ?? [],
         meta: result.meta ?? {
           total: 0,
@@ -125,8 +159,12 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
           limit: filters.limit ?? 12,
           totalPages: 0,
         },
-      });
+      };
+      applyPayload(payload, filters.limit ?? 12);
     } catch (e) {
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
       console.error('❌ [SHOP CATALOG]', e);
       setError(true);
       if (!hasVisibleRows) {
@@ -140,22 +178,25 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
           },
         });
       }
-    } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [filters]);
+  }, [applyPayload, filters, filtersKey]);
 
   useEffect(() => {
     if (initialFiltersKey && filtersKey === initialFiltersKey && initialPayload) {
-      setProductsData(payloadToResponse(initialPayload, filters.limit ?? 12));
-      setLoading(false);
-      setRefreshing(false);
-      setError(false);
+      applyPayload(initialPayload, filters.limit ?? 12);
       return;
     }
+
+    const cached = getProductListClientCache(filtersKey);
+    if (cached) {
+      applyPayload(cached, filters.limit ?? 12);
+      return;
+    }
+
     void fetchList();
-  }, [fetchList, filtersKey, filters.limit, initialFiltersKey, initialPayload]);
+  }, [applyPayload, fetchList, filters.limit, filtersKey, initialFiltersKey, initialPayload]);
 
   usePrefetchAdjacentProductListPages(filters, productsData?.meta);
 

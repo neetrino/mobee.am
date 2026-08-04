@@ -71,8 +71,8 @@ export function ProductCardList({
   colorsInteractive = false,
   onCardColorSelect,
 }: ProductCardListProps) {
-  const { t } = useTranslation();
-  const categoryLine = getProductCardCategoryLineLabel(product);
+  const { t, lang } = useTranslation();
+  const categoryLine = getProductCardCategoryLineLabel(product, lang);
   const imageSrc = resolveProductCardImageSrc(product.image);
   const listingCacheSource = buildProductCardCachePayload(product);
   const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';
@@ -85,7 +85,7 @@ export function ProductCardList({
     : product.inStock && productHasPrice && !isAddingToCart;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden" data-product-card-root>
       <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:px-7 sm:py-5">
         {/* Product Image */}
         <ProductCardNavLink

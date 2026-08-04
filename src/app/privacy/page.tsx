@@ -183,7 +183,7 @@ function PrivacyPolicySection({
 }: PrivacyPolicySectionProps) {
   return (
     <section>
-      <h2 className="text-2xl font-semibold text-gray-900">
+      <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
         {sectionNumber}. {t(section.titleKey)}
       </h2>
 
@@ -217,7 +217,7 @@ export default function PrivacyPage() {
   return (
     <div className="policy-page">
       <div className="policy-page-inner">
-        <h1 className="text-4xl font-bold text-gray-900">{t('privacy.title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">{t('privacy.title')}</h1>
         <p className="text-gray-600">
           {t('privacy.lastUpdated')}{' '}
           {new Date().toLocaleDateString(undefined, {
@@ -228,7 +228,7 @@ export default function PrivacyPage() {
         </p>
 
         <div className="mt-8 space-y-6">
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="space-y-4">
               {PRIVACY_INTRO_KEYS.map((translationKey) => (
                 <p key={translationKey} className="text-gray-600">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, type PointerEvent } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { X } from 'lucide-react';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import {
@@ -12,7 +13,6 @@ import {
 } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
-import { ShopFilterSectionHeader } from './shop/ShopFilterSectionHeader';
 import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 import {
   priceToSliderPercentage,
@@ -324,17 +324,25 @@ export function PriceFilter({
 
   return (
     <section className="border-b border-[#E2E8F0] pb-6">
-      <div className="flex items-center justify-between gap-3">
-        <ShopFilterSectionHeader
-          title={t('products.filters.price.sectionTitle')}
-          titleClassName="text-base font-semibold leading-6 tracking-[-0.02em] text-[#314158]"
-          showClear={hasActivePriceFilter}
-          onClear={clearPriceFilter}
-          className="min-w-0 flex-1"
-        />
-        <p className="shrink-0 text-base font-bold leading-6 tracking-[-0.02em] text-black">
-          {formatPrice(safeMinPrice)} - {formatPrice(safeMaxPrice)}
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="min-w-0 text-base font-semibold leading-6 tracking-[-0.02em] text-[#314158]">
+          {t('products.filters.price.sectionTitle')}
+        </h3>
+        <div className="shrink-0 text-right">
+          <p className="text-base font-bold leading-6 tracking-[-0.02em] text-black">
+            {formatPrice(safeMinPrice)} - {formatPrice(safeMaxPrice)}
+          </p>
+          {hasActivePriceFilter ? (
+            <button
+              type="button"
+              onClick={clearPriceFilter}
+              className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium leading-5 tracking-[-0.01em] text-[#2DB2FF] transition-colors hover:text-[#25A0E0]"
+            >
+              <X className="h-4 w-4" strokeWidth={2} aria-hidden />
+              <span>{t('products.filters.clearSection')}</span>
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-4">

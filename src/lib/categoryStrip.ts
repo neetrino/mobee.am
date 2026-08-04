@@ -96,7 +96,7 @@ export const CATEGORY_STRIP_VISUALS: Record<CategoryStripSlotKey, CategoryStripV
     tall: false,
     imageWrapperClassName:
       'absolute left-[20px] top-[9px] flex size-[154px] items-center justify-center',
-    imageClassName: 'object-cover',
+    imageClassName: 'object-contain',
   },
   headphones: {
     imageWidth: 146,
@@ -197,6 +197,11 @@ export function resolveCategoryStripImageForItem(
   media: unknown,
   slotKey: CategoryStripSlotKey,
 ): string {
+  // Curated local watches asset is 1024²; CMS/R2 uploads for this slot are often ~128² and blur on desktop.
+  if (slotKey === 'watches') {
+    return resolveCategoryStripImageSrc(slotKey);
+  }
+
   const fromMedia = extractCategoryImageUrl(media);
   if (fromMedia) {
     return fromMedia;

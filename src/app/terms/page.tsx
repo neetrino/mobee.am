@@ -181,7 +181,7 @@ function TermsSectionBlock({ section, sectionNumber, t }: TermsSectionProps) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-2xl font-semibold text-gray-900">
+      <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
         {sectionNumber}. {t(section.titleKey)}
       </h2>
 
@@ -231,7 +231,7 @@ export default function TermsPage() {
   return (
     <div className="policy-page">
       <div className="policy-page-inner">
-        <h1 className="text-4xl font-bold text-gray-900">{t('terms.title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">{t('terms.title')}</h1>
         <p className="text-gray-600">
           {t('terms.lastUpdated')}{' '}
           {new Date().toLocaleDateString(undefined, {
@@ -242,7 +242,7 @@ export default function TermsPage() {
         </p>
 
         <div className="mt-8 space-y-6">
-          <Card className="p-6 space-y-6">
+          <Card className="space-y-6 p-4 sm:p-6">
             {TERMS_SECTIONS.map((section, index) => (
               <TermsSectionBlock
                 key={section.key}

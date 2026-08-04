@@ -1,6 +1,5 @@
 import { Prisma } from "@white-shop/db";
 import { logger } from "../../../utils/logger";
-import { processImageUrl, smartSplitUrls } from "../../../utils/image-utils";
 import {
   processVariantOptions,
   parseVariantPrices,
