@@ -197,11 +197,8 @@ export function resolveCategoryStripImageForItem(
   media: unknown,
   slotKey: CategoryStripSlotKey,
 ): string {
-  // Curated local watches asset is 1024²; CMS/R2 uploads for this slot are often ~128² and blur on desktop.
-  if (slotKey === 'watches') {
-    return resolveCategoryStripImageSrc(slotKey);
-  }
-
+  // Always prefer the CMS/admin category image so home strip matches /supersudo/categories.
+  // Slot fallbacks (including curated watches PNG) are only used when media is missing.
   const fromMedia = extractCategoryImageUrl(media);
   if (fromMedia) {
     return fromMedia;
