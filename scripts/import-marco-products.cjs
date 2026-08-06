@@ -342,18 +342,6 @@ function normalizeMedia(media, alt = "") {
   return out;
 }
 
-function countMedia(media) {
-  if (!Array.isArray(media)) return 0;
-  return media.filter((item) => {
-    if (typeof item === "string") return item.trim().length > 0;
-    if (item && typeof item === "object") {
-      const url = item.url || item.src || item.value;
-      return typeof url === "string" && url.trim().length > 0;
-    }
-    return false;
-  }).length;
-}
-
 /** Build SQL expression that turns a jsonb JSON-array param into jsonb[]. */
 function jsonbArrayParam(paramIndex) {
   return `COALESCE(
