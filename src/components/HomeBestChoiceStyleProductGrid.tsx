@@ -5,7 +5,6 @@ import { ProductCardListingProvider } from './ProductCardListingContext';
 import type { FeaturedHomeProduct } from './useFeaturedHomeProducts';
 import {
   HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT,
-  HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT,
   HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET,
   HOME_BEST_CHOICE_MOBILE_CAROUSEL_PAGE_GAP_CLASS,
   HOME_BEST_CHOICE_MOBILE_INNER_GRID_PHONE_CLASS,
@@ -16,7 +15,7 @@ import {
   useHomeBestChoiceCarouselPageSync,
   type MobileCarouselViewState,
 } from './useHomeBestChoiceCarouselPageSync';
-import { useHomeDesktopCarouselPager } from './useHomeDesktopCarouselPager';
+import { useHomeDesktopItemCarousel } from './useHomeDesktopItemCarousel';
 import { HomeDesktopCarouselArrows } from './HomeDesktopCarouselArrows';
 import { useHomeDesktopCarouselHomeStyle } from './useHomeDesktopCarouselHomeStyle';
 
@@ -38,7 +37,7 @@ export function getHomeCuratedProductCardProps(homeStyle: boolean) {
 }
 
 /**
- * Desktop carousel (`lg+`) — same price + add-to-cart pill as “Լավագույն ընտրություն”;
+ * Desktop carousel (`lg+`) — same price + add-to-cart pill as home curated rows;
  * optional shifted art on iPad-width desktop only.
  */
 export function getHomeCuratedDesktopProductCardProps(homeStyle: boolean) {
@@ -59,31 +58,30 @@ export const HOME_BEST_CHOICE_MOBILE_CAROUSEL =
 
 export const HOME_BEST_CHOICE_MOBILE_PAGE = 'w-full min-w-full shrink-0 snap-start';
 
-/** Horizontal snap carousel for `lg+` (desktop). Each page is one container width. */
-const HOME_BEST_CHOICE_DESKTOP_CAROUSEL =
-  'hidden lg:flex overflow-x-auto overscroll-x-contain scrollbar-hide snap-x snap-mandatory';
+/** Desktop: continuous card strip (scroll one card per arrow). Gap matches former grid `gap-6`. */
+const HOME_BEST_CHOICE_DESKTOP_STRIP =
+  'hidden lg:flex gap-6 overflow-x-auto overscroll-x-contain scrollbar-hide snap-x snap-mandatory';
 
-const HOME_BEST_CHOICE_DESKTOP_PAGE = 'w-full min-w-full shrink-0 snap-start';
+/**
+ * Card width so `cols` fit in the viewport (gap-6 = 1.5rem between cards).
+ * Tailwind classes stay static for JIT.
+ */
+function homeBestChoiceDesktopCardWidthClass(desktopPageCols: number): string {
+  switch (desktopPageCols) {
+    case 4:
+      return 'w-[calc((100%-4.5rem)/4)]';
+    case 3:
+      return 'w-[calc((100%-3rem)/3)]';
+    case 2:
+    default:
+      return 'w-[calc((100%-1.5rem)/2)]';
+  }
+}
 
 export function homeBestChoiceMobileInnerGridClass(cardsPerView: number): string {
   return cardsPerView === HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET
     ? HOME_BEST_CHOICE_MOBILE_INNER_GRID_TABLET_CLASS
     : HOME_BEST_CHOICE_MOBILE_INNER_GRID_PHONE_CLASS;
-}
-
-/**
- * Desktop page grid template — Tailwind classes are static so JIT picks them up.
- */
-function homeBestChoiceDesktopInnerGridClass(desktopPageCols: number): string {
-  switch (desktopPageCols) {
-    case 4:
-      return 'grid grid-cols-4 gap-6';
-    case 3:
-      return 'grid grid-cols-3 gap-6';
-    case 2:
-    default:
-      return 'grid grid-cols-2 gap-6';
-  }
 }
 
 type HomeBestChoiceStyleProductGridProps = {
@@ -95,7 +93,10 @@ type HomeBestChoiceStyleProductGridProps = {
   mobileCarouselAriaLabel: string;
   /** Reports visible snap page for {@link HomeMobileSectionTitle} indicators. */
   onMobileCarouselViewChange?: (state: MobileCarouselViewState) => void;
-  /** Desktop carousel page shape (rows × cols). Defaults to 2×2 (4 cards per page). */
+  /**
+   * Kept for call-site compatibility. Desktop is a single-row strip;
+   * `desktopPageCols` controls how many cards fit in the viewport.
+   */
   desktopPageRows?: number;
   desktopPageCols?: number;
   /** Accessible labels for the `lg+` prev/next arrow buttons. */
@@ -132,7 +133,6 @@ export function HomeBestChoiceStyleProductGrid({
   mobileCardsPerView,
   mobileCarouselAriaLabel,
   onMobileCarouselViewChange,
-  desktopPageRows = HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT,
   desktopPageCols = HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT,
   desktopPrevAriaLabel,
   desktopNextAriaLabel,
@@ -149,16 +149,14 @@ export function HomeBestChoiceStyleProductGrid({
     onMobileCarouselViewChange,
   );
 
-  const desktopCardsPerPage = Math.max(1, desktopPageRows * desktopPageCols);
-  const desktopPages = chunkArray(visible, desktopCardsPerPage);
-  const desktopPageCount = desktopPages.length;
-  const desktopInnerGridClass = homeBestChoiceDesktopInnerGridClass(desktopPageCols);
+  const desktopCardWidthClass = homeBestChoiceDesktopCardWidthClass(desktopPageCols);
   const {
     scrollRef: desktopScrollRef,
-    state: desktopPagerState,
-    scrollToPrev,
-    scrollToNext,
-  } = useHomeDesktopCarouselPager(desktopPageCount);
+    canScrollPrev,
+    canScrollNext,
+    scrollByItem,
+  } = useHomeDesktopItemCarousel(visible.length);
+  const showDesktopArrows = visible.length > desktopPageCols;
 
   return (
     <ProductCardListingProvider>
@@ -197,32 +195,30 @@ export function HomeBestChoiceStyleProductGrid({
       <div className="relative hidden lg:block">
         <div
           ref={desktopScrollRef}
-          className={HOME_BEST_CHOICE_DESKTOP_CAROUSEL}
+          className={HOME_BEST_CHOICE_DESKTOP_STRIP}
           role="region"
           aria-roledescription="carousel"
           aria-label={mobileCarouselAriaLabel}
         >
-          {desktopPages.map((page, pageIndex) => (
-            <div key={`d-page-${pageIndex}`} className={HOME_BEST_CHOICE_DESKTOP_PAGE}>
-              <div className={desktopInnerGridClass}>
-                {page.map((product) => (
-                  <BestChoiceProductCell
-                    key={product.id}
-                    product={product}
-                    viewMode="grid-2"
-                    cardProps={getHomeCuratedDesktopProductCardProps(desktopHomeStyle)}
-                  />
-                ))}
-              </div>
+          {visible.map((product) => (
+            <div
+              key={product.id}
+              className={`${desktopCardWidthClass} shrink-0 snap-start`}
+            >
+              <BestChoiceProductCell
+                product={product}
+                viewMode="grid-2"
+                cardProps={getHomeCuratedDesktopProductCardProps(desktopHomeStyle)}
+              />
             </div>
           ))}
         </div>
-        {desktopPageCount > 1 && (
+        {showDesktopArrows && (
           <HomeDesktopCarouselArrows
-            canScrollPrev={desktopPagerState.canScrollPrev}
-            canScrollNext={desktopPagerState.canScrollNext}
-            onScrollPrev={scrollToPrev}
-            onScrollNext={scrollToNext}
+            canScrollPrev={canScrollPrev}
+            canScrollNext={canScrollNext}
+            onScrollPrev={() => scrollByItem(-1)}
+            onScrollNext={() => scrollByItem(1)}
             prevAriaLabel={desktopPrevAriaLabel}
             nextAriaLabel={desktopNextAriaLabel}
           />
@@ -253,7 +249,6 @@ export function HomeBestChoiceStyleProductGridSkeleton({
   mobileCardsPerView,
   mobileCarouselAriaLabel,
   onMobileCarouselViewChange,
-  desktopPageRows = HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT,
   desktopPageCols = HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT,
 }: {
   productsPerPage: number;
@@ -271,10 +266,8 @@ export function HomeBestChoiceStyleProductGridSkeleton({
     mobilePageCount,
     onMobileCarouselViewChange,
   );
-
-  const desktopCardsPerPage = Math.max(1, desktopPageRows * desktopPageCols);
-  const desktopPages = chunkArray(indices, desktopCardsPerPage);
-  const desktopInnerGridClass = homeBestChoiceDesktopInnerGridClass(desktopPageCols);
+  const desktopCardWidthClass = homeBestChoiceDesktopCardWidthClass(desktopPageCols);
+  const desktopSkeletonCount = Math.min(productsPerPage, desktopPageCols);
 
   return (
     <>
@@ -305,14 +298,10 @@ export function HomeBestChoiceStyleProductGridSkeleton({
         ))}
       </div>
       <div className="relative hidden lg:block" aria-hidden="true">
-        <div className={HOME_BEST_CHOICE_DESKTOP_CAROUSEL}>
-          {desktopPages.map((pageIndices, pageIndex) => (
-            <div key={`sk-d-page-${pageIndex}`} className={HOME_BEST_CHOICE_DESKTOP_PAGE}>
-              <div className={desktopInnerGridClass}>
-                {pageIndices.map((i) => (
-                  <SkeletonCell key={`sk-d-${i}`} />
-                ))}
-              </div>
+        <div className={HOME_BEST_CHOICE_DESKTOP_STRIP}>
+          {Array.from({ length: desktopSkeletonCount }, (_, i) => (
+            <div key={`sk-d-${i}`} className={`${desktopCardWidthClass} shrink-0`}>
+              <SkeletonCell />
             </div>
           ))}
         </div>
