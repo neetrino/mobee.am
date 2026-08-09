@@ -24,6 +24,8 @@
     "home": "Home",
     "products": "Shop",
     "categories": "Categories",
+    "previousCategories": "Previous categories",
+    "nextCategories": "Next categories",
     "cart": "Cart",
     "wishlist": "Wishlist",
     "compare": "Compare",
