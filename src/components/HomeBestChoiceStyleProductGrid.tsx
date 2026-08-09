@@ -87,7 +87,7 @@ export function homeBestChoiceMobileInnerGridClass(cardsPerView: number): string
 type HomeBestChoiceStyleProductGridProps = {
   products: FeaturedHomeProduct[];
   productsPerPage: number;
-  /** Cards per horizontal snap page below `lg` (4 = 2×2 phone, 6 = 3×2 tablet). */
+  /** Cards per single-row horizontal snap page below `lg` (2 phone, 3 tablet). */
   mobileCardsPerView: number;
   /** Accessible name for the horizontal product strip on small screens. */
   mobileCarouselAriaLabel: string;

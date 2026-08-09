@@ -17,7 +17,7 @@ function readTabletRangeCardsPerView(): number {
 }
 
 /**
- * Cards per carousel “page” below `lg`: 4 on phones (2×2), 6 on tablet / iPad mini (3×2).
+ * Cards per single-row carousel page below `lg`: 2 on phones, 3 on tablet / iPad mini.
  */
 export function useHomeBestChoiceMobileCardsPerView(): number {
   const [cardsPerView, setCardsPerView] = useState(HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_COMPACT);

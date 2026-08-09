@@ -66,7 +66,7 @@ function HomeFeaturedCarouselSection({
       <FeaturedIntroHeading />
       <HomeMobileSectionTitle
         sectionHeadingId="home-featured-heading-mobile"
-        title={t(language, 'home.mobile_home.featuredSectionTitle')}
+        title={t(language, 'home.featured_intro.title')}
         titleClassName={HOME_CURATED_SECTION_MOBILE_TITLE_CLASS}
         syncedCarouselPageIndex={featuredCarousel.pageIndex}
         syncedCarouselPageCount={featuredCarousel.pageCount}

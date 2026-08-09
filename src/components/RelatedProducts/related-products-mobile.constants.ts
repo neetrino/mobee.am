@@ -5,7 +5,7 @@ import {
 import { HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA } from '../home-best-choice.constants';
 
 /**
- * PDP related-products mobile strip: two cards per snap page on phones (same row as home 2×2 cell width).
+ * PDP related-products mobile strip: two cards per snap page on phones, matching the home row.
  */
 export const RELATED_PRODUCTS_MOBILE_CARDS_PER_PAGE_PHONE = 2;
 
