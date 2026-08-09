@@ -17,6 +17,14 @@ import {
 import { AuthPageBrandMark } from '../../components/AuthPageBrandMark';
 import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
 
+function RequiredMark() {
+  return (
+    <span className="ml-0.5 text-red-500" aria-hidden="true">
+      *
+    </span>
+  );
+}
+
 export default function RegisterPage() {
   const { t } = useTranslation();
   const [firstName, setFirstName] = useState('');
@@ -45,91 +53,72 @@ export default function RegisterPage() {
     setError(null);
     setIsSubmitting(true);
 
-    console.log('🔐 [REGISTER PAGE] Form submitted');
-
-    // Validation - check in order of importance
-    console.log('🔍 [REGISTER PAGE] Validating form data...');
-    console.log('🔍 [REGISTER PAGE] Form state:', {
-      email: email.trim() || 'empty',
-      phone: phone.trim() || 'empty',
-      hasPassword: !!password,
-      passwordLength: password.length,
-      passwordsMatch: password === confirmPassword,
-      acceptTerms,
-    });
-
     if (!acceptTerms) {
-      console.log('❌ [REGISTER PAGE] Validation failed: Terms not accepted');
       setError(t('register.errors.acceptTerms'));
       setIsSubmitting(false);
       return;
     }
 
-    if (!email.trim() && !phone.trim()) {
-      console.log('❌ [REGISTER PAGE] Validation failed: No email or phone');
-      setError(t('register.errors.emailOrPhoneRequired'));
+    if (!firstName.trim()) {
+      setError(t('register.errors.firstNameRequired'));
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!lastName.trim()) {
+      setError(t('register.errors.lastNameRequired'));
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!email.trim()) {
+      setError(t('register.errors.emailRequired'));
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!phone.trim()) {
+      setError(t('register.errors.phoneRequired'));
       setIsSubmitting(false);
       return;
     }
 
     if (!password) {
-      console.log('❌ [REGISTER PAGE] Validation failed: No password');
       setError(t('register.errors.passwordRequired'));
       setIsSubmitting(false);
       return;
     }
 
     if (password.length < 6) {
-      console.log('❌ [REGISTER PAGE] Validation failed: Password too short');
       setError(t('register.errors.passwordMinLength'));
       setIsSubmitting(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      console.log('❌ [REGISTER PAGE] Validation failed: Passwords do not match');
       setError(t('register.errors.passwordsDoNotMatch'));
       setIsSubmitting(false);
       return;
     }
 
-    console.log('✅ [REGISTER PAGE] All validations passed');
-
     try {
-      console.log('📤 [REGISTER PAGE] Calling register function...');
-      console.log('📤 [REGISTER PAGE] Registration data:', {
-        email: email.trim() || 'not provided',
-        phone: phone.trim() || 'not provided',
-        hasPassword: !!password,
-        firstName: firstName.trim() || 'not provided',
-        lastName: lastName.trim() || 'not provided',
-      });
-      
       await register({
-        email: email.trim() || undefined,
-        phone: phone.trim() || undefined,
+        email: email.trim(),
+        phone: phone.trim(),
         password,
-        firstName: firstName.trim() || undefined,
-        lastName: lastName.trim() || undefined,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
       });
-      
-      console.log('✅ [REGISTER PAGE] Registration successful, redirecting...');
-      // Redirect is handled by AuthContext
-      // But we can also redirect here as a fallback
+
       setTimeout(() => {
         if (window.location.pathname === '/register') {
-          console.log('🔄 [REGISTER PAGE] Fallback redirect to home...');
           window.location.href = '/';
         }
       }, 1000);
-    } catch (err: any) {
-      console.error('❌ [REGISTER PAGE] Registration error:', err);
-      console.error('❌ [REGISTER PAGE] Error details:', {
-        message: err.message,
-        stack: err.stack,
-        name: err.name,
-      });
-      setError(err.message || t('register.errors.registrationFailed'));
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : t('register.errors.registrationFailed');
+      setError(message || t('register.errors.registrationFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -153,6 +142,7 @@ export default function RegisterPage() {
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
                 {t('register.form.firstName')}
+                <RequiredMark />
               </label>
               <Input
                 id="firstName"
@@ -162,11 +152,13 @@ export default function RegisterPage() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 disabled={isSubmitting || isLoading}
+                required
               />
             </div>
             <div>
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
                 {t('register.form.lastName')}
+                <RequiredMark />
               </label>
               <Input
                 id="lastName"
@@ -176,96 +168,113 @@ export default function RegisterPage() {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 disabled={isSubmitting || isLoading}
+                required
               />
             </div>
           </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('register.form.email')}
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder={t('register.placeholders.email')}
-              className={`w-full ${authFormClasses.input}`}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isSubmitting || isLoading}
-            />
-          </div>
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('register.form.phone')}
-            </label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder={t('register.placeholders.phone')}
-              className={`w-full ${authFormClasses.input}`}
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={isSubmitting || isLoading}
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('register.form.password')}
-            </label>
-            <div className="relative">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                {t('register.form.email')}
+                <RequiredMark />
+              </label>
               <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder={t('register.placeholders.password')}
-                className={`w-full pr-10 ${authFormClasses.input}`}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="email"
+                type="email"
+                placeholder={t('register.placeholders.email')}
+                className={`w-full ${authFormClasses.input}`}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting || isLoading}
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${authFormClasses.passwordToggle}`}
-                disabled={isSubmitting || isLoading}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
-              {t('register.passwordHint')}
-            </p>
-          </div>
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('register.form.confirmPassword')}
-            </label>
-            <div className="relative">
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                {t('register.form.phone')}
+                <RequiredMark />
+              </label>
               <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder={t('register.placeholders.confirmPassword')}
-                className={`w-full pr-10 ${authFormClasses.input}`}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                id="phone"
+                type="tel"
+                placeholder={t('register.placeholders.phone')}
+                className={`w-full ${authFormClasses.input}`}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 disabled={isSubmitting || isLoading}
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${authFormClasses.passwordToggle}`}
-                disabled={isSubmitting || isLoading}
+            </div>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div>
+              <label
+                htmlFor="password"
+                className="mb-2 block text-sm font-medium text-gray-700"
               >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
+                {t('register.form.password')}
+                <RequiredMark />
+              </label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder={t('register.placeholders.password')}
+                  className={`w-full pr-10 ${authFormClasses.input}`}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isSubmitting || isLoading}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${authFormClasses.passwordToggle}`}
+                  disabled={isSubmitting || isLoading}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                {t('register.passwordHint')}
+              </p>
+            </div>
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                {t('register.form.confirmPassword')}
+                <RequiredMark />
+              </label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder={t('register.placeholders.confirmPassword')}
+                  className={`w-full pr-10 ${authFormClasses.input}`}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isSubmitting || isLoading}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${authFormClasses.passwordToggle}`}
+                  disabled={isSubmitting || isLoading}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
           <div className="flex items-start">
@@ -275,7 +284,6 @@ export default function RegisterPage() {
               checked={acceptTerms}
               onChange={(e) => {
                 setAcceptTerms(e.target.checked);
-                // Clear error when checkbox is checked
                 if (e.target.checked && error === t('register.errors.acceptTerms')) {
                   setError(null);
                 }
@@ -293,6 +301,7 @@ export default function RegisterPage() {
               <Link href="/privacy" className={authFormClasses.linkInline}>
                 {t('register.form.privacyPolicy')}
               </Link>
+              <RequiredMark />
             </label>
           </div>
           {!acceptTerms && error === t('register.errors.acceptTerms') && (
@@ -320,4 +329,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
