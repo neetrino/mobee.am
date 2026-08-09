@@ -6,8 +6,6 @@ import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
 type PartnerLogoId = 'apple' | 'lg' | 'samsung' | 'xiaomi';
 
-const PARTNER_LOGOS_PER_MOBILE_PAGE = 2;
-
 const PARTNER_LOGOS: readonly {
   id: PartnerLogoId;
   src: string;
@@ -26,19 +24,11 @@ const PARTNER_LOGOS: readonly {
     desktopWrapperClass: 'h-[69px] w-[58px]',
   },
   {
-    id: 'lg',
-    src: '/images/home/partner-logos/lg.svg',
-    width: 121,
-    height: 53,
-    mobileWrapperClass: 'h-[54px] w-[123px] max-w-full',
-    desktopWrapperClass: 'h-[53px] w-[121px]',
-  },
-  {
     id: 'samsung',
     src: '/images/home/partner-logos/samsung.svg',
     width: 211,
     height: 33,
-    mobileWrapperClass: 'h-[24px] w-[150px] max-w-[85%]',
+    mobileWrapperClass: 'h-[22px] w-[108px] max-w-[85%]',
     desktopWrapperClass: 'h-[33px] w-[211px]',
   },
   {
@@ -46,22 +36,22 @@ const PARTNER_LOGOS: readonly {
     src: '/images/home/partner-logos/xiaomi.svg',
     width: 83,
     height: 53,
-    mobileWrapperClass: 'h-[38px] w-[60px]',
+    mobileWrapperClass: 'h-[48px] w-[75px]',
     desktopWrapperClass: 'h-[53px] w-[83px]',
+  },
+  {
+    id: 'lg',
+    src: '/images/home/partner-logos/lg.svg',
+    width: 121,
+    height: 53,
+    mobileWrapperClass: 'h-[45px] w-[103px] max-w-full',
+    desktopWrapperClass: 'h-[53px] w-[121px]',
   },
 ];
 
-/** Mobile: horizontal snap — 2 brand cards per page. */
+/** Mobile: horizontal strip with 2.5 manufacturer cards visible. */
 const PARTNER_MOBILE_TRACK_CLASS =
-  'flex [touch-action:pan-x] overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory lg:hidden';
-
-function chunkPartnerLogosForMobilePages<T>(items: readonly T[], pageSize: number): T[][] {
-  const pages: T[][] = [];
-  for (let index = 0; index < items.length; index += pageSize) {
-    pages.push([...items.slice(index, index + pageSize)]);
-  }
-  return pages;
-}
+  'flex gap-3 overflow-x-auto overscroll-x-contain [touch-action:pan-x] [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-proximity lg:hidden';
 
 /**
  * Partner brand strip — matches Figma “Partner Logos” (node 1:248).
@@ -69,46 +59,39 @@ function chunkPartnerLogosForMobilePages<T>(items: readonly T[], pageSize: numbe
  */
 export function PartnerLogosSection() {
   const { t } = useTranslation();
-  const mobilePages = chunkPartnerLogosForMobilePages(PARTNER_LOGOS, PARTNER_LOGOS_PER_MOBILE_PAGE);
 
   return (
-    <section className="bg-white" aria-labelledby="partner-logos-heading">
-      <h2 id="partner-logos-heading" className="sr-only">
-        {t('home.partner_logos.heading')}
-      </h2>
-
+    <section
+      className="bg-white"
+      aria-label={t('home.partner_logos.heading')}
+    >
       <div className="pb-4 pt-8 lg:hidden">
-        <div
-          className={PARTNER_MOBILE_TRACK_CLASS}
-          aria-roledescription="carousel"
-          aria-label={t('home.partner_logos.heading')}
-        >
-          {mobilePages.map((pageItems) => (
-            <div
-              key={pageItems.map((item) => item.id).join('-')}
-              className="grid w-full shrink-0 snap-center grid-cols-2 gap-3 px-3"
-            >
-              {pageItems.map((item) => (
+        <div className={SITE_CONTENT_GUTTERS_CLASS}>
+          <div
+            className={PARTNER_MOBILE_TRACK_CLASS}
+            aria-roledescription="carousel"
+            aria-label={t('home.partner_logos.heading')}
+          >
+            {PARTNER_LOGOS.map((item) => (
+              <div
+                key={item.id}
+                className="flex h-[100px] w-[calc((100%-1.5rem)/2.5)] shrink-0 snap-start items-center justify-center rounded-[20px] border border-[#e7e7e7] bg-white px-3 sm:w-[180px] md:w-[200px]"
+              >
                 <div
-                  key={item.id}
-                  className="flex h-[120px] w-full items-center justify-center rounded-2xl border border-[#eeeef0] bg-[#f7f8fa] px-4"
+                  className={`relative flex max-w-full shrink-0 items-center justify-center ${item.mobileWrapperClass}`}
                 >
-                  <div
-                    className={`relative flex max-w-full shrink-0 items-center justify-center ${item.mobileWrapperClass}`}
-                  >
-                    <Image
-                      src={item.src}
-                      alt={t(`home.partner_logos.${item.id}`)}
-                      width={item.width}
-                      height={item.height}
-                      className="h-full w-full object-contain object-center"
-                      unoptimized
-                    />
-                  </div>
+                  <Image
+                    src={item.src}
+                    alt={t(`home.partner_logos.${item.id}`)}
+                    width={item.width}
+                    height={item.height}
+                    className="h-full w-full object-contain object-center"
+                    unoptimized
+                  />
                 </div>
-              ))}
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
