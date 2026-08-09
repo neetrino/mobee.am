@@ -1,25 +1,17 @@
 import { z } from "zod";
 
-const emptyToUndefined = (value: unknown): unknown =>
-  value === "" || value === null ? undefined : value;
-
 const loginSchema = z.object({
   email: z.string().email("Valid email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
-const registerSchema = z
-  .object({
-    email: z.preprocess(emptyToUndefined, z.string().email().optional()),
-    phone: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    firstName: z.preprocess(emptyToUndefined, z.string().optional()),
-    lastName: z.preprocess(emptyToUndefined, z.string().optional()),
-  })
-  .refine((data) => data.email ?? data.phone, {
-    message: "Either email or phone is required",
-    path: ["email"],
-  });
+const registerSchema = z.object({
+  email: z.string().email("Valid email is required"),
+  phone: z.string().min(1, "Phone is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+});
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;

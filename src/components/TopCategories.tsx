@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   categoryStripCardAspectClass,
   categoryStripHref,
@@ -21,6 +21,7 @@ import { reorderHomeStripItemsForMobile } from '../lib/homeCategoryStripMobileOr
 import { CategoryStripLink } from './CategoryStripLink';
 import type { LanguageCode } from '../lib/language';
 import { useHomeCategoryStrip } from './useHomeCategoryStrip';
+import { HomeDesktopCarouselArrows } from './HomeDesktopCarouselArrows';
 
 type TopCategoriesProps = {
   initialItems?: HomeStripCategoryItem[];
@@ -36,6 +37,57 @@ const CATEGORY_STRIP_SCROLL_ROW_CLASS =
 const CATEGORY_STRIP_IMAGE_QUALITY = 75;
 /** Watches use rotate + CSS scale — higher encode quality keeps edges sharper on desktop. */
 const CATEGORY_STRIP_WATCHES_IMAGE_QUALITY = 92;
+const CATEGORY_STRIP_SCROLL_EDGE_TOLERANCE_PX = 2;
+
+function useCategoryStripScroll(itemCount: number) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const element = scrollRef.current;
+    if (!element) {
+      return;
+    }
+    setCanScrollPrev(element.scrollLeft > CATEGORY_STRIP_SCROLL_EDGE_TOLERANCE_PX);
+    setCanScrollNext(
+      element.scrollLeft + element.clientWidth <
+        element.scrollWidth - CATEGORY_STRIP_SCROLL_EDGE_TOLERANCE_PX,
+    );
+  }, []);
+
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element) {
+      return;
+    }
+    updateScrollState();
+    element.addEventListener('scroll', updateScrollState, { passive: true });
+    const resizeObserver = new ResizeObserver(updateScrollState);
+    resizeObserver.observe(element);
+    return () => {
+      element.removeEventListener('scroll', updateScrollState);
+      resizeObserver.disconnect();
+    };
+  }, [itemCount, updateScrollState]);
+
+  const scrollByItem = useCallback((direction: -1 | 1) => {
+    const element = scrollRef.current;
+    const firstItem = element?.children.item(0);
+    const secondItem = element?.children.item(1);
+    if (
+      !element ||
+      !(firstItem instanceof HTMLElement) ||
+      !(secondItem instanceof HTMLElement)
+    ) {
+      return;
+    }
+    const itemStep = secondItem.offsetLeft - firstItem.offsetLeft;
+    element.scrollBy({ left: direction * itemStep, behavior: 'smooth' });
+  }, []);
+
+  return { scrollRef, canScrollPrev, canScrollNext, scrollByItem };
+}
 
 function CategoryStripDesktopImage({
   slotKey,
@@ -107,6 +159,12 @@ export function TopCategories({ initialItems, initialLocale }: TopCategoriesProp
     () => reorderHomeStripItemsForMobile(sortedItems),
     [sortedItems],
   );
+  const {
+    scrollRef,
+    canScrollPrev,
+    canScrollNext,
+    scrollByItem,
+  } = useCategoryStripScroll(sortedItems.length);
 
   if (loading) {
     return (
@@ -160,34 +218,44 @@ export function TopCategories({ initialItems, initialLocale }: TopCategoriesProp
             );
           })}
         </div>
-        <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} hidden lg:flex`}>
-          {sortedItems.map((category, index) => {
-            const slotKey = resolveStripSlotKey(category, index);
-            const visual = getCategoryStripVisual(slotKey);
-            const imageSrc = resolveCategoryStripImageForItem(category.media, slotKey);
+        <div className="relative hidden lg:block">
+          <div ref={scrollRef} className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} hidden lg:flex`}>
+            {sortedItems.map((category, index) => {
+              const slotKey = resolveStripSlotKey(category, index);
+              const visual = getCategoryStripVisual(slotKey);
+              const imageSrc = resolveCategoryStripImageForItem(category.media, slotKey);
 
-            return (
-              <CategoryStripLink
-                key={category.id}
-                href={categoryStripHref(category)}
-                categorySlug={category.slug}
-                className={`category-strip-card-cq group relative flex w-[197px] shrink-0 flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(visual)}`}
-              >
-                <div className="relative h-full w-full min-h-0 overflow-hidden">
-                  <CategoryStripDesktopImage slotKey={slotKey} imageSrc={imageSrc} />
-                </div>
-                <div
-                  className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex ${getCategoryStripTitleTranslateClass(category, slotKey)} justify-center px-1.5 pb-2.5 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
-                    visual.tall ? 'xl:pb-3' : ''
-                  }`}
+              return (
+                <CategoryStripLink
+                  key={category.id}
+                  href={categoryStripHref(category)}
+                  categorySlug={category.slug}
+                  className={`category-strip-card-cq group relative flex w-[197px] shrink-0 flex-col overflow-hidden rounded-[24px] bg-[#f0f2f4] transition-transform hover:opacity-[0.98] active:scale-[0.99] xl:rounded-[30px] ${categoryStripCardAspectClass(visual)}`}
                 >
-                  <span className="line-clamp-2 max-w-full break-words text-[13px] font-bold leading-snug text-[#1c1c1c] [overflow-wrap:anywhere] xl:text-[16px] xl:leading-5">
-                    {category.title}
-                  </span>
-                </div>
-              </CategoryStripLink>
-            );
-          })}
+                  <div className="relative h-full w-full min-h-0 overflow-hidden">
+                    <CategoryStripDesktopImage slotKey={slotKey} imageSrc={imageSrc} />
+                  </div>
+                  <div
+                    className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 flex ${getCategoryStripTitleTranslateClass(category, slotKey)} justify-center px-1.5 pb-2.5 pt-1 text-center xl:px-2 xl:pb-[10px] xl:pt-0 ${
+                      visual.tall ? 'xl:pb-3' : ''
+                    }`}
+                  >
+                    <span className="line-clamp-2 max-w-full break-words text-[13px] font-bold leading-snug text-[#1c1c1c] [overflow-wrap:anywhere] xl:text-[16px] xl:leading-5">
+                      {category.title}
+                    </span>
+                  </div>
+                </CategoryStripLink>
+              );
+            })}
+          </div>
+          <HomeDesktopCarouselArrows
+            canScrollPrev={canScrollPrev}
+            canScrollNext={canScrollNext}
+            onScrollPrev={() => scrollByItem(-1)}
+            onScrollNext={() => scrollByItem(1)}
+            prevAriaLabel={t('common.navigation.previousCategories')}
+            nextAriaLabel={t('common.navigation.nextCategories')}
+          />
         </div>
       </div>
     </section>

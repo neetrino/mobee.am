@@ -14,7 +14,8 @@
     "search": "Поиск",
     "shopNow": "Купить сейчас",
     "viewMore": "Узнать больше",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "back": "Назад"
   },
   "dialog": {
     "confirm": "Подтвердить"
@@ -24,6 +25,8 @@
     "home": "Главная",
     "products": "Товары",
     "categories": "Категории",
+    "previousCategories": "Предыдущие категории",
+    "nextCategories": "Следующие категории",
     "cart": "Корзина",
     "wishlist": "Избранное",
     "compare": "Сравнить",

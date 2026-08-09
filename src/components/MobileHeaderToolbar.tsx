@@ -14,7 +14,6 @@ import {
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
 import { MobileHeaderToolbarCompareIcon } from './icons/mobile-header-toolbar/MobileHeaderToolbarCompareIcon';
-import { MobileHeaderToolbarMenuIcon } from './icons/mobile-header-toolbar/MobileHeaderToolbarMenuIcon';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
 import { useMobileHeaderSearchDock } from './useMobileHeaderSearchDock';
 import { isCompareAppRoute } from '../lib/compareAppRoute';
@@ -124,6 +123,7 @@ export function MobileHeaderToolbar({
 
       <div
         ref={searchWrapRef}
+        data-mobile-header-toolbar
         className={`z-40 border-b border-gray-100 bg-white shadow-sm ${
           searchDocked ? 'fixed inset-x-0 top-0' : ''
         }`}
@@ -224,11 +224,36 @@ export function MobileHeaderToolbar({
           <button
             type="button"
             onClick={onOpenMenu}
-            className={MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS}
+            className={`${MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS} overflow-hidden`}
             aria-expanded={mobileMenuOpen}
-            aria-label={t('common.ariaLabels.openMenu')}
+            aria-label={t(
+              mobileMenuOpen ? 'common.ariaLabels.closeMenu' : 'common.ariaLabels.openMenu',
+            )}
           >
-            <MobileHeaderToolbarMenuIcon size={44} className="shrink-0" />
+            <span
+              className={`absolute flex size-5 flex-col justify-center gap-[5px] transition-[opacity,transform] duration-300 ease-out ${
+                mobileMenuOpen ? '-rotate-90 scale-[0.82] opacity-0' : 'rotate-0 scale-100 opacity-100'
+              }`}
+              aria-hidden
+            >
+              <span className="h-0.5 w-full rounded bg-current" />
+              <span className="h-0.5 w-full rounded bg-current" />
+              <span className="h-0.5 w-full rounded bg-current" />
+            </span>
+            <svg
+              className={`absolute size-5 transition-[opacity,transform] duration-300 ease-out ${
+                mobileMenuOpen ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-[0.82] opacity-0'
+              }`}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              aria-hidden
+            >
+              <path d="M18 6 6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
           </button>
         </div>
       </div>

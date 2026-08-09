@@ -7,8 +7,8 @@ import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
 import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
 import {
   HOME_CURATED_SECTION_DESKTOP_TITLE_CLASS,
+  HOME_CURATED_SECTION_FIRST_TOP_CLASS,
   HOME_CURATED_SECTION_MOBILE_TITLE_CLASS,
-  HOME_SPECIAL_OFFERS_SECTION_OUTER_MARGIN_CLASS,
 } from './home-best-choice.constants';
 
 const montserrat = siteMontserrat;
@@ -21,7 +21,7 @@ type SpecialOffersSectionHeadingProps = {
 };
 
 /**
- * Row below the home “best choice” grid — same typography/rhythm as {@link FeaturedIntroHeading}.
+ * First home curated product block heading — same typography/rhythm as {@link FeaturedIntroHeading}.
  */
 export function SpecialOffersSectionHeading({
   children,
@@ -32,7 +32,7 @@ export function SpecialOffersSectionHeading({
 
   return (
     <div
-      className={`${HOME_SPECIAL_OFFERS_SECTION_OUTER_MARGIN_CLASS} ${montserrat.className}`}
+      className={`${HOME_CURATED_SECTION_FIRST_TOP_CLASS} ${montserrat.className}`}
       aria-label={t('home.special_offers_heading.title')}
     >
       <div className="hidden flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 lg:flex">

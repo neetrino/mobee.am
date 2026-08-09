@@ -14,7 +14,8 @@
     "search": "Որոնել",
     "shopNow": "Գնել հիմա",
     "viewMore": "Դիտել ավելին",
-    "close": "Փակել"
+    "close": "Փակել",
+    "back": "Հետ"
   },
   "dialog": {
     "confirm": "Հաստատել"
@@ -24,6 +25,8 @@
     "home": "Գլխավոր",
     "products": "Խանութ",
     "categories": "Կատեգորիաներ",
+    "previousCategories": "Նախորդ կատեգորիաները",
+    "nextCategories": "Հաջորդ կատեգորիաները",
     "cart": "Զամբյուղ",
     "wishlist": "Նախընտրած",
     "compare": "Համեմատել",

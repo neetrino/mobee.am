@@ -5,7 +5,7 @@
 
 /** Register (and shared): mobile tweaks; from `lg` same max width as legacy auth. */
 export const AUTH_PAGE_OUTER_CLASS =
-  'mx-auto w-full max-w-xl px-3 sm:px-6 lg:max-w-lg lg:px-8 py-12';
+  'mx-auto w-full max-w-xl px-3 py-12 sm:px-6 lg:px-8';
 
 /** Tighter card padding only below `sm`; from `sm` up matches original `p-8`. */
 export const AUTH_PAGE_CARD_CLASS = 'rounded-[15px] p-5 sm:p-8';

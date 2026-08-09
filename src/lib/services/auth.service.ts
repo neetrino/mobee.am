@@ -4,11 +4,11 @@ import { signAccessToken } from "@/lib/security/sign-access-token";
 import { logger } from "../utils/logger";
 
 export interface RegisterData {
-  email?: string;
-  phone?: string;
+  email: string;
+  phone: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface LoginData {
@@ -40,12 +40,21 @@ class AuthService {
       hasLastName: !!data.lastName,
     });
 
-    if (!data.email && !data.phone) {
+    if (!data.email?.trim() || !data.phone?.trim()) {
       throw {
         status: 400,
         type: "https://api.shop.am/problems/validation-error",
         title: "Validation failed",
-        detail: "Either email or phone is required",
+        detail: "Email and phone are required",
+      };
+    }
+
+    if (!data.firstName?.trim() || !data.lastName?.trim()) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/validation-error",
+        title: "Validation failed",
+        detail: "First name and last name are required",
       };
     }
 
@@ -61,10 +70,7 @@ class AuthService {
     // Check if user already exists
     const existingUser = await db.user.findFirst({
       where: {
-        OR: [
-          ...(data.email ? [{ email: data.email }] : []),
-          ...(data.phone ? [{ phone: data.phone }] : []),
-        ],
+        OR: [{ email: data.email }, { phone: data.phone }],
         deletedAt: null,
       },
       select: { id: true },
@@ -88,11 +94,11 @@ class AuthService {
     try {
       user = await db.user.create({
         data: {
-          email: data.email || null,
-          phone: data.phone || null,
+          email: data.email,
+          phone: data.phone,
           passwordHash,
-          firstName: data.firstName || null,
-          lastName: data.lastName || null,
+          firstName: data.firstName,
+          lastName: data.lastName,
           locale: "en",
           roles: ["customer"],
         },
