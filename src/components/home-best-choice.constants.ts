@@ -97,8 +97,13 @@ export const HOME_CURATED_SECTION_MOBILE_TITLE_CLASS =
   'text-xl font-bold leading-snug text-[#303030]' as const;
 
 /**
- * Home special-offers block: vertical offset from the featured (“Առաջարկված”) row above.
- * Mobile-only bump; `lg` keeps the large gap under the desktop intro layout.
+ * First curated product block on home (currently special offers): top padding after categories.
  */
-export const HOME_SPECIAL_OFFERS_SECTION_OUTER_MARGIN_CLASS =
+export const HOME_CURATED_SECTION_FIRST_TOP_CLASS = 'pt-6' as const;
+
+/**
+ * Following curated product block on home: offset from the row above.
+ * Mobile bump + large `lg` gap under the previous desktop intro/grid.
+ */
+export const HOME_CURATED_SECTION_FOLLOWING_MARGIN_CLASS =
   'mt-8 lg:mt-[9rem]' as const;

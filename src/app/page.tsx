@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { HomeHeroManagedCarousel } from '../components/HomeHeroManagedCarousel';
 import { TopCategories } from '../components/TopCategories';
-import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
 import { HomeProductSectionsSection } from '../components/home/HomeProductSectionsSection';
 import { readLanguageFromCookies } from '../lib/language';
 import { getCachedHomeCategoryStrip } from '../lib/services/categories-home-strip-cached';
@@ -40,8 +39,6 @@ export default async function HomePage() {
       </section>
 
       <TopCategories initialItems={homeStrip.data} initialLocale={language} />
-
-      <FeaturedIntroHeading />
 
       <Suspense fallback={<HomeProductSectionsFallback />}>
         <HomeProductSectionsSection language={language} />
