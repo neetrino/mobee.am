@@ -12,6 +12,7 @@ import {
 } from "../products/variant-price-display";
 import { pickCategoryTranslation } from "../pickCategoryTranslation";
 import { localizeCategoryTitle } from "../category-title-i18n";
+import { pickProductTranslation } from "../products/pickProductTranslation";
 import type { LanguageCode } from "../language";
 
 export type ProductListingTransformContext = {
@@ -97,7 +98,7 @@ class ProductsFindTransformService {
     const data = products.map((product: ProductWithRelations) => {
       // Безопасное получение translation с проверкой на существование массива
       const translations = Array.isArray(product.translations) ? product.translations : [];
-      const translation = translations.find((t: { locale: string }) => t.locale === lang) || translations[0] || null;
+      const translation = pickProductTranslation(translations, lang);
       
       // Безопасное получение brand translation
       const brandTranslations = product.brand && Array.isArray(product.brand.translations)

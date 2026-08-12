@@ -1127,6 +1127,31 @@ function buildPlanItem({
     seoDescription: t.seoDescription || null,
   }));
 
+  // Ensure Mobee always has hy/en/ru title rows (fallback copy from best available).
+  {
+    const byLocale = new Map(translations.map((t) => [t.locale, t]));
+    const source =
+      byLocale.get("en") ||
+      byLocale.get("hy") ||
+      byLocale.get("ru") ||
+      translations[0] ||
+      null;
+    if (source && source.title) {
+      for (const locale of ["hy", "en", "ru"]) {
+        if (byLocale.has(locale) && String(byLocale.get(locale).title || "").trim()) {
+          continue;
+        }
+        byLocale.set(locale, {
+          ...source,
+          locale,
+          slug: source.slug ? `${source.slug}-${locale}` : source.slug,
+        });
+      }
+      translations.length = 0;
+      translations.push(...byLocale.values());
+    }
+  }
+
   if (hasConflict) {
     return {
       action: "CONFLICT",
