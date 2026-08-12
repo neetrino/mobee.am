@@ -28,15 +28,13 @@ function localeTranslationScope(lang: string) {
  */
 function getListingInclude(ctx: QueryExecutionContext) {
   const { lang, includeCompareDescriptions } = ctx;
-  const descriptionLocales =
-    includeCompareDescriptions && lang !== "hy" ? [lang, "hy"] : [lang];
-  const translations =
-    descriptionLocales.length === 1
-      ? { where: { locale: descriptionLocales[0] } }
-      : { where: { locale: { in: descriptionLocales } } };
+  const locales = new Set(["hy", "en", "ru", lang]);
+  if (includeCompareDescriptions) {
+    locales.add("hy");
+  }
 
   return {
-    translations,
+    translations: { where: { locale: { in: [...locales] } } },
     brand: {
       include: {
         translations: localeTranslationScope(lang),

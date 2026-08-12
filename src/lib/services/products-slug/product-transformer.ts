@@ -10,6 +10,7 @@ import type { ProductWithFullRelations, ProductVariantWithOptions } from "./type
 import { hasDisplayPrice } from "../../products/variant-price-display";
 import { pickCategoryTranslation } from "../../pickCategoryTranslation";
 import { localizeCategoryTitle } from "../../category-title-i18n";
+import { pickProductTranslation } from "../../products/pickProductTranslation";
 import type { LanguageCode } from "../../language";
 
 function normalizeAttributeValueColors(colors: unknown): string[] | null {
@@ -430,7 +431,7 @@ export async function transformProduct(
 ) {
   // Get translations
   const translations = Array.isArray(product.translations) ? product.translations : [];
-  const translation = translations.find((t: { locale: string }) => t.locale === lang) || translations[0] || null;
+  const translation = pickProductTranslation(translations, lang);
   const hyTranslation = translations.find((t: { locale: string }) => t.locale === 'hy') || null;
   
   // Get brand translation
