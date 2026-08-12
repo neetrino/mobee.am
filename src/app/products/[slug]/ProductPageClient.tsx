@@ -15,11 +15,12 @@ import type { Product } from './types';
 import type { LanguageCode } from '../../../lib/language';
 import { dispatchCartFlyAnimation } from '@/lib/cart/dispatchCartFlyAnimation';
 import { resolveCartLineProductImageUrl } from '@/lib/cart/resolveCartLineProductImage';
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC, resolveProductCardImageSrc } from '@/lib/productCardDisplayImage';
+import { resolveProductCardImageSrc } from '@/lib/productCardDisplayImage';
 import { upsertGuestCartItem } from '@/lib/cart/guest-cart';
 import { dispatchCartUpdated } from '@/lib/cart/dispatch-cart-updated';
 import { formatPriceInCurrency } from '@/lib/currency';
 import { buildRelatedProductsContextFromProduct } from '@/lib/products/build-related-context';
+import { ProductImagePlaceholder } from '@/components/ProductImagePlaceholder';
 import {
   PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS,
   PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS,
@@ -125,7 +126,7 @@ export function ProductPageClient({
     const flyEl = document.querySelector<HTMLElement>('[data-pdp-cart-fly-source]');
     const slideSrc = images[currentImageIndex];
     const flyUrl =
-      typeof slideSrc === 'string' && slideSrc.length > 0 ? slideSrc : PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+      typeof slideSrc === 'string' && slideSrc.length > 0 ? slideSrc : null;
 
     if (!isLoggedIn) {
       upsertGuestCartItem({
@@ -206,14 +207,21 @@ export function ProductPageClient({
       >
         <div className="grid grid-cols-1 items-start gap-12 product-2col:grid-cols-[55%_45%] [&>*]:min-w-0">
           <div className="relative mx-auto aspect-square w-full max-w-lg">
-            <Image
-              src={shellImage}
-              alt={shellProduct.title}
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
+            {shellImage ? (
+              <Image
+                src={shellImage}
+                alt={shellProduct.title}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            ) : (
+              <ProductImagePlaceholder
+                className="h-full w-full rounded-lg"
+                aria-label={`No image for ${shellProduct.title}`}
+              />
+            )}
           </div>
           <div className="flex flex-col gap-4">
             <h1 className="text-2xl font-bold text-gray-900">{shellProduct.title}</h1>

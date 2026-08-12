@@ -7,6 +7,7 @@ import { apiClient } from '../../lib/api-client';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
+import { ProductImagePlaceholder } from '../../components/ProductImagePlaceholder';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
@@ -247,14 +248,24 @@ const CompareGroupTableComponent = ({
             className="relative mx-auto h-32 w-32 overflow-hidden rounded-lg bg-gray-100"
             data-cart-fly-source
           >
-            <Image
-              src={resolveProductCardImageSrc(product.image)}
-              alt={product.title}
-              fill
-              className="object-cover"
-              sizes="128px"
-              loading="lazy"
-            />
+            {(() => {
+              const src = resolveProductCardImageSrc(product.image);
+              return src ? (
+                <Image
+                  src={src}
+                  alt={product.title}
+                  fill
+                  className="object-cover"
+                  sizes="128px"
+                  loading="lazy"
+                />
+              ) : (
+                <ProductImagePlaceholder
+                  className="h-full w-full"
+                  aria-label={`No image for ${product.title}`}
+                />
+              );
+            })()}
           </div>
         </ProductCardNavLink>
       ),

@@ -24,6 +24,7 @@ interface CategoryIconProps {
 export function CategoryIcon({ category, product, isActive, t }: CategoryIconProps) {
   const title = category.title.toLowerCase();
   const slug = category.slug.toLowerCase();
+  const productImageSrc = product ? resolveProductCardImageSrc(product.image) : null;
 
   // Special categories (all, new, sale) use getCategoryIcon
   if (slug === 'all' || title.includes('new') || title.includes('sale')) {
@@ -35,9 +36,9 @@ export function CategoryIcon({ category, product, isActive, t }: CategoryIconPro
     <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white border-2 flex items-center justify-center overflow-hidden transition-all ${
       isActive ? 'border-gray-400 shadow-md' : 'border-gray-200'
     }`}>
-      {product ? (
+      {productImageSrc ? (
         <Image
-          src={resolveProductCardImageSrc(product.image)}
+          src={productImageSrc}
           alt={category.title}
           width={80}
           height={80}

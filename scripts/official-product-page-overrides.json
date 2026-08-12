@@ -1,0 +1,2431 @@
+{
+  "bosch": {
+    "KBN96ADDO": {
+      "pageUrl": "https://www.bosch-home.com/mt/en/mkt-product/KBN96ADD0",
+      "normalizedModel": "KBN96ADD0",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "KFN96VPEA": {
+      "pageUrl": "https://www.bosch-home.com/ne/en/mkt-product/fridges-freezers/side-by-side/sidebysidefrenchdoor/KFN96VPEA",
+      "normalizedModel": "KFN96VPEA",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "KGP86AXBON": {
+      "pageUrl": "https://www.bosch-home.com/az/az/mkt-product/soyuducu-ve-dondurucular/soyuducu-donduruculari/dondurucusu-asagida-olan-serbest-dondurucu-soyuducular/KGP86AXB0N",
+      "normalizedModel": "KGP86AXB0N",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "KGP86FICON": {
+      "pageUrl": "https://www.bosch-home.com/az/az/mkt-product/soyuducu-ve-dondurucular/soyuducu-donduruculari/dondurucusu-asagida-olan-serbest-dondurucu-soyuducular/KGP86FIC0N",
+      "normalizedModel": "KGP86FIC0N",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "WNA244X0GC": {
+      "pageUrl": "https://www.bosch-home.com/ae/en/mkt-product/WNA244X0GC",
+      "normalizedModel": "WNA244X0GC",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "bosch",
+      "category": "Washing Machine",
+      "marcoModel": "WNA244X0GC",
+      "note": null,
+      "approvedImageUrls": [
+        {
+          "url": "https://media3.bsh-group.com/Product_Shots/17635154_WNA244X0GC_STP_def.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": false
+        }
+      ]
+    },
+    "WGA14400GC": {
+      "pageUrl": "https://www.bosch-home.com/ae/en/mkt-product/washers-dryers/washing-machines/frontloader-washing-machines/WGA14400GC",
+      "normalizedModel": "WGA14400GC",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "bosch",
+      "category": "Washing Machine",
+      "marcoModel": "WGA14400GC",
+      "note": null
+    },
+    "WAN28282GC": {
+      "pageUrl": "https://www.bosch-home.com/ae/en/mkt-product/washers-dryers/washing-machines/frontloader-washing-machines/WAN28282GC",
+      "normalizedModel": "WAN28282GC",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "bosch",
+      "category": "Washing Machine",
+      "marcoModel": "WAN28282GC",
+      "note": null
+    },
+    "WAJ2018SME": {
+      "pageUrl": "https://www.bosch-home.com/ne/en/mkt-product/washers-dryers/washing-machines/front-loading-washing-machines/WAJ2018SME",
+      "normalizedModel": "WAJ2018SME",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "bosch",
+      "category": "Washing Machine",
+      "marcoModel": "WAJ2018SME",
+      "note": null
+    },
+    "WGK2522XTR": {
+      "pageUrl": "https://www.bosch-home.com/us/en/productservice/WGK252ZXTR-01",
+      "normalizedModel": "WGK252ZXTR",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_TYPO",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "bosch",
+      "category": "Washing Machine",
+      "marcoModel": "WGK2522XTR",
+      "note": "approved official WGK252ZXTR for Marco WGK2522XTR"
+    }
+  },
+  "hisense": {
+    "WF3S1043BB3": {
+      "pageUrl": "https://uk.hisense.com/products/laundry/washing-machines/WASHER-WF3S1043BW3-WF3S1043BB3-HSN/p/000000000020014433",
+      "normalizedModel": "WF3S1043BB3",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://static14.gorenje.com/mabagor/imagelib/qr-product/6/e/6e909bbaf8b2ac3e8d209c01bf25413e_254810_2.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "WF3S9043BW4": {
+      "pageUrl": "https://ru.hisense.com/catalog/washing-machines/WF3S9043BW4/",
+      "normalizedModel": "WF3S9043BW4",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "WF5S1043BB": {
+      "pageUrl": "https://ru.hisense.com/catalog/washing-machines/WF5S1043BB/",
+      "normalizedModel": "WF5S1043BB",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "WFVC6010T": {
+      "pageUrl": "https://hisense.co.za/products/hisense-wfvc6010t-6kg-front-loader-washing-machine/",
+      "normalizedModel": "WFVC6010T",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "WF3S8043BB3": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200140710000000000000000000?lang=en",
+      "normalizedModel": "WF3S8043BB3",
+      "matchType": "SUPPORT_PAGE",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://static14.gorenje.com/mabagor/imagelib/qr-product/4/a/4a22072c45cacd0be1d73e35bac40ca5_255462_2.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "WFQP6012EVM": {
+      "pageUrl": "https://uk.hisense.com/products/laundry/washing-machines/WASHER-WFQP6012EVM-HSN/p/000000000020010061",
+      "normalizedModel": "WFQP6012EVM",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://hisense-static.hgecdn.net/img/w_full/medias/MB-PIMG-F7CB0EDA7AA33B5AD55E07AE2E4294F7-MABAGOR-1200Wx1200H?context=bWFzdGVyfG1hYmFnb3Jwcm9kdWN0aW1hZ2VzfDY1MTMxfGltYWdlL2pwZWd8YUdVMUwyaGtNQzg1TkRFeE5qRTFOalV6T1RFNEwwMUNYMUJKVFVkZlJqZERRakJGUkVFM1FVRXpNMEkxUVVRMU5VVXdOMEZGTWtVME1qazBSamRmVFVGQ1FVZFBVaTB4TWpBd1YzZ3hNakF3U0F8YTkxNWUwNzVjZjdhNmU1YTc4NjlmMGYyMTIzZWY0MTE1N2JjZWQxYmM1ZTQ1ZmQyZDQ0MzkyZTJmNjY4YmJjNw",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": false
+        }
+      ]
+    },
+    "WFQP8014EVM": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200100620000000000000000000?lang=en",
+      "normalizedModel": "WFQP8014EVM",
+      "matchType": "SUPPORT_PAGE",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://static14.gorenje.com/mabagor/imagelib/qr-product/c/8/c828da07bfb9723ece70d6aa3f5e9856_209160_2.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "WFQA1014EVJMWT": {
+      "pageUrl": "https://pos.shophisense.com/product/washing-machine/hisense-wfqa1014evjmwt-10kg-front-load-washer-with-smart-wi-ficonnectlife1400-rpmauto-dosingpause-add/",
+      "normalizedModel": "WFQA1014EVJMWT",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "WFQA1214EVJMT": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200111490001202400000000000?lang=ar",
+      "normalizedModel": "WFQA1214EVJMT",
+      "matchType": "SUPPORT_PAGE",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://static14.gorenje.com/mabagor/imagelib/qr-product/0/a/0a45f8aca019e0c635c624a69096eaae_211800_2.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "WFQP7012EVM": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200100600000000000000000000?lang=en",
+      "normalizedModel": "WFQP7012EVM",
+      "matchType": "SUPPORT_PAGE",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://static14.gorenje.com/mabagor/imagelib/qr-product/e/a/ea26ee8343950a5acdee803763a3f38d_209159_2.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "85U7NQ": {
+      "pageUrl": "https://hr.hisense.com/proizvodi/tv/uled-miniled-tv/TV-SET-85U7NQ-HSN/p/000000000020013352",
+      "normalizedModel": "85U7NQ",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "85U7NQ",
+      "note": null
+    },
+    "75E7Q": {
+      "pageUrl": "https://mk.hisense.com/proizvodi/televizori/hi-qled-tv/TV-SET-75E7Q-HSN/p/000000000020016418",
+      "normalizedModel": "75E7Q",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "75E7Q",
+      "note": null
+    },
+    "65E7Q": {
+      "pageUrl": "https://uk.hisense.com/products/tv/qled-tv/TV-SET-65E7QTUK-HSN%27%2522/p/000000000020016410",
+      "normalizedModel": "65E7Q",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "65E7Q",
+      "note": "approved official 65E7QTUK source"
+    },
+    "58E7Q": {
+      "pageUrl": "https://uk.hisense.com/products/tv/qled-tv/TV-SET-58E7QTUK-HSN/p/000000000020016736/972531%2525252540",
+      "normalizedModel": "58E7Q",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "58E7Q",
+      "note": "approved official 58E7QTUK source"
+    },
+    "55A7Q": {
+      "pageUrl": "https://de.hisense.com/produkte/tv/hi-qled-tv/TV-SET-55A7Q-HSN/p/000000000020016324",
+      "normalizedModel": "55A7Q",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "55A7Q",
+      "note": null
+    },
+    "43E7Q": {
+      "pageUrl": "https://gr.hisense.com/products/tv/hi-qled-tv/TV-SET-43E7Q-HSN/p/000000000020015991",
+      "normalizedModel": "43E7Q",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "43E7Q",
+      "note": null
+    },
+    "32A4Q": {
+      "pageUrl": "https://uk.hisense.com/products/tv/fhd-hd-tv/TV-SET-32A4QTUK-HSN/p/000000000020016127",
+      "normalizedModel": "32A4Q",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "32A4Q",
+      "note": "approved official 32A4QTUK source"
+    },
+    "65A61N": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200131790000000000000000000?lang=en",
+      "normalizedModel": "65A61N",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "65A61N",
+      "note": "user approves official 65A6N source"
+    },
+    "55A62NS": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200138500000000000000000000?lang=en",
+      "normalizedModel": "55A62NS",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "55A62NS",
+      "note": "user approves official 55A6N source"
+    },
+    "85A7K": {
+      "pageUrl": null,
+      "normalizedModel": "85A7K",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "85A7K",
+      "note": "NO_CANONICAL_URL — lookup for 85A7KAU on hisense.com found no verified HTML product page",
+      "lookupAlias": "85A7KAU"
+    },
+    "65U7HQ": {
+      "pageUrl": "https://ua.hisense.com/products/tv/uled-mini-led-tv/TV-SET-65U7HQ-HSN/p/000000000020009566",
+      "normalizedModel": "65U7HQ",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "65U7HQ",
+      "note": null
+    },
+    "50A62NS": {
+      "pageUrl": "https://me.hisense.com/proizvodi/televizori/uhd-tv/TV-SET-50A6N-HSN/p/000000000020013852",
+      "normalizedModel": "50A62NS",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "50A62NS",
+      "note": "user approves official 50A6N source"
+    },
+    "75A62NS": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200131250000000000000000000?lang=en",
+      "normalizedModel": "75A62NS",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "75A62NS",
+      "note": "user approves official 75A6N source"
+    },
+    "65A62NS": {
+      "pageUrl": "https://no.hisense.com/produkter/tv/uhd-tv/TV-SET-65A6N-HSN/p/000000000020013179",
+      "normalizedModel": "65A62NS",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "65A62NS",
+      "note": "user approves official 65A6N source"
+    },
+    "50E7Q": {
+      "pageUrl": "https://uk.hisense.com/products/tv/qled-tv/TV-SET-50E7QTUK-HSN/p/000000000020015951/965430%252540",
+      "normalizedModel": "50E7Q",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "50E7Q",
+      "note": "approved official 50E7QTUK source"
+    },
+    "50A61N": {
+      "pageUrl": "https://uk.hisense.com/products/tv/uhd-tv/50A6NTUK-GB-HSN/p/000000000020013853",
+      "normalizedModel": "50A61N",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "50A61N",
+      "note": "user approves official 50A6N/TUK source"
+    },
+    "43A62NS": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/20014042?lang=en",
+      "normalizedModel": "43A62NS",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "43A62NS",
+      "note": "user approves official 43A6N source"
+    },
+    "32A4K": {
+      "pageUrl": "https://uk.hisense.com/products/tv/fhd-hd-tv/TV-SET-32A4KTUK-HSN/p/000000000020011556",
+      "normalizedModel": "32A4K",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "32A4K",
+      "note": "official 32A4KTUK verified on uk.hisense.com",
+      "lookupAlias": "32A4KTUK"
+    },
+    "RW12D4NWG0": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200109360000000000000000000?lang=en",
+      "normalizedModel": "RW12D4NWG0",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_QR",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RW12D4NWG0",
+      "note": null
+    },
+    "RQ768N4GBE": {
+      "pageUrl": "https://uk.hisense.com/products/%252525252525252525252525252525252525252525252525252525252525252529/freestanding-refrigerators/cross-door-refrigerators/REFRIG-BCD-605W-RQ768N4GBE-HSN/p/000000000020012750",
+      "normalizedModel": "RQ768N4GBE",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RQ768N4GBE",
+      "note": null
+    },
+    "RQ561N4AC1": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200009670000000000000000000?lang=en",
+      "normalizedModel": "RQ561N4AC1",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RQ561N4AC1",
+      "note": "user approves official RQ562N4AC1 source"
+    },
+    "RB645N4BFE": {
+      "pageUrl": "https://uk.hisense.com/products/cooling/freestanding-refrigerators/combi-refrigerators/REFRIG-BCD-469WY-RB645N4BFE-HSN/p/000000000020004006%3B979220%2525252525252540",
+      "normalizedModel": "RB645N4BFE",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RB645N4BFE",
+      "note": null
+    },
+    "RB645N4BIE": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200040070000000000000000000?lang=en-US",
+      "normalizedModel": "RB645N4BIE",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_QR",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RB645N4BIE",
+      "note": null
+    },
+    "WF3S7021BWU": {
+      "pageUrl": "https://ru.hisense.com/catalog/washing-machines/WF3S7021BWU/",
+      "normalizedModel": "WF3S7021BWU",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Washing Machine",
+      "marcoModel": "WF3S7021BWU",
+      "note": null
+    },
+    "WF3S7021BTU": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/20011889?lang=en",
+      "normalizedModel": "WF3S7021BTU",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "REVIEW_BASE",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Washing Machine",
+      "marcoModel": "WF3S7021BTU/A",
+      "note": "user approves official base WF3S7021BW source"
+    },
+    "WF1I6022BWU": {
+      "pageUrl": "https://ru.hisense.com/catalog/washing-machines/WF1I6022BWUC/",
+      "normalizedModel": "WF1I6022BWU",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Washing Machine",
+      "marcoModel": "WF1I6022BWU",
+      "note": "user approves official WF1I6022BWU/C source"
+    },
+    "WDQA9014EVJMT": {
+      "pageUrl": "https://qrcode.hisense.com/appliance/0000000000200101430000000000000000000?lang=en-AU",
+      "normalizedModel": "WDQA9014EVJMT",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_QR",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Washing Machine",
+      "marcoModel": "WDQA9014EVJMT",
+      "note": null
+    },
+    "43A4K": {
+      "pageUrl": "https://files.hisense-usa.com/download/f256489d13ed9a0f",
+      "normalizedModel": "43A4K",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "TV",
+      "marcoModel": "43A4K",
+      "note": "user-approved Hisense USA file asset; may need manual image if not HTML"
+    },
+    "RD-39WCR-INOX": {
+      "pageUrl": "https://hisense.cl/productos/refrigeradores/rd-39wc/",
+      "normalizedModel": "RD-39WC",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_BASE",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RD-39WCR-INOX",
+      "note": null
+    },
+    "RD39WC BG": {
+      "pageUrl": "https://hisense.cl/productos/refrigeradores/rd-39wc/",
+      "normalizedModel": "RD-39WC",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_BASE",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RD39WC BG",
+      "note": null
+    },
+    "RT729N4WSU1": {
+      "pageUrl": "https://www.hisenseme.com/products/729l-with-dispenser",
+      "normalizedModel": "RT729N4WSU1",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RT729N4WSU1",
+      "note": null
+    },
+    "RT3N635NAD4": {
+      "pageUrl": "https://hisenseme.com/products/top-mount-830l-rt3n635nad4",
+      "normalizedModel": "RT3N635NAD4",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RT3N635NAD4",
+      "note": null
+    },
+    "RT328N4DGN": {
+      "pageUrl": "https://hisenseme.com/products/328l-refrigerator-rt328n4dgn",
+      "normalizedModel": "RT328N4DGN",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RT328N4DGN",
+      "note": null
+    },
+    "RQ561N4AB1": {
+      "pageUrl": "https://products.hisenseme.co/products/432l-cross-door-refrigerator-rq561n4ab1",
+      "normalizedModel": "RQ561N4AB1",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RQ561N4AB1",
+      "note": null
+    },
+    "WFIB7012MT": {
+      "pageUrl": "https://hisense.ci/hisense_machine_a_laver_7kg_a%2B%2B%2B_front_load___snowflake_drum___wfvb7012mt-2567.html",
+      "normalizedModel": "WFVB7012MT",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Washing Machine",
+      "marcoModel": "WFIB7012MT",
+      "note": "approved official WFVB7012MT"
+    },
+    "DT27DR4 Inox": {
+      "pageUrl": "https://vlv.am/en/Product/18860",
+      "normalizedModel": "DT27DR4 Inox",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "DT27DR4 Inox",
+      "note": "Inox only — do not apply to DT27DR4 Black | manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/24-06-2025/685a6d4e8d3ba.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/24-06-2025/685a6d4f3587a.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "DB35DCUR Inox": {
+      "pageUrl": "https://vlv.am/en/Product/7547",
+      "normalizedModel": "DB35DCUR Inox",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "DB35DCUR Inox",
+      "note": "manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/28-01-2026/6979ac9e67fae.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/28-01-2026/6979ac9ed17c7.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/28-01-2026/6979ac9f7be71.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/28-01-2026/6979ac9f1a838.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "RS12DR-Silver": {
+      "pageUrl": "https://vlv.am/en/Product/18503",
+      "normalizedModel": "RS12DR-Silver",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RS12DR-Silver",
+      "note": "manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/29-07-2026/6a69e7323b556.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/29-07-2026/6a69e732adb06.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/29-07-2026/6a69e73359502.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/29-07-2026/6a69e73407219.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/29-07-2026/6a69e734ca4a6.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/29-07-2026/6a69db4da2b12.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/29-07-2026/6a69db4e5069c.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/29-07-2026/6a69db4ee03e4.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "RD33WCRWD Inox": {
+      "pageUrl": "https://vlv.am/en/Product/26929",
+      "normalizedModel": "RD33WCRWD Inox",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Refrigerator",
+      "marcoModel": "RD33WCRWD Inox",
+      "note": "manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/20-12-2024/67652c7209bd2.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/20-12-2024/67652c72c89a8.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/20-12-2024/67652c7362c86.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/20-12-2024/67652c146121a.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/20-12-2024/67652c14f01d5.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/20-12-2024/67652c730bb25.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "AS12UW4SYRKC01": {
+      "pageUrl": "https://hisense.co.za/products/hisense-as-12uw4syrck01-air-conditioner/",
+      "normalizedModel": "AS12UW4SYRKC01",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Air Conditioner",
+      "marcoModel": "AS12UW4SYRKC01",
+      "note": null
+    },
+    "AS09UW4SYRKC00A": {
+      "pageUrl": "https://hisense.co.za/products/hisense-as-09uw4syrck00a-air-conditioner/",
+      "normalizedModel": "AS09UW4SYRKC00A",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Air Conditioner",
+      "marcoModel": "AS09UW4SYRKC00A",
+      "note": null
+    },
+    "AS09HR4SYD TD": {
+      "pageUrl": "https://vlv.am/en/Product/17103",
+      "normalizedModel": "AS09HR4SYD TD",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Air Conditioner",
+      "marcoModel": "AS09HR4SYD TD",
+      "note": "manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/27-01-2026/6978c1c65a7e2.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/27-01-2026/6978c1c6be9b0.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/27-01-2026/6978c7624d757.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/27-01-2026/6978c1a1e23e5.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/27-01-2026/6978c76215548.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/27-01-2026/6978c1a1c1168.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "AS09HR4SY DDE": {
+      "pageUrl": "https://vlv.am/en/Product/18264",
+      "normalizedModel": "AS09HR4SY DDE",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Air Conditioner",
+      "marcoModel": "AS09HR4SY DDE",
+      "note": "manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a5777529ac5c.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a577753750d9.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a5777540f896.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a573bc237035.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a573bc2cedde.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a574408049ed.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a574408aa28b.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a57440948a5b.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "AS-12UW4RYRCA03A": {
+      "pageUrl": "https://vlv.am/en/Product/31150",
+      "normalizedModel": "AS-12UW4RYRCA03A",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Air Conditioner",
+      "marcoModel": "AS-12UW4RYRCA03A",
+      "note": "manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/16-07-2026/6a58dbbb51067.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/16-07-2026/6a58dbbbc1664.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/16-07-2026/6a58dbbcf1f58.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/16-07-2026/6a58d1fd7ea60.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/16-07-2026/6a58d1fe29d28.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/16-07-2026/6a58d1fee99a8.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/16-07-2026/6a58d4cb7f39a.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/16-07-2026/6a58d4cc190c4.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "AS-12HR4SVDDJ": {
+      "pageUrl": "https://vlv.am/en/Product/18405",
+      "normalizedModel": "AS-12HR4SVDDJ",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Air Conditioner",
+      "marcoModel": "AS-12HR4SVDDJ",
+      "note": "manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a5779ab7524e.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a5779abda4ff.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a5779ad334ef.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a5779aedc5e9.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a574408049ed.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a574408aa28b.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a57440948a5b.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/15-07-2026/6a573bc237035.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "AST-24UW4RBTCA02B": {
+      "pageUrl": "https://vlv.am/en/Product/37364",
+      "normalizedModel": "AST-24UW4RBTCA02B",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "hisense",
+      "category": "Air Conditioner",
+      "marcoModel": "AST-24UW4RBTCA02B",
+      "note": "manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://vlv.am/public/uploads/images/17-07-2026/6a5a0e51dcb30.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/17-07-2026/6a5a0e52652d4.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/17-07-2026/6a5a0dbcf408b.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/17-07-2026/6a5a0e5332442.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/17-07-2026/6a59d63476760.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/17-07-2026/6a59d634ca000.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/17-07-2026/6a59d6354d9a1.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://vlv.am/public/uploads/images/17-07-2026/6a59d635e1675.webp",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    }
+  },
+  "lg": {
+    "F2V7GW1W": {
+      "pageUrl": "https://www.lg.com/ru/washing-machines/lg-f2v7gw1w",
+      "normalizedModel": "F2V7GW1W",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://www.lg.com/ru/images/washing-machines/md07580292/gallery/d-1.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": false
+        }
+      ]
+    },
+    "F2V9GW9P": {
+      "pageUrl": "https://www.lg.com/ru/washing-machines/lg-F2V9GW9P",
+      "normalizedModel": "F2V9GW9P",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://www.lg.com/ru/images/washing-machines/md06178019/gallery/F2V9GW9P_medium.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": false
+        }
+      ]
+    },
+    "F-2J3HS8J": {
+      "pageUrl": "https://www.lg.com/kz/laundry/washing-machines/f2j3hs8j/",
+      "normalizedModel": "F2J3HS8J",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "F-2V7FR2P": {
+      "pageUrl": "https://www.lg.com/kz/laundry/washing-dryer-washing-machines/f2v7fr2p/",
+      "normalizedModel": "F2V7FR2P",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "F-4J3TS2W": {
+      "pageUrl": "https://www.lg.com/ru/washing-machines/lg-f4j3ts2w",
+      "normalizedModel": "F4J3TS2W",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://www.lg.com/ru/images/washing-machines/md07585121/gallery2/medium01.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": false
+        }
+      ]
+    },
+    "F18L2CRV2T2": {
+      "pageUrl": "https://www.lg.com/ae_ar/washing-machines/lg-f18l2crv2t2_f8k5xnk4-gcc",
+      "normalizedModel": "F18L2CRV2T2",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://www.lg.com/ae_ar/images/washing-machines/MD07515804/D-01.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": false
+        }
+      ]
+    },
+    "F2T9FW9P": {
+      "pageUrl": "https://www.lg.com/kz/laundry/washing-machines/f2t9fw9p/",
+      "normalizedModel": "F2T9FW9P",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "F2T9GW9P": {
+      "pageUrl": "https://www.lg.com/kz/laundry/washing-machines/f2t9gw9p/",
+      "normalizedModel": "F2T9GW9P",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "F2V3GS4W": {
+      "pageUrl": "https://www.lg.com/kz/laundry/washing-machines/f2v3gs4w/",
+      "normalizedModel": "F2V3GS4W",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "F2V5GG2S": {
+      "pageUrl": "https://www.lg.com/kz/laundry/washing-machines/f2v5gg2s/",
+      "normalizedModel": "F2V5GG2S",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "55UA75009LA": {
+      "pageUrl": "https://www.lg.com/uz/televisions/lg-55ua75009la",
+      "normalizedModel": "55UA75009LA",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "55UA75009LA",
+      "note": null
+    },
+    "43UR801COLJ": {
+      "pageUrl": "https://www.lg.com/ae/business/commercial-tv/lg-43ur801c0lj",
+      "normalizedModel": "43UR801COLJ",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_TYPO",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "43UR801COLJ",
+      "note": "Marco O vs official digit 0"
+    },
+    "55UR801COLJ": {
+      "pageUrl": "https://www.lg.com/ae/support/product/lg-55UR801C0LJ.AMAE",
+      "normalizedModel": "55UR801COLJ",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_TYPO",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "55UR801COLJ",
+      "note": "Marco O vs official digit 0"
+    },
+    "50UR801COLJ": {
+      "pageUrl": "https://www.lg.com/ae/support/product/lg-50UR801C0LJ.AMAE",
+      "normalizedModel": "50UR801COLJ",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_TYPO",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "50UR801COLJ",
+      "note": "Marco O vs official digit 0"
+    },
+    "OLED65C36LC": {
+      "pageUrl": "https://www.lg.com/es/tv-y-barras-de-sonido/oled/oled65c36lc/",
+      "normalizedModel": "OLED65C36LC",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "OLED65C36LC",
+      "note": null
+    },
+    "OLED55C36LC": {
+      "pageUrl": "https://www.lg.com/es/tvs-soundbars/smart-tvs/oled55c36lc/",
+      "normalizedModel": "OLED55C36LC",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "OLED55C36LC",
+      "note": null
+    },
+    "55QNED756RA": {
+      "pageUrl": "https://www.lg.com/uk/tvs-soundbars/qned/55qned756ra/",
+      "normalizedModel": "55QNED756RA",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "55QNED756RA",
+      "note": null
+    },
+    "55NANO846QA": {
+      "pageUrl": "https://www.lg.com/sa_en/tv-soundbars/nanocell/55nano846qa/",
+      "normalizedModel": "55NANO846QA",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "55NANO846QA",
+      "note": null
+    },
+    "55NANO766QA": {
+      "pageUrl": "https://www.lg.com/uk/tvs-soundbars/nanocell/55nano766qa/",
+      "normalizedModel": "55NANO766QA",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "55NANO766QA",
+      "note": null
+    },
+    "50UQ80006LB": {
+      "pageUrl": "https://www.lg.com/uk/tvs-soundbars/4k-uhd-tvs/50uq80006lb/",
+      "normalizedModel": "50UQ80006LB",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "50UQ80006LB",
+      "note": null
+    },
+    "50QNED756RA": {
+      "pageUrl": "https://www.lg.com/uk/tvs-soundbars/qned/50qned756ra/",
+      "normalizedModel": "50QNED756RA",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "50QNED756RA",
+      "note": null
+    },
+    "43UR81006LJ": {
+      "pageUrl": "https://www.lg.com/it/tv-soundbar/tv-uhd-4k/43ur81006lj/",
+      "normalizedModel": "43UR81006LJ",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "43UR81006LJ",
+      "note": null
+    },
+    "65QNED756RA": {
+      "pageUrl": "https://www.lg.com/uk/tvs-soundbars/qned/65qned756ra/",
+      "normalizedModel": "65QNED756RA",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "65QNED756RA",
+      "note": null
+    },
+    "65NANO846QA": {
+      "pageUrl": "https://www.lg.com/levant_en/tvs-soundbars/lg-65nano846qa",
+      "normalizedModel": "65NANO846QA",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "65NANO846QA",
+      "note": null
+    },
+    "65QNED82A6B": {
+      "pageUrl": "https://www.lg.com/uk/tvs-soundbars/qned/65qned82a6b/",
+      "normalizedModel": "65QNED82A6B",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "65QNED82A6B",
+      "note": null
+    },
+    "65NANO81A6A": {
+      "pageUrl": "https://www.lg.com/uk/tvs-soundbars/nanocell/65nano81a6a/",
+      "normalizedModel": "65NANO81A6A",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "65NANO81A6A",
+      "note": null
+    },
+    "55NANO81A6A": {
+      "pageUrl": "https://www.lg.com/uk/tvs-soundbars/nanocell/55nano81a6a/",
+      "normalizedModel": "55NANO81A6A",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "TV",
+      "marcoModel": "55NANO81A6A",
+      "note": null
+    },
+    "GR-B589BQCM": {
+      "pageUrl": "https://www.lg.com/ae/support/product/lg-GR-B589BQCM",
+      "normalizedModel": "GR-B589BQCM",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GR-B589BQCM",
+      "note": null
+    },
+    "GR-X267CQEW": {
+      "pageUrl": "https://www.lg.com/ir/support/product/lg-GR-X267CQEW",
+      "normalizedModel": "GR-X267CQEW",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GR-X267CQEW",
+      "note": null
+    },
+    "GR-B452PGFK": {
+      "pageUrl": "https://www.lg.com/ae_ar/refrigerators/lg-gr-b452pgfk",
+      "normalizedModel": "GR-B452PGFK",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GR-B452PGFK",
+      "note": null
+    },
+    "GR-A34FDMKJ": {
+      "pageUrl": "https://www.lg.com/ae/refrigerators/lg-gr-a34fdmkj",
+      "normalizedModel": "GR-A34FDMKJ",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GR-A34FDMKJ",
+      "note": null
+    },
+    "GR-B459FQFW": {
+      "pageUrl": "https://www.lg.com/ae/refrigerators/lg-gr-b459fqfw",
+      "normalizedModel": "GR-B459FQFW",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GR-B459FQFW",
+      "note": null
+    },
+    "GN-F702HLHU": {
+      "pageUrl": "https://www.lg.com/africa/support/product/lg-GN-F702HLHU",
+      "normalizedModel": "GN-F702HLHU",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GN-F702HLHU",
+      "note": null
+    },
+    "GN-C752HQCL": {
+      "pageUrl": "https://www.lg.com/levant_en/support/product/lg-GN-C752HQCL",
+      "normalizedModel": "GN-C752HQCL",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GN-C752HQCL",
+      "note": null
+    },
+    "GN-B502PLGB": {
+      "pageUrl": "https://www.lg.com/africa/support/product/lg-GN-B502PLGB",
+      "normalizedModel": "GN-B502PLGB",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GN-B502PLGB",
+      "note": null
+    },
+    "GN-B422PLGB": {
+      "pageUrl": "https://www.lg.com/ae/support/product/lg-GN-B422PLGB",
+      "normalizedModel": "GN-B422PLGB",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GN-B422PLGB",
+      "note": null
+    },
+    "GC-X24FFCBB": {
+      "pageUrl": "https://www.lg.com/kz/refrigerators/multi-door-fridge-freezers/gc-x24ffcbb/",
+      "normalizedModel": "GC-X24FFCBB",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GC-X24FFCBB",
+      "note": null
+    },
+    "GR-X29FTLML": {
+      "pageUrl": "https://www.lg.com/africa/support/product/lg-GR-X29FTLML",
+      "normalizedModel": "GR-X29FTLML",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GR-X29FTLML",
+      "note": null
+    },
+    "DA12CEH": {
+      "pageUrl": "https://www.lg.com/ae/non-tropical-split-air-conditioners/lg-da12ceh",
+      "normalizedModel": "DA12CEH",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "AC",
+      "marcoModel": "DA12CEH",
+      "note": null
+    },
+    "F2Y1VYP6JP": {
+      "pageUrl": "https://www.lg.com/eastafrica/support/product/lg-F2Y1VYP6JP",
+      "normalizedModel": "F2Y1VYP6JP",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "F2Y1VYP6JP",
+      "note": null
+    },
+    "WT1310YJ": {
+      "pageUrl": "https://www.lg.com/eastafrica/support/product/lg-WT1310YJ",
+      "normalizedModel": "WT1310YJ",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "WT1310YJ",
+      "note": null
+    },
+    "F2Y1HYP6J": {
+      "pageUrl": "https://www.lg.com/ae/support/product/lg-F2Y1HYP6J",
+      "normalizedModel": "F2Y1HYP6J",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "F2Y1HYP6J",
+      "note": "title also mentions F2Y2HYP6J"
+    },
+    "F2Y1HYP65P": {
+      "pageUrl": "https://www.lg.com/africa/support/product/lg-F2Y1HYP65P",
+      "normalizedModel": "F2Y1HYP65P",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "F2Y1HYP65P",
+      "note": "title also mentions F2Y2HYP65"
+    },
+    "L5C0905PSGC": {
+      "pageUrl": "https://www.lg.com/ae/support/product/lg-L5C0905PSGC",
+      "normalizedModel": "L5C0905PSGC",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "L5C0905PSGC",
+      "note": null
+    },
+    "F2V7GWL1W": {
+      "pageUrl": "https://www.lg.com/ae/support/product/lg-F2V7GWL1W",
+      "normalizedModel": "F2V7GWL1W",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "F2V7GWL1W",
+      "note": null
+    },
+    "F2V7GWL2P": {
+      "pageUrl": "https://www.lg.com/africa/support/product/lg-F2V7GWL2P",
+      "normalizedModel": "F2V7GWL2P",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "F2V7GWL2P",
+      "note": null
+    },
+    "GC-J257SQKV": {
+      "pageUrl": "https://www.lg.com/za/fridge-freezers/side-by-side/gc-j257sqks/",
+      "normalizedModel": "GC-J257SQKS",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Refrigerator",
+      "marcoModel": "GC-J257SQKV",
+      "note": "approved official GC-J257SQKS"
+    },
+    "DA18CEN": {
+      "pageUrl": "https://www.lg.com/ae/non-tropical-split-air-conditioners/lg-da18ceh",
+      "normalizedModel": "DA18CEH",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_MODEL_VARIANT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Air Conditioner",
+      "marcoModel": "DA18CEN",
+      "note": "approved official DA18CEH | manual approvedImageUrls from user-approved page",
+      "approvedImageUrls": [
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/D_1.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/D_2.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/D_3.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/D_4.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/D_5.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/D_6.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/DZ_1.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/DZ_2.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/DZ_3.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        },
+        {
+          "url": "https://www.lg.com/ae/images/non-tropical-split-air-conditioners/md07604542/gallery/DZ_4.jpg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": true
+        }
+      ]
+    },
+    "F2X5PYNY6": {
+      "pageUrl": "https://www.lg.com/ma/lave-linge-et-seche-linge/lave-linge-a-chargement-frontal/f2x5pyny6/",
+      "normalizedModel": "F2X5PYNY6",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "F2X5PYNY6",
+      "note": null
+    },
+    "F4V5VYLOW": {
+      "pageUrl": "https://www.lg.com/ae/support/product/lg-F4V5VYL0W",
+      "normalizedModel": "F4V5VYL0W",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_TYPO",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "lg",
+      "category": "Washing Machine",
+      "marcoModel": "F4V5VYLOW",
+      "note": "approved official F4V5VYL0W (zero)"
+    }
+  },
+  "midea": {
+    "AF-24N8D0": {
+      "pageUrl": "https://www.midea.com/ge-en/air-conditioners/inverter-conditioner/conditioner-af-24n8d0-forest.af-24n8d0",
+      "normalizedModel": "AF-24N8D0",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "AF-09N8D1": {
+      "pageUrl": "https://mideaarmenia.am/midea-af-09n8d1-pip?limit=75&order=ASC&sort=pd.name&tag=condicioner",
+      "normalizedModel": "AF-09N8D1",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "AF-12N8D1": {
+      "pageUrl": "https://mideaarmenia.am/midea-af-12n8d1-pip",
+      "normalizedModel": "AF-12N8D1",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://mideaarmenia.am/image/cache/catalog/product/odorakich/midea-af-09n8d1-pip-51-568x568.jpg",
+          "evidence": "MANUAL_USER_APPROVED_SHARED_SERIES_IMAGE",
+          "allowLowResolution": false,
+          "allowModelFilenameMismatch": true
+        }
+      ]
+    },
+    "AF-18N8D0": {
+      "pageUrl": "https://mideaarmenia.am/midea-af-18n8d0-pip",
+      "normalizedModel": "AF-18N8D0",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "manual-approved-list",
+      "approvedImageUrls": [
+        {
+          "url": "https://mideaarmenia.am/image/cache/catalog/product/odorakich/midea-af-09n8d1-pip-51-568x568.jpg",
+          "evidence": "MANUAL_USER_APPROVED_SHARED_SERIES_IMAGE",
+          "allowLowResolution": false,
+          "allowModelFilenameMismatch": true
+        }
+      ]
+    },
+    "MDRB489FGE02O": {
+      "pageUrl": "https://www.midea.com/cz/refrigerators/bottom-mount-freezer/Combined-Refrigerator-330L.mdrb489fge02o",
+      "normalizedModel": "MDRB489FGE02O",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Refrigerator",
+      "marcoModel": "MDRB489FGE02O",
+      "note": null,
+      "approvedImageUrls": [
+        {
+          "url": "https://web-res.midea.com/content/dam/midea-aem/cz/refrigerazione/combinati/mdrb489fge02o/prodotto/MDRB489FGE02O-1.jpg/jcr%3Acontent/renditions/cq5dam.web.5000.5000.jpeg",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": false
+        }
+      ]
+    },
+    "MDRB470MIE22OM": {
+      "pageUrl": "https://www.midea.com/ge-en/refrigerators/double-door-refrigerator/double-door-mdrb470mie22om.mdrb470mie22om",
+      "normalizedModel": "MDRB470MIE22OM",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Refrigerator",
+      "marcoModel": "MDRB470MIE22OM",
+      "note": null
+    },
+    "MDRB424FGF02I": {
+      "pageUrl": "https://www.midea.com/ge-en/refrigerators/double-door-refrigerator/double-door-mdrb424fgf01I.mdrb424fgf02i",
+      "normalizedModel": "MDRB424FGF02I",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Refrigerator",
+      "marcoModel": "MDRB424FGF02I",
+      "note": null
+    },
+    "MDRB424FGF01I": {
+      "pageUrl": "https://www.midea.com/ge-en/refrigerators/double-door-refrigerator/double-door-mdrb424fgf01I.mdrb424fgf01i",
+      "normalizedModel": "MDRB424FGF01I",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Refrigerator",
+      "marcoModel": "MDRB424FGF01I",
+      "note": null
+    },
+    "MF100W60/T": {
+      "pageUrl": "https://www.midea.com/za/laundry/front-loaders/front-loader-washing-machine-mf100-lunar-dial-series.mf100w60-t",
+      "normalizedModel": "MF100W60/T",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Washing Machine",
+      "marcoModel": "MF100W60/T",
+      "note": null
+    },
+    "MF100W60/D": {
+      "pageUrl": "https://www.midea.com/me/laundry/front-load-washer/midea-front-load-washer-with-lunar-dial-hygiene-90-c.mf100w60-w-gcc",
+      "normalizedModel": "MF100W60/D",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_BASE",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Washing Machine",
+      "marcoModel": "MF100W60/D",
+      "note": "approved MF100W60 family source for /D"
+    },
+    "MF01814BS47/W/D": {
+      "pageUrl": "https://www.midea.com/kz/washing-machines/front-load-washing-machines/midea-washing-machines-with-healthguard-technology.mf01814bs47-w",
+      "normalizedModel": "MF01814BS47/W/D",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Washing Machine",
+      "marcoModel": "MF01814BS47/W/D",
+      "note": "approved official /W base"
+    },
+    "MF01814BS47/T": {
+      "pageUrl": "https://www.midea.com/kz/washing-machines/front-load-washing-machines/midea-washing-machines-with-healthguard-technology.mf01814bs47-w",
+      "normalizedModel": "MF01814BS47/T",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Washing Machine",
+      "marcoModel": "MF01814BS47/T",
+      "note": "user approves /W official source for Marco /T"
+    },
+    "MFA01W80B/W-C": {
+      "pageUrl": "https://www.mideaarmenia.am/midea-mfa01w80b-w-c",
+      "normalizedModel": "MFA01W80B/W-C",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Washing Machine",
+      "marcoModel": "MFA01W80B/W-C",
+      "note": null
+    },
+    "MFA01W70B/W-C": {
+      "pageUrl": "https://mideaarmenia.am/midea-mfa01w70b-w-c",
+      "normalizedModel": "MFA01W70B/W-C",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Washing Machine",
+      "marcoModel": "MFA01W70B/W-C",
+      "note": null
+    },
+    "MFA01W70B/T-C": {
+      "pageUrl": "https://www.mideaarmenia.am/midea-mfa01w70b-t-c",
+      "normalizedModel": "MFA01W70B/T-C",
+      "matchType": "APPROVED_LOCAL_DISTRIBUTOR",
+      "approvalStatus": "LOCAL_DISTRIBUTOR",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "midea",
+      "category": "Washing Machine",
+      "marcoModel": "MFA01W70B/T-C",
+      "note": null
+    }
+  },
+  "samsung": {
+    "55CU8000": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/uhd-4k-tv/crystal-uhd-cu8000-55-inch-ua55cu8000uxzn/",
+      "normalizedModel": "UA55CU8000UXZN",
+      "matchType": "APPROVED_REGIONAL_ANALOG",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA65Q80CAUXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/qled-tv/q80c-65-inch-qled-4k-smart-tv-qa65q80cauxzn/",
+      "normalizedModel": "QA65Q80CAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA55Q60CA": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/qled-tv/q60c-55-inch-qled-4k-smart-tv-qa55q60cauxzn/",
+      "normalizedModel": "QA55Q60CAUXZN",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA55Q7FAAUXLY": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/qled-tv/q7f-55-inch-qled-4k-smart-tv-qa55q7faauxzn/",
+      "normalizedModel": "QA55Q7FAAUXZN",
+      "matchType": "APPROVED_REGIONAL_ANALOG",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA55Q80BAUXZN": {
+      "pageUrl": "https://www.samsung.com/iran/tvs/qled-tv/q80b-55-inch-qled-4k-smart-tv-qa55q80bauxzn/",
+      "normalizedModel": "QA55Q80BAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA55S95CAUXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/oled-tv/s95c-55-inch-oled-4k-smart-tv-qa55s95cauxzn/",
+      "normalizedModel": "QA55S95CAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA65Q70CAUXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/qled-tv/q70c-65-inch-qled-4k-smart-tv-qa65q70cauxzn/",
+      "normalizedModel": "QA65Q70CAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA65S95CAUXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/oled-tv/s95c-65-inch-oled-4k-smart-tv-qa65s95cauxzn/",
+      "normalizedModel": "QA65S95CAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA75Q60CAUXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/qled-tv/q60c-75-inch-qled-4k-smart-tv-qa75q60cauxzn/",
+      "normalizedModel": "QA75Q60CAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA75Q80BAUXZN": {
+      "pageUrl": "https://www.samsung.com/iran/tvs/qled-tv/q80b-75-inch-qled-4k-smart-tv-qa75q80bauxzn/",
+      "normalizedModel": "QA75Q80BAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA75QN85CAUXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/qled-tv/qn85c-75-inch-neo-qled-4k-smart-tv-qa75qn85cauxzn/",
+      "normalizedModel": "QA75QN85CAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QA85Q60CAUXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/qled-tv/q60c-85-inch-qled-4k-smart-tv-qa85q60cauxzn/",
+      "normalizedModel": "QA85Q60CAUXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "QE55Q70CAUXRU": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/qled-tv/q70c-55-inch-qled-4k-smart-tv-qe55q70cauxru/",
+      "normalizedModel": "QE55Q70CAUXRU",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UE50DU7100UXCE": {
+      "pageUrl": "https://www.samsung.com/kz_ru/tvs/uhd-4k-tv/du7000-50-inch-crystal-uhd-4k-tizen-os-smart-tv-ue50du7100uxce/",
+      "normalizedModel": "UE50DU7100UXCE",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UE55DU7100UXCE": {
+      "pageUrl": "https://www.samsung.com/kz_ru/tvs/uhd-4k-tv/du7000-55-inch-crystal-uhd-4k-tizen-os-smart-tv-ue55du7100uxce/",
+      "normalizedModel": "UE55DU7100UXCE",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UE65DU7100UXCE": {
+      "pageUrl": "https://www.samsung.com/kz_ru/tvs/uhd-4k-tv/du7000-65-inch-crystal-uhd-4k-tizen-os-smart-tv-ue65du7100uxce/",
+      "normalizedModel": "UE65DU7100UXCE",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UA50DU7000UXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/uhd-4k-tv/du7000-50-inch-crystal-uhd-4k-tizen-os-smart-tv-ua50du7000uxzn/",
+      "normalizedModel": "UA50DU7000UXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UA50DU8000UXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/uhd-4k-tv/du8000-50-inch-crystal-uhd-4k-tizen-os-smart-tv-ua50du8000uxzn/",
+      "normalizedModel": "UA50DU8000UXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UA55DU8000UXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/uhd-4k-tv/du8000-55-inch-crystal-uhd-4k-tizen-os-smart-tv-ua55du8000uxzn/",
+      "normalizedModel": "UA55DU8000UXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UA55U8000FUXLY": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/uhd-4k-tv/u8000f-55-inch-crystal-uhd-4k-smart-tv-ue55u8000fuxru/",
+      "normalizedModel": "UE55U8000FUXRU",
+      "matchType": "APPROVED_REGIONAL_ANALOG",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UA65CU8000UXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/uhd-4k-tv/crystal-uhd-cu8000-65-inch-ua65cu8000uxzn/",
+      "normalizedModel": "UA65CU8000UXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UA65U8000FUXLY": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/uhd-4k-tv/u8000f-65-inch-crystal-uhd-4k-smart-tv-ue65u8000fuxru/",
+      "normalizedModel": "UE65U8000FUXRU",
+      "matchType": "APPROVED_REGIONAL_ANALOG",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UA85CU7000UXZN": {
+      "pageUrl": "https://www.samsung.com/ae/tvs/uhd-4k-tv/cu7000-85-inch-ua85cu7000uxzn/",
+      "normalizedModel": "UA85CU7000UXZN",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UE43CU8000UXRU": {
+      "pageUrl": "https://www.samsung.com/az/tvs/uhd-4k-tv/cu8000-43-inch-ue43cu8000uxru/",
+      "normalizedModel": "UE43CU8000UXRU",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UE43DU8000UXCE": {
+      "pageUrl": "https://www.samsung.com/kz_ru/tvs/uhd-4k-tv/du8000-43-inch-crystal-uhd-4k-tizen-os-smart-tv-ue43du8000uxce/",
+      "normalizedModel": "UE43DU8000UXCE",
+      "matchType": "EXACT",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UA43U8000FUXLY": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/uhd-4k-tv/u8000f-43-inch-crystal-uhd-4k-smart-tv-ue43u8000fuxru/",
+      "normalizedModel": "UE43U8000FUXRU",
+      "matchType": "APPROVED_REGIONAL_ANALOG",
+      "approved": true,
+      "source": "manual-approved-list"
+    },
+    "UE65U8000FUXRU": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/uhd-4k-tv/u8000f-65-inch-crystal-uhd-4k-smart-tv-ue65u8000fuxru/",
+      "normalizedModel": "UE65U8000FUXRU",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "TV",
+      "marcoModel": "UE65U8000FUXRU",
+      "note": null,
+      "approvedImageUrls": [
+        {
+          "url": "https://images.samsung.com/is/image/samsung/p6pim/ru/ue65u8000fuxru/gallery/ru-uhd-u8000-ue65u8000fuxru-546259940?$1164_776_PNG$=",
+          "evidence": "MANUAL_APPROVED_IMAGE",
+          "allowLowResolution": false
+        }
+      ]
+    },
+    "UE55U8000FUXRU": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/uhd-4k-tv/u8000f-55-inch-crystal-uhd-4k-smart-tv-ue55u8000fuxru/",
+      "normalizedModel": "UE55U8000FUXRU",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "TV",
+      "marcoModel": "UE55U8000FUXRU",
+      "note": null
+    },
+    "UE50U8000FUXRU": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/uhd-4k-tv/u8000f-50-inch-crystal-uhd-4k-smart-tv-ue50u8000fuxru/",
+      "normalizedModel": "UE50U8000FUXRU",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "TV",
+      "marcoModel": "UE50U8000FUXRU",
+      "note": null
+    },
+    "UE43F6000FUXRU": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/full-hd-tv/f6000-43-inch-ue43f6000fuxru/",
+      "normalizedModel": "UE43F6000FUXRU",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "TV",
+      "marcoModel": "UE43F6000FUXRU",
+      "note": null
+    },
+    "QE85Q7FAAUXRU": {
+      "pageUrl": "https://www.samsung.com/ru/support/model/QE85Q7FAAUXRU/",
+      "normalizedModel": "QE85Q7FAAUXRU",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "TV",
+      "marcoModel": "QE85Q7FAAUXRU",
+      "note": null
+    },
+    "QE65Q7FAAUXRU": {
+      "pageUrl": "https://www.samsung.com/ru/tvs/qled-tv/q7f-65-inch-qled-4k-smart-tv-qe65q7faauxru/",
+      "normalizedModel": "QE65Q7FAAUXRU",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "TV",
+      "marcoModel": "QE65Q7FAAUXRU",
+      "note": null
+    },
+    "QE43Q7FAAUXRU": {
+      "pageUrl": "https://www.samsung.com/ie/tvs/qled-tv/q7f-43-inch-qled-4k-smart-tv-qe43q7faauxxu/",
+      "normalizedModel": "QE43Q7FAAUXRU",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "TV",
+      "marcoModel": "QE43Q7FAAUXRU",
+      "note": "approved equivalent: official suffix UXXU, Marco UXRU"
+    },
+    "RT53DB7B60ETWT": {
+      "pageUrl": "https://www.samsung.com/ru/refrigerators/top-mount-freezer/rt7300d-smartthings-ai-energy-mode-top-mount-freezer-smartthings-ai-energy-mode-540l-essential-beige-rt53db7b60etwr/",
+      "normalizedModel": "RT53DB7B60ETWT",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RT53DB7B60ETWT",
+      "note": "approved ETWR source for Marco ETWT"
+    },
+    "RT35CG5400S9SG": {
+      "pageUrl": "https://www.samsung.com/ae/refrigerators/top-mount-freezer/rt5300c-top-mount-freezer-spacemax-350l-silver-rt35cg5400s9sg/",
+      "normalizedModel": "RT35CG5400S9SG",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RT35CG5400S9SG",
+      "note": null
+    },
+    "RS80T5190SL": {
+      "pageUrl": "https://www.samsung.com/ae/support/model/RS80T5190SL/SG/",
+      "normalizedModel": "RS80T5190SL",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RS80T5190SL",
+      "note": "approved official /SG suffix"
+    },
+    "RR39M73107F": {
+      "pageUrl": "https://www.samsung.com/ae/refrigerators/one-door/375l-refined-steel-rr39m73107f-sg/",
+      "normalizedModel": "RR39M73107F",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RR39M73107F/SG",
+      "note": null
+    },
+    "RH65A5401M9": {
+      "pageUrl": "https://www.samsung.com/ae/support/model/RH65A5401M9/EU/",
+      "normalizedModel": "RH65A5401M9",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RH65A5401M9/EU",
+      "note": null
+    },
+    "RB50DG602ES9WR": {
+      "pageUrl": "https://www.samsung.com/uk/support/model.RB50DG602ES9EF/",
+      "normalizedModel": "RB50DG602ES9WR",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RB50DG602ES9WR",
+      "note": "approved base, official EF suffix vs Marco WR"
+    },
+    "RB31FERNDWW": {
+      "pageUrl": "https://www.samsung.com/pk/support/model/RB31FERNDWW/WT/",
+      "normalizedModel": "RB31FERNDWW",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RB31FERNDWW/WR",
+      "note": "approved WT source for Marco WR"
+    },
+    "RB29FSRNDWW": {
+      "pageUrl": "https://www.samsung.com/uk/support/model/RB29FSRNDWW/WT/",
+      "normalizedModel": "RB29FSRNDWW",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RB29FSRNDWW/WT",
+      "note": null
+    },
+    "RB29FERNDSA/WT": {
+      "pageUrl": "https://www.samsung.com/uk/support/model/RB29FERNDSA/WT/",
+      "normalizedModel": "RB29FERNDSA/WT",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RB29FERNDSA/WT",
+      "note": null
+    },
+    "RB29FERNDSA/WR": {
+      "pageUrl": "https://www.samsung.com/ru/support/model/RB29FERNDSA/WR/",
+      "normalizedModel": "RB29FERNDSA/WR",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Refrigerator",
+      "marcoModel": "RB29FERNDSA/WR",
+      "note": null
+    },
+    "AR24CXFCABT": {
+      "pageUrl": "https://www.samsung.com/levant/support/model/AR24CXFCABT/JO/",
+      "normalizedModel": "AR24CXFCABT",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "AC",
+      "marcoModel": "AR24CXFCABT/JO",
+      "note": null
+    },
+    "AR18CXFCABT": {
+      "pageUrl": "https://www.samsung.com/levant/support/model/AR18CXFCABT/JO/",
+      "normalizedModel": "AR18CXFCABT",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "AC",
+      "marcoModel": "AR18CXFCABT/JO",
+      "note": null
+    },
+    "AR12CXFCABT": {
+      "pageUrl": "https://www.samsung.com/levant/support/model/AR12CXFCABTXJO/",
+      "normalizedModel": "AR12CXFCABT",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_NORMALIZED",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "AC",
+      "marcoModel": "AR12CXFCABT/JO",
+      "note": "same approved region suffix normalized as XJO"
+    },
+    "AR12CXFCABTXJO": {
+      "pageUrl": "https://www.samsung.com/levant/support/model/AR12CXFCABTXJO/",
+      "normalizedModel": "AR12CXFCABTXJO",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_NORMALIZED",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "AC",
+      "marcoModel": "AR12CXFCABT/JO",
+      "note": "alias for compact extractor"
+    },
+    "WW80AG6L28BBLP": {
+      "pageUrl": "https://www.samsung.com/ru/washers-and-dryers/washing-machines/ww6100a-front-loading-eco-bubble-ai-control-lagest-capacity-8kg-white-ww80ag6l28bblp/",
+      "normalizedModel": "WW80AG6L28BBLP",
+      "matchType": "EXACT",
+      "approvalStatus": "EXACT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Washing Machine",
+      "marcoModel": "WW80AG6L28BBLP",
+      "note": null
+    },
+    "WW70AG6S23AXLP": {
+      "pageUrl": "https://www.samsung.com/az/support/model/WW70AG6S23AXLP/",
+      "normalizedModel": "WW70AG6S23AXLP",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Washing Machine",
+      "marcoModel": "WW70AG6S23AXLP",
+      "note": null
+    },
+    "WW70AG6S23AELP": {
+      "pageUrl": "https://www.samsung.com/ru/support/model/WW70AG6S23AELP/",
+      "normalizedModel": "WW70AG6S23AELP",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Washing Machine",
+      "marcoModel": "WW70AG6S23AELP",
+      "note": null
+    },
+    "WW70AG5S20CXLP": {
+      "pageUrl": "https://www.samsung.com/ru/support/model/WW70AG5S20CXLP/",
+      "normalizedModel": "WW70AG5S20CXLP",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Washing Machine",
+      "marcoModel": "WW70AG5S20CXLP",
+      "note": null
+    },
+    "WW90TAO46AX": {
+      "pageUrl": "https://www.samsung.com/uk/business/washers-and-dryers/washing-machines/front-load-9kg-inox-ww90ta046ax-eu/",
+      "normalizedModel": "WW90TAO46AX",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_TYPO",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Washing Machine",
+      "marcoModel": "WW90TAO46AX",
+      "note": "Marco uses letter O, official digit 0"
+    },
+    "WW90T4541AE": {
+      "pageUrl": "https://www.samsung.com/ru/support/model/WW90T4541AE/LP/",
+      "normalizedModel": "WW90T4541AE",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Washing Machine",
+      "marcoModel": "WW90T4541AE/LP",
+      "note": null
+    },
+    "WW80TA046AX1": {
+      "pageUrl": "https://www.samsung.com/lb/washers-and-dryers/washing-machines/ww5000t-front-loading-eco-bubble-hygiene-steam-dit-8kg-platinum-silver-ww80ta046ax1fh/",
+      "normalizedModel": "WW80TA046AX1",
+      "matchType": "EXACT_CORRECTED_MODEL",
+      "approvalStatus": "REVIEW_SUFFIX",
+      "approved": true,
+      "source": "approved-102-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Washing Machine",
+      "marcoModel": "WW80TA046AX1",
+      "note": "approved official FH suffix"
+    },
+    "WW90T604CLH/LP": {
+      "pageUrl": "https://www.samsung.com/ru/support/model/WW90T604CLH/LP/",
+      "normalizedModel": "WW90T604CLH/LP",
+      "matchType": "SUPPORT_PAGE",
+      "approvalStatus": "EXACT_SUPPORT",
+      "approved": true,
+      "source": "approved-retry-28-batch-2026-08-12",
+      "brand": "samsung",
+      "category": "Washing Machine",
+      "marcoModel": "WW90T604CLH/LP",
+      "note": null
+    }
+  }
+}

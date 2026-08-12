@@ -41,7 +41,7 @@ function CheckoutOrderItemTile({ item, onRemove, isRemoving }: CheckoutOrderItem
     <li className="w-[88px] shrink-0">
       <div className="relative">
         <div className="relative flex h-[104px] w-full items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white">
-          {imageError ? (
+          {imageError || !imageSrc ? (
             <ProductImagePlaceholder
               className="absolute inset-0"
               aria-label={productTitle ? `No image for ${productTitle}` : 'No image'}

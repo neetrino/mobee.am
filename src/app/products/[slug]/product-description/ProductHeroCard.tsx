@@ -5,6 +5,7 @@ import type { ProductDescriptionSpecRow } from '@/lib/products/extract-product-d
 import { ProductSpecRow } from './ProductSpecCard';
 import { getProductSpecSectionIcon, getProductSpecSectionIconClassName } from './product-spec-row-icon';
 import { PRODUCT_DESCRIPTION_CARD_CLASS } from './product-description.constants';
+import { ProductImagePlaceholder } from '@/components/ProductImagePlaceholder';
 
 const HeroSectionIcon = getProductSpecSectionIcon('general');
 const HERO_SECTION_ICON_CLASS = getProductSpecSectionIconClassName('general');
@@ -14,7 +15,7 @@ const HERO_GRID_CLASS =
 
 interface ProductHeroCardProps {
   imageAlt: string;
-  imageUrl: string;
+  imageUrl: string | null;
   rows: ProductDescriptionSpecRow[];
   language: LanguageCode;
 }
@@ -43,7 +44,14 @@ export function ProductHeroCard({ imageAlt, imageUrl, rows, language }: ProductH
       <div className={HERO_GRID_CLASS}>
         <div className="col-start-1 row-start-1 flex flex-col items-center">
           <div className="relative aspect-square w-full max-w-[220px]">
-            <Image src={imageUrl} alt={imageAlt} fill className="object-contain" sizes="220px" />
+            {imageUrl ? (
+              <Image src={imageUrl} alt={imageAlt} fill className="object-contain" sizes="220px" />
+            ) : (
+              <ProductImagePlaceholder
+                className="h-full w-full rounded-lg"
+                aria-label={imageAlt ? `No image for ${imageAlt}` : 'No image'}
+              />
+            )}
           </div>
         </div>
 

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '../lib/i18n-client';
 import { formatPrice, getStoredCurrency } from '../lib/currency';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
+import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 import { buildProductCardCachePayload } from '@/lib/products/product-card-cache';
 import { warmProductCardNavigation } from '@/lib/products/product-card-nav';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
@@ -103,13 +104,23 @@ export function SearchDropdown({
                   }`}
                 >
                   <div className="w-12 h-12 flex-shrink-0 rounded-lg bg-gray-100 overflow-hidden relative">
-                    <Image
-                      src={resolveProductCardImageSrc(result.image)}
-                      alt={result.title}
-                      fill
-                      className="object-cover"
-                      sizes="48px"
-                    />
+                    {(() => {
+                      const src = resolveProductCardImageSrc(result.image);
+                      return src ? (
+                        <Image
+                          src={src}
+                          alt={result.title}
+                          fill
+                          className="object-cover"
+                          sizes="48px"
+                        />
+                      ) : (
+                        <ProductImagePlaceholder
+                          className="h-full w-full"
+                          aria-label={`No image for ${result.title}`}
+                        />
+                      );
+                    })()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 line-clamp-2">
