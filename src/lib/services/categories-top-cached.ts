@@ -1,7 +1,7 @@
 import { db } from "@white-shop/db";
 import { cacheService } from "@/lib/services/cache.service";
 import { processImageUrl } from "@/lib/utils/image-utils";
-import { pickCategoryTranslation } from "@/lib/pickCategoryTranslation";
+import { resolveLocalizedCategoryFields } from "@/lib/category-title-i18n";
 
 const CACHE_TTL_SECONDS = 300;
 export const DEFAULT_TOP_CATEGORY_LIMIT = 5;
@@ -40,7 +40,7 @@ function buildTopCategoriesCacheKey(
   limit: number,
   includeImages: boolean,
 ): string {
-  return `categories:top:v2:${lang}:${limit}:${includeImages ? "img" : "noimg"}`;
+  return `categories:top:v3:${lang}:${limit}:${includeImages ? "img" : "noimg"}`;
 }
 
 /**
@@ -121,29 +121,37 @@ export async function getCachedTopCategories(
   }
 
   const allCats = categories.flatMap((cat) => {
-    const translation = pickCategoryTranslation(cat.translations, lang);
+    const localized = resolveLocalizedCategoryFields(cat.translations, lang);
     const parentCount = countMap.get(cat.id) || 0;
     const childrenCount = cat.children.reduce(
       (sum, child) => sum + (countMap.get(child.id) || 0),
       0,
     );
-    return [
-      {
-        id: cat.id,
-        slug: translation?.slug || "",
-        title: translation?.title || "",
-        productCount: parentCount + childrenCount,
-      },
-      ...cat.children.map((child) => {
-        const childTranslation = pickCategoryTranslation(child.translations, lang);
-        return {
+    const parentItem = localized
+      ? {
+          id: cat.id,
+          slug: localized.slug,
+          title: localized.title,
+          productCount: parentCount + childrenCount,
+        }
+      : null;
+
+    const childItems = cat.children.flatMap((child) => {
+      const childLocalized = resolveLocalizedCategoryFields(child.translations, lang);
+      if (!childLocalized) {
+        return [];
+      }
+      return [
+        {
           id: child.id,
-          slug: childTranslation?.slug || "",
-          title: childTranslation?.title || "",
+          slug: childLocalized.slug,
+          title: childLocalized.title,
           productCount: countMap.get(child.id) || 0,
-        };
-      }),
-    ];
+        },
+      ];
+    });
+
+    return parentItem ? [parentItem, ...childItems] : childItems;
   });
 
   const topCats = allCats
