@@ -10,6 +10,7 @@ import { logger } from "../../utils/logger";
 import type { ProductWithRelations } from "./types";
 import type { ProductSortOption } from "@/lib/products/sort";
 import { listPriceSortKey } from "@/lib/products/variant-price-display";
+import { productHasMarcoListingImage } from "@/lib/products/marco-product-image";
 
 type QueryExecutionContext = {
   listingMode: boolean;
@@ -445,9 +446,10 @@ export async function fetchProductsPageForPriceSort(
     select: {
       id: true,
       createdAt: true,
+      media: true,
       variants: {
         where: { published: true },
-        select: { price: true, priceOnRequest: true },
+        select: { price: true, priceOnRequest: true, imageUrl: true, media: true },
       },
     },
   });
@@ -457,8 +459,12 @@ export async function fetchProductsPageForPriceSort(
       id: row.id,
       listPrice: listPriceFromLightVariants(row.variants),
       createdAt: row.createdAt,
+      isMarco: productHasMarcoListingImage(row),
     }))
     .sort((a, b) => {
+      if (a.isMarco !== b.isMarco) {
+        return a.isMarco ? 1 : -1;
+      }
       if (a.listPrice !== b.listPrice) {
         return sort === "price-asc"
           ? a.listPrice - b.listPrice
@@ -491,6 +497,69 @@ export async function fetchProductsPageForPriceSort(
   const orderMap = new Map(pageIds.map((id, index) => [id, index]));
   products.sort(
     (a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0)
+  );
+
+  return products;
+}
+
+/**
+ * Default catalog pagination: non-Marco images first, then newer createdAt.
+ */
+export async function fetchProductsPageDemotingMarco(
+  where: Prisma.ProductWhereInput,
+  limit: number,
+  skip: number,
+  listingMode: boolean,
+  lang = "en",
+): Promise<ProductWithRelations[]> {
+  const lightRows = await db.product.findMany({
+    where,
+    select: {
+      id: true,
+      createdAt: true,
+      media: true,
+      variants: {
+        where: { published: true },
+        select: { imageUrl: true, media: true },
+      },
+    },
+  });
+
+  const sortedIds = lightRows
+    .map((row) => ({
+      id: row.id,
+      createdAt: row.createdAt.getTime(),
+      isMarco: productHasMarcoListingImage(row),
+    }))
+    .sort((a, b) => {
+      if (a.isMarco !== b.isMarco) {
+        return a.isMarco ? 1 : -1;
+      }
+      return b.createdAt - a.createdAt;
+    })
+    .map((row) => row.id);
+
+  const pageIds = sortedIds.slice(skip, skip + limit);
+  if (pageIds.length === 0) {
+    return [];
+  }
+
+  const narrowedWhere: Prisma.ProductWhereInput = {
+    AND: [where, { id: { in: pageIds } }],
+  };
+
+  const products = await executeProductQuery(
+    narrowedWhere,
+    pageIds.length,
+    0,
+    "default",
+    listingMode,
+    lang,
+  );
+
+  const orderMap = new Map(pageIds.map((id, index) => [id, index]));
+  products.sort(
+    (a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0),
   );
 
   return products;

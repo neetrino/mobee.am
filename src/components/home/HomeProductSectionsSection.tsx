@@ -10,13 +10,16 @@ import {
 } from "@/lib/services/products-list-cached";
 import { HomeProductSections } from "@/components/FeaturedProductsTabs";
 import type { FeaturedHomeProduct } from "@/components/useFeaturedHomeProducts";
+import { isMarcoHostedProductImageUrl } from "@/lib/products/marco-product-image";
 
 type HomeProductSectionsSectionProps = {
   language: LanguageCode;
 };
 
 function mapPayloadToFeaturedProducts(payload: ProductListPayload): FeaturedHomeProduct[] {
-  return (payload.data ?? []) as FeaturedHomeProduct[];
+  return ((payload.data ?? []) as FeaturedHomeProduct[]).filter(
+    (product) => !isMarcoHostedProductImageUrl(product.image),
+  );
 }
 
 /**

@@ -1,12 +1,17 @@
 import { db } from "@white-shop/db";
+import type { CategoryTreeNode } from "@/lib/category-nav";
 import { resolveLocalizedCategoryFields } from "../category-title-i18n";
 import { pickCategoryTranslation } from "../pickCategoryTranslation";
+
+export type CategoriesTreeResult = {
+  data: CategoryTreeNode[];
+};
 
 class CategoriesService {
   /**
    * Get category tree
    */
-  async getTree(lang: string = "en") {
+  async getTree(lang: string = "en"): Promise<CategoriesTreeResult> {
     const categories = await db.category.findMany({
       where: {
         published: true,
@@ -25,16 +30,8 @@ class CategoriesService {
       },
     });
 
-    // Build tree structure
-    const categoryMap = new Map();
-    const rootCategories: Array<{
-      id: string;
-      slug: string;
-      title: string;
-      fullPath: string;
-      media: unknown;
-      children: unknown[];
-    }> = [];
+    const categoryMap = new Map<string, CategoryTreeNode>();
+    const rootCategories: CategoryTreeNode[] = [];
 
     categories.forEach((category: {
       id: string;
@@ -45,13 +42,13 @@ class CategoriesService {
       const localized = resolveLocalizedCategoryFields(category.translations, lang);
       if (!localized) return;
 
-      const categoryData = {
+      const categoryData: CategoryTreeNode = {
         id: category.id,
         slug: localized.slug,
         title: localized.title,
         fullPath: localized.fullPath,
         media: category.media ?? [],
-        children: [] as unknown[],
+        children: [],
       };
 
       categoryMap.set(category.id, categoryData);
@@ -61,17 +58,17 @@ class CategoriesService {
       }
     });
 
-    // Build parent-child relationships
     categories.forEach((category: {
       id: string;
       parentId: string | null;
     }) => {
-      if (category.parentId) {
-        const parent = categoryMap.get(category.parentId);
-        const child = categoryMap.get(category.id);
-        if (parent && child) {
-          parent.children.push(child);
-        }
+      if (!category.parentId) {
+        return;
+      }
+      const parent = categoryMap.get(category.parentId);
+      const child = categoryMap.get(category.id);
+      if (parent && child) {
+        parent.children.push(child);
       }
     });
 
