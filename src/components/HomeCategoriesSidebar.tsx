@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
+import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 
 interface Category {
   id: string;
@@ -326,13 +327,23 @@ export function HomeCategoriesSidebar() {
           }}
         >
           <div className="relative w-full h-32 mb-2 rounded overflow-hidden bg-gray-100">
-            <Image
-              src={resolveProductCardImageSrc(hoveredProduct.image)}
-              alt={hoveredProduct.title}
-              fill
-              className="object-cover"
-              sizes="192px"
-            />
+            {(() => {
+              const src = resolveProductCardImageSrc(hoveredProduct.image);
+              return src ? (
+                <Image
+                  src={src}
+                  alt={hoveredProduct.title}
+                  fill
+                  className="object-cover"
+                  sizes="192px"
+                />
+              ) : (
+                <ProductImagePlaceholder
+                  className="h-full w-full"
+                  aria-label={`No image for ${hoveredProduct.title}`}
+                />
+              );
+            })()}
           </div>
           <p className="text-xs text-gray-700 font-medium truncate">{hoveredProduct.title}</p>
         </div>

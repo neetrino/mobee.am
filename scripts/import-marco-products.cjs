@@ -2,7 +2,8 @@
  * Marco → Mobee product importer.
  *
  * Default: dry-run (no Mobee writes).
- * Apply writes only with --apply.
+ * Apply writes CREATE-only with --apply (never updates existing Mobee products).
+ * Unsafe CREATE rows (missing SKU and/or price <= 0) are excluded from writes.
  *
  * Usage:
  *   node scripts/import-marco-products.cjs
@@ -18,166 +19,62 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { Client } = require("pg");
+const {
+  GROUPS,
+  GROUP_KEYS,
+  categoryMatchesGroup,
+  normalizeText,
+} = require("./lib/marco/groups.constants.cjs");
 
 const SOURCE_NAME = "marco";
 const STOCK_SENTINEL = 100000;
+/** Marco stores AMD in full units; Mobee catalog prices are AMD / 1000. */
+const MARCO_PRICE_TO_MOBEE_DIVISOR = 1000;
 const REPORT_PATH = path.join(
   process.cwd(),
   "scripts",
   "import-marco-products.dry-run.json"
 );
 
-const GROUPS = {
-  "samsung-tv": {
-    key: "samsung-tv",
-    brand: "Samsung",
-    brandAliases: ["samsung"],
-    categoryLabel: "телевизоры",
-    includePatterns: [
-      "телевизор",
-      "television",
-      "televisions",
-      "smart tv",
-      "հեռուստացույց",
-    ],
-    allowTvToken: true,
-    excludePatterns: [
-      "apple tv",
-      "accessory",
-      "аксессуар",
-      "remote",
-      "пульт",
-      "mount",
-      "крепление",
-      "bracket",
-      "stand",
-      "подставк",
-      "soundbar",
-      "саундбар",
-      "cover",
-      "чехол",
-    ],
-  },
-  "bosch-refrigerators": {
-    key: "bosch-refrigerators",
-    brand: "Bosch",
-    brandAliases: ["bosch"],
-    categoryLabel: "холодильники",
-    includePatterns: [
-      "холодильник",
-      "refrigerator",
-      "fridge",
-      "սառնարան",
-    ],
-    excludePatterns: [
-      "accessory",
-      "accessories",
-      "аксессуар",
-      "filter",
-      "фильтр",
-      "part",
-      "запчаст",
-      "shelf",
-      "полк",
-      "freezer only",
-      "морозильник",
-    ],
-  },
-  "lg-washing-machines": {
-    key: "lg-washing-machines",
-    brand: "LG",
-    brandAliases: ["lg"],
-    categoryLabel: "стиральные машины",
-    includePatterns: [
-      "стиральн",
-      "washing machine",
-      "washing machines",
-      "washing-machine",
-      "լվացքի մեքեն",
-    ],
-    allowWasherToken: true,
-    excludePatterns: [
-      "посудомо",
-      "dishwasher",
-      "dish washer",
-      "սպասք լվացող",
-      "dryer",
-      "сушильн",
-      "accessory",
-      "аксессуар",
-      "filter",
-      "фильтр",
-      "part",
-      "запчаст",
-      "hose",
-      "шланг",
-      "powder",
-      "порошок",
-    ],
-  },
-  "hisense-washing-machines": {
-    key: "hisense-washing-machines",
-    brand: "Hisense",
-    brandAliases: ["hisense"],
-    categoryLabel: "стиральные машины",
-    includePatterns: [
-      "стиральн",
-      "washing machine",
-      "washing machines",
-      "washing-machine",
-      "լվացքի մեքեն",
-    ],
-    allowWasherToken: true,
-    excludePatterns: [
-      "посудомо",
-      "dishwasher",
-      "dish washer",
-      "սպասք լվացող",
-      "dryer",
-      "сушильн",
-      "accessory",
-      "аксессуар",
-      "filter",
-      "фильтр",
-      "part",
-      "запчаст",
-      "hose",
-      "шланг",
-    ],
-  },
-  "midea-air-conditioners": {
-    key: "midea-air-conditioners",
-    brand: "Midea",
-    brandAliases: ["midea"],
-    categoryLabel: "кондиционеры",
-    includePatterns: [
-      "кондиционер",
-      "air conditioner",
-      "air-conditioning",
-      "air conditioning",
-      "aircondition",
-      "օդորակիչ",
-    ],
-    allowAcToken: true,
-    excludePatterns: [
-      "accessory",
-      "accessories",
-      "аксессуар",
-      "пульт",
-      "remote",
-      "filter",
-      "фильтр",
-      "крепление",
-      "mount",
-      "part",
-      "запчаст",
-      "cover",
-      "чехол",
-      "heater only",
-      "обогреватель",
-    ],
-  },
-};
+/**
+ * Explicit CREATE exclusions: missing SKU + price 0 (do not invent values).
+ * Kept as a hard denylist in addition to the generic safety gate.
+ */
+const UNSAFE_CREATE_MARCO_PRODUCT_IDS = new Set([
+  "cmpphlcv4079zhtkb5wny80qr", // MIDEA AF-24N8D0
+  "cmppffhyi07um4c5zmdecwwj8", // HISENSE AS18UW4SMSKC02G
+  "cmppfffgn07ti4c5zuawemcpx", // HISENSE AS12HR4SV DDE (black)
+  "cmppff4pr07os4c5zmoedzwkq", // HISENSE AS24UW4SBTKC00A
+  "cmppff0xj07ns4c5zvy2qmr7w", // HISENSE AS12HR4SYRCA01
+]);
+
+function planHasTruthySku(plan) {
+  return (plan.variants || []).some(
+    (v) => typeof v.sku === "string" && v.sku.trim().length > 0
+  );
+}
+
+function planHasPositivePrice(plan) {
+  return (plan.variants || []).some((v) => Number(v.price) > 0);
+}
+
+/**
+ * CREATE rows that must never be written: denylist and/or missing SKU / price.
+ */
+function getUnsafeCreateReasons(plan) {
+  if (plan.action !== "CREATE") return [];
+  const reasons = [];
+  if (UNSAFE_CREATE_MARCO_PRODUCT_IDS.has(plan.marcoProductId)) {
+    reasons.push("EXPLICIT_UNSAFE_DENYLIST");
+  }
+  if (!planHasTruthySku(plan)) reasons.push("MISSING_SKU");
+  if (!planHasPositivePrice(plan)) reasons.push("PRICE_ZERO_OR_MISSING");
+  return reasons;
+}
+
+function isSafeCreateWriteCandidate(plan) {
+  return plan.action === "CREATE" && getUnsafeCreateReasons(plan).length === 0;
+}
 
 function loadEnv(filePath) {
   const out = {};
@@ -233,52 +130,6 @@ function hostOf(url) {
   } catch {
     return "unknown-host";
   }
-}
-
-function normalizeText(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function matchesAny(haystack, patterns) {
-  const text = normalizeText(haystack);
-  return patterns.some((p) => text.includes(normalizeText(p)));
-}
-
-function hasWholeWord(haystack, word) {
-  const text = normalizeText(haystack);
-  const re = new RegExp(`(^|[^a-z0-9а-яё])${word}([^a-z0-9а-яё]|$)`, "i");
-  return re.test(text);
-}
-
-function categoryMatchesGroup(group, category) {
-  const blob = `${category.title || ""} ${category.slug || ""} ${category.path || ""}`;
-  if (matchesAny(blob, group.excludePatterns)) return false;
-  if (matchesAny(blob, group.includePatterns)) return true;
-  if (group.allowWasherToken) {
-    if (hasWholeWord(blob, "washer") || hasWholeWord(blob, "washers")) return true;
-  }
-  if (group.allowTvToken) {
-    if (
-      hasWholeWord(blob, "tv") ||
-      hasWholeWord(blob, "tvs") ||
-      category.slug === "tv" ||
-      /(^|[-_/])tvs?($|[-_/])/i.test(category.slug || "")
-    ) {
-      return true;
-    }
-  }
-  if (group.allowAcToken) {
-    if (
-      hasWholeWord(blob, "ac") ||
-      /(^|[-_/])acs?($|[-_/])/i.test(category.slug || "")
-    ) {
-      return true;
-    }
-  }
-  return false;
 }
 
 function createId() {
@@ -361,17 +212,29 @@ function normalizeStock(stock) {
   return { stock: Number.isFinite(n) ? n : 0, warning: null };
 }
 
+/**
+ * Convert Marco money (full AMD) to Mobee catalog units (AMD / 1000).
+ * Keeps up to 2 decimal places.
+ */
+function toMobeePrice(marcoAmount) {
+  if (marcoAmount == null) return null;
+  const n = Number(marcoAmount);
+  if (!Number.isFinite(n)) return null;
+  return Math.round((n / MARCO_PRICE_TO_MOBEE_DIVISOR) * 100) / 100;
+}
+
 function compareAtFromMarco(variant) {
   const price = Number(variant.price);
   if (!Number.isFinite(price)) return null;
   const discountType = String(variant.discountType || "").toUpperCase();
   const discountValue = Number(variant.discountValue);
   if (!Number.isFinite(discountValue) || discountValue <= 0) return null;
-  if (discountType === "AMOUNT") return price + discountValue;
-  if (discountType === "PERCENT" && discountValue < 100) {
-    return Math.round((price / (1 - discountValue / 100)) * 100) / 100;
+  let marcoCompare = null;
+  if (discountType === "AMOUNT") marcoCompare = price + discountValue;
+  else if (discountType === "PERCENT" && discountValue < 100) {
+    marcoCompare = Math.round((price / (1 - discountValue / 100)) * 100) / 100;
   }
-  return null;
+  return toMobeePrice(marcoCompare);
 }
 
 function productCategoryIds(product) {
@@ -953,9 +816,21 @@ function summarizeSelection(plans, args) {
     (p) => p.action === "SKIP" && p.reason === "UNPUBLISHED"
   ).length;
   const publishedCandidates = plans.filter((p) => p.action !== "SKIP").length;
-  let writeCandidates = plans.filter(
-    (p) => p.action === "CREATE" || p.action === "UPDATE"
-  );
+  const createTotal = plans.filter((p) => p.action === "CREATE").length;
+  const updateExisting = plans.filter((p) => p.action === "UPDATE").length;
+  const excludedUnsafeCreates = plans
+    .filter((p) => p.action === "CREATE" && !isSafeCreateWriteCandidate(p))
+    .map((p) => ({
+      group: p.group,
+      marcoProductId: p.marcoProductId,
+      title: p.title,
+      reasons: getUnsafeCreateReasons(p),
+      hasSku: planHasTruthySku(p),
+      hasPositivePrice: planHasPositivePrice(p),
+    }));
+
+  // CREATE-only: never write UPDATE/EXISTING. Exclude unsafe CREATEs.
+  let writeCandidates = plans.filter((p) => isSafeCreateWriteCandidate(p));
   if (args.sourceProductId) {
     writeCandidates = writeCandidates.filter(
       (p) => p.marcoProductId === args.sourceProductId
@@ -964,11 +839,25 @@ function summarizeSelection(plans, args) {
   const selectedForApply =
     args.limit != null ? writeCandidates.slice(0, args.limit) : writeCandidates;
 
+  const zeroPriceWriteCandidates = writeCandidates.filter(
+    (p) => !planHasPositivePrice(p)
+  ).length;
+  const missingSkuWriteCandidates = writeCandidates.filter(
+    (p) => !planHasTruthySku(p)
+  ).length;
+
   return {
     rawCandidates,
     publishedCandidates,
+    createTotal,
+    updateExisting,
+    updateWriteCandidates: 0,
+    excludedUnsafeCreate: excludedUnsafeCreates.length,
+    excludedUnsafeCreates,
     writeCandidates: writeCandidates.length,
     selectedForApply: selectedForApply.length,
+    zeroPriceWriteCandidates,
+    missingSkuWriteCandidates,
     skippedUnpublished,
     selectedPlans: selectedForApply,
     writePlans: writeCandidates,
@@ -1058,7 +947,11 @@ function buildPlanItem({
 }) {
   const warnings = [];
   const title = pickTitle(product.translations);
-  const media = normalizeMedia(product.media, title || "");
+  // Never import Marco media/images — Mobee uses official manufacturer photos only.
+  const media = [];
+  if (countMedia(normalizeMedia(product.media, title || "")) > 0) {
+    warnings.push("MARCO_MEDIA_SKIPPED");
+  }
   const classification = classifyProduct(product);
 
   if (!brandMapping?.mobeeBrandId) {
@@ -1153,7 +1046,9 @@ function buildPlanItem({
       if (stockInfo.warning) warnings.push(stockInfo.warning);
 
       const price = Number(variant.price);
-      const safePrice = Number.isFinite(price) ? price : 0;
+      const safePrice = Number.isFinite(price)
+        ? toMobeePrice(price)
+        : 0;
       if (safePrice === 0) warnings.push("PRICE_ZERO");
 
       const opts = mapOptions(
@@ -1173,6 +1068,8 @@ function buildPlanItem({
       noteSourceHit(bySource);
       noteSkuConflict(bySku, bySource);
 
+      const costMobee = toMobeePrice(variant.cost);
+
       variantsPlan.push({
         marcoVariantId: variant.id,
         generatedDefault: false,
@@ -1180,13 +1077,13 @@ function buildPlanItem({
         sourcePid,
         sku: variant.sku || null,
         barcode: variant.barcode || null,
-        price: safePrice,
+        price: safePrice ?? 0,
         compareAtPrice: compareAtFromMarco(variant),
-        cost: variant.cost == null ? null : Number(variant.cost),
+        cost: costMobee,
         stock: stockInfo.stock,
         stockReserved: Number(variant.stockReserved) || 0,
         weightGrams: variant.weightGrams,
-        imageUrl: variant.imageUrl || null,
+        imageUrl: null,
         position: variant.position || 0,
         published: variant.published !== false,
         attributes: variant.attributes || null,
@@ -1693,15 +1590,16 @@ async function main() {
     console.log(`Usage:
   node scripts/import-marco-products.cjs [--group=<name>] [--limit=<n>] [--source-product-id=<id>] [--apply]
 
-Groups: ${Object.keys(GROUPS).join(", ")}
-Default mode: dry-run (writes report only).
---limit applies only to CREATE/UPDATE write candidates (SKIP/CONFLICT do not consume it).`);
+Groups: ${GROUP_KEYS.join(", ")}
+Default mode: dry-run (writes report only). Without --group, all ${GROUP_KEYS.length} brand×category groups are evaluated.
+--limit applies only to safe CREATE write candidates (UPDATE/SKIP/CONFLICT/unsafe CREATE do not consume it).
+--apply inserts safe CREATE products only; existing Mobee products are never updated.`);
     return;
   }
 
   if (args.group && !GROUPS[args.group]) {
     throw new Error(
-      `Unknown group "${args.group}". Supported: ${Object.keys(GROUPS).join(", ")}`
+      `Unknown group "${args.group}". Supported: ${GROUP_KEYS.join(", ")}`
     );
   }
 
@@ -1796,6 +1694,28 @@ Default mode: dry-run (writes report only).
     }
 
     const plans = [];
+    const seenMarcoProductIds = new Map(); // marcoProductId -> first group key
+    const crossGroupDuplicates = [];
+
+    // Ensure every selected group appears in byGroup (including zero matches).
+    for (const group of selectedGroups) {
+      report.byGroup[group.key] = {
+        brand: group.brand,
+        categoryLabel: group.categoryLabel,
+        categoryKey: group.categoryKey,
+        CREATE: 0,
+        UPDATE: 0,
+        SKIP: 0,
+        CONFLICT: 0,
+        rawCandidates: 0,
+        publishedCandidates: 0,
+        writeCandidates: 0,
+        skippedUnpublished: 0,
+        selectedForApply: 0,
+        crossGroupDuplicateSkipped: 0,
+        sampleTitles: [],
+      };
+    }
 
     for (const group of selectedGroups) {
       const marcoBrand =
@@ -1890,6 +1810,19 @@ Default mode: dry-run (writes report only).
       const existingBySku = await lookupExistingBySku(mobee, skus);
 
       for (const product of products) {
+        if (seenMarcoProductIds.has(product.id)) {
+          const firstGroup = seenMarcoProductIds.get(product.id);
+          crossGroupDuplicates.push({
+            marcoProductId: product.id,
+            title: pickTitle(product.translations),
+            keptGroup: firstGroup,
+            skippedGroup: group.key,
+          });
+          report.byGroup[group.key].crossGroupDuplicateSkipped += 1;
+          continue;
+        }
+        seenMarcoProductIds.set(product.id, group.key);
+
         const plan = buildPlanItem({
           group,
           product,
@@ -1907,6 +1840,12 @@ Default mode: dry-run (writes report only).
           attrMap: { attrByKey, valuesByAttr, marcoKeyById },
         });
         plans.push(plan);
+        if (
+          report.byGroup[group.key].sampleTitles.length < 5 &&
+          plan.title
+        ) {
+          report.byGroup[group.key].sampleTitles.push(plan.title);
+        }
       }
     }
 
@@ -1939,7 +1878,7 @@ Default mode: dry-run (writes report only).
       } else if (plan.action !== "SKIP") {
         report.byGroup[plan.group].publishedCandidates += 1;
       }
-      if (plan.action === "CREATE" || plan.action === "UPDATE") {
+      if (isSafeCreateWriteCandidate(plan)) {
         report.byGroup[plan.group].writeCandidates += 1;
       }
 
@@ -1996,8 +1935,15 @@ Default mode: dry-run (writes report only).
     report.selection = {
       rawCandidates: selection.rawCandidates,
       publishedCandidates: selection.publishedCandidates,
+      createTotal: selection.createTotal,
+      updateExisting: selection.updateExisting,
+      updateWriteCandidates: selection.updateWriteCandidates,
+      excludedUnsafeCreate: selection.excludedUnsafeCreate,
+      excludedUnsafeCreates: selection.excludedUnsafeCreates,
       writeCandidates: selection.writeCandidates,
       selectedForApply: selection.selectedForApply,
+      zeroPriceWriteCandidates: selection.zeroPriceWriteCandidates,
+      missingSkuWriteCandidates: selection.missingSkuWriteCandidates,
       skippedUnpublished: selection.skippedUnpublished,
       selectedProducts: selection.selectedPlans.map((p) => ({
         group: p.group,
@@ -2019,16 +1965,118 @@ Default mode: dry-run (writes report only).
       skipPlans.every((p) => p.reason === "UNPUBLISHED");
     report.skipReasons = [...new Set(skipPlans.map((p) => p.reason))];
 
+    // Data-quality + matrix summary (dry-run and apply).
+    const skuToPlans = new Map();
+    let withoutSku = 0;
+    let withoutPrice = 0;
+    let withoutImage = 0;
+    for (const plan of report.products) {
+      const variants = Array.isArray(plan.variants) ? plan.variants : [];
+      const mediaCount = countMedia(plan.media);
+      if (mediaCount === 0) withoutImage += 1;
+      if (!variants.length) {
+        withoutSku += 1;
+        withoutPrice += 1;
+        continue;
+      }
+      let planHasSku = false;
+      let planHasPrice = false;
+      for (const v of variants) {
+        if (v.sku) {
+          planHasSku = true;
+          if (!skuToPlans.has(v.sku)) skuToPlans.set(v.sku, []);
+          skuToPlans.get(v.sku).push({
+            marcoProductId: plan.marcoProductId,
+            group: plan.group,
+            title: plan.title,
+            action: plan.action,
+          });
+        }
+        if (v.price != null && Number(v.price) > 0) planHasPrice = true;
+      }
+      if (!planHasSku) withoutSku += 1;
+      if (!planHasPrice) withoutPrice += 1;
+    }
+    const duplicateSkuGroups = [...skuToPlans.entries()]
+      .filter(([, rows]) => {
+        const productIds = new Set(rows.map((r) => r.marcoProductId));
+        return productIds.size > 1 || rows.length > 1;
+      })
+      .map(([sku, rows]) => ({
+        sku,
+        occurrences: rows.length,
+        uniqueProducts: [...new Set(rows.map((r) => r.marcoProductId))].length,
+        rows,
+      }));
+
+    report.crossGroupDuplicates = crossGroupDuplicates;
+    report.quality = {
+      uniqueMarcoProducts: seenMarcoProductIds.size,
+      matchedProducts: report.products.length,
+      newProducts: report.counts.CREATE || 0,
+      alreadyExisting: report.counts.UPDATE || 0,
+      conflicts: report.counts.CONFLICT || 0,
+      skipped: report.counts.SKIP || 0,
+      crossGroupDuplicateSkipped: crossGroupDuplicates.length,
+      withoutSku,
+      withoutPrice,
+      withoutImage,
+      duplicateSkuGroupCount: duplicateSkuGroups.length,
+      duplicateSkuGroups: duplicateSkuGroups.slice(0, 50),
+    };
+
+    report.matrix = GROUP_KEYS.map((key) => {
+      const g = GROUPS[key];
+      const row = report.byGroup[key] || {
+        CREATE: 0,
+        UPDATE: 0,
+        SKIP: 0,
+        CONFLICT: 0,
+        rawCandidates: 0,
+      };
+      return {
+        group: key,
+        brand: g.brand,
+        category: g.categoryLabel,
+        categoryKey: g.categoryKey,
+        found: row.rawCandidates || 0,
+        new: row.CREATE || 0,
+        existing: row.UPDATE || 0,
+        skip: row.SKIP || 0,
+        conflict: row.CONFLICT || 0,
+        crossGroupDuplicateSkipped: row.crossGroupDuplicateSkipped || 0,
+        sampleTitles: row.sampleTitles || [],
+      };
+    });
+
     if (args.apply) {
+      const unsafeSelected = selection.selectedPlans.filter(
+        (p) => !isSafeCreateWriteCandidate(p)
+      );
+      if (unsafeSelected.length > 0) {
+        throw new Error(
+          `Refusing --apply: ${unsafeSelected.length} non-safe CREATE plan(s) in selection`
+        );
+      }
+      const nonCreateSelected = selection.selectedPlans.filter(
+        (p) => p.action !== "CREATE"
+      );
+      if (nonCreateSelected.length > 0) {
+        throw new Error(
+          `Refusing --apply: ${nonCreateSelected.length} non-CREATE plan(s) in selection (CREATE-only)`
+        );
+      }
+
       for (const plan of selection.selectedPlans) {
+        if (plan.action !== "CREATE" || !isSafeCreateWriteCandidate(plan)) {
+          throw new Error(
+            `Refusing write for ${plan.marcoProductId}: action=${plan.action}`
+          );
+        }
         const sourcePids = (plan.variants || []).map((v) => v.sourcePid);
         try {
-          const result =
-            plan.action === "CREATE"
-              ? await applyCreate(mobee, plan, hasJoinTable)
-              : await applyUpdate(mobee, plan, hasJoinTable);
-          if (plan.action === "CREATE") report.applyResults.appliedCreate += 1;
-          else report.applyResults.appliedUpdate += 1;
+          const result = await applyCreate(mobee, plan, hasJoinTable);
+          report.applyResults.appliedCreate += 1;
           report.applyResults.items.push({
             action: plan.action,
             group: plan.group,
@@ -2052,20 +2100,12 @@ Default mode: dry-run (writes report only).
             note: null,
           };
           try {
-            if (plan.action === "CREATE") {
-              rollbackVerification = await verifyCreateRollback(
-                mobee,
-                err.applyProductId || null,
-                sourcePids,
-                hasJoinTable
-              );
-            } else {
-              rollbackVerification = {
-                rollbackVerified: true,
-                checks: null,
-                note: "UPDATE failure rolled back; create-absence check N/A",
-              };
-            }
+            rollbackVerification = await verifyCreateRollback(
+              mobee,
+              err.applyProductId || null,
+              sourcePids,
+              hasJoinTable
+            );
           } catch (verifyErr) {
             rollbackVerification = {
               rollbackVerified: false,
@@ -2177,12 +2217,40 @@ Default mode: dry-run (writes report only).
       )
     );
 
+    console.log("\n## Quality / dedup");
+    console.log(JSON.stringify(report.quality, null, 2));
+
+    console.log("\n## Brand × category matrix");
+    console.log(
+      "Brand".padEnd(10) +
+        "Category".padEnd(22) +
+        "Found".padStart(7) +
+        "New".padStart(7) +
+        "Existing".padStart(10) +
+        "Skip".padStart(7) +
+        "Conflict".padStart(10)
+    );
+    for (const row of report.matrix || []) {
+      console.log(
+        String(row.brand).padEnd(10) +
+          String(row.category).padEnd(22) +
+          String(row.found).padStart(7) +
+          String(row.new).padStart(7) +
+          String(row.existing).padStart(10) +
+          String(row.skip).padStart(7) +
+          String(row.conflict).padStart(10)
+      );
+    }
+
     console.log("\n## Selection");
     console.log(JSON.stringify(report.selection, null, 2));
 
-    console.log("\n## By group");
-    console.log(JSON.stringify(report.byGroup, null, 2));
-
+    console.log("\n## By group (summary)");
+    for (const row of report.matrix || []) {
+      console.log(
+        `- ${row.group}: found=${row.found} new=${row.new} existing=${row.existing} samples=${(row.sampleTitles || []).slice(0, 3).join(" | ") || "-"}`
+      );
+    }
     console.log("\n## SKIP policy");
     console.log(
       JSON.stringify(

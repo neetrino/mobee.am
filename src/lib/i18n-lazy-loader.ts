@@ -4,12 +4,15 @@ import { type Namespace, VALID_NAMESPACES } from './i18n-types';
 import enCommon from '../locales/en/common.json';
 import enHome from '../locales/en/home.json';
 import enProduct from '../locales/en/product.json';
+import enProducts from '../locales/en/products.json';
 import hyCommon from '../locales/hy/common.json';
 import hyHome from '../locales/hy/home.json';
 import hyProduct from '../locales/hy/product.json';
+import hyProducts from '../locales/hy/products.json';
 import ruCommon from '../locales/ru/common.json';
 import ruHome from '../locales/ru/home.json';
 import ruProduct from '../locales/ru/product.json';
+import ruProducts from '../locales/ru/products.json';
 
 type TranslationRecord = Record<string, unknown>;
 type LocaleStore = Partial<Record<Namespace, TranslationRecord>>;
@@ -19,16 +22,19 @@ const STOREFRONT_SEED_BY_LANG: Partial<Record<LanguageCode, LocaleStore>> = {
     common: enCommon as TranslationRecord,
     home: enHome as TranslationRecord,
     product: enProduct as TranslationRecord,
+    products: enProducts as TranslationRecord,
   },
   hy: {
     common: hyCommon as TranslationRecord,
     home: hyHome as TranslationRecord,
     product: hyProduct as TranslationRecord,
+    products: hyProducts as TranslationRecord,
   },
   ru: {
     common: ruCommon as TranslationRecord,
     home: ruHome as TranslationRecord,
     product: ruProduct as TranslationRecord,
+    products: ruProducts as TranslationRecord,
   },
 };
 
@@ -56,7 +62,8 @@ function notifyListeners(): void {
 
 /**
  * Synchronously seeds storefront-critical namespaces for SSR and first paint.
- * `common`, `home`, and `product` must be available before lazy loads complete to avoid hydration mismatches on PDP.
+ * `common`, `home`, `product`, and `products` must be available before lazy loads
+ * complete to avoid hydration mismatches on PDP and /shop (filters/sort UI).
  */
 export function seedStorefrontLocale(lang: LanguageCode): void {
   const seed = STOREFRONT_SEED_BY_LANG[lang];
@@ -91,9 +98,9 @@ export function clearLazyTranslationStore(): void {
 }
 
 export async function preloadStorefrontNamespaces(lang: LanguageCode): Promise<void> {
-  await preloadNamespaces(lang, ['common', 'home', 'product']);
+  await preloadNamespaces(lang, ['common', 'home', 'product', 'products']);
   if (lang !== 'en') {
-    await preloadNamespaces('en', ['common', 'home', 'product']);
+    await preloadNamespaces('en', ['common', 'home', 'product', 'products']);
   }
 }
 

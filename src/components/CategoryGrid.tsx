@@ -317,19 +317,23 @@ export function CategoryGrid() {
               >
                 {/* Product Image or Icon */}
                 <div className="transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1 relative">
-                  {product ? (
-                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-white shadow-md border-2 border-gray-200 group-hover:border-gray-400 transition-all duration-300">
-                      <Image
-                        src={resolveProductCardImageSrc(product.image)}
-                        alt={category.title}
-                        width={80}
-                        height={80}
-                        className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-300"
-                      />
-                    </div>
-                  ) : (
-                    getCategoryIcon(category.title, category.slug)
-                  )}
+                  {(() => {
+                    const src = product ? resolveProductCardImageSrc(product.image) : null;
+                    if (!src) {
+                      return getCategoryIcon(category.title, category.slug);
+                    }
+                    return (
+                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-white shadow-md border-2 border-gray-200 group-hover:border-gray-400 transition-all duration-300">
+                        <Image
+                          src={src}
+                          alt={category.title}
+                          width={80}
+                          height={80}
+                          className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-300"
+                        />
+                      </div>
+                    );
+                  })()}
                 </div>
                 
                 {/* Category Name */}

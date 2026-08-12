@@ -74,6 +74,7 @@ export function ProductCardList({
   const { t, lang } = useTranslation();
   const categoryLine = getProductCardCategoryLineLabel(product, lang);
   const imageSrc = resolveProductCardImageSrc(product.image);
+  const showPlaceholder = imageError || !imageSrc;
   const listingCacheSource = buildProductCardCachePayload(product);
   const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';
   const productHasPrice = product.hasPrice ?? (product.price != null && product.price > 0);
@@ -96,7 +97,7 @@ export function ProductCardList({
           aria-label={product.title}
         >
           <span className="relative block h-full w-full" data-cart-fly-source>
-          {!imageError ? (
+          {!showPlaceholder && imageSrc ? (
             <Image
               src={imageSrc}
               alt={product.title}

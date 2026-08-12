@@ -4,7 +4,10 @@ import type { CartFlyFromRect } from './cart-fly-animation.types';
 /**
  * Queues a flying product thumbnail toward the header / bottom cart control.
  */
-export function dispatchCartFlyAnimation(imageUrl: string, sourceEl: Element | null): void {
+export function dispatchCartFlyAnimation(
+  imageUrl: string | null | undefined,
+  sourceEl: Element | null,
+): void {
   if (typeof window === 'undefined' || !sourceEl || !imageUrl) {
     return;
   }

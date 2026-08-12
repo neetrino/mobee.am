@@ -45,8 +45,8 @@ export function ProductCardImage({
   linkColor = null,
 }: ProductCardImageProps) {
   const router = useRouter();
-  const showPlaceholder = imageError;
   const imageSrc = resolveProductCardImageSrc(image);
+  const showPlaceholder = imageError || !imageSrc;
   const warmHandlers = listingCacheSource
     ? buildProductCardNavHandlers(listingCacheSource, router, linkColor)
     : undefined;

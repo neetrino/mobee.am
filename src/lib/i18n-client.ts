@@ -34,10 +34,11 @@ export function useTranslation() {
     pathname?.startsWith('/supersudo') === true || pathname?.startsWith('/admin') === true;
 
   // Include revision in hook value deps so memoized `t(...)` callers recompute after lazy loads.
+  // Server snapshot stays 0 so hydration matches the client's first paint revision.
   const translationRevision = useSyncExternalStore(
     subscribeLazyTranslations,
     getLazyTranslationRevision,
-    getLazyTranslationRevision,
+    () => 0,
   );
 
   useEffect(() => {
@@ -102,7 +103,7 @@ export function useAdminTranslation() {
   const translationRevision = useSyncExternalStore(
     subscribeLazyTranslations,
     getLazyTranslationRevision,
-    getLazyTranslationRevision,
+    () => 0,
   );
 
   useEffect(() => {

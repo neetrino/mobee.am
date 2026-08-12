@@ -9,7 +9,7 @@ interface ProductDescriptionDesktopProps {
   language: LanguageCode;
   productId: string;
   productTitle: string;
-  imageUrl: string;
+  imageUrl: string | null;
 }
 
 export function ProductDescriptionDesktop({
