@@ -18,6 +18,7 @@ import {
   type ProductListingViewMode,
 } from '@/lib/products/view-mode';
 import { resolveProductCardLinkColor } from '@/lib/shop/listing-color-link';
+import { isMarcoHostedProductImageUrl } from '@/lib/products/marco-product-image';
 
 interface Product {
   id: string;
@@ -107,26 +108,31 @@ export function ProductsGrid({
   }, []);
 
   const sortedProducts = useMemo(() => {
-    if (sortBy === 'default') {
-      return products;
-    }
+    const marcoRank = (product: Product): number =>
+      isMarcoHostedProductImageUrl(product.image) ? 1 : 0;
+
     const sorted = [...products];
-    switch (sortBy) {
-      case 'price-asc':
-        sorted.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        sorted.sort((a, b) => b.price - a.price);
-        break;
-      case 'name-asc':
-        sorted.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case 'name-desc':
-        sorted.sort((a, b) => b.title.localeCompare(a.title));
-        break;
-      default:
-        break;
-    }
+    sorted.sort((a, b) => {
+      const marcoDiff = marcoRank(a) - marcoRank(b);
+      if (marcoDiff !== 0) {
+        return marcoDiff;
+      }
+      if (sortBy === 'default') {
+        return 0;
+      }
+      switch (sortBy) {
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        case 'name-asc':
+          return a.title.localeCompare(b.title);
+        case 'name-desc':
+          return b.title.localeCompare(a.title);
+        default:
+          return 0;
+      }
+    });
     return sorted;
   }, [products, sortBy]);
 

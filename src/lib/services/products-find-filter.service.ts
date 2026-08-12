@@ -1,5 +1,6 @@
 import { ProductFilters, ProductWithRelations } from "./products-find-query.service";
 import { minPricedVariantPrice } from "../products/variant-price-display";
+import { productHasMarcoListingImage } from "../products/marco-product-image";
 
 /**
  * Normalize comma-separated filter values and drop placeholders like "undefined" or "null".
@@ -145,47 +146,74 @@ class ProductsFindFilterService {
 
     // Sort
     const { filter, sort = "default" } = filters;
+
+    // Home "The Best Choice" uses filter=new — never show Marco-image products there.
+    if (filter === "new") {
+      products = products.filter(
+        (product: ProductWithRelations) => !productHasMarcoListingImage(product),
+      );
+    }
+
+    const demoteMarco = (
+      a: ProductWithRelations,
+      b: ProductWithRelations,
+      compare: () => number,
+    ): number => {
+      const aMarco = productHasMarcoListingImage(a);
+      const bMarco = productHasMarcoListingImage(b);
+      if (aMarco !== bMarco) {
+        return aMarco ? 1 : -1;
+      }
+      return compare();
+    };
+
     if (
       bestsellerProductIds.length > 0 &&
       (filter === "bestseller" || sort === "bestseller")
     ) {
       const rank = new Map<string, number>();
       bestsellerProductIds.forEach((id, index) => rank.set(id, index));
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
-        const aRank = rank.get(a.id) ?? Number.MAX_SAFE_INTEGER;
-        const bRank = rank.get(b.id) ?? Number.MAX_SAFE_INTEGER;
-        return aRank - bRank;
-      });
+      products.sort((a: ProductWithRelations, b: ProductWithRelations) =>
+        demoteMarco(a, b, () => {
+          const aRank = rank.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+          const bRank = rank.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+          return aRank - bRank;
+        }),
+      );
     } else if (sort === "price-asc" || sort === "price-desc") {
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
-        const aVariants = Array.isArray(a.variants) ? a.variants : [];
-        const bVariants = Array.isArray(b.variants) ? b.variants : [];
-        const aPrice = aVariants.length > 0 ? Math.min(...aVariants.map((v: { price: number }) => v.price)) : 0;
-        const bPrice = bVariants.length > 0 ? Math.min(...bVariants.map((v: { price: number }) => v.price)) : 0;
-        return sort === "price-asc" ? aPrice - bPrice : bPrice - aPrice;
-      });
+      products.sort((a: ProductWithRelations, b: ProductWithRelations) =>
+        demoteMarco(a, b, () => {
+          const aVariants = Array.isArray(a.variants) ? a.variants : [];
+          const bVariants = Array.isArray(b.variants) ? b.variants : [];
+          const aPrice = aVariants.length > 0 ? Math.min(...aVariants.map((v: { price: number }) => v.price)) : 0;
+          const bPrice = bVariants.length > 0 ? Math.min(...bVariants.map((v: { price: number }) => v.price)) : 0;
+          return sort === "price-asc" ? aPrice - bPrice : bPrice - aPrice;
+        }),
+      );
     } else if (sort === "name-asc" || sort === "name-desc") {
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
-        const locale = filters.lang || "en";
-        const aTitle =
-          a.translations.find((translation: { locale: string }) => translation.locale === locale)?.title ||
-          a.translations[0]?.title ||
-          "";
-        const bTitle =
-          b.translations.find((translation: { locale: string }) => translation.locale === locale)?.title ||
-          b.translations[0]?.title ||
-          "";
-        const compare = aTitle.localeCompare(bTitle, locale, { sensitivity: "base" });
-        return sort === "name-asc" ? compare : -compare;
-      });
-    } else if (sort === "default") {
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
+      products.sort((a: ProductWithRelations, b: ProductWithRelations) =>
+        demoteMarco(a, b, () => {
+          const locale = filters.lang || "en";
+          const aTitle =
+            a.translations.find((translation: { locale: string }) => translation.locale === locale)?.title ||
+            a.translations[0]?.title ||
+            "";
+          const bTitle =
+            b.translations.find((translation: { locale: string }) => translation.locale === locale)?.title ||
+            b.translations[0]?.title ||
+            "";
+          const compare = aTitle.localeCompare(bTitle, locale, { sensitivity: "base" });
+          return sort === "name-asc" ? compare : -compare;
+        }),
+      );
     } else {
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
+      products.sort((a: ProductWithRelations, b: ProductWithRelations) =>
+        demoteMarco(
+          a,
+          b,
+          () => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        ),
+      );
     }
 
     return products;

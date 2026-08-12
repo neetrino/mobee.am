@@ -13,6 +13,7 @@ import {
 } from '@/lib/home/home-product-filters';
 import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
+import { isMarcoHostedProductImageUrl } from '@/lib/products/marco-product-image';
 
 export interface FeaturedHomeProduct {
   id: string;
@@ -73,11 +74,17 @@ async function fetchFeaturedHomePage(
   };
 
   const localizedProducts = await fetchByLanguage(language);
-  if (localizedProducts.length > 0 || language === 'en') {
-    return localizedProducts;
+  const withoutMarco = localizedProducts.filter(
+    (product) => !isMarcoHostedProductImageUrl(product.image),
+  );
+  if (withoutMarco.length > 0 || language === 'en') {
+    return withoutMarco;
   }
 
-  return fetchByLanguage('en');
+  const englishProducts = await fetchByLanguage('en');
+  return englishProducts.filter(
+    (product) => !isMarcoHostedProductImageUrl(product.image),
+  );
 }
 
 export function useFeaturedHomeProducts(options: UseFeaturedHomeProductsOptions = {}) {

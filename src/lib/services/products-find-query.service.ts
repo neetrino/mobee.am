@@ -2,6 +2,7 @@ import { buildWhereClause } from "./products-find-query/query-builder";
 import {
   executeProductQuery,
   fetchProductsPageForPriceSort,
+  fetchProductsPageDemotingMarco,
 } from "./products-find-query/query-executor";
 import { db } from "@white-shop/db";
 import type { ProductFilters, ProductWithRelations } from "./products-find-query/types";
@@ -62,7 +63,9 @@ class ProductsFindQueryService {
         Boolean(filters.colors || filters.sizes || filters.brand) ||
         filters.sort === "name-asc" ||
         filters.sort === "name-desc" ||
-        filters.sort === "bestseller");
+        filters.sort === "bestseller" ||
+        // Best Choice ("new"): over-fetch so Marco-image products can be excluded.
+        filters.filter === "new");
 
     if (isPriceSort && !needOverFetch && !filters.ids?.length) {
       const priceSort =
@@ -74,6 +77,27 @@ class ProductsFindQueryService {
           limit,
           (page - 1) * limit,
           priceSort,
+          listingMode,
+          lang,
+        ),
+      ]);
+      return {
+        products,
+        bestsellerProductIds,
+        total,
+      };
+    }
+
+    const isDefaultSort =
+      !filters.sort || filters.sort === "default";
+
+    if (!needOverFetch && isDefaultSort) {
+      const [total, products] = await Promise.all([
+        db.product.count({ where }),
+        fetchProductsPageDemotingMarco(
+          where,
+          limit,
+          (page - 1) * limit,
           listingMode,
           lang,
         ),
@@ -97,7 +121,10 @@ class ProductsFindQueryService {
       };
     }
 
-    const fetchLimit = Math.min(limit * 10, 200);
+    const fetchLimit =
+      filters.filter === "new"
+        ? Math.min(Math.max(limit * 20, 80), 250)
+        : Math.min(limit * 10, 200);
     const products = await executeProductQuery(where, fetchLimit, 0, filters.sort, listingMode, lang);
 
     return {
