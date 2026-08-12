@@ -23,8 +23,20 @@ function translationHasArmenianCopy(row: LocalizedRecord): boolean {
   return false;
 }
 
+function hasEmptyTitle(row: LocalizedRecord): boolean {
+  if (!('title' in row)) {
+    return false;
+  }
+  const title = (row as { title?: unknown }).title;
+  return typeof title === 'string' && title.trim().length === 0;
+}
+
 function isUsableTranslation<T extends LocalizedRecord>(row: T | undefined, lang: string): row is T {
   if (!row) {
+    return false;
+  }
+  // Empty EN/RU rows must not block fallback / localization.
+  if (hasEmptyTitle(row)) {
     return false;
   }
   if (lang === 'hy') {

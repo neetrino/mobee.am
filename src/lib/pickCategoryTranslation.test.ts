@@ -40,6 +40,14 @@ describe('pickCategoryTranslation', () => {
     expect(pickCategoryTranslation(hyOnly, 'hy')?.title).toBe('Վարսահարդարիչներ');
   });
 
+  it('rejects empty titles so blank EN/RU rows do not win', () => {
+    const withEmptyEn = [
+      { locale: 'en', title: '' },
+      { locale: 'hy', title: 'Հեռախոս' },
+    ];
+    expect(pickCategoryTranslation(withEmptyEn, 'en')).toBeUndefined();
+  });
+
   it('detects Armenian script', () => {
     expect(containsArmenianScript('Վարսահարդարիչներ')).toBe(true);
     expect(containsArmenianScript('Hair dryers')).toBe(false);
