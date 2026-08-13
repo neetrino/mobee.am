@@ -1,4 +1,5 @@
 import { Prisma } from "@white-shop/db";
+import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import { logger } from "../../../utils/logger";
 import {
   cleanImageUrls,
@@ -86,6 +87,7 @@ export function buildProductUpdateData(
   published?: boolean;
   publishedAt?: Date;
   featured?: boolean;
+  warrantyYears?: number | null;
   updatedAt?: Date;
 } {
   const updateData: {
@@ -96,6 +98,7 @@ export function buildProductUpdateData(
     published?: boolean;
     publishedAt?: Date;
     featured?: boolean;
+    warrantyYears?: number | null;
     updatedAt?: Date;
   } = {};
 
@@ -118,6 +121,9 @@ export function buildProductUpdateData(
     }
     if (product.featured !== undefined) {
       updateData.featured = product.featured;
+    }
+    if (product.warrantyYears !== undefined) {
+      updateData.warrantyYears = normalizeProductWarrantyYears(product.warrantyYears);
     }
   }
 

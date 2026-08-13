@@ -8,6 +8,7 @@ import type { LanguageCode } from '../../../lib/language';
 import { CompareIcon } from '../../../components/icons/CompareIcon';
 import { InstallmentPriceButton } from '../../../components/ProductCard/InstallmentPriceButton';
 import { InstallmentRequestModal } from '../../../components/ProductCard/InstallmentRequestModal';
+import { ProductWarrantyBadge } from '../../../components/ProductCard/ProductWarrantyBadge';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
 import {
   buildVariantTitleForInquiry,
@@ -19,6 +20,7 @@ import {
   PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS,
 } from './product-pdp-ipad-pro-band.constants';
 import type { AttributeGroupValue, Product, ProductVariant, VariantOption } from './types';
+import { isProductWarrantyYears } from '../../../lib/constants/product-warranty';
 
 interface ProductInfoAndActionsProps {
   product: Product;
@@ -123,23 +125,28 @@ export function ProductInfoAndActions({
         <h1 className="min-w-0 flex-1 text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">
           {title}
         </h1>
-        <span
-          className={`mt-1 inline-flex shrink-0 items-center gap-1.5 text-sm font-medium ${
-            isStockAvailable ? 'text-emerald-600' : 'text-red-600'
-          }`}
-          aria-live="polite"
-        >
-          {isStockAvailable ? (
-            <CheckCircle2 className="h-5 w-5" strokeWidth={2} aria-hidden />
-          ) : (
-            <XCircle className="h-5 w-5" strokeWidth={2} aria-hidden />
-          )}
-          <span>
-            {isStockAvailable
-              ? t(language, 'common.stock.inStock')
-              : t(language, 'common.stock.outOfStock')}
+        <div className="mt-1 flex shrink-0 flex-col items-end gap-2 sm:flex-row sm:items-start">
+          {isProductWarrantyYears(product.warrantyYears) ? (
+            <ProductWarrantyBadge years={product.warrantyYears} size="promo" className="shrink-0" />
+          ) : null}
+          <span
+            className={`inline-flex items-center gap-1.5 text-sm font-medium ${
+              isStockAvailable ? 'text-emerald-600' : 'text-red-600'
+            }`}
+            aria-live="polite"
+          >
+            {isStockAvailable ? (
+              <CheckCircle2 className="h-5 w-5" strokeWidth={2} aria-hidden />
+            ) : (
+              <XCircle className="h-5 w-5" strokeWidth={2} aria-hidden />
+            )}
+            <span>
+              {isStockAvailable
+                ? t(language, 'common.stock.inStock')
+                : t(language, 'common.stock.outOfStock')}
+            </span>
           </span>
-        </span>
+        </div>
       </div>
 
       {currentVariant?.sku && (

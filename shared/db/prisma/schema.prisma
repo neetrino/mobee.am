@@ -221,6 +221,8 @@ model Product {
   labels            ProductLabel[]
   productAttributes ProductAttribute[]
   discountPercent   Int                  @default(0)
+  /// Official warranty duration in years: 1 | 2 | 3, or null when none.
+  warrantyYears     Int?
   deletedAt         DateTime?
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt

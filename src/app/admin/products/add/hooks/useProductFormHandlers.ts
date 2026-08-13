@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { convertPrice, type CurrencyCode } from '@/lib/currency';
 import { showToast } from '@/components/Toast';
 import type { Attribute, Variant, GeneratedVariant } from '../types';
+import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
 import type { EditableProductSnapshot } from '../utils/editableProductSnapshot';
 import { buildEditableProductSnapshot } from '../utils/editableProductSnapshot';
 import {
@@ -82,6 +83,7 @@ interface ProductFormData {
   categoryIds: string[];
   published: boolean;
   featured: boolean;
+  warrantyYears: ProductWarrantyYears | null;
   imageUrls: string[];
   featuredImageIndex: number;
   mainProductImage: string;

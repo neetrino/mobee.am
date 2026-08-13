@@ -1,4 +1,5 @@
 import { logger } from "../../../utils/logger";
+import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import type { ProductFilters } from "./types";
 import { buildProductWhereClause, buildProductOrderByClause } from "./query-builder";
 import { executeProductListQuery, executeProductDetailQuery } from "./query-executor";
@@ -96,6 +97,8 @@ export async function getProductById(productId: string) {
     categoryIds: product.categoryIds || [],
     attributeIds: allAttributeIds, // All attribute IDs that this product has
     published: product.published,
+    featured: product.featured ?? false,
+    warrantyYears: normalizeProductWarrantyYears(product.warrantyYears),
     media: Array.isArray(product.media) ? product.media : [],
     labels: labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({
       id: label.id,

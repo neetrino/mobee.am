@@ -14,6 +14,8 @@ import { ProductLabels } from '../ProductLabels';
 import { useTranslation } from '../../lib/i18n-client';
 import type { CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
+import type { ProductWarrantyYears } from '../../lib/constants/product-warranty';
+import { ProductWarrantyBadge } from './ProductWarrantyBadge';
 import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
 
 interface ProductCardGridProps {
@@ -32,6 +34,7 @@ interface ProductCardGridProps {
     compareAtPrice?: number | null;
     originalPrice?: number | null;
     discountPercent?: number | null;
+    warrantyYears?: ProductWarrantyYears | null;
     colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
   };
   currency: CurrencyCode;
@@ -202,6 +205,11 @@ export function ProductCardGrid({
         {product.labels && product.labels.length > 0 ? (
           <div className="pointer-events-none absolute inset-0 z-20">
             <ProductLabels labels={product.labels} />
+          </div>
+        ) : null}
+        {product.warrantyYears ? (
+          <div className="pointer-events-none absolute bottom-3 left-3 z-20 max-lg:bottom-2 max-lg:left-2">
+            <ProductWarrantyBadge years={product.warrantyYears} size="catalog" />
           </div>
         ) : null}
         <ProductCardActions

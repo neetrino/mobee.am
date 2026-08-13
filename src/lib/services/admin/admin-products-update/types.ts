@@ -94,6 +94,7 @@ export interface NormalizedProductUpdate {
     categoryIds?: string[];
     published?: boolean;
     featured?: boolean;
+    warrantyYears?: number | null;
   };
   labels?: LabelsUpdateOps;
   attributes?: AttributesUpdateOps;
@@ -123,6 +124,7 @@ export interface UpdateProductData {
   categoryIds?: string[];
   published?: boolean;
   featured?: boolean;
+  warrantyYears?: number | null;
   locale?: string;
   media?: unknown[];
   labels?: LabelInput[];

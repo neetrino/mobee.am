@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import { cacheService } from "./cache.service";
 import { ProductWithRelations } from "./products-find-query.service";
 import {
@@ -326,6 +327,9 @@ class ProductsFindTransformService {
         originalPrice: variantHasPrice && appliedDiscount > 0 ? originalPrice : variantHasPrice ? variant?.compareAtPrice || null : null,
         compareAtPrice: variantHasPrice ? variant?.compareAtPrice || null : null,
         discountPercent: variantHasPrice && appliedDiscount > 0 ? appliedDiscount : null,
+        warrantyYears: normalizeProductWarrantyYears(
+          (product as { warrantyYears?: number | null }).warrantyYears,
+        ),
         image: listingImage,
         inStock: variantHasPrice && (variant?.stock || 0) > 0,
         labels: Array.isArray(product.labels)

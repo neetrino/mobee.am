@@ -3,6 +3,7 @@ import { showToast } from '@/components/Toast';
 import { invalidateAdminSessionCacheByPrefix } from '@/lib/admin/admin-session-cache';
 import type { PartialProductUpdateInput } from '@/lib/schemas/admin-product-update.schema';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
 import { hasPartialUpdateWork } from '../utils/productUpdateDiff';
 
 const ADMIN_PRODUCTS_LIST_CACHE_PREFIX = '/supersudo/products';
@@ -19,6 +20,7 @@ interface CreateAndSubmitPayloadProps {
     categoryIds: string[];
     published: boolean;
     featured: boolean;
+    warrantyYears: ProductWarrantyYears | null;
     imageUrls: string[];
     featuredImageIndex: number;
     mainProductImage: string;
@@ -101,6 +103,7 @@ export async function createAndSubmitPayload({
       categoryIds: formData.categoryIds.length > 0 ? formData.categoryIds : undefined,
       published: isEditMode ? formData.published : true,
       featured: formData.featured,
+      warrantyYears: formData.warrantyYears,
       locale: 'en',
       variants,
       attributeIds: attributeIds.length > 0 ? attributeIds : undefined,

@@ -1,4 +1,5 @@
 import type { GeneratedVariant, ProductLabel } from "../types";
+import type { ProductWarrantyYears } from "@/lib/constants/product-warranty";
 
 export interface EditableVariantSnapshot {
   databaseVariantId?: string;
@@ -24,6 +25,7 @@ export interface EditableProductSnapshot {
     categoryIds: string[];
     published: boolean;
     featured: boolean;
+    warrantyYears: ProductWarrantyYears | null;
   };
   labels: ProductLabel[];
   attributeIds: string[];
@@ -49,6 +51,7 @@ export interface BuildEditableSnapshotInput {
     categoryIds: string[];
     published: boolean;
     featured: boolean;
+    warrantyYears: ProductWarrantyYears | null;
     imageUrls: string[];
     labels: ProductLabel[];
   };
@@ -113,6 +116,12 @@ export function buildEditableProductSnapshot(
       categoryIds: sortIds(input.formData.categoryIds),
       published: input.formData.published,
       featured: input.formData.featured,
+      warrantyYears:
+        input.formData.warrantyYears === 1 ||
+        input.formData.warrantyYears === 2 ||
+        input.formData.warrantyYears === 3
+          ? input.formData.warrantyYears
+          : null,
     },
     labels: input.formData.labels
       .filter((label) => label.value.trim() !== "")

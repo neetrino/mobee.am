@@ -12,6 +12,7 @@ export type ProductCardCachePayload = {
   published?: boolean;
   compareAtPrice?: number | null;
   discountPercent?: number | null;
+  warrantyYears?: import('../constants/product-warranty').ProductWarrantyYears | null;
 };
 
 type ProductCardCacheEntry = {
@@ -110,6 +111,7 @@ export function buildProductCardCachePayload(product: {
   defaultVariantId?: string | null;
   compareAtPrice?: number | null;
   discountPercent?: number | null;
+  warrantyYears?: import('../constants/product-warranty').ProductWarrantyYears | null;
   published?: boolean;
 }): ProductCardCachePayload {
   return {
@@ -125,6 +127,7 @@ export function buildProductCardCachePayload(product: {
     published: product.published,
     compareAtPrice: product.compareAtPrice ?? null,
     discountPercent: product.discountPercent ?? null,
+    warrantyYears: product.warrantyYears ?? null,
   };
 }
 
@@ -140,6 +143,7 @@ export function touchProductCardCacheFromListing(product: {
   defaultVariantId?: string | null;
   compareAtPrice?: number | null;
   discountPercent?: number | null;
+  warrantyYears?: import('../constants/product-warranty').ProductWarrantyYears | null;
 }): void {
   writeProductCardCache(buildProductCardCachePayload(product));
 }
