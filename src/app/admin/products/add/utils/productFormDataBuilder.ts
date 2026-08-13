@@ -1,8 +1,5 @@
-/**
- * Utilities for building product form data
- */
-
 import type { ProductData, Variant, ProductLabel } from '../types';
+import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
 
 interface FormData {
   title: string;
@@ -13,6 +10,7 @@ interface FormData {
   categoryIds: string[];
   published: boolean;
   featured: boolean;
+  warrantyYears: ProductWarrantyYears | null;
   imageUrls: string[];
   featuredImageIndex: number;
   mainProductImage: string;
@@ -41,6 +39,10 @@ export function buildFormData(
     categoryIds: product.categoryIds || [],
     published: product.published || false,
     featured: product.featured || false,
+    warrantyYears:
+      product.warrantyYears === 1 || product.warrantyYears === 2 || product.warrantyYears === 3
+        ? product.warrantyYears
+        : null,
     imageUrls: normalizedMedia,
     featuredImageIndex:
       featuredIndexFromApi >= 0 && featuredIndexFromApi < normalizedMedia.length

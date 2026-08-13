@@ -75,6 +75,9 @@ function buildProductDiff(
   if (initial.product.featured !== current.product.featured) {
     product.featured = current.product.featured;
   }
+  if (initial.product.warrantyYears !== current.product.warrantyYears) {
+    product.warrantyYears = current.product.warrantyYears;
+  }
 
   return Object.keys(product).length > 0 ? product : undefined;
 }

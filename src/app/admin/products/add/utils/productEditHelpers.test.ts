@@ -15,6 +15,7 @@ const baseSnapshot: EditableProductSnapshot = {
     categoryIds: ["cat-1"],
     published: true,
     featured: false,
+    warrantyYears: null,
   },
   labels: [{ id: "label-1", type: "text", value: "New", position: "top-left", color: null }],
   attributeIds: ["attr-color"],
@@ -240,6 +241,65 @@ describe("buildPartialProductUpdatePayload", () => {
     });
 
     expect(hasPartialUpdateWork(payload)).toBe(false);
+  });
+
+  it("emits warrantyYears null when clearing warranty", () => {
+    const initial: EditableProductSnapshot = {
+      ...baseSnapshot,
+      product: { ...baseSnapshot.product, warrantyYears: 3 },
+    };
+    const current: EditableProductSnapshot = {
+      ...baseSnapshot,
+      product: { ...baseSnapshot.product, warrantyYears: null },
+    };
+
+    const payload = buildPartialProductUpdatePayload({
+      initial,
+      current,
+      processedVariants: [
+        {
+          databaseVariantId: "db-v1",
+          price: 1000,
+          stock: 5,
+          sku: "SHIRT-RED",
+          published: true,
+        },
+      ],
+      media: baseSnapshot.media,
+    });
+
+    expect(payload.product).toEqual({ warrantyYears: null });
+    expect(hasPartialUpdateWork(payload)).toBe(true);
+  });
+
+  it("omits warrantyYears when unchanged", () => {
+    const initial: EditableProductSnapshot = {
+      ...baseSnapshot,
+      product: { ...baseSnapshot.product, warrantyYears: 2 },
+    };
+    const current: EditableProductSnapshot = {
+      ...baseSnapshot,
+      product: { ...baseSnapshot.product, warrantyYears: 2 },
+      basic: { ...baseSnapshot.basic, title: "Shirt Updated" },
+    };
+
+    const payload = buildPartialProductUpdatePayload({
+      initial,
+      current,
+      processedVariants: [
+        {
+          databaseVariantId: "db-v1",
+          price: 1000,
+          stock: 5,
+          sku: "SHIRT-RED",
+          published: true,
+        },
+      ],
+      media: baseSnapshot.media,
+    });
+
+    expect(payload.basic?.title).toBe("Shirt Updated");
+    expect(payload.product?.warrantyYears).toBeUndefined();
   });
 });
 

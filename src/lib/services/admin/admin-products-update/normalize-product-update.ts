@@ -145,7 +145,8 @@ function normalizeLegacy(data: LegacyProductUpdateInput): NormalizedProductUpdat
     data.primaryCategoryId !== undefined ||
     data.categoryIds !== undefined ||
     data.published !== undefined ||
-    data.featured !== undefined;
+    data.featured !== undefined ||
+    data.warrantyYears !== undefined;
 
   if (hasProduct) {
     ops.product = {
@@ -154,6 +155,7 @@ function normalizeLegacy(data: LegacyProductUpdateInput): NormalizedProductUpdat
       ...(data.categoryIds !== undefined && { categoryIds: data.categoryIds }),
       ...(data.published !== undefined && { published: data.published }),
       ...(data.featured !== undefined && { featured: data.featured }),
+      ...(data.warrantyYears !== undefined && { warrantyYears: data.warrantyYears }),
     };
   }
 

@@ -21,6 +21,7 @@ import { dispatchCartUpdated } from '@/lib/cart/dispatch-cart-updated';
 import { formatPriceInCurrency } from '@/lib/currency';
 import { buildRelatedProductsContextFromProduct } from '@/lib/products/build-related-context';
 import { ProductImagePlaceholder } from '@/components/ProductImagePlaceholder';
+import { ProductWarrantyBadge } from '@/components/ProductCard/ProductWarrantyBadge';
 import {
   PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS,
   PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS,
@@ -224,7 +225,14 @@ export function ProductPageClient({
             )}
           </div>
           <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold text-gray-900">{shellProduct.title}</h1>
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="min-w-0 flex-1 text-2xl font-bold text-gray-900">{shellProduct.title}</h1>
+              {shellProduct.warrantyYears === 1 ||
+              shellProduct.warrantyYears === 2 ||
+              shellProduct.warrantyYears === 3 ? (
+                <ProductWarrantyBadge years={shellProduct.warrantyYears} size="promo" className="shrink-0" />
+              ) : null}
+            </div>
             {shellProduct.brand?.name ? (
               <p className="text-sm text-gray-600">{shellProduct.brand.name}</p>
             ) : null}

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { EditableProductSnapshot } from '../utils/editableProductSnapshot';
 import { buildEditableProductSnapshot } from '../utils/editableProductSnapshot';
 import type { GeneratedVariant, ProductLabel } from '../types';
+import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
 
 interface UseInitialProductSnapshotProps {
   isEditMode: boolean;
@@ -19,6 +20,7 @@ interface UseInitialProductSnapshotProps {
     categoryIds: string[];
     published: boolean;
     featured: boolean;
+    warrantyYears: ProductWarrantyYears | null;
     imageUrls: string[];
     labels: ProductLabel[];
   };

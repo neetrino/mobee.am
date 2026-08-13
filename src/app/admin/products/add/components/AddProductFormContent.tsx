@@ -14,6 +14,7 @@ import type {
   GeneratedVariant,
 } from '../types';
 import type { CurrencyCode } from '@/lib/currency';
+import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
 import { BasicInformation } from './BasicInformation';
 import { CategoriesBrands } from './CategoriesBrands';
 import { SimpleProductFields } from './SimpleProductFields';
@@ -44,6 +45,7 @@ interface AddProductFormContentProps {
     featuredImageIndex: number;
     labels: ProductLabel[];
     featured: boolean;
+    warrantyYears: ProductWarrantyYears | null;
     variants: Variant[];
   };
   productType: 'simple' | 'variable';
@@ -108,6 +110,7 @@ interface AddProductFormContentProps {
   onRemoveLabel: (index: number) => void;
   onUpdateLabel: (index: number, field: keyof ProductLabel, value: ProductLabel[keyof ProductLabel]) => void;
   onFeaturedChange: (featured: boolean) => void;
+  onWarrantyYearsChange: (years: ProductWarrantyYears | null) => void;
   onVariantsUpdate: (updater: (prev: Variant[]) => Variant[]) => void;
   onApplyToAllVariants: (field: 'price' | 'compareAtPrice' | 'stock' | 'sku', value: string) => void;
   isClothingCategory: () => boolean;
@@ -174,6 +177,7 @@ export function AddProductFormContent({
   onRemoveLabel,
   onUpdateLabel,
   onFeaturedChange,
+  onWarrantyYearsChange,
   onVariantsUpdate,
   onApplyToAllVariants,
   isClothingCategory,
@@ -296,7 +300,18 @@ export function AddProductFormContent({
               onRemoveLabel={onRemoveLabel}
               onUpdateLabel={onUpdateLabel}
             />
-            <Publishing featured={formData.featured} onFeaturedChange={onFeaturedChange} />
+            <Publishing
+              featured={formData.featured}
+              onFeaturedChange={onFeaturedChange}
+              warrantyYears={
+                formData.warrantyYears === 1 ||
+                formData.warrantyYears === 2 ||
+                formData.warrantyYears === 3
+                  ? formData.warrantyYears
+                  : null
+              }
+              onWarrantyYearsChange={onWarrantyYearsChange}
+            />
           </div>
         </details>
 

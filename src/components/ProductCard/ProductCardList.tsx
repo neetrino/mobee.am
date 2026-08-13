@@ -13,6 +13,8 @@ import type { CurrencyCode } from '../../lib/currency';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
 import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
 import type { ProductLabel } from '../ProductLabels';
+import type { ProductWarrantyYears } from '../../lib/constants/product-warranty';
+import { ProductWarrantyBadge } from './ProductWarrantyBadge';
 import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
 
 interface ProductCardListProps {
@@ -31,6 +33,7 @@ interface ProductCardListProps {
     compareAtPrice?: number | null;
     originalPrice?: number | null;
     discountPercent?: number | null;
+    warrantyYears?: ProductWarrantyYears | null;
     colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
   };
   currency: CurrencyCode;
@@ -133,6 +136,11 @@ export function ProductCardList({
               </p>
             ) : null}
           </ProductCardNavLink>
+          {product.warrantyYears ? (
+            <div className="mt-2">
+              <ProductWarrantyBadge years={product.warrantyYears} size="catalog" />
+            </div>
+          ) : null}
           {/* Available Colors */}
           {product.colors && product.colors.length > 0 && (
             <div className="flex items-center gap-1.5 mt-2 flex-wrap">

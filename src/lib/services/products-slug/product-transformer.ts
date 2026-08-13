@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import {
   processImageUrl,
   smartSplitUrls,
@@ -509,6 +510,7 @@ export async function transformProduct(
     categories,
     media: transformMedia(product),
     labels: transformLabels(product),
+    warrantyYears: normalizeProductWarrantyYears(product.warrantyYears),
     variants: Array.isArray(product.variants) ? transformVariants(
       product.variants,
       actualDiscount,

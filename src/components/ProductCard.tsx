@@ -45,6 +45,7 @@ interface Product {
   primaryCategoryId?: string | null;
   categoryIds?: string[];
   categories?: Array<{ id: string; slug?: string; title?: string }>;
+  warrantyYears?: import('../lib/constants/product-warranty').ProductWarrantyYears | null;
 }
 
 type ViewMode = 'list' | 'grid-2' | 'grid-3';

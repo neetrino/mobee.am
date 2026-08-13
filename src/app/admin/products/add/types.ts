@@ -76,6 +76,7 @@ export interface ProductData {
   attributeIds?: string[]; // All attribute IDs that this product has
   published: boolean;
   featured?: boolean;
+  warrantyYears?: import('@/lib/constants/product-warranty').ProductWarrantyYears | null;
   media?: string[];
   labels?: ProductLabel[];
   variants?: Array<{

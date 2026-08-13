@@ -98,6 +98,7 @@ export interface Product {
   productAttributes?: ProductAttribute[];
   productDiscount?: number | null;
   globalDiscount?: number | null;
+  warrantyYears?: import('../../../lib/constants/product-warranty').ProductWarrantyYears | null;
 }
 
 // Reserved routes that should not be treated as product slugs

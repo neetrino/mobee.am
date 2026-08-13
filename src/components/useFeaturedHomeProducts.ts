@@ -36,6 +36,7 @@ export interface FeaturedHomeProduct {
   >;
   originalPrice?: number | null;
   discountPercent?: number | null;
+  warrantyYears?: import('../lib/constants/product-warranty').ProductWarrantyYears | null;
   labels?: ProductLabel[];
   primaryCategoryId?: string | null;
   categoryIds?: string[];

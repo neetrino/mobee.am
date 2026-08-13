@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import { PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE } from "@/lib/database/productVariantDb.constants";
+import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import { revalidateProductCache } from "./admin-products-update/cache-revalidator";
 import { findOrCreateAttributeValue } from "../../utils/variant-generator";
 import { ensureProductAttributesTable } from "../../utils/db-ensure";
@@ -96,6 +97,7 @@ class AdminProductsCreateService {
     categoryIds?: string[];
     published: boolean;
     featured?: boolean;
+    warrantyYears?: number | null;
     locale: string;
     media?: any[];
     mainProductImage?: string;
@@ -337,6 +339,7 @@ class AdminProductsCreateService {
             media: finalMedia,
             published: data.published,
             featured: data.featured ?? false,
+            warrantyYears: normalizeProductWarrantyYears(data.warrantyYears),
             publishedAt: data.published ? new Date() : undefined,
             translations: {
               create: {

@@ -1,71 +1,53 @@
 import { describe, expect, it } from "vitest";
 import {
+  legacyProductUpdateSchema,
+  partialProductUpdateSchema,
   safeParseAdminProductUpdate,
-  isPartialProductUpdatePayload,
 } from "./admin-product-update.schema";
 
-describe("admin-product-update.schema", () => {
-  describe("isPartialProductUpdatePayload", () => {
-    it("detects partial shape by basic/product", () => {
-      expect(isPartialProductUpdatePayload({ basic: { title: "A" } })).toBe(true);
-      expect(isPartialProductUpdatePayload({ product: { published: true } })).toBe(
-        true
-      );
-    });
-
-    it("detects partial variants object vs legacy array", () => {
-      expect(
-        isPartialProductUpdatePayload({
-          variants: { update: [{ id: "v1", price: 10 }] },
-        })
-      ).toBe(true);
-      expect(
-        isPartialProductUpdatePayload({
-          variants: [{ price: 10, stock: 1 }],
-        })
-      ).toBe(false);
-    });
+describe("admin product update warrantyYears", () => {
+  it("accepts 1 | 2 | 3 | null on partial product section", () => {
+    for (const warrantyYears of [1, 2, 3, null] as const) {
+      const parsed = partialProductUpdateSchema.safeParse({
+        product: { warrantyYears },
+      });
+      expect(parsed.success).toBe(true);
+      if (parsed.success) {
+        expect(parsed.data.product?.warrantyYears).toBe(warrantyYears);
+      }
+    }
   });
 
-  describe("safeParseAdminProductUpdate", () => {
-    it("parses price-only partial update", () => {
-      const result = safeParseAdminProductUpdate({
-        variants: { update: [{ id: "var-1", price: 199 }] },
+  it("rejects unsupported warrantyYears values", () => {
+    for (const warrantyYears of [0, 4, 5, "lifetime"]) {
+      const parsed = partialProductUpdateSchema.safeParse({
+        product: { warrantyYears },
       });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.format).toBe("partial");
-      }
-    });
+      expect(parsed.success).toBe(false);
+    }
+  });
 
-    it("parses legacy flat payload", () => {
-      const result = safeParseAdminProductUpdate({
-        title: "Phone",
-        slug: "phone",
-        published: true,
-        variants: [{ id: "v1", price: 100, stock: 2 }],
-        attributeIds: ["a1"],
-        labels: [{ type: "sale", value: "10%", position: "top" }],
-      });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.format).toBe("legacy");
-      }
+  it("accepts string years that normalize to 1|2|3", () => {
+    const parsed = partialProductUpdateSchema.safeParse({
+      product: { warrantyYears: "3" },
     });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.product?.warrantyYears).toBe(3);
+    }
+  });
 
-    it("rejects update variant without id", () => {
-      const result = safeParseAdminProductUpdate({
-        variants: { update: [{ price: 10 }] },
-      });
-      expect(result.success).toBe(false);
+  it("accepts legacy flat warrantyYears", () => {
+    const parsed = legacyProductUpdateSchema.safeParse({
+      warrantyYears: 2,
     });
+    expect(parsed.success).toBe(true);
+  });
 
-    it("ignores mainProductImage on legacy payload", () => {
-      const result = safeParseAdminProductUpdate({
-        title: "X",
-        mainProductImage: "https://cdn.example/x.jpg",
-      });
-      expect(result.success).toBe(true);
+  it("safeParse rejects warrantyYears = 5", () => {
+    const result = safeParseAdminProductUpdate({
+      product: { warrantyYears: 5 },
     });
+    expect(result.success).toBe(false);
   });
 });

@@ -2,6 +2,20 @@ import { z } from "zod";
 
 const numberLike = z.union([z.number(), z.string()]);
 
+/** Canonical warranty years: 1 | 2 | 3 | null (omit = unchanged). Rejects other numbers. */
+const warrantyYearsSchema = z.preprocess((value) => {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value === null || value === "" || value === "none") {
+    return null;
+  }
+  if (typeof value === "string") {
+    return Number.parseInt(value, 10);
+  }
+  return value;
+}, z.union([z.literal(1), z.literal(2), z.literal(3), z.null()]));
+
 const labelInputSchema = z.object({
   id: z.string().optional(),
   type: z.string().min(1),
@@ -64,6 +78,7 @@ const partialProductUpdateSchema = z.object({
       categoryIds: z.array(z.string()).optional(),
       published: z.boolean().optional(),
       featured: z.boolean().optional(),
+      warrantyYears: warrantyYearsSchema.optional(),
     })
     .optional(),
   labels: z
@@ -119,6 +134,7 @@ const legacyProductUpdateSchema = z.object({
   categoryIds: z.array(z.string()).optional(),
   published: z.boolean().optional(),
   featured: z.boolean().optional(),
+  warrantyYears: warrantyYearsSchema.optional(),
   locale: z.string().optional(),
   media: z.array(mediaItemSchema).optional(),
   labels: z.array(labelInputSchema).optional(),
