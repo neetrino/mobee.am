@@ -7,6 +7,16 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { showToast } from '../../../../components/Toast';
 import { uploadBrandLogo } from '../utils/uploadBrandLogo';
 
+const ALLOWED_BRAND_LOGO_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+]);
+
+const BRAND_LOGO_FILE_ACCEPT = 'image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif';
+
 type BrandLogoFieldProps = {
   logoUrl: string | null;
   onChange: (logoUrl: string | null) => void;
@@ -22,7 +32,9 @@ export function BrandLogoField({ logoUrl, onChange }: BrandLogoFieldProps) {
     if (!file) {
       return;
     }
-    if (!file.type.startsWith('image/')) {
+    if (!ALLOWED_BRAND_LOGO_MIME_TYPES.has(file.type)) {
+      showToast(t('admin.brands.logoInvalidType'), 'error');
+      event.target.value = '';
       return;
     }
 
@@ -44,9 +56,10 @@ export function BrandLogoField({ logoUrl, onChange }: BrandLogoFieldProps) {
 
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-gray-700">
+      <label className="mb-1 block text-sm font-medium text-gray-700">
         {t('admin.brands.logo')}
       </label>
+      <p className="mb-2 text-xs text-gray-500">{t('admin.brands.logoHint')}</p>
       <div className="flex items-center gap-3">
         <div className="relative size-16 overflow-hidden rounded-supersudo border border-gray-200 bg-gray-50">
           {logoUrl ? (
@@ -67,7 +80,7 @@ export function BrandLogoField({ logoUrl, onChange }: BrandLogoFieldProps) {
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept={BRAND_LOGO_FILE_ACCEPT}
             className="hidden"
             onChange={handleFileChange}
           />

@@ -656,6 +656,8 @@
     "addNewBrand": "Add New Brand",
     "brandName": "Brand Name *",
     "logo": "Logo",
+    "logoHint": "JPEG, PNG, WebP or GIF. PNG or WebP with a transparent background works best. Max 5 MB. SVG is not supported.",
+    "logoInvalidType": "Use JPEG, PNG, WebP or GIF.",
     "noLogo": "No logo",
     "uploadLogo": "Upload logo",
     "uploadingLogo": "Uploading...",

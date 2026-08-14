@@ -659,6 +659,8 @@
     "addNewBrand": "Ավելացնել նոր բրենդ",
     "brandName": "Բրենդի անվանում *",
     "logo": "Լոգո",
+    "logoHint": "JPEG, PNG, WebP կամ GIF։ Ավելի լավ է PNG կամ WebP՝ թափանցիկ ֆոնով։ Առավելագույնը 5 ՄԲ։ SVG չի ընդունվում։",
+    "logoInvalidType": "Օգտագործեք JPEG, PNG, WebP կամ GIF։",
     "noLogo": "Լոգո չկա",
     "uploadLogo": "Վերբեռնել լոգո",
     "uploadingLogo": "Վերբեռնվում է...",
