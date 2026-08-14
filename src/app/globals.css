@@ -28,6 +28,13 @@
     /* iOS Safari: avoid automatic text scaling that feels like a page zoom after load. */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /*
+     * Արգելում է էջի rubber-band / pull-to-refresh / կողային pan։
+     * Ուղղահայաց scroll-ը մնում է. ներքին carousel-ները ունեն իրենց overscroll-contain։
+     * `clip` (ոչ `hidden`) — որ sticky ֆիլտրերն ու header-ը չկոտրվեն։
+     */
+    overscroll-behavior: none;
+    overflow-x: clip;
   }
 
   /*
@@ -60,6 +67,17 @@
 
   body {
     @apply bg-white text-gray-900;
+    overscroll-behavior: none;
+    overflow-x: clip;
+  }
+
+  /*
+   * Նկարի/հղման native drag-ը տեսողականորեն նման է էջը քաշելուն։
+   * Տեքստի ընտրությունն ու ներքին carousel-ները չեն ազդվում։
+   */
+  img,
+  a {
+    -webkit-user-drag: none;
   }
 }
 
