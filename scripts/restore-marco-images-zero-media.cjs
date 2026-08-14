@@ -366,10 +366,6 @@ async function r2ObjectExists(r2, key) {
   }
 }
 
-async function loadProductById(mobee, productId) {
-  return loadProductSnapshotById(mobee, productId);
-}
-
 async function loadProductSnapshotById(mobee, productId) {
   const { rows } = await mobee.query(
     `

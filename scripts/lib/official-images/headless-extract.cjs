@@ -10,7 +10,6 @@ let playwrightModule = null;
 async function loadPlaywright() {
   if (playwrightModule) return playwrightModule;
   try {
-    // eslint-disable-next-line import/no-extraneous-dependencies
     playwrightModule = require("playwright");
     return playwrightModule;
   } catch {
