@@ -4,6 +4,7 @@ import {
   buildHomeSpecialOffersProductFilters,
 } from "@/lib/home/home-product-filters";
 import { buildProductListCacheKey } from "@/lib/shop/product-list-cache-key";
+import { getCachedHomeBrands } from "@/lib/services/home-brands-cached";
 import {
   getCachedProductList,
   type ProductListPayload,
@@ -29,10 +30,12 @@ export async function HomeProductSectionsSection({ language }: HomeProductSectio
   const featuredFilters = buildHomeFeaturedProductFilters(language);
   const specialOffersFilters = buildHomeSpecialOffersProductFilters(language);
 
-  const [{ result: featuredPayload }, { result: specialOffersPayload }] = await Promise.all([
-    getCachedProductList(featuredFilters),
-    getCachedProductList(specialOffersFilters),
-  ]);
+  const [{ result: featuredPayload }, { result: specialOffersPayload }, { result: homeBrands }] =
+    await Promise.all([
+      getCachedProductList(featuredFilters),
+      getCachedProductList(specialOffersFilters),
+      getCachedHomeBrands(language),
+    ]);
 
   return (
     <HomeProductSections
@@ -41,6 +44,7 @@ export async function HomeProductSectionsSection({ language }: HomeProductSectio
       initialFeaturedFiltersKey={buildProductListCacheKey(featuredFilters)}
       initialSpecialOffersProducts={mapPayloadToFeaturedProducts(specialOffersPayload)}
       initialSpecialOffersFiltersKey={buildProductListCacheKey(specialOffersFilters)}
+      homeBrands={homeBrands.data}
     />
   );
 }

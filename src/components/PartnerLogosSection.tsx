@@ -7,15 +7,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
+import type { HomeBrandLogo } from '@/lib/home/home-brand-logos';
 import {
+  PARTNER_LOGO_APPLE_IMAGE_CLASS,
+  PARTNER_LOGO_APPLE_SLUG,
   PARTNER_LOGO_CARD_CLASS,
   PARTNER_LOGO_IMAGE_CLASS,
-  PARTNER_LOGOS,
+  PARTNER_LOGO_IMAGE_HEIGHT_PX,
+  PARTNER_LOGO_IMAGE_WIDTH_PX,
   PARTNER_LOGOS_NAV_BUTTON_CLASS,
   PARTNER_LOGOS_SCROLL_EDGE_TOLERANCE_PX,
   PARTNER_LOGOS_TRACK_CLASS,
   partnerLogoShopHref,
-  type PartnerLogoItem,
 } from './partner-logos.constants';
 
 const montserrat = siteMontserrat;
@@ -69,15 +72,20 @@ function usePartnerLogosScroll(itemCount: number) {
   return { scrollRef, canScrollPrev, canScrollNext, scrollByItem };
 }
 
-function PartnerLogoCard({ item, alt }: { item: PartnerLogoItem; alt: string }) {
+function PartnerLogoCard({ brand }: { brand: HomeBrandLogo }) {
+  const imageClassName =
+    brand.slug === PARTNER_LOGO_APPLE_SLUG
+      ? PARTNER_LOGO_APPLE_IMAGE_CLASS
+      : PARTNER_LOGO_IMAGE_CLASS;
+
   return (
-    <Link href={partnerLogoShopHref(item.id)} className={PARTNER_LOGO_CARD_CLASS}>
+    <Link href={partnerLogoShopHref(brand.slug)} className={PARTNER_LOGO_CARD_CLASS}>
       <Image
-        src={item.src}
-        alt={alt}
-        width={item.width}
-        height={item.height}
-        className={item.imageClassName ?? PARTNER_LOGO_IMAGE_CLASS}
+        src={brand.logoUrl}
+        alt={brand.name}
+        width={PARTNER_LOGO_IMAGE_WIDTH_PX}
+        height={PARTNER_LOGO_IMAGE_HEIGHT_PX}
+        className={imageClassName}
         unoptimized
       />
     </Link>
@@ -124,12 +132,16 @@ function PartnerLogosNav({
 }
 
 /**
- * Partner brand strip — equal cards in one scrolling row (redstore.am manufacturers).
+ * Partner brand strip — logos from `/supersudo/brands` (published + uploaded photo).
  */
-export function PartnerLogosSection() {
+export function PartnerLogosSection({ brands }: { brands: HomeBrandLogo[] }) {
   const { t } = useTranslation();
   const { scrollRef, canScrollPrev, canScrollNext, scrollByItem } =
-    usePartnerLogosScroll(PARTNER_LOGOS.length);
+    usePartnerLogosScroll(brands.length);
+
+  if (brands.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -148,12 +160,8 @@ export function PartnerLogosSection() {
           aria-roledescription="carousel"
           aria-label={t('home.partner_logos.heading')}
         >
-          {PARTNER_LOGOS.map((item) => (
-            <PartnerLogoCard
-              key={item.id}
-              item={item}
-              alt={t(`home.partner_logos.${item.id}`)}
-            />
+          {brands.map((brand) => (
+            <PartnerLogoCard key={brand.id} brand={brand} />
           ))}
         </div>
         <PartnerLogosNav

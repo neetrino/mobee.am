@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 import { invalidateAdminReferenceServerCache } from "@/lib/admin/admin-reference-server-cache";
+import { invalidateHomeBrandsCache } from "@/lib/services/home-brands-cached";
 
 /**
  * PUT /api/v1/admin/brands/[id]
@@ -23,6 +24,7 @@ export async function PUT(
 
     const result = await adminService.updateBrand(id, body);
     await invalidateAdminReferenceServerCache("brands");
+    await invalidateHomeBrandsCache();
 
     return NextResponse.json(result);
   } catch (error: any) {
@@ -59,6 +61,7 @@ export async function DELETE(
 
     await adminService.deleteBrand(id);
     await invalidateAdminReferenceServerCache("brands");
+    await invalidateHomeBrandsCache();
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
