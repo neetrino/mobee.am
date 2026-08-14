@@ -13,6 +13,7 @@ class AdminBrandsService {
       select: {
         id: true,
         slug: true,
+        logoUrl: true,
         translations: {
           where: { locale: "en" },
           take: 1,
@@ -25,13 +26,20 @@ class AdminBrandsService {
     });
 
     return {
-      data: brands.map((brand: { id: string; slug: string; translations?: Array<{ name: string }> }) => {
+      data: brands.map(
+        (brand: {
+          id: string;
+          slug: string;
+          logoUrl: string | null;
+          translations?: Array<{ name: string }>;
+        }) => {
         const translations = Array.isArray(brand.translations) ? brand.translations : [];
         const translation = translations[0] || null;
         return {
           id: brand.id,
           name: translation?.name || "",
           slug: brand.slug,
+          logoUrl: brand.logoUrl,
         };
       }),
     };
@@ -101,6 +109,7 @@ class AdminBrandsService {
         id: brand.id,
         name: translation?.name || "",
         slug: brand.slug,
+        logoUrl: brand.logoUrl,
       },
     };
   }
@@ -196,6 +205,7 @@ class AdminBrandsService {
         id: updatedBrand!.id,
         name: translation?.name || "",
         slug: updatedBrand!.slug,
+        logoUrl: updatedBrand!.logoUrl,
       },
     };
   }

@@ -199,8 +199,8 @@ export function ProductsTable({
                   <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {t('admin.products.featured')}
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pl-6">
-                    <span className="ml-6 inline-block">{t('admin.products.actions')}</span>
+                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('admin.products.actions')}
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <button
@@ -353,8 +353,8 @@ export function ProductsTable({
                         </svg>
                       </button>
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center gap-1 flex-wrap">
+                    <td className="px-3 py-4 align-middle whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center justify-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -382,7 +382,7 @@ export function ProductsTable({
                         <button
                           type="button"
                           onClick={() => handleTogglePublished(product.id, product.published, product.title)}
-                          className={`relative ml-[10px] inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-2 ${
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-2 ${
                             product.published
                               ? 'bg-green-500'
                               : 'bg-gray-300'

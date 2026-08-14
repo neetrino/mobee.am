@@ -15,6 +15,7 @@ import {
   HOME_CURATED_SECTION_MOBILE_TITLE_CLASS,
   HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS,
 } from './home-best-choice.constants';
+import type { HomeBrandLogo } from '@/lib/home/home-brand-logos';
 import type { LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
 import {
@@ -36,6 +37,7 @@ export type HomeProductSectionsProps = {
   initialFeaturedFiltersKey?: string;
   initialSpecialOffersProducts?: FeaturedHomeProduct[];
   initialSpecialOffersFiltersKey?: string;
+  homeBrands?: HomeBrandLogo[];
 };
 
 type HomeFeaturedCarouselSectionProps = {
@@ -193,6 +195,7 @@ export function HomeProductSections({
   initialFeaturedFiltersKey,
   initialSpecialOffersProducts,
   initialSpecialOffersFiltersKey,
+  homeBrands = [],
 }: HomeProductSectionsProps = {}) {
   const { language, products, loading, error, fetchProducts, productsPerPage } =
     useFeaturedHomeProducts({
@@ -261,7 +264,7 @@ export function HomeProductSections({
         <WhyChooseUsSection />
       </div>
 
-      <HomePagePartnerLogos />
+      <HomePagePartnerLogos brands={homeBrands} />
 
       <HomeMobileSaleBanner />
     </section>

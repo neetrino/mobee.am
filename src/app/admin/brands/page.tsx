@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
 import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
@@ -9,11 +10,13 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
+import { BrandLogoField } from './components/BrandLogoField';
 
 interface Brand {
   id: string;
   name: string;
   slug: string;
+  logoUrl: string | null;
 }
 
 function BrandsSection() {
@@ -22,7 +25,7 @@ function BrandsSection() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
-  const [formData, setFormData] = useState({ name: '' });
+  const [formData, setFormData] = useState({ name: '', logoUrl: null as string | null });
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -87,20 +90,20 @@ function BrandsSection() {
 
   const handleOpenAddModal = () => {
     setEditingBrand(null);
-    setFormData({ name: '' });
+    setFormData({ name: '', logoUrl: null });
     setShowModal(true);
   };
 
   const handleOpenEditModal = (brand: Brand) => {
     setEditingBrand(brand);
-    setFormData({ name: brand.name });
+    setFormData({ name: brand.name, logoUrl: brand.logoUrl });
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingBrand(null);
-    setFormData({ name: '' });
+    setFormData({ name: '', logoUrl: null });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,6 +121,7 @@ function BrandsSection() {
         console.log('🔄 [ADMIN] Updating brand:', editingBrand.id);
         await apiClient.put(`/api/v1/admin/brands/${editingBrand.id}`, {
           name: formData.name.trim(),
+          logoUrl: formData.logoUrl,
         });
         console.log('✅ [ADMIN] Brand updated successfully');
         showToast(t('admin.brands.updatedSuccess'), 'success');
@@ -126,6 +130,7 @@ function BrandsSection() {
         console.log('➕ [ADMIN] Creating brand:', formData.name);
         await apiClient.post('/api/v1/admin/brands', {
           name: formData.name.trim(),
+          logoUrl: formData.logoUrl,
         });
         console.log('✅ [ADMIN] Brand created successfully');
         showToast(t('admin.brands.createdSuccess'), 'success');
@@ -211,15 +216,28 @@ function BrandsSection() {
           {filteredBrands.length === 0 ? (
             <p className="text-sm text-gray-500 py-2">{t('admin.brands.noSearchResults')}</p>
           ) : (
-        <div className="space-y-2 max-h-96 overflow-y-auto">
+        <div className="space-y-2">
         {filteredBrands.map((brand) => (
           <div
             key={brand.id}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-supersudo hover:bg-gray-100 transition-colors"
+            className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-supersudo hover:bg-gray-100 transition-colors"
           >
-            <div>
-              <div className="text-sm font-medium text-gray-900">{brand.name}</div>
-              <div className="text-xs text-gray-500">{brand.slug}</div>
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="relative size-10 shrink-0 overflow-hidden rounded-supersudo border border-gray-200 bg-white">
+                {brand.logoUrl ? (
+                  <Image
+                    src={brand.logoUrl}
+                    alt=""
+                    fill
+                    sizes="40px"
+                    className="object-contain"
+                  />
+                ) : null}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium text-gray-900">{brand.name}</div>
+                <div className="text-xs text-gray-500">{brand.slug}</div>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -294,6 +312,11 @@ function BrandsSection() {
                 />
               </div>
 
+              <BrandLogoField
+                logoUrl={formData.logoUrl}
+                onChange={(logoUrl) => setFormData({ ...formData, logoUrl })}
+              />
+
               <div className="flex items-center justify-end gap-3 pt-4">
                 <Button
                   type="button"
@@ -326,6 +349,7 @@ export default function BrandsPage() {
     <div className="mx-auto w-full max-w-7xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">{t('admin.brands.title')}</h1>
+        <p className="mt-2 text-sm text-gray-500">{t('admin.brands.logoHint')}</p>
       </div>
 
       <Card className="p-6">

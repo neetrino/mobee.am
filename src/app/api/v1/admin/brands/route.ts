@@ -5,6 +5,7 @@ import {
   getCachedAdminReferenceResponse,
   invalidateAdminReferenceServerCache,
 } from "@/lib/admin/admin-reference-server-cache";
+import { invalidateHomeBrandsCache } from "@/lib/services/home-brands-cached";
 
 /**
  * GET /api/v1/admin/brands
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
 
     const result = await adminService.createBrand(body);
     await invalidateAdminReferenceServerCache("brands");
+    await invalidateHomeBrandsCache();
 
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {

@@ -43,10 +43,16 @@
   },
   "partner_logos": {
     "heading": "Featured brands",
+    "scrollPrevious": "Previous brands",
+    "scrollNext": "Next brands",
     "apple": "Apple",
+    "bosch": "Bosch",
+    "dyson": "Dyson",
+    "hisense": "Hisense",
     "lg": "LG",
+    "midea": "Midea",
     "samsung": "Samsung",
-    "xiaomi": "Xiaomi"
+    "sony": "Sony"
   },
   "featured_products": {
     "title": "Featured Products",

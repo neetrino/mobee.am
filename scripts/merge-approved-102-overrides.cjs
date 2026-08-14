@@ -47,7 +47,6 @@ function main() {
 
   const byBrandLogical = {};
   for (const row of BATCH_ROWS) {
-    const k = `${row.brand}|${row.marcoModel}`;
     byBrandLogical[row.brand] = byBrandLogical[row.brand] || new Set();
     byBrandLogical[row.brand].add(row.marcoModel);
   }
