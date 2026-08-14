@@ -9,6 +9,10 @@ import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
 import { ShopFilterSectionHeader } from './shop/ShopFilterSectionHeader';
 import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
+import {
+  brandFilterTokenMatches,
+  isBrandFilterSelected,
+} from '@/lib/shop/brand-filter-tokens';
 
 interface BrandFilterProps {
   category?: string;
@@ -70,10 +74,14 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
   };
 
   const handleBrandSelect = (brandId: string) => {
-    const currentBrands = selected;
-    const newBrands = currentBrands.includes(brandId)
-      ? currentBrands.filter((id) => id !== brandId)
-      : [...currentBrands, brandId];
+    const brand = brands.find((item) => item.id === brandId);
+    if (!brand) {
+      return;
+    }
+
+    const currentlySelected = isBrandFilterSelected(selected, brand);
+    const withoutBrand = selected.filter((token) => !brandFilterTokenMatches(token, brand));
+    const newBrands = currentlySelected ? withoutBrand : [...withoutBrand, brand.id];
 
     setSelected(newBrands);
 
@@ -125,7 +133,7 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
       {brands.length > 0 ? (
         <div className="mt-4 space-y-3">
           {brands.map((brand) => {
-            const isSelected = selected.includes(brand.id);
+            const isSelected = isBrandFilterSelected(selected, brand);
 
             return (
               <button

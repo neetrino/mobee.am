@@ -24,6 +24,28 @@ const normalizeFilterList = (
   return items;
 };
 
+function productMatchesBrandTokens(
+  product: ProductWithRelations,
+  brandList: string[],
+): boolean {
+  if (product.brandId && brandList.includes(product.brandId)) {
+    return true;
+  }
+
+  const normalized = brandList.map((token) => token.toLowerCase());
+  const brand = product.brand;
+  if (!brand) {
+    return false;
+  }
+
+  if (brand.slug && normalized.includes(brand.slug.toLowerCase())) {
+    return true;
+  }
+
+  const names = brand.translations?.map((row) => row.name.trim().toLowerCase()) ?? [];
+  return names.some((name) => name.length > 0 && normalized.includes(name));
+}
+
 class ProductsFindFilterService {
   /**
    * Filter products by price, colors, sizes, brand in memory
@@ -48,12 +70,11 @@ class ProductsFindFilterService {
       });
     }
 
-    // Filter by brand(s) - support multiple brands (comma-separated)
+    // Filter by brand(s) — id (checkbox) or slug/name (home logo strip)
     const brandList = normalizeFilterList(brand);
     if (brandList.length > 0) {
-      products = products.filter(
-        (product: ProductWithRelations) => 
-          product.brandId && brandList.includes(product.brandId)
+      products = products.filter((product: ProductWithRelations) =>
+        productMatchesBrandTokens(product, brandList),
       );
     }
 

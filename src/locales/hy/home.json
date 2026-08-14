@@ -45,10 +45,16 @@
   },
   "partner_logos": {
     "heading": "Բրենդներ",
+    "scrollPrevious": "Նախորդ բրենդները",
+    "scrollNext": "Հաջորդ բրենդները",
     "apple": "Apple",
+    "bosch": "Bosch",
+    "dyson": "Dyson",
+    "hisense": "Hisense",
     "lg": "LG",
+    "midea": "Midea",
     "samsung": "Samsung",
-    "xiaomi": "Xiaomi"
+    "sony": "Sony"
   },
   "featured_products": {
     "title": "Առաջարկվող ապրանքներ",

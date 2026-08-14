@@ -17,7 +17,7 @@ const PartnerLogosSection = dynamic(
 function PartnerLogosPlaceholder() {
   return (
     <div
-      className="mx-auto h-24 w-full max-w-6xl animate-pulse rounded-lg bg-gray-100"
+      className="mx-auto h-48 w-full max-w-6xl animate-pulse rounded-lg bg-gray-100"
       aria-hidden
     />
   );

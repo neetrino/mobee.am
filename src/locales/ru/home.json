@@ -43,10 +43,16 @@
   },
   "partner_logos": {
     "heading": "Бренды",
+    "scrollPrevious": "Предыдущие бренды",
+    "scrollNext": "Следующие бренды",
     "apple": "Apple",
+    "bosch": "Bosch",
+    "dyson": "Dyson",
+    "hisense": "Hisense",
     "lg": "LG",
+    "midea": "Midea",
     "samsung": "Samsung",
-    "xiaomi": "Xiaomi"
+    "sony": "Sony"
   },
   "featured_products": {
     "title": "Рекомендуемые товары",
