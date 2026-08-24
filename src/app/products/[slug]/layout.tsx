@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCachedProductBySlug } from "@/lib/services/products-slug-cached";
+import { getSiteAssetUrl } from "@/lib/site-url";
 import {
   SITE_APP_ICON_HEIGHT_PX,
   SITE_APP_ICON_PATH,
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const previewImage = firstImage
       ? { url: firstImage, alt: title }
       : {
-          url: SITE_APP_ICON_PATH,
+          url: getSiteAssetUrl(SITE_APP_ICON_PATH),
           width: SITE_APP_ICON_WIDTH_PX,
           height: SITE_APP_ICON_HEIGHT_PX,
           alt: SITE_BRAND_NAME,

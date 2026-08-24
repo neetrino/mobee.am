@@ -15,7 +15,7 @@ import {
 } from '../lib/brand.constants';
 import { readLanguageFromCookies } from '../lib/language';
 import type { CategoryTreeNode } from '../lib/category-nav';
-import { getSiteUrl } from '../lib/site-url';
+import { getSiteAssetUrl, getSiteUrl } from '../lib/site-url';
 import { getCachedCategoriesTree } from '../lib/services/categories-tree-cached';
 import { TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT } from '../lib/tablet-ipad-air-like-layout';
 import { withRootLayoutDevTiming } from '../lib/root-layout-dev-timing';
@@ -28,7 +28,7 @@ export const viewport: Viewport = {
 };
 
 const siteShareImage = {
-  url: SITE_APP_ICON_PATH,
+  url: getSiteAssetUrl(SITE_APP_ICON_PATH),
   width: SITE_APP_ICON_WIDTH_PX,
   height: SITE_APP_ICON_HEIGHT_PX,
   alt: SITE_BRAND_NAME,
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: SITE_SHARE_TITLE,
     description: SITE_SHARE_DESCRIPTION,
-    images: [SITE_APP_ICON_PATH],
+    images: [getSiteAssetUrl(SITE_APP_ICON_PATH)],
   },
 };
 
