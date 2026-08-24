@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { productsService } from "@/lib/services/products.service";
-import { SITE_BRAND_NAME } from "@/lib/brand.constants";
+import {
+  SITE_APP_ICON_HEIGHT_PX,
+  SITE_APP_ICON_PATH,
+  SITE_APP_ICON_WIDTH_PX,
+  SITE_BRAND_NAME,
+} from "@/lib/brand.constants";
 
 const DEFAULT_TITLE = "Product";
 const SITE_NAME = SITE_BRAND_NAME;
@@ -19,6 +24,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       Array.isArray(product.media) && product.media.length > 0
         ? String(product.media[0])
         : null;
+    const previewImage = firstImage
+      ? { url: firstImage, alt: title }
+      : {
+          url: SITE_APP_ICON_PATH,
+          width: SITE_APP_ICON_WIDTH_PX,
+          height: SITE_APP_ICON_HEIGHT_PX,
+          alt: SITE_BRAND_NAME,
+        };
 
     return {
       title: `${title} | ${SITE_NAME}`,
@@ -26,14 +39,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title,
         description: description ?? undefined,
-        ...(firstImage && { images: [{ url: firstImage, alt: title }] }),
+        images: [previewImage],
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
         title,
         description: description ?? undefined,
-        ...(firstImage && { images: [firstImage] }),
+        images: [previewImage.url],
       },
     };
   } catch {
