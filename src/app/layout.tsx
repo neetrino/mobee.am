@@ -6,13 +6,16 @@ import { ClientProviders } from '../components/ClientProviders';
 import { SiteChrome } from '../components/SiteChrome';
 import { siteInter } from '../lib/fonts/site-fonts';
 import {
+  SITE_APP_ICON_HEIGHT_PX,
   SITE_APP_ICON_PATH,
+  SITE_APP_ICON_WIDTH_PX,
   SITE_BRAND_NAME,
   SITE_SHARE_DESCRIPTION,
   SITE_SHARE_TITLE,
 } from '../lib/brand.constants';
 import { readLanguageFromCookies } from '../lib/language';
 import type { CategoryTreeNode } from '../lib/category-nav';
+import { getSiteUrl } from '../lib/site-url';
 import { getCachedCategoriesTree } from '../lib/services/categories-tree-cached';
 import { TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT } from '../lib/tablet-ipad-air-like-layout';
 import { withRootLayoutDevTiming } from '../lib/root-layout-dev-timing';
@@ -24,7 +27,15 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const siteShareImage = {
+  url: SITE_APP_ICON_PATH,
+  width: SITE_APP_ICON_WIDTH_PX,
+  height: SITE_APP_ICON_HEIGHT_PX,
+  alt: SITE_BRAND_NAME,
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   /** Stops iOS Safari from injecting tel links into text/DOM and breaking React hydration. */
   formatDetection: {
     telephone: false,
@@ -44,11 +55,13 @@ export const metadata: Metadata = {
     siteName: SITE_BRAND_NAME,
     locale: 'hy_AM',
     type: 'website',
+    images: [siteShareImage],
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_SHARE_TITLE,
     description: SITE_SHARE_DESCRIPTION,
+    images: [SITE_APP_ICON_PATH],
   },
 };
 
