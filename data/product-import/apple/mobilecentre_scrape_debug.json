@@ -1,0 +1,11 @@
+{
+  "candidate_links": 701,
+  "flat_variants": 19,
+  "variable_products": 8,
+  "missing_targets": 30,
+  "outputs": [
+    "mobilecentre_apple_flat_variants.json",
+    "mobilecentre_apple_variable_products.json",
+    "mobilecentre_missing_targets.json"
+  ]
+}

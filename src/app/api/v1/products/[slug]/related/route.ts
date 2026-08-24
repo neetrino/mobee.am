@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { productsService } from "@/lib/services/products.service";
-import { findRelatedProducts } from "@/lib/services/products-related.service";
+import { findRelatedProducts, resolveRelatedCategoryIds, type RelatedCategorySource } from "@/lib/services/products-related.service";
+import { findProductRelatedContextBySlug } from "@/lib/services/products-related-context.service";
+import { getCachedProductBySlug } from "@/lib/services/products-slug-cached";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 30;
-
-type ProductForRelated = Awaited<ReturnType<typeof productsService.findBySlug>>;
 
 export const dynamic = "force-dynamic";
 
@@ -22,35 +21,94 @@ function parseLimit(rawLimit: string | null): number {
   return Math.min(parsed, MAX_LIMIT);
 }
 
-function isNotFoundError(error: unknown): boolean {
-  return (error as { status?: number }).status === 404;
+function parseCategoryIds(raw: string | null): string[] {
+  if (!raw?.trim()) {
+    return [];
+  }
+
+  return raw
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
 }
 
-async function findProductForRelated(
+function buildContextFromQuery(
+  productId: string | null,
+  primaryCategoryId: string | null,
+  categoryIds: string[],
+): RelatedCategorySource | null {
+  const normalizedId = productId?.trim();
+  if (!normalizedId) {
+    return null;
+  }
+
+  return {
+    id: normalizedId,
+    primaryCategoryId: primaryCategoryId?.trim() || null,
+    categoryIds,
+  };
+}
+
+async function resolveRelatedContext(
   slug: string,
   lang: string,
-): Promise<ProductForRelated | null> {
+  queryContext: RelatedCategorySource | null,
+): Promise<RelatedCategorySource | null> {
+  if (queryContext && resolveRelatedCategoryIds(queryContext).length > 0) {
+    return queryContext;
+  }
+
+  const productId = queryContext?.id;
+
   try {
-    return await productsService.findBySlug(slug, lang);
-  } catch (loadError: unknown) {
-    if (!isNotFoundError(loadError) || lang === "en") {
-      throw loadError;
+    const { result } = await getCachedProductBySlug(slug, lang);
+    if (productId && result.id !== productId) {
+      return result;
+    }
+    if (productId) {
+      return {
+        id: productId,
+        primaryCategoryId: result.primaryCategoryId,
+        categoryIds: result.categoryIds,
+        categories: result.categories,
+      };
+    }
+    return result;
+  } catch (error: unknown) {
+    if ((error as { status?: number }).status !== 404) {
+      throw error;
     }
   }
 
-  try {
-    return await productsService.findBySlug(slug, "en");
-  } catch (fallbackError: unknown) {
-    if (isNotFoundError(fallbackError)) {
-      return null;
+  if (lang !== "en") {
+    try {
+      const { result } = await getCachedProductBySlug(slug, "en");
+      if (productId) {
+        return {
+          id: productId,
+          primaryCategoryId: result.primaryCategoryId,
+          categoryIds: result.categoryIds,
+          categories: result.categories,
+        };
+      }
+      return result;
+    } catch (error: unknown) {
+      if ((error as { status?: number }).status !== 404) {
+        throw error;
+      }
     }
-    throw fallbackError;
   }
+
+  if (productId) {
+    return queryContext;
+  }
+
+  return findProductRelatedContextBySlug(slug, lang);
 }
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
     const { slug } = await params;
@@ -58,7 +116,13 @@ export async function GET(
     const lang = searchParams.get("lang") || "en";
     const limit = parseLimit(searchParams.get("limit"));
 
-    const currentProduct = await findProductForRelated(slug, lang);
+    const queryContext = buildContextFromQuery(
+      searchParams.get("productId"),
+      searchParams.get("primaryCategoryId"),
+      parseCategoryIds(searchParams.get("categoryIds")),
+    );
+
+    const currentProduct = await resolveRelatedContext(slug, lang, queryContext);
     if (!currentProduct) {
       return NextResponse.json({ data: [] });
     }
@@ -87,7 +151,7 @@ export async function GET(
         detail: err.detail || err.message || "An error occurred",
         instance: req.url,
       },
-      { status: err.status || 500 }
+      { status: err.status || 500 },
     );
   }
 }

@@ -1,5 +1,6 @@
 {
   "filters": {
+    "clearSection": "Մաքրել",
     "sidebar": {
       "title": "Ֆիլտր",
       "subtitle": "Find what fits you best"
@@ -7,7 +8,8 @@
     "price": {
       "title": "Զտել ըստ գնի",
       "sectionTitle": "Գին",
-      "priceLabel": "Գին:"
+      "priceLabel": "Գին:",
+      "loading": "Բեռնվում է..."
     },
     "category": {
       "title": "Կատեգորիաներ"
@@ -70,5 +72,10 @@
     },
     "scrollLeft": "Ոլորել կատեգորիաները ձախ",
     "scrollRight": "Ոլորել կատեգորիաները աջ"
+  },
+  "warranty": {
+    "years_suffix": "ՏԱՐԻ",
+    "label": "ԵՐԱՇԽԻՔ",
+    "badge_aria": "{years} տարի երաշխիք"
   }
 }

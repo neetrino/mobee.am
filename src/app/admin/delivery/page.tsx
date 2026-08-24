@@ -1,24 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
+import { useRouter } from 'next/navigation';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ADMIN_SECONDARY_OUTLINE_BUTTON_EXTRA_CLASS } from '../admin-secondary-action-button.constants';
-import { AdminPageShell } from '../components/AdminPageShell';
+import { AdminFormSelectDropdown } from '../components/AdminFormSelectDropdown';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
 import { ARMENIA_FALLBACK_DELIVERY_CITIES } from '../../../lib/constants/armenia-delivery-cities.constants';
 
 const SUPPORTED_COUNTRIES = ['Armenia'] as const;
-
-const SELECT_CLASS =
-  'w-full px-3 py-2 border border-gray-300 rounded-supersudo bg-white focus:outline-none focus:ring-2 focus:ring-admin appearance-none bg-[length:1.25rem] bg-[right_0.75rem_center] bg-no-repeat pr-10';
-
-const SELECT_CHEVRON_BG =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")";
 
 interface DeliveryLocation {
   id?: string;
@@ -33,33 +28,20 @@ interface DeliverySettings {
 
 export default function DeliveryPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [locations, setLocations] = useState<DeliveryLocation[]>([]);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchDeliverySettings();
-    }
-  }, [isLoggedIn, isAdmin]);
+    fetchDeliverySettings();
+  }, []);
 
   const fetchDeliverySettings = async () => {
     try {
       setLoading(true);
       console.log('[ADMIN] Fetching delivery settings...');
-      const data = await apiClient.get<DeliverySettings>('/api/v1/admin/delivery');
+      const data = await fetchAdminReference<DeliverySettings>('delivery');
       setLocations(data.locations || []);
       console.log('[ADMIN] Delivery settings loaded:', data);
     } catch (err: any) {
@@ -75,6 +57,7 @@ export default function DeliveryPage() {
     try {
       console.log('[ADMIN] Saving delivery settings...', { locations });
       await apiClient.put('/api/v1/admin/delivery', { locations });
+      invalidateAdminReferenceCache('delivery');
       showToast(t('admin.delivery.savedSuccess'), 'success');
       console.log('[ADMIN] Delivery settings saved');
       await fetchDeliverySettings();
@@ -105,7 +88,7 @@ export default function DeliveryPage() {
     setLocations(updated);
   };
 
-  if (isLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -116,12 +99,17 @@ export default function DeliveryPage() {
     );
   }
 
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
+  const countryOptions = [
+    { value: '', label: t('admin.delivery.selectCountry') },
+    ...SUPPORTED_COUNTRIES.map((country) => ({ value: country, label: country })),
+  ];
+
+  const cityOptions = [
+    { value: '', label: t('admin.delivery.selectCity') },
+    ...ARMENIA_FALLBACK_DELIVERY_CITIES.map((city) => ({ value: city, label: city })),
+  ];
 
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/delivery'} router={router} t={t}>
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.delivery.title')}</h1>
@@ -151,37 +139,29 @@ export default function DeliveryPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.delivery.country')}</label>
-                      <select
+                      <AdminFormSelectDropdown
+                        id={`delivery-country-${index}`}
                         value={location.country}
-                        onChange={(e) => handleUpdateLocation(index, 'country', e.target.value)}
-                        className={SELECT_CLASS}
-                        style={{ backgroundImage: SELECT_CHEVRON_BG }}
+                        options={countryOptions}
+                        onChange={(next) => handleUpdateLocation(index, 'country', next)}
+                        ariaLabel={t('admin.delivery.country')}
+                        placeholder={t('admin.delivery.selectCountry')}
                         disabled={saving}
-                      >
-                        <option value="">{t('admin.delivery.selectCountry')}</option>
-                        {SUPPORTED_COUNTRIES.map((country) => (
-                          <option key={country} value={country}>
-                            {country}
-                          </option>
-                        ))}
-                      </select>
+                        flyoutZIndexClass="z-30"
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.delivery.city')}</label>
-                      <select
+                      <AdminFormSelectDropdown
+                        id={`delivery-city-${index}`}
                         value={location.city}
-                        onChange={(e) => handleUpdateLocation(index, 'city', e.target.value)}
-                        className={SELECT_CLASS}
-                        style={{ backgroundImage: SELECT_CHEVRON_BG }}
+                        options={cityOptions}
+                        onChange={(next) => handleUpdateLocation(index, 'city', next)}
+                        ariaLabel={t('admin.delivery.city')}
+                        placeholder={t('admin.delivery.selectCity')}
                         disabled={saving || !location.country}
-                      >
-                        <option value="">{t('admin.delivery.selectCity')}</option>
-                        {ARMENIA_FALLBACK_DELIVERY_CITIES.map((city) => (
-                          <option key={city} value={city}>
-                            {city}
-                          </option>
-                        ))}
-                      </select>
+                        flyoutZIndexClass="z-30"
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.delivery.price')}</label>
@@ -232,6 +212,5 @@ export default function DeliveryPage() {
           </Button>
         </div>
       </div>
-    </AdminPageShell>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { ProductCardImage } from './ProductCardImage';
+import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
 import { ProductCardInfo } from './ProductCardInfo';
 import { ProductCardActions } from './ProductCardActions';
 import { ProductCardPriceBlock } from './ProductCardPriceBlock';
@@ -13,6 +14,8 @@ import { ProductLabels } from '../ProductLabels';
 import { useTranslation } from '../../lib/i18n-client';
 import type { CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
+import type { ProductWarrantyYears } from '../../lib/constants/product-warranty';
+import { ProductWarrantyBadge } from './ProductWarrantyBadge';
 import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
 
 interface ProductCardGridProps {
@@ -22,7 +25,8 @@ interface ProductCardGridProps {
     title: string;
     primaryCategoryId?: string | null;
     categories?: Array<{ id: string; slug?: string; title?: string }>;
-    price: number;
+    price: number | null;
+    hasPrice?: boolean;
     image: string | null;
     inStock: boolean;
     brand: { id: string; name: string } | null;
@@ -30,7 +34,8 @@ interface ProductCardGridProps {
     compareAtPrice?: number | null;
     originalPrice?: number | null;
     discountPercent?: number | null;
-    colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+    warrantyYears?: ProductWarrantyYears | null;
+    colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
   };
   currency: CurrencyCode;
   isInWishlist: boolean;
@@ -52,6 +57,13 @@ interface ProductCardGridProps {
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
+  addButtonNavigatesToProduct?: boolean;
+  linkColor?: string | null;
+  selectedCardLinkColor?: string | null;
+  colorsInteractive?: boolean;
+  onCardColorSelect?: (color: { value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }) => void;
+  /** Stack installment CTA label on two lines. */
+  stackInstallmentLabel?: boolean;
 }
 
 /**
@@ -75,10 +87,16 @@ export function ProductCardGrid({
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
+  addButtonNavigatesToProduct = false,
+  linkColor = null,
+  selectedCardLinkColor = null,
+  colorsInteractive = false,
+  onCardColorSelect,
+  stackInstallmentLabel = false,
 }: ProductCardGridProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
-  const categoryLine = getProductCardCategoryLineLabel(product);
+  const categoryLine = getProductCardCategoryLineLabel(product, lang);
   const footerPriceClass = (() => {
     if (smallerFooterPrice) {
       return isCompact
@@ -91,11 +109,14 @@ export function ProductCardGrid({
       : 'text-[1.1875rem] leading-[1.6625rem]';
   })();
 
+  const productHasPrice = product.hasPrice ?? (product.price != null && product.price > 0);
   const listPrice = product.compareAtPrice ?? product.originalPrice ?? null;
   const showStrike =
     homeProductGridCard &&
+    productHasPrice &&
     listPrice != null &&
-    listPrice > (product.price || 0);
+    product.price != null &&
+    listPrice > product.price;
 
   const mobileDiscountLabel =
     homeProductGridCard &&
@@ -107,9 +128,16 @@ export function ProductCardGrid({
         )
       : null;
 
+  const primaryActionDisabled = addButtonNavigatesToProduct
+    ? false
+    : !product.inStock || !productHasPrice || isAddingToCart;
+  const primaryActionEnabled = addButtonNavigatesToProduct
+    ? true
+    : product.inStock && productHasPrice && !isAddingToCart;
+
   const cardShellClass = homeProductGridCard
-    ? 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] max-lg:hover:shadow-none lg:min-h-[583px]'
-    : 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] transition-shadow hover:shadow-md lg:min-h-[583px]';
+    ? 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] lg:min-h-[583px]'
+    : 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] lg:min-h-[583px]';
 
   /** Mobile: reserve in-flow height so absolutely positioned image/actions do not overlap the title. */
   const imageStackClass = homeProductGridCard
@@ -143,7 +171,7 @@ export function ProductCardGrid({
       : 'text-[0.83125rem]';
 
   const infoPricePad = homeProductGridCard
-    ? 'px-3 pb-2 max-lg:pt-1 lg:px-5 lg:pb-3'
+    ? 'px-3 pb-2 max-lg:pb-1.5 max-lg:pt-1 lg:px-5 lg:pb-3'
     : isCompact
       ? 'px-3 pb-2'
       : 'px-5 pb-3';
@@ -169,12 +197,19 @@ export function ProductCardGrid({
               shiftImageInFrame={shiftImageInFrame}
               squareImageFrame={squareImageFrame}
               imageLoadPriority={imageLoadPriority}
+              listingCacheSource={buildProductCardCachePayload(product)}
+              linkColor={linkColor}
             />
           </div>
         </div>
         {product.labels && product.labels.length > 0 ? (
           <div className="pointer-events-none absolute inset-0 z-20">
             <ProductLabels labels={product.labels} />
+          </div>
+        ) : null}
+        {product.warrantyYears ? (
+          <div className="pointer-events-none absolute bottom-3 left-3 z-20 max-lg:bottom-2 max-lg:left-2">
+            <ProductWarrantyBadge years={product.warrantyYears} size="catalog" />
           </div>
         ) : null}
         <ProductCardActions
@@ -205,10 +240,16 @@ export function ProductCardGrid({
           hidePrice
           omitBrandRow={homeProductGridCard}
           titleSizeMobileFigma={homeProductGridCard}
+          listingCacheSource={buildProductCardCachePayload(product)}
+          linkColor={linkColor}
+          selectedCardLinkColor={selectedCardLinkColor}
+          colorsInteractive={colorsInteractive}
+          onCardColorSelect={onCardColorSelect}
         />
-        <div className={infoPricePad}>
+        <div className={`mt-auto ${infoPricePad}`}>
           <ProductCardPriceBlock
             price={product.price}
+            hasPrice={productHasPrice}
             currency={currency}
             discountPercent={product.discountPercent}
             listPrice={listPrice}
@@ -218,21 +259,20 @@ export function ProductCardGrid({
             showStrike={showStrike}
           />
         </div>
-        <div className="min-h-0 flex-1" aria-hidden />
       </div>
 
       <div
-        className={`shrink-0 flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-3 ${footerPad} ${
-          homeProductGridCard ? 'max-lg:gap-2' : ''
+        className={`shrink-0 flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-2 ${footerPad} ${
+          homeProductGridCard ? 'max-lg:gap-1.5' : ''
         }`}
       >
         <div className="flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={onAddToCart}
-            disabled={!product.inStock || isAddingToCart}
+            disabled={primaryActionDisabled}
             className={`inline-flex shrink-0 items-center justify-center bg-[#2db2ff] font-medium text-white transition-opacity ${
-              product.inStock && !isAddingToCart
+              primaryActionEnabled
                 ? 'cursor-pointer hover:opacity-90'
                 : 'cursor-default opacity-50'
             } ${
@@ -276,19 +316,23 @@ export function ProductCardGrid({
               </>
             )}
           </button>
-          <InstallmentPriceButton onClick={handleInstallmentClick} />
+          {productHasPrice ? (
+            <InstallmentPriceButton
+              onClick={handleInstallmentClick}
+              stackLabel={stackInstallmentLabel}
+            />
+          ) : null}
         </div>
-        {homeProductGridCard ? (
-          <div className="hidden min-h-[22px] max-lg:flex max-lg:items-center">
-            {mobileDiscountLabel ? (
-              <span className="inline-flex h-[22px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold leading-none text-[#ff383c]">
-                {mobileDiscountLabel}
-              </span>
-            ) : null}
+        {homeProductGridCard && mobileDiscountLabel ? (
+          <div className="hidden max-lg:flex max-lg:items-center">
+            <span className="inline-flex h-[22px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold leading-none text-[#ff383c]">
+              {mobileDiscountLabel}
+            </span>
           </div>
         ) : null}
       </div>
 
+      {productHasPrice && product.price != null ? (
       <InstallmentRequestModal
         isOpen={isInstallmentModalOpen}
         onClose={() => setIsInstallmentModalOpen(false)}
@@ -299,6 +343,7 @@ export function ProductCardGrid({
         currency="AMD"
         productImageUrl={product.image}
       />
+      ) : null}
     </div>
   );
 }

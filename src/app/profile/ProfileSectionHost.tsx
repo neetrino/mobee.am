@@ -1,6 +1,7 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
+import { ProfileFlashAlert } from './ProfileFlashAlert';
 import { ProfileSectionModal } from './ProfileSectionModal';
 import { ProfileSheetBody } from './ProfileSheetBody';
 
@@ -12,7 +13,40 @@ export type ProfileSectionHostProps = ProfileSheetBodyProps & {
   modalTitle: string;
   onCloseSheet: () => void;
   closeLabel: string;
+  error?: string | null;
+  success?: string | null;
+  onDismissError?: () => void;
+  onDismissSuccess?: () => void;
 };
+
+function ProfileAlerts({
+  error,
+  success,
+  onDismissError,
+  onDismissSuccess,
+}: {
+  error?: string | null;
+  success?: string | null;
+  onDismissError?: () => void;
+  onDismissSuccess?: () => void;
+}): ReactNode {
+  return (
+    <>
+      <ProfileFlashAlert
+        message={error}
+        variant="error"
+        onDismiss={() => onDismissError?.()}
+        className="mb-4"
+      />
+      <ProfileFlashAlert
+        message={success}
+        variant="success"
+        onDismiss={() => onDismissSuccess?.()}
+        className="mb-4"
+      />
+    </>
+  );
+}
 
 /**
  * Desktop: section inline under the profile header. Mobile: {@link ProfileSectionModal}.
@@ -23,15 +57,29 @@ export function ProfileSectionHost({
   modalTitle,
   onCloseSheet,
   closeLabel,
+  error,
+  success,
+  onDismissError,
+  onDismissSuccess,
   ...sheetBodyProps
 }: ProfileSectionHostProps) {
-  if (!profileSheetOpen) {
-    return null;
-  }
-
-  const body = <ProfileSheetBody {...sheetBodyProps} />;
+  const body = (
+    <>
+      <ProfileAlerts
+        error={error}
+        success={success}
+        onDismissError={onDismissError}
+        onDismissSuccess={onDismissSuccess}
+      />
+      <ProfileSheetBody {...sheetBodyProps} />
+    </>
+  );
 
   if (isDesktopLayout) {
+    if (!profileSheetOpen) {
+      return null;
+    }
+
     return (
       <section
         className="overflow-hidden rounded-[20px] border border-admin-100 bg-white shadow-sm"
@@ -62,7 +110,7 @@ export function ProfileSectionHost({
 
   return (
     <ProfileSectionModal
-      open
+      open={profileSheetOpen}
       title={modalTitle}
       onClose={onCloseSheet}
       closeLabel={closeLabel}

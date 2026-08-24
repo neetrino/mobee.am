@@ -1,19 +1,22 @@
 ﻿'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
+import Image from 'next/image';
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AdminPageShell } from '../components/AdminPageShell';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
+import { BrandLogoField } from './components/BrandLogoField';
 
 interface Brand {
   id: string;
   name: string;
   slug: string;
+  logoUrl: string | null;
 }
 
 function BrandsSection() {
@@ -22,7 +25,7 @@ function BrandsSection() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
-  const [formData, setFormData] = useState({ name: '' });
+  const [formData, setFormData] = useState({ name: '', logoUrl: null as string | null });
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -40,7 +43,7 @@ function BrandsSection() {
     try {
       setLoading(true);
       console.log('🏷️ [ADMIN] Fetching brands...');
-      const response = await apiClient.get<{ data: Brand[] }>('/api/v1/admin/brands');
+      const response = await fetchAdminReference<{ data: Brand[] }>('brands');
       setBrands(response.data || []);
       console.log('✅ [ADMIN] Brands loaded:', response.data?.length || 0);
     } catch (err) {
@@ -66,7 +69,7 @@ function BrandsSection() {
     try {
       console.log(`🗑️ [ADMIN] Deleting brand: ${brandName} (${brandId})`);
       await apiClient.delete(`/api/v1/admin/brands/${brandId}`);
-      console.log('✅ [ADMIN] Brand deleted successfully');
+      invalidateAdminReferenceCache('brands');
       fetchBrands();
       showToast(t('admin.brands.deletedSuccess'), 'success');
     } catch (err: any) {
@@ -87,20 +90,20 @@ function BrandsSection() {
 
   const handleOpenAddModal = () => {
     setEditingBrand(null);
-    setFormData({ name: '' });
+    setFormData({ name: '', logoUrl: null });
     setShowModal(true);
   };
 
   const handleOpenEditModal = (brand: Brand) => {
     setEditingBrand(brand);
-    setFormData({ name: brand.name });
+    setFormData({ name: brand.name, logoUrl: brand.logoUrl });
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingBrand(null);
-    setFormData({ name: '' });
+    setFormData({ name: '', logoUrl: null });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,6 +121,7 @@ function BrandsSection() {
         console.log('🔄 [ADMIN] Updating brand:', editingBrand.id);
         await apiClient.put(`/api/v1/admin/brands/${editingBrand.id}`, {
           name: formData.name.trim(),
+          logoUrl: formData.logoUrl,
         });
         console.log('✅ [ADMIN] Brand updated successfully');
         showToast(t('admin.brands.updatedSuccess'), 'success');
@@ -126,11 +130,13 @@ function BrandsSection() {
         console.log('➕ [ADMIN] Creating brand:', formData.name);
         await apiClient.post('/api/v1/admin/brands', {
           name: formData.name.trim(),
+          logoUrl: formData.logoUrl,
         });
         console.log('✅ [ADMIN] Brand created successfully');
         showToast(t('admin.brands.createdSuccess'), 'success');
       }
       
+      invalidateAdminReferenceCache('brands');
       fetchBrands();
       handleCloseModal();
     } catch (err: any) {
@@ -210,15 +216,28 @@ function BrandsSection() {
           {filteredBrands.length === 0 ? (
             <p className="text-sm text-gray-500 py-2">{t('admin.brands.noSearchResults')}</p>
           ) : (
-        <div className="space-y-2 max-h-96 overflow-y-auto">
+        <div className="space-y-2">
         {filteredBrands.map((brand) => (
           <div
             key={brand.id}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-supersudo hover:bg-gray-100 transition-colors"
+            className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-supersudo hover:bg-gray-100 transition-colors"
           >
-            <div>
-              <div className="text-sm font-medium text-gray-900">{brand.name}</div>
-              <div className="text-xs text-gray-500">{brand.slug}</div>
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="relative size-10 shrink-0 overflow-hidden rounded-supersudo border border-gray-200 bg-white">
+                {brand.logoUrl ? (
+                  <Image
+                    src={brand.logoUrl}
+                    alt=""
+                    fill
+                    sizes="40px"
+                    className="object-contain"
+                  />
+                ) : null}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium text-gray-900">{brand.name}</div>
+                <div className="text-xs text-gray-500">{brand.slug}</div>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -251,19 +270,27 @@ function BrandsSection() {
         </>
       )}
 
-      {/* Add/Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-supersudo shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+      <AnimatedModalPortal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        closeAriaLabel={t('admin.brands.cancel')}
+        blockClose={submitting}
+        labelledBy="brand-modal-title"
+        panelClassName="w-full max-w-md rounded-supersudo bg-white p-6 shadow-xl"
+      >
+        {({ requestClose }) => (
+          <>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 id="brand-modal-title" className="text-lg font-semibold text-gray-900">
                 {editingBrand ? t('admin.brands.editBrand') : t('admin.brands.addNewBrand')}
               </h3>
               <button
-                onClick={handleCloseModal}
+                type="button"
+                onClick={requestClose}
                 className="text-gray-400 transition-colors hover:text-admin-600"
+                aria-label={t('admin.brands.cancel')}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -271,7 +298,7 @@ function BrandsSection() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="brand-name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="brand-name" className="mb-1 block text-sm font-medium text-gray-700">
                   {t('admin.brands.brandName')}
                 </label>
                 <input
@@ -279,17 +306,22 @@ function BrandsSection() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:ring-2 focus:ring-admin focus:border-transparent"
+                  className="w-full rounded-supersudo border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-admin"
                   placeholder={t('admin.brands.enterBrandName')}
                   required
                 />
               </div>
 
+              <BrandLogoField
+                logoUrl={formData.logoUrl}
+                onChange={(logoUrl) => setFormData({ ...formData, logoUrl })}
+              />
+
               <div className="flex items-center justify-end gap-3 pt-4">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handleCloseModal}
+                  onClick={requestClose}
                   disabled={submitting}
                 >
                   {t('admin.brands.cancel')}
@@ -303,54 +335,27 @@ function BrandsSection() {
                 </Button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </AnimatedModalPortal>
     </>
   );
 }
 
 export default function BrandsPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
 
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/brands'} router={router} t={t}>
-      <div className="mx-auto w-full max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.brands.title')}</h1>
-        </div>
-
-        <Card className="p-6">
-          <BrandsSection />
-        </Card>
+    <div className="mx-auto w-full max-w-7xl">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">{t('admin.brands.title')}</h1>
+        <p className="mt-2 text-sm text-gray-500">{t('admin.brands.logoHint')}</p>
       </div>
-    </AdminPageShell>
+
+      <Card className="p-6">
+        <BrandsSection />
+      </Card>
+    </div>
   );
 }
 

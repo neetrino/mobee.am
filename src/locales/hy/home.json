@@ -8,15 +8,15 @@
   "hero_promo_body_line2": "պրոֆեսիոնալ տեսախցիկի համակարգը:",
   "hero_free_shipping": "Անվճար առաքում",
   "hero_cta_more": "Ավելին",
-  "hero_chat_line1": "Զրուցեք",
-  "hero_chat_bold": "Apple մասնագետի",
-  "hero_chat_line2": " հետ առցանց կամ խանութում:",
-  "hero_discount_percent": "50%",
+  "hero_chat_line1": "Մեր ողջ տեսականու համար՝",
+  "hero_discount_percent": "2%",
   "hero_iphone_title": "iPhone 17 Pro",
+  "hero_banner_carousel_aria_label": "Առաջարկված ակցիաներ",
+  "hero_banner_carousel_go_to_slide": "Անցնել սլայդ",
   "hero_iphone_title_mobile_line1": "iPhone 17",
   "hero_iphone_title_mobile_line2": "Pro",
   "featured_intro": {
-    "title": "Լավագույն ընտրություն",
+    "title": "Վերջին Նորություններ",
     "subtitle": "Պարզ ընտրություն լավագույններից",
     "cta": "Ավելին"
   },
@@ -45,10 +45,16 @@
   },
   "partner_logos": {
     "heading": "Բրենդներ",
+    "scrollPrevious": "Նախորդ բրենդները",
+    "scrollNext": "Հաջորդ բրենդները",
     "apple": "Apple",
+    "bosch": "Bosch",
+    "dyson": "Dyson",
+    "hisense": "Hisense",
     "lg": "LG",
+    "midea": "Midea",
     "samsung": "Samsung",
-    "xiaomi": "Xiaomi"
+    "sony": "Sony"
   },
   "featured_products": {
     "title": "Առաջարկվող ապրանքներ",

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { productsService } from "@/lib/services/products.service";
+import { getCachedProductBySlug } from "@/lib/services/products-slug-cached";
 import {
   SITE_APP_ICON_HEIGHT_PX,
   SITE_APP_ICON_PATH,
@@ -17,7 +17,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   try {
-    const product = await productsService.findBySlug(slug, "en");
+    const { result: product } = await getCachedProductBySlug(slug, "en");
     const title = product.seo?.title || product.title || DEFAULT_TITLE;
     const description = product.seo?.description || product.description || null;
     const firstImage =

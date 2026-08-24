@@ -6,6 +6,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const filters = {
       category: searchParams.get("category") || undefined,
+      search: searchParams.get("search") || undefined,
       lang: searchParams.get("lang") || "en",
     };
 

@@ -1,11 +1,15 @@
 ﻿'use client';
 
 import { useRouter } from 'next/navigation';
+import { AdminTableSkeleton } from '../../components/AdminTableSkeleton';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
-import { ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC } from '@/app/admin/admin-uniform-product-thumbnail.constants';
+import { resolveAdminProductThumbnailSrc } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatPrice, type CurrencyCode } from '../../../../lib/currency';
 import type { Category, Product, ProductsResponse } from '../types';
+
+const PRODUCT_TABLE_TITLE_MAX_WIDTH_CLASS = 'max-w-[30ch]';
+const PRODUCT_TABLE_SLUG_MAX_WIDTH_CLASS = 'max-w-[28ch]';
 
 function resolveProductCategories(
   categoryIds: string[] | undefined,
@@ -65,10 +69,7 @@ export function ProductsTable({
   return (
     <Card className="overflow-hidden">
       {loading ? (
-        <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.products.loadingProducts')}</p>
-        </div>
+        <AdminTableSkeleton rows={10} columns={8} />
       ) : sortedProducts.length === 0 ? (
         <div className="p-8 text-center">
           <p className="text-gray-600">{t('admin.products.noProducts')}</p>
@@ -198,8 +199,8 @@ export function ProductsTable({
                   <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {t('admin.products.featured')}
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pl-6">
-                    <span className="ml-6 inline-block">{t('admin.products.actions')}</span>
+                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('admin.products.actions')}
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <button
@@ -253,15 +254,25 @@ export function ProductsTable({
                       />
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+                      <div className="flex min-w-0 items-center">
                         <img
-                          src={ADMIN_UNIFORM_PRODUCT_THUMBNAIL_SRC}
+                          src={resolveAdminProductThumbnailSrc(product.image)}
                           alt={product.title}
-                          className="h-12 w-12 rounded-supersudo object-cover mr-3"
+                          className="mr-3 h-12 w-12 shrink-0 rounded-supersudo object-cover"
                         />
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{product.title}</div>
-                          <div className="text-sm text-gray-500">{product.slug}</div>
+                        <div className="min-w-0">
+                          <div
+                            className={`truncate text-sm font-medium text-gray-900 ${PRODUCT_TABLE_TITLE_MAX_WIDTH_CLASS}`}
+                            title={product.title}
+                          >
+                            {product.title}
+                          </div>
+                          <div
+                            className={`truncate text-sm text-gray-500 ${PRODUCT_TABLE_SLUG_MAX_WIDTH_CLASS}`}
+                            title={product.slug}
+                          >
+                            {product.slug}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -342,8 +353,8 @@ export function ProductsTable({
                         </svg>
                       </button>
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center gap-1 flex-wrap">
+                    <td className="px-3 py-4 align-middle whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center justify-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -371,7 +382,7 @@ export function ProductsTable({
                         <button
                           type="button"
                           onClick={() => handleTogglePublished(product.id, product.published, product.title)}
-                          className={`relative ml-[10px] inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-2 ${
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-2 ${
                             product.published
                               ? 'bg-green-500'
                               : 'bg-gray-300'

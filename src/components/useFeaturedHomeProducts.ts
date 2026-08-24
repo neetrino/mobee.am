@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { apiClient } from '../lib/api-client';
 import { type LanguageCode } from '../lib/language';
-import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
 import { t } from '../lib/i18n';
 import type { ProductLabel } from './ProductLabels';
+import { useUiLanguage } from './UiLanguageProvider';
 import {
   buildHomeFeaturedProductFilters,
   HOME_FEATURED_FILTER,
@@ -13,6 +13,7 @@ import {
 } from '@/lib/home/home-product-filters';
 import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
+import { isMarcoHostedProductImageUrl } from '@/lib/products/marco-product-image';
 
 export interface FeaturedHomeProduct {
   id: string;
@@ -35,6 +36,7 @@ export interface FeaturedHomeProduct {
   >;
   originalPrice?: number | null;
   discountPercent?: number | null;
+  warrantyYears?: import('../lib/constants/product-warranty').ProductWarrantyYears | null;
   labels?: ProductLabel[];
   primaryCategoryId?: string | null;
   categoryIds?: string[];
@@ -73,16 +75,23 @@ async function fetchFeaturedHomePage(
   };
 
   const localizedProducts = await fetchByLanguage(language);
-  if (localizedProducts.length > 0 || language === 'en') {
-    return localizedProducts;
+  const withoutMarco = localizedProducts.filter(
+    (product) => !isMarcoHostedProductImageUrl(product.image),
+  );
+  if (withoutMarco.length > 0 || language === 'en') {
+    return withoutMarco;
   }
 
-  return fetchByLanguage('en');
+  const englishProducts = await fetchByLanguage('en');
+  return englishProducts.filter(
+    (product) => !isMarcoHostedProductImageUrl(product.image),
+  );
 }
 
 export function useFeaturedHomeProducts(options: UseFeaturedHomeProductsOptions = {}) {
-  const { initialProducts, initialFiltersKey, serverLanguage } = options;
-  const language = useClientSyncedLanguage();
+  const { initialProducts, initialFiltersKey } = options;
+  // Same source as header/shop cards — not useClientSyncedLanguage (SSR snapshot is always `hy`).
+  const language = useUiLanguage();
   const [products, setProducts] = useState<FeaturedHomeProduct[]>(() => initialProducts ?? []);
   const [loading, setLoading] = useState(
     () => !(initialProducts && initialFiltersKey),
@@ -90,8 +99,8 @@ export function useFeaturedHomeProducts(options: UseFeaturedHomeProductsOptions 
   const [error, setError] = useState<string | null>(null);
 
   const filtersKey = useMemo(
-    () => buildProductListCacheKey(buildHomeFeaturedProductFilters(serverLanguage ?? language)),
-    [language, serverLanguage],
+    () => buildProductListCacheKey(buildHomeFeaturedProductFilters(language)),
+    [language],
   );
 
   const fetchProducts = useCallback(
@@ -99,16 +108,16 @@ export function useFeaturedHomeProducts(options: UseFeaturedHomeProductsOptions 
       try {
         setLoading(true);
         setError(null);
-        setProducts(await fetchFeaturedHomePage(serverLanguage ?? language, filter));
+        setProducts(await fetchFeaturedHomePage(language, filter));
       } catch (err) {
         console.error('[HomeProductSections] Error:', err);
-        setError(t(serverLanguage ?? language, 'home.featured_products.errorLoading'));
+        setError(t(language, 'home.featured_products.errorLoading'));
         setProducts([]);
       } finally {
         setLoading(false);
       }
     },
-    [language, serverLanguage],
+    [language],
   );
 
   useEffect(() => {
@@ -122,7 +131,7 @@ export function useFeaturedHomeProducts(options: UseFeaturedHomeProductsOptions 
   }, [fetchProducts, filtersKey, initialFiltersKey, initialProducts]);
 
   return {
-    language: serverLanguage ?? language,
+    language,
     products,
     loading,
     error,

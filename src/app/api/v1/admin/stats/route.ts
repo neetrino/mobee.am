@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import { withAdminPerfLog } from "@/lib/admin/admin-perf-log";
 
 /**
  * Force dynamic rendering for this route
@@ -13,48 +14,35 @@ export const dynamic = "force-dynamic";
  * Get admin statistics (users count, etc.)
  */
 export async function GET(req: NextRequest) {
-  try {
-    console.log("📊 [ADMIN STATS] Request received:", { url: req.url });
-    const user = await authenticateToken(req);
-    
-    if (!user || !requireAdmin(user)) {
-      console.log("❌ [ADMIN STATS] Unauthorized or not admin");
+  return withAdminPerfLog("/api/v1/admin/stats", async (markAuthComplete) => {
+    try {
+      const authResult = await requireAdminApiContext(req);
+      if (authResult instanceof NextResponse) {
+        return authResult;
+      }
+      markAuthComplete(authResult.source);
+
+      const result = await adminService.getStats();
+      return NextResponse.json(result);
+    } catch (error: unknown) {
+      const err = error as {
+        type?: string;
+        title?: string;
+        status?: number;
+        detail?: string;
+        message?: string;
+      };
+      console.error("[ADMIN STATS] Error:", err.message ?? err.detail);
       return NextResponse.json(
         {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
+          type: err.type || "https://api.shop.am/problems/internal-error",
+          title: err.title || "Internal Server Error",
+          status: err.status || 500,
+          detail: err.detail || err.message || "An error occurred",
           instance: req.url,
         },
-        { status: 403 }
+        { status: err.status || 500 }
       );
     }
-
-    console.log(`✅ [ADMIN STATS] User authenticated: ${user.id}`);
-    const result = await adminService.getStats();
-    console.log("✅ [ADMIN STATS] Stats data retrieved successfully");
-    
-    return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("❌ [ADMIN STATS] Error:", {
-      message: error.message,
-      stack: error.stack,
-      type: error.type,
-      status: error.status,
-      detail: error.detail,
-      url: req.url,
-    });
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
-

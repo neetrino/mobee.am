@@ -1,7 +1,26 @@
 import { db } from "@white-shop/db";
-import { processImageUrl } from "../utils/image-utils";
+import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import { cacheService } from "./cache.service";
 import { ProductWithRelations } from "./products-find-query.service";
+import {
+  findListingDisplayVariant,
+  resolveListingDisplayColor,
+  resolveListingProductImage,
+} from "./products-listing-display-variant";
+import {
+  hasDisplayPrice,
+  pickListingPriceVariant,
+} from "../products/variant-price-display";
+import { pickCategoryTranslation } from "../pickCategoryTranslation";
+import { localizeCategoryTitle } from "../category-title-i18n";
+import { pickProductTranslation } from "../products/pickProductTranslation";
+import type { LanguageCode } from "../language";
+
+export type ProductListingTransformContext = {
+  colors?: string;
+  /** Compare tray: include description HTML for spec extraction. */
+  includeDescriptions?: boolean;
+};
 
 const DISCOUNT_CONTEXT_CACHE_KEY = "product-list:discount-context";
 const DISCOUNT_CONTEXT_TTL_SEC = 120;
@@ -72,6 +91,7 @@ class ProductsFindTransformService {
     products: ProductWithRelations[],
     lang: string = "en",
     discounts: ProductDiscountContext,
+    listingContext?: ProductListingTransformContext,
   ): Promise<any[]> {
     const { globalDiscount, categoryDiscounts, brandDiscounts } = discounts;
 
@@ -79,7 +99,7 @@ class ProductsFindTransformService {
     const data = products.map((product: ProductWithRelations) => {
       // Безопасное получение translation с проверкой на существование массива
       const translations = Array.isArray(product.translations) ? product.translations : [];
-      const translation = translations.find((t: { locale: string }) => t.locale === lang) || translations[0] || null;
+      const translation = pickProductTranslation(translations, lang);
       
       // Безопасное получение brand translation
       const brandTranslations = product.brand && Array.isArray(product.brand.translations)
@@ -89,16 +109,18 @@ class ProductsFindTransformService {
         ? brandTranslations.find((t: { locale: string }) => t.locale === lang) || brandTranslations[0]
         : null;
       
-      // Безопасное получение variant
       const variants = Array.isArray(product.variants) ? product.variants : [];
-      const variant = variants.length > 0
-        ? variants.sort((a: { price: number }, b: { price: number }) => a.price - b.price)[0]
-        : null;
+      const displayVariant = findListingDisplayVariant(
+        variants,
+        listingContext?.colors,
+        lang,
+      );
+      const variant = pickListingPriceVariant(variants, displayVariant);
 
       // Get all unique colors from ALL variants with imageUrl and colors hex (support both new and old format)
       // IMPORTANT: Only collect colors that actually exist in variants
       // IMPORTANT: Process ALL variants to get ALL colors, not just the first variant
-      const colorMap = new Map<string, { value: string; imageUrl?: string | null; colors?: string[] | null }>();
+      const colorMap = new Map<string, { value: string; linkValue: string; imageUrl?: string | null; colors?: string[] | null }>();
       
       
       // Process all variants to collect all unique colors
@@ -106,11 +128,19 @@ class ProductsFindTransformService {
         // First, try to get ALL color options from variant.options (not just the first one)
         const options = Array.isArray(v.options) ? v.options : [];
         const colorOptions = options.filter((opt: ProductWithRelations['variants'][number]['options'][number]) => {
-          // Support both new format (AttributeValue) and old format (attributeKey/value)
-          if ('attributeValue' in opt && opt.attributeValue) {
+          // Prefer attributeKey so listing still matches when AttributeValue.attribute is thin/omitted.
+          const legacy = opt as { attributeKey?: string | null; key?: string; attribute?: string };
+          if (
+            legacy.attributeKey === "color" ||
+            legacy.key === "color" ||
+            legacy.attribute === "color"
+          ) {
+            return true;
+          }
+          if ("attributeValue" in opt && opt.attributeValue) {
             return opt.attributeValue.attribute?.key === "color";
           }
-          return opt.attributeKey === "color";
+          return false;
         });
         
         // Process all color options from this variant
@@ -122,7 +152,7 @@ class ProductsFindTransformService {
           if ('attributeValue' in colorOption && colorOption.attributeValue) {
             // New format: get from translation or value
             const translation = colorOption.attributeValue.translations?.find((t: { locale: string }) => t.locale === lang) || colorOption.attributeValue.translations?.[0];
-            colorValue = translation?.label || colorOption.attributeValue.value || "";
+            colorValue = translation?.label || colorOption.attributeValue.value || colorOption.value || "";
             // Get imageUrl and colors from AttributeValue
             imageUrl = colorOption.attributeValue.imageUrl || null;
             const colorsValue = colorOption.attributeValue.colors;
@@ -134,12 +164,23 @@ class ProductsFindTransformService {
           
           if (colorValue) {
             const normalizedValue = colorValue.trim().toLowerCase();
-            // Store color with imageUrl and colors hex if not already stored or if we have better data
-            if (!colorMap.has(normalizedValue) || (imageUrl && !colorMap.get(normalizedValue)?.imageUrl)) {
+            const canonicalValue = (
+              ('attributeValue' in colorOption && colorOption.attributeValue?.value) ||
+              colorOption.value ||
+              colorValue
+            ).trim();
+            const linkValue = canonicalValue.toLowerCase();
+            const existing = colorMap.get(normalizedValue);
+            const shouldReplace =
+              !existing ||
+              (Boolean(colorsHex?.length) && !existing.colors?.length) ||
+              (Boolean(imageUrl) && !existing.imageUrl);
+            if (shouldReplace) {
               colorMap.set(normalizedValue, {
                 value: colorValue.trim(),
-                imageUrl: imageUrl || null,
-                colors: colorsHex || null,
+                linkValue,
+                imageUrl: imageUrl || existing?.imageUrl || null,
+                colors: colorsHex || existing?.colors || null,
               });
             }
           }
@@ -160,6 +201,7 @@ class ProductsFindTransformService {
               if (!colorMap.has(normalizedValue)) {
                 colorMap.set(normalizedValue, {
                   value: colorValue.trim(),
+                  linkValue: colorValue.trim().toLowerCase(),
                   imageUrl: null,
                   colors: null,
                 });
@@ -191,6 +233,7 @@ class ProductsFindTransformService {
                   if (attrValue.imageUrl || attrValue.colors) {
                     colorMap.set(normalizedValue, {
                       value: colorValue.trim(),
+                      linkValue: existing?.linkValue ?? colorValue.trim().toLowerCase(),
                       imageUrl: attrValue.imageUrl || existing?.imageUrl || null,
                       colors: attrValue.colors || existing?.colors || null,
                     });
@@ -203,10 +246,25 @@ class ProductsFindTransformService {
       }
       
       const availableColors = Array.from(colorMap.values());
+      const listingImage = resolveListingProductImage(
+        product,
+        displayVariant,
+        listingContext?.colors,
+        lang,
+      );
+      const displayColor = resolveListingDisplayColor(
+        variants,
+        displayVariant,
+        listingImage,
+        availableColors,
+        variant,
+        lang,
+      );
 
-      const originalPrice = variant?.price || 0;
+      const originalPrice = variant?.price ?? 0;
       let finalPrice = originalPrice;
       const productDiscount = product.discountPercent || 0;
+      const variantHasPrice = hasDisplayPrice(variant);
       
       // Calculate applied discount with priority: productDiscount > categoryDiscount > brandDiscount > globalDiscount
       let appliedDiscount = 0;
@@ -228,18 +286,23 @@ class ProductsFindTransformService {
         }
       }
 
-      if (appliedDiscount > 0 && originalPrice > 0) {
+      if (appliedDiscount > 0 && originalPrice > 0 && variantHasPrice) {
         finalPrice = originalPrice * (1 - appliedDiscount / 100);
       }
 
-      // Get categories with translations
+      // Get categories with translations; dictionary fills en/ru when DB still has Armenian copy.
       const categories = Array.isArray(product.categories) ? product.categories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
         const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
-        const catTranslation = catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
+        const catTranslation = pickCategoryTranslation(catTranslations, lang) ?? null;
+        const hyTitle =
+          catTranslations.find((entry) => entry.locale === "hy")?.title ||
+          catTranslations[0]?.title ||
+          "";
+        const sourceTitle = catTranslation?.title || hyTitle;
         return {
           id: cat.id,
           slug: catTranslation?.slug || "",
-          title: catTranslation?.title || "",
+          title: localizeCategoryTitle(sourceTitle, lang as LanguageCode),
         };
       }) : [];
 
@@ -250,7 +313,7 @@ class ProductsFindTransformService {
         subtitle: translation?.subtitle || "",
         primaryCategoryId: product.primaryCategoryId ?? null,
         categoryIds: Array.isArray(product.categoryIds) ? [...product.categoryIds] : [],
-        defaultVariantId: variant?.id ?? null,
+        defaultVariantId: variant?.id ?? variants[0]?.id ?? null,
         brand: product.brand
           ? {
               id: product.brand.id,
@@ -258,21 +321,17 @@ class ProductsFindTransformService {
             }
           : null,
         categories,
-        price: finalPrice,
-        originalPrice: appliedDiscount > 0 ? originalPrice : variant?.compareAtPrice || null,
-        compareAtPrice: variant?.compareAtPrice || null,
-        discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
-        image: (() => {
-          // Use unified image utilities to get first valid main image
-          if (!Array.isArray(product.media) || product.media.length === 0) {
-            return null;
-          }
-          
-          // Process first image - cast JsonValue to ImageUrlInput
-          const firstImage = processImageUrl(product.media[0] as string | null | undefined | { url?: string; src?: string; value?: string });
-          return firstImage || null;
-        })(),
-        inStock: (variant?.stock || 0) > 0,
+        price: variantHasPrice ? finalPrice : null,
+        hasPrice: variantHasPrice,
+        priceOnRequest: Boolean(variant?.priceOnRequest),
+        originalPrice: variantHasPrice && appliedDiscount > 0 ? originalPrice : variantHasPrice ? variant?.compareAtPrice || null : null,
+        compareAtPrice: variantHasPrice ? variant?.compareAtPrice || null : null,
+        discountPercent: variantHasPrice && appliedDiscount > 0 ? appliedDiscount : null,
+        warrantyYears: normalizeProductWarrantyYears(
+          (product as { warrantyYears?: number | null }).warrantyYears,
+        ),
+        image: listingImage,
+        inStock: variantHasPrice && (variant?.stock || 0) > 0,
         labels: Array.isArray(product.labels)
           ? product.labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({
               id: label.id,
@@ -282,7 +341,17 @@ class ProductsFindTransformService {
               color: label.color,
             }))
           : [],
-        colors: availableColors, // Add available colors array
+        colors: availableColors,
+        displayColor,
+        ...(listingContext?.includeDescriptions
+          ? {
+              description: translation?.descriptionHtml || null,
+              sourceDescription:
+                translations.find((t: { locale: string }) => t.locale === 'hy')?.descriptionHtml ||
+                translation?.descriptionHtml ||
+                null,
+            }
+          : {}),
       };
     });
 

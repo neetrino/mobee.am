@@ -1,8 +1,9 @@
 // Product page types and interfaces
 
-export interface ProductPageProps {
+/** @deprecated Legacy client page props — use ProductPageClientProps in ProductPageClient.tsx */
+export type ProductPageProps = {
   params: Promise<{ slug?: string }>;
-}
+};
 
 export interface ProductMedia {
   url?: string;
@@ -21,6 +22,8 @@ export interface ProductVariant {
   id: string;
   sku: string;
   price: number;
+  priceOnRequest?: boolean;
+  hasPrice?: boolean;
   originalPrice?: number | null;
   compareAtPrice?: number;
   stock: number;
@@ -29,6 +32,7 @@ export interface ProductVariant {
   productDiscount?: number | null;
   globalDiscount?: number | null;
   imageUrl?: string;
+  media?: ProductMedia[];
 }
 
 export interface ProductLabel {
@@ -71,6 +75,8 @@ export interface Product {
   title: string;
   subtitle?: string;
   description?: string;
+  /** Armenian source description (hy translation) for locale fallback on PDP. */
+  sourceDescription?: string | null;
   /** Primary image URL aligned with product cards (`processImageUrl(media[0])`). */
   image?: string | null;
   media: ProductMedia[] | string[];
@@ -92,6 +98,7 @@ export interface Product {
   productAttributes?: ProductAttribute[];
   productDiscount?: number | null;
   globalDiscount?: number | null;
+  warrantyYears?: import('../../../lib/constants/product-warranty').ProductWarrantyYears | null;
 }
 
 // Reserved routes that should not be treated as product slugs

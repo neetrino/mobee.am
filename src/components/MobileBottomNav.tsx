@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import type { LucideIcon } from 'lucide-react';
 import { Heart, Home, UserRound } from 'lucide-react';
 import { getCompareCount, getWishlistCount } from '../lib/storageCounts';
@@ -25,11 +25,7 @@ import {
   MOBILE_BOTTOM_NAV_TAB_STROKE_WIDTH,
 } from './mobile-bottom-nav.constants';
 
-const montserratNav = Montserrat({
-  subsets: ['latin'],
-  weight: ['400'],
-  display: 'swap',
-});
+const montserratNav = siteMontserrat;
 
 type NavKey = 'home' | 'shop' | 'cart' | 'wishlist' | 'compare' | 'profile';
 

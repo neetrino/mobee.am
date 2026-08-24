@@ -14,7 +14,7 @@ const Footer = dynamic(
 function FooterLazyPlaceholder() {
   return (
     <footer
-      className="hidden min-h-[420px] border-t border-[#eee] bg-white lg:block"
+      className="hidden min-h-[440px] border-t border-[#eee] bg-white lg:block"
       aria-hidden
     />
   );

@@ -1,12 +1,13 @@
 'use client';
 
-import { Suspense, startTransition, useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
 import { useProfilePage } from './useProfilePage';
 import { ProfileHeader } from './ProfileHeader';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { ProfileDesktopMain } from './ProfileDesktopMain';
+import { ProfileFlashAlert } from './ProfileFlashAlert';
 import { ProfileSectionHost } from './ProfileSectionHost';
 import type { ProfileTabConfig } from './types';
 
@@ -18,6 +19,8 @@ function ProfilePageContent() {
     loading,
     error,
     success,
+    setError,
+    setSuccess,
     profile,
     activeTab,
     handleTabChange,
@@ -51,13 +54,14 @@ function ProfilePageContent() {
     setOrdersPage,
     ordersMeta,
     selectedOrder,
-    setSelectedOrder,
+    closeOrderDetails,
     orderDetailsLoading,
     orderDetailsError,
     isReordering,
     handleOrderClick,
     handleReOrder,
     currency,
+    isDesktopProfileLayout,
   } = useProfilePage();
 
   const tabs: ProfileTabConfig[] = useMemo(
@@ -205,6 +209,8 @@ function ProfilePageContent() {
           <ProfileDesktopMain
             error={error}
             success={success}
+            onDismissError={() => setError(null)}
+            onDismissSuccess={() => setSuccess(null)}
             activeTab={activeTab}
             dashboardData={dashboardData}
             dashboardLoading={dashboardLoading}
@@ -239,42 +245,51 @@ function ProfilePageContent() {
             handleChangePassword={handleChangePassword}
           />
 
-          {/* Mobile — алерты + модалка секций */}
-          <div className="flex w-full flex-col gap-4 lg:hidden">
-            {error && (
-              <div className="rounded-[15px] border border-red-200 bg-red-50 p-4">
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            )}
-            {success && (
-              <div className="rounded-[15px] border border-green-200 bg-green-50 p-4">
-                <p className="text-sm text-green-600">{success}</p>
-              </div>
-            )}
-            <ProfileSectionHost
-              profileSheetOpen={profileSheetOpen}
-              isDesktopLayout={false}
-              modalTitle={modalTitle}
-              onCloseSheet={closeProfileSheet}
-              closeLabel={t('common.buttons.close')}
-              {...sheetProps}
-            />
-          </div>
+          {/* Mobile — модалка секций (алерты внутри попапа). Not mounted on desktop:
+              a hidden open sheet still acquires body scroll lock and freezes the page. */}
+          {!isDesktopProfileLayout ? (
+            <div className="flex w-full flex-col gap-4">
+              {!profileSheetOpen ? (
+                <>
+                  <ProfileFlashAlert
+                    message={error}
+                    variant="error"
+                    onDismiss={() => setError(null)}
+                  />
+                  <ProfileFlashAlert
+                    message={success}
+                    variant="success"
+                    onDismiss={() => setSuccess(null)}
+                  />
+                </>
+              ) : null}
+              <ProfileSectionHost
+                profileSheetOpen={profileSheetOpen}
+                isDesktopLayout={false}
+                modalTitle={modalTitle}
+                onCloseSheet={closeProfileSheet}
+                closeLabel={t('common.buttons.close')}
+                error={error}
+                success={success}
+                onDismissError={() => setError(null)}
+                onDismissSuccess={() => setSuccess(null)}
+                {...sheetProps}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
 
-      {selectedOrder && (
-        <OrderDetailsModal
-          selectedOrder={selectedOrder}
-          orderDetailsLoading={orderDetailsLoading}
-          orderDetailsError={orderDetailsError}
-          isReordering={isReordering}
-          currency={currency}
-          onClose={() => startTransition(() => setSelectedOrder(null))}
-          onReOrder={handleReOrder}
-          t={t}
-        />
-      )}
+      <OrderDetailsModal
+        selectedOrder={selectedOrder}
+        orderDetailsLoading={orderDetailsLoading}
+        orderDetailsError={orderDetailsError}
+        isReordering={isReordering}
+        currency={currency}
+        onClose={closeOrderDetails}
+        onReOrder={handleReOrder}
+        t={t}
+      />
     </>
   );
 }

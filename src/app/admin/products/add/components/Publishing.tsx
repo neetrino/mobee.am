@@ -1,17 +1,33 @@
 'use client';
 
 import { useTranslation } from '../../../../../lib/i18n-client';
+import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
+import { ProductWarrantySelect } from './ProductWarrantySelect';
 
 interface PublishingProps {
   featured: boolean;
   onFeaturedChange: (featured: boolean) => void;
+  warrantyYears: ProductWarrantyYears | null;
+  onWarrantyYearsChange: (years: ProductWarrantyYears | null) => void;
 }
 
-export function Publishing({ featured, onFeaturedChange }: PublishingProps) {
+export function Publishing({
+  featured,
+  onFeaturedChange,
+  warrantyYears,
+  onWarrantyYearsChange,
+}: PublishingProps) {
   const { t } = useTranslation();
 
   return (
-    <div>
+    <div className="space-y-6">
+      <div>
+        <h3 className="mb-1 text-sm font-semibold text-gray-900">
+          {t('admin.products.add.productWarranty')}
+        </h3>
+        <p className="mb-3 text-xs text-gray-500">{t('admin.products.add.productWarrantyHint')}</p>
+        <ProductWarrantySelect warrantyYears={warrantyYears} onChange={onWarrantyYearsChange} />
+      </div>
       <div className="space-y-2">
         <label className="flex items-center">
           <input
@@ -29,5 +45,3 @@ export function Publishing({ featured, onFeaturedChange }: PublishingProps) {
     </div>
   );
 }
-
-

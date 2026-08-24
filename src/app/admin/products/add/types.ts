@@ -76,6 +76,7 @@ export interface ProductData {
   attributeIds?: string[]; // All attribute IDs that this product has
   published: boolean;
   featured?: boolean;
+  warrantyYears?: import('@/lib/constants/product-warranty').ProductWarrantyYears | null;
   media?: string[];
   labels?: ProductLabel[];
   variants?: Array<{
@@ -92,7 +93,8 @@ export interface ProductData {
 }
 
 export interface GeneratedVariant {
-  id: string; // Unique ID for this variant
+  id: string; // UI-only row id
+  databaseVariantId?: string; // Real DB ProductVariant.id; undefined for new rows
   selectedValueIds: string[]; // Array of selected value IDs from all attributes
   price: string;
   compareAtPrice: string;

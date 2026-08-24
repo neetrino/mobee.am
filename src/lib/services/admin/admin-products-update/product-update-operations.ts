@@ -1,28 +1,128 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
-import { PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE } from "@/lib/database/productVariantDb.constants";
 import { logger } from "../../../utils/logger";
-import type { UpdateProductData } from "./types";
-import { collectVariantImages, buildProductUpdateData, updateProductTranslation, updateProductLabels, updateProductAttributes } from "./product-updater";
-import { updateOrCreateVariant } from "./variant-updater";
+import type { AdminProductUpdateInput } from "@/lib/schemas/admin-product-update.schema";
+import type { NormalizedProductUpdate, ProductUpdateResult } from "./types";
+import {
+  normalizeProductUpdate,
+  hasProductUpdateWork,
+  needsAttributeValueImageSync,
+} from "./normalize-product-update";
+import {
+  collectVariantImages,
+  buildProductUpdateData,
+  updateProductTranslation,
+  updateProductLabels,
+  updateProductAttributes,
+} from "./product-updater";
+import { applyVariantOperations } from "./variant-updater";
 import { updateAttributeValueImageUrls } from "./attribute-value-updater";
 
+async function fetchProductUpdatedAt(productId: string): Promise<Date> {
+  const product = await db.product.findUnique({
+    where: { id: productId },
+    select: { updatedAt: true },
+  });
+  return product?.updatedAt ?? new Date();
+}
+
+async function fetchProductSlug(
+  productId: string,
+  locale: string
+): Promise<string | undefined> {
+  const translation = await db.productTranslation.findUnique({
+    where: {
+      productId_locale: {
+        productId,
+        locale,
+      },
+    },
+    select: { slug: true },
+  });
+  return translation?.slug;
+}
+
 /**
- * Update product
+ * Run atomic product update sections inside a transaction.
+ */
+async function runProductUpdateTransaction(
+  productId: string,
+  ops: NormalizedProductUpdate,
+  existing: { publishedAt: Date | null }
+): Promise<Date> {
+  const updatedAt = await db.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      const needsMediaImages =
+        ops.media?.replace !== undefined || ops.product !== undefined;
+      const allVariantImages = needsMediaImages
+        ? await collectVariantImages(ops.variants, productId, tx)
+        : [];
+
+      const updateData = buildProductUpdateData(ops, allVariantImages, existing);
+
+      if (ops.basic) {
+        await updateProductTranslation(productId, ops, tx);
+      }
+
+      if (ops.labels) {
+        await updateProductLabels(productId, ops.labels, tx);
+      }
+
+      if (ops.attributes) {
+        await updateProductAttributes(productId, ops.attributes, tx);
+      }
+
+      if (ops.variants) {
+        await applyVariantOperations(
+          ops.variants,
+          productId,
+          ops.locale || "en",
+          tx
+        );
+      }
+
+      const hasProductFields =
+        updateData.brandId !== undefined ||
+        updateData.primaryCategoryId !== undefined ||
+        updateData.categoryIds !== undefined ||
+        updateData.media !== undefined ||
+        updateData.published !== undefined ||
+        updateData.featured !== undefined;
+
+      // Always touch product.updatedAt when any section ran.
+      const product = await tx.product.update({
+        where: { id: productId },
+        data: hasProductFields
+          ? updateData
+          : { updatedAt: updateData.updatedAt ?? new Date() },
+        select: { updatedAt: true },
+      });
+
+      return product.updatedAt;
+    }
+  );
+
+  return updatedAt;
+}
+
+/**
+ * Update product using normalized partial operations.
+ * Image sync and cache revalidation happen outside the transaction.
  */
 export async function updateProduct(
   productId: string,
-  data: UpdateProductData
-) {
+  data: AdminProductUpdateInput
+): Promise<ProductUpdateResult> {
   try {
-    logger.info('Updating product', { productId });
-    
-    // Check if product exists
+    logger.info("Updating product", { productId });
+
     const existing = await db.product.findUnique({
       where: { id: productId },
-      include: {
-        translations: true,
-      }
+      select: {
+        id: true,
+        publishedAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!existing) {
@@ -34,88 +134,58 @@ export async function updateProduct(
       };
     }
 
-    // Execute everything in a transaction for atomicity and speed
-    const result = await db.$transaction(async (tx: Prisma.TransactionClient) => {
-      // Collect all variant images to exclude from main media (if media is being updated)
-      const allVariantImages = await collectVariantImages(data.variants, productId, tx);
+    const ops = normalizeProductUpdate(data);
 
-      // 1. Update product base data
-      const updateData = buildProductUpdateData(data, allVariantImages, existing);
+    if (!hasProductUpdateWork(ops)) {
+      logger.info("Empty product update — skipping transaction", { productId });
+      return {
+        success: true,
+        id: productId,
+        updatedAt: existing.updatedAt,
+        didUpdate: false,
+        productSlug: await fetchProductSlug(productId, ops.locale || "en"),
+      };
+    }
 
-      // 2. Update translation
-      await updateProductTranslation(productId, data, tx);
+    // Ensure table exists BEFORE transaction, only when attributes section present.
+    if (ops.attributes) {
+      const { ensureProductAttributesTable } = await import(
+        "../../../utils/db-ensure"
+      );
+      await ensureProductAttributesTable();
+    }
 
-      // 3. Update labels
-      await updateProductLabels(productId, data.labels, tx);
+    const updatedAt = await runProductUpdateTransaction(
+      productId,
+      ops,
+      existing
+    );
 
-      // 3.5. Update ProductAttribute relations
-      await updateProductAttributes(productId, data.attributeIds, tx);
-
-      // 4. Update variants
-      if (data.variants !== undefined) {
-        // Get existing variants with their IDs and SKUs for matching
-        const existingVariants = await tx.productVariant.findMany({
-          where: { productId },
-          select: { id: true, sku: true },
+    // Post-commit: conditional AttributeValue image sync (never fails the request).
+    if (needsAttributeValueImageSync(ops)) {
+      try {
+        await updateAttributeValueImageUrls(productId);
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        logger.warn("Post-commit attribute image sync failed", {
+          productId,
+          error: errorMessage,
         });
-        const existingVariantIds = new Set<string>(existingVariants.map((v: { id: string }) => v.id));
-        // Create a map of SKU -> variant ID for quick lookup
-        const existingSkuMap = new Map<string, string>();
-        existingVariants.forEach((v: { id: string; sku: string | null }) => {
-          if (v.sku) {
-            existingSkuMap.set(v.sku.trim().toLowerCase(), v.id);
-          }
-        });
-        const incomingVariantIds = new Set<string>();
-        
-        const locale = data.locale || "en";
-        
-        // Process each variant: update if exists, create if new
-        if (data.variants.length > 0) {
-          for (const variant of data.variants) {
-            const variantId = await updateOrCreateVariant(
-              variant,
-              productId,
-              locale,
-              existingVariantIds,
-              existingSkuMap,
-              tx
-            );
-            incomingVariantIds.add(variantId);
-          }
-        }
-        
-        // Delete variants that are no longer in the list
-        const variantsToDelete = Array.from(existingVariantIds).filter(id => !incomingVariantIds.has(id));
-        if (variantsToDelete.length > 0) {
-          await tx.productVariant.deleteMany({
-            where: {
-              id: { in: variantsToDelete },
-              productId,
-            },
-          });
-          logger.info(`Deleted ${variantsToDelete.length} variant(s)`, { variantIds: variantsToDelete });
-        }
       }
+    }
 
-      // Update attribute value imageUrls from variant images
-      await updateAttributeValueImageUrls(productId, tx);
+    const productSlug =
+      ops.basic?.slug ||
+      (await fetchProductSlug(productId, ops.locale || "en"));
 
-      // 5. Finally update the product record itself
-      return await tx.product.update({
-        where: { id: productId },
-        data: updateData,
-        include: {
-          translations: true,
-          variants: {
-            select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
-          },
-          labels: true,
-        },
-      });
-    });
-
-    return result;
+    return {
+      success: true,
+      id: productId,
+      updatedAt,
+      didUpdate: true,
+      productSlug,
+    };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error("updateProduct error", { error: errorMessage });
@@ -123,6 +193,5 @@ export async function updateProduct(
   }
 }
 
-
-
-
+/** Exported for tests — fetch current updatedAt without heavy includes. */
+export { fetchProductUpdatedAt };

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { calculateDateRange } from "./analytics";
+import { calculateDateRange } from "./analytics-date-range";
 import { normalizeCurrencyCode } from "@/lib/contracts/admin-analytics";
 
 describe("calculateDateRange", () => {

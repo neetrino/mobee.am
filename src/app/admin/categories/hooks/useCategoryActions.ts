@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { apiClient } from '../../../../lib/api-client';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { DEFAULT_LANGUAGE } from '../../../../lib/language';
 import { logger } from '../../../../lib/utils/logger';
 import { showToast } from '../../../../components/Toast';
@@ -32,6 +33,7 @@ interface UseCategoryActionsReturn {
 
 const initialFormData: CategoryFormData = {
   title: '',
+  slug: '',
   parentId: '',
   requiresSizes: false,
   subcategoryIds: [],
@@ -65,6 +67,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     try {
       await apiClient.post('/api/v1/admin/categories', {
         title: formData.title.trim(),
+        slug: formData.slug.trim() || undefined,
         parentId: formData.parentId || undefined,
         requiresSizes: formData.requiresSizes,
         imageUrl: formData.imageUrl,
@@ -72,6 +75,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       });
       setShowAddModal(false);
       resetForm();
+      invalidateAdminReferenceCache('categories');
       await fetchCategories();
       showToast(t('admin.categories.createdSuccess'), 'success');
     } catch (err: unknown) {
@@ -96,6 +100,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
 
       setFormData({
         title: category.title,
+        slug: categoryWithChildren.slug || category.slug,
         parentId: category.parentId || '',
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: categoryWithChildren.children?.map(child => child.id) || [],
@@ -105,6 +110,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       logger.error('Error fetching category children', { error: err });
       setFormData({
         title: category.title,
+        slug: category.slug,
         parentId: category.parentId || '',
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: [],
@@ -121,10 +127,16 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       return;
     }
 
+    if (!formData.slug.trim()) {
+      showToast(t('admin.categories.slugRequired'), 'warning');
+      return;
+    }
+
     setSaving(true);
     try {
       await apiClient.put(`/api/v1/admin/categories/${editingCategory.id}`, {
         title: formData.title.trim(),
+        slug: formData.slug.trim(),
         parentId: formData.parentId || null,
         requiresSizes: formData.requiresSizes,
         subcategoryIds: formData.subcategoryIds,
@@ -134,6 +146,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       setShowEditModal(false);
       setEditingCategory(null);
       resetForm();
+      invalidateAdminReferenceCache('categories');
       await fetchCategories();
       showToast(t('admin.categories.updatedSuccess'), 'success');
     } catch (err: unknown) {
@@ -156,6 +169,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     setTogglingHomePageId(categoryId);
     try {
       await apiClient.patch(`/api/v1/admin/categories/${categoryId}/home-strip`);
+      invalidateAdminReferenceCache('categories');
       await fetchCategories();
       showToast(t('admin.categories.homeStripToggled'), 'success');
     } catch (err: unknown) {
@@ -178,6 +192,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     setReordering(true);
     try {
       await apiClient.patch('/api/v1/admin/categories/reorder', payload);
+      invalidateAdminReferenceCache('categories');
       await fetchCategories({ silent: true });
       showToast(t('admin.categories.reorderSuccess'), 'success');
     } catch (err: unknown) {
@@ -209,6 +224,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       logger.info('Deleting category', { categoryId, categoryTitle });
       await apiClient.delete(`/api/v1/admin/categories/${categoryId}`);
       logger.info('Category deleted successfully');
+      invalidateAdminReferenceCache('categories');
       await fetchCategories();
       showToast(t('admin.categories.deletedSuccess'), 'success');
     } catch (err: unknown) {

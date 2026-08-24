@@ -1,22 +1,19 @@
-const FALLBACK_PRODUCT_CARD_DISPLAY_SRC = "/images/product-card-display.png";
-
-const fromEnv = process.env.NEXT_PUBLIC_PRODUCT_CARD_DISPLAY_IMAGE_URL;
-
 /**
- * Static art on product cards (grid, list, related carousel).
- * After one-time upload to R2, set `NEXT_PUBLIC_PRODUCT_CARD_DISPLAY_IMAGE_URL` to the public URL.
- */
-export const PRODUCT_CARD_DISPLAY_IMAGE_SRC =
-  typeof fromEnv === "string" && fromEnv.trim().length > 0
-    ? fromEnv.trim()
-    : FALLBACK_PRODUCT_CARD_DISPLAY_SRC;
-
-/**
- * Temporary storefront override: every product uses `PRODUCT_CARD_DISPLAY_IMAGE_SRC`
- * (local `public/images/product-card-display.png` or `NEXT_PUBLIC_PRODUCT_CARD_DISPLAY_IMAGE_URL`).
+ * Resolves a product listing/detail image URL.
+ * Returns null when the product has no image — callers should show
+ * {@link ProductImagePlaceholder} instead of a fake phone photo.
  */
 export function resolveProductCardImageSrc(
-  _productImage: string | null | undefined,
-): string {
-  return PRODUCT_CARD_DISPLAY_IMAGE_SRC;
+  productImage: string | null | undefined,
+): string | null {
+  if (typeof productImage === "string" && productImage.trim().length > 0) {
+    return productImage.trim();
+  }
+  return null;
 }
+
+/**
+ * @deprecated Kept for rare fly-animation / decorative callers that still need a string.
+ * Prefer {@link resolveProductCardImageSrc} + placeholder UI when the product has no image.
+ */
+export const PRODUCT_CARD_DISPLAY_IMAGE_SRC: string | null = null;

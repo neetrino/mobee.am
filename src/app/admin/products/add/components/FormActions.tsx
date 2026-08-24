@@ -7,9 +7,10 @@ import { useRouter } from 'next/navigation';
 interface FormActionsProps {
   loading: boolean;
   isEditMode: boolean;
+  isSnapshotReady?: boolean;
 }
 
-export function FormActions({ loading, isEditMode }: FormActionsProps) {
+export function FormActions({ loading, isEditMode, isSnapshotReady = true }: FormActionsProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -19,7 +20,7 @@ export function FormActions({ loading, isEditMode }: FormActionsProps) {
         <Button
           type="submit"
           variant="admin"
-          disabled={loading}
+          disabled={loading || (isEditMode && !isSnapshotReady)}
           className="flex-1 w-full sm:w-auto order-2 sm:order-1 !bg-admin-500 !text-white shadow-sm hover:!bg-admin-600 focus:!ring-admin-400 focus:!ring-offset-2 border-0"
         >
           {loading

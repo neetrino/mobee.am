@@ -6,6 +6,12 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { showToast } from '../../../components/Toast';
 import { formatPriceInCurrency, convertPrice, getStoredCurrency, initializeCurrencyRates, CurrencyCode } from '../../../lib/currency';
+import {
+  buildAdminSessionCacheKey,
+  readAdminSessionCache,
+} from '@/lib/admin/admin-session-cache';
+import { fetchAdminListWithCache } from '@/lib/admin/admin-list-cache';
+import { DEFAULT_ORDERS_LIST_PARAMS } from '@/lib/admin/admin-page-warm';
 
 export interface Order {
   id: string;
@@ -101,15 +107,18 @@ export function useOrders() {
   const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const defaultOrdersCache = readAdminSessionCache<OrdersResponse>(
+    buildAdminSessionCacheKey('/supersudo/orders', DEFAULT_ORDERS_LIST_PARAMS),
+  );
+  const [orders, setOrders] = useState<Order[]>(defaultOrdersCache?.data ?? []);
+  const [loading, setLoading] = useState(defaultOrdersCache === null);
   const [currency, setCurrency] = useState<CurrencyCode>(getStoredCurrency());
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
   const [fulfillmentStatusFilter, setFulfillmentStatusFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState<OrdersResponse['meta'] | null>(null);
+  const [meta, setMeta] = useState<OrdersResponse['meta'] | null>(defaultOrdersCache?.meta ?? null);
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [updatingStatuses, setUpdatingStatuses] = useState<Set<string>>(new Set());
@@ -136,33 +145,43 @@ export function useOrders() {
     }
   }, [searchParams]);
 
-  const fetchOrders = useCallback(async () => {
+  const fetchOrders = useCallback(async (force = false) => {
     try {
-      setLoading(true);
-      console.log('📦 [ADMIN] Fetching orders...', {
-        page,
-        statusFilter,
-        paymentStatusFilter,
-        fulfillmentStatusFilter,
-        searchQuery,
-        sortBy,
-        sortOrder,
-      });
-      
-      const response = await apiClient.get<OrdersResponse>('/api/v1/admin/orders', {
-        params: {
-          page: page.toString(),
-          limit: '20',
-          status: statusFilter || '',
-          paymentStatus: paymentStatusFilter || '',
-          fulfillmentStatus: fulfillmentStatusFilter || '',
-          search: searchQuery || '',
-          sortBy: sortBy || '',
-          sortOrder: sortOrder || '',
-        },
+      const params: Record<string, string> = {
+        page: page.toString(),
+        limit: '20',
+        status: statusFilter || '',
+        paymentStatus: paymentStatusFilter || '',
+        fulfillmentStatus: fulfillmentStatusFilter || '',
+        search: searchQuery || '',
+        sortBy: sortBy || '',
+        sortOrder: sortOrder || '',
+      };
+
+      const cached = readAdminSessionCache<OrdersResponse>(
+        buildAdminSessionCacheKey('/supersudo/orders', params),
+      );
+      if (!force && cached) {
+        setOrders(cached.data || []);
+        setMeta(cached.meta || null);
+        setLoading(false);
+        return;
+      }
+
+      if (orders.length === 0 && !cached) {
+        setLoading(true);
+      }
+
+      const { data: response } = await fetchAdminListWithCache<OrdersResponse>({
+        route: '/supersudo/orders',
+        params,
+        force,
+        fetcher: () =>
+          apiClient.get<OrdersResponse>('/api/v1/admin/orders', {
+            params,
+          }),
       });
 
-      console.log('✅ [ADMIN] Orders fetched:', response);
       setOrders(response.data || []);
       setMeta(response.meta || null);
     } catch (err) {
@@ -170,7 +189,7 @@ export function useOrders() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, paymentStatusFilter, fulfillmentStatusFilter, searchQuery, sortBy, sortOrder]);
+  }, [page, statusFilter, paymentStatusFilter, fulfillmentStatusFilter, searchQuery, sortBy, sortOrder, orders.length]);
 
   // Initialize currency rates and listen for currency changes
   useEffect(() => {
@@ -245,6 +264,7 @@ export function useOrders() {
 
   const handleViewOrderDetails = async (orderId: string) => {
     setSelectedOrderId(orderId);
+    setOrderDetails(null);
     setLoadingOrderDetails(true);
     try {
       const response = await apiClient.get<OrderDetails>(`/api/v1/admin/orders/${orderId}`);

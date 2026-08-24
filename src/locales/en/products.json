@@ -1,5 +1,6 @@
 {
   "filters": {
+    "clearSection": "Clear",
     "sidebar": {
       "title": "Filter",
       "subtitle": "Find what fits you best"
@@ -7,7 +8,8 @@
     "price": {
       "title": "Filter by Price",
       "sectionTitle": "Price",
-      "priceLabel": "Price:"
+      "priceLabel": "Price:",
+      "loading": "Loading..."
     },
     "category": {
       "title": "Categories"
@@ -70,6 +72,11 @@
       "new": "NEW",
       "sale": "SALE"
     }
+  },
+  "warranty": {
+    "years_suffix": "YRS",
+    "label": "WARRANTY",
+    "badge_aria": "{years} year warranty"
   }
 }
 

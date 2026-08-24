@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Input } from '@shop/ui';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { useTranslation } from '../../lib/i18n-client';
 import { apiClient } from '../../lib/api-client';
 import { isValidEmail } from '../../lib/utils/email';
 import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
+import { STOREFRONT_MODAL_TRANSITION_MS } from '../../lib/storefront-modal-motion.constants';
 import type { CurrencyCode } from '../../lib/currency';
 
 interface InstallmentRequestModalProps {
@@ -96,7 +98,7 @@ function validateForm(values: FormState, t: (key: string) => string): FormErrors
 
 function InstallmentRequestSuccessView({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center px-2 py-8 text-center">
+    <div className="flex flex-col items-start py-4">
       <div
         className="mb-5 flex size-16 items-center justify-center rounded-full bg-[#e8f5e9]"
         aria-hidden
@@ -111,7 +113,7 @@ function InstallmentRequestSuccessView({ message }: { message: string }) {
           />
         </svg>
       </div>
-      <p className="max-w-sm text-sm leading-relaxed text-gray-800">{message}</p>
+      <p className="text-left text-sm leading-relaxed text-gray-800">{message}</p>
     </div>
   );
 }
@@ -136,19 +138,17 @@ export function InstallmentRequestModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  if (!isOpen) {
-    return null;
-  }
-
-  const handleClose = () => {
-    if (isSubmitting) {
+  useEffect(() => {
+    if (isOpen) {
       return;
     }
-    setForm(EMPTY_FORM);
-    setErrors({});
-    setIsSuccess(false);
-    onClose();
-  };
+    const timeoutId = window.setTimeout(() => {
+      setForm(EMPTY_FORM);
+      setErrors({});
+      setIsSuccess(false);
+    }, STOREFRONT_MODAL_TRANSITION_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [isOpen]);
 
   const handleFieldChange = (field: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -197,101 +197,125 @@ export function InstallmentRequestModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
-      onClick={handleClose}
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeAriaLabel={t('checkout.modals.closeModal')}
+      panelMotionVariant="sheet"
+      blockClose={isSubmitting}
+      labelledBy="installment-request-modal-title"
+      panelClassName="flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-2xl"
+      panelProps={{ lang: FORM_INPUT_LATIN_LANG }}
     >
-      <div
-        lang={FORM_INPUT_LATIN_LANG}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-        style={{ zIndex: 10000 }}
-      >
-        <div className="relative mb-4">
-          <button
-            type="button"
-            onClick={handleClose}
-            className="absolute right-0 top-0 shrink-0 rounded-full p-1 text-gray-400 transition-colors hover:text-gray-600"
-            aria-label={t('checkout.modals.closeModal')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M18 6L6 18M6 6l12 12"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-          {!isSuccess ? (
-            <div className="px-8">
-              <h2 className="mb-2 text-center text-lg font-semibold text-gray-900">
+      {({ requestClose }) => (
+        <>
+          <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-100 px-4 py-4 sm:px-6">
+            {!isSuccess ? (
+              <div className="min-w-0 pr-2 text-left">
+                <h2
+                  id="installment-request-modal-title"
+                  className="text-lg font-semibold text-gray-900"
+                >
+                  {t('product.aparik.modalTitle')}
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                  {t('product.aparik.modalIntro')}
+                </p>
+              </div>
+            ) : (
+              <h2 id="installment-request-modal-title" className="sr-only">
                 {t('product.aparik.modalTitle')}
               </h2>
-              <p className="text-sm leading-relaxed text-gray-700">{t('product.aparik.modalIntro')}</p>
-            </div>
-          ) : null}
-        </div>
-
-        {isSuccess ? (
-          <InstallmentRequestSuccessView message={t('product.aparik.submitSuccess')} />
-        ) : (
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            <Input
-              label={t('checkout.form.firstName')}
-              value={form.firstName}
-              onChange={(event) => handleFieldChange('firstName', event.target.value)}
-              error={errors.firstName}
-              disabled={isSubmitting}
-              required
-            />
-            <Input
-              label={t('checkout.form.lastName')}
-              value={form.lastName}
-              onChange={(event) => handleFieldChange('lastName', event.target.value)}
-              error={errors.lastName}
-              disabled={isSubmitting}
-              required
-            />
-            <Input
-              label={t('checkout.form.email')}
-              type="email"
-              value={form.email}
-              onChange={(event) => handleFieldChange('email', event.target.value)}
-              error={errors.email}
-              disabled={isSubmitting}
-              required
-            />
-            <Input
-              label={t('checkout.form.phone')}
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel-national"
-              placeholder="+374 XX XXX XXX"
-              value={form.phone}
-              onChange={(event) => handlePhoneChange(event.target.value)}
-              error={errors.phone}
-              disabled={isSubmitting}
-              maxLength={PHONE_DIGITS_MAX}
-              required
-            />
-
-            {errors.submit ? (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                {errors.submit}
-              </div>
-            ) : null}
-
+            )}
             <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full rounded-xl bg-[#2db2ff] px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              type="button"
+              onClick={requestClose}
+              className="shrink-0 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
+              aria-label={t('checkout.modals.closeModal')}
             >
-              {isSubmitting ? t('product.aparik.submitting') : t('common.buttons.submit')}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M18 6L6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
             </button>
-          </form>
-        )}
-      </div>
-    </div>
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 sm:pb-6">
+            {isSuccess ? (
+              <InstallmentRequestSuccessView message={t('product.aparik.submitSuccess')} />
+            ) : (
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="min-w-0">
+                    <Input
+                      label={t('checkout.form.firstName')}
+                      value={form.firstName}
+                      onChange={(event) => handleFieldChange('firstName', event.target.value)}
+                      error={errors.firstName}
+                      disabled={isSubmitting}
+                      checkoutChrome
+                      required
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <Input
+                      label={t('checkout.form.lastName')}
+                      value={form.lastName}
+                      onChange={(event) => handleFieldChange('lastName', event.target.value)}
+                      error={errors.lastName}
+                      disabled={isSubmitting}
+                      checkoutChrome
+                      required
+                    />
+                  </div>
+                </div>
+                <Input
+                  label={t('checkout.form.email')}
+                  type="email"
+                  value={form.email}
+                  onChange={(event) => handleFieldChange('email', event.target.value)}
+                  error={errors.email}
+                  disabled={isSubmitting}
+                  checkoutChrome
+                  required
+                />
+                <Input
+                  label={t('checkout.form.phone')}
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel-national"
+                  placeholder="+374 XX XXX XXX"
+                  value={form.phone}
+                  onChange={(event) => handlePhoneChange(event.target.value)}
+                  error={errors.phone}
+                  disabled={isSubmitting}
+                  maxLength={PHONE_DIGITS_MAX}
+                  checkoutChrome
+                  required
+                />
+
+                {errors.submit ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                    {errors.submit}
+                  </div>
+                ) : null}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full rounded-xl bg-[#2db2ff] px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSubmitting ? t('product.aparik.submitting') : t('common.buttons.submit')}
+                </button>
+              </form>
+            )}
+          </div>
+        </>
+      )}
+    </AnimatedModalPortal>
   );
 }

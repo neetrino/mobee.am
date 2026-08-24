@@ -10,7 +10,6 @@ import { CompareGroupTable } from './CompareGroupTable';
 import { CompareTableSkeleton } from './CompareTableSkeleton';
 import { useComparePageData } from './useComparePageData';
 import {
-  COMPARE_EMPTY_STATE_DESCRIPTION_CLASS,
   COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS,
   COMPARE_EMPTY_STATE_IMAGE_DISPLAY_CLASS,
   COMPARE_EMPTY_STATE_IMAGE_INTRINSIC_HEIGHT_PX,
@@ -79,7 +78,6 @@ export default function ComparePage() {
           <div className={COMPARE_EMPTY_STATE_TEXT_BLOCK_CLASS}>
             <div className={COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS}>
               <h2 className={COMPARE_EMPTY_STATE_TITLE_CLASS}>{t('common.compare.empty')}</h2>
-              <p className={COMPARE_EMPTY_STATE_DESCRIPTION_CLASS}>{t('common.compare.emptyDescription')}</p>
             </div>
             <Link href="/products" className="w-full">
               <Button

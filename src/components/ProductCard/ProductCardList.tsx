@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
 import type { MouseEvent } from 'react';
 import { formatPrice } from '../../lib/currency';
@@ -9,9 +8,13 @@ import { CompareIcon } from '../icons/CompareIcon';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { WishlistHeartIcon } from '../icons/WishlistHeartIcon';
 import { ProductColors } from './ProductColors';
+import { ProductCardNavLink } from './ProductCardNavLink';
 import type { CurrencyCode } from '../../lib/currency';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
+import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
 import type { ProductLabel } from '../ProductLabels';
+import type { ProductWarrantyYears } from '../../lib/constants/product-warranty';
+import { ProductWarrantyBadge } from './ProductWarrantyBadge';
 import { getProductCardCategoryLineLabel } from '../../lib/productCardCategoryLabel';
 
 interface ProductCardListProps {
@@ -21,7 +24,8 @@ interface ProductCardListProps {
     title: string;
     primaryCategoryId?: string | null;
     categories?: Array<{ id: string; slug?: string; title?: string }>;
-    price: number;
+    price: number | null;
+    hasPrice?: boolean;
     image: string | null;
     inStock: boolean;
     brand: { id: string; name: string } | null;
@@ -29,7 +33,8 @@ interface ProductCardListProps {
     compareAtPrice?: number | null;
     originalPrice?: number | null;
     discountPercent?: number | null;
-    colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+    warrantyYears?: ProductWarrantyYears | null;
+    colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
   };
   currency: CurrencyCode;
   isInWishlist: boolean;
@@ -41,6 +46,11 @@ interface ProductCardListProps {
   onWishlistToggle: (e: MouseEvent) => void;
   onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
+  addButtonNavigatesToProduct?: boolean;
+  linkColor?: string | null;
+  selectedCardLinkColor?: string | null;
+  colorsInteractive?: boolean;
+  onCardColorSelect?: (color: { value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }) => void;
 }
 
 /**
@@ -58,22 +68,39 @@ export function ProductCardList({
   onWishlistToggle,
   onCompareToggle,
   onAddToCart,
+  addButtonNavigatesToProduct = false,
+  linkColor = null,
+  selectedCardLinkColor = null,
+  colorsInteractive = false,
+  onCardColorSelect,
 }: ProductCardListProps) {
-  const { t } = useTranslation();
-  const categoryLine = getProductCardCategoryLineLabel(product);
+  const { t, lang } = useTranslation();
+  const categoryLine = getProductCardCategoryLineLabel(product, lang);
   const imageSrc = resolveProductCardImageSrc(product.image);
+  const showPlaceholder = imageError || !imageSrc;
+  const listingCacheSource = buildProductCardCachePayload(product);
   const listPriceClass = 'text-[1.1875rem] sm:text-[1.425rem]';
+  const productHasPrice = product.hasPrice ?? (product.price != null && product.price > 0);
+  const primaryActionDisabled = addButtonNavigatesToProduct
+    ? false
+    : !product.inStock || !productHasPrice || isAddingToCart;
+  const primaryActionEnabled = addButtonNavigatesToProduct
+    ? true
+    : product.inStock && productHasPrice && !isAddingToCart;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors" data-product-card-root>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden" data-product-card-root>
       <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:px-7 sm:py-5">
         {/* Product Image */}
-        <Link
-          href={`/products/${product.slug}`}
+        <ProductCardNavLink
+          slug={product.slug}
+          cachePayload={listingCacheSource}
+          linkColor={linkColor}
           className="relative h-20 w-20 flex-shrink-0 self-start overflow-hidden rounded-lg border border-gray-100 bg-white sm:h-28 sm:w-28 sm:self-center"
-          data-cart-fly-source
+          aria-label={product.title}
         >
-          {!imageError ? (
+          <span className="relative block h-full w-full" data-cart-fly-source>
+          {!showPlaceholder && imageSrc ? (
             <Image
               src={imageSrc}
               alt={product.title}
@@ -90,11 +117,12 @@ export function ProductCardList({
               </svg>
             </div>
           )}
-        </Link>
+          </span>
+        </ProductCardNavLink>
 
         {/* Product Info */}
         <div className="flex-1 min-w-0 w-full sm:w-auto">
-          <Link href={`/products/${product.slug}`} className="block">
+          <ProductCardNavLink slug={product.slug} cachePayload={listingCacheSource} linkColor={linkColor} className="block">
             <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400">
               {product.brand?.name || t('common.defaults.category')}
             </p>
@@ -107,11 +135,22 @@ export function ProductCardList({
                 <span className="line-clamp-2">{categoryLine}</span>
               </p>
             ) : null}
-          </Link>
+          </ProductCardNavLink>
+          {product.warrantyYears ? (
+            <div className="mt-2">
+              <ProductWarrantyBadge years={product.warrantyYears} size="catalog" />
+            </div>
+          ) : null}
           {/* Available Colors */}
           {product.colors && product.colors.length > 0 && (
             <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-              <ProductColors colors={product.colors} maxVisible={6} />
+              <ProductColors
+                colors={product.colors}
+                maxVisible={6}
+                interactive={colorsInteractive}
+                selectedLinkValue={selectedCardLinkColor ?? linkColor}
+                onColorSelect={onCardColorSelect}
+              />
             </div>
           )}
         </div>
@@ -120,14 +159,18 @@ export function ProductCardList({
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
           {/* Price */}
           <div className="flex flex-col">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={`whitespace-nowrap ${listPriceClass} font-semibold text-black`}>
-                {formatPrice(product.price || 0, currency)}
-              </span>
-              {product.discountPercent && product.discountPercent > 0 ? (
-                <span className="text-[0.7125rem] font-semibold text-blue-600 sm:text-[0.83125rem]">
-                  -{product.discountPercent}%
-                </span>
+            <div className="flex items-center gap-2 flex-wrap min-h-[1.5rem]">
+              {productHasPrice && product.price != null ? (
+                <>
+                  <span className={`whitespace-nowrap ${listPriceClass} font-semibold text-black`}>
+                    {formatPrice(product.price, currency)}
+                  </span>
+                  {product.discountPercent && product.discountPercent > 0 ? (
+                    <span className="text-[0.7125rem] font-semibold text-blue-600 sm:text-[0.83125rem]">
+                      -{product.discountPercent}%
+                    </span>
+                  ) : null}
+                </>
               ) : null}
             </div>
           </div>
@@ -165,9 +208,9 @@ export function ProductCardList({
             {/* Cart Icon */}
             <button
               onClick={onAddToCart}
-              disabled={!product.inStock || isAddingToCart}
+              disabled={primaryActionDisabled}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
-                product.inStock && !isAddingToCart
+                primaryActionEnabled
                   ? 'cursor-pointer bg-gray-100 text-gray-700 hover:bg-admin-500 hover:text-white'
                   : 'cursor-default bg-gray-100 text-gray-400'
               }`}

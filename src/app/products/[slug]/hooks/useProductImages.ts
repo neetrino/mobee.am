@@ -1,17 +1,16 @@
 import { useMemo } from "react";
-import { PRODUCT_CARD_DISPLAY_IMAGE_SRC } from "../../../../lib/productCardDisplayImage";
-import type { Product } from "../types";
-
-/** Same storefront hero image repeated so the PDP gallery shows three slides. */
-const PDP_GALLERY_SLIDE_COUNT = 3;
+import type { Product, ProductVariant } from "../types";
+import { getVariantMedia } from "../utils/variant-media";
 
 /**
- * Product detail gallery — storefront display image repeated for multi-image UI until product media drives the gallery.
+ * Returns gallery URLs for the selected variant (or default/fallback product media).
  */
-export function useProductImages(_product: Product | null): string[] {
+export function useProductImages(
+  product: Product | null,
+  selectedVariant: ProductVariant | null | undefined,
+): string[] {
   return useMemo(
-    () =>
-      Array.from({ length: PDP_GALLERY_SLIDE_COUNT }, () => PRODUCT_CARD_DISPLAY_IMAGE_SRC),
-    [],
+    () => getVariantMedia(product, selectedVariant),
+    [product, selectedVariant],
   );
 }

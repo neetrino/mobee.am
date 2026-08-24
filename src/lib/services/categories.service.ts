@@ -1,10 +1,17 @@
 import { db } from "@white-shop/db";
+import type { CategoryTreeNode } from "@/lib/category-nav";
+import { resolveLocalizedCategoryFields } from "../category-title-i18n";
+import { pickCategoryTranslation } from "../pickCategoryTranslation";
+
+export type CategoriesTreeResult = {
+  data: CategoryTreeNode[];
+};
 
 class CategoriesService {
   /**
    * Get category tree
    */
-  async getTree(lang: string = "en") {
+  async getTree(lang: string = "en"): Promise<CategoriesTreeResult> {
     const categories = await db.category.findMany({
       where: {
         published: true,
@@ -23,9 +30,8 @@ class CategoriesService {
       },
     });
 
-    // Build tree structure
-    const categoryMap = new Map();
-    const rootCategories: any[] = [];
+    const categoryMap = new Map<string, CategoryTreeNode>();
+    const rootCategories: CategoryTreeNode[] = [];
 
     categories.forEach((category: {
       id: string;
@@ -33,18 +39,16 @@ class CategoriesService {
       media: unknown;
       translations: Array<{ locale: string; slug: string; title: string; fullPath: string }>;
     }) => {
-      const translation =
-        category.translations.find((t: { locale: string }) => t.locale === lang) ||
-        category.translations[0];
-      if (!translation) return;
+      const localized = resolveLocalizedCategoryFields(category.translations, lang);
+      if (!localized) return;
 
-      const categoryData = {
+      const categoryData: CategoryTreeNode = {
         id: category.id,
-        slug: translation.slug,
-        title: translation.title,
-        fullPath: translation.fullPath,
+        slug: localized.slug,
+        title: localized.title,
+        fullPath: localized.fullPath,
         media: category.media ?? [],
-        children: [] as any[],
+        children: [],
       };
 
       categoryMap.set(category.id, categoryData);
@@ -54,17 +58,17 @@ class CategoriesService {
       }
     });
 
-    // Build parent-child relationships
     categories.forEach((category: {
       id: string;
       parentId: string | null;
     }) => {
-      if (category.parentId) {
-        const parent = categoryMap.get(category.parentId);
-        const child = categoryMap.get(category.id);
-        if (parent && child) {
-          parent.children.push(child);
-        }
+      if (!category.parentId) {
+        return;
+      }
+      const parent = categoryMap.get(category.parentId);
+      const child = categoryMap.get(category.id);
+      if (parent && child) {
+        parent.children.push(child);
       }
     });
 
@@ -82,7 +86,6 @@ class CategoriesService {
         translations: {
           some: {
             slug,
-            locale: lang,
           },
         },
         published: true,
@@ -107,29 +110,27 @@ class CategoriesService {
       };
     }
 
-    const translation =
-      category.translations.find((t: { locale: string }) => t.locale === lang) ||
-      category.translations[0];
-    const parentTranslation = category.parent
-      ? category.parent.translations.find((t: { locale: string }) => t.locale === lang) ||
-        category.parent.translations[0]
+    const localized = resolveLocalizedCategoryFields(category.translations, lang);
+    const parentLocalized = category.parent
+      ? resolveLocalizedCategoryFields(category.parent.translations, lang)
       : null;
+    const translation = pickCategoryTranslation(category.translations, lang);
 
     return {
       id: category.id,
-      slug: translation?.slug || "",
-      title: translation?.title || "",
+      slug: localized?.slug || translation?.slug || "",
+      title: localized?.title || translation?.title || "",
       description: translation?.description || null,
-      fullPath: translation?.fullPath || "",
+      fullPath: localized?.fullPath || translation?.fullPath || "",
       seo: {
-        title: translation?.seoTitle || translation?.title,
+        title: translation?.seoTitle || localized?.title || translation?.title,
         description: translation?.seoDescription || null,
       },
       parent: category.parent
         ? {
             id: category.parent.id,
-            slug: parentTranslation?.slug || "",
-            title: parentTranslation?.title || "",
+            slug: parentLocalized?.slug || "",
+            title: parentLocalized?.title || "",
           }
         : null,
     };
@@ -137,4 +138,3 @@ class CategoriesService {
 }
 
 export const categoriesService = new CategoriesService();
-

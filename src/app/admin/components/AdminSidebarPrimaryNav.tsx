@@ -8,14 +8,14 @@ import {
   MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS,
   MOBILE_DRAWER_ADMIN_SUBMENU_HORIZONTAL_TRIM_CLASS,
 } from '../../../components/mobile-drawer-nav.constants';
+import { ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS } from '../admin-sidebar-layout.constants';
 import type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
+import { AdminSidebarNavLink } from './AdminSidebarNavLink';
 import { ProductsNavRow } from './AdminSidebarProductsNavRow';
 
 function rowChevronRightClassName(isActive: boolean): string {
   return isActive ? 'text-white/90' : 'text-gray-400';
 }
-
-const PRODUCT_SUBMENU_IDS = new Set(['categories', 'brands', 'attributes']);
 
 export const PRODUCT_GROUP_PATHS = [
   '/supersudo/products',
@@ -41,21 +41,31 @@ function isTabActive(tab: AdminMenuItem, currentPath: string, productGroupActive
   );
 }
 
-interface NavItemButtonProps {
+interface NavItemLinkProps {
   tab: AdminMenuItem;
   isActive: boolean;
-  onNavigate: () => void;
   presentation: AdminSidebarNavPresentation;
   desktopCollapsed?: boolean;
+  onAfterNavigate?: () => void;
 }
 
-function NavItemButton({ tab, isActive, onNavigate, presentation, desktopCollapsed }: NavItemButtonProps) {
+function NavItemLink({
+  tab,
+  isActive,
+  presentation,
+  desktopCollapsed,
+  onAfterNavigate,
+}: NavItemLinkProps) {
   const rowClass = isActive ? MOBILE_DRAWER_ADMIN_MENU_ITEM_ACTIVE_CLASS : MOBILE_DRAWER_ADMIN_MENU_ITEM_CLASS;
   const subTrimClass = tab.isSubCategory ? MOBILE_DRAWER_ADMIN_SUBMENU_HORIZONTAL_TRIM_CLASS : '';
 
   if (presentation === 'mobileDrawer') {
     return (
-      <button type="button" onClick={onNavigate} className={`${rowClass} ${subTrimClass}`.trim()}>
+      <AdminSidebarNavLink
+        href={tab.path}
+        onAfterNavigate={onAfterNavigate}
+        className={`${rowClass} ${subTrimClass}`.trim()}
+      >
         <span className="flex min-w-0 flex-1 items-center justify-start gap-3 text-left">
           <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-600'}`}>{tab.icon}</span>
           <span className={MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS}>{tab.label}</span>
@@ -69,37 +79,31 @@ function NavItemButton({ tab, isActive, onNavigate, presentation, desktopCollaps
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-      </button>
+      </AdminSidebarNavLink>
     );
   }
 
-  if (desktopCollapsed) {
-    return (
-      <button
-        type="button"
-        onClick={onNavigate}
-        title={tab.label}
-        aria-label={tab.label}
-        className={`flex w-full items-center justify-center rounded-supersudo px-2 py-3 text-sm font-medium transition-all ${subTrimClass} ${
-          isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-        }`.trim()}
-      >
-        <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
-      </button>
-    );
-  }
+  const collapsedRail = presentation === 'desktopSidebar' && Boolean(desktopCollapsed);
 
   return (
-    <button
-      type="button"
-      onClick={onNavigate}
-      className={`flex w-full items-center gap-3 rounded-supersudo px-4 py-3 text-left text-sm font-medium transition-all ${subTrimClass} ${
-        isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-      }`.trim()}
+    <AdminSidebarNavLink
+      href={tab.path}
+      onAfterNavigate={onAfterNavigate}
+      title={collapsedRail ? tab.label : undefined}
+      aria-label={collapsedRail ? tab.label : undefined}
+      className={`flex w-full items-center rounded-supersudo py-3 text-sm font-medium transition-all duration-300 ease-in-out motion-reduce:transition-none ${subTrimClass} ${
+        collapsedRail ? 'justify-center px-2' : 'gap-3 px-4 text-left'
+      } ${isActive ? 'bg-admin text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`.trim()}
     >
       <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>{tab.icon}</span>
-      <span>{tab.label}</span>
-    </button>
+      <span
+        className={`truncate ${ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS} ${
+          collapsedRail ? 'max-w-0 opacity-0' : 'max-w-[12rem] opacity-100'
+        }`}
+      >
+        {tab.label}
+      </span>
+    </AdminSidebarNavLink>
   );
 }
 
@@ -109,11 +113,13 @@ export interface PrimaryNavListProps {
   productGroupActive: boolean;
   isProductsExpanded: boolean;
   setIsProductsExpanded: Dispatch<SetStateAction<boolean>>;
-  goTo: (path: string) => void;
   t: (path: string) => string;
   presentation: AdminSidebarNavPresentation;
   desktopCollapsed?: boolean;
+  onAfterNavigate?: () => void;
 }
+
+const PRODUCT_SUBMENU_IDS = new Set(['categories', 'brands', 'attributes']);
 
 type PrimaryNavContext = Omit<PrimaryNavListProps, 'primaryTabs'>;
 
@@ -123,10 +129,10 @@ function renderPrimaryNavItem(tab: AdminMenuItem, ctx: PrimaryNavContext) {
     productGroupActive,
     isProductsExpanded,
     setIsProductsExpanded,
-    goTo,
     t,
     presentation,
     desktopCollapsed,
+    onAfterNavigate,
   } = ctx;
 
   if (tab.isSubCategory && (!isProductsExpanded || desktopCollapsed)) {
@@ -142,9 +148,6 @@ function renderPrimaryNavItem(tab: AdminMenuItem, ctx: PrimaryNavContext) {
         tab={tab}
         isActive={isActive}
         isExpanded={isProductsExpanded}
-        onNavigate={() => {
-          goTo(tab.path);
-        }}
         onToggleExpand={() => {
           setIsProductsExpanded((prev) => !prev);
         }}
@@ -152,6 +155,7 @@ function renderPrimaryNavItem(tab: AdminMenuItem, ctx: PrimaryNavContext) {
         collapseAria={t('admin.sidebar.collapseProductsMenu')}
         presentation={presentation}
         iconRail={presentation === 'desktopSidebar' && Boolean(desktopCollapsed)}
+        onAfterNavigate={onAfterNavigate}
       />
     );
   }
@@ -161,15 +165,13 @@ function renderPrimaryNavItem(tab: AdminMenuItem, ctx: PrimaryNavContext) {
   }
 
   return (
-    <NavItemButton
+    <NavItemLink
       key={tab.id}
       tab={tab}
       isActive={isActive}
-      onNavigate={() => {
-        goTo(tab.path);
-      }}
       presentation={presentation}
       desktopCollapsed={desktopCollapsed}
+      onAfterNavigate={onAfterNavigate}
     />
   );
 }

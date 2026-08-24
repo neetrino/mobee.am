@@ -138,7 +138,7 @@ export const CartItemRow = memo(function CartItemRow({
               href={`/products/${item.variant.product.slug}`}
               className="relative block h-full min-h-[104px] w-full max-lg:min-h-[104px] lg:min-h-0"
             >
-              {imageError ? (
+              {imageError || !imageSrc ? (
                 <ProductImagePlaceholder
                   className="absolute inset-0"
                   aria-label={

@@ -13,6 +13,8 @@ import {
   persistProductListingViewMode,
   type ProductListingViewMode,
 } from '@/lib/products/view-mode';
+import { getStoredLanguage } from '@/lib/language';
+import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 
 const SORT_OPTIONS: ProductSortOption[] = [...PRODUCT_SORT_OPTIONS];
 
@@ -85,8 +87,8 @@ export function ShopSortFilter() {
     }
     params.delete('page');
     setOpen(false);
-    const query = params.toString();
-    router.push(query ? `/shop?${query}` : '/shop');
+    const href = warmShopNavigationFromSearchParams(router, params, getStoredLanguage());
+    router.push(href);
   };
 
   const applyListingMode = (mode: ProductListingViewMode) => {

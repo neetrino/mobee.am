@@ -2,16 +2,20 @@
 
 import { useCallback } from 'react';
 import { FeaturedBestChoiceGrid } from './FeaturedBestChoiceGrid';
+import { FeaturedIntroHeading } from './FeaturedIntroHeading';
 import { SpecialOffersProductGrid } from './SpecialOffersProductGrid';
 import { SpecialOffersSectionHeading } from './SpecialOffersSectionHeading';
 import { WhyChooseUsSection } from './WhyChooseUsSection';
 import { HomeMobileSectionTitle } from './HomeMobileSectionTitle';
 import { HomeMobileSaleBanner } from './HomeMobileSaleBanner';
+import { HomePagePartnerLogos } from './HomePagePartnerLogos';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 import {
+  HOME_CURATED_SECTION_FOLLOWING_MARGIN_CLASS,
   HOME_CURATED_SECTION_MOBILE_TITLE_CLASS,
   HOME_SECTION_HEADING_TO_GRID_GAP_LG_CLASS,
 } from './home-best-choice.constants';
+import type { HomeBrandLogo } from '@/lib/home/home-brand-logos';
 import type { LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
 import {
@@ -33,6 +37,7 @@ export type HomeProductSectionsProps = {
   initialFeaturedFiltersKey?: string;
   initialSpecialOffersProducts?: FeaturedHomeProduct[];
   initialSpecialOffersFiltersKey?: string;
+  homeBrands?: HomeBrandLogo[];
 };
 
 type HomeFeaturedCarouselSectionProps = {
@@ -59,10 +64,11 @@ function HomeFeaturedCarouselSection({
   onFeaturedCarouselViewChange,
 }: HomeFeaturedCarouselSectionProps) {
   return (
-    <>
+    <div className={HOME_CURATED_SECTION_FOLLOWING_MARGIN_CLASS}>
+      <FeaturedIntroHeading />
       <HomeMobileSectionTitle
         sectionHeadingId="home-featured-heading-mobile"
-        title={t(language, 'home.mobile_home.featuredSectionTitle')}
+        title={t(language, 'home.featured_intro.title')}
         titleClassName={HOME_CURATED_SECTION_MOBILE_TITLE_CLASS}
         syncedCarouselPageIndex={featuredCarousel.pageIndex}
         syncedCarouselPageCount={featuredCarousel.pageCount}
@@ -79,7 +85,7 @@ function HomeFeaturedCarouselSection({
           onMobileCarouselViewChange={onFeaturedCarouselViewChange}
         />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -154,17 +160,6 @@ function HomeProductSectionsBody(props: HomeProductSectionsBodyProps) {
       <h2 id="home-product-sections" className="sr-only">
         {t(language, 'home.featured_products.title')}
       </h2>
-      <HomeFeaturedCarouselSection
-        language={language}
-        featuredCarousel={rest.featuredCarousel}
-        loading={rest.loading}
-        error={rest.error}
-        products={rest.products}
-        productsPerPage={rest.productsPerPage}
-        mobileCardsPerView={rest.mobileCardsPerView}
-        onRetry={rest.onRetry}
-        onFeaturedCarouselViewChange={rest.onFeaturedCarouselViewChange}
-      />
       <HomeSpecialOffersCarouselSection
         specialOffersLanguage={rest.specialOffersLanguage}
         specialOffersCarousel={rest.specialOffersCarousel}
@@ -175,6 +170,17 @@ function HomeProductSectionsBody(props: HomeProductSectionsBodyProps) {
         mobileCardsPerView={rest.mobileCardsPerView}
         onRetrySpecialOffers={rest.onRetrySpecialOffers}
         onSpecialOffersCarouselViewChange={rest.onSpecialOffersCarouselViewChange}
+      />
+      <HomeFeaturedCarouselSection
+        language={language}
+        featuredCarousel={rest.featuredCarousel}
+        loading={rest.loading}
+        error={rest.error}
+        products={rest.products}
+        productsPerPage={rest.productsPerPage}
+        mobileCardsPerView={rest.mobileCardsPerView}
+        onRetry={rest.onRetry}
+        onFeaturedCarouselViewChange={rest.onFeaturedCarouselViewChange}
       />
     </div>
   );
@@ -189,6 +195,7 @@ export function HomeProductSections({
   initialFeaturedFiltersKey,
   initialSpecialOffersProducts,
   initialSpecialOffersFiltersKey,
+  homeBrands = [],
 }: HomeProductSectionsProps = {}) {
   const { language, products, loading, error, fetchProducts, productsPerPage } =
     useFeaturedHomeProducts({
@@ -256,6 +263,8 @@ export function HomeProductSections({
       <div className="hidden lg:block">
         <WhyChooseUsSection />
       </div>
+
+      <HomePagePartnerLogos brands={homeBrands} />
 
       <HomeMobileSaleBanner />
     </section>

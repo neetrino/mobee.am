@@ -1,4 +1,9 @@
 import { db } from "@white-shop/db";
+import {
+  HOME_HERO_SETTING_KEY,
+  resolveHomeHeroSettingsForRead,
+  type HomeHeroSettings,
+} from "@/lib/home-hero";
 
 class AdminSettingsService {
   /**
@@ -10,6 +15,10 @@ class AdminSettingsService {
         key: {
           in: ['globalDiscount', 'categoryDiscounts', 'brandDiscounts', 'defaultCurrency', 'currencyRates'],
         },
+      },
+      select: {
+        key: true,
+        value: true,
       },
     });
     
@@ -250,6 +259,42 @@ class AdminSettingsService {
       stepSize: stored.stepSize ?? null,
       stepSizePerCurrency: stored.stepSizePerCurrency ?? null,
     };
+  }
+
+  /**
+   * Get homepage hero slides (Settings or converted static banners when empty).
+   */
+  async getHomeHeroSettings(): Promise<HomeHeroSettings> {
+    const setting = await db.settings.findUnique({
+      where: { key: HOME_HERO_SETTING_KEY },
+    });
+
+    return resolveHomeHeroSettingsForRead(setting?.value ?? null);
+  }
+
+  /**
+   * Upsert homepage hero slides. Caller must pass already-validated values.
+   * Replacing image URLs does not delete previous R2 objects (no R2 delete workflow).
+   */
+  async updateHomeHeroSettings(data: HomeHeroSettings): Promise<HomeHeroSettings> {
+    const value: HomeHeroSettings = {
+      slides: data.slides,
+    };
+
+    const setting = await db.settings.upsert({
+      where: { key: HOME_HERO_SETTING_KEY },
+      update: {
+        value,
+        updatedAt: new Date(),
+      },
+      create: {
+        key: HOME_HERO_SETTING_KEY,
+        value,
+        description: 'Homepage hero carousel slides (desktop/mobile images + CTA href)',
+      },
+    });
+
+    return resolveHomeHeroSettingsForRead(setting.value);
   }
 }
 

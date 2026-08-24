@@ -1,12 +1,25 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, type PointerEvent } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { X } from 'lucide-react';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
-import { getStoredCurrency, formatPrice as formatCurrencyPrice, type CurrencyCode } from '../lib/currency';
+import {
+  getStoredCurrency,
+  formatPrice as formatCurrencyPrice,
+  initializeCurrencyRates,
+  type CurrencyCode,
+} from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
+import {
+  priceToSliderPercentage,
+  resolvePriceFilterStepInBase,
+  roundPriceToStep,
+  syncPriceFilterValuesFromUrl,
+} from '@/lib/shop/resolve-price-filter-step';
 
 interface PriceFilterProps {
   currentMinPrice?: string;
@@ -18,212 +31,240 @@ interface PriceFilterProps {
 interface PriceRange {
   min: number;
   max: number;
+  hasProducts?: boolean;
   stepSize?: number | null;
   stepSizePerCurrency?: Partial<Record<CurrencyCode, number>> | null;
 }
 
-export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: PriceFilterProps) {
+function readSliderValues(
+  range: PriceRange,
+  minFromUrl: string | undefined,
+  maxFromUrl: string | undefined,
+): { min: number; max: number } {
+  return syncPriceFilterValuesFromUrl(
+    range,
+    minFromUrl ?? null,
+    maxFromUrl ?? null,
+  );
+}
+
+export function PriceFilter({
+  currentMinPrice,
+  currentMaxPrice,
+  category,
+  search,
+}: PriceFilterProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
   const { t } = useTranslation();
-  const [priceRange, setPriceRange] = useState<PriceRange>({
-    min: 0,
-    max: 100000,
-    stepSize: null,
-    stepSizePerCurrency: null,
-  });
-  const [minPrice, setMinPrice] = useState(currentMinPrice ? parseFloat(currentMinPrice) : 0);
-  const [maxPrice, setMaxPrice] = useState(currentMaxPrice ? parseFloat(currentMaxPrice) : 100000);
-  const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null);
-  const [currency, setCurrency] = useState<CurrencyCode>('USD'); // Default для SSR
+  const [priceRange, setPriceRange] = useState<PriceRange | null>(() =>
+    filtersContext?.data?.priceRange
+      ? (filtersContext.data.priceRange as PriceRange)
+      : null,
+  );
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(0);
+  const [currency, setCurrency] = useState<CurrencyCode>('USD');
   const sliderRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef<'min' | 'max' | null>(null);
+  const activePointerIdRef = useRef<number | null>(null);
+  const minPriceRef = useRef(minPrice);
+  const maxPriceRef = useRef(maxPrice);
+  const priceRangeRef = useRef<PriceRange | null>(priceRange);
 
-  // Helper function to round value to step size
-  const roundToStep = (value: number, step: number | null | undefined): number => {
-    if (!step || step <= 0) return Math.round(value);
-    return Math.round(value / step) * step;
-  };
+  const syncRefs = useCallback(
+    (nextMin: number, nextMax: number, nextRange?: PriceRange) => {
+      minPriceRef.current = nextMin;
+      maxPriceRef.current = nextMax;
+      setMinPrice(nextMin);
+      setMaxPrice(nextMax);
+      if (nextRange) {
+        priceRangeRef.current = nextRange;
+        setPriceRange(nextRange);
+      }
+    },
+    [],
+  );
 
-  // Загружаем валюту только на клиенте, чтобы избежать проблем с гидратацией
-  useEffect(() => {
-    const updateCurrency = () => {
-      setCurrency(getStoredCurrency());
-    };
-    
-    // Загружаем валюту при монтировании
-    updateCurrency();
-    
-    // Слушаем изменения валюты
-    if (typeof window !== 'undefined') {
-      window.addEventListener('currency-updated', updateCurrency);
-      return () => {
-        window.removeEventListener('currency-updated', updateCurrency);
-      };
+  const resetDragState = useCallback(() => {
+    isDraggingRef.current = null;
+    if (activePointerIdRef.current !== null && sliderRef.current) {
+      try {
+        sliderRef.current.releasePointerCapture(activePointerIdRef.current);
+      } catch {
+        // pointer already released
+      }
+      activePointerIdRef.current = null;
     }
   }, []);
 
   useEffect(() => {
+    void initializeCurrencyRates();
+
+    const syncCurrency = () => {
+      resetDragState();
+      setCurrency(getStoredCurrency());
+      const range = priceRangeRef.current;
+      if (!range) return;
+      const { min, max } = readSliderValues(range, currentMinPrice, currentMaxPrice);
+      syncRefs(min, max);
+    };
+
+    syncCurrency();
+    window.addEventListener('currency-updated', syncCurrency);
+    return () => window.removeEventListener('currency-updated', syncCurrency);
+  }, [currentMinPrice, currentMaxPrice, resetDragState, syncRefs]);
+
+  useEffect(() => {
     if (filtersContext?.data?.priceRange) {
-      const pr = filtersContext.data.priceRange;
-      setPriceRange(pr as PriceRange);
-      if (!currentMinPrice) setMinPrice(pr.min);
-      if (!currentMaxPrice) setMaxPrice(pr.max);
+      const pr = filtersContext.data.priceRange as PriceRange;
+      const { min, max } = readSliderValues(pr, currentMinPrice, currentMaxPrice);
+      syncRefs(min, max, pr);
       return;
     }
     if (filtersContext === null) {
       fetchPriceRange();
     }
-  }, [category, filtersContext?.data?.priceRange, filtersContext === null]);
+  }, [category, search, filtersContext?.data?.priceRange, filtersContext === null]);
 
   useEffect(() => {
-    if (currentMinPrice) {
-      setMinPrice(parseFloat(currentMinPrice));
-    } else {
-      setMinPrice(priceRange.min);
-    }
-    if (currentMaxPrice) {
-      setMaxPrice(parseFloat(currentMaxPrice));
-    } else {
-      setMaxPrice(priceRange.max);
-    }
-  }, [currentMinPrice, currentMaxPrice, priceRange]);
+    if (isDraggingRef.current || !priceRangeRef.current) return;
+    const range = priceRangeRef.current;
+    const { min, max } = readSliderValues(range, currentMinPrice, currentMaxPrice);
+    syncRefs(min, max);
+  }, [currentMinPrice, currentMaxPrice, priceRange, syncRefs]);
 
   const fetchPriceRange = async () => {
     try {
       const language = getStoredLanguage();
       const params: Record<string, string> = { lang: language };
       if (category) params.category = category;
+      if (search) params.search = search;
 
       const response = await apiClient.get<PriceRange>('/api/v1/products/price-range', { params });
-      setPriceRange(response);
-      if (!currentMinPrice) setMinPrice(response.min);
-      if (!currentMaxPrice) setMaxPrice(response.max);
+      const { min, max } = readSliderValues(response, currentMinPrice, currentMaxPrice);
+      syncRefs(min, max, response);
     } catch (error) {
       console.error('Error fetching price range:', error);
     }
   };
 
-  const resolveStepSize = (): number => {
-    const perCurrency = priceRange.stepSizePerCurrency || {};
-    const currencyStep = perCurrency[currency];
-    if (currencyStep && currencyStep > 0) {
-      return currencyStep;
+  const applyPriceFilter = useCallback(() => {
+    const range = priceRangeRef.current;
+    if (!range) return;
+
+    const nextMin = minPriceRef.current;
+    const nextMax = maxPriceRef.current;
+    const shouldApplyMin = nextMin !== range.min;
+    const shouldApplyMax = nextMax !== range.max;
+
+    if (!shouldApplyMin && !shouldApplyMax) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (shouldApplyMin) {
+      params.set('minPrice', nextMin.toString());
+    } else {
+      params.delete('minPrice');
     }
-    if (priceRange.stepSize && priceRange.stepSize > 0) {
-      return priceRange.stepSize;
+
+    if (shouldApplyMax) {
+      params.set('maxPrice', nextMax.toString());
+    } else {
+      params.delete('maxPrice');
     }
-    return 1;
-  };
 
-  const getPercentage = (value: number) => {
-    return ((value - priceRange.min) / (priceRange.max - priceRange.min)) * 100;
-  };
+    params.delete('page');
 
-  const handleMouseDown = (type: 'min' | 'max') => {
-    setIsDragging(type);
-  };
+    const nextQueryString = params.toString();
+    if (nextQueryString === searchParams.toString()) return;
 
-  const updatePrice = (clientX: number) => {
-    if (!sliderRef.current) return;
+    const href = warmShopNavigationFromSearchParams(
+      router,
+      params,
+      getStoredLanguage(),
+      pathname,
+    );
+    router.replace(href, { scroll: false });
+  }, [pathname, router, searchParams]);
 
+  const updatePriceFromClientX = useCallback((clientX: number) => {
+    const dragging = isDraggingRef.current;
+    const range = priceRangeRef.current;
+    if (!dragging || !range || !sliderRef.current) return;
+
+    const step = resolvePriceFilterStepInBase(range);
     const rect = sliderRef.current.getBoundingClientRect();
+    if (rect.width <= 0) return;
+
     const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-    const value = priceRange.min + (percentage / 100) * (priceRange.max - priceRange.min);
-    const step = resolveStepSize();
-    const roundedValue = roundToStep(value, step);
+    const value = range.min + (percentage / 100) * (range.max - range.min);
+    const roundedValue = roundPriceToStep(value, step);
 
-    if (isDragging === 'min') {
-      const currentMax = typeof maxPrice === 'number' && !isNaN(maxPrice) ? maxPrice : priceRange.max;
-      const newMin = Math.max(priceRange.min, Math.min(roundedValue, currentMax - step));
+    if (dragging === 'min') {
+      const currentMax = maxPriceRef.current;
+      const newMin = Math.max(range.min, Math.min(roundedValue, currentMax - step));
+      minPriceRef.current = newMin;
       setMinPrice(newMin);
-    } else if (isDragging === 'max') {
-      const currentMin = typeof minPrice === 'number' && !isNaN(minPrice) ? minPrice : priceRange.min;
-      const newMax = Math.min(priceRange.max, Math.max(roundedValue, currentMin + step));
+      return;
+    }
+
+    const currentMin = minPriceRef.current;
+    const newMax = Math.min(range.max, Math.max(roundedValue, currentMin + step));
+    maxPriceRef.current = newMax;
+    setMaxPrice(newMax);
+  }, []);
+
+  const endDrag = useCallback(() => {
+    if (!isDraggingRef.current) return;
+    resetDragState();
+    applyPriceFilter();
+  }, [applyPriceFilter, resetDragState]);
+
+  const startDrag = useCallback((type: 'min' | 'max', event: PointerEvent<HTMLElement>) => {
+    if (event.button !== 0) return;
+    isDraggingRef.current = type;
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+      activePointerIdRef.current = event.pointerId;
+    } catch {
+      // ignore if capture is not supported
+    }
+  }, []);
+
+  const handleTrackPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    const range = priceRangeRef.current;
+    if (event.button !== 0 || !range) return;
+    const rect = sliderRef.current?.getBoundingClientRect();
+    if (!rect || rect.width <= 0) return;
+
+    const step = resolvePriceFilterStepInBase(range);
+    const percentage = ((event.clientX - rect.left) / rect.width) * 100;
+    const value = range.min + (percentage / 100) * (range.max - range.min);
+    const roundedValue = roundPriceToStep(value, step);
+    const currentMin = minPriceRef.current;
+    const currentMax = maxPriceRef.current;
+
+    if (Math.abs(roundedValue - currentMin) < Math.abs(roundedValue - currentMax)) {
+      const newMin = Math.max(range.min, Math.min(roundedValue, currentMax - step));
+      minPriceRef.current = newMin;
+      setMinPrice(newMin);
+      startDrag('min', event);
+    } else {
+      const newMax = Math.min(range.max, Math.max(roundedValue, currentMin + step));
+      maxPriceRef.current = newMax;
       setMaxPrice(newMax);
+      startDrag('max', event);
     }
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return;
-    updatePrice(e.clientX);
+  const handleSliderPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+    updatePriceFromClientX(event.clientX);
   };
 
-  const handleTouchMove = (e: TouchEvent) => {
-    if (!isDragging || e.touches.length === 0) return;
-    updatePrice(e.touches[0].clientX);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(null);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(null);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('touchend', handleTouchEnd);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        document.removeEventListener('touchmove', handleTouchMove);
-        document.removeEventListener('touchend', handleTouchEnd);
-      };
-    }
-  }, [isDragging, minPrice, maxPrice, priceRange]);
-
-  // Auto-apply filter when dragging ends
-  useEffect(() => {
-    if (!isDragging) {
-      // Only apply if values have changed from initial/default
-      const shouldApplyMin = minPrice !== priceRange.min;
-      const shouldApplyMax = maxPrice !== priceRange.max;
-      
-      if (shouldApplyMin || shouldApplyMax) {
-        // Ստեղծում ենք նոր URLSearchParams URL-ի հիման վրա, որպեսզի պահպանենք բոլոր params-ները
-        const params = new URLSearchParams(searchParams.toString());
-        
-        if (shouldApplyMin) {
-          params.set('minPrice', minPrice.toString());
-        } else {
-          params.delete('minPrice');
-        }
-        
-        if (shouldApplyMax) {
-          params.set('maxPrice', maxPrice.toString());
-        } else {
-          params.delete('maxPrice');
-        }
-        
-        // Reset page to 1 when filters change
-        params.delete('page');
-        
-        const nextQueryString = params.toString();
-        const currentQueryString = searchParams.toString();
-
-        // Avoid navigation loop when query already matches current URL.
-        if (nextQueryString === currentQueryString) {
-          return;
-        }
-
-        // Use a small delay to debounce rapid changes
-        const timeoutId = setTimeout(() => {
-          const nextUrl = nextQueryString ? `${pathname}?${nextQueryString}` : pathname;
-          router.replace(nextUrl, { scroll: false });
-        }, 300);
-        
-        return () => clearTimeout(timeoutId);
-      }
-    }
-  }, [isDragging, minPrice, maxPrice, priceRange, pathname, searchParams, router]);
-
-  // Используем функцию форматирования из currency.ts для консистентности
   const formatPrice = (price: number) => {
     if (typeof price !== 'number' || isNaN(price) || !isFinite(price)) {
       return formatCurrencyPrice(0, currency);
@@ -231,48 +272,87 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
     return formatCurrencyPrice(price, currency);
   };
 
-  const safeMinPrice: number = typeof minPrice === 'number' && !isNaN(minPrice) && isFinite(minPrice) ? minPrice : 0;
-  const safeMaxPrice: number = typeof maxPrice === 'number' && !isNaN(maxPrice) && isFinite(maxPrice) ? maxPrice : 100000;
-  
-  const minPercentage = getPercentage(safeMinPrice);
-  const maxPercentage = getPercentage(safeMaxPrice);
+  const isLoading = priceRange === null || (filtersContext?.loading && !priceRange);
+  const hasProducts = priceRange?.hasProducts ?? (priceRange ? priceRange.max > priceRange.min || priceRange.min > 0 : false);
 
-  return (
-    <section className="border-b border-[#E2E8F0] pb-6">
-      <div className="flex items-center justify-between gap-3">
+  if (isLoading) {
+    return (
+      <section className="border-b border-[#E2E8F0] pb-6">
         <h3 className="text-base font-semibold leading-6 tracking-[-0.02em] text-[#314158]">
           {t('products.filters.price.sectionTitle')}
         </h3>
-        <p className="text-base font-bold leading-6 tracking-[-0.02em] text-black">
-          {formatPrice(Number(safeMinPrice) || 0)} - {formatPrice(Number(safeMaxPrice) || 100000)}
-        </p>
+        <div className="mt-4 h-2 animate-pulse rounded-full bg-[#E2E8F0]" aria-hidden />
+        <p className="mt-3 text-sm text-[#62748E]">{t('products.filters.price.loading')}</p>
+      </section>
+    );
+  }
+
+  if (!hasProducts) {
+    return null;
+  }
+
+  const boundsMin = priceRange.min;
+  const boundsMax = priceRange.max;
+  const safeMinPrice =
+    typeof minPrice === 'number' && !isNaN(minPrice) && isFinite(minPrice) ? minPrice : boundsMin;
+  const safeMaxPrice =
+    typeof maxPrice === 'number' && !isNaN(maxPrice) && isFinite(maxPrice) ? maxPrice : boundsMax;
+
+  const minPercentage = priceToSliderPercentage(safeMinPrice, boundsMin, boundsMax);
+  const maxPercentage = priceToSliderPercentage(safeMaxPrice, boundsMin, boundsMax);
+
+  const hasActivePriceFilter =
+    Boolean(currentMinPrice) ||
+    Boolean(currentMaxPrice) ||
+    safeMinPrice !== priceRange.min ||
+    safeMaxPrice !== priceRange.max;
+
+  const clearPriceFilter = () => {
+    syncRefs(priceRange.min, priceRange.max);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('minPrice');
+    params.delete('maxPrice');
+    params.delete('page');
+    const href = warmShopNavigationFromSearchParams(
+      router,
+      params,
+      getStoredLanguage(),
+      pathname,
+    );
+    router.push(href);
+  };
+
+  return (
+    <section className="border-b border-[#E2E8F0] pb-6">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="min-w-0 text-base font-semibold leading-6 tracking-[-0.02em] text-[#314158]">
+          {t('products.filters.price.sectionTitle')}
+        </h3>
+        <div className="shrink-0 text-right">
+          <p className="text-base font-bold leading-6 tracking-[-0.02em] text-black">
+            {formatPrice(safeMinPrice)} - {formatPrice(safeMaxPrice)}
+          </p>
+          {hasActivePriceFilter ? (
+            <button
+              type="button"
+              onClick={clearPriceFilter}
+              className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium leading-5 tracking-[-0.01em] text-[#2DB2FF] transition-colors hover:text-[#25A0E0]"
+            >
+              <X className="h-4 w-4" strokeWidth={2} aria-hidden />
+              <span>{t('products.filters.clearSection')}</span>
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-4">
         <div
           ref={sliderRef}
-          className="relative h-2 cursor-pointer rounded-full bg-[#E2E8F0]"
-          onMouseDown={(e) => {
-            const rect = sliderRef.current?.getBoundingClientRect();
-            if (!rect) return;
-            const percentage = ((e.clientX - rect.left) / rect.width) * 100;
-    const value = priceRange.min + (percentage / 100) * (priceRange.max - priceRange.min);
-    const step = resolveStepSize();
-            const roundedValue = roundToStep(value, step);
-            
-            const currentMin = typeof minPrice === 'number' && !isNaN(minPrice) ? minPrice : priceRange.min;
-            const currentMax = typeof maxPrice === 'number' && !isNaN(maxPrice) ? maxPrice : priceRange.max;
-            
-            if (Math.abs(roundedValue - currentMin) < Math.abs(roundedValue - currentMax)) {
-              const newMin = Math.max(priceRange.min, Math.min(roundedValue, currentMax - step));
-              setMinPrice(newMin);
-              handleMouseDown('min');
-            } else {
-              const newMax = Math.min(priceRange.max, Math.max(roundedValue, currentMin + step));
-              setMaxPrice(newMax);
-              handleMouseDown('max');
-            }
-          }}
+          className="relative h-2 touch-none cursor-pointer rounded-full bg-[#E2E8F0]"
+          onPointerDown={handleTrackPointerDown}
+          onPointerMove={handleSliderPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
         >
           <div
             className="absolute h-2 rounded-full bg-[#3BA3E3]"
@@ -283,30 +363,22 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
           />
 
           <div
-            className="absolute cursor-grab active:cursor-grabbing z-10"
+            className="absolute z-10 flex h-8 w-8 cursor-grab touch-none items-center justify-center active:cursor-grabbing"
             style={{ left: `${minPercentage}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              handleMouseDown('min');
-            }}
-            onTouchStart={(e) => {
-              e.stopPropagation();
-              handleMouseDown('min');
+            onPointerDown={(event) => {
+              event.stopPropagation();
+              startDrag('min', event);
             }}
           >
             <div className="h-5 w-5 rounded-full border border-[#E2E8F0] bg-white shadow-sm transition-colors hover:border-[#2CA1E2] hover:shadow-md" />
           </div>
 
           <div
-            className="absolute cursor-grab active:cursor-grabbing z-10"
+            className="absolute z-10 flex h-8 w-8 cursor-grab touch-none items-center justify-center active:cursor-grabbing"
             style={{ left: `${maxPercentage}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              handleMouseDown('max');
-            }}
-            onTouchStart={(e) => {
-              e.stopPropagation();
-              handleMouseDown('max');
+            onPointerDown={(event) => {
+              event.stopPropagation();
+              startDrag('max', event);
             }}
           >
             <div className="h-5 w-5 rounded-full border border-[#E2E8F0] bg-white shadow-sm transition-colors hover:border-[#2CA1E2] hover:shadow-md" />

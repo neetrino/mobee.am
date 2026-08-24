@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getAdminMenuTABS } from '../admin-menu.config';
 import {
   ADMIN_SIDEBAR_COLLAPSED_RAIL_NAV_SCROLL_PADDING_X_CLASS,
   ADMIN_SIDEBAR_NAV_SCROLL_TOP_PADDING_CLASS,
 } from '../admin-sidebar-layout.constants';
 import type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
+import { adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
 import { isProductGroupPathActive, PrimaryNavList } from './AdminSidebarPrimaryNav';
 
 export type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
@@ -28,14 +29,16 @@ export interface AdminSidebarNavBodyProps {
  */
 export function AdminSidebarNavBody({
   currentPath,
-  router,
+  router: _router,
   t,
   onAfterNavigate,
   presentation = 'desktopSidebar',
   desktopCollapsed,
 }: AdminSidebarNavBodyProps) {
-  const adminTabs = getAdminMenuTABS(t);
-  const primaryTabs = adminTabs.filter((tab) => tab.id !== 'home');
+  useEffect(() => adminNavMarkMount('AdminSidebarNavBody'), []);
+
+  const adminTabs = useMemo(() => getAdminMenuTABS(t), [t]);
+  const primaryTabs = useMemo(() => adminTabs.filter((tab) => tab.id !== 'home'), [adminTabs]);
   const productGroupActive = isProductGroupPathActive(currentPath);
   const [isProductsExpanded, setIsProductsExpanded] = useState(productGroupActive);
 
@@ -44,11 +47,6 @@ export function AdminSidebarNavBody({
       setIsProductsExpanded(true);
     }
   }, [productGroupActive]);
-
-  const goTo = (path: string) => {
-    router.push(path);
-    onAfterNavigate?.();
-  };
 
   const scrollShellClass =
     presentation === 'mobileDrawer'
@@ -75,10 +73,10 @@ export function AdminSidebarNavBody({
           productGroupActive={productGroupActive}
           isProductsExpanded={isProductsExpanded}
           setIsProductsExpanded={setIsProductsExpanded}
-          goTo={goTo}
           t={t}
           presentation={presentation}
           desktopCollapsed={desktopCollapsed}
+          onAfterNavigate={onAfterNavigate}
         />
       </div>
     </div>

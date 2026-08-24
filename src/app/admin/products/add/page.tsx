@@ -1,13 +1,11 @@
 ﻿'use client';
 
 import { Suspense } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../../../../lib/auth/AuthContext';
+import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { AdminPageShell } from '../../components/AdminPageShell';
+import { AdminContentSkeleton } from '../../components/AdminContentSkeleton';
 import { PageHeader } from './components/PageHeader';
-import { ValueSelectionModal } from './components/ValueSelectionModal';
-import { AddProductFormContent } from './components/AddProductFormContent';
 import { useProductFormState } from './hooks/useProductFormState';
 import { useProductDataLoading } from './hooks/useProductDataLoading';
 import { useProductEditMode } from './hooks/useProductEditMode';
@@ -19,13 +17,21 @@ import { useProductAttributeHelpers } from './hooks/useProductAttributeHelpers';
 import { useProductAttributeHandlers } from './hooks/useProductAttributeHandlers';
 import { useProductFormHandlers } from './hooks/useProductFormHandlers';
 import { useProductFormCallbacks } from './hooks/useProductFormCallbacks';
+import { useInitialProductSnapshot } from './hooks/useInitialProductSnapshot';
 import { isClothingCategory as checkIsClothingCategory, generateSlug } from './utils/productUtils';
+
+const AddProductFormContent = dynamic(
+  () => import('./components/AddProductFormContent').then((module) => ({ default: module.AddProductFormContent })),
+  { loading: () => <AdminContentSkeleton lines={6} /> },
+);
+
+const ValueSelectionModal = dynamic(
+  () => import('./components/ValueSelectionModal').then((module) => ({ default: module.ValueSelectionModal })),
+  { loading: () => null },
+);
 
 function AddProductPageContent() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const productId = searchParams.get('id');
   const isEditMode = !!productId;
@@ -33,9 +39,6 @@ function AddProductPageContent() {
   const formState = useProductFormState();
 
   useProductDataLoading({
-    isLoggedIn,
-    isAdmin,
-    isLoading,
     setBrands: formState.setBrands,
     setCategories: formState.setCategories,
     setAttributes: formState.setAttributes,
@@ -51,8 +54,6 @@ function AddProductPageContent() {
 
   useProductEditMode({
     productId,
-    isLoggedIn,
-    isAdmin,
     attributes: formState.attributes,
     defaultCurrency: formState.defaultCurrency,
     setLoadingProduct: formState.setLoadingProduct,
@@ -64,6 +65,7 @@ function AddProductPageContent() {
     setHasVariantsToLoad: formState.setHasVariantsToLoad,
     setProductType: formState.setProductType,
     setSimpleProductData: formState.setSimpleProductData,
+    setSimpleProductDatabaseVariantId: formState.setSimpleProductDatabaseVariantId,
   });
 
   useProductVariantConversion({
@@ -149,6 +151,19 @@ function AddProductPageContent() {
     getSizeAttribute,
   });
 
+  const { initialEditableProductRef, isSnapshotReady } = useInitialProductSnapshot({
+    isEditMode,
+    productId,
+    hasVariantsToLoad: formState.hasVariantsToLoad,
+    loadingProduct: formState.loadingProduct,
+    formData: formState.formData,
+    productType: formState.productType,
+    simpleProductData: formState.simpleProductData,
+    simpleProductDatabaseVariantId: formState.simpleProductDatabaseVariantId,
+    selectedAttributesForVariants: formState.selectedAttributesForVariants,
+    generatedVariants: formState.generatedVariants,
+  });
+
   const { handleSubmit } = useProductFormHandlers({
     formData: formState.formData,
     setFormData: formState.setFormData,
@@ -157,6 +172,7 @@ function AddProductPageContent() {
     setCategories: formState.setCategories,
     productType: formState.productType,
     simpleProductData: formState.simpleProductData,
+    simpleProductDatabaseVariantId: formState.simpleProductDatabaseVariantId,
     selectedAttributesForVariants: formState.selectedAttributesForVariants,
     generatedVariants: formState.generatedVariants,
     attributes: formState.attributes,
@@ -167,30 +183,22 @@ function AddProductPageContent() {
     newCategoryName: formState.newCategoryName,
     isEditMode,
     productId,
+    initialEditableProductRef,
     getColorAttribute,
     getSizeAttribute,
     isClothingCategory,
   });
 
-  if (isLoading || formState.loadingProduct) {
+  if (formState.loadingProduct) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">
-            {formState.loadingProduct ? t('admin.products.add.loadingProduct') : t('admin.products.add.loading')}
-          </p>
-        </div>
+      <div className="mx-auto w-full max-w-7xl py-8">
+        <AdminContentSkeleton lines={6} />
       </div>
     );
   }
 
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
-
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/products/add'} router={router} t={t}>
+    <>
       <div className="mx-auto w-full max-w-7xl">
         <PageHeader isEditMode={isEditMode} />
 
@@ -204,6 +212,7 @@ function AddProductPageContent() {
           defaultCurrency={formState.defaultCurrency}
           isEditMode={isEditMode}
           loading={formState.loading}
+          isSnapshotReady={isSnapshotReady}
           imageUploadLoading={formState.imageUploadLoading}
           imageUploadError={formState.imageUploadError}
           categoriesExpanded={formState.categoriesExpanded}
@@ -252,6 +261,9 @@ function AddProductPageContent() {
           onRemoveLabel={removeLabel}
           onUpdateLabel={(index, field, value) => updateLabel(index, field, value)}
           onFeaturedChange={(featured) => formState.setFormData((prev) => ({ ...prev, featured }))}
+          onWarrantyYearsChange={(warrantyYears) =>
+            formState.setFormData((prev) => ({ ...prev, warrantyYears }))
+          }
           onVariantsUpdate={(updater) => formState.setFormData((prev) => ({ ...prev, variants: updater(prev.variants) }))}
           onApplyToAllVariants={(field, value) => applyToAllVariants(field, value)}
           isClothingCategory={isClothingCategory}
@@ -271,22 +283,13 @@ function AddProductPageContent() {
           onAttributeValueIdsUpdate={formState.setSelectedAttributeValueIds}
         />
       )}
-    </AdminPageShell>
+    </>
   );
 }
 
 export default function AddProductPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
-            <p className="text-sm text-gray-600">Loading...</p>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<AdminContentSkeleton lines={6} />}>
       <AddProductPageContent />
     </Suspense>
   );

@@ -39,6 +39,7 @@ export default function CheckoutPage() {
     errors,
     isSubmitting,
     setValue,
+    purchaseIntent,
     paymentMethod,
     shippingMethod,
     shippingCity,
@@ -47,6 +48,8 @@ export default function CheckoutPage() {
     orderSummary,
     handlePlaceOrder,
     onSubmit,
+    removeItem,
+    removingItemId,
   } = useCheckout();
 
   if (loading) {
@@ -88,14 +91,17 @@ export default function CheckoutPage() {
       <form onSubmit={handlePlaceOrder} lang={FORM_INPUT_LATIN_LANG}>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <CheckoutForm
+            cart={cart}
+            onRemoveItem={removeItem}
+            removingItemId={removingItemId}
             register={register}
             setValue={setValue}
             errors={errors}
             isSubmitting={isSubmitting}
+            purchaseIntent={purchaseIntent}
             shippingMethod={shippingMethod}
             shippingCity={shippingCity}
             deliveryAvailable={deliveryAvailable}
-            deliverySpeed={deliverySpeed}
             paymentMethod={paymentMethod}
             paymentMethods={paymentMethods}
             logoErrors={logoErrors}
@@ -115,6 +121,7 @@ export default function CheckoutPage() {
             requiresRegionalQuote={requiresRegionalQuote}
             error={error}
             isSubmitting={isSubmitting}
+            purchaseIntent={purchaseIntent}
             register={register}
             promoCodeError={errors.promoCode?.message}
             onPlaceOrder={(e) => {

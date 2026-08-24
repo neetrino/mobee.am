@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import { safeParseAdminProductUpdate } from "@/lib/schemas/admin-product-update.schema";
+import { logger } from "@/lib/utils/logger";
+
+type RouteError = {
+  type?: string;
+  title?: string;
+  status?: number;
+  detail?: string;
+  message?: string;
+};
 
 /**
  * GET /api/v1/admin/products/[id]
@@ -11,98 +21,96 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const { id } = await params;
     const product = await adminService.getProductById(id);
 
     return NextResponse.json(product);
-  } catch (error: any) {
-    console.error("❌ [ADMIN PRODUCTS] GET [id] Error:", error);
+  } catch (error: unknown) {
+    const err = error as RouteError;
+    logger.error("ADMIN PRODUCTS GET [id] Error", {
+      error: err.message || String(error),
+    });
     return NextResponse.json(
       {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
+        type: err.type || "https://api.shop.am/problems/internal-error",
+        title: err.title || "Internal Server Error",
+        status: err.status || 500,
+        detail: err.detail || err.message || "An error occurred",
         instance: req.url,
       },
-      { status: error.status || 500 }
+      { status: err.status || 500 }
     );
   }
 }
 
 /**
  * PUT /api/v1/admin/products/[id]
- * Update a product
+ * Partial or legacy full product update
  */
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const { id } = await params;
-    const body = await req.json();
-    console.log("📤 [ADMIN PRODUCTS] PUT request:", { 
-      id, 
-      bodyKeys: Object.keys(body),
-      hasVariants: !!body.variants,
-      variantsCount: body.variants?.length || 0,
-      body: JSON.stringify(body, null, 2) 
+    const body: unknown = await req.json();
+
+    const parsed = safeParseAdminProductUpdate(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Validation Error",
+          status: 400,
+          detail: parsed.error.flatten(),
+          instance: req.url,
+        },
+        { status: 400 }
+      );
+    }
+
+    logger.info("ADMIN PRODUCTS PUT request", {
+      id,
+      format: parsed.format,
+      bodyKeys: Object.keys(body as Record<string, unknown>),
     });
 
-    const product = await adminService.updateProduct(id, body);
-    console.log("✅ [ADMIN PRODUCTS] Product updated:", { id, productId: product?.id });
+    const result = await adminService.updateProduct(id, parsed.data);
 
-    return NextResponse.json(product);
-  } catch (error: any) {
-    console.error("❌ [ADMIN PRODUCTS] PUT Error:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
-      code: error?.code,
-      meta: error?.meta,
-      type: error?.type,
-      title: error?.title,
-      status: error?.status,
-      detail: error?.detail,
-      fullError: error,
+    logger.info("ADMIN PRODUCTS Product updated", {
+      id,
+      productId: result.id,
+    });
+
+    return NextResponse.json(result);
+  } catch (error: unknown) {
+    const err = error as RouteError;
+    logger.error("ADMIN PRODUCTS PUT Error", {
+      message: err.message || String(error),
+      type: err.type,
+      title: err.title,
+      status: err.status,
+      detail: err.detail,
     });
     return NextResponse.json(
       {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
+        type: err.type || "https://api.shop.am/problems/internal-error",
+        title: err.title || "Internal Server Error",
+        status: err.status || 500,
+        detail: err.detail || err.message || "An error occurred",
         instance: req.url,
       },
-      { status: error.status || 500 }
+      { status: err.status || 500 }
     );
   }
 }
@@ -116,39 +124,32 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const { id } = await params;
-    console.log("🗑️ [ADMIN PRODUCTS] DELETE request:", id);
+    logger.info("ADMIN PRODUCTS DELETE request", { id });
 
     await adminService.deleteProduct(id);
-    console.log("✅ [ADMIN PRODUCTS] Product deleted:", id);
+    logger.info("ADMIN PRODUCTS Product deleted", { id });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error("❌ [ADMIN PRODUCTS] DELETE Error:", error);
+  } catch (error: unknown) {
+    const err = error as RouteError;
+    logger.error("ADMIN PRODUCTS DELETE Error", {
+      error: err.message || String(error),
+    });
     return NextResponse.json(
       {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
+        type: err.type || "https://api.shop.am/problems/internal-error",
+        title: err.title || "Internal Server Error",
+        status: err.status || 500,
+        detail: err.detail || err.message || "An error occurred",
         instance: req.url,
       },
-      { status: error.status || 500 }
+      { status: err.status || 500 }
     );
   }
 }
-

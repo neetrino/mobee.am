@@ -21,8 +21,6 @@ import { buildFormData } from '../utils/productFormDataBuilder';
 
 interface UseProductEditModeProps {
   productId: string | null;
-  isLoggedIn: boolean;
-  isAdmin: boolean;
   attributes: any[];
   defaultCurrency: CurrencyCode;
   setLoadingProduct: (loading: boolean) => void;
@@ -34,12 +32,11 @@ interface UseProductEditModeProps {
   setHasVariantsToLoad: (has: boolean) => void;
   setProductType: (type: 'simple' | 'variable') => void;
   setSimpleProductData: (data: any) => void;
+  setSimpleProductDatabaseVariantId: (id: string | undefined) => void;
 }
 
 export function useProductEditMode({
   productId,
-  isLoggedIn,
-  isAdmin,
   attributes,
   defaultCurrency,
   setLoadingProduct,
@@ -51,12 +48,13 @@ export function useProductEditMode({
   setHasVariantsToLoad,
   setProductType,
   setSimpleProductData,
+  setSimpleProductDatabaseVariantId,
 }: UseProductEditModeProps) {
   const router = useRouter();
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (productId && isLoggedIn && isAdmin) {
+    if (productId) {
       const loadProduct = async () => {
         try {
           setLoadingProduct(true);
@@ -232,7 +230,8 @@ export function useProductEditMode({
             setProductType('simple');
 
             if (hasVariants && variants.length > 0) {
-              const firstVariant = variants[0] as any;
+              const firstVariant = variants[0] as { id?: string; price?: number | string; compareAtPrice?: number | string; sku?: string; stock?: number | string };
+              setSimpleProductDatabaseVariantId(firstVariant.id);
               setSimpleProductData({
                 price: firstVariant.price
                   ? String(
@@ -260,6 +259,7 @@ export function useProductEditMode({
                 quantity: String(firstVariant.stock || 0),
               });
             } else {
+              setSimpleProductDatabaseVariantId(undefined);
               setSimpleProductData({
                 price: '',
                 compareAtPrice: '',
@@ -285,8 +285,6 @@ export function useProductEditMode({
     }
   }, [
     productId,
-    isLoggedIn,
-    isAdmin,
     router,
     attributes,
     defaultCurrency,
@@ -299,6 +297,7 @@ export function useProductEditMode({
     setHasVariantsToLoad,
     setProductType,
     setSimpleProductData,
+    setSimpleProductDatabaseVariantId,
     t,
   ]);
 }

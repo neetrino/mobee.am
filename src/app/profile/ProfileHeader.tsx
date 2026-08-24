@@ -1,10 +1,16 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import type { CSSProperties } from 'react';
 import { UserAvatar } from '../../components/UserAvatar';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { ProfileDeleteAccount } from './ProfileDeleteAccount';
 import { ProfileMenuNav } from './ProfileMenuNav';
+import {
+  PROFILE_SIDEBAR_BOTTOM_OFFSET_CSS,
+  PROFILE_SIDEBAR_STICKY_CLASS,
+  PROFILE_SIDEBAR_TOP_OFFSET_CSS,
+} from './profileUi.constants';
 import type { UserProfile, ProfileTab, ProfileTabConfig } from './types';
 
 interface ProfileHeaderProps {
@@ -34,8 +40,16 @@ export function ProfileHeader({
     router.push('/');
   };
 
+  const sidebarStickyStyle = {
+    ['--profile-sidebar-top-offset']: PROFILE_SIDEBAR_TOP_OFFSET_CSS,
+    ['--profile-sidebar-bottom-offset']: PROFILE_SIDEBAR_BOTTOM_OFFSET_CSS,
+  } as CSSProperties;
+
   return (
-    <div className="flex w-full flex-shrink-0 flex-col lg:sticky lg:top-8 lg:w-max lg:min-w-80 lg:max-w-2xl lg:self-start">
+    <div
+      className={`flex w-full flex-shrink-0 flex-col lg:w-max lg:min-w-80 lg:max-w-2xl ${PROFILE_SIDEBAR_STICKY_CLASS}`}
+      style={sidebarStickyStyle}
+    >
       {/* Mobile — карточки, меню-список, выход */}
       <div className="flex w-full flex-col gap-3 lg:hidden">
         <div className="w-full rounded-[15px] border border-admin-100 bg-white p-4 shadow-sm">
@@ -44,7 +58,6 @@ export function ProfileHeader({
               firstName={profile?.firstName}
               lastName={profile?.lastName}
               size="lg"
-              className="flex-shrink-0"
             />
             <div className="min-w-0 flex-1 break-words">
               <h1 className="mb-1 break-words text-lg font-bold text-gray-900">
@@ -95,7 +108,6 @@ export function ProfileHeader({
               firstName={profile?.firstName}
               lastName={profile?.lastName}
               size="lg"
-              className="flex-shrink-0"
             />
             <div className="min-w-0 flex-1 break-words">
               <h1 className="mb-1 break-words text-lg font-bold text-gray-900">

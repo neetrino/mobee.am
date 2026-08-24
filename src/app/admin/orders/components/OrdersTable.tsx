@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
+import { AdminTableSkeleton } from '../../components/AdminTableSkeleton';
 import { Card } from '@/app/admin/lib/adminShopUi';
 import { CurrencyCode } from '../../../../lib/currency';
 import { OrderRow } from './OrderRow';
@@ -50,11 +51,8 @@ export function OrdersTable({
 
   if (loading) {
     return (
-      <Card className="p-6">
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.orders.loadingOrders')}</p>
-        </div>
+      <Card className="p-3 sm:p-4 lg:p-5">
+        <AdminTableSkeleton rows={10} columns={7} />
       </Card>
     );
   }
@@ -169,10 +167,10 @@ export function OrdersTable({
                 selected={selectedIds.has(order.id)}
                 updatingStatus={updatingStatuses.has(order.id)}
                 updatingPaymentStatus={updatingPaymentStatuses.has(order.id)}
-                onToggleSelect={() => onToggleSelect(order.id)}
-                onViewDetails={() => onViewDetails(order.id)}
-                onStatusChange={(newStatus) => onStatusChange(order.id, newStatus)}
-                onPaymentStatusChange={(newPaymentStatus) => onPaymentStatusChange(order.id, newPaymentStatus)}
+                onToggleSelect={onToggleSelect}
+                onViewDetails={onViewDetails}
+                onStatusChange={onStatusChange}
+                onPaymentStatusChange={onPaymentStatusChange}
                 formatCurrency={formatCurrency}
               />
             ))}

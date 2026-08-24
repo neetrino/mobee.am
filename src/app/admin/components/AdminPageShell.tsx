@@ -1,12 +1,15 @@
 'use client';
 
 import type { ReactNode, SetStateAction } from 'react';
-import { useCallback, useLayoutEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
+import { useAdminNav } from './AdminNavProvider';
 import {
   ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS,
   ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS,
   ADMIN_PAGE_MAIN_EXPANDED_SHIFT_LEFT_CLASS,
+  ADMIN_PAGE_MAIN_LAYOUT_TRANSITION_CLASS,
 } from '../admin-sidebar-layout.constants';
 import {
   readAdminSidebarDesktopCollapsedFromSession,
@@ -16,20 +19,24 @@ import { AdminSidebar } from './AdminSidebar';
 
 interface AdminPageShellProps {
   currentPath: string;
-  router: ReturnType<typeof useRouter>;
+  router: AppRouterInstance;
   t: ReturnType<typeof import('../../../lib/i18n-client').useTranslation>['t'];
   children: ReactNode;
   mainClassName?: string;
 }
 
 export function AdminPageShell({
-  currentPath,
+  currentPath: _currentPath,
   router,
   t,
   children,
   mainClassName,
 }: AdminPageShellProps) {
+  const { effectivePath } = useAdminNav();
+  const currentPath = effectivePath;
   const [desktopSidebarCollapsed, setDesktopSidebarCollapsedState] = useState(false);
+
+  useEffect(() => adminNavMarkMount('AdminPageShell'), []);
 
   useLayoutEffect(() => {
     setDesktopSidebarCollapsedState(readAdminSidebarDesktopCollapsedFromSession());
@@ -60,7 +67,7 @@ export function AdminPageShell({
           onDesktopCollapsedChange={setDesktopSidebarCollapsed}
         />
         <div
-          className={`flex-1 min-w-0 w-full mx-auto ${ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS} ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
+          className={`flex-1 min-w-0 w-full mx-auto ${ADMIN_PAGE_MAIN_BOTTOM_PADDING_CLASS} ${ADMIN_PAGE_MAIN_LAYOUT_TRANSITION_CLASS} ${mainHorizontalPaddingClass} ${mainExpandedShiftClass} ${
             desktopSidebarCollapsed ? '' : (mainClassName ?? '')
           }`.trim()}
         >

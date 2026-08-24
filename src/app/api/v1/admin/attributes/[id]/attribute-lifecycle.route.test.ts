@@ -1,17 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PATCH as patchTranslations } from "./translations/route";
 import { POST as createValue } from "./values/route";
 import {
   DELETE as deleteValue,
   PATCH as patchValue,
 } from "./values/[valueId]/route";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 
-vi.mock("@/lib/middleware/auth", () => ({
-  authenticateToken: vi.fn(),
-  requireAdmin: vi.fn(),
+vi.mock("@/lib/middleware/admin-api-auth", () => ({
+  requireAdminApiContext: vi.fn(),
 }));
 
 vi.mock("@/lib/services/admin.service", () => ({
@@ -26,19 +25,25 @@ vi.mock("@/lib/services/admin.service", () => ({
 describe("admin attribute lifecycle routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(authenticateToken).mockResolvedValue({
-      id: "admin-1",
-      role: "admin",
-    } as never);
-    vi.mocked(requireAdmin).mockReturnValue(true);
+    vi.mocked(requireAdminApiContext).mockResolvedValue({
+      userId: "admin-1",
+      roles: ["admin"],
+      source: "fallback-auth",
+    });
   });
 
   it("returns 403 for non-admin access", async () => {
-    vi.mocked(authenticateToken).mockResolvedValue({
-      id: "user-1",
-      role: "customer",
-    } as never);
-    vi.mocked(requireAdmin).mockReturnValue(false);
+    vi.mocked(requireAdminApiContext).mockResolvedValue(
+      NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/forbidden",
+          title: "Forbidden",
+          status: 403,
+          detail: "Admin access required",
+        },
+        { status: 403 },
+      ),
+    );
 
     const req = new NextRequest("http://localhost:3000/api/v1/admin/attributes/attr-1/values", {
       method: "POST",

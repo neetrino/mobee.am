@@ -1,5 +1,6 @@
 import { extractCategoryImageUrl } from './categoryMedia';
 import type { CategoryTreeNode } from './category-nav';
+import { isHouseholdAppliancesStripCategory } from './homeCategoryStripMobileOrder';
 import {
   ACCESSORIES_SLUG_PARTS,
   COMPUTERS_SLUG_PARTS,
@@ -95,7 +96,7 @@ export const CATEGORY_STRIP_VISUALS: Record<CategoryStripSlotKey, CategoryStripV
     tall: false,
     imageWrapperClassName:
       'absolute left-[20px] top-[9px] flex size-[154px] items-center justify-center',
-    imageClassName: 'object-cover',
+    imageClassName: 'object-contain',
   },
   headphones: {
     imageWidth: 146,
@@ -196,6 +197,8 @@ export function resolveCategoryStripImageForItem(
   media: unknown,
   slotKey: CategoryStripSlotKey,
 ): string {
+  // Always prefer the CMS/admin category image so home strip matches /supersudo/categories.
+  // Slot fallbacks (including curated watches PNG) are only used when media is missing.
   const fromMedia = extractCategoryImageUrl(media);
   if (fromMedia) {
     return fromMedia;
@@ -206,6 +209,21 @@ export function resolveCategoryStripImageForItem(
 
 export function getCategoryStripVisual(slotKey: CategoryStripSlotKey): CategoryStripVisual {
   return CATEGORY_STRIP_VISUALS[slotKey];
+}
+
+export function getCategoryStripTitleTranslateClass(
+  category: CategoryTreeNode,
+  slotKey: CategoryStripSlotKey,
+): string {
+  if (isHouseholdAppliancesStripCategory(category)) {
+    return '-translate-y-[3px]';
+  }
+
+  if (slotKey === 'accessories') {
+    return '-translate-y-[6px]';
+  }
+
+  return '-translate-y-[8px]';
 }
 
 export function categoryStripHref(category: CategoryTreeNode): string {

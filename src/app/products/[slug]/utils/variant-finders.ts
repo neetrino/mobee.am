@@ -23,7 +23,7 @@ export function findVariantByColorAndSize(
   // IMPORTANT: Use variantHasColor to check ALL color options, not just the first one
   if (normalizedColor && normalizedSize) {
     const variant = product.variants.find((v) => {
-      const hasColor = variantHasColor(v, normalizedColor);
+      const hasColor = variantHasColor(v, normalizedColor, product);
       const vSize = getOptionValue(v.options, 'size');
       return hasColor && vSize === normalizedSize;
     });
@@ -32,10 +32,8 @@ export function findVariantByColorAndSize(
 
   // 2. If color selected but no exact match with size, find any variant of this color
   if (normalizedColor) {
-    // Prefer in-stock variant of this color
-    // IMPORTANT: Use variantHasColor to check ALL color options
     const colorVariants = product.variants.filter((v) =>
-      variantHasColor(v, normalizedColor)
+      variantHasColor(v, normalizedColor, product)
     );
 
     if (colorVariants.length > 0) {
@@ -93,7 +91,7 @@ export function findVariantByAllAttributes(
   const variantMatches = (variant: ProductVariant): boolean => {
     // Check color - IMPORTANT: Use variantHasColor to check ALL color options
     if (normalizedColor) {
-      if (!variantHasColor(variant, normalizedColor)) return false;
+      if (!variantHasColor(variant, normalizedColor, product)) return false;
     }
 
     // Check size
@@ -149,6 +147,73 @@ export function findVariantByAllAttributes(
     return anyMatch;
   }
 
+  return findVariantByAllAttributesFallback(
+    product,
+    normalizedColor || null,
+    normalizedSize || null,
+  );
+}
+
+/**
+ * Find variant only when all provided attribute values match exactly.
+ * Does not fall back to partial matches or the first variant.
+ */
+export function findVariantByAllAttributesStrict(
+  product: Product | null,
+  color: string | null,
+  size: string | null,
+  otherAttributes: Map<string, string>,
+): ProductVariant | null {
+  if (!product?.variants || product.variants.length === 0) return null;
+
+  const normalizedColor = color?.toLowerCase().trim();
+  const normalizedSize = size?.toLowerCase().trim();
+
+  const variantMatches = (variant: ProductVariant): boolean => {
+    if (normalizedColor && !variantHasColor(variant, normalizedColor, product)) {
+      return false;
+    }
+
+    if (normalizedSize) {
+      const vSize = getOptionValue(variant.options, 'size');
+      if (vSize !== normalizedSize) return false;
+    }
+
+    for (const [attrKey, attrValue] of otherAttributes.entries()) {
+      if (attrKey === 'color' || attrKey === 'size') continue;
+
+      const variantValue = getOptionValue(variant.options, attrKey);
+      const normalizedAttrValue = attrValue.toLowerCase().trim();
+      const option = variant.options?.find(
+        (opt) => opt.key === attrKey || opt.attribute === attrKey,
+      );
+
+      if (!option) return false;
+
+      if (option.valueId && attrValue && option.valueId === attrValue) {
+        continue;
+      }
+
+      if (variantValue !== normalizedAttrValue) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  return (
+    product.variants.find((variant) => variantMatches(variant) && variant.imageUrl) ??
+    product.variants.find((variant) => variantMatches(variant)) ??
+    null
+  );
+}
+
+function findVariantByAllAttributesFallback(
+  product: Product,
+  normalizedColor: string | null,
+  normalizedSize: string | null,
+): ProductVariant | null {
   // 3. Fallback: find by color and size only
   if (normalizedColor || normalizedSize) {
     return findVariantByColorAndSize(

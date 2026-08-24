@@ -1,5 +1,6 @@
 {
   "filters": {
+    "clearSection": "Очистить",
     "sidebar": {
       "title": "Фильтр",
       "subtitle": "Find what fits you best"
@@ -7,7 +8,8 @@
     "price": {
       "title": "Фильтр по цене",
       "sectionTitle": "Цена",
-      "priceLabel": "Цена:"
+      "priceLabel": "Цена:",
+      "loading": "Загрузка..."
     },
     "category": {
       "title": "Категории"
@@ -70,5 +72,10 @@
     },
     "scrollLeft": "Прокрутить категории влево",
     "scrollRight": "Прокрутить категории вправо"
+  },
+  "warranty": {
+    "years_suffix": "ГОДА",
+    "label": "ГАРАНТИЯ",
+    "badge_aria": "Гарантия {years} года"
   }
 }

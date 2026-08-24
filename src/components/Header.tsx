@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
-import type { CSSProperties, FormEvent } from 'react';
+import type { AnimationEvent, FormEvent } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { getStoredCurrency, setStoredCurrency, type CurrencyCode, CURRENCIES, initializeCurrencyRates, clearCurrencyRatesCache } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
-import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
+import { getStoredLanguage } from '../lib/language';
 import { useInstantSearch } from './hooks/useInstantSearch';
 import { useHeaderRoutePrefetch, prefetchHeaderHref } from './hooks/useHeaderRoutePrefetch';
 import { SearchDropdown } from './SearchDropdown';
@@ -21,37 +23,32 @@ import { HEADER_FIGMA_ASSETS } from './header-figma-assets';
 import {
   HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
   HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE,
-  getDockedBarTopMotionStyle,
   HEADER_STRIP_MIN_HEIGHT_LG,
   HEADER_DESKTOP_BRAND_LOGO_HEIGHT_CLASS,
   HEADER_STRIP_PADDING_Y,
-  MOBILE_PRIMARY_MENU_BAR_CLASS,
-  MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS,
-  MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS,
-  MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS,
-  MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
-  MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS,
   SITE_CONTENT_GUTTERS_CLASS,
 } from './header-strip-layout';
 import { SiteBrandLogo } from './SiteBrandLogo';
-import { CompareIcon } from './icons/CompareIcon';
-import { HeaderSecondaryBar } from './HeaderSecondaryBar';
-import { HEADER_NAV_COUNT_INLINE_BADGE_CLASS } from './header-nav-count-badge.constants';
+import { MobileHeaderToolbar } from './MobileHeaderToolbar';
+import {
+  HeaderSecondaryBar,
+} from './HeaderSecondaryBar';
 import { useCategoriesTree } from './CategoriesTreeContext';
+import { CategoriesMenuFlyout } from './CategoriesMenuFlyout';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../lib/layout-breakpoints.constants';
 import {
-  MOBILE_DRAWER_NAV_BUTTON_CLASS,
-  MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS,
-  MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS,
+  MOBILE_DRAWER_SHELL_ROOT_CLASS,
+  MOBILE_HEADER_DROPDOWN_TRANSITION_MS,
 } from './mobile-drawer-nav.constants';
 import { phoneDisplayToTelHref, splitContactPhoneDisplay } from '../lib/contactPhoneDisplay';
+import { MobileHeaderDropdown } from './MobileHeaderDropdown';
 
-/** Desktop navbar strip only; drawer + contact + footer keep `contact.phone` i18n. */
+/** Desktop navbar strip only; contact + footer keep `contact.phone` i18n. */
 const NAVBAR_SUPPORT_PHONE_DISPLAY = '055-81-11-81';
 
-/** Handset glyph — horizontal nudge next to numbers (navbar + mobile drawer). */
+/** Handset glyph — horizontal nudge next to numbers (navbar). */
 const HEADER_SUPPORT_PHONE_ICON_OFFSET_CLASS = 'translate-x-[2px]';
-/** Phone digits — slight right nudge relative to icon (navbar + mobile drawer). */
+/** Phone digits — slight right nudge relative to icon (navbar). */
 const HEADER_SUPPORT_PHONE_NUMBER_OFFSET_CLASS = 'translate-x-[3px]';
 
 /** Any scroll-up past this delta shows the primary strip while search/secondary is docked. */
@@ -59,23 +56,7 @@ const PRIMARY_STRIP_SCROLL_UP_REVEAL_THRESHOLD_PX = 2;
 /** Any scroll-down past this delta hides the peeking primary strip again. */
 const PRIMARY_STRIP_SCROLL_DOWN_HIDE_THRESHOLD_PX = 2;
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['500', '600', '800', '900'],
-  display: 'swap',
-});
-
-/** Right padding on pill so input clears the submit control (half-width overlap). */
-const MOBILE_HOME_SEARCH_PILL_RIGHT_PAD_CLASS = 'pr-28';
-/** Same height as pill (h-11); right edge flush with pill (absolute in wrapper). */
-const MOBILE_HOME_SEARCH_SUBMIT_CLASS =
-  'absolute right-0 top-1/2 z-10 flex h-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#2DB2FF] px-4 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-95 active:opacity-90';
-
-// Navigation links will be translated dynamically using useTranslation hook
-const primaryNavLinks = [
-  { href: '/about', translationKey: 'common.navigation.about' },
-  { href: '/contact', translationKey: 'common.navigation.contact' },
-];
+const montserrat = siteMontserrat;
 
 interface Category {
   id: string;
@@ -85,77 +66,12 @@ interface Category {
   children: Category[];
 }
 
-const CATEGORY_MEGA_MENU_MAX_COLUMNS = 4;
-const CATEGORY_MEGA_MENU_MIN_COLUMN_WIDTH_PX = 150;
-
-// Icon Components
 const SearchIcon = () => (
   <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
     <path d="M15.5 15.5L19 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 );
-
-/** Globe stroke in 24×24 viewBox at 22px render: 2 * (24/22). */
-const MOBILE_GLOBE_STROKE_USER_UNITS = (2 * 24) / 22;
-
-/** Globe for mobile primary strip language control (inherits text color for strokes). */
-const GlobeLanguageIcon = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="shrink-0 text-black"
-    aria-hidden
-  >
-    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS} />
-    <path
-      d="M2 12h20"
-      stroke="currentColor"
-      strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS}
-      strokeLinecap="round"
-    />
-    <path
-      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-      stroke="currentColor"
-      strokeWidth={MOBILE_GLOBE_STROKE_USER_UNITS}
-    />
-  </svg>
-);
-
-const MOBILE_PRIMARY_LANG_PILL_CODES: LanguageCode[] = ['hy', 'en', 'ru'];
-
-const mobilePrimaryLangButtonClassName =
-  'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-black shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400';
-
-/** Mobile locale flyout — white card (no outer gray frame). */
-const MOBILE_LOCALE_MENU_PANEL_CLASS =
-  'absolute right-0 top-full z-[60] mt-2 w-[min(calc(100vw-2rem),8rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white py-0 shadow-xl ring-1 ring-black/5';
-
-const MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS =
-  'border-b border-gray-100 bg-gray-50/80 px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500';
-
-const MOBILE_LOCALE_MENU_ROW_LANG =
-  'w-full px-3 py-2.5 text-center text-sm transition-colors duration-150';
-
-const MOBILE_LOCALE_MENU_ROW_CURRENCY =
-  'flex w-full items-center justify-center gap-2 px-3 py-2.5 text-sm transition-colors duration-150';
-
-function mobileLocaleMenuLangRowClass(active: boolean): string {
-  if (active) {
-    return `${MOBILE_LOCALE_MENU_ROW_LANG} bg-admin-50 font-semibold text-admin-800`;
-  }
-  return `${MOBILE_LOCALE_MENU_ROW_LANG} font-normal text-gray-800 hover:bg-admin-50/40`;
-}
-
-function mobileLocaleMenuCurrencyRowClass(active: boolean): string {
-  if (active) {
-    return `${MOBILE_LOCALE_MENU_ROW_CURRENCY} bg-admin-50 font-semibold text-admin-800`;
-  }
-  return `${MOBILE_LOCALE_MENU_ROW_CURRENCY} font-normal text-gray-800 hover:bg-admin-50/40`;
-}
 
 /**
  * Component that syncs search params with state
@@ -202,77 +118,6 @@ function HeaderSearchSync({
   }, [searchParams, categories, setSearchQuery, setSelectedCategory]);
 
   return null;
-}
-
-/** Root categories mega menu (desktop secondary bar). */
-function CategoriesMenuFlyout({
-  loading,
-  roots,
-  onItemNavigate,
-  loadingLabel,
-  onLinkHover,
-}: {
-  loading: boolean;
-  roots: Category[];
-  onItemNavigate: () => void;
-  loadingLabel: string;
-  onLinkHover: (href: string) => void;
-}) {
-  const columnCount = Math.min(roots.length, CATEGORY_MEGA_MENU_MAX_COLUMNS);
-
-  return (
-    <>
-      <div className="absolute left-0 top-full z-[55] h-2 w-full" aria-hidden />
-      <div className="absolute left-0 top-full z-[55] pt-2">
-        <div className="max-h-[min(24rem,calc(100vh-6rem))] w-max max-w-[min(calc(100vw-2rem),44rem)] overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-2xl">
-          {loading ? (
-            <div className="px-4 py-2 text-sm text-gray-500">{loadingLabel}</div>
-          ) : (
-            <div className="overflow-y-auto overscroll-y-contain p-6 [scrollbar-gutter:stable]">
-              <div
-                className="grid gap-6"
-                style={{
-                  gridTemplateColumns: `repeat(${columnCount}, minmax(${CATEGORY_MEGA_MENU_MIN_COLUMN_WIDTH_PX}px, 1fr))`,
-                }}
-              >
-                {roots.map((category) => (
-                  <div key={category.id} className="flex flex-col">
-                    <div className="mb-4 border-b border-gray-200 pb-2">
-                      <Link
-                        href={`/shop?category=${category.slug}`}
-                        className="text-sm font-bold uppercase tracking-wide text-gray-900 hover:text-gray-700"
-                        prefetch
-                        onMouseEnter={() => onLinkHover(`/shop?category=${category.slug}`)}
-                        onClick={onItemNavigate}
-                      >
-                        {category.title}
-                      </Link>
-                    </div>
-                    {category.children.length > 0 ? (
-                      <div className="space-y-2.5">
-                        {category.children.map((subCategory) => (
-                          <Link
-                            key={subCategory.id}
-                            href={`/shop?category=${subCategory.slug}`}
-                            className="block py-1 text-sm text-gray-700 transition-colors duration-150 hover:text-gray-900"
-                            prefetch
-                            onMouseEnter={() => onLinkHover(`/shop?category=${subCategory.slug}`)}
-                            onClick={onItemNavigate}
-                          >
-                            {subCategory.title}
-                          </Link>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </>
-  );
 }
 
 /** Figma mobee-new — support phone (icon node 178:537) + optional language pill */
@@ -324,44 +169,6 @@ function HeaderPhoneLangCluster({
   );
 }
 
-/** Support numbers in mobile drawer — one tappable row per line from `contact.phone`, each with its own handset icon. */
-function MobileDrawerSupportPhoneButtons() {
-  const { t } = useTranslation();
-  const phoneLines = splitContactPhoneDisplay(t('contact.phone'));
-
-  return (
-    <>
-      {phoneLines.map((line) => (
-        <a
-          key={line}
-          href={phoneDisplayToTelHref(line)}
-          className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case text-gray-800`}
-          aria-label={`${t('common.header.supportPhoneAria')}: ${line}`}
-        >
-          <span className="flex min-w-0 flex-1 items-center gap-2">
-            <span className={`relative size-6 shrink-0 ${HEADER_SUPPORT_PHONE_ICON_OFFSET_CLASS}`}>
-              <img
-                src={HEADER_FIGMA_ASSETS.phoneIcon}
-                alt=""
-                width={24}
-                height={24}
-                className="absolute inset-0 block size-6 max-w-none"
-                decoding="async"
-                loading="lazy"
-              />
-            </span>
-            <span
-              className={`min-w-0 text-sm font-semibold tabular-nums text-[#374151] ${HEADER_SUPPORT_PHONE_NUMBER_OFFSET_CLASS}`}
-            >
-              {line}
-            </span>
-          </span>
-        </a>
-      ))}
-    </>
-  );
-}
-
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
@@ -375,13 +182,17 @@ export function Header() {
   const showSearchModalRef = useRef(false);
   showSearchModalRef.current = showSearchModal;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuExiting, setMobileMenuExiting] = useState(false);
+  const [isOverlayPortalReady, setIsOverlayPortalReady] = useState(false);
   const [showCategoriesPillMenu, setShowCategoriesPillMenu] = useState(false);
+  const [categoriesMenuEntered, setCategoriesMenuEntered] = useState(false);
   const [showMobilePrimaryLangMenu, setShowMobilePrimaryLangMenu] = useState(false);
+  const [mobileLocaleMenuExiting, setMobileLocaleMenuExiting] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('AMD');
   const { categories, loadingCategories } = useCategoriesTree();
   const [, setSelectedCategory] = useState<Category | null>(null);
 
-  useHeaderRoutePrefetch(router, { boostKey: mobileMenuOpen || showCategoriesPillMenu });
+  useHeaderRoutePrefetch(router, { boostKey: mobileMenuOpen || mobileMenuExiting || showCategoriesPillMenu });
 
   const prefetchNavHref = useCallback(
     (href: string) => prefetchHeaderHref(router, href),
@@ -407,11 +218,8 @@ export function Header() {
   const searchDropdownOpenRef = useRef(false);
   const mobileHomeSearchFormRef = useRef<HTMLFormElement>(null);
   const mobileHomeSearchInputRef = useRef<HTMLInputElement>(null);
-  const mobileStrip1WrapRef = useRef<HTMLDivElement>(null);
-  const mobileStrip1Ref = useRef<HTMLDivElement>(null);
   const desktopPrimaryWrapRef = useRef<HTMLDivElement>(null);
   const desktopPrimaryRowRef = useRef<HTMLDivElement>(null);
-  const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
   const categoriesPillWrapRef = useRef<HTMLDivElement>(null);
   const mobilePrimaryLangRef = useRef<HTMLDivElement>(null);
   const primaryStripRef = useRef<HTMLElement | null>(null);
@@ -420,16 +228,10 @@ export function Header() {
   const searchQueryForDockRef = useRef('');
   const [secondaryDocked, setSecondaryDocked] = useState(false);
   const [secondaryBarHeightPx, setSecondaryBarHeightPx] = useState(0);
-  const [mobileSearchDocked, setMobileSearchDocked] = useState(false);
-  const [mobileSearchFlowSpacerPx, setMobileSearchFlowSpacerPx] = useState(0);
   const [primaryBarPeekFromScrollUp, setPrimaryBarPeekFromScrollUp] = useState(false);
-  const [mobileStrip1HeightPx, setMobileStrip1HeightPx] = useState(0);
   const [desktopPrimaryBarHeightPx, setDesktopPrimaryBarHeightPx] = useState(0);
   const lastScrollYRef = useRef(0);
-  const prevMobileSearchDockedRef = useRef<boolean | null>(null);
-  const [mobileStripPeekSlideIn, setMobileStripPeekSlideIn] = useState(false);
   const [desktopPrimaryPeekSlideIn, setDesktopPrimaryPeekSlideIn] = useState(false);
-  const [headerLayoutReady, setHeaderLayoutReady] = useState(false);
 
   const syncSecondaryDock = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -457,45 +259,12 @@ export function Header() {
     setSecondaryDocked(primaryScrolledPast && !blockDockForSearchUi);
   }, []);
 
-  const syncMobileSearchDock = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    if (window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY).matches) {
-      setMobileSearchDocked(false);
-      setMobileSearchFlowSpacerPx(0);
-      return;
-    }
-    const strip1Wrap = mobileStrip1WrapRef.current;
-    const searchWrap = mobileSearchWrapRef.current;
-    if (searchWrap) {
-      const h = Math.round(searchWrap.getBoundingClientRect().height);
-      if (h > 0) {
-        setMobileSearchFlowSpacerPx(h);
-      }
-    }
-    if (!strip1Wrap) {
-      return;
-    }
-    const stripScrolledPast = strip1Wrap.getBoundingClientRect().bottom <= 0;
-    const blockDockForSearchUi =
-      searchQueryForDockRef.current.trim().length > 0 || searchDropdownOpenRef.current;
-    setMobileSearchDocked(stripScrolledPast && !blockDockForSearchUi);
-  }, []);
-
   useLayoutEffect(() => {
-    const stripInner = mobileStrip1Ref.current;
     const desktopInner = desktopPrimaryRowRef.current;
     if (typeof ResizeObserver === 'undefined') {
       return;
     }
     const measure = () => {
-      if (stripInner) {
-        const h = Math.round(stripInner.getBoundingClientRect().height);
-        if (h > 0) {
-          setMobileStrip1HeightPx(h);
-        }
-      }
       if (desktopInner) {
         const h = Math.round(desktopInner.getBoundingClientRect().height);
         if (h > 0) {
@@ -505,9 +274,6 @@ export function Header() {
     };
     measure();
     const ro = new ResizeObserver(measure);
-    if (stripInner) {
-      ro.observe(stripInner);
-    }
     if (desktopInner) {
       ro.observe(desktopInner);
     }
@@ -530,34 +296,6 @@ export function Header() {
       ro.disconnect();
     };
   }, [syncSecondaryDock]);
-
-  useLayoutEffect(() => {
-    syncMobileSearchDock();
-    const searchWrap = mobileSearchWrapRef.current;
-    if (typeof ResizeObserver === 'undefined' || !searchWrap) {
-      setHeaderLayoutReady(true);
-      return;
-    }
-    const ro = new ResizeObserver(() => {
-      syncMobileSearchDock();
-    });
-    ro.observe(searchWrap);
-    setHeaderLayoutReady(true);
-    return () => {
-      ro.disconnect();
-    };
-  }, [syncMobileSearchDock]);
-
-  /**
-   * When the mobile search bar returns to the normal flow (no longer docked), drop peek state so a
-   * later dock does not reopen the strip without an intentional scroll-up gesture.
-   */
-  useEffect(() => {
-    if (prevMobileSearchDockedRef.current === true && mobileSearchDocked === false) {
-      setPrimaryBarPeekFromScrollUp(false);
-    }
-    prevMobileSearchDockedRef.current = mobileSearchDocked;
-  }, [mobileSearchDocked]);
 
   useEffect(() => {
     lastScrollYRef.current = window.scrollY;
@@ -583,7 +321,6 @@ export function Header() {
         setSearchDropdownOpen(false);
       }
       syncSecondaryDock();
-      syncMobileSearchDock();
       if (isDesktopLayout) {
         const primaryEl = primaryStripRef.current;
         if (primaryEl && primaryEl.getBoundingClientRect().bottom > 0) {
@@ -593,16 +330,13 @@ export function Header() {
     };
     const onResize = () => {
       syncSecondaryDock();
-      syncMobileSearchDock();
     };
     syncSecondaryDock();
-    syncMobileSearchDock();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
     const mq = window.matchMedia(LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY);
     const onMq = () => {
       syncSecondaryDock();
-      syncMobileSearchDock();
     };
     mq.addEventListener('change', onMq);
     return () => {
@@ -610,33 +344,75 @@ export function Header() {
       window.removeEventListener('resize', onResize);
       mq.removeEventListener('change', onMq);
     };
-  }, [syncSecondaryDock, syncMobileSearchDock]);
+  }, [syncSecondaryDock]);
 
   useEffect(() => {
     setPrimaryBarPeekFromScrollUp(false);
     lastScrollYRef.current = typeof window !== 'undefined' ? window.scrollY : 0;
   }, [pathname]);
 
-  const mobileStripPeekActive = mobileSearchDocked && primaryBarPeekFromScrollUp;
   const desktopPrimaryPeekActive = secondaryDocked && primaryBarPeekFromScrollUp;
 
-  useEffect(() => {
-    if (!mobileStripPeekActive) {
-      setMobileStripPeekSlideIn(false);
+  const closeMobileLocaleMenu = useCallback(() => {
+    setShowMobilePrimaryLangMenu((open) => {
+      if (open) {
+        setMobileLocaleMenuExiting(true);
+      }
+      return false;
+    });
+  }, []);
+
+  const toggleMobileLocaleMenu = useCallback(() => {
+    if (mobileLocaleMenuExiting) {
       return;
     }
-    setMobileStripPeekSlideIn(false);
-    let innerId = 0;
-    const outerId = requestAnimationFrame(() => {
-      innerId = requestAnimationFrame(() => {
-        setMobileStripPeekSlideIn(true);
-      });
+    if (showMobilePrimaryLangMenu) {
+      closeMobileLocaleMenu();
+      return;
+    }
+    setMobileLocaleMenuExiting(false);
+    setShowMobilePrimaryLangMenu(true);
+  }, [mobileLocaleMenuExiting, showMobilePrimaryLangMenu, closeMobileLocaleMenu]);
+
+  const handleMobileLocaleMenuAnimationEnd = useCallback((event: AnimationEvent<HTMLDivElement>) => {
+    if (event.animationName.includes('fade-out')) {
+      setMobileLocaleMenuExiting(false);
+    }
+  }, []);
+
+  const mobileLocaleMenuVisible = showMobilePrimaryLangMenu || mobileLocaleMenuExiting;
+
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen((open) => {
+      if (open) {
+        setMobileMenuExiting(true);
+      }
+      return false;
     });
-    return () => {
-      cancelAnimationFrame(outerId);
-      cancelAnimationFrame(innerId);
-    };
-  }, [mobileStripPeekActive]);
+  }, []);
+
+  const openMobileMenu = useCallback(() => {
+    if (mobileMenuExiting) {
+      return;
+    }
+    setMobileMenuExiting(false);
+    setMobileMenuOpen(true);
+  }, [mobileMenuExiting]);
+
+  const handleMobileMenuPanelAnimationEnd = useCallback((event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+    if (event.animationName.includes('mobile-header-dropdown-out')) {
+      setMobileMenuExiting(false);
+    }
+  }, []);
+
+  const mobileMenuVisible = mobileMenuOpen || mobileMenuExiting;
+
+  useEffect(() => {
+    setIsOverlayPortalReady(true);
+  }, []);
 
   useEffect(() => {
     if (!desktopPrimaryPeekActive) {
@@ -679,8 +455,7 @@ export function Header() {
   useLayoutEffect(() => {
     searchQueryForDockRef.current = searchQuery;
     syncSecondaryDock();
-    syncMobileSearchDock();
-  }, [searchQuery, searchDropdownOpen, syncSecondaryDock, syncMobileSearchDock]);
+  }, [searchQuery, searchDropdownOpen, syncSecondaryDock]);
 
   const fetchCart = async () => {
     if (!isLoggedIn) {
@@ -766,12 +541,14 @@ export function Header() {
         setCartTotal((t) => t + (detail.optimisticAdd.price ?? 0) * (detail.optimisticAdd.quantity ?? 1));
         return;
       }
-      if (detail?.itemsCount !== undefined && detail?.total !== undefined) {
+      if (detail?.itemsCount !== undefined) {
         setCartCount(detail.itemsCount);
-        setCartTotal(detail.total);
+        if (detail?.total !== undefined) {
+          setCartTotal(detail.total);
+        }
         return;
       }
-      fetchCart();
+      void fetchCart();
     };
 
     window.addEventListener('wishlist-updated', handleWishlistUpdate);
@@ -840,7 +617,7 @@ export function Header() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (mobilePrimaryLangRef.current && !mobilePrimaryLangRef.current.contains(event.target as Node)) {
-        setShowMobilePrimaryLangMenu(false);
+        closeMobileLocaleMenu();
       }
       const clickTarget = event.target as Node;
       const inDesktopCategories = categoriesPillWrapRef.current?.contains(clickTarget);
@@ -880,15 +657,27 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    if (mobileMenuOpen || !mobileMenuExiting) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      setMobileMenuExiting(false);
+    }, MOBILE_HEADER_DROPDOWN_TRANSITION_MS);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [mobileMenuOpen, mobileMenuExiting]);
+
+  useEffect(() => {
     if (typeof document === 'undefined') {
       return;
     }
 
-    if (!mobileMenuOpen) {
+    if (!mobileMenuVisible) {
       return;
     }
     return acquireBodyScrollLock();
-  }, [mobileMenuOpen]);
+  }, [mobileMenuVisible]);
 
   // Focus search input when modal opens; sync dropdown with query. When modal is closed, do not
   // force-close the dropdown so the desktop secondary search bar can keep showing results.
@@ -923,11 +712,11 @@ export function Header() {
       }
 
       if (showMobilePrimaryLangMenu) {
-        setShowMobilePrimaryLangMenu(false);
+        closeMobileLocaleMenu();
       }
 
       if (mobileMenuOpen) {
-        setMobileMenuOpen(false);
+        closeMobileMenu();
       }
     };
 
@@ -935,7 +724,7 @@ export function Header() {
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [showSearchModal, mobileMenuOpen, showCategoriesPillMenu, showMobilePrimaryLangMenu]);
+  }, [showSearchModal, mobileMenuOpen, showCategoriesPillMenu, showMobilePrimaryLangMenu, closeMobileLocaleMenu, closeMobileMenu]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -970,21 +759,11 @@ export function Header() {
     window.dispatchEvent(new Event('currency-updated'));
   };
 
-  /** In-flow placeholder for the fixed search row only; peeking strip1 height is reserved on its wrap. */
-  const mobileDockedHeaderSpacerPx =
-    mobileSearchDocked && mobileSearchFlowSpacerPx > 0 ? mobileSearchFlowSpacerPx : 0;
-
-  const mobileSearchPeekTopPx =
-    mobileStripPeekActive && mobileStrip1HeightPx > 0 ? mobileStrip1HeightPx : 0;
-  const mobileDockedSearchTopStyle: CSSProperties | undefined = mobileSearchDocked
-    ? { top: mobileSearchPeekTopPx, ...getDockedBarTopMotionStyle(mobileSearchPeekTopPx) }
-    : undefined;
-
   return (
     <div className={`relative z-50 ${montserrat.className}`}>
     <header
       ref={primaryStripRef}
-      className="overflow-visible border-b border-gray-200 bg-white lg:border-b-0"
+      className="overflow-visible bg-white max-lg:border-b-0 lg:border-b-0"
     >
       <Suspense fallback={null}>
         <HeaderSearchSync
@@ -994,230 +773,45 @@ export function Header() {
         />
       </Suspense>
 
-      <div className={SITE_CONTENT_GUTTERS_CLASS}>
-        {/* Mobile — strip 1 scrolls away; strip 2 pins to viewport top once strip 1 has left */}
-        <div
-          ref={mobileStrip1WrapRef}
-          className="lg:hidden"
-          style={
-            mobileStripPeekActive && mobileStrip1HeightPx > 0
-              ? { height: mobileStrip1HeightPx }
-              : undefined
+      <MobileHeaderToolbar
+        t={t}
+        compareCount={compareCount}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchResults={searchResults}
+        searchLoading={searchLoading}
+        searchError={searchError}
+        searchDropdownOpen={searchDropdownOpen}
+        setSearchDropdownOpen={setSearchDropdownOpen}
+        searchSelectedIndex={searchSelectedIndex}
+        searchHandleKeyDown={searchHandleKeyDown}
+        handleSearch={handleSearch}
+        clearSearch={clearSearch}
+        routerPush={router.push}
+        showSearchModal={showSearchModal}
+        formRef={mobileHomeSearchFormRef}
+        inputRef={mobileHomeSearchInputRef}
+        localeContainerRef={mobilePrimaryLangRef}
+        localeMenuVisible={mobileLocaleMenuVisible}
+        localeMenuExiting={mobileLocaleMenuExiting}
+        selectedCurrency={selectedCurrency}
+        onToggleLocaleMenu={toggleMobileLocaleMenu}
+        onCloseLocaleMenu={closeMobileLocaleMenu}
+        onLocaleMenuAnimationEnd={handleMobileLocaleMenuAnimationEnd}
+        onCurrencyChange={handleCurrencyChange}
+        onOpenMenu={() => {
+          setShowCategoriesPillMenu(false);
+          closeMobileLocaleMenu();
+          if (mobileMenuOpen) {
+            closeMobileMenu();
+            return;
           }
-        >
-          <div
-            ref={mobileStrip1Ref}
-            className={`border-b border-gray-100 ${
-              mobileStripPeekActive
-                ? `fixed left-0 right-0 top-0 z-[45] border-b border-gray-200 bg-white shadow-sm will-change-transform motion-reduce:will-change-auto motion-reduce:transition-none ${SITE_CONTENT_GUTTERS_CLASS} ${
-                    mobileStripPeekSlideIn ? 'translate-y-0' : '-translate-y-full motion-reduce:translate-y-0'
-                  }`
-                : ''
-            }`}
-            style={
-              mobileStripPeekActive && headerLayoutReady
-                ? { ...HEADER_PRIMARY_PEEK_STRIP_MOTION_STYLE }
-                : undefined
-            }
-          >
-          <div className="relative flex items-center justify-between gap-3 py-2.5">
-            <div className="relative z-20 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowCategoriesPillMenu(false);
-                  setShowMobilePrimaryLangMenu(false);
-                  setMobileMenuOpen(true);
-                }}
-                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
-                aria-expanded={mobileMenuOpen}
-                aria-label={t('common.ariaLabels.openMenu')}
-              >
-                <span className={MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS} aria-hidden>
-                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
-                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
-                  <span className={MOBILE_PRIMARY_MENU_BAR_CLASS} />
-                </span>
-              </button>
-            </div>
-            {/* Figma 180:1419 mark + 178:529 wordmark — center cluster like desktop */}
-            <Link
-              href="/"
-              className="absolute left-1/2 top-1/2 z-10 flex max-w-[min(220px,48vw)] -translate-x-1/2 -translate-y-1/2 shrink-0 items-center justify-center transition-opacity active:opacity-90"
-              aria-label={t('common.navigation.home')}
-            >
-              <SiteBrandLogo
-                decorative
-                alt={t('common.ariaLabels.siteLogo')}
-                heightClass="h-8"
-                priority
-              />
-            </Link>
-            <div className="relative z-20 shrink-0" ref={mobilePrimaryLangRef}>
-              <button
-                type="button"
-                onClick={() => setShowMobilePrimaryLangMenu((open) => !open)}
-                className={mobilePrimaryLangButtonClassName}
-                aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
-                aria-expanded={showMobilePrimaryLangMenu}
-                aria-haspopup="dialog"
-                aria-controls="header-mobile-locale-menu"
-              >
-                <GlobeLanguageIcon />
-              </button>
-              {showMobilePrimaryLangMenu ? (
-                <div
-                  id="header-mobile-locale-menu"
-                  className={MOBILE_LOCALE_MENU_PANEL_CLASS}
-                  role="dialog"
-                  aria-label={t('common.ariaLabels.changeLanguageAndCurrency')}
-                >
-                  <div className={MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} id="header-mobile-locale-lang-heading">
-                    {t('common.localeMenu.languageSection')}
-                  </div>
-                  <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-lang-heading">
-                    {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
-                      const active = getStoredLanguage() === code;
-                      const label = LANGUAGES[code].nativeName;
-                      return (
-                        <button
-                          key={code}
-                          type="button"
-                          onClick={() => {
-                            setShowMobilePrimaryLangMenu(false);
-                            if (!active) setStoredLanguage(code);
-                          }}
-                          className={mobileLocaleMenuLangRowClass(active)}
-                        >
-                          {label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div
-                    className={`${MOBILE_LOCALE_MENU_SECTION_HEAD_CLASS} border-t border-gray-200`}
-                    id="header-mobile-locale-currency-heading"
-                  >
-                    {t('common.localeMenu.currencySection')}
-                  </div>
-                  <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-currency-heading">
-                    {Object.values(CURRENCIES).map((currency) => {
-                      const active = selectedCurrency === currency.code;
-                      return (
-                        <button
-                          key={currency.code}
-                          type="button"
-                          onClick={() => {
-                            setShowMobilePrimaryLangMenu(false);
-                            if (!active) handleCurrencyChange(currency.code);
-                          }}
-                          className={mobileLocaleMenuCurrencyRowClass(active)}
-                        >
-                          <span>{currency.code}</span>
-                          <span className={active ? 'text-admin-700' : 'text-gray-500'}>{currency.symbol}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-          </div>
-        </div>
+          openMobileMenu();
+        }}
+        mobileMenuOpen={mobileMenuOpen}
+      />
 
-        {headerLayoutReady && mobileDockedHeaderSpacerPx > 0 ? (
-          <div
-            aria-hidden
-            className="shrink-0 motion-reduce:transition-none lg:hidden"
-            style={{
-              height: mobileDockedHeaderSpacerPx,
-              ...HEADER_PRIMARY_PEEK_HEIGHT_MOTION_STYLE,
-            }}
-          />
-        ) : null}
-
-        <div
-          ref={mobileSearchWrapRef}
-          className={`border-b border-gray-100 bg-white py-2.5 shadow-sm lg:hidden ${
-            headerLayoutReady && mobileSearchDocked
-              ? 'fixed inset-x-0 z-40 border-b border-gray-200 motion-reduce:transition-none'
-              : ''
-          }`}
-          style={headerLayoutReady ? mobileDockedSearchTopStyle : undefined}
-        >
-          <div className={headerLayoutReady && mobileSearchDocked ? SITE_CONTENT_GUTTERS_CLASS : 'min-w-0 w-full'}>
-            <form
-              ref={mobileHomeSearchFormRef}
-              onSubmit={handleSearch}
-              className="relative min-w-0 w-full"
-              suppressHydrationWarning
-            >
-              <div className="relative w-full min-w-0">
-                <div
-                  className={`flex h-11 min-w-0 items-center gap-3 rounded-[64px] bg-[#f7f7f7] px-3 ${MOBILE_HOME_SEARCH_PILL_RIGHT_PAD_CLASS}`}
-                >
-                  <span className="inline-flex shrink-0 text-gray-500" aria-hidden>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <circle cx="11" cy="11" r="7" strokeWidth={2} />
-                      <path strokeLinecap="round" strokeWidth={2} d="M20 20l-4.3-4.3" />
-                    </svg>
-                  </span>
-                  <input
-                    ref={mobileHomeSearchInputRef}
-                    type="search"
-                    name="header-mobile-home-search"
-                    suppressHydrationWarning
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      if (e.target.value.trim().length >= 1) {
-                        setSearchDropdownOpen(true);
-                      } else {
-                        setSearchDropdownOpen(false);
-                      }
-                    }}
-                    onFocus={() => {
-                      if (searchQuery.trim().length >= 1) {
-                        setSearchDropdownOpen(true);
-                      }
-                    }}
-                    onKeyDown={searchHandleKeyDown}
-                    placeholder={t('common.mainHeader.searchPlaceholder')}
-                    autoComplete="off"
-                    className={`min-w-0 flex-1 bg-transparent ${MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS} text-gray-900 outline-none placeholder:text-[#6b7280]`}
-                    aria-controls="header-mobile-search-results"
-                    aria-expanded={searchDropdownOpen && searchResults.length > 0}
-                    aria-autocomplete="list"
-                  />
-                </div>
-                <button type="submit" className={MOBILE_HOME_SEARCH_SUBMIT_CLASS}>
-                  {t('common.buttons.search')}
-                </button>
-              </div>
-              {!showSearchModal ? (
-                <SearchDropdown
-                  listboxId="header-mobile-search-results"
-                  results={searchResults}
-                  loading={searchLoading}
-                  error={searchError}
-                  isOpen={searchDropdownOpen}
-                  selectedIndex={searchSelectedIndex}
-                  query={searchQuery}
-                  onResultClick={(result) => {
-                    router.push(`/products/${result.slug}`);
-                    clearSearch();
-                    setSearchDropdownOpen(false);
-                  }}
-                  onClose={() => setSearchDropdownOpen(false)}
-                  className="mt-1"
-                />
-              ) : null}
-            </form>
-          </div>
-        </div>
-
-        {/* Desktop — Figma spacing at 2xl; nav link gaps scale lg → xl (iPad Pro uses lg gap-4). */}
+      <div className={SITE_CONTENT_GUTTERS_CLASS}>
         <div
           ref={desktopPrimaryWrapRef}
           className="hidden motion-reduce:transition-none lg:block"
@@ -1305,19 +899,20 @@ export function Header() {
         categoriesWrapRef={categoriesPillWrapRef}
         categoriesLabel={t('common.navigation.categories')}
         isCategoriesMenuOpen={showCategoriesPillMenu}
+        categoriesChevronOpen={categoriesMenuEntered}
         onCategoriesButtonClick={() => {
           setShowCategoriesPillMenu((open) => !open);
         }}
         categoriesMenu={
-          showCategoriesPillMenu ? (
-            <CategoriesMenuFlyout
-              loading={loadingCategories}
-              roots={getRootCategories(categories)}
-              onItemNavigate={() => setShowCategoriesPillMenu(false)}
-              loadingLabel={t('common.messages.loading')}
-              onLinkHover={prefetchNavHref}
-            />
-          ) : null
+          <CategoriesMenuFlyout
+            open={showCategoriesPillMenu}
+            onEnteredChange={setCategoriesMenuEntered}
+            loading={loadingCategories}
+            roots={getRootCategories(categories)}
+            onItemNavigate={() => setShowCategoriesPillMenu(false)}
+            loadingLabel={t('common.messages.loading')}
+            onLinkHover={prefetchNavHref}
+          />
         }
         searchQuery={searchQuery}
         onSearchChange={(value) => {
@@ -1369,103 +964,41 @@ export function Header() {
         onLogout={logout}
       />
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-50 flex bg-black/40 lg:hidden"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div
-            className="flex h-full min-h-screen min-w-[17rem] w-[min(83vw,24rem)] max-w-full flex-col bg-white shadow-2xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
-              <Link
-                href="/"
-                onClick={() => setMobileMenuOpen(false)}
-                aria-label={t('common.navigation.home')}
-                className="flex min-w-0 max-w-[min(200px,70%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
-              >
-                <SiteBrandLogo decorative alt={t('common.ariaLabels.siteLogo')} heightClass="h-8" />
-              </Link>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_CLASS}
-                aria-label={t('common.ariaLabels.closeMenu')}
-              >
-                <span className={MOBILE_PRIMARY_MENU_CLOSE_ICON_WRAP_CLASS} aria-hidden>
-                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_POSITIVE_CLASS} />
-                  <span className={MOBILE_PRIMARY_MENU_CLOSE_BAR_DIAGONAL_NEGATIVE_CLASS} />
-                </span>
-              </button>
-            </div>
+      {/* Mobile Menu — portaled so chrome (FAB / sticky header) cannot stack above it */}
+      {isOverlayPortalReady && mobileMenuVisible
+        ? createPortal(
+            <div
+              className={`${MOBILE_DRAWER_SHELL_ROOT_CLASS} pointer-events-none`}
+              role="dialog"
+              aria-modal="true"
+            >
+              <MobileHeaderDropdown
+                pathname={pathname}
+                exiting={mobileMenuExiting}
+                aboutLabel={t('common.navigation.about')}
+                contactLabel={t('common.navigation.contact')}
+                policiesLabel={t('common.footer.policiesHeading')}
+                closeLabel={t('common.ariaLabels.closeMenu')}
+                onClose={closeMobileMenu}
+                onAnimationEnd={handleMobileMenuPanelAnimationEnd}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
 
-            <div className="flex-1 overflow-hidden min-h-0">
-              <nav className="flex h-full flex-col bg-white">
-                <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
-                  {primaryNavLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      prefetch
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={MOBILE_DRAWER_PRIMARY_NAV_LINK_CLASS}
-                    >
-                      <span className={MOBILE_DRAWER_NAV_BUTTON_LABEL_CLASS}>{t(link.translationKey)}</span>
-                      <svg className="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  ))}
-
-                  <Link
-                    href="/compare"
-                    prefetch
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`${MOBILE_DRAWER_NAV_BUTTON_CLASS} normal-case font-medium text-gray-700 md:hidden`}
-                  >
-                    <span className="flex min-w-0 flex-1 items-center gap-2 normal-case font-medium text-gray-700">
-                      <CompareIcon size={18} className="shrink-0" />
-                      <span className="min-w-0 flex-1 text-pretty">{t('common.navigation.compare')}</span>
-                    </span>
-                    <span className="flex shrink-0 items-center gap-2">
-                      {compareCount > 0 ? (
-                        <span className={HEADER_NAV_COUNT_INLINE_BADGE_CLASS}>
-                          {compareCount > 99 ? '99+' : compareCount}
-                        </span>
-                      ) : null}
-                      <svg
-                        className="h-5 w-5 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        aria-hidden
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </Link>
-
-                  <MobileDrawerSupportPhoneButtons />
-                </div>
-              </nav>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Search Modal */}
-      {showSearchModal && (
-        <div className="fixed inset-0 bg-black/20 z-50 flex items-start justify-center pt-20 px-4">
-          <div 
-            ref={searchModalRef}
-            className="w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-gray-200/80 p-4 animate-in fade-in slide-in-from-top-2 duration-200 relative"
-          >
+      <AnimatedModalPortal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        closeAriaLabel={t('common.ariaLabels.closeMenu')}
+        listenEscape={false}
+        backdropClassName="absolute inset-0 bg-black/20"
+        dialogFrameClassName="fixed left-1/2 top-20 z-10 w-full max-w-2xl -translate-x-1/2 px-4"
+        panelClassName="w-full rounded-xl border border-gray-200/80 bg-white p-4 shadow-2xl"
+      >
+        {({ requestClose }) => (
+          <div ref={searchModalRef}>
             <form onSubmit={handleSearch} className="flex items-center gap-2">
-              {/* Search Input */}
               <input
                 ref={searchInputRef}
                 type="text"
@@ -1474,7 +1007,9 @@ export function Header() {
                   setSearchQuery(e.target.value);
                   if (e.target.value.trim().length >= 1) setSearchDropdownOpen(true);
                 }}
-                onFocus={() => { if (searchQuery.trim().length >= 1) setSearchDropdownOpen(true); }}
+                onFocus={() => {
+                  if (searchQuery.trim().length >= 1) setSearchDropdownOpen(true);
+                }}
                 onKeyDown={searchHandleKeyDown}
                 placeholder={t('common.placeholders.search')}
                 className={`flex-1 h-11 px-4 border-2 border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent ${MOBILE_IOS_NO_FOCUS_ZOOM_INPUT_TEXT_CLASS} placeholder:text-gray-400`}
@@ -1482,11 +1017,9 @@ export function Header() {
                 aria-expanded={searchDropdownOpen && searchResults.length > 0}
                 aria-autocomplete="list"
               />
-              
-              {/* Search Button */}
               <button
                 type="submit"
-                className="h-11 px-6 bg-gray-900 text-white rounded-r-lg hover:bg-gray-800 transition-colors flex items-center justify-center"
+                className="flex h-11 items-center justify-center rounded-r-lg bg-gray-900 px-6 text-white transition-colors hover:bg-gray-800"
               >
                 <SearchIcon />
               </button>
@@ -1501,15 +1034,15 @@ export function Header() {
               query={searchQuery}
               onResultClick={(result) => {
                 router.push(`/products/${result.slug}`);
-                setShowSearchModal(false);
+                requestClose();
                 clearSearch();
               }}
               onClose={() => setSearchDropdownOpen(false)}
-              onSeeAllClick={() => setShowSearchModal(false)}
+              onSeeAllClick={requestClose}
             />
           </div>
-        </div>
-      )}
+        )}
+      </AnimatedModalPortal>
     </div>
   );
 }

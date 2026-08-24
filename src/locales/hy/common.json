@@ -14,7 +14,8 @@
     "search": "Որոնել",
     "shopNow": "Գնել հիմա",
     "viewMore": "Դիտել ավելին",
-    "close": "Փակել"
+    "close": "Փակել",
+    "back": "Հետ"
   },
   "dialog": {
     "confirm": "Հաստատել"
@@ -24,6 +25,8 @@
     "home": "Գլխավոր",
     "products": "Խանութ",
     "categories": "Կատեգորիաներ",
+    "previousCategories": "Նախորդ կատեգորիաները",
+    "nextCategories": "Հաջորդ կատեգորիաները",
     "cart": "Զամբյուղ",
     "wishlist": "Նախընտրած",
     "compare": "Համեմատել",
@@ -48,7 +51,7 @@
     "stores": "Խանութներ"
   },
   "mainHeader": {
-    "searchPlaceholder": "Գտիր լավագույնը",
+    "searchPlaceholder": "Փնտրել…",
     "specialOffers": "Հատուկ առաջարկներ",
     "phonesLink": "Հեռախոսներ",
     "tabletsLink": "Պլանշետներ",
@@ -96,7 +99,6 @@
   "compare": {
     "title": "Համեմատել ապրանքները",
     "empty": "Համեմատելու ապրանքներ չկան",
-    "emptyDescription": "Ավելացրեք ապրանքներ ըստ կատեգորիայի՝ մինչև 4 յուրաքանչյուր կատեգորիայում (օր. հեռախոսները՝ հեռախոսների հետ, ժամացույցները՝ ժամացույցների հետ): Տարբեր կատեգորիաները ցուցադրվում են առանձին բլոկներում:",
     "perCategoryHint": "Յուրաքանչյուր կատեգորիա ունի իր համեմատման աղյուսակը (մինչև 4 ապրանք մեկ կատեգորիայում):",
     "uncategorized": "Այլ ապրանքներ",
     "category": "Կատեգորիա",
@@ -183,7 +185,7 @@
     "removeFromWishlist": "Հեռացնել լավագույնից",
     "addToCompare": "Ավելացնել համեմատման ցուցակ",
     "removeFromCompare": "Հեռացնել համեմատման ցուցակից",
-    "outOfStock": "Արտադրված",
+    "outOfStock": "Առկա չէ",
     "search": "Որոնել",
     "searchPlaceholder": "Որոնել ապրանքներ",
     "openMenu": "Բացել նավիգացիայի մենյու",
@@ -214,6 +216,11 @@
   "defaults": {
     "category": "Մթերք"
   },
+  "productLabels": {
+    "new": "Նոր",
+    "sale": "Զեղչ",
+    "hot": "Տաք"
+  },
   "footer": {
     "visitUs": "Այցելիր մեզ",
     "locationHeading": "Մեր գտնվելու վայրը",
@@ -226,13 +233,16 @@
     "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Ապրանք",
     "sectionsHeading": "Բաժիններ",
+    "sectionsContact": "Հետադարձ կապ",
     "termsHeading": "Պայմաններ",
+    "policiesHeading": "Քաղաքականություն",
     "connectHeading": "Կապ",
     "shop": "Խանութ",
     "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
       "refund": "Վերադարձի և փոխանակման քաղաքականություն",
       "delivery": "Առաքման քաղաքականություն",
+      "credit": "Ապառիկի պայմաններ",
       "terms": "Ծառայությունների մասին պայմաններ",
       "privacy": "Գաղտնիության քաղաքականություն"
     },
@@ -248,6 +258,14 @@
       "policiesNavLabel": "Իրավական և քաղաքականություն",
       "paymentMethodsLabel": "Ընդունված վճարման եղանակներ"
     }
+  },
+  "stickyContact": {
+    "openMenu": "Բացել կապի տարբերակները",
+    "closeMenu": "Փակել կապի տարբերակները",
+    "menuLabel": "Կապի տարբերակներ",
+    "yandexMaps": "Բացել Yandex Maps-ում",
+    "whatsapp": "WhatsApp",
+    "callNow": "Զանգահարել"
   },
   "product": {
     "product": "ապրանք",

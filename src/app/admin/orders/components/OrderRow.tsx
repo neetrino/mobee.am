@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
 import { getPaymentStatusColor, getStatusColor } from '../utils/orderUtils';
@@ -13,14 +13,14 @@ interface OrderRowProps {
   selected: boolean;
   updatingStatus: boolean;
   updatingPaymentStatus: boolean;
-  onToggleSelect: () => void;
-  onViewDetails: () => void;
-  onStatusChange: (newStatus: string) => void;
-  onPaymentStatusChange: (newPaymentStatus: string) => void;
+  onToggleSelect: (orderId: string) => void;
+  onViewDetails: (orderId: string) => void;
+  onStatusChange: (orderId: string, newStatus: string) => void;
+  onPaymentStatusChange: (orderId: string, newPaymentStatus: string) => void;
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
 }
 
-export function OrderRow({
+export const OrderRow = memo(function OrderRow({
   order,
   selected,
   updatingStatus,
@@ -78,20 +78,17 @@ export function OrderRow({
             className="size-4 shrink-0 rounded border-gray-300 text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-1"
             aria-label={t('admin.orders.selectOrder').replace('{number}', order.number)}
             checked={selected}
-            onChange={onToggleSelect}
+            onChange={() => onToggleSelect(order.id)}
           />
         </div>
       </td>
       <td
         className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
-        onClick={onViewDetails}
+        onClick={() => onViewDetails(order.id)}
       >
         <div className={`inline-block -translate-x-[93px] ${ORDER_ROW_ORDER_NUMBER_VERTICAL_CLASS} text-sm font-medium text-gray-900`}>{order.number}</div>
       </td>
-      <td
-        className="px-2 py-3 align-top text-sm break-words cursor-pointer hover:bg-gray-50 sm:px-3"
-        onClick={onViewDetails}
-      >
+      <td className="px-2 py-3 align-top text-sm break-words sm:px-3">
         <div className="-translate-x-[100px]">
           <div className="text-sm font-medium text-gray-900">
             {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
@@ -99,7 +96,13 @@ export function OrderRow({
           {order.customerPhone && (
             <div className="text-xs text-gray-500 break-all">{order.customerPhone}</div>
           )}
-          <div className="mt-2 text-xs text-admin-600">{t('admin.orders.viewOrderDetails')}</div>
+          <button
+            type="button"
+            onClick={() => onViewDetails(order.id)}
+            className="mt-2 text-left text-xs font-medium text-admin-600 underline-offset-2 transition-colors hover:text-admin-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-admin focus-visible:ring-offset-1 rounded-sm"
+          >
+            {t('admin.orders.viewOrderDetails')}
+          </button>
         </div>
       </td>
       <td className="px-2 py-3 align-top text-sm font-medium text-gray-900 break-words sm:px-3">
@@ -123,7 +126,7 @@ export function OrderRow({
                 id={`order-${order.id}-status`}
                 value={order.status}
                 options={statusOptions}
-                onValueChange={onStatusChange}
+                onValueChange={(newStatus) => onStatusChange(order.id, newStatus)}
                 triggerTintClassName={getStatusColor(order.status)}
                 ariaLabel={t('admin.orders.orderRowChangeStatusAria')}
                 fixedStatusTriggerWidth
@@ -145,7 +148,7 @@ export function OrderRow({
                 id={`order-${order.id}-payment`}
                 value={order.paymentStatus}
                 options={paymentOptions}
-                onValueChange={onPaymentStatusChange}
+                onValueChange={(newPaymentStatus) => onPaymentStatusChange(order.id, newPaymentStatus)}
                 triggerTintClassName={getPaymentStatusColor(order.paymentStatus)}
                 ariaLabel={t('admin.orders.orderRowChangePaymentAria')}
                 fixedPaymentTriggerWidth
@@ -161,5 +164,5 @@ export function OrderRow({
       </td>
     </tr>
   );
-}
+});
 

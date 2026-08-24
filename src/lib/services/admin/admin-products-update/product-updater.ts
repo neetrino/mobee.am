@@ -1,47 +1,82 @@
 import { Prisma } from "@white-shop/db";
+import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import { logger } from "../../../utils/logger";
-import { cleanImageUrls, separateMainAndVariantImages, smartSplitUrls } from "../../../utils/image-utils";
-import type { UpdateProductData } from "./types";
+import {
+  cleanImageUrls,
+  separateMainAndVariantImages,
+  smartSplitUrls,
+} from "../../../utils/image-utils";
+import type {
+  LabelsUpdateOps,
+  AttributesUpdateOps,
+  MediaUpdateOps,
+  NormalizedProductUpdate,
+} from "./types";
 
 /**
- * Collect variant images from data or existing variants
+ * Collect variant images from incoming ops or existing DB variants.
  */
 export async function collectVariantImages(
-  variants: UpdateProductData['variants'],
+  variants: NormalizedProductUpdate["variants"],
   productId: string,
   tx: Prisma.TransactionClient
 ): Promise<string[]> {
   const allVariantImages: string[] = [];
-  
-  if (variants !== undefined) {
-    variants.forEach((variant) => {
-      if (variant.imageUrl) {
-        const urls = smartSplitUrls(variant.imageUrl);
-        allVariantImages.push(...urls);
-      }
-    });
-  } else {
-    // If variants not being updated, get existing variant images
+
+  const pushImage = (imageUrl: string | null | undefined) => {
+    if (!imageUrl) {
+      return;
+    }
+    allVariantImages.push(...smartSplitUrls(imageUrl));
+  };
+
+  if (variants === undefined) {
     const existingVariants = await tx.productVariant.findMany({
       where: { productId },
       select: { imageUrl: true },
     });
-    existingVariants.forEach((variant) => {
-      if (variant.imageUrl) {
-        const urls = smartSplitUrls(variant.imageUrl);
-        allVariantImages.push(...urls);
-      }
-    });
+    existingVariants.forEach((variant) => pushImage(variant.imageUrl));
+    return allVariantImages;
   }
-  
+
+  if (variants.legacyReplace) {
+    variants.legacyReplace.forEach((variant) => pushImage(variant.imageUrl));
+    return allVariantImages;
+  }
+
+  (variants.create ?? []).forEach((variant) => pushImage(variant.imageUrl));
+
+  const deleteIds = new Set(variants.deleteIds ?? []);
+  const updateImageById = new Map(
+    (variants.update ?? [])
+      .filter((variant) => variant.imageUrl !== undefined)
+      .map((variant) => [variant.id, variant.imageUrl])
+  );
+
+  const existingVariants = await tx.productVariant.findMany({
+    where: { productId },
+    select: { id: true, imageUrl: true },
+  });
+
+  existingVariants.forEach((variant) => {
+    if (deleteIds.has(variant.id)) {
+      return;
+    }
+    if (updateImageById.has(variant.id)) {
+      pushImage(updateImageById.get(variant.id));
+      return;
+    }
+    pushImage(variant.imageUrl);
+  });
+
   return allVariantImages;
 }
 
 /**
- * Build product update data
+ * Build Prisma product scalar update from product + media sections.
  */
 export function buildProductUpdateData(
-  data: UpdateProductData,
+  ops: NormalizedProductUpdate,
   allVariantImages: string[],
   existing: { publishedAt: Date | null }
 ): {
@@ -52,6 +87,8 @@ export function buildProductUpdateData(
   published?: boolean;
   publishedAt?: Date;
   featured?: boolean;
+  warrantyYears?: number | null;
+  updatedAt?: Date;
 } {
   const updateData: {
     brandId?: string | null;
@@ -61,82 +98,119 @@ export function buildProductUpdateData(
     published?: boolean;
     publishedAt?: Date;
     featured?: boolean;
+    warrantyYears?: number | null;
+    updatedAt?: Date;
   } = {};
-  
-  if (data.brandId !== undefined) updateData.brandId = data.brandId || null;
-  if (data.primaryCategoryId !== undefined) updateData.primaryCategoryId = data.primaryCategoryId || null;
-  if (data.categoryIds !== undefined) updateData.categoryIds = data.categoryIds || [];
-  
-  if (data.media !== undefined) {
-    // Separate main images from variant images and clean them
+
+  const product = ops.product;
+  if (product) {
+    if (product.brandId !== undefined) {
+      updateData.brandId = product.brandId;
+    }
+    if (product.primaryCategoryId !== undefined) {
+      updateData.primaryCategoryId = product.primaryCategoryId;
+    }
+    if (product.categoryIds !== undefined) {
+      updateData.categoryIds = product.categoryIds;
+    }
+    if (product.published !== undefined) {
+      updateData.published = product.published;
+      if (product.published && !existing.publishedAt) {
+        updateData.publishedAt = new Date();
+      }
+    }
+    if (product.featured !== undefined) {
+      updateData.featured = product.featured;
+    }
+    if (product.warrantyYears !== undefined) {
+      updateData.warrantyYears = normalizeProductWarrantyYears(product.warrantyYears);
+    }
+  }
+
+  if (ops.media?.replace !== undefined) {
     const { main } = separateMainAndVariantImages(
-      data.media as Array<string | { url?: string; src?: string; value?: string }>,
+      ops.media.replace as MediaUpdateOps["replace"] &
+        Array<string | { url?: string; src?: string; value?: string }>,
       allVariantImages
     );
     updateData.media = cleanImageUrls(main);
-    logger.debug('Updated main media', { count: updateData.media.length, variantImagesExcluded: allVariantImages.length });
+    logger.debug("Updated main media", {
+      count: updateData.media.length,
+      variantImagesExcluded: allVariantImages.length,
+    });
   }
-  
-  if (data.published !== undefined) {
-    updateData.published = data.published;
-    if (data.published && !existing.publishedAt) {
-      updateData.publishedAt = new Date();
-    }
-  }
-  
-  if (data.featured !== undefined) updateData.featured = data.featured;
-  
+
+  updateData.updatedAt = new Date();
   return updateData;
 }
 
 /**
- * Update product translation
+ * Update product translation when basic section is present.
  */
 export async function updateProductTranslation(
   productId: string,
-  data: UpdateProductData,
+  ops: NormalizedProductUpdate,
   tx: Prisma.TransactionClient
-) {
-  if (data.title || data.slug || data.subtitle !== undefined || data.descriptionHtml !== undefined) {
-    const locale = data.locale || "en";
-    await tx.productTranslation.upsert({
-      where: {
-        productId_locale: {
-          productId,
-          locale,
-        },
-      },
-      update: {
-        ...(data.title && { title: data.title }),
-        ...(data.slug && { slug: data.slug }),
-        ...(data.subtitle !== undefined && { subtitle: data.subtitle || null }),
-        ...(data.descriptionHtml !== undefined && { descriptionHtml: data.descriptionHtml || null }),
-      },
-      create: {
+): Promise<void> {
+  const basic = ops.basic;
+  if (!basic) {
+    return;
+  }
+
+  const hasField =
+    basic.title !== undefined ||
+    basic.slug !== undefined ||
+    basic.subtitle !== undefined ||
+    basic.descriptionHtml !== undefined;
+
+  if (!hasField) {
+    return;
+  }
+
+  const locale = ops.locale || "en";
+  await tx.productTranslation.upsert({
+    where: {
+      productId_locale: {
         productId,
         locale,
-        title: data.title || "",
-        slug: data.slug || "",
-        subtitle: data.subtitle || null,
-        descriptionHtml: data.descriptionHtml || null,
       },
-    });
-  }
+    },
+    update: {
+      ...(basic.title !== undefined && { title: basic.title }),
+      ...(basic.slug !== undefined && { slug: basic.slug }),
+      ...(basic.subtitle !== undefined && { subtitle: basic.subtitle }),
+      ...(basic.descriptionHtml !== undefined && {
+        descriptionHtml: basic.descriptionHtml,
+      }),
+    },
+    create: {
+      productId,
+      locale,
+      title: basic.title || "",
+      slug: basic.slug || "",
+      subtitle: basic.subtitle ?? null,
+      descriptionHtml: basic.descriptionHtml ?? null,
+    },
+  });
 }
 
 /**
- * Update product labels
+ * Differential or replace-style label updates. Ownership: productId scoped.
  */
 export async function updateProductLabels(
   productId: string,
-  labels: UpdateProductData['labels'],
+  labels: LabelsUpdateOps | undefined,
   tx: Prisma.TransactionClient
-) {
-  if (labels !== undefined) {
+): Promise<void> {
+  if (!labels) {
+    return;
+  }
+
+  if (labels.replace !== undefined) {
     await tx.productLabel.deleteMany({ where: { productId } });
-    if (labels.length > 0) {
+    if (labels.replace.length > 0) {
       await tx.productLabel.createMany({
-        data: labels.map((label) => ({
+        data: labels.replace.map((label) => ({
           productId,
           type: label.type,
           value: label.value,
@@ -145,33 +219,110 @@ export async function updateProductLabels(
         })),
       });
     }
+    return;
+  }
+
+  if (labels.removeIds && labels.removeIds.length > 0) {
+    await tx.productLabel.deleteMany({
+      where: {
+        id: { in: labels.removeIds },
+        productId,
+      },
+    });
+  }
+
+  if (labels.update && labels.update.length > 0) {
+    for (const label of labels.update) {
+      if (!label.id) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Invalid label update",
+          detail: "Label update requires id",
+        };
+      }
+      const result = await tx.productLabel.updateMany({
+        where: { id: label.id, productId },
+        data: {
+          type: label.type,
+          value: label.value,
+          position: label.position,
+          color: label.color ?? undefined,
+        },
+      });
+      if (result.count === 0) {
+        throw {
+          status: 404,
+          type: "https://api.shop.am/problems/not-found",
+          title: "Label not found",
+          detail: `Label '${label.id}' does not belong to this product`,
+        };
+      }
+    }
+  }
+
+  if (labels.add && labels.add.length > 0) {
+    await tx.productLabel.createMany({
+      data: labels.add.map((label) => ({
+        productId,
+        type: label.type,
+        value: label.value,
+        position: label.position,
+        color: label.color || undefined,
+      })),
+    });
   }
 }
 
 /**
- * Update product attributes
+ * Differential or replace-style product attribute links.
+ * Caller must run ensureProductAttributesTable BEFORE the transaction.
  */
 export async function updateProductAttributes(
   productId: string,
-  attributeIds: UpdateProductData['attributeIds'],
+  attributes: AttributesUpdateOps | undefined,
   tx: Prisma.TransactionClient
-) {
-  if (attributeIds !== undefined) {
-    // Ensure table exists (for Vercel deployments where migrations might not run)
-    const { ensureProductAttributesTable } = await import("../../../utils/db-ensure");
-    await ensureProductAttributesTable();
-    
+): Promise<void> {
+  if (!attributes) {
+    return;
+  }
+
+  if (attributes.replaceIds !== undefined) {
     await tx.productAttribute.deleteMany({ where: { productId } });
-    if (attributeIds.length > 0) {
+    if (attributes.replaceIds.length > 0) {
       await tx.productAttribute.createMany({
-        data: attributeIds.map((attributeId) => ({
+        data: attributes.replaceIds.map((attributeId) => ({
           productId,
           attributeId,
         })),
         skipDuplicates: true,
       });
-      logger.info('Updated ProductAttribute relations', { attributeIds });
+      logger.info("Replaced ProductAttribute relations", {
+        attributeIds: attributes.replaceIds,
+      });
     }
+    return;
+  }
+
+  if (attributes.removeIds && attributes.removeIds.length > 0) {
+    await tx.productAttribute.deleteMany({
+      where: {
+        productId,
+        attributeId: { in: attributes.removeIds },
+      },
+    });
+  }
+
+  if (attributes.addIds && attributes.addIds.length > 0) {
+    await tx.productAttribute.createMany({
+      data: attributes.addIds.map((attributeId) => ({
+        productId,
+        attributeId,
+      })),
+      skipDuplicates: true,
+    });
+    logger.info("Added ProductAttribute relations", {
+      attributeIds: attributes.addIds,
+    });
   }
 }
-

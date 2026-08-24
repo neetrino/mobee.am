@@ -1,8 +1,10 @@
 'use client';
 
 import type { ChangeEvent } from 'react';
+import dynamic from 'next/dynamic';
 import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
+import { AdminContentSkeleton } from '../../../components/AdminContentSkeleton';
 import type {
   Brand,
   Category,
@@ -12,15 +14,24 @@ import type {
   GeneratedVariant,
 } from '../types';
 import type { CurrencyCode } from '@/lib/currency';
+import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
 import { BasicInformation } from './BasicInformation';
-import { ProductImages } from './ProductImages';
 import { CategoriesBrands } from './CategoriesBrands';
 import { SimpleProductFields } from './SimpleProductFields';
 import { AttributesSelection } from './AttributesSelection';
-import { VariantBuilder } from './VariantBuilder';
 import { ProductLabels } from './ProductLabels';
 import { Publishing } from './Publishing';
 import { FormActions } from './FormActions';
+
+const ProductImages = dynamic(
+  () => import('./ProductImages').then((module) => ({ default: module.ProductImages })),
+  { loading: () => <AdminContentSkeleton lines={2} /> },
+);
+
+const VariantBuilder = dynamic(
+  () => import('./VariantBuilder').then((module) => ({ default: module.VariantBuilder })),
+  { loading: () => <AdminContentSkeleton lines={4} /> },
+);
 
 interface AddProductFormContentProps {
   formData: {
@@ -34,6 +45,7 @@ interface AddProductFormContentProps {
     featuredImageIndex: number;
     labels: ProductLabel[];
     featured: boolean;
+    warrantyYears: ProductWarrantyYears | null;
     variants: Variant[];
   };
   productType: 'simple' | 'variable';
@@ -49,6 +61,7 @@ interface AddProductFormContentProps {
   defaultCurrency: CurrencyCode;
   isEditMode: boolean;
   loading: boolean;
+  isSnapshotReady?: boolean;
   imageUploadLoading: boolean;
   imageUploadError: string | null;
   categoriesExpanded: boolean;
@@ -97,6 +110,7 @@ interface AddProductFormContentProps {
   onRemoveLabel: (index: number) => void;
   onUpdateLabel: (index: number, field: keyof ProductLabel, value: ProductLabel[keyof ProductLabel]) => void;
   onFeaturedChange: (featured: boolean) => void;
+  onWarrantyYearsChange: (years: ProductWarrantyYears | null) => void;
   onVariantsUpdate: (updater: (prev: Variant[]) => Variant[]) => void;
   onApplyToAllVariants: (field: 'price' | 'compareAtPrice' | 'stock' | 'sku', value: string) => void;
   isClothingCategory: () => boolean;
@@ -114,6 +128,7 @@ export function AddProductFormContent({
   defaultCurrency,
   isEditMode,
   loading,
+  isSnapshotReady = true,
   imageUploadLoading,
   imageUploadError,
   categoriesExpanded,
@@ -162,6 +177,7 @@ export function AddProductFormContent({
   onRemoveLabel,
   onUpdateLabel,
   onFeaturedChange,
+  onWarrantyYearsChange,
   onVariantsUpdate,
   onApplyToAllVariants,
   isClothingCategory,
@@ -284,11 +300,22 @@ export function AddProductFormContent({
               onRemoveLabel={onRemoveLabel}
               onUpdateLabel={onUpdateLabel}
             />
-            <Publishing featured={formData.featured} onFeaturedChange={onFeaturedChange} />
+            <Publishing
+              featured={formData.featured}
+              onFeaturedChange={onFeaturedChange}
+              warrantyYears={
+                formData.warrantyYears === 1 ||
+                formData.warrantyYears === 2 ||
+                formData.warrantyYears === 3
+                  ? formData.warrantyYears
+                  : null
+              }
+              onWarrantyYearsChange={onWarrantyYearsChange}
+            />
           </div>
         </details>
 
-        <FormActions loading={loading} isEditMode={isEditMode} />
+        <FormActions loading={loading} isEditMode={isEditMode} isSnapshotReady={isSnapshotReady} />
       </form>
     </Card>
   );

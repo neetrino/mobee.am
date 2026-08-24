@@ -1,5 +1,6 @@
 'use client';
 
+import { useAnimatedFlyoutDismiss } from '../../../../lib/useAnimatedFlyoutDismiss';
 import {
   ORDERS_FILTER_DROPDOWN_CHEVRON_WRAP_CLASS,
   ORDERS_FILTER_DROPDOWN_FLYOUT_MAX_WIDTH_CLASS,
@@ -34,6 +35,7 @@ export function OrdersFilterDropdown({
   ariaLabel,
 }: OrdersFilterDropdownProps) {
   const displayLabel = options.find((o) => o.value === value)?.label ?? options[0]?.label ?? '';
+  const { isVisible, flyoutMotionClass, handleFlyoutAnimationEnd } = useAnimatedFlyoutDismiss(isOpen);
 
   return (
     <div className="relative inline-block max-w-full shrink-0">
@@ -41,7 +43,7 @@ export function OrdersFilterDropdown({
         type="button"
         id={`${id}-trigger`}
         className={ORDERS_FILTER_DROPDOWN_TRIGGER_CLASS}
-        aria-expanded={isOpen}
+        aria-expanded={isVisible}
         aria-haspopup="listbox"
         aria-controls={`${id}-listbox`}
         aria-label={ariaLabel}
@@ -50,7 +52,7 @@ export function OrdersFilterDropdown({
         <span className="min-w-0 flex-1 break-words text-left leading-snug">{displayLabel}</span>
         <span
           className={`${ORDERS_FILTER_DROPDOWN_CHEVRON_WRAP_CLASS} ${
-            isOpen ? 'rotate-180' : 'rotate-0'
+            isVisible ? 'rotate-180' : 'rotate-0'
           }`}
           aria-hidden
         >
@@ -65,7 +67,7 @@ export function OrdersFilterDropdown({
           </svg>
         </span>
       </button>
-      {isOpen ? (
+      {isVisible ? (
         <>
           <div className="pointer-events-none absolute left-0 top-full z-[60] h-1 w-full" aria-hidden />
           <div
@@ -73,7 +75,10 @@ export function OrdersFilterDropdown({
             role="listbox"
             className={`absolute left-0 top-full z-[60] min-w-full w-max pt-1 ${ORDERS_FILTER_DROPDOWN_FLYOUT_MAX_WIDTH_CLASS}`}
           >
-            <div className={ORDERS_FILTER_DROPDOWN_PANEL_CLASS}>
+            <div
+              className={`${ORDERS_FILTER_DROPDOWN_PANEL_CLASS} ${flyoutMotionClass}`}
+              onAnimationEnd={handleFlyoutAnimationEnd}
+            >
               {options.map((opt) => {
                 const active = opt.value === value;
                 return (

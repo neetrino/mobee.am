@@ -1,46 +1,11 @@
 ﻿'use client';
 
-import { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
-import { useTranslation } from '../../../lib/i18n-client';
 import { AttributesPageContent } from './AttributesPageContent';
-import { AdminPageShell } from '../components/AdminPageShell';
 
 export default function AttributesPage() {
-  const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null; // Will redirect
-  }
-
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/attributes'} router={router} t={t}>
-      <div className="mx-auto w-full max-w-7xl">
-        <AttributesPageContent />
-      </div>
-    </AdminPageShell>
+    <div className="mx-auto w-full max-w-7xl">
+      <AttributesPageContent />
+    </div>
   );
 }
-

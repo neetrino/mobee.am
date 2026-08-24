@@ -1,13 +1,14 @@
 'use client';
 
 import { useMemo, useState, type MouseEvent } from 'react';
-import { FileText, Heart } from 'lucide-react';
+import { CheckCircle2, FileText, Heart, XCircle } from 'lucide-react';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { CompareIcon } from '../../../components/icons/CompareIcon';
 import { InstallmentPriceButton } from '../../../components/ProductCard/InstallmentPriceButton';
 import { InstallmentRequestModal } from '../../../components/ProductCard/InstallmentRequestModal';
+import { ProductWarrantyBadge } from '../../../components/ProductCard/ProductWarrantyBadge';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
 import {
   buildVariantTitleForInquiry,
@@ -19,16 +20,19 @@ import {
   PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS,
 } from './product-pdp-ipad-pro-band.constants';
 import type { AttributeGroupValue, Product, ProductVariant, VariantOption } from './types';
+import { isProductWarrantyYears } from '../../../lib/constants/product-warranty';
 
 interface ProductInfoAndActionsProps {
   product: Product;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   discountPercent: number | null;
   currency: string;
   language: LanguageCode;
   quantity: number;
   maxQuantity: number;
   isOutOfStock: boolean;
+  isSingleVariantOutOfStock: boolean;
   isVariationRequired: boolean;
   hasUnavailableAttributes: boolean;
   unavailableAttributes: Map<string, boolean>;
@@ -57,12 +61,14 @@ interface ProductInfoAndActionsProps {
 export function ProductInfoAndActions({
   product,
   price,
+  hasPrice = price != null && price > 0,
   discountPercent,
   currency,
   language,
   quantity,
   maxQuantity,
   isOutOfStock,
+  isSingleVariantOutOfStock,
   isVariationRequired,
   hasUnavailableAttributes,
   unavailableAttributes,
@@ -99,6 +105,13 @@ export function ProductInfoAndActions({
     [selectedColor, attributeGroups, language, currentVariant, selectedSize]
   );
 
+  const isStockAvailable = useMemo(() => {
+    if (isVariationRequired) {
+      return (product.variants ?? []).some((variant) => (variant.stock ?? 0) > 0);
+    }
+    return Boolean(currentVariant && currentVariant.stock > 0);
+  }, [isVariationRequired, product.variants, currentVariant]);
+
   const handleInstallmentClick = (event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -106,9 +119,35 @@ export function ProductInfoAndActions({
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-w-0 w-full flex-col">
       {product.brand && <p className="mb-1 text-sm text-gray-500">{product.brand.name}</p>}
-      <h1 className="text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">{title}</h1>
+      <div className="flex items-start justify-between gap-3">
+        <h1 className="min-w-0 flex-1 text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">
+          {title}
+        </h1>
+        <div className="mt-1 flex shrink-0 flex-col items-end gap-2 sm:flex-row sm:items-start">
+          {isProductWarrantyYears(product.warrantyYears) ? (
+            <ProductWarrantyBadge years={product.warrantyYears} size="promo" className="shrink-0" />
+          ) : null}
+          <span
+            className={`inline-flex items-center gap-1.5 text-sm font-medium ${
+              isStockAvailable ? 'text-emerald-600' : 'text-red-600'
+            }`}
+            aria-live="polite"
+          >
+            {isStockAvailable ? (
+              <CheckCircle2 className="h-5 w-5" strokeWidth={2} aria-hidden />
+            ) : (
+              <XCircle className="h-5 w-5" strokeWidth={2} aria-hidden />
+            )}
+            <span>
+              {isStockAvailable
+                ? t(language, 'common.stock.inStock')
+                : t(language, 'common.stock.outOfStock')}
+            </span>
+          </span>
+        </div>
+      </div>
 
       {currentVariant?.sku && (
         <div className="mt-3">
@@ -121,40 +160,48 @@ export function ProductInfoAndActions({
       <hr className="my-5 border-0 border-t border-gray-200" />
 
       <div className={`flex flex-wrap items-center gap-4 ${PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS}`}>
-        <div
-          className="flex h-11 min-w-[8.5rem] select-none items-stretch overflow-hidden rounded-[15px] border border-gray-200 bg-white px-0.5"
-          role="group"
-          aria-label={t(language, 'product.quantity')}
-        >
-          <button
-            type="button"
-            onClick={() => onQuantityAdjust(-1)}
-            disabled={quantity <= 1}
-            className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
-            aria-label={t(language, 'common.ariaLabels.decreaseQuantity')}
+        {hasPrice ? (
+          <div
+            className="flex h-11 min-w-[8.5rem] select-none items-stretch overflow-hidden rounded-[15px] border border-gray-200 bg-white px-0.5"
+            role="group"
+            aria-label={t(language, 'product.quantity')}
           >
-            −
-          </button>
-          <span className="flex min-w-[2rem] items-center justify-center px-2 text-base font-bold tabular-nums leading-none text-gray-900">
-            {quantity}
-          </span>
-          <button
-            type="button"
-            onClick={() => onQuantityAdjust(1)}
-            disabled={quantity >= maxQuantity || maxQuantity <= 0}
-            className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
-            aria-label={t(language, 'common.ariaLabels.increaseQuantity')}
-          >
-            +
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => onQuantityAdjust(-1)}
+              disabled={quantity <= 1}
+              className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
+              aria-label={t(language, 'common.ariaLabels.decreaseQuantity')}
+            >
+              −
+            </button>
+            <span className="flex min-w-[2rem] items-center justify-center px-2 text-base font-bold tabular-nums leading-none text-gray-900">
+              {quantity}
+            </span>
+            <button
+              type="button"
+              onClick={() => onQuantityAdjust(1)}
+              disabled={quantity >= maxQuantity || maxQuantity <= 0}
+              className="flex min-w-9 flex-1 cursor-pointer items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-default disabled:opacity-40"
+              aria-label={t(language, 'common.ariaLabels.increaseQuantity')}
+            >
+              +
+            </button>
+          </div>
+        ) : null}
 
         <div className={`flex flex-wrap items-baseline justify-end gap-2 text-right ${PDP_IPAD_PRO_BAND_PRICE_TEXT_CLASS}`}>
-          <span className="text-xl font-bold text-gray-900 sm:text-2xl">
-            {formatPrice(price, currency as CurrencyCode)}
-          </span>
-          {discountPercent != null && discountPercent > 0 && (
-            <span className="text-sm font-semibold text-admin">-{discountPercent}%</span>
+          {hasPrice && price != null ? (
+            <>
+              <span className="text-xl font-bold text-gray-900 sm:text-2xl">
+                {formatPrice(price, currency as CurrencyCode)}
+              </span>
+              {discountPercent != null && discountPercent > 0 && (
+                <span className="text-sm font-semibold text-admin">-{discountPercent}%</span>
+              )}
+            </>
+          ) : (
+            <span className="min-h-[1.75rem]" aria-hidden="true" />
           )}
         </div>
       </div>
@@ -164,6 +211,13 @@ export function ProductInfoAndActions({
       {isVariationRequired && (
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="text-sm font-medium text-amber-900">{getRequiredAttributesMessage()}</p>
+        </div>
+      )}
+      {isSingleVariantOutOfStock && !isVariationRequired && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
+          <p className="text-sm font-medium text-red-800">
+            {t(language, 'product.outOfStock')}
+          </p>
         </div>
       )}
       {hasUnavailableAttributes && !isVariationRequired && (
@@ -200,16 +254,22 @@ export function ProductInfoAndActions({
         getOptionValue={getOptionValue}
       />
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 text-sm">
+      <div className="mt-8 flex w-full min-w-0 flex-row flex-wrap items-center justify-between gap-2 text-sm sm:gap-3">
         <button
           type="button"
           onClick={onScrollToDetails}
-          className="inline-flex w-fit items-center gap-2 font-medium text-admin hover:underline"
+          className="inline-flex max-w-full items-center gap-2 font-medium text-admin hover:underline"
         >
           <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
           {t(language, 'product.moreDetails')}
         </button>
-        <InstallmentPriceButton onClick={handleInstallmentClick} />
+        {hasPrice ? (
+          <InstallmentPriceButton
+            onClick={handleInstallmentClick}
+            size="md"
+            className="shrink-0"
+          />
+        ) : null}
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">
@@ -255,6 +315,7 @@ export function ProductInfoAndActions({
         </div>
       </div>
 
+      {hasPrice && price != null ? (
       <InstallmentRequestModal
         isOpen={isInstallmentModalOpen}
         onClose={() => setIsInstallmentModalOpen(false)}
@@ -269,6 +330,7 @@ export function ProductInfoAndActions({
         variantTitle={inquiryVariantDetails.variantTitle}
         sku={inquiryVariantDetails.sku}
       />
+      ) : null}
     </div>
   );
 }

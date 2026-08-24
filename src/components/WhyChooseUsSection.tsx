@@ -1,16 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { Montserrat } from 'next/font/google';
+import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { HomeMoreCtaPillLink } from './HomeMoreCtaPillLink';
+import { WHY_CHOOSE_US_ICON_SRC } from '../lib/constants/ui-icons.constants';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-});
+const montserrat = siteMontserrat;
 
 type BenefitId = 'warranty' | 'delivery' | 'installment' | 'original';
 
@@ -20,10 +17,10 @@ const BENEFITS: readonly {
   width: number;
   height: number;
 }[] = [
-  { id: 'warranty', src: '/images/home/why-choose-us/warranty.svg', width: 44, height: 42 },
-  { id: 'delivery', src: '/images/home/why-choose-us/delivery.png', width: 49, height: 39 },
-  { id: 'installment', src: '/images/home/why-choose-us/installment.png', width: 57, height: 42 },
-  { id: 'original', src: '/images/home/why-choose-us/original.png', width: 37, height: 48 },
+  { id: 'warranty', src: WHY_CHOOSE_US_ICON_SRC.warranty, width: 44, height: 42 },
+  { id: 'delivery', src: WHY_CHOOSE_US_ICON_SRC.delivery, width: 49, height: 39 },
+  { id: 'installment', src: WHY_CHOOSE_US_ICON_SRC.installment, width: 57, height: 42 },
+  { id: 'original', src: WHY_CHOOSE_US_ICON_SRC.original, width: 37, height: 48 },
 ];
 
 /** Benefit column horizontal nudge; bottom row uses this at all widths. */

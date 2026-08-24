@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { productsService } from "@/lib/services/products.service";
+import { getCachedProductBySlug } from "@/lib/services/products-slug-cached";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ export async function GET(
     const { searchParams } = new URL(req.url);
     const lang = searchParams.get("lang") || "en";
     const { slug } = await params;
-    const result = await productsService.findBySlug(slug, lang);
+    const { result } = await getCachedProductBySlug(slug, lang);
     return NextResponse.json(result);
   } catch (error: unknown) {
     const err = error as { status?: number };

@@ -4,13 +4,8 @@ import { DEFAULT_USER_AVATAR_SRC } from './user-avatar.constants';
 
 /**
  * UserAvatar Component
- * 
+ *
  * Displays a user avatar image with a default profile picture fallback.
- * 
- * @param firstName - User's first name
- * @param lastName - User's last name
- * @param avatarUrl - Optional URL to user's avatar image
- * @param size - Size of the avatar (default: 'md')
  */
 interface UserAvatarProps {
   firstName?: string | null;
@@ -20,33 +15,33 @@ interface UserAvatarProps {
   className?: string;
 }
 
-export function UserAvatar({ 
-  firstName, 
-  lastName, 
-  avatarUrl, 
-  size = 'md',
-  className = '' 
-}: UserAvatarProps) {
-  // Size classes (`lg` tuned for profile header — between `md` and old 96px)
-  const sizeClasses = {
-    sm: 'w-10 h-10 text-sm',
-    md: 'w-16 h-16 text-lg',
-    lg: 'h-20 w-20 text-xl',
-    xl: 'w-32 h-32 text-3xl',
-  };
+const AVATAR_SIZE_CLASS: Record<NonNullable<UserAvatarProps['size']>, string> = {
+  sm: 'size-10',
+  md: 'size-16',
+  lg: 'size-20',
+  xl: 'size-32',
+};
 
+export function UserAvatar({
+  firstName,
+  lastName,
+  avatarUrl,
+  size = 'md',
+  className = '',
+}: UserAvatarProps) {
   const displayName = `${firstName || ''} ${lastName || ''}`.trim();
+  const isDefaultAvatar = !avatarUrl;
+  const sizeClass = AVATAR_SIZE_CLASS[size];
 
   return (
-    <div className={`relative flex-shrink-0 ${sizeClasses[size]} ${className}`}>
+    <div
+      className={`relative flex-none overflow-hidden rounded-full bg-white aspect-square ${sizeClass} ${className}`.trim()}
+    >
       <img
         src={avatarUrl || DEFAULT_USER_AVATAR_SRC}
         alt={displayName || 'User avatar'}
-        className="h-full w-full rounded-full object-cover"
+        className={`block h-full w-full ${isDefaultAvatar ? 'object-contain' : 'object-cover'}`}
       />
     </div>
   );
 }
-
-
-

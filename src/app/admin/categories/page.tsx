@@ -1,22 +1,17 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../../lib/auth/AuthContext';
+import { useState } from 'react';
 import { Card, Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useCategories } from './hooks/useCategories';
 import { useCategoryActions } from './hooks/useCategoryActions';
 import { CategoriesHeader } from './components/CategoriesHeader';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { CategoriesList } from './components/CategoriesList';
 import { AddCategoryModal } from './components/AddCategoryModal';
 import { EditCategoryModal } from './components/EditCategoryModal';
 
 export default function CategoriesPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
   const { categories, loading, fetchCategories } = useCategories();
   const [categorySearchQuery, setCategorySearchQuery] = useState('');
   const {
@@ -39,32 +34,8 @@ export default function CategoriesPage() {
     resetForm,
   } = useCategoryActions();
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
-
   return (
-    <AdminPageShell currentPath="/supersudo/categories" router={router} t={t}>
+    <>
       <div className="mx-auto w-full max-w-7xl">
         <CategoriesHeader />
         <Card className="p-6">
@@ -162,6 +133,6 @@ export default function CategoriesPage() {
         onFormDataChange={setFormData}
         onSubmit={() => handleUpdateCategory(fetchCategories)}
       />
-    </AdminPageShell>
+    </>
   );
 }

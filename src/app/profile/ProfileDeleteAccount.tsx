@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { apiClient, ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth/AuthContext';
+import { STOREFRONT_MODAL_TRANSITION_MS } from '@/lib/storefront-modal-motion.constants';
 import { DELETE_ACCOUNT_CONFIRM_PHRASE } from './profile-delete-account.constants';
 
 interface ProfileDeleteAccountProps {
@@ -23,20 +25,20 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
   const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!modalOpen) return;
-    setConfirmStep(1);
-    setTypedPhrase('');
-    setLocalError(null);
+    if (modalOpen) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      setConfirmStep(1);
+      setTypedPhrase('');
+      setLocalError(null);
+    }, STOREFRONT_MODAL_TRANSITION_MS);
+    return () => window.clearTimeout(timeoutId);
   }, [modalOpen]);
 
   const phraseMatches = typedPhrase.trim() === DELETE_ACCOUNT_CONFIRM_PHRASE;
 
   const openModal = () => setModalOpen(true);
-
-  const closeModal = () => {
-    if (deleting) return;
-    setModalOpen(false);
-  };
 
   const handleFinalDelete = async () => {
     if (!phraseMatches) {
@@ -133,108 +135,103 @@ export function ProfileDeleteAccount({ t, variant = 'sidebar' }: ProfileDeleteAc
         )}
       </button>
 
-      {modalOpen && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
-          role="presentation"
-          onClick={closeModal}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-account-title"
-            className="max-w-md rounded-[15px] border border-gray-200 bg-white p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {confirmStep === 1 ? (
-              <>
-                <h2 id="delete-account-title" className="text-lg font-semibold text-gray-900">
-                  {t('profile.deleteAccount.confirmTitle')}
-                </h2>
-                <p className="mt-2 text-sm text-gray-600">{t('profile.deleteAccount.confirmBody')}</p>
-                <div className="mt-6 flex flex-wrap justify-end gap-2">
+      <AnimatedModalPortal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        closeAriaLabel={t('profile.deleteAccount.cancel')}
+        blockClose={deleting}
+        labelledBy="delete-account-title"
+        panelClassName="max-w-md rounded-[15px] border border-gray-200 bg-white p-6 shadow-xl"
+      >
+        {({ requestClose }) =>
+          confirmStep === 1 ? (
+            <>
+              <h2 id="delete-account-title" className="text-lg font-semibold text-gray-900">
+                {t('profile.deleteAccount.confirmTitle')}
+              </h2>
+              <p className="mt-2 text-sm text-gray-600">{t('profile.deleteAccount.confirmBody')}</p>
+              <div className="mt-6 flex flex-wrap justify-end gap-2">
+                <button
+                  type="button"
+                  disabled={deleting}
+                  onClick={requestClose}
+                  className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {t('profile.deleteAccount.cancel')}
+                </button>
+                <button
+                  type="button"
+                  disabled={deleting}
+                  onClick={() => setConfirmStep(2)}
+                  className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+                >
+                  {t('profile.deleteAccount.continueToConfirm')}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 id="delete-account-title" className="text-lg font-semibold text-gray-900">
+                {t('profile.deleteAccount.finalTitle')}
+              </h2>
+              <p className="mt-2 text-sm text-gray-600">{t('profile.deleteAccount.finalBody')}</p>
+              <label htmlFor="delete-account-phrase" className="mt-4 block text-sm font-medium text-gray-700">
+                {t('profile.deleteAccount.typeLabel')}
+              </label>
+              <input
+                id="delete-account-phrase"
+                type="text"
+                autoComplete="off"
+                value={typedPhrase}
+                onChange={(e) => {
+                  setTypedPhrase(e.target.value);
+                  if (localError) setLocalError(null);
+                }}
+                placeholder={DELETE_ACCOUNT_CONFIRM_PHRASE}
+                disabled={deleting}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 disabled:bg-gray-50"
+              />
+              {localError && (
+                <p className="mt-3 text-sm text-red-600" role="alert">
+                  {localError}
+                </p>
+              )}
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
+                <button
+                  type="button"
+                  disabled={deleting}
+                  onClick={() => {
+                    setConfirmStep(1);
+                    setTypedPhrase('');
+                    setLocalError(null);
+                  }}
+                  className="rounded-full px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50"
+                >
+                  {t('profile.deleteAccount.back')}
+                </button>
+                <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     disabled={deleting}
-                    onClick={closeModal}
+                    onClick={requestClose}
                     className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                   >
                     {t('profile.deleteAccount.cancel')}
                   </button>
                   <button
                     type="button"
-                    disabled={deleting}
-                    onClick={() => setConfirmStep(2)}
-                    className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+                    disabled={deleting || !phraseMatches}
+                    onClick={() => void handleFinalDelete()}
+                    className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
                   >
-                    {t('profile.deleteAccount.continueToConfirm')}
+                    {deleting ? t('profile.deleteAccount.deleting') : t('profile.deleteAccount.confirm')}
                   </button>
                 </div>
-              </>
-            ) : (
-              <>
-                <h2 id="delete-account-title" className="text-lg font-semibold text-gray-900">
-                  {t('profile.deleteAccount.finalTitle')}
-                </h2>
-                <p className="mt-2 text-sm text-gray-600">{t('profile.deleteAccount.finalBody')}</p>
-                <label htmlFor="delete-account-phrase" className="mt-4 block text-sm font-medium text-gray-700">
-                  {t('profile.deleteAccount.typeLabel')}
-                </label>
-                <input
-                  id="delete-account-phrase"
-                  type="text"
-                  autoComplete="off"
-                  value={typedPhrase}
-                  onChange={(e) => {
-                    setTypedPhrase(e.target.value);
-                    if (localError) setLocalError(null);
-                  }}
-                  placeholder={DELETE_ACCOUNT_CONFIRM_PHRASE}
-                  disabled={deleting}
-                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 disabled:bg-gray-50"
-                />
-                {localError && (
-                  <p className="mt-3 text-sm text-red-600" role="alert">
-                    {localError}
-                  </p>
-                )}
-                <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    disabled={deleting}
-                    onClick={() => {
-                      setConfirmStep(1);
-                      setTypedPhrase('');
-                      setLocalError(null);
-                    }}
-                    className="rounded-full px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50"
-                  >
-                    {t('profile.deleteAccount.back')}
-                  </button>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      disabled={deleting}
-                      onClick={closeModal}
-                      className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      {t('profile.deleteAccount.cancel')}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={deleting || !phraseMatches}
-                      onClick={() => void handleFinalDelete()}
-                      className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-                    >
-                      {deleting ? t('profile.deleteAccount.deleting') : t('profile.deleteAccount.confirm')}
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+              </div>
+            </>
+          )
+        }
+      </AnimatedModalPortal>
     </>
   );
 }

@@ -9,10 +9,13 @@ import { ensureProductVariantAttributesColumn } from "../../utils/db-ensure";
 import { logger } from "../../utils/logger";
 import type { ProductWithRelations } from "./types";
 import type { ProductSortOption } from "@/lib/products/sort";
+import { listPriceSortKey } from "@/lib/products/variant-price-display";
+import { productHasMarcoListingImage } from "@/lib/products/marco-product-image";
 
 type QueryExecutionContext = {
   listingMode: boolean;
   lang: string;
+  includeCompareDescriptions?: boolean;
 };
 
 function localeTranslationScope(lang: string) {
@@ -20,28 +23,57 @@ function localeTranslationScope(lang: string) {
 }
 
 /**
- * Lightweight include for shop grid — skips productAttributes and deep attributeValue joins.
+ * Lightweight include for shop grid — skips productAttributes, but keeps
+ * AttributeValue.colors / imageUrl so product-card swatches can render HEX/gradients.
  */
-function getListingInclude(lang: string) {
-  const locale = localeTranslationScope(lang);
+function getListingInclude(ctx: QueryExecutionContext) {
+  const { lang, includeCompareDescriptions } = ctx;
+  const locales = new Set(["hy", "en", "ru", lang]);
+  if (includeCompareDescriptions) {
+    locales.add("hy");
+  }
+
   return {
-    translations: locale,
+    translations: { where: { locale: { in: [...locales] } } },
     brand: {
       include: {
-        translations: locale,
+        translations: localeTranslationScope(lang),
       },
     },
     variants: {
       where: { published: true },
       select: {
         ...PRODUCT_VARIANT_DB_SELECT,
-        options: true,
+        options: {
+          include: {
+            attributeValue: {
+              select: {
+                id: true,
+                value: true,
+                colors: true,
+                imageUrl: true,
+                attribute: {
+                  select: {
+                    key: true,
+                  },
+                },
+                translations: {
+                  where: { locale: lang },
+                  select: {
+                    locale: true,
+                    label: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
     labels: true,
     categories: {
       include: {
-        translations: locale,
+        translations: localeTranslationScope(lang),
       },
     },
   };
@@ -49,7 +81,7 @@ function getListingInclude(lang: string) {
 
 function resolveQueryInclude(ctx: QueryExecutionContext) {
   if (ctx.listingMode) {
-    return getListingInclude(ctx.lang);
+    return getListingInclude(ctx);
   }
   return {
     ...getBaseInclude(),
@@ -155,8 +187,13 @@ export async function executeProductQuery(
   sort: ProductSortOption = "default",
   listingMode = false,
   lang = "en",
+  includeCompareDescriptions = false,
 ): Promise<ProductWithRelations[]> {
-  const ctx: QueryExecutionContext = { listingMode, lang };
+  const ctx: QueryExecutionContext = {
+    listingMode,
+    lang,
+    includeCompareDescriptions,
+  };
   const orderBy = getOrderBy(sort);
 
   if (listingMode) {
@@ -312,14 +349,22 @@ async function executeWithoutAttributeValue(
   ctx: QueryExecutionContext = { listingMode: false, lang: "en" },
 ): Promise<ProductWithRelations[]> {
   const orderBy = getOrderBy(sort);
-  const include = ctx.listingMode
-    ? getListingInclude(ctx.lang)
-    : getBaseIncludeWithoutAttributeValue();
 
   if (ctx.listingMode) {
+    // Listing fallback must not re-include attributeValue (that is what failed).
+    const listingWithoutAttributeValue = {
+      ...getListingInclude(ctx),
+      variants: {
+        where: { published: true },
+        select: {
+          ...PRODUCT_VARIANT_DB_SELECT,
+          options: true,
+        },
+      },
+    };
     const products = await db.product.findMany({
       where,
-      include,
+      include: listingWithoutAttributeValue,
       orderBy,
       skip,
       take: limit,
@@ -377,10 +422,9 @@ function getOrderBy(sort: ProductSortOption): Prisma.ProductOrderByWithRelationI
  * Listing "from" price: minimum published variant price (matches grid / filter sort).
  */
 function listPriceFromLightVariants(
-  variants: ReadonlyArray<{ price: number }>
+  variants: ReadonlyArray<{ price: number; priceOnRequest?: boolean | null }>,
 ): number {
-  if (variants.length === 0) return 0;
-  return Math.min(...variants.map((v) => v.price));
+  return listPriceSortKey([...variants]);
 }
 
 /**
@@ -400,9 +444,10 @@ export async function fetchProductsPageForPriceSort(
     select: {
       id: true,
       createdAt: true,
+      media: true,
       variants: {
         where: { published: true },
-        select: { price: true },
+        select: { price: true, priceOnRequest: true, imageUrl: true, media: true },
       },
     },
   });
@@ -412,8 +457,12 @@ export async function fetchProductsPageForPriceSort(
       id: row.id,
       listPrice: listPriceFromLightVariants(row.variants),
       createdAt: row.createdAt,
+      isMarco: productHasMarcoListingImage(row),
     }))
     .sort((a, b) => {
+      if (a.isMarco !== b.isMarco) {
+        return a.isMarco ? 1 : -1;
+      }
       if (a.listPrice !== b.listPrice) {
         return sort === "price-asc"
           ? a.listPrice - b.listPrice
@@ -446,6 +495,69 @@ export async function fetchProductsPageForPriceSort(
   const orderMap = new Map(pageIds.map((id, index) => [id, index]));
   products.sort(
     (a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0)
+  );
+
+  return products;
+}
+
+/**
+ * Default catalog pagination: non-Marco images first, then newer createdAt.
+ */
+export async function fetchProductsPageDemotingMarco(
+  where: Prisma.ProductWhereInput,
+  limit: number,
+  skip: number,
+  listingMode: boolean,
+  lang = "en",
+): Promise<ProductWithRelations[]> {
+  const lightRows = await db.product.findMany({
+    where,
+    select: {
+      id: true,
+      createdAt: true,
+      media: true,
+      variants: {
+        where: { published: true },
+        select: { imageUrl: true, media: true },
+      },
+    },
+  });
+
+  const sortedIds = lightRows
+    .map((row) => ({
+      id: row.id,
+      createdAt: row.createdAt.getTime(),
+      isMarco: productHasMarcoListingImage(row),
+    }))
+    .sort((a, b) => {
+      if (a.isMarco !== b.isMarco) {
+        return a.isMarco ? 1 : -1;
+      }
+      return b.createdAt - a.createdAt;
+    })
+    .map((row) => row.id);
+
+  const pageIds = sortedIds.slice(skip, skip + limit);
+  if (pageIds.length === 0) {
+    return [];
+  }
+
+  const narrowedWhere: Prisma.ProductWhereInput = {
+    AND: [where, { id: { in: pageIds } }],
+  };
+
+  const products = await executeProductQuery(
+    narrowedWhere,
+    pageIds.length,
+    0,
+    "default",
+    listingMode,
+    lang,
+  );
+
+  const orderMap = new Map(pageIds.map((id, index) => [id, index]));
+  products.sort(
+    (a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0),
   );
 
   return products;

@@ -2,7 +2,6 @@
  * Unified image URL utilities for consistent handling across the application
  */
 
-import imageCompression from 'browser-image-compression';
 import { logger } from './logger';
 
 /**
@@ -346,8 +345,9 @@ export async function processImageFile(
       initialQuality = 0.8
     } = options || {};
 
+    const imageCompression = (await import('browser-image-compression')).default;
+
     // Process image with compression and EXIF orientation correction
-    // browser-image-compression automatically handles EXIF orientation
     const compressedFile = await imageCompression(file, {
       maxSizeMB,
       maxWidthOrHeight,

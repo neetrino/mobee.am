@@ -38,6 +38,7 @@ export interface BrandOption {
 export interface PriceRangeOption {
   min: number;
   max: number;
+  hasProducts?: boolean;
   stepSize?: number | null;
   stepSizePerCurrency?: Record<string, number> | null;
 }
@@ -72,7 +73,7 @@ const DEFAULT_FILTERS: ProductsFiltersData = {
   colors: [],
   sizes: [],
   brands: [],
-  priceRange: { min: 0, max: 100000, stepSize: null, stepSizePerCurrency: null },
+  priceRange: { min: 0, max: 0, hasProducts: false, stepSize: null, stepSizePerCurrency: null },
 };
 const SHOP_CATEGORY_FILTER_LIMIT = '100';
 

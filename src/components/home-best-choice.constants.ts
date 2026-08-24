@@ -2,14 +2,14 @@ import { LAYOUT_DESKTOP_MIN_WIDTH_PX } from '../lib/layout-breakpoints.constants
 
 /**
  * Home “best choice” / special-offers product rows: cards per horizontal snap page below `lg`.
- * Narrow phones: 2×2 grid per page (four cards).
+ * Narrow phones: one row with two cards per page.
  */
-export const HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_COMPACT = 4;
+export const HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_COMPACT = 2;
 
 /**
- * Tablet / iPad mini while still in the mobile carousel: 3×2 grid per page.
+ * Tablet / iPad mini while still in the mobile carousel: one row with three cards per page.
  */
-export const HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET = 6;
+export const HOME_BEST_CHOICE_MOBILE_CARDS_PER_VIEW_TABLET = 3;
 
 /**
  * ~iPad mini portrait (`744px` CSS); from this width until `lg` the home carousel uses six-card pages.
@@ -24,6 +24,17 @@ export const HOME_BEST_CHOICE_MOBILE_DESKTOP_MIN_WIDTH_PX = LAYOUT_DESKTOP_MIN_W
 export const HOME_BEST_CHOICE_MOBILE_TABLET_RANGE_MEDIA = `(min-width: ${HOME_BEST_CHOICE_MOBILE_TABLET_MIN_WIDTH_PX}px) and (max-width: ${
   HOME_BEST_CHOICE_MOBILE_DESKTOP_MIN_WIDTH_PX - 1
 }px)`;
+
+/** Horizontal space between mobile carousel snap pages (matches Tailwind `gap-4`). */
+export const HOME_BEST_CHOICE_MOBILE_CAROUSEL_PAGE_GAP_CLASS = 'gap-4';
+
+/** Home mobile carousel phone row — two equal-height cards. */
+export const HOME_BEST_CHOICE_MOBILE_INNER_GRID_PHONE_CLASS =
+  'grid grid-cols-2 gap-x-2 gap-y-5';
+
+/** Home mobile carousel tablet row — three equal-height cards. */
+export const HOME_BEST_CHOICE_MOBILE_INNER_GRID_TABLET_CLASS =
+  'grid grid-cols-3 gap-x-5 gap-y-5';
 
 /**
  * Column/gap track for home best-choice desktop grid and cart line items.
@@ -86,8 +97,14 @@ export const HOME_CURATED_SECTION_MOBILE_TITLE_CLASS =
   'text-xl font-bold leading-snug text-[#303030]' as const;
 
 /**
- * Home special-offers block: vertical offset from the featured (“Առաջարկված”) row above.
- * Mobile-only bump; `lg` keeps the large gap under the desktop intro layout.
+ * Following curated product block on home: offset from the row above.
+ * Mobile bump + large `lg` gap under the previous desktop intro/grid.
  */
-export const HOME_SPECIAL_OFFERS_SECTION_OUTER_MARGIN_CLASS =
+export const HOME_CURATED_SECTION_FOLLOWING_MARGIN_CLASS =
   'mt-8 lg:mt-[9rem]' as const;
+
+/**
+ * First curated product block on home: same vertical offset as following curated blocks.
+ */
+export const HOME_CURATED_SECTION_FIRST_TOP_CLASS =
+  HOME_CURATED_SECTION_FOLLOWING_MARGIN_CLASS;

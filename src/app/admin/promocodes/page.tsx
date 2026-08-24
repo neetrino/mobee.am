@@ -1,13 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
 import { Check, Copy, Trash2 } from 'lucide-react';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
-import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { apiClient, ApiError } from '../../../lib/api-client';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '../../../components/Toast';
 import { confirmDialog } from '../../../components/ConfirmDialog';
 
@@ -61,9 +58,6 @@ function getErrorDetail(error: unknown, fallback: string): string {
 
 export default function PromoCodesPage() {
   const { t } = useTranslation();
-  const router = useRouter();
-  const pathname = usePathname();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
 
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,16 +87,8 @@ export default function PromoCodesPage() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && (!isLoggedIn || !isAdmin)) {
-      router.push('/supersudo');
-    }
-  }, [isAdmin, isLoading, isLoggedIn, router]);
-
-  useEffect(() => {
-    if (!isLoading && isLoggedIn && isAdmin) {
-      fetchPromoCodes();
-    }
-  }, [fetchPromoCodes, isAdmin, isLoading, isLoggedIn]);
+    fetchPromoCodes();
+  }, [fetchPromoCodes]);
 
   useEffect(() => {
     return () => {
@@ -218,23 +204,7 @@ export default function PromoCodesPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
-
   return (
-    <AdminPageShell currentPath={pathname || '/supersudo/promocodes'} router={router} t={t}>
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.promocodes.title')}</h1>
@@ -373,6 +343,5 @@ export default function PromoCodesPage() {
           </Card>
         </div>
       </div>
-    </AdminPageShell>
   );
 }

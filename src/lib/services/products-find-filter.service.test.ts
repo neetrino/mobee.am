@@ -47,3 +47,56 @@ describe("productsFindFilterService sorting", () => {
     expect(sorted.map((item) => item.id)).toEqual(["3", "2", "1"]);
   });
 });
+
+describe("productsFindFilterService brand tokens", () => {
+  function createBrandedProduct(input: {
+    id: string;
+    brandId: string;
+    slug: string;
+    name: string;
+  }): ProductWithRelations {
+    return {
+      id: input.id,
+      brandId: input.brandId,
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      translations: [{ locale: "en", title: input.name }],
+      variants: [{ price: 100, options: [] }],
+      brand: {
+        id: input.brandId,
+        slug: input.slug,
+        translations: [{ locale: "en", name: input.name }],
+      },
+    } as unknown as ProductWithRelations;
+  }
+
+  const apple = createBrandedProduct({
+    id: "p1",
+    brandId: "brand_1",
+    slug: "apple",
+    name: "Apple",
+  });
+  const samsung = createBrandedProduct({
+    id: "p2",
+    brandId: "brand_2",
+    slug: "samsung",
+    name: "Samsung",
+  });
+
+  it("keeps products when the URL brand token is the home-logo slug", () => {
+    const filtered = productsFindFilterService.filterProducts(
+      [apple, samsung],
+      { brand: "apple", lang: "en" },
+      [],
+    );
+    expect(filtered.map((item) => item.id)).toEqual(["p1"]);
+  });
+
+  it("keeps products when the URL brand token is the database id", () => {
+    const filtered = productsFindFilterService.filterProducts(
+      [apple, samsung],
+      { brand: "brand_2", lang: "en" },
+      [],
+    );
+    expect(filtered.map((item) => item.id)).toEqual(["p2"]);
+  });
+});

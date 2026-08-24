@@ -40,9 +40,10 @@ describe("auth.schema", () => {
   });
 
   describe("register", () => {
-    it("parses valid register with email", () => {
+    it("parses valid register with all required fields", () => {
       const body = {
         email: "u@x.com",
+        phone: "+37412345678",
         password: "123456",
         firstName: "A",
         lastName: "B",
@@ -51,19 +52,35 @@ describe("auth.schema", () => {
       expect(safeParseRegister(body).success).toBe(true);
     });
 
-    it("parses valid register with phone", () => {
-      const body = { phone: "+123", password: "123456" };
-      expect(parseRegisterBody(body)).toEqual(body);
+    it("rejects when phone is missing", () => {
+      const body = {
+        email: "u@x.com",
+        password: "123456",
+        firstName: "A",
+        lastName: "B",
+      };
+      expect(safeParseRegister(body).success).toBe(false);
     });
 
     it("rejects password shorter than 6", () => {
-      const body = { email: "u@x.com", password: "12345" };
+      const body = {
+        email: "u@x.com",
+        phone: "+37412345678",
+        password: "12345",
+        firstName: "A",
+        lastName: "B",
+      };
       expect(() => parseRegisterBody(body)).toThrow();
       expect(safeParseRegister(body).success).toBe(false);
     });
 
-    it("rejects when neither email nor phone", () => {
-      const body = { password: "123456" };
+    it("rejects when email is missing", () => {
+      const body = {
+        phone: "+37412345678",
+        password: "123456",
+        firstName: "A",
+        lastName: "B",
+      };
       expect(() => parseRegisterBody(body)).toThrow();
     });
   });

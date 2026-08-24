@@ -53,7 +53,7 @@ describe("getCachedProductFilters", () => {
       colors: [],
       sizes: [],
       brands: [],
-      priceRange: { min: 0, max: 100, stepSize: null, stepSizePerCurrency: null },
+      priceRange: { min: 0, max: 100, hasProducts: true, stepSize: null, stepSizePerCurrency: null },
     };
     vi.mocked(cacheService.get).mockResolvedValue(JSON.stringify(payload));
 
@@ -68,7 +68,7 @@ describe("getCachedProductFilters", () => {
       colors: [{ value: "black", label: "Black", count: 2 }],
       sizes: [],
       brands: [],
-      priceRange: { min: 0, max: 5000, stepSize: 100, stepSizePerCurrency: null },
+      priceRange: { min: 0, max: 5000, hasProducts: true, stepSize: 100, stepSizePerCurrency: null },
     };
     vi.mocked(cacheService.get).mockResolvedValue(null);
     vi.mocked(productsService.getFilters).mockResolvedValue(payload);

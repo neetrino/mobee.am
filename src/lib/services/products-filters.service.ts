@@ -1,12 +1,17 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
 import {
-  PRODUCT_VARIANT_DB_SELECT,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
 } from "@/lib/database/productVariantDb.constants";
 import { adminSettingsService } from "./admin/admin-settings.service";
 import { ProductWithRelations } from "./products-find-query.service";
 import { buildCategoryTreesOrWhere } from "./products-find-query/category-utils";
+import {
+  computePriceBoundsFromProductRows,
+  loadPriceBounds,
+} from "./products-price-range.utils";
+import { loadProductDiscountContext } from "./products-find-transform.service";
+import { minPricedVariantPrice } from "../products/variant-price-display";
 
 class ProductsFiltersService {
   /**
@@ -127,19 +132,18 @@ class ProductsFiltersService {
 
     // Compute price range from the base result set (before price filter is applied),
     // so slider bounds remain stable while users adjust min/max values.
-    let rangeMin = Infinity;
-    let rangeMax = 0;
-    products.forEach((product: ProductWithRelations) => {
-      if (!product || !product.variants || !Array.isArray(product.variants)) {
-        return;
-      }
-      product.variants.forEach((v: { price?: number }) => {
-        if (typeof v?.price === 'number') {
-          if (v.price < rangeMin) rangeMin = v.price;
-          if (v.price > rangeMax) rangeMax = v.price;
-        }
-      });
-    });
+    const discounts = await loadProductDiscountContext();
+    const priceBounds = computePriceBoundsFromProductRows(
+      products.map((product) => ({
+        discountPercent: product.discountPercent,
+        primaryCategoryId: product.primaryCategoryId,
+        brandId: product.brandId,
+        variants: Array.isArray(product.variants) ? product.variants : [],
+      })),
+      discounts,
+    );
+    const priceMin = priceBounds.min;
+    const priceMax = priceBounds.max;
 
     // Filter by price in memory
     if (filters.minPrice || filters.maxPrice) {
@@ -149,10 +153,9 @@ class ProductsFiltersService {
         if (!product || !product.variants || !Array.isArray(product.variants)) {
           return false;
         }
-        const prices = product.variants.map((v: { price?: number }) => v?.price).filter((p: number | undefined): p is number => p !== undefined);
-        if (prices.length === 0) return false;
-        const minPrice = Math.min(...prices);
-        return minPrice >= min && minPrice <= max;
+        const listMin = minPricedVariantPrice(product.variants);
+        if (listMin == null) return false;
+        return listMin >= min && listMin <= max;
       });
     }
 
@@ -264,26 +267,25 @@ class ProductsFiltersService {
         });
       });
       
-      // Also check productAttributes for color attribute values with imageUrl and colors
+      // Enrich variant-derived colors with imageUrl/colors from attribute definitions.
+      // Do not add colors that are not present on any variant (count would stay 0).
       if ((product as any).productAttributes && Array.isArray((product as any).productAttributes)) {
         (product as any).productAttributes.forEach((productAttr: any) => {
           if (productAttr.attribute?.key === 'color' && productAttr.attribute?.values) {
             productAttr.attribute.values.forEach((attrValue: any) => {
               const translation = attrValue.translations?.find((t: { locale: string }) => t.locale === lang) || attrValue.translations?.[0];
               const colorValue = translation?.label || attrValue.value || "";
-              if (colorValue) {
-                const colorKey = colorValue.toLowerCase();
-                const existing = colorMap.get(colorKey);
-                // Update if we have imageUrl or colors hex and they're not already set
-                if (attrValue.imageUrl || attrValue.colors) {
-                  colorMap.set(colorKey, {
-                    count: existing?.count || 0,
-                    label: existing?.label || colorValue,
-                    imageUrl: attrValue.imageUrl || existing?.imageUrl || null,
-                    colors: attrValue.colors || existing?.colors || null,
-                  });
-                }
-              }
+              if (!colorValue) return;
+
+              const colorKey = colorValue.toLowerCase();
+              const existing = colorMap.get(colorKey);
+              if (!existing || (!attrValue.imageUrl && !attrValue.colors)) return;
+
+              colorMap.set(colorKey, {
+                ...existing,
+                imageUrl: attrValue.imageUrl || existing.imageUrl || null,
+                colors: attrValue.colors || existing.colors || null,
+              });
             });
           }
         });
@@ -293,13 +295,15 @@ class ProductsFiltersService {
     // Convert maps to arrays
     const colors: Array<{ value: string; label: string; count: number; imageUrl?: string | null; colors?: string[] | null }> = Array.from(
       colorMap.entries()
-    ).map(([key, data]) => ({
-      value: key, // lowercase for filtering
-      label: data.label, // canonical label (prefer capitalized)
-      count: data.count, // merged count
-      imageUrl: data.imageUrl || null,
-      colors: data.colors || null,
-    }));
+    )
+      .filter(([, data]) => data.count > 0)
+      .map(([key, data]) => ({
+        value: key, // lowercase for filtering
+        label: data.label, // canonical label (prefer capitalized)
+        count: data.count, // merged count
+        imageUrl: data.imageUrl || null,
+        colors: data.colors || null,
+      }));
 
     const sizes: Array<{ value: string; count: number }> = Array.from(
       sizeMap.entries()
@@ -323,8 +327,6 @@ class ProductsFiltersService {
       colors.sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label));
 
       const brands = Array.from(brandMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-      const priceMin = rangeMin === Infinity ? 0 : Math.floor(rangeMin / 1000) * 1000;
-      const priceMax = rangeMax === 0 ? 100000 : Math.ceil(rangeMax / 1000) * 1000;
       let stepSize: number | null = null;
       let stepSizePerCurrency: Record<string, number> | null = null;
       try {
@@ -346,7 +348,13 @@ class ProductsFiltersService {
         colors,
         sizes,
         brands,
-        priceRange: { min: priceMin, max: priceMax, stepSize, stepSizePerCurrency },
+        priceRange: {
+          min: priceMin,
+          max: priceMax,
+          hasProducts: priceBounds.hasProducts,
+          stepSize,
+          stepSizePerCurrency,
+        },
       };
     } catch (error) {
       console.error('❌ [PRODUCTS FILTERS SERVICE] Error in getFilters:', error);
@@ -354,7 +362,7 @@ class ProductsFiltersService {
         colors: [],
         sizes: [],
         brands: [],
-        priceRange: { min: 0, max: 100000, stepSize: null, stepSizePerCurrency: null },
+        priceRange: { min: 0, max: 0, hasProducts: false, stepSize: null, stepSizePerCurrency: null },
       };
     }
   }
@@ -362,51 +370,13 @@ class ProductsFiltersService {
   /**
    * Get price range
    */
-  async getPriceRange(filters: { category?: string; lang?: string }) {
-    const where: Prisma.ProductWhereInput = {
-      published: true,
-      deletedAt: null,
-    };
-
-    if (filters.category) {
-      const catWhere = await buildCategoryTreesOrWhere(
-        filters.category,
-        filters.lang || "en",
-      );
-      if (catWhere) {
-        Object.assign(where, catWhere);
-      }
-    }
-
-    const products = await db.product.findMany({
-      where,
-      include: {
-        variants: {
-          where: {
-            published: true,
-          },
-          select: PRODUCT_VARIANT_DB_SELECT,
-        },
-      },
+  async getPriceRange(filters: { category?: string; search?: string; lang?: string }) {
+    const priceBounds = await loadPriceBounds({
+      category: filters.category,
+      search: filters.search,
+      lang: filters.lang,
     });
 
-    let minPrice = Infinity;
-    let maxPrice = 0;
-
-    products.forEach((product: { variants: Array<{ price: number }> }) => {
-      if (product.variants.length > 0) {
-        const prices = product.variants.map((v: { price: number }) => v.price);
-        const productMin = Math.min(...prices);
-        const productMax = Math.max(...prices);
-        if (productMin < minPrice) minPrice = productMin;
-        if (productMax > maxPrice) maxPrice = productMax;
-      }
-    });
-
-    minPrice = minPrice === Infinity ? 0 : Math.floor(minPrice / 1000) * 1000;
-    maxPrice = maxPrice === 0 ? 100000 : Math.ceil(maxPrice / 1000) * 1000;
-
-    // Load price filter settings to provide optional step sizes per currency
     let stepSize: number | null = null;
     let stepSizePerCurrency: {
       USD?: number;
@@ -420,9 +390,6 @@ class ProductsFiltersService {
       stepSize = settings.stepSize ?? null;
 
       if (settings.stepSizePerCurrency) {
-        // stepSizePerCurrency in settings is stored in display currency units.
-        // Here we pass them through to the frontend as-is; the slider logic
-        // will choose the appropriate value for the active currency.
         stepSizePerCurrency = {
           USD: settings.stepSizePerCurrency.USD ?? undefined,
           AMD: settings.stepSizePerCurrency.AMD ?? undefined,
@@ -431,12 +398,16 @@ class ProductsFiltersService {
         };
       }
     } catch (error) {
-      console.error('❌ [PRODUCTS FILTERS SERVICE] Error loading price filter settings for price range:', error);
+      console.error(
+        "❌ [PRODUCTS FILTERS SERVICE] Error loading price filter settings for price range:",
+        error,
+      );
     }
 
     return {
-      min: minPrice,
-      max: maxPrice,
+      min: priceBounds.min,
+      max: priceBounds.max,
+      hasProducts: priceBounds.hasProducts,
       stepSize,
       stepSizePerCurrency,
     };

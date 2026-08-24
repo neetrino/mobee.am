@@ -133,7 +133,7 @@ async function initRedis() {
 /**
  * Get value from cache
  */
-export async function get(key: string): Promise<string | null> {
+export async function get(key: string): Promise<string | unknown | null> {
   if (!redisAvailable) {
     await initRedis();
   }

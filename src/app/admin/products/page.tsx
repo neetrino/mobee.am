@@ -1,25 +1,31 @@
 ﻿'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { buildAdminSessionCacheKey, readAdminSessionCache } from '@/lib/admin/admin-session-cache';
+import { fetchAdminListWithCache } from '@/lib/admin/admin-list-cache';
+import { DEFAULT_PRODUCTS_LIST_PARAMS } from '@/lib/admin/admin-page-warm';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getStoredCurrency, initializeCurrencyRates, type CurrencyCode } from '../../../lib/currency';
 import { ProductFilters } from './components/ProductFilters';
 import { ProductsTable } from './components/ProductsTable';
 import { useProductHandlers } from './hooks/useProductHandlers';
 import type { Product, ProductsResponse, Category } from './types';
-import { AdminPageShell } from '../components/AdminPageShell';
 import { showToast } from '@/components/Toast';
+import { useAdminPageNavDebug } from '../hooks/useAdminPageNavDebug';
 
 export default function ProductsPage() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading } = useAuth();
+  const { isLoggedIn, isAdmin } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const initialProductsCache = readAdminSessionCache<ProductsResponse>(
+    buildAdminSessionCacheKey('/supersudo/products', DEFAULT_PRODUCTS_LIST_PARAMS),
+  );
+  const [products, setProducts] = useState<Product[]>(initialProductsCache?.data ?? []);
+  const [loading, setLoading] = useState(initialProductsCache === null);
   const [search, setSearch] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [categories, setCategories] = useState<Category[]>([]);
@@ -28,7 +34,7 @@ export default function ProductsPage() {
   const [skuSearch, setSkuSearch] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'inStock' | 'outOfStock'>('all');
   const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState<ProductsResponse['meta'] | null>(null);
+  const [meta, setMeta] = useState<ProductsResponse['meta'] | null>(initialProductsCache?.meta ?? null);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('createdAt-desc');
@@ -37,16 +43,14 @@ export default function ProductsPage() {
   const [_togglingAllFeatured, setTogglingAllFeatured] = useState(false);
   const [currency, setCurrency] = useState<CurrencyCode>('USD');
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !isAdmin) {
-        router.push('/supersudo');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
+  useAdminPageNavDebug(loading || categoriesLoading);
 
-  // Initialize currency rates and listen for currency changes
+  useEffect(() => {
+    if (isLoggedIn && isAdmin) {
+      void fetchCategories();
+    }
+  }, [isLoggedIn, isAdmin]);
+
   useEffect(() => {
     const updateCurrency = () => {
       const newCurrency = getStoredCurrency();
@@ -76,13 +80,6 @@ export default function ProductsPage() {
     }
   }, []);
 
-  // Fetch categories on mount
-  useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchCategories();
-    }
-  }, [isLoggedIn, isAdmin]);
-
   // Close category dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -104,7 +101,7 @@ export default function ProductsPage() {
     try {
       setCategoriesLoading(true);
       console.log('📂 [ADMIN] Fetching categories...');
-      const response = await apiClient.get<{ data: Category[] }>('/api/v1/admin/categories');
+      const response = await fetchAdminReference<{ data: Category[] }>('categories');
       setCategories(response.data || []);
       console.log('✅ [ADMIN] Categories loaded:', response.data?.length || 0);
     } catch (err: any) {
@@ -122,9 +119,8 @@ export default function ProductsPage() {
      
   }, [isLoggedIn, isAdmin, page, search, selectedCategories, skuSearch, stockFilter, sortBy, minPrice, maxPrice]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (force = false) => {
     try {
-      setLoading(true);
       const params: Record<string, string> = {
         page: page.toString(),
         limit: '20',
@@ -158,13 +154,33 @@ export default function ProductsPage() {
         params.stock = stockFilter;
       }
 
-      const response = await apiClient.get<ProductsResponse>('/api/v1/admin/products', {
+      const cached = readAdminSessionCache<ProductsResponse>(
+        buildAdminSessionCacheKey('/supersudo/products', params),
+      );
+      if (!force && cached) {
+        setProducts(cached.data || []);
+        setMeta(cached.meta || null);
+        setLoading(false);
+        return;
+      }
+
+      if (products.length === 0 && !cached) {
+        setLoading(true);
+      }
+
+      const { data: response } = await fetchAdminListWithCache<ProductsResponse>({
+        route: '/supersudo/products',
         params,
+        force,
+        fetcher: () =>
+          apiClient.get<ProductsResponse>('/api/v1/admin/products', {
+            params,
+          }),
       });
 
       setProducts(response.data || []);
       setMeta(response.meta || null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [ADMIN] Error fetching products:', err);
       showToast(
         t('admin.products.errorLoading').replace(
@@ -287,26 +303,8 @@ export default function ProductsPage() {
     setPage(1);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null;
-  }
-
-  const currentPath = pathname || '/supersudo/products';
-
   return (
-    <AdminPageShell currentPath={currentPath} router={router} t={t}>
-      <div className="mx-auto w-full max-w-7xl">
+    <div className="mx-auto w-full max-w-7xl">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('admin.products.title')}</h1>
@@ -379,6 +377,5 @@ export default function ProductsPage() {
           setPage={setPage}
         />
       </div>
-    </AdminPageShell>
   );
 }

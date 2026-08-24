@@ -1,0 +1,121 @@
+{
+  "title": "Installment Terms",
+  "lastUpdated": "Last updated:",
+  "intro": "Below are the requirements for arranging an installment plan, the general terms, and partner bank offers.",
+  "sections": {
+    "eligibility": {
+      "title": "Requirements for arranging an installment",
+      "description": "To arrange an installment plan, you must meet the following requirements:",
+      "items": {
+        "age": "Be 18–70 years old",
+        "citizen": "Be a citizen of the Republic of Armenia",
+        "employment": "Be a registered employee or have a clean credit history",
+        "documents": "Have a passport, social card, or ID card",
+        "foreigners": "Foreign citizens must provide a certificate from their place of registration",
+        "online": "Online installment arrangement is also available from your preferred location without visiting the store"
+      }
+    },
+    "generalTerms": {
+      "title": "Provided installment terms",
+      "description": "Main installment terms:",
+      "items": {
+        "downPayment": "0% down payment (at the customer’s option)",
+        "interest": "0–12% interest rate (depending on the chosen bank)",
+        "term": "3–60 months repayment term",
+        "serviceFee": "Account service fee — monthly from 1% of the total value, depending on the bank selected"
+      }
+    },
+    "partnerBanks": {
+      "title": "Partner banks",
+      "description": "Installments are available through the following partner banks. Terms may be changed by the bank."
+    },
+    "disclaimer": {
+      "title": "Important note",
+      "description": "Dear customer, please note that there may be certain differences between this estimate and the payment schedule approved by the bank at the time of in-store installment arrangement, depending on personal data."
+    }
+  },
+  "banks": {
+    "acba": {
+      "name": "ACBA-CREDIT AGRICOLE BANK CJSC",
+      "items": {
+        "minTerm": "Minimum term — 3 months",
+        "maxTerm": "Maximum term — 48 months",
+        "minAmount": "Minimum amount — 26,000 AMD",
+        "maxAmount": "Maximum amount — 3,500,000 AMD",
+        "collateral": "Collateral — the purchased product",
+        "nominalRate": "Annual nominal interest rate — 21.6% per year without a service fee",
+        "effectiveRate": "Annual effective interest rate — 23.8–24%",
+        "repayment": "Loan repayments — equal monthly payments",
+        "commission": "Loan commission — 0% monthly of the contractual loan amount",
+        "interestCalc": "Interest calculation — daily on the declining loan balance"
+      }
+    },
+    "aeb": {
+      "name": "ARMECONOMBANK",
+      "items": {
+        "currency": "Loan currency — AMD",
+        "amount": "Loan amount — 25,000–2,000,000 AMD",
+        "annualRate": "Annual interest rate — 0–21.5%",
+        "effectiveRate": "Effective interest rate — 0–24%",
+        "term": "Loan term — 6–36 months",
+        "downPayment": "Down payment — from 0%",
+        "serviceFee": "Commission — during loan servicing, a monthly account service fee of 0–1% of the loan balance is charged. In case of early repayment, it is reduced proportionally"
+      }
+    },
+    "ineco": {
+      "name": "INECOBANK",
+      "items": {
+        "age": "Limit requests may be made by persons aged 18–70",
+        "amount": "Loan amount — 30,000–15,000,000 AMD",
+        "term": "Loan term via the “Installment on the spot” system — 12–36 months",
+        "nominalRate": "Annual nominal interest rate — 19–21.7%",
+        "effectiveRate": "Annual effective interest rate — 0–23.99%",
+        "monthlyFee": "Monthly loan service fee — 0%",
+        "latePenalty": "Overdue obligations — a penalty of 0.13% of the overdue amount is charged for each day of delay",
+        "earlyRepayment": "Early repayment penalty — not applied"
+      }
+    },
+    "vtb": {
+      "name": "VTB ARMENIA BANK CJSC",
+      "items": {
+        "age": "Limit requests may be made by men aged 20+ and women aged 18+",
+        "nominalRate": "Nominal loan interest rate (depending on cooperation terms with the retail point) — 0%–21.4%",
+        "term": "Loan term in months (depending on cooperation terms with the retail point) — 3–60 months",
+        "maxAmount": "Maximum loan amount — 4,500,000 AMD",
+        "minAmount": "Minimum loan amount — 30,000 AMD",
+        "penalty": "In case of non-performance, penalties on overdue loan and interest — 0.13% for each overdue calendar day"
+      }
+    },
+    "ameria": {
+      "name": "AMERIABANK CJSC",
+      "items": {
+        "effectiveRate": "Annual effective loan interest rate — 18.5–21%",
+        "amount": "Loan amount — 50,000–6,000,000 AMD",
+        "term": "Loan term — 6–36 months"
+      }
+    },
+    "unibank": {
+      "name": "UNIBANK",
+      "items": {
+        "effectiveRate": "Annual effective loan interest rate — 23–24%",
+        "productPage": "Product page — https://www.unibank.am/hy/service/consumer/u-aparik/",
+        "bankSite": "Bank website — https://www.unibank.am/hy/",
+        "contacts": "Bank contacts — (37410) 59-22-59; 59-55-55",
+        "supervision": "The bank is supervised by the Central Bank"
+      }
+    },
+    "evoca": {
+      "name": "EVOCABANK OJSC",
+      "items": {
+        "borrower": "Borrower — RA resident individuals aged 20+, whose age during loan servicing will not exceed 65",
+        "currency": "Currency — AMD",
+        "disbursement": "Loan disbursement method — non-cash",
+        "term": "Loan term — 24–48 months",
+        "amount": "Loan amount — 50,000–1,500,000 AMD",
+        "commission": "Customer commission calculated monthly on the initial principal — 0%",
+        "annualRate": "Annual loan interest rate — 21.5%",
+        "partnerFee": "Partner organization commission (one-time) — 1.5%"
+      }
+    }
+  }
+}

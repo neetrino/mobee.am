@@ -7,6 +7,7 @@ import {
   releaseVariantStockReservation,
   reserveVariantStock,
 } from "./inventory/stock-reservation";
+import { assertVariantPurchasable } from "../products/variant-price-display";
 
 class CartService {
   /**
@@ -100,6 +101,7 @@ class CartService {
           price: number;
           compareAtPrice?: number | null;
           imageUrl?: string | null;
+          media?: unknown;
         };
       }) => {
         const product = item.product;
@@ -110,7 +112,7 @@ class CartService {
 
         const imageUrl = resolveCartLineProductImageUrl(
           { media: product?.media },
-          { imageUrl: variant?.imageUrl ?? null },
+          { imageUrl: variant?.imageUrl ?? null, media: variant?.media },
         );
 
         const productDiscount = product?.discountPercent ?? 0;
@@ -202,7 +204,7 @@ class CartService {
 
     const variant = await db.productVariant.findUnique({
       where: { id: variantId },
-      select: { id: true, published: true, productId: true, price: true },
+      select: { id: true, published: true, productId: true, price: true, priceOnRequest: true },
     });
 
     if (!variant || !variant.published) {
@@ -212,6 +214,8 @@ class CartService {
         title: "Variant not found",
       };
     }
+
+    assertVariantPurchasable(variant);
 
     /** Trust DB relation — client `productId` can be stale (wishlist/cache); cart row must match variant. */
     const resolvedProductId = variant.productId;

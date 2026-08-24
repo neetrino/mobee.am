@@ -14,7 +14,8 @@
     "search": "Search",
     "shopNow": "Shop Now",
     "viewMore": "View More",
-    "close": "Close"
+    "close": "Close",
+    "back": "Back"
   },
   "dialog": {
     "confirm": "Confirm"
@@ -24,6 +25,8 @@
     "home": "Home",
     "products": "Shop",
     "categories": "Categories",
+    "previousCategories": "Previous categories",
+    "nextCategories": "Next categories",
     "cart": "Cart",
     "wishlist": "Wishlist",
     "compare": "Compare",
@@ -96,7 +99,6 @@
   "compare": {
     "title": "Compare Products",
     "empty": "No products to compare",
-    "emptyDescription": "Add products to compare by category — up to 4 in each category (e.g. phones with phones, watches with watches). Different categories appear in separate sections.",
     "perCategoryHint": "Each category has its own comparison table (up to 4 products per category).",
     "uncategorized": "Other products",
     "category": "Category",
@@ -216,6 +218,11 @@
   "defaults": {
     "category": "Grocery"
   },
+  "productLabels": {
+    "new": "New",
+    "sale": "Sale",
+    "hot": "Hot"
+  },
   "footer": {
     "visitUs": "Visit us",
     "locationHeading": "Our location",
@@ -228,13 +235,16 @@
     "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Products",
     "sectionsHeading": "Sections",
+    "sectionsContact": "Contact us",
     "termsHeading": "Terms",
+    "policiesHeading": "Policies",
     "connectHeading": "Connect",
     "shop": "Shop",
     "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
       "refund": "Return & Exchange Policy",
       "delivery": "Delivery Policy",
+      "credit": "Installment Terms",
       "terms": "Terms of Service",
       "privacy": "Privacy Policy"
     },
@@ -250,6 +260,14 @@
       "policiesNavLabel": "Legal and policies",
       "paymentMethodsLabel": "Accepted payment methods"
     }
+  },
+  "stickyContact": {
+    "openMenu": "Open contact options",
+    "closeMenu": "Close contact options",
+    "menuLabel": "Contact options",
+    "yandexMaps": "Open in Yandex Maps",
+    "whatsapp": "WhatsApp",
+    "callNow": "Call now"
   },
   "product": {
     "product": "product",

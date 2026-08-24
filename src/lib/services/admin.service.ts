@@ -22,6 +22,7 @@ class AdminService {
   getUserActivity = adminStatsService.getUserActivity.bind(adminStatsService);
   getRecentOrders = adminStatsService.getRecentOrders.bind(adminStatsService);
   getTopProducts = adminStatsService.getTopProducts.bind(adminStatsService);
+  getDashboardBundle = adminStatsService.getDashboardBundle.bind(adminStatsService);
   getActivity = adminStatsService.getActivity.bind(adminStatsService);
   getAnalytics = adminStatsService.getAnalytics.bind(adminStatsService);
 
@@ -41,6 +42,8 @@ class AdminService {
   updateSettings = adminSettingsService.updateSettings.bind(adminSettingsService);
   getPriceFilterSettings = adminSettingsService.getPriceFilterSettings.bind(adminSettingsService);
   updatePriceFilterSettings = adminSettingsService.updatePriceFilterSettings.bind(adminSettingsService);
+  getHomeHeroSettings = adminSettingsService.getHomeHeroSettings.bind(adminSettingsService);
+  updateHomeHeroSettings = adminSettingsService.updateHomeHeroSettings.bind(adminSettingsService);
 
   // Delivery methods
   getDeliverySettings = adminDeliveryService.getDeliverySettings.bind(adminDeliveryService);

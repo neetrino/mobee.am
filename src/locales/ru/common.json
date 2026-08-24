@@ -14,7 +14,8 @@
     "search": "Поиск",
     "shopNow": "Купить сейчас",
     "viewMore": "Узнать больше",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "back": "Назад"
   },
   "dialog": {
     "confirm": "Подтвердить"
@@ -24,6 +25,8 @@
     "home": "Главная",
     "products": "Товары",
     "categories": "Категории",
+    "previousCategories": "Предыдущие категории",
+    "nextCategories": "Следующие категории",
     "cart": "Корзина",
     "wishlist": "Избранное",
     "compare": "Сравнить",
@@ -96,7 +99,6 @@
   "compare": {
     "title": "Сравнить товары",
     "empty": "Нет товаров для сравнения",
-    "emptyDescription": "Добавляйте товары по категориям — до 4 в каждой (например телефоны с телефонами, часы с часами). Разные категории показываются отдельными блоками.",
     "perCategoryHint": "У каждой категории своя таблица сравнения (до 4 товаров в категории).",
     "uncategorized": "Другие товары",
     "category": "Категория",
@@ -216,6 +218,11 @@
   "defaults": {
     "category": "Бакалея"
   },
+  "productLabels": {
+    "new": "Новинка",
+    "sale": "Скидка",
+    "hot": "Хит"
+  },
   "footer": {
     "visitUs": "Посетите нас",
     "locationHeading": "Наш адрес",
@@ -228,13 +235,16 @@
     "allRightsReserved": "All Rights Reserved.",
     "productsHeading": "Товары",
     "sectionsHeading": "Разделы",
+    "sectionsContact": "Обратная связь",
     "termsHeading": "Условия",
+    "policiesHeading": "Политики",
     "connectHeading": "Связь",
     "shop": "Магазин",
     "copyright": "© {year} Mobee. All rights reserved.",
     "policiesRow": {
       "refund": "Политика возврата и обмена",
       "delivery": "Политика доставки",
+      "credit": "Условия рассрочки",
       "terms": "Условия обслуживания",
       "privacy": "Политика конфиденциальности"
     },
@@ -250,6 +260,14 @@
       "policiesNavLabel": "Правовая информация",
       "paymentMethodsLabel": "Способы оплаты"
     }
+  },
+  "stickyContact": {
+    "openMenu": "Открыть варианты связи",
+    "closeMenu": "Закрыть варианты связи",
+    "menuLabel": "Варианты связи",
+    "yandexMaps": "Открыть в Яндекс Картах",
+    "whatsapp": "WhatsApp",
+    "callNow": "Позвонить"
   },
   "product": {
     "product": "товар",

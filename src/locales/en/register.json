@@ -5,7 +5,7 @@
     "firstName": "First Name",
     "lastName": "Last Name",
     "email": "Email",
-    "phone": "Phone (optional if email is provided)",
+    "phone": "Phone",
     "password": "Password",
     "confirmPassword": "Confirm Password",
     "acceptTerms": "I agree to",
@@ -28,7 +28,10 @@
   "errors": {
     "acceptTerms": "Please accept the Terms of Service and Privacy Policy",
     "mustAcceptTerms": "You must accept the terms to continue",
-    "emailOrPhoneRequired": "Please provide email or phone number",
+    "firstNameRequired": "Please enter your first name",
+    "lastNameRequired": "Please enter your last name",
+    "emailRequired": "Please enter your email",
+    "phoneRequired": "Please enter your phone number",
     "passwordRequired": "Please enter a password",
     "passwordMinLength": "Password must be at least 6 characters",
     "passwordsDoNotMatch": "Passwords do not match",
@@ -36,9 +39,3 @@
   },
   "passwordHint": "Must be at least 6 characters"
 }
-
-
-
-
-
-

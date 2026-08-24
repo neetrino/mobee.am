@@ -62,6 +62,3 @@ export const COMPARE_EMPTY_STATE_HEADLINE_STACK_CLASS =
 export const COMPARE_EMPTY_STATE_TITLE_CLASS =
   'max-w-[284px] text-2xl font-bold leading-[1.2] text-[#1c1b1b]';
 
-export const COMPARE_EMPTY_STATE_DESCRIPTION_CLASS =
-  'w-full max-w-[328px] text-sm leading-[1.5] tracking-[0.07px] text-[#6f7384]';
-

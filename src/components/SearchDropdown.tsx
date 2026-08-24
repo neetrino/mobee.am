@@ -2,9 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from '../lib/i18n-client';
 import { formatPrice, getStoredCurrency } from '../lib/currency';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';
+import { ProductImagePlaceholder } from './ProductImagePlaceholder';
+import { buildProductCardCachePayload } from '@/lib/products/product-card-cache';
+import { warmProductCardNavigation } from '@/lib/products/product-card-nav';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
 
 export interface SearchDropdownProps {
@@ -36,7 +40,24 @@ export function SearchDropdown({
   listboxId = 'search-results',
 }: SearchDropdownProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const currency = getStoredCurrency();
+
+  const warmSearchResult = (result: InstantSearchResultItem) => {
+    warmProductCardNavigation(
+      buildProductCardCachePayload({
+        id: result.id,
+        slug: result.slug,
+        title: result.title,
+        price: result.price,
+        hasPrice: result.hasPrice,
+        image: result.image,
+        compareAtPrice: result.compareAtPrice,
+        inStock: true,
+      }),
+      router,
+    );
+  };
 
   if (!isOpen) {
     return null;
@@ -75,18 +96,31 @@ export function SearchDropdown({
                 <button
                   type="button"
                   onClick={() => onResultClick(result)}
+                  onPointerDown={() => warmSearchResult(result)}
+                  onMouseEnter={() => warmSearchResult(result)}
+                  onFocus={() => warmSearchResult(result)}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
                     index === selectedIndex ? 'bg-gray-100' : 'hover:bg-gray-50'
                   }`}
                 >
                   <div className="w-12 h-12 flex-shrink-0 rounded-lg bg-gray-100 overflow-hidden relative">
-                    <Image
-                      src={resolveProductCardImageSrc(result.image)}
-                      alt={result.title}
-                      fill
-                      className="object-cover"
-                      sizes="48px"
-                    />
+                    {(() => {
+                      const src = resolveProductCardImageSrc(result.image);
+                      return src ? (
+                        <Image
+                          src={src}
+                          alt={result.title}
+                          fill
+                          className="object-cover"
+                          sizes="48px"
+                        />
+                      ) : (
+                        <ProductImagePlaceholder
+                          className="h-full w-full"
+                          aria-label={`No image for ${result.title}`}
+                        />
+                      );
+                    })()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 line-clamp-2">
@@ -95,14 +129,19 @@ export function SearchDropdown({
                     {result.category && (
                       <p className="text-xs text-gray-500 mt-0.5">{result.category}</p>
                     )}
-                    <p className="text-sm font-semibold text-gray-700 mt-0.5">
-                      {formatPrice(result.price, currency)}
-                      {result.compareAtPrice != null && result.compareAtPrice > result.price && (
-                        <span className="ml-2 text-xs text-gray-500 line-through">
-                          {formatPrice(result.compareAtPrice, currency)}
-                        </span>
-                      )}
-                    </p>
+                    {(result.hasPrice ?? (result.price != null && result.price > 0)) &&
+                    result.price != null ? (
+                      <p className="text-sm font-semibold text-gray-700 mt-0.5">
+                        {formatPrice(result.price, currency)}
+                        {result.compareAtPrice != null && result.compareAtPrice > result.price ? (
+                          <span className="ml-2 text-xs text-gray-500 line-through">
+                            {formatPrice(result.compareAtPrice, currency)}
+                          </span>
+                        ) : null}
+                      </p>
+                    ) : (
+                      <p className="mt-0.5 min-h-[1.25rem]" aria-hidden="true" />
+                    )}
                   </div>
                 </button>
               </li>

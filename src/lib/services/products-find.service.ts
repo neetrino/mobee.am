@@ -44,6 +44,10 @@ class ProductsFindService {
       paginatedProducts,
       lang,
       discounts,
+      {
+        colors: filters.colors,
+        includeDescriptions: Boolean(filters.ids?.length),
+      },
     );
 
     return {

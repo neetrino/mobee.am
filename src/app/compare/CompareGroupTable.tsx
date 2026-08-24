@@ -1,16 +1,21 @@
 'use client';
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import type { MouseEvent, MutableRefObject, ReactNode } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { apiClient } from '../../lib/api-client';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimation';
 import { resolveProductCardImageSrc } from '../../lib/productCardDisplayImage';
+import { ProductImagePlaceholder } from '../../components/ProductImagePlaceholder';
 import { formatPrice, type CurrencyCode } from '../../lib/currency';
+import { getStoredLanguage } from '../../lib/language';
 import { upsertGuestCartItem } from '../../lib/cart/guest-cart';
+import { dispatchCartUpdated } from '../../lib/cart/dispatch-cart-updated';
 import { showToast } from '../../components/Toast';
+import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
+import { buildCompareSpecTableRows } from '../../lib/products/extract-compare-product-specs';
+import { ProductCardNavLink } from '../../components/ProductCard/ProductCardNavLink';
 
 export interface CompareTableProduct {
   id: string;
@@ -27,7 +32,8 @@ export interface CompareTableProduct {
     id: string;
     name: string;
   } | null;
-  description?: string;
+  description?: string | null;
+  sourceDescription?: string | null;
 }
 
 interface CompareGroupTableProps {
@@ -74,6 +80,21 @@ async function resolveVariantForCart(product: CompareTableProduct): Promise<{
   };
 }
 
+function buildCompareNavPayload(product: CompareTableProduct) {
+  return buildProductCardCachePayload({
+    id: product.id,
+    slug: product.slug,
+    title: product.title,
+    price: product.price,
+    image: product.image,
+    inStock: product.inStock,
+    brand: product.brand,
+    defaultVariantId: product.defaultVariantId,
+    compareAtPrice: product.compareAtPrice ?? product.originalPrice,
+    discountPercent: product.discountPercent,
+  });
+}
+
 function CompareProductColumn({
   product,
   onRemove,
@@ -111,6 +132,21 @@ const CompareGroupTableComponent = ({
   addToCartInFlightRef,
   onRemove,
 }: CompareGroupTableProps) => {
+  const language = getStoredLanguage();
+
+  const descriptionSpecRows = useMemo(
+    () =>
+      buildCompareSpecTableRows(
+        products.map((product) => ({
+          id: product.id,
+          description: product.description,
+          sourceDescription: product.sourceDescription,
+        })),
+        language,
+      ),
+    [products, language],
+  );
+
   const handleAddToCart = useCallback(
     (e: MouseEvent, product: CompareTableProduct) => {
       e.preventDefault();
@@ -141,7 +177,7 @@ const CompareGroupTableComponent = ({
               variantId: resolved.variantId,
               quantity: 1,
             });
-            window.dispatchEvent(new Event('cart-updated'));
+            dispatchCartUpdated();
             dispatchCartFlyAnimation(flyUrl, flySource);
           } catch (error: unknown) {
             console.error('Error adding to guest cart:', error);
@@ -153,11 +189,9 @@ const CompareGroupTableComponent = ({
         return;
       }
 
-      window.dispatchEvent(
-        new CustomEvent('cart-updated', {
-          detail: { optimisticAdd: { quantity: 1, price: product.price } },
-        }),
-      );
+      dispatchCartUpdated({
+        optimisticAdd: { quantity: 1, price: product.price },
+      });
       dispatchCartFlyAnimation(flyUrl, flySource);
       addToCartInFlightRef.current.add(product.id);
 
@@ -166,7 +200,7 @@ const CompareGroupTableComponent = ({
           const resolved = await resolveVariantForCart(product);
           if (!resolved) {
             showToast(t('common.alerts.noVariantsAvailable'), 'warning');
-            window.dispatchEvent(new Event('cart-updated'));
+            dispatchCartUpdated();
             return;
           }
 
@@ -179,14 +213,14 @@ const CompareGroupTableComponent = ({
             },
           );
 
-          window.dispatchEvent(
-            new CustomEvent('cart-updated', {
-              detail: response.cartSummary ?? null,
-            }),
-          );
+          if (response.cartSummary) {
+            dispatchCartUpdated(response.cartSummary);
+          } else {
+            dispatchCartUpdated();
+          }
         } catch (error: unknown) {
           console.error('Error adding to cart:', error);
-          window.dispatchEvent(new Event('cart-updated'));
+          dispatchCartUpdated();
           showToast(t('common.alerts.failedToAddToCart'), 'error');
         } finally {
           addToCartInFlightRef.current.delete(product.id);
@@ -205,33 +239,48 @@ const CompareGroupTableComponent = ({
       id: 'image',
       label: t('common.compare.image'),
       renderCell: (product) => (
-        <Link href={`/products/${product.slug}`} className="inline-block">
+        <ProductCardNavLink
+          slug={product.slug}
+          cachePayload={buildCompareNavPayload(product)}
+          className="inline-block"
+        >
           <div
             className="relative mx-auto h-32 w-32 overflow-hidden rounded-lg bg-gray-100"
             data-cart-fly-source
           >
-            <Image
-              src={resolveProductCardImageSrc(product.image)}
-              alt={product.title}
-              fill
-              className="object-cover"
-              sizes="128px"
-              loading="lazy"
-            />
+            {(() => {
+              const src = resolveProductCardImageSrc(product.image);
+              return src ? (
+                <Image
+                  src={src}
+                  alt={product.title}
+                  fill
+                  className="object-cover"
+                  sizes="128px"
+                  loading="lazy"
+                />
+              ) : (
+                <ProductImagePlaceholder
+                  className="h-full w-full"
+                  aria-label={`No image for ${product.title}`}
+                />
+              );
+            })()}
           </div>
-        </Link>
+        </ProductCardNavLink>
       ),
     },
     {
       id: 'name',
       label: t('common.compare.name'),
       renderCell: (product) => (
-        <Link
-          href={`/products/${product.slug}`}
+        <ProductCardNavLink
+          slug={product.slug}
+          cachePayload={buildCompareNavPayload(product)}
           className="block text-center text-base font-semibold text-gray-900 transition-colors hover:text-blue-600"
         >
           {product.title}
-        </Link>
+        </ProductCardNavLink>
       ),
     },
     {
@@ -264,12 +313,13 @@ const CompareGroupTableComponent = ({
       label: t('common.compare.actions'),
       renderCell: (product) => (
         <div className="flex flex-col items-center gap-2">
-          <Link
-            href={`/products/${product.slug}`}
+          <ProductCardNavLink
+            slug={product.slug}
+            cachePayload={buildCompareNavPayload(product)}
             className="text-sm font-medium text-black transition-colors hover:text-admin-500"
           >
             {t('common.compare.viewDetails')}
-          </Link>
+          </ProductCardNavLink>
           {product.inStock && (
             <button
               type="button"
@@ -284,20 +334,31 @@ const CompareGroupTableComponent = ({
     },
   ];
 
+  const allRows = [
+    ...rows,
+    ...descriptionSpecRows.map((specRow) => ({
+      id: specRow.id,
+      label: specRow.label,
+      renderCell: (product: CompareTableProduct) => (
+        <span>{specRow.valuesByProductId.get(product.id) ?? '-'}</span>
+      ),
+    })),
+  ];
+
   return (
     <section className="mb-10 last:mb-0" aria-labelledby={sectionDomId}>
-      <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-        <h2 id={sectionDomId} className="text-lg font-semibold text-gray-900">
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <h2 id={sectionDomId} className="min-w-0 text-lg font-semibold text-gray-900">
           {categoryHeading}
         </h2>
-        <p className="text-sm text-gray-600">{compareSummaryLine}</p>
+        <p className="shrink-0 text-sm text-gray-600">{compareSummaryLine}</p>
       </div>
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="sticky left-0 z-10 min-w-[150px] bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                <th className="min-w-[150px] bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700">
                   {t('common.compare.characteristic')}
                 </th>
                 {products.map((product) => (
@@ -306,9 +367,9 @@ const CompareGroupTableComponent = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {rows.map((row) => (
+              {allRows.map((row) => (
                 <tr key={row.id} className="transition-colors hover:bg-gray-50">
-                  <td className="sticky left-0 z-10 bg-gray-50 px-4 py-4 text-sm font-medium text-gray-700">
+                  <td className="bg-gray-50 px-4 py-4 text-sm font-medium text-gray-700">
                     {row.label}
                   </td>
                   {products.map((product) => (

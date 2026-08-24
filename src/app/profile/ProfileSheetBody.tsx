@@ -84,6 +84,7 @@ export function ProfileSheetBody(props: ProfileSheetBodyProps) {
           currency={props.currency}
           onOrderClick={props.handleOrderClick}
           t={t}
+          embeddedInSheet
         />
       );
     case 'personal':
@@ -95,6 +96,7 @@ export function ProfileSheetBody(props: ProfileSheetBodyProps) {
           onSave={props.handleSavePersonalInfo}
           profile={props.profile}
           t={t}
+          embeddedInSheet
         />
       );
     case 'addresses':
@@ -113,6 +115,7 @@ export function ProfileSheetBody(props: ProfileSheetBodyProps) {
           onEdit={props.handleEditAddress}
           onResetForm={props.resetAddressForm}
           t={t}
+          embeddedInSheet
         />
       );
     case 'password':
@@ -123,6 +126,7 @@ export function ProfileSheetBody(props: ProfileSheetBodyProps) {
           savingPassword={props.savingPassword}
           onSave={props.handleChangePassword}
           t={t}
+          embeddedInSheet
         />
       );
     default:

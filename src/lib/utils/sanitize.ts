@@ -21,11 +21,20 @@ const SANITIZE_ALLOWED_TAGS = [
   'blockquote',
   'span',
   'div',
+  'table',
+  'tbody',
+  'thead',
+  'tr',
+  'td',
+  'th',
 ] as const;
 
 const SANITIZE_ALLOWED_ATTRIBUTES: Record<string, string[]> = {
   '*': ['class'],
   a: ['href', 'target', 'rel'],
+  td: ['colspan', 'rowspan'],
+  th: ['colspan', 'rowspan'],
+  span: ['class', 'aria-hidden'],
 };
 
 /**

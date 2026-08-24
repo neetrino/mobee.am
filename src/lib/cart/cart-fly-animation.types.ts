@@ -12,6 +12,6 @@ export interface CartFlyAnimationDetail {
 
 /** Optional context when invoking add-to-cart from UI with a visible product thumbnail. */
 export interface CartFlyContext {
-  imageUrl: string;
+  imageUrl: string | null;
   flySourceEl: HTMLElement | null;
 }

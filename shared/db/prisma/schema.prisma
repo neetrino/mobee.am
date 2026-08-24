@@ -221,6 +221,8 @@ model Product {
   labels            ProductLabel[]
   productAttributes ProductAttribute[]
   discountPercent   Int                  @default(0)
+  /// Official warranty duration in years: 1 | 2 | 3, or null when none.
+  warrantyYears     Int?
   deletedAt         DateTime?
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
@@ -232,6 +234,7 @@ model Product {
   reviews    ProductReview[]
 
   @@index([brandId])
+  @@index([primaryCategoryId])
   @@index([published, publishedAt])
   @@index([featured])
   @@index([deletedAt])
@@ -262,15 +265,22 @@ model ProductVariant {
   sku            String?                @unique
   barcode        String?
   price          Float
+  priceOnRequest Boolean                @default(false)
   compareAtPrice Float?
   cost           Float?
   stock          Int                    @default(0)
   stockReserved  Int                    @default(0)
   weightGrams    Int?
   imageUrl       String?
+  media          Json[]                 @default([])
   position       Int                    @default(0)
   published      Boolean                @default(true)
   attributes     Json?                  // JSONB: Stores variant attributes as { "color": [...], "size": [...] }
+  // External source tracking (MobileCentre and future sources)
+  source         String?
+  sourcePid      String?
+  visibleId      String?
+  sourceUrl      String?
   options        ProductVariantOption[]
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
@@ -280,6 +290,8 @@ model ProductVariant {
   orderItems OrderItem[]
 
   @@index([productId])
+  @@index([stock, published])
+  @@index([source])
   @@map("product_variants")
 }
 
@@ -417,6 +429,7 @@ model Order {
 
   @@index([userId])
   @@index([status, createdAt(sort: Desc)])
+  @@index([paymentStatus, createdAt(sort: Desc)])
   @@index([customerEmail])
   @@index([createdAt(sort: Desc)])
   @@map("orders")

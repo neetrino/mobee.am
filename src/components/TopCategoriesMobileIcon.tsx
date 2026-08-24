@@ -12,23 +12,20 @@ export function TopCategoriesMobileIcon({
   imageSrc,
   slotKey,
 }: {
-  imageSrc: string | null;
+  imageSrc: string;
   slotKey: CategoryStripSlotKey;
 }) {
-  if (!imageSrc) {
-    return <span className="size-[65px] rounded-lg bg-[#e4e7eb]" />;
-  }
-
   if (slotKey === 'watches') {
     return (
-      <span className="flex size-[65px] items-center justify-center">
-        <span className="flex-none -rotate-[5.85deg]">
+      <span className="relative flex size-[65px] items-center justify-center">
+        <span className="relative size-[52px] flex-none -rotate-[5.85deg]">
           <Image
             src={imageSrc}
             alt=""
-            width={52}
-            height={52}
-            className="object-cover"
+            fill
+            sizes="104px"
+            quality={90}
+            className="object-contain"
           />
         </span>
       </span>

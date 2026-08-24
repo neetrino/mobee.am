@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminInventoryService } from "@/lib/services/admin/admin-inventory.service";
 
 interface AdjustmentPayload {
@@ -27,18 +27,9 @@ function validatePayload(payload: AdjustmentPayload) {
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const payload = (await req.json()) as AdjustmentPayload;
@@ -61,7 +52,7 @@ export async function POST(req: NextRequest) {
       quantityDelta: payload.quantityDelta as number,
       reason: (payload.reason as string).trim(),
       note: payload.note as string | undefined,
-      adminUserId: user.id,
+      adminUserId: authResult.userId,
     });
 
     return NextResponse.json(result, { status: 200 });

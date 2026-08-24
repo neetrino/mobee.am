@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { ProductCardListingProvider } from './ProductCardListingContext';
-import { getHomeCuratedProductCardProps } from './HomeBestChoiceStyleProductGrid';
+import { getHomeCuratedProductCardProps, LISTING_ADD_BUTTON_NAVIGATES_TO_PRODUCT } from './HomeBestChoiceStyleProductGrid';
 import { useTranslation } from '../lib/i18n-client';
 import { SHOP_LISTING_EAGER_IMAGE_CARD_COUNT } from '@/lib/performance/shop-listing-image-priority.constants';
 import type { ProductSortOption } from '@/lib/products/sort';
@@ -17,6 +17,8 @@ import {
   parseProductListingViewMode,
   type ProductListingViewMode,
 } from '@/lib/products/view-mode';
+import { resolveProductCardLinkColor } from '@/lib/shop/listing-color-link';
+import { isMarcoHostedProductImageUrl } from '@/lib/products/marco-product-image';
 
 interface Product {
   id: string;
@@ -36,11 +38,14 @@ interface Product {
   primaryCategoryId?: string | null;
   categoryIds?: string[];
   categories?: Array<{ id: string; slug?: string; title?: string }>;
+  colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
+  displayColor?: string | null;
 }
 
 interface ProductsGridProps {
   products: Product[];
   sortBy?: ProductSortOption;
+  selectedFilterColors?: string[];
 }
 
 /**
@@ -57,7 +62,11 @@ function desktopShopGridClass(viewMode: ProductListingViewMode): string {
   return 'grid grid-cols-2 gap-x-2 gap-y-5 md:grid-cols-3 lg:grid-cols-3 lg:gap-6';
 }
 
-export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
+export function ProductsGrid({
+  products,
+  sortBy = 'default',
+  selectedFilterColors = [],
+}: ProductsGridProps) {
   const { t } = useTranslation();
   const [isCompactThreeColumn, setIsCompactThreeColumn] = useState(false);
   const [isLegacyDesktopShop, setIsLegacyDesktopShop] = useState(false);
@@ -99,26 +108,31 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
   }, []);
 
   const sortedProducts = useMemo(() => {
-    if (sortBy === 'default') {
-      return products;
-    }
+    const marcoRank = (product: Product): number =>
+      isMarcoHostedProductImageUrl(product.image) ? 1 : 0;
+
     const sorted = [...products];
-    switch (sortBy) {
-      case 'price-asc':
-        sorted.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        sorted.sort((a, b) => b.price - a.price);
-        break;
-      case 'name-asc':
-        sorted.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case 'name-desc':
-        sorted.sort((a, b) => b.title.localeCompare(a.title));
-        break;
-      default:
-        break;
-    }
+    sorted.sort((a, b) => {
+      const marcoDiff = marcoRank(a) - marcoRank(b);
+      if (marcoDiff !== 0) {
+        return marcoDiff;
+      }
+      if (sortBy === 'default') {
+        return 0;
+      }
+      switch (sortBy) {
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        case 'name-asc':
+          return a.title.localeCompare(b.title);
+        case 'name-desc':
+          return b.title.localeCompare(a.title);
+        default:
+          return 0;
+      }
+    });
     return sorted;
   }, [products, sortBy]);
 
@@ -157,7 +171,13 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
               }}
               viewMode={cardViewMode}
               {...homeCardProps}
+              {...LISTING_ADD_BUTTON_NAVIGATES_TO_PRODUCT}
               imageLoadPriority={index < SHOP_LISTING_EAGER_IMAGE_CARD_COUNT}
+              linkColor={
+                selectedFilterColors.length > 0
+                  ? resolveProductCardLinkColor(product.colors, selectedFilterColors)
+                  : undefined
+              }
             />
           </div>
         ))}

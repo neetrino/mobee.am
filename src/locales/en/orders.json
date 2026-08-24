@@ -5,6 +5,9 @@
   },
   "guestEmailRequired": "Use the link from your order confirmation (with your email) to view this order.",
   "placedSuccess": {
+    "title": "Thank you for your order!",
+    "description": "Your order has been placed successfully. Order number: {number}.",
+    "viewOrderDetails": "View order details",
     "message": "Order #{number} was placed successfully."
   },
   "title": "Order #{number}",

@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react';
-import { Button, Input, Card } from '@shop/ui';
+import { Button, Input } from '@shop/ui';
 import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
+import { ProfileSectionCard } from './ProfileSectionCard';
 import type { UserProfile } from './types';
 
 interface ProfilePersonalInfoProps {
@@ -15,6 +16,8 @@ interface ProfilePersonalInfoProps {
   onSave: (e: FormEvent) => void;
   profile: UserProfile | null;
   t: (key: string) => string;
+  /** When true, omit outer Card — modal/sheet already provides the frame. */
+  embeddedInSheet?: boolean;
 }
 
 export function ProfilePersonalInfo({
@@ -24,12 +27,15 @@ export function ProfilePersonalInfo({
   onSave,
   profile,
   t,
+  embeddedInSheet = false,
 }: ProfilePersonalInfoProps) {
   return (
-    <Card className="rounded-[15px] p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.personal.title')}</h2>
-      <form onSubmit={onSave} className="space-y-4 max-w-2xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
+      {!embeddedInSheet ? (
+        <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.personal.title')}</h2>
+      ) : null}
+      <form onSubmit={onSave} className="max-w-2xl space-y-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Input
             label={t('profile.personal.firstName')}
             value={personalInfo.firstName}
@@ -85,9 +91,6 @@ export function ProfilePersonalInfo({
           </Button>
         </div>
       </form>
-    </Card>
+    </ProfileSectionCard>
   );
 }
-
-
-

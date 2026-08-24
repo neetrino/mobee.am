@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  buildColorSwatchStyle,
+  getProductColorHex,
+  isKnownProductColor,
+} from '../../../lib/product-color-hex.constants';
 import type { ReactNode } from 'react';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { t, getAttributeLabel } from '../../../lib/i18n';
@@ -28,34 +33,12 @@ export interface ProductAttributesSelectorProps {
   getOptionValue: (options: VariantOption[] | undefined, key: string) => string | null;
 }
 
-const getColorValue = (colorName: string): string => {
-  const colorMap: Record<string, string> = {
-    beige: '#F5F5DC',
-    black: '#000000',
-    blue: '#0000FF',
-    brown: '#A52A2A',
-    gray: '#808080',
-    grey: '#808080',
-    green: '#008000',
-    red: '#FF0000',
-    white: '#FFFFFF',
-    yellow: '#FFFF00',
-    orange: '#FFA500',
-    pink: '#FFC0CB',
-    purple: '#800080',
-    navy: '#000080',
-    maroon: '#800000',
-    olive: '#808000',
-    teal: '#008080',
-    cyan: '#00FFFF',
-    magenta: '#FF00FF',
-    lime: '#00FF00',
-    silver: '#C0C0C0',
-    gold: '#FFD700',
-  };
-  const normalizedName = colorName.toLowerCase().trim();
-  return colorMap[normalizedName] || '#CCCCCC';
-};
+
+function resolveSwatchFallbackHex(value: string, label: string): string {
+  if (isKnownProductColor(value)) return getProductColorHex(value);
+  if (isKnownProductColor(label)) return getProductColorHex(label);
+  return getProductColorHex(value);
+}
 
 function sortAttributeEntries(
   entries: Array<[string, AttributeGroupValue[]]>
@@ -101,6 +84,74 @@ function SpecRow({
 const selectedPillClass = 'border-admin bg-admin-50 text-gray-900';
 const idlePillClass = 'border-gray-200 text-gray-900 hover:border-gray-400';
 const oosPillClass = 'border-gray-200 text-gray-400 line-through opacity-80';
+const pillButtonClass =
+  'inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border-2 px-4 py-2 text-sm font-medium transition-colors';
+const colorSwatchButtonClass =
+  'inline-flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 transition-all';
+
+function renderColorSwatch({
+  value,
+  label,
+  colors,
+  imageUrl,
+  isSelected,
+  oos,
+  onClick,
+  ariaLabel,
+}: {
+  value: string;
+  label: string;
+  colors?: string[] | null;
+  imageUrl?: string | null;
+  isSelected: boolean;
+  oos: boolean;
+  onClick?: () => void;
+  ariaLabel: string;
+}) {
+  const processedImageUrl = imageUrl ? processImageUrl(imageUrl) : null;
+  const hasImage = Boolean(processedImageUrl?.trim());
+  const fallbackHex = resolveSwatchFallbackHex(value, label);
+  const borderClass =
+    isSelected ? 'border-admin ring-2 ring-admin/25' : 'border-gray-200 hover:border-gray-400';
+
+  const content = hasImage && processedImageUrl ? (
+    <img
+      src={processedImageUrl}
+      alt=""
+      className="h-full w-full object-cover"
+      loading="lazy"
+      decoding="async"
+    />
+  ) : null;
+
+  const style = hasImage ? undefined : buildColorSwatchStyle(colors, fallbackHex);
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        title={ariaLabel}
+        aria-label={ariaLabel}
+        className={`${colorSwatchButtonClass} ${borderClass} ${oos ? 'opacity-60' : ''}`}
+        style={style}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <span
+      title={ariaLabel}
+      aria-label={ariaLabel}
+      className={`${colorSwatchButtonClass} ${borderClass} ${oos ? 'opacity-60' : ''}`}
+      style={style}
+    >
+      {content}
+    </span>
+  );
+}
 
 export function ProductAttributesSelector({
   product,
@@ -128,10 +179,26 @@ export function ProductAttributesSelector({
           const isUnavailable = unavailableAttributes.get(attrKey) ?? false;
           const isColor = attrKey === 'color' || attrKey === 'colour';
           const isSize = attrKey === 'size';
-          const singleValue = attrGroups.length === 1 && !isColor;
+          const singleValue = attrGroups.length === 1;
 
           if (singleValue) {
             const only = attrGroups[0];
+            if (isColor) {
+              const colorLabel = getAttributeLabel(language, attrKey, only.value);
+              return (
+                <SpecRow key={attrKey} label={label} unavailable={isUnavailable}>
+                  {renderColorSwatch({
+                    value: only.value,
+                    label: only.label,
+                    colors: only.colors,
+                    imageUrl: only.imageUrl,
+                    isSelected: selectedColor === only.value?.toLowerCase().trim(),
+                    oos: only.stock <= 0,
+                    ariaLabel: colorLabel,
+                  })}
+                </SpecRow>
+              );
+            }
             return (
               <SpecRow key={attrKey} label={label} unavailable={isUnavailable}>
                 <span className="text-sm font-medium text-gray-900">
@@ -144,35 +211,23 @@ export function ProductAttributesSelector({
           if (isColor) {
             return (
               <SpecRow key={attrKey} label={label} unavailable={isUnavailable}>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2.5">
                   {attrGroups.map((g) => {
                     const isSelected = selectedColor === g.value?.toLowerCase().trim();
-                    const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
-                    const hasImage = Boolean(processedImageUrl?.trim());
-                    const colorHex =
-                      g.colors && Array.isArray(g.colors) && g.colors.length > 0 ? g.colors[0] : getColorValue(g.value);
+                    const colorLabel = getAttributeLabel(language, attrKey, g.value);
                     return (
-                      <button
-                        key={g.valueId || g.value}
-                        type="button"
-                        onClick={() => onColorSelect(g.value)}
-                        title={getAttributeLabel(language, attrKey, g.value)}
-                        className={`h-14 w-14 shrink-0 overflow-hidden rounded-md border-2 transition-all ${
-                          isSelected ? 'border-admin ring-2 ring-admin/25' : 'border-gray-200 hover:border-gray-400'
-                        } ${g.stock <= 0 ? 'opacity-60' : ''}`}
-                        style={hasImage ? undefined : { backgroundColor: colorHex }}
-                      >
-                        {hasImage && processedImageUrl ? (
-                           
-                          <img
-                            src={processedImageUrl}
-                            alt={g.label}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : null}
-                      </button>
+                      <span key={g.valueId || g.value}>
+                        {renderColorSwatch({
+                          value: g.value,
+                          label: g.label,
+                          colors: g.colors,
+                          imageUrl: g.imageUrl,
+                          isSelected,
+                          oos: g.stock <= 0,
+                          onClick: () => onColorSelect(g.value),
+                          ariaLabel: colorLabel,
+                        })}
+                      </span>
                     );
                   })}
                 </div>
@@ -180,32 +235,23 @@ export function ProductAttributesSelector({
             );
           }
 
+          // Size / storage / SIM / etc. — text pills only (images belong on color swatches).
           if (isSize) {
             return (
               <SpecRow key={attrKey} label={label} unavailable={isUnavailable}>
                 <div className="flex flex-wrap gap-2">
                   {attrGroups.map((g) => {
                     const isSelected = selectedSize === g.value.toLowerCase().trim();
-                    const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
-                    const hasImage = Boolean(processedImageUrl?.trim());
                     const oos = g.stock <= 0;
                     return (
                       <button
                         key={g.valueId || g.value}
                         type="button"
                         onClick={() => onSizeSelect(g.value)}
-                        className={`inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border-2 px-4 py-2 text-sm font-medium transition-colors ${
+                        className={`${pillButtonClass} ${
                           isSelected ? selectedPillClass : oos ? oosPillClass : idlePillClass
                         }`}
                       >
-                        {hasImage && processedImageUrl ? (
-                           
-                          <img
-                            src={processedImageUrl}
-                            alt=""
-                            className="h-6 w-6 rounded object-cover"
-                          />
-                        ) : null}
                         <span>{getAttributeLabel(language, attrKey, g.value)}</span>
                       </button>
                     );
@@ -219,33 +265,19 @@ export function ProductAttributesSelector({
             <SpecRow key={attrKey} label={label} unavailable={isUnavailable}>
               <div className="flex flex-wrap gap-2">
                 {attrGroups.map((g) => {
-                  const selectedValueId = selectedAttributeValues.get(attrKey);
-                  const isSelected = selectedValueId === g.valueId || (!g.valueId && selectedColor === g.value);
-                  const processedImageUrl = g.imageUrl ? processImageUrl(g.imageUrl) : null;
-                  const hasImage = Boolean(processedImageUrl?.trim());
-                  const hasColors = Boolean(g.colors?.length);
-                  const colorHex = hasColors && g.colors ? g.colors[0] : null;
+                  const selectedValue = selectedAttributeValues.get(attrKey);
+                  const optionValue = g.valueId || g.value;
+                  const isSelected = selectedValue === optionValue || selectedValue === g.value;
                   const oos = g.stock <= 0;
                   return (
                     <button
                       key={g.valueId || g.value}
                       type="button"
                       onClick={() => onAttributeValueSelect(attrKey, g.valueId || g.value)}
-                      className={`inline-flex min-h-[2.5rem] items-center gap-2 rounded-full border-2 px-4 py-2 text-sm font-medium transition-colors ${
+                      className={`${pillButtonClass} ${
                         isSelected ? selectedPillClass : oos ? oosPillClass : idlePillClass
                       }`}
-                      style={!hasImage && colorHex ? { backgroundColor: colorHex } : undefined}
                     >
-                      {hasImage && processedImageUrl ? (
-                         
-                        <img
-                          src={processedImageUrl}
-                          alt=""
-                          className="h-6 w-6 rounded object-cover"
-                        />
-                      ) : hasColors && colorHex ? (
-                        <span className="h-6 w-6 rounded border border-gray-300" style={{ backgroundColor: colorHex }} />
-                      ) : null}
                       <span>{getAttributeLabel(language, attrKey, g.value)}</span>
                     </button>
                   );
@@ -262,21 +294,21 @@ export function ProductAttributesSelector({
     <div>
       {colorGroups.length > 0 && (
         <SpecRow label={t(language, 'product.color')} unavailable={false}>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2.5">
             {colorGroups.map((g) => {
               const isSelected = selectedColor === g.color?.toLowerCase().trim();
-              const oos = g.stock <= 0;
+              const colorLabel = getAttributeLabel(language, 'color', g.color);
               return (
-                <button
-                  key={g.color}
-                  type="button"
-                  onClick={() => onColorSelect(g.color)}
-                  title={getAttributeLabel(language, 'color', g.color)}
-                  className={`h-14 w-14 shrink-0 rounded-md border-2 transition-all ${
-                    isSelected ? 'border-admin ring-2 ring-admin/25' : 'border-gray-200 hover:border-gray-400'
-                  } ${oos ? 'opacity-60' : ''}`}
-                  style={{ backgroundColor: getColorValue(g.color) }}
-                />
+                <span key={g.color}>
+                  {renderColorSwatch({
+                    value: g.color,
+                    label: g.color,
+                    isSelected,
+                    oos: g.stock <= 0,
+                    onClick: () => onColorSelect(g.color),
+                    ariaLabel: colorLabel,
+                  })}
+                </span>
               );
             })}
           </div>
@@ -302,7 +334,7 @@ export function ProductAttributesSelector({
                   key={g.size}
                   type="button"
                   onClick={() => onSizeSelect(g.size)}
-                  className={`inline-flex min-h-[2.5rem] items-center rounded-full border-2 px-4 py-2 text-sm font-medium transition-colors ${
+                  className={`${pillButtonClass} ${
                     isSelected ? selectedPillClass : oos ? oosPillClass : idlePillClass
                   }`}
                 >

@@ -1,15 +1,25 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import type { AnimationEvent, ReactNode } from 'react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { acquireBodyScrollLock } from '../lib/body-scroll-lock';
 import {
   MOBILE_PRIMARY_MENU_BAR_CLASS,
   MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS,
   MOBILE_PRIMARY_MENU_OPEN_BUTTON_WITH_LABEL_CLASS,
 } from './header-strip-layout';
-import { MOBILE_DRAWER_SHELL_PANEL_CLASS } from './mobile-drawer-nav.constants';
+import {
+  MOBILE_DRAWER_SHELL_BACKDROP_CLASS,
+  MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS,
+  MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS,
+  MOBILE_DRAWER_SHELL_PANEL_CLASS,
+  MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS,
+  MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS,
+  MOBILE_DRAWER_SHELL_ROOT_CLASS,
+  MOBILE_DRAWER_SHELL_TRANSITION_MS,
+} from './mobile-drawer-nav.constants';
 import { SiteBrandLogo } from './SiteBrandLogo';
 
 export interface AdminMenuItem {
@@ -47,19 +57,132 @@ export function AdminMenuDrawer({
   closeMenuAria,
 }: AdminMenuDrawerProps) {
   const [open, setOpen] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+  const [isOverlayPortalReady, setIsOverlayPortalReady] = useState(false);
+  const isVisible = open || isExiting;
+
+  const requestClose = useCallback(() => {
+    if (isExiting || !open) {
+      return;
+    }
+    setIsExiting(true);
+    setOpen(false);
+  }, [isExiting, open]);
+
+  const openDrawer = useCallback(() => {
+    if (isExiting) {
+      return;
+    }
+    setIsExiting(false);
+    setOpen(true);
+  }, [isExiting]);
+
+  const handlePanelAnimationEnd = useCallback((event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+    if (event.animationName.includes('mobile-drawer-panel-out')) {
+      setIsExiting(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!open) return;
-    return acquireBodyScrollLock();
+    setIsOverlayPortalReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      setIsExiting(false);
+    }
   }, [open]);
+
+  useEffect(() => {
+    if (open || !isExiting) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      setIsExiting(false);
+    }, MOBILE_DRAWER_SHELL_TRANSITION_MS);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [open, isExiting]);
+
+  useEffect(() => {
+    if (!isVisible) {
+      return;
+    }
+    return acquireBodyScrollLock();
+  }, [isVisible]);
+
+  const drawer = isVisible ? (
+    <div className={MOBILE_DRAWER_SHELL_ROOT_CLASS} role="dialog" aria-modal="true">
+      <button
+        type="button"
+        className={`${MOBILE_DRAWER_SHELL_BACKDROP_CLASS} ${
+          isExiting
+            ? MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS
+            : MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS
+        }`}
+        aria-label={closeMenuAria}
+        onClick={requestClose}
+      />
+      <div
+        className={`${MOBILE_DRAWER_SHELL_PANEL_CLASS} ${
+          isExiting
+            ? MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS
+            : MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS
+        }`}
+        aria-label={drawerTitle}
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+        onAnimationEnd={handlePanelAnimationEnd}
+      >
+        <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Link
+              href={logoHref}
+              onClick={requestClose}
+              aria-label={logoLinkAria}
+              className="flex min-w-0 max-w-[min(200px,55%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
+            >
+              <SiteBrandLogo decorative alt={siteLogoAlt} heightClass="h-8" />
+            </Link>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <p className="min-w-0 flex-1 text-pretty text-base font-semibold text-gray-900">{drawerTitle}</p>
+            <button
+              type="button"
+              onClick={requestClose}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-admin-300 hover:bg-admin-50 hover:text-admin-600"
+              aria-label={closeMenuAria}
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
+          <nav className="flex h-full min-h-0 flex-col">
+            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
+              {renderNav(() => {
+                requestClose();
+              })}
+            </div>
+          </nav>
+        </div>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <>
       <button
         type="button"
-        onClick={() => {
-          setOpen(true);
-        }}
+        onClick={openDrawer}
         className={MOBILE_PRIMARY_MENU_OPEN_BUTTON_WITH_LABEL_CLASS}
       >
         <span className={MOBILE_PRIMARY_MENU_ICON_WRAP_CLASS} aria-hidden>
@@ -70,64 +193,7 @@ export function AdminMenuDrawer({
         <span className="text-base font-bold leading-tight text-gray-900">{drawerMenuButton}</span>
       </button>
 
-      {open ? (
-        <div
-          className="fixed inset-0 z-50 flex bg-black/40"
-          onClick={() => {
-            setOpen(false);
-          }}
-        >
-          <div
-            className={MOBILE_DRAWER_SHELL_PANEL_CLASS}
-            role="dialog"
-            aria-modal="true"
-            aria-label={drawerTitle}
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-          >
-            <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Link
-                  href={logoHref}
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                  aria-label={logoLinkAria}
-                  className="flex min-w-0 max-w-[min(200px,55%)] shrink-0 items-center rounded-xl transition-opacity active:opacity-90"
-                >
-                  <SiteBrandLogo decorative alt={siteLogoAlt} heightClass="h-8" />
-                </Link>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <p className="min-w-0 flex-1 text-pretty text-base font-semibold text-gray-900">{drawerTitle}</p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-admin-300 hover:bg-admin-50 hover:text-admin-600"
-                  aria-label={closeMenuAria}
-                >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
-              <nav className="flex h-full min-h-0 flex-col">
-                <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-3">
-                  {renderNav(() => {
-                    setOpen(false);
-                  })}
-                </div>
-              </nav>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {isOverlayPortalReady && drawer ? createPortal(drawer, document.body) : null}
     </>
   );
 }

@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { formatPrice } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import { ProductColors } from './ProductColors';
+import { ProductCardNavLink } from './ProductCardNavLink';
+import { buildProductPageHref } from '../../lib/products/product-page-href';
+import type { ProductCardCachePayload } from '../../lib/products/product-card-cache';
 import type { CurrencyCode } from '../../lib/currency';
 
 interface ProductCardInfoProps {
@@ -12,10 +15,11 @@ interface ProductCardInfoProps {
   /** Localized category line under the title (replaces product subtitle on cards). */
   categoryLine?: string | null;
   brandName?: string | null;
-  price: number;
+  price: number | null;
+  hasPrice?: boolean;
   discountPercent?: number | null;
   currency: CurrencyCode;
-  colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
+  colors?: Array<{ value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }>;
   isCompact?: boolean;
   /** Figma mobee-new: price lives in the bordered footer row with the add button */
   hidePrice?: boolean;
@@ -23,6 +27,11 @@ interface ProductCardInfoProps {
   omitBrandRow?: boolean;
   /** Home mobile grid — title at 12px regular on small screens. */
   titleSizeMobileFigma?: boolean;
+  listingCacheSource?: ProductCardCachePayload;
+  linkColor?: string | null;
+  selectedCardLinkColor?: string | null;
+  colorsInteractive?: boolean;
+  onCardColorSelect?: (color: { value: string; linkValue?: string; imageUrl?: string | null; colors?: string[] | null }) => void;
 }
 
 /**
@@ -34,6 +43,7 @@ export function ProductCardInfo({
   categoryLine,
   brandName,
   price,
+  hasPrice = price != null && price > 0,
   discountPercent,
   currency,
   colors,
@@ -41,6 +51,11 @@ export function ProductCardInfo({
   hidePrice = false,
   omitBrandRow = false,
   titleSizeMobileFigma = false,
+  listingCacheSource,
+  linkColor = null,
+  selectedCardLinkColor = null,
+  colorsInteractive = false,
+  onCardColorSelect,
 }: ProductCardInfoProps) {
   const { t } = useTranslation();
 
@@ -71,48 +86,77 @@ export function ProductCardInfo({
 
   return (
     <div className={paddingClass}>
-      <Link href={`/products/${slug}`} className="block">
-        {!omitBrandRow ? (
-          <p
-            className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
-          >
-            {brandName || t('common.defaults.category')}
-          </p>
-        ) : null}
-        <h3 className={titleClass}>{title}</h3>
-        {categoryLine ? (
-          <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
-            <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
-            <span className="line-clamp-2">{categoryLine}</span>
-          </p>
-        ) : null}
-      </Link>
+      {listingCacheSource ? (
+        <ProductCardNavLink slug={slug} cachePayload={listingCacheSource} linkColor={linkColor} className="block">
+          {!omitBrandRow ? (
+            <p
+              className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
+            >
+              {brandName || t('common.defaults.category')}
+            </p>
+          ) : null}
+          <h3 className={titleClass}>{title}</h3>
+          {categoryLine ? (
+            <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
+              <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
+              <span className="line-clamp-2">{categoryLine}</span>
+            </p>
+          ) : null}
+        </ProductCardNavLink>
+      ) : (
+        <Link href={buildProductPageHref(slug, { color: linkColor })} className="block" prefetch>
+          {!omitBrandRow ? (
+            <p
+              className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
+            >
+              {brandName || t('common.defaults.category')}
+            </p>
+          ) : null}
+          <h3 className={titleClass}>{title}</h3>
+          {categoryLine ? (
+            <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
+              <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
+              <span className="line-clamp-2">{categoryLine}</span>
+            </p>
+          ) : null}
+        </Link>
+      )}
 
       {/* Available Colors */}
       {colors && colors.length > 0 && (
-        <ProductColors colors={colors} isCompact={isCompact} />
+        <ProductColors
+          colors={colors}
+          isCompact={isCompact}
+          interactive={colorsInteractive}
+          selectedLinkValue={selectedCardLinkColor ?? linkColor}
+          onColorSelect={onCardColorSelect}
+        />
       )}
 
       {!hidePrice ? (
         <div className={`mt-2 flex items-center justify-between ${isCompact ? 'gap-2' : 'gap-4'}`}>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span
-                className={`whitespace-nowrap ${priceClass} font-semibold text-gray-900`}
-              >
-                {formatPrice(price || 0, currency)}
-              </span>
-              {discountPercent && discountPercent > 0 ? (
+          {hasPrice && price != null ? (
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
                 <span
-                  className={`${
-                    isCompact ? 'text-[0.7125rem]' : 'text-[0.83125rem]'
-                  } font-semibold text-blue-600`}
+                  className={`whitespace-nowrap ${priceClass} font-semibold text-gray-900`}
                 >
-                  -{discountPercent}%
+                  {formatPrice(price, currency)}
                 </span>
-              ) : null}
+                {discountPercent && discountPercent > 0 ? (
+                  <span
+                    className={`${
+                      isCompact ? 'text-[0.7125rem]' : 'text-[0.83125rem]'
+                    } font-semibold text-blue-600`}
+                  >
+                    -{discountPercent}%
+                  </span>
+                ) : null}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="min-h-[1.25rem]" aria-hidden="true" />
+          )}
         </div>
       ) : null}
     </div>

@@ -1,8 +1,10 @@
 import Link from 'next/link';
-import { Button, Card } from '@shop/ui';
+import { Button } from '@shop/ui';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
+import { ProfileSectionCard } from './ProfileSectionCard';
 import { getStatusColor, getPaymentStatusColor } from './utils';
+import { getProfileOrdersPath } from './profile-orders-path';
 import type { OrderListItem } from './types';
 
 interface ProfileOrdersProps {
@@ -19,6 +21,7 @@ interface ProfileOrdersProps {
   currency: CurrencyCode;
   onOrderClick: (order: OrderListItem, e: React.MouseEvent<HTMLAnchorElement>) => void;
   t: (key: string) => string;
+  embeddedInSheet?: boolean;
 }
 
 export function ProfileOrders({
@@ -30,11 +33,14 @@ export function ProfileOrders({
   currency,
   onOrderClick,
   t,
+  embeddedInSheet = false,
 }: ProfileOrdersProps) {
   if (ordersLoading) {
     return (
-      <Card className="rounded-[15px] p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
+      <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
+        {!embeddedInSheet ? (
+          <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+        ) : null}
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="animate-pulse">
@@ -42,34 +48,38 @@ export function ProfileOrders({
             </div>
           ))}
         </div>
-      </Card>
+      </ProfileSectionCard>
     );
   }
 
   if (orders.length === 0) {
     return (
-      <Card className="rounded-[15px] p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
-        <div className="text-center py-12">
-          <p className="text-gray-600 mb-4">{t('profile.orders.noOrders')}</p>
+      <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
+        {!embeddedInSheet ? (
+          <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+        ) : null}
+        <div className="py-12 text-center">
+          <p className="mb-4 text-gray-600">{t('profile.orders.noOrders')}</p>
           <Link href="/products">
             <Button variant="brand" className={PROFILE_PILL_BUTTON_CLASS}>
               {t('profile.dashboard.startShopping')}
             </Button>
           </Link>
         </div>
-      </Card>
+      </ProfileSectionCard>
     );
   }
 
   return (
-    <Card className="w-full rounded-[15px] p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('profile.orders.title')}</h2>
+    <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
+      {!embeddedInSheet ? (
+        <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+      ) : null}
       <div className="space-y-4">
         {orders.map((order) => (
           <Link
             key={order.id}
-            href={`/orders/${order.number}`}
+            href={getProfileOrdersPath({ orderNumber: order.number })}
             onClick={(e) => onOrderClick(order, e)}
             className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
           >
@@ -148,7 +158,7 @@ export function ProfileOrders({
           </div>
         )}
       </div>
-    </Card>
+    </ProfileSectionCard>
   );
 }
 

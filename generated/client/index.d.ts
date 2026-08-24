@@ -15841,6 +15841,10 @@ export namespace Prisma {
     imageUrl: string | null
     position: number | null
     published: boolean | null
+    source: string | null
+    sourcePid: string | null
+    visibleId: string | null
+    sourceUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -15859,6 +15863,10 @@ export namespace Prisma {
     imageUrl: string | null
     position: number | null
     published: boolean | null
+    source: string | null
+    sourcePid: string | null
+    visibleId: string | null
+    sourceUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -15875,9 +15883,14 @@ export namespace Prisma {
     stockReserved: number
     weightGrams: number
     imageUrl: number
+    media: number
     position: number
     published: number
     attributes: number
+    source: number
+    sourcePid: number
+    visibleId: number
+    sourceUrl: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -15918,6 +15931,10 @@ export namespace Prisma {
     imageUrl?: true
     position?: true
     published?: true
+    source?: true
+    sourcePid?: true
+    visibleId?: true
+    sourceUrl?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -15936,6 +15953,10 @@ export namespace Prisma {
     imageUrl?: true
     position?: true
     published?: true
+    source?: true
+    sourcePid?: true
+    visibleId?: true
+    sourceUrl?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -15952,9 +15973,14 @@ export namespace Prisma {
     stockReserved?: true
     weightGrams?: true
     imageUrl?: true
+    media?: true
     position?: true
     published?: true
     attributes?: true
+    source?: true
+    sourcePid?: true
+    visibleId?: true
+    sourceUrl?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -16058,9 +16084,14 @@ export namespace Prisma {
     stockReserved: number
     weightGrams: number | null
     imageUrl: string | null
+    media: JsonValue[]
     position: number
     published: boolean
     attributes: JsonValue | null
+    source: string | null
+    sourcePid: string | null
+    visibleId: string | null
+    sourceUrl: string | null
     createdAt: Date
     updatedAt: Date
     _count: ProductVariantCountAggregateOutputType | null
@@ -16096,9 +16127,14 @@ export namespace Prisma {
     stockReserved?: boolean
     weightGrams?: boolean
     imageUrl?: boolean
+    media?: boolean
     position?: boolean
     published?: boolean
     attributes?: boolean
+    source?: boolean
+    sourcePid?: boolean
+    visibleId?: boolean
+    sourceUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     options?: boolean | ProductVariant$optionsArgs<ExtArgs>
@@ -16120,9 +16156,14 @@ export namespace Prisma {
     stockReserved?: boolean
     weightGrams?: boolean
     imageUrl?: boolean
+    media?: boolean
     position?: boolean
     published?: boolean
     attributes?: boolean
+    source?: boolean
+    sourcePid?: boolean
+    visibleId?: boolean
+    sourceUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     product?: boolean | ProductDefaultArgs<ExtArgs>
@@ -16140,9 +16181,14 @@ export namespace Prisma {
     stockReserved?: boolean
     weightGrams?: boolean
     imageUrl?: boolean
+    media?: boolean
     position?: boolean
     published?: boolean
     attributes?: boolean
+    source?: boolean
+    sourcePid?: boolean
+    visibleId?: boolean
+    sourceUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -16178,9 +16224,14 @@ export namespace Prisma {
       stockReserved: number
       weightGrams: number | null
       imageUrl: string | null
+      media: Prisma.JsonValue[]
       position: number
       published: boolean
       attributes: Prisma.JsonValue | null
+      source: string | null
+      sourcePid: string | null
+      visibleId: string | null
+      sourceUrl: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["productVariant"]>
@@ -16591,9 +16642,14 @@ export namespace Prisma {
     readonly stockReserved: FieldRef<"ProductVariant", 'Int'>
     readonly weightGrams: FieldRef<"ProductVariant", 'Int'>
     readonly imageUrl: FieldRef<"ProductVariant", 'String'>
+    readonly media: FieldRef<"ProductVariant", 'Json[]'>
     readonly position: FieldRef<"ProductVariant", 'Int'>
     readonly published: FieldRef<"ProductVariant", 'Boolean'>
     readonly attributes: FieldRef<"ProductVariant", 'Json'>
+    readonly source: FieldRef<"ProductVariant", 'String'>
+    readonly sourcePid: FieldRef<"ProductVariant", 'String'>
+    readonly visibleId: FieldRef<"ProductVariant", 'String'>
+    readonly sourceUrl: FieldRef<"ProductVariant", 'String'>
     readonly createdAt: FieldRef<"ProductVariant", 'DateTime'>
     readonly updatedAt: FieldRef<"ProductVariant", 'DateTime'>
   }
@@ -30282,9 +30338,14 @@ export namespace Prisma {
     stockReserved: 'stockReserved',
     weightGrams: 'weightGrams',
     imageUrl: 'imageUrl',
+    media: 'media',
     position: 'position',
     published: 'published',
     attributes: 'attributes',
+    source: 'source',
+    sourcePid: 'sourcePid',
+    visibleId: 'visibleId',
+    sourceUrl: 'sourceUrl',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -31590,9 +31651,14 @@ export namespace Prisma {
     stockReserved?: IntFilter<"ProductVariant"> | number
     weightGrams?: IntNullableFilter<"ProductVariant"> | number | null
     imageUrl?: StringNullableFilter<"ProductVariant"> | string | null
+    media?: JsonNullableListFilter<"ProductVariant">
     position?: IntFilter<"ProductVariant"> | number
     published?: BoolFilter<"ProductVariant"> | boolean
     attributes?: JsonNullableFilter<"ProductVariant">
+    source?: StringNullableFilter<"ProductVariant"> | string | null
+    sourcePid?: StringNullableFilter<"ProductVariant"> | string | null
+    visibleId?: StringNullableFilter<"ProductVariant"> | string | null
+    sourceUrl?: StringNullableFilter<"ProductVariant"> | string | null
     createdAt?: DateTimeFilter<"ProductVariant"> | Date | string
     updatedAt?: DateTimeFilter<"ProductVariant"> | Date | string
     options?: ProductVariantOptionListRelationFilter
@@ -31613,9 +31679,14 @@ export namespace Prisma {
     stockReserved?: SortOrder
     weightGrams?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
+    media?: SortOrder
     position?: SortOrder
     published?: SortOrder
     attributes?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    sourcePid?: SortOrderInput | SortOrder
+    visibleId?: SortOrderInput | SortOrder
+    sourceUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     options?: ProductVariantOptionOrderByRelationAggregateInput
@@ -31639,9 +31710,14 @@ export namespace Prisma {
     stockReserved?: IntFilter<"ProductVariant"> | number
     weightGrams?: IntNullableFilter<"ProductVariant"> | number | null
     imageUrl?: StringNullableFilter<"ProductVariant"> | string | null
+    media?: JsonNullableListFilter<"ProductVariant">
     position?: IntFilter<"ProductVariant"> | number
     published?: BoolFilter<"ProductVariant"> | boolean
     attributes?: JsonNullableFilter<"ProductVariant">
+    source?: StringNullableFilter<"ProductVariant"> | string | null
+    sourcePid?: StringNullableFilter<"ProductVariant"> | string | null
+    visibleId?: StringNullableFilter<"ProductVariant"> | string | null
+    sourceUrl?: StringNullableFilter<"ProductVariant"> | string | null
     createdAt?: DateTimeFilter<"ProductVariant"> | Date | string
     updatedAt?: DateTimeFilter<"ProductVariant"> | Date | string
     options?: ProductVariantOptionListRelationFilter
@@ -31662,9 +31738,14 @@ export namespace Prisma {
     stockReserved?: SortOrder
     weightGrams?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
+    media?: SortOrder
     position?: SortOrder
     published?: SortOrder
     attributes?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    sourcePid?: SortOrderInput | SortOrder
+    visibleId?: SortOrderInput | SortOrder
+    sourceUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProductVariantCountOrderByAggregateInput
@@ -31689,9 +31770,14 @@ export namespace Prisma {
     stockReserved?: IntWithAggregatesFilter<"ProductVariant"> | number
     weightGrams?: IntNullableWithAggregatesFilter<"ProductVariant"> | number | null
     imageUrl?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
+    media?: JsonNullableListFilter<"ProductVariant">
     position?: IntWithAggregatesFilter<"ProductVariant"> | number
     published?: BoolWithAggregatesFilter<"ProductVariant"> | boolean
     attributes?: JsonNullableWithAggregatesFilter<"ProductVariant">
+    source?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
+    sourcePid?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
+    visibleId?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
+    sourceUrl?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ProductVariant"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ProductVariant"> | Date | string
   }
@@ -33812,9 +33898,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductVariantOptionCreateNestedManyWithoutVariantInput
@@ -33835,9 +33926,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
@@ -33856,9 +33952,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUpdateManyWithoutVariantNestedInput
@@ -33879,9 +33980,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
@@ -33901,9 +34007,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -33919,9 +34030,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -33938,9 +34054,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -36071,9 +36192,14 @@ export namespace Prisma {
     stockReserved?: SortOrder
     weightGrams?: SortOrder
     imageUrl?: SortOrder
+    media?: SortOrder
     position?: SortOrder
     published?: SortOrder
     attributes?: SortOrder
+    source?: SortOrder
+    sourcePid?: SortOrder
+    visibleId?: SortOrder
+    sourceUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36102,6 +36228,10 @@ export namespace Prisma {
     imageUrl?: SortOrder
     position?: SortOrder
     published?: SortOrder
+    source?: SortOrder
+    sourcePid?: SortOrder
+    visibleId?: SortOrder
+    sourceUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36120,6 +36250,10 @@ export namespace Prisma {
     imageUrl?: SortOrder
     position?: SortOrder
     published?: SortOrder
+    source?: SortOrder
+    sourcePid?: SortOrder
+    visibleId?: SortOrder
+    sourceUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -37902,6 +38036,10 @@ export namespace Prisma {
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutTranslationsInput, ProductUpdateWithoutTranslationsInput>, ProductUncheckedUpdateWithoutTranslationsInput>
   }
 
+  export type ProductVariantCreatemediaInput = {
+    set: InputJsonValue[]
+  }
+
   export type ProductVariantOptionCreateNestedManyWithoutVariantInput = {
     create?: XOR<ProductVariantOptionCreateWithoutVariantInput, ProductVariantOptionUncheckedCreateWithoutVariantInput> | ProductVariantOptionCreateWithoutVariantInput[] | ProductVariantOptionUncheckedCreateWithoutVariantInput[]
     connectOrCreate?: ProductVariantOptionCreateOrConnectWithoutVariantInput | ProductVariantOptionCreateOrConnectWithoutVariantInput[]
@@ -37964,6 +38102,11 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type ProductVariantUpdatemediaInput = {
+    set?: InputJsonValue[]
+    push?: InputJsonValue | InputJsonValue[]
   }
 
   export type ProductVariantOptionUpdateManyWithoutVariantNestedInput = {
@@ -40211,9 +40354,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductVariantOptionCreateNestedManyWithoutVariantInput
@@ -40232,9 +40380,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
@@ -40486,9 +40639,14 @@ export namespace Prisma {
     stockReserved?: IntFilter<"ProductVariant"> | number
     weightGrams?: IntNullableFilter<"ProductVariant"> | number | null
     imageUrl?: StringNullableFilter<"ProductVariant"> | string | null
+    media?: JsonNullableListFilter<"ProductVariant">
     position?: IntFilter<"ProductVariant"> | number
     published?: BoolFilter<"ProductVariant"> | boolean
     attributes?: JsonNullableFilter<"ProductVariant">
+    source?: StringNullableFilter<"ProductVariant"> | string | null
+    sourcePid?: StringNullableFilter<"ProductVariant"> | string | null
+    visibleId?: StringNullableFilter<"ProductVariant"> | string | null
+    sourceUrl?: StringNullableFilter<"ProductVariant"> | string | null
     createdAt?: DateTimeFilter<"ProductVariant"> | Date | string
     updatedAt?: DateTimeFilter<"ProductVariant"> | Date | string
   }
@@ -41013,9 +41171,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     product: ProductCreateNestedOneWithoutVariantsInput
@@ -41035,9 +41198,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
@@ -41096,9 +41264,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
@@ -41118,9 +41291,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
@@ -41630,9 +41808,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductVariantOptionCreateNestedManyWithoutVariantInput
@@ -41652,9 +41835,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
@@ -41776,9 +41964,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUpdateManyWithoutVariantNestedInput
@@ -41798,9 +41991,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
@@ -42247,9 +42445,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductVariantOptionCreateNestedManyWithoutVariantInput
@@ -42269,9 +42472,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
@@ -42382,9 +42590,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUpdateManyWithoutVariantNestedInput
@@ -42404,9 +42617,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
@@ -43630,9 +43848,14 @@ export namespace Prisma {
     stockReserved?: number
     weightGrams?: number | null
     imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
     position?: number
     published?: boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -43716,9 +43939,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUpdateManyWithoutVariantNestedInput
@@ -43737,9 +43965,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
@@ -43758,9 +43991,14 @@ export namespace Prisma {
     stockReserved?: IntFieldUpdateOperationsInput | number
     weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
     position?: IntFieldUpdateOperationsInput | number
     published?: BoolFieldUpdateOperationsInput | boolean
     attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

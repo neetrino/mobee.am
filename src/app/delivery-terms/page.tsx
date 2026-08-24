@@ -1,6 +1,7 @@
 'use client';
 
 import { Card } from '@shop/ui';
+import { PolicyBackButton } from '@/components/PolicyBackButton';
 import { useTranslation } from '../../lib/i18n-client';
 
 const DELIVERY_TERM_SECTIONS = [
@@ -36,20 +37,21 @@ export default function DeliveryTermsPage() {
   return (
     <div className="policy-page">
       <div className="policy-page-inner">
-        <h1 className="text-4xl font-bold text-gray-900">{t('delivery-terms.title')}</h1>
+        <PolicyBackButton />
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">{t('delivery-terms.title')}</h1>
         <p className="text-gray-600">
           {t('delivery-terms.lastUpdated')}{' '}
           {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
         </p>
 
         <div className="mt-8 space-y-6">
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <p className="text-gray-600">{t('delivery-terms.intro')}</p>
 
             <div className="mt-6 space-y-6">
               {DELIVERY_TERM_SECTIONS.map((section, index) => (
                 <section key={section} className="space-y-3">
-                  <h2 className="text-2xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
                     {index + 1}. {t(`delivery-terms.sections.${section}.title`)}
                   </h2>
                   <p className="text-gray-600">{t(`delivery-terms.sections.${section}.description`)}</p>

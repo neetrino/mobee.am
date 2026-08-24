@@ -8,6 +8,7 @@
 const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { withIpv4FirstDnsEnv } = require('./force-ipv4-dns.cjs');
 
 const rootDir = path.resolve(__dirname, '..');
 const dbRoot = path.join(rootDir, 'shared', 'db');
@@ -47,7 +48,7 @@ if (args[0] === 'dev') {
 const child = spawnSync('pnpm', ['exec', 'prisma', ...args], {
   cwd: dbRoot,
   stdio: 'inherit',
-  env: process.env,
+  env: withIpv4FirstDnsEnv(process.env),
   shell: process.platform === 'win32',
 });
 

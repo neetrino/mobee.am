@@ -116,9 +116,7 @@ export async function getRequest<T>(
   const maxRetries = 3;
   const retryDelay = 1000; // 1 second
   const timeout = 30000; // 30 seconds timeout
-  
-  console.log('🌐 [API CLIENT] GET request:', { url, endpoint, baseUrl });
-  
+
   let response: Response;
   try {
     // Create timeout controller
@@ -142,13 +140,6 @@ export async function getRequest<T>(
       }
       throw fetchError;
     }
-    
-    // Log response status safely
-    try {
-      console.log('🌐 [API CLIENT] GET response status:', response.status, response.statusText || '');
-    } catch {
-      console.warn('⚠️ [API CLIENT] Failed to log response status');
-    }
   } catch (networkError: unknown) {
     handleNetworkError(networkError, baseUrl, url);
   }
@@ -171,8 +162,7 @@ export async function getRequest<T>(
     }
 
     const contentType = response.headers?.get('content-type');
-    console.log('🌐 [API CLIENT] Response content-type:', contentType);
-    
+
     if (!contentType || !contentType.includes('application/json')) {
       const text = await response.text();
       console.error('❌ [API CLIENT] GET Non-JSON response:', {
@@ -184,8 +174,7 @@ export async function getRequest<T>(
     }
     
     const jsonData = await response.json();
-    console.log('✅ [API CLIENT] GET Response parsed successfully');
-    
+
     if (!jsonData) {
       console.warn('⚠️ [API CLIENT] Response data is null or undefined');
       return null as T;
@@ -214,17 +203,13 @@ export async function postRequest<T>(
 ): Promise<T> {
   try {
     const url = buildUrl(baseUrl, endpoint, options?.params);
-    
-    console.log('📤 [API CLIENT] POST request:', { url, data: data ? 'provided' : 'none' });
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: getHeaders(options),
       body: data ? JSON.stringify(data) : undefined,
       ...fetchInitWithoutCustomOptions(options),
     });
-
-    console.log('📥 [API CLIENT] Response status:', response.status, response.statusText);
 
     if (!response.ok) {
       const isUnauthorized = response.status === 401;
@@ -238,7 +223,6 @@ export async function postRequest<T>(
 
     try {
       const jsonData = await response.json();
-      console.log('✅ [API CLIENT] Response parsed successfully');
       return jsonData;
     } catch (parseError: unknown) {
       console.error('❌ [API CLIENT] JSON parse error:', parseError);
@@ -281,9 +265,7 @@ export async function putRequest<T>(
   options?: RequestOptions
 ): Promise<T> {
   const url = buildUrl(baseUrl, endpoint, options?.params);
-  
-  console.log('📤 [API CLIENT] PUT request:', { url, endpoint, hasData: !!data });
-  
+
   const response = await fetch(url, {
     method: 'PUT',
     headers: getHeaders(options),
@@ -291,15 +273,12 @@ export async function putRequest<T>(
     ...fetchInitWithoutCustomOptions(options),
   });
 
-  console.log('📥 [API CLIENT] PUT response status:', response.status, response.statusText);
-
   if (!response.ok) {
     await handleErrorResponse(response, url, baseUrl, options);
   }
 
   try {
     const jsonData = await response.json();
-    console.log('✅ [API CLIENT] PUT Response parsed successfully');
     return jsonData;
   } catch (parseError: unknown) {
     console.error('❌ [API CLIENT] PUT JSON parse error:', {

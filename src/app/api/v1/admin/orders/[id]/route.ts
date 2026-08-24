@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
+import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 
 /**
@@ -11,18 +11,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const { id } = await params;
@@ -67,18 +58,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const { id } = await params;
@@ -130,19 +112,9 @@ export async function DELETE(
   try {
     // Ստուգում ենք ավտորիզացիան
     console.log("🔐 [ADMIN ORDERS] DELETE - Ստուգվում է ավտորիզացիան...");
-    const user = await authenticateToken(req);
-    if (!user || !requireAdmin(user)) {
-      console.log("❌ [ADMIN ORDERS] DELETE - Մերժված մուտք (403)");
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/forbidden",
-          title: "Forbidden",
-          status: 403,
-          detail: "Admin access required",
-          instance: req.url,
-        },
-        { status: 403 }
-      );
+    const authResult = await requireAdminApiContext(req);
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     // Ստանում ենք պատվերի ID-ն
@@ -180,7 +152,6 @@ export async function DELETE(
 
     console.log("🗑️ [ADMIN ORDERS] DELETE request:", {
       orderId,
-      userId: user.id,
       timestamp: new Date().toISOString(),
     });
 

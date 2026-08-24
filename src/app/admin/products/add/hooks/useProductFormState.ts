@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import type { Brand, Category, Attribute, Variant, ProductLabel, GeneratedVariant } from '../types';
 import type { CurrencyCode } from '@/lib/currency';
+import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
 
 export function useProductFormState() {
   const [loading, setLoading] = useState(false);
@@ -17,6 +18,7 @@ export function useProductFormState() {
     categoryIds: [] as string[],
     published: false,
     featured: false,
+    warrantyYears: null as ProductWarrantyYears | null,
     imageUrls: [] as string[],
     featuredImageIndex: 0,
     mainProductImage: '' as string,
@@ -50,6 +52,7 @@ export function useProductFormState() {
     sku: '',
     quantity: '',
   });
+  const [simpleProductDatabaseVariantId, setSimpleProductDatabaseVariantId] = useState<string | undefined>(undefined);
   const [selectedAttributesForVariants, setSelectedAttributesForVariants] = useState<Set<string>>(new Set());
   const [selectedAttributeValueIds, setSelectedAttributeValueIds] = useState<Record<string, string[]>>({});
   const [openValueModal, setOpenValueModal] = useState<{ variantId: string; attributeId: string } | null>(null);
@@ -119,6 +122,8 @@ export function useProductFormState() {
     setProductType,
     simpleProductData,
     setSimpleProductData,
+    simpleProductDatabaseVariantId,
+    setSimpleProductDatabaseVariantId,
     // Variant builder states
     selectedAttributesForVariants,
     setSelectedAttributesForVariants,

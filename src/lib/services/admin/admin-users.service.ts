@@ -1,46 +1,97 @@
+import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 import type { AdminUserUpdateInput } from "@/lib/schemas/admin-users.schema";
+import { invalidateAdminUserValidationCache } from "@/lib/middleware/admin-validation-cache";
+
+export interface AdminUsersFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+}
+
+function buildUsersWhere(filters: AdminUsersFilters): Prisma.UserWhereInput {
+  const andConditions: Prisma.UserWhereInput[] = [{ deletedAt: null }];
+
+  const role = filters.role?.trim().toLowerCase();
+  if (role === "admin") {
+    andConditions.push({ roles: { has: "admin" } });
+  } else if (role === "customer") {
+    andConditions.push({ roles: { has: "customer" } });
+  }
+
+  const search = filters.search?.trim();
+  if (search) {
+    andConditions.push({
+      OR: [
+        { email: { contains: search, mode: "insensitive" } },
+        { phone: { contains: search, mode: "insensitive" } },
+        { firstName: { contains: search, mode: "insensitive" } },
+        { lastName: { contains: search, mode: "insensitive" } },
+      ],
+    });
+  }
+
+  if (andConditions.length === 1) {
+    return andConditions[0];
+  }
+
+  return { AND: andConditions };
+}
 
 class AdminUsersService {
   /**
-   * Get users
+   * Get users with pagination, search, and role filter
    */
-  async getUsers(_filters: any) {
-    const users = await db.user.findMany({
-      where: {
-        deletedAt: null,
-      },
-      take: 100,
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        firstName: true,
-        lastName: true,
-        roles: true,
-        blocked: true,
-        createdAt: true,
-        _count: {
-          select: {
-            orders: true,
+  async getUsers(filters: AdminUsersFilters = {}) {
+    const page = filters.page && filters.page > 0 ? filters.page : 1;
+    const limit = filters.limit && filters.limit > 0 ? Math.min(filters.limit, 100) : 20;
+    const skip = (page - 1) * limit;
+    const where = buildUsersWhere(filters);
+
+    const [users, total] = await Promise.all([
+      db.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          email: true,
+          phone: true,
+          firstName: true,
+          lastName: true,
+          roles: true,
+          blocked: true,
+          createdAt: true,
+          _count: {
+            select: {
+              orders: true,
+            },
           },
         },
-      },
-    });
+      }),
+      db.user.count({ where }),
+    ]);
 
     return {
-      data: users.map((user: { id: string; email: string | null; phone: string | null; firstName: string | null; lastName: string | null; roles: string[] | null; blocked: boolean; createdAt: Date; _count?: { orders?: number } }) => ({
+      data: users.map((user) => ({
         id: user.id,
-        email: user.email,
-        phone: user.phone,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        roles: user.roles,
+        email: user.email ?? "",
+        phone: user.phone ?? "",
+        firstName: user.firstName ?? "",
+        lastName: user.lastName ?? "",
+        roles: user.roles ?? [],
         blocked: user.blocked,
-        createdAt: user.createdAt,
+        createdAt: user.createdAt.toISOString(),
         ordersCount: user._count?.orders ?? 0,
       })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
     };
   }
 
@@ -48,7 +99,7 @@ class AdminUsersService {
    * Update user
    */
   async updateUser(userId: string, data: AdminUserUpdateInput) {
-    return await db.user.update({
+    const updated = await db.user.update({
       where: { id: userId },
       data: {
         ...(data.blocked !== undefined ? { blocked: data.blocked } : {}),
@@ -66,6 +117,10 @@ class AdminUsersService {
         updatedAt: true,
       },
     });
+
+    await invalidateAdminUserValidationCache(userId);
+
+    return updated;
   }
 
   /**
@@ -95,11 +150,10 @@ class AdminUsersService {
       select: { id: true },
     });
 
+    await invalidateAdminUserValidationCache(userId);
+
     return { success: true };
   }
 }
 
 export const adminUsersService = new AdminUsersService();
-
-
-

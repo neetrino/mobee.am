@@ -6,6 +6,13 @@
 
 import { type LanguageCode } from './language';
 import { getStoredLanguage } from './language';
+import {
+  type Namespace,
+  type ProductField,
+  VALID_NAMESPACES,
+} from './i18n-types';
+
+export type { Namespace, ProductField } from './i18n-types';
 
 // Pre-load all translations at build time for optimal performance
 import enCommon from '../locales/en/common.json';
@@ -20,6 +27,7 @@ import enFaq from '../locales/en/faq.json';
 import enLogin from '../locales/en/login.json';
 import enCookies from '../locales/en/cookies.json';
 import enDeliveryTerms from '../locales/en/delivery-terms.json';
+import enCredit from '../locales/en/credit.json';
 import enTerms from '../locales/en/terms.json';
 import enPrivacy from '../locales/en/privacy.json';
 import enSupport from '../locales/en/support.json';
@@ -45,6 +53,7 @@ import hyFaq from '../locales/hy/faq.json';
 import hyLogin from '../locales/hy/login.json';
 import hyCookies from '../locales/hy/cookies.json';
 import hyDeliveryTerms from '../locales/hy/delivery-terms.json';
+import hyCredit from '../locales/hy/credit.json';
 import hyTerms from '../locales/hy/terms.json';
 import hyPrivacy from '../locales/hy/privacy.json';
 import hySupport from '../locales/hy/support.json';
@@ -70,6 +79,7 @@ import ruFaq from '../locales/ru/faq.json';
 import ruLogin from '../locales/ru/login.json';
 import ruCookies from '../locales/ru/cookies.json';
 import ruDeliveryTerms from '../locales/ru/delivery-terms.json';
+import ruCredit from '../locales/ru/credit.json';
 import ruTerms from '../locales/ru/terms.json';
 import ruPrivacy from '../locales/ru/privacy.json';
 import ruSupport from '../locales/ru/support.json';
@@ -82,10 +92,6 @@ import ruRegister from '../locales/ru/register.json';
 import ruCategories from '../locales/ru/categories.json';
 import ruOrders from '../locales/ru/orders.json';
 import ruAdmin from '../locales/ru/admin.json';
-
-// Type definitions for better type safety
-export type Namespace = 'common' | 'home' | 'product' | 'products' | 'attributes' | 'delivery' | 'about' | 'contact' | 'faq' | 'login' | 'cookies' | 'delivery-terms' | 'terms' | 'privacy' | 'support' | 'stores' | 'returns' | 'refund-policy' | 'profile' | 'checkout' | 'register' | 'categories' | 'orders' | 'admin';
-export type ProductField = 'title' | 'shortDescription' | 'longDescription';
 
 // Translation store - organized by language and namespace
 // Supports en, hy, and ru languages
@@ -103,6 +109,7 @@ const translations: Partial<Record<LanguageCode, Record<Namespace, any>>> = {
     login: enLogin,
     cookies: enCookies,
     'delivery-terms': enDeliveryTerms,
+    credit: enCredit,
     terms: enTerms,
     privacy: enPrivacy,
     support: enSupport,
@@ -129,6 +136,7 @@ const translations: Partial<Record<LanguageCode, Record<Namespace, any>>> = {
     login: hyLogin,
     cookies: hyCookies,
     'delivery-terms': hyDeliveryTerms,
+    credit: hyCredit,
     terms: hyTerms,
     privacy: hyPrivacy,
     support: hySupport,
@@ -155,6 +163,7 @@ const translations: Partial<Record<LanguageCode, Record<Namespace, any>>> = {
     login: ruLogin,
     cookies: ruCookies,
     'delivery-terms': ruDeliveryTerms,
+    credit: ruCredit,
     terms: ruTerms,
     privacy: ruPrivacy,
     support: ruSupport,
@@ -254,10 +263,9 @@ export function t(lang: LanguageCode | undefined, path: string): string {
   }
 
   // Validate namespace
-  const validNamespaces: Namespace[] = ['common', 'home', 'product', 'products', 'attributes', 'delivery', 'about', 'contact', 'faq', 'login', 'cookies', 'delivery-terms', 'terms', 'privacy', 'support', 'stores', 'returns', 'refund-policy', 'profile', 'checkout', 'register', 'categories', 'orders', 'admin'];
-  if (!validNamespaces.includes(namespace)) {
+  if (!VALID_NAMESPACES.includes(namespace)) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[i18n] Invalid namespace: "${namespace}". Valid namespaces: ${validNamespaces.join(', ')}`);
+      console.warn(`[i18n] Invalid namespace: "${namespace}". Valid namespaces: ${VALID_NAMESPACES.join(', ')}`);
     }
     return path;
   }
@@ -506,7 +514,7 @@ export function clearTranslationCache(): void {
  * Get all available namespaces
  */
 export function getAvailableNamespaces(): Namespace[] {
-  return ['common', 'home', 'product', 'products', 'attributes', 'delivery', 'about', 'contact', 'faq', 'login', 'cookies', 'delivery-terms', 'terms', 'privacy', 'support', 'stores', 'returns', 'refund-policy', 'profile', 'checkout', 'register', 'categories', 'orders'];
+  return ['common', 'home', 'product', 'products', 'attributes', 'delivery', 'about', 'contact', 'faq', 'login', 'cookies', 'delivery-terms', 'credit', 'terms', 'privacy', 'support', 'stores', 'returns', 'refund-policy', 'profile', 'checkout', 'register', 'categories', 'orders'];
 }
 
 /**

@@ -1,9 +1,10 @@
 ﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
 import { QuickSettingsContent } from './QuickSettingsContent';
 import {
@@ -40,8 +41,6 @@ interface AdminProductsListMeta {
 export default function QuickSettingsPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
   const [globalDiscount, setGlobalDiscount] = useState<number>(0);
   const [discountLoading, setDiscountLoading] = useState(false);
   const [discountSaving, setDiscountSaving] = useState(false);
@@ -66,7 +65,7 @@ export default function QuickSettingsPage() {
     try {
       console.log('⚙️ [QUICK SETTINGS] Fetching settings...');
       setDiscountLoading(true);
-      const settings = await apiClient.get<AdminSettingsResponse>('/api/v1/admin/settings');
+      const settings = await fetchAdminReference<AdminSettingsResponse>('settings');
       setGlobalDiscount(settings.globalDiscount || 0);
       setCategoryDiscounts(settings.categoryDiscounts || {});
       setBrandDiscounts(settings.brandDiscounts || {});
@@ -152,7 +151,7 @@ export default function QuickSettingsPage() {
     try {
       console.log('📂 [QUICK SETTINGS] Fetching categories...');
       setCategoriesLoading(true);
-      const response = await apiClient.get<{ data: AdminCategory[] }>('/api/v1/admin/categories');
+      const response = await fetchAdminReference<{ data: AdminCategory[] }>('categories');
       if (response?.data && Array.isArray(response.data)) {
         setCategories(response.data);
         console.log('✅ [QUICK SETTINGS] Categories loaded:', response.data.length);
@@ -171,7 +170,7 @@ export default function QuickSettingsPage() {
     try {
       console.log('🏷️ [QUICK SETTINGS] Fetching brands...');
       setBrandsLoading(true);
-      const response = await apiClient.get<{ data: AdminBrand[] }>('/api/v1/admin/brands');
+      const response = await fetchAdminReference<{ data: AdminBrand[] }>('brands');
       if (response?.data && Array.isArray(response.data)) {
         setBrands(response.data);
         console.log('✅ [QUICK SETTINGS] Brands loaded:', response.data.length);
@@ -274,8 +273,7 @@ export default function QuickSettingsPage() {
         globalDiscount: discountValue,
         ...buildDiscountPayload(),
       });
-      
-      // Refresh products to get updated labels with new discount percentage
+      invalidateAdminReferenceCache('settings');
       await fetchProducts(productsPage);
       
       showToast(t('admin.quickSettings.savedSuccess'), 'success');
@@ -297,9 +295,9 @@ export default function QuickSettingsPage() {
         globalDiscount,
         ...buildDiscountPayload(),
       });
+      invalidateAdminReferenceCache('settings');
       await fetchProducts(productsPage);
       showToast(t('admin.quickSettings.savedSuccess'), 'success');
-      console.log('✅ [QUICK SETTINGS] Category discounts saved');
     } catch (err: any) {
       console.error('❌ [QUICK SETTINGS] Error saving category discounts:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save';
@@ -317,9 +315,9 @@ export default function QuickSettingsPage() {
         globalDiscount,
         ...buildDiscountPayload(),
       });
+      invalidateAdminReferenceCache('settings');
       await fetchProducts(productsPage);
       showToast(t('admin.quickSettings.savedSuccess'), 'success');
-      console.log('✅ [QUICK SETTINGS] Brand discounts saved');
     } catch (err: any) {
       console.error('❌ [QUICK SETTINGS] Error saving brand discounts:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save';
@@ -385,41 +383,8 @@ export default function QuickSettingsPage() {
     }
   }, [isLoading, isLoggedIn, isAdmin, productsSearchApplied, fetchProducts]);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn) {
-        console.log('❌ [QUICK SETTINGS] User not logged in, redirecting to login...');
-        router.push('/login');
-        return;
-      }
-      if (!isAdmin) {
-        console.log('❌ [QUICK SETTINGS] User is not admin, redirecting to home...');
-        router.push('/');
-        return;
-      }
-    }
-  }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  if (isLoading) {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn || !isAdmin) {
-    return null; // Will redirect
-  }
-
-  return (
-      <QuickSettingsContent
-      currentPath={pathname || '/supersudo/quick-settings'}
-      router={router}
-      t={t}
+    <QuickSettingsContent
       globalDiscount={globalDiscount}
       setGlobalDiscount={setGlobalDiscount}
       discountLoading={discountLoading}
