@@ -27,9 +27,9 @@
     "scrollNext": "Next special offers"
   },
   "why_choose_us_heading": {
-    "title": "Why choose us",
-    "subtitle": "Solutions that work for your everyday use",
-    "cta": "More"
+    "title_lead": "Why choose",
+    "title_emphasis": "us",
+    "subtitle": "Solutions that work for your everyday use"
   },
   "why_choose_us_benefits": {
     "warranty_title": "Warranty",

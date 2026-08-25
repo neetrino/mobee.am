@@ -33,6 +33,14 @@ export const WHY_CHOOSE_US_ICON_SRC = {
   original: `${UI_ICONS_BASE}/home/why-choose-us/original.webp`,
 } as const;
 
+/** Figma Mobee-Dev-Neew Why Choose Us collage photos (home section). */
+export const WHY_CHOOSE_US_PHOTO_SRC = {
+  delivery: '/images/home/why-choose-us/delivery.jpg',
+  installment: '/images/home/why-choose-us/installment.jpg',
+  warranty: '/images/home/why-choose-us/warranty.jpg',
+  original: '/images/home/why-choose-us/original.jpg',
+} as const;
+
 export const PAYMENT_ICON_SRC = {
   arca: `${UI_ICONS_BASE}/payments/arca.webp`,
   aparik: `${UI_ICONS_BASE}/payments/aparik.webp`,
