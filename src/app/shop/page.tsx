@@ -41,7 +41,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   return (
     <div className={`w-full max-w-full ${SHOP_PAGE_FOOTER_GAP_CLASS}`}>
       <div
-        className={`flex w-full flex-col gap-6 pt-4 lg:min-h-0 lg:flex-row lg:items-start ${SITE_CONTENT_GUTTERS_CLASS}`}
+        className={`flex w-full flex-col gap-4 pt-2 lg:min-h-0 lg:flex-row lg:items-start lg:gap-6 lg:pt-4 ${SITE_CONTENT_GUTTERS_CLASS}`}
       >
         <Suspense fallback={<ShopFiltersAsideFallback />}>
           <ShopFiltersShell language={language} searchParams={params}>
