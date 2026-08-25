@@ -21,6 +21,7 @@ import {
 } from './product-pdp-ipad-pro-band.constants';
 import type { AttributeGroupValue, Product, ProductVariant, VariantOption } from './types';
 import { isProductWarrantyYears } from '../../../lib/constants/product-warranty';
+import { resolveProductAttributeLabel } from './utils';
 
 interface ProductInfoAndActionsProps {
   product: Product;
@@ -32,7 +33,6 @@ interface ProductInfoAndActionsProps {
   quantity: number;
   maxQuantity: number;
   isOutOfStock: boolean;
-  isSingleVariantOutOfStock: boolean;
   isVariationRequired: boolean;
   hasUnavailableAttributes: boolean;
   unavailableAttributes: Map<string, boolean>;
@@ -68,7 +68,6 @@ export function ProductInfoAndActions({
   quantity,
   maxQuantity,
   isOutOfStock,
-  isSingleVariantOutOfStock,
   isVariationRequired,
   hasUnavailableAttributes,
   unavailableAttributes,
@@ -122,15 +121,12 @@ export function ProductInfoAndActions({
     <div className="flex min-w-0 w-full flex-col">
       {product.brand && <p className="mb-1 text-sm text-gray-500">{product.brand.name}</p>}
       <div className="flex items-start justify-between gap-3">
-        <h1 className="min-w-0 flex-1 text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">
-          {title}
-        </h1>
-        <div className="mt-1 flex shrink-0 flex-col items-end gap-2 sm:flex-row sm:items-start">
-          {isProductWarrantyYears(product.warrantyYears) ? (
-            <ProductWarrantyBadge years={product.warrantyYears} size="promo" className="shrink-0" />
-          ) : null}
+        <div className="min-w-0 flex-1 flex flex-col gap-3 pt-0.5">
+          <h1 className="text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">
+            {title}
+          </h1>
           <span
-            className={`inline-flex items-center gap-1.5 text-sm font-medium ${
+            className={`mt-1 inline-flex items-center gap-1.5 text-sm font-medium ${
               isStockAvailable ? 'text-emerald-600' : 'text-red-600'
             }`}
             aria-live="polite"
@@ -147,15 +143,10 @@ export function ProductInfoAndActions({
             </span>
           </span>
         </div>
+        {isProductWarrantyYears(product.warrantyYears) ? (
+          <ProductWarrantyBadge years={product.warrantyYears} size="promo" className="mt-1 shrink-0" />
+        ) : null}
       </div>
-
-      {currentVariant?.sku && (
-        <div className="mt-3">
-          <p className="text-sm text-gray-600">
-            SKU: {currentVariant.sku}
-          </p>
-        </div>
-      )}
 
       <hr className="my-5 border-0 border-t border-gray-200" />
 
@@ -213,24 +204,13 @@ export function ProductInfoAndActions({
           <p className="text-sm font-medium text-amber-900">{getRequiredAttributesMessage()}</p>
         </div>
       )}
-      {isSingleVariantOutOfStock && !isVariationRequired && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
-          <p className="text-sm font-medium text-red-800">
-            {t(language, 'product.outOfStock')}
-          </p>
-        </div>
-      )}
       {hasUnavailableAttributes && !isVariationRequired && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
           <p className="text-sm font-medium text-red-800">
             {Array.from(unavailableAttributes.entries())
               .map(([attrKey]) => {
                 const productAttr = product.productAttributes?.find((pa) => pa.attribute?.key === attrKey);
-                const attributeName =
-                  productAttr?.attribute?.name || attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
-                if (attrKey === 'color') return t(language, 'product.color');
-                if (attrKey === 'size') return t(language, 'product.size');
-                return attributeName;
+                return resolveProductAttributeLabel(attrKey, language, productAttr?.attribute?.name);
               })
               .join(', ')}{' '}
             {t(language, 'product.outOfStock')}

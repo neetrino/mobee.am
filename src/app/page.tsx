@@ -29,8 +29,8 @@ export default async function HomePage() {
   const managedSlides = toHeroCarouselSlides(homeHero);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-white">
-      <section className="bg-white">
+    <div className="flex min-h-0 flex-1 flex-col bg-gray-50">
+      <section className="bg-gray-50">
         {managedSlides.length > 0 ? (
           <HomeHeroManagedCarousel slides={managedSlides} />
         ) : (
