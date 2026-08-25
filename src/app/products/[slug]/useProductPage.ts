@@ -18,6 +18,7 @@ import { getVariantMainImageIndex } from './utils/variant-media';
 import { resolveCompareCategoryId } from '../../../lib/shop/compare-storage';
 import { getMissingRequiredAttributeKeys } from './utils/required-attribute-selection';
 import { findVariantByAllAttributesStrict, findVariantByAllAttributes, findVariantByColorAndSize } from './utils/variant-finders';
+import { resolveProductAttributeLabel } from './utils';
 import type { Product } from './types';
 
 export type UseProductPageProps = {
@@ -259,10 +260,7 @@ export function useProductPage({
 
   const resolveAttributeLabel = (attrKey: string): string => {
     const productAttr = product?.productAttributes?.find((pa) => pa.attribute?.key === attrKey);
-    if (productAttr?.attribute?.name) return productAttr.attribute.name;
-    if (attrKey === 'color' || attrKey === 'colour') return t(language, 'product.color');
-    if (attrKey === 'size') return t(language, 'product.size');
-    return attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
+    return resolveProductAttributeLabel(attrKey, language, productAttr?.attribute?.name);
   };
 
   const getRequiredAttributesMessage = (): string => {

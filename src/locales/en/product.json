@@ -6,6 +6,7 @@
   "description_title": "Description",
   "color": "Color",
   "size": "Size",
+  "storage": "Storage",
   "quantity": "Quantity",
   "addToCart": "Add to Cart",
   "outOfStock": "Out of Stock",

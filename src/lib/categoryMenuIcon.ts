@@ -16,8 +16,8 @@ import {
   WandSparkles,
   WashingMachine,
   Watch,
-  Wind,
 } from 'lucide-react';
+import { HairDryerIcon } from '@/components/icons/HairDryerIcon';
 import {
   ACCESSORIES_SLUG_PARTS,
   COMPUTERS_SLUG_PARTS,
@@ -167,7 +167,7 @@ function resolvePrimaryIcon(category: CategoryIconSource): LucideIcon | null {
     matchesSlugParts(category, HAIR_DRYER_SLUG_PARTS) ||
     titleIncludes(category, ['ֆեն', 'фен', 'hair dryer', 'վարսահարդարիչ'])
   ) {
-    return Wind;
+    return HairDryerIcon;
   }
   if (
     matchesSlugParts(category, GAME_CONSOLE_SLUG_PARTS) ||

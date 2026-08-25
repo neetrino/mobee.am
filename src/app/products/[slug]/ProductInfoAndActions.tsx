@@ -21,6 +21,7 @@ import {
 } from './product-pdp-ipad-pro-band.constants';
 import type { AttributeGroupValue, Product, ProductVariant, VariantOption } from './types';
 import { isProductWarrantyYears } from '../../../lib/constants/product-warranty';
+import { resolveProductAttributeLabel } from './utils';
 
 interface ProductInfoAndActionsProps {
   product: Product;
@@ -209,11 +210,7 @@ export function ProductInfoAndActions({
             {Array.from(unavailableAttributes.entries())
               .map(([attrKey]) => {
                 const productAttr = product.productAttributes?.find((pa) => pa.attribute?.key === attrKey);
-                const attributeName =
-                  productAttr?.attribute?.name || attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
-                if (attrKey === 'color') return t(language, 'product.color');
-                if (attrKey === 'size') return t(language, 'product.size');
-                return attributeName;
+                return resolveProductAttributeLabel(attrKey, language, productAttr?.attribute?.name);
               })
               .join(', ')}{' '}
             {t(language, 'product.outOfStock')}

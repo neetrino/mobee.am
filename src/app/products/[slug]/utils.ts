@@ -1,4 +1,6 @@
 import type { VariantOption } from './types';
+import { t } from '../../../lib/i18n';
+import type { LanguageCode } from '../../../lib/language';
 
 /**
  * Helper function to get color hex/rgb from color name
@@ -25,5 +27,32 @@ export const getOptionValue = (options: VariantOption[] | undefined, key: string
   return opt?.value?.toLowerCase().trim() || null;
 };
 
+const ATTRIBUTE_LABEL_I18N_KEYS: Record<string, string> = {
+  color: 'product.color',
+  colour: 'product.color',
+  size: 'product.size',
+  storage: 'product.storage',
+  memory: 'product.storage',
+};
 
-
+/**
+ * Localized attribute row label. Prefers i18n for known keys so DB English
+ * names (e.g. "Storage") do not leak into hy/ru UI.
+ */
+export function resolveProductAttributeLabel(
+  attrKey: string,
+  language: LanguageCode,
+  fallbackName?: string | null,
+): string {
+  const i18nKey = ATTRIBUTE_LABEL_I18N_KEYS[attrKey.toLowerCase()];
+  if (i18nKey) {
+    const translated = t(language, i18nKey);
+    if (translated && translated !== i18nKey) {
+      return translated;
+    }
+  }
+  if (fallbackName?.trim()) {
+    return fallbackName;
+  }
+  return attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
+}

@@ -13,8 +13,8 @@ import {
   WandSparkles,
   WashingMachine,
   Watch,
-  Wind,
 } from 'lucide-react';
+import { HairDryerIcon } from '@/components/icons/HairDryerIcon';
 import { resolveCategoryMenuIcon } from './categoryMenuIcon';
 
 describe('resolveCategoryMenuIcon', () => {
@@ -24,8 +24,8 @@ describe('resolveCategoryMenuIcon', () => {
       { title: 'Հեռախոս', slug: 'heraxos', icon: Smartphone },
       { title: 'Համակարգիչ', slug: 'hamakargich', icon: Laptop },
       { title: 'Պլանշետ', slug: 'planshet', fullPath: 'tablets', icon: Tablet },
-      { title: 'Վարսահարդարիչ', slug: 'varsahardarich', icon: Wind },
-      { title: 'Ֆեն', slug: 'hair-dryer', icon: Wind },
+      { title: 'Վարսահարդարիչ', slug: 'varsahardarich', icon: HairDryerIcon },
+      { title: 'Ֆեն', slug: 'hair-dryer', icon: HairDryerIcon },
       { title: 'Մազերի ուղղիչ', slug: 'hair-straightener', icon: WandSparkles },
       { title: 'Հեռուստացույց', slug: 'herustacuyc', icon: Tv },
       { title: 'Օդորակիչ', slug: 'ac', icon: AirVent },
