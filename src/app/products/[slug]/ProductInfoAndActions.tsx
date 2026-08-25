@@ -147,14 +147,6 @@ export function ProductInfoAndActions({
         </div>
       </div>
 
-      {currentVariant?.sku && (
-        <div className="mt-3">
-          <p className="text-sm text-gray-600">
-            SKU: {currentVariant.sku}
-          </p>
-        </div>
-      )}
-
       <hr className="my-5 border-0 border-t border-gray-200" />
 
       <div className={`flex flex-wrap items-center gap-4 ${PDP_IPAD_PRO_BAND_QTY_PRICE_ROW_CLASS}`}>

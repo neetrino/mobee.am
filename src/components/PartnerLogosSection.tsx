@@ -145,7 +145,7 @@ export function PartnerLogosSection({ brands }: { brands: HomeBrandLogo[] }) {
 
   return (
     <section
-      className="mt-8 bg-white pb-6 pt-6 lg:mt-20 lg:pb-10 lg:pt-10"
+      className="mt-8 bg-gray-50 pb-6 pt-6 lg:mt-20 lg:pb-10 lg:pt-10"
       aria-label={t('home.partner_logos.heading')}
     >
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-5 lg:gap-10`}>

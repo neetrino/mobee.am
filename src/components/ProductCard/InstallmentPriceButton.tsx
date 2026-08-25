@@ -66,11 +66,11 @@ export function InstallmentPriceButton({
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex h-[38px] w-[120px] shrink-0 items-center gap-0.5 rounded-full border border-[#2db2ff] bg-transparent py-1 pl-2 pr-2.5 text-[#2db2ff] transition-opacity hover:opacity-90 max-lg:h-[34px] max-lg:w-auto max-lg:max-w-[110px] max-lg:px-1.5 ${className}`}
+        className={`inline-flex h-[38px] w-[120px] shrink-0 items-center gap-0.5 rounded-full border border-[#2db2ff] bg-transparent py-1 pl-2 pr-2.5 text-[#2db2ff] transition-opacity hover:opacity-90 ${className}`}
         aria-label={buttonLabel}
       >
-        <MoneyExchangeIcon size={20} className="shrink-0 max-lg:size-[18px]" />
-        <span className="min-w-0 flex-1 text-center text-xs font-medium leading-tight max-lg:text-[11px]">
+        <MoneyExchangeIcon size={20} className="shrink-0" />
+        <span className="min-w-0 flex-1 text-center text-xs font-medium leading-tight">
           {buttonLabel}
         </span>
       </button>

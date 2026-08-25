@@ -16,9 +16,9 @@ const SIZE_STYLES: Record<
   { number: string; label: string; padding: string }
 > = {
   catalog: {
-    number: 'text-[1.125rem] leading-none',
-    label: 'text-[0.625rem] leading-tight',
-    padding: 'px-2 py-1.5',
+    number: 'text-[0.9375rem] leading-none lg:text-[1.125rem]',
+    label: 'text-[0.5625rem] leading-tight lg:text-[0.625rem]',
+    padding: 'px-1.5 py-1 lg:px-2 lg:py-1.5',
   },
   promo: {
     number: 'text-[1.375rem] leading-none sm:text-[1.5rem]',
@@ -47,11 +47,11 @@ export function ProductWarrantyBadge({
     >
       <div className={`flex items-end justify-center gap-0.5 ${styles.padding}`}>
         <span className={`font-bold uppercase text-white ${styles.number}`}>{years}</span>
-        <span className="text-[0.875rem] font-normal uppercase leading-[0.9375rem] text-white">
+        <span className="text-[0.75rem] font-normal uppercase leading-[0.875rem] text-white lg:text-[0.875rem] lg:leading-[0.9375rem]">
           {t('products.warranty.years_suffix')}
         </span>
       </div>
-      <div className="bg-admin px-2 py-0.5">
+      <div className="bg-admin px-1.5 py-0.5 lg:px-2">
         <span className={`block font-bold uppercase text-white ${styles.label}`}>
           {t('products.warranty.label')}
         </span>
