@@ -35,10 +35,10 @@ export const WHY_CHOOSE_US_ICON_SRC = {
 
 /** Figma Mobee-Dev-Neew Why Choose Us collage photos (home section). */
 export const WHY_CHOOSE_US_PHOTO_SRC = {
-  delivery: '/images/home/why-choose-us/delivery.jpg',
-  installment: '/images/home/why-choose-us/installment.jpg',
-  warranty: '/images/home/why-choose-us/warranty.jpg',
-  original: '/images/home/why-choose-us/original.jpg',
+  delivery: '/images/home/why-choose-us/delivery.webp',
+  installment: '/images/home/why-choose-us/installment.webp',
+  warranty: '/images/home/why-choose-us/warranty.webp',
+  original: '/images/home/why-choose-us/original.webp',
 } as const;
 
 export const PAYMENT_ICON_SRC = {
