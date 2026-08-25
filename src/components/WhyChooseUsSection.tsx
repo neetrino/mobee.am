@@ -141,7 +141,7 @@ export function WhyChooseUsSection() {
   const { t } = useTranslation();
 
   return (
-    <section className="mt-[7.5rem]" aria-labelledby="why-choose-us-heading">
+    <section className="bg-white" aria-labelledby="why-choose-us-heading">
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} ${montserrat.className}`}>
         <div className="grid grid-cols-[minmax(0,375fr)_minmax(0,392fr)_minmax(0,400fr)] items-start gap-x-[50px]">
           <div className="pt-[62px]">

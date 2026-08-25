@@ -239,7 +239,7 @@ export function HomeProductSections({
   );
 
   return (
-    <section className="bg-gray-50 pb-0 pt-2 lg:pb-16 lg:pt-0" aria-labelledby="home-product-sections">
+    <section className="bg-gray-50 pb-0 pt-2 lg:pt-0" aria-labelledby="home-product-sections">
       <HomeProductSectionsBody
         language={language}
         products={products}
@@ -260,13 +260,15 @@ export function HomeProductSections({
         mobileCardsPerView={mobileCardsPerView}
       />
 
-      <div className="hidden lg:block">
-        <WhyChooseUsSection />
+      <div className="bg-white lg:mt-12 lg:pb-16 lg:pt-[4.5rem]">
+        <div className="hidden lg:block">
+          <WhyChooseUsSection />
+        </div>
+
+        <HomePagePartnerLogos brands={homeBrands} />
+
+        <HomeMobileSaleBanner />
       </div>
-
-      <HomePagePartnerLogos brands={homeBrands} />
-
-      <HomeMobileSaleBanner />
     </section>
   );
 }
