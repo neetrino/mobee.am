@@ -82,7 +82,8 @@
       "connector": "Разъём",
       "charging": "Зарядка",
       "sim": "SIM",
-      "camera": "Камера"
+      "camera": "Камера",
+      "gps": "GPS"
     }
   },
   "aparik": {

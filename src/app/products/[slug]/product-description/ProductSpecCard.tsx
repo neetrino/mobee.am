@@ -18,7 +18,7 @@ export function ProductSpecRow({ row, language }: ProductSpecRowProps) {
 
   return (
     <div className={ROW_CLASS}>
-      {createElement(getProductSpecRowIcon(row.labelKey), {
+      {createElement(getProductSpecRowIcon(row.labelKey, row.label), {
         className: 'h-5 w-5 shrink-0 text-gray-400',
         'aria-hidden': true,
       })}

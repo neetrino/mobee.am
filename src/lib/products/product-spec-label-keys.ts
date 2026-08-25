@@ -47,6 +47,7 @@ export const PRODUCT_SPEC_ARMENIAN_LABEL_KEYS: ReadonlyArray<readonly [string, s
   ['Մարտկոցի Տեսակ', 'product.specs.labels.batteryType'],
   ['Մարտկոցի տեսակը', 'product.specs.labels.batteryType'],
   ['Մարտկոցի հզորությունը', 'product.specs.labels.batteryCapacity'],
+  ['Մարտկոցի հզորություն', 'product.specs.labels.batteryCapacity'],
   ['ՕՀ տեսակ', 'product.specs.labels.operatingSystem'],
   ['Չիպ', 'product.specs.labels.processor'],
   ['Չիպ.', 'product.specs.labels.processor'],
@@ -64,12 +65,16 @@ export const PRODUCT_SPEC_ARMENIAN_LABEL_KEYS: ReadonlyArray<readonly [string, s
   ['Բարձախոսներ', 'product.specs.labels.other'],
   ['Չափս', 'product.specs.labels.dimensions'],
   ['Լիցքավորման բնիկի տեսակը', 'product.specs.labels.connector'],
+  ['Միացք', 'product.specs.labels.connector'],
+  ['GPS', 'product.specs.labels.gps'],
+  ['Gps', 'product.specs.labels.gps'],
   ['Լիցքավորում', 'product.specs.labels.charging'],
   ['Կշիռ', 'product.specs.labels.weight'],
   ['Հաստություն', 'product.specs.labels.dimensions'],
   ['Երկարություն', 'product.specs.labels.dimensions'],
   ['Լայնությունը', 'product.specs.labels.dimensions'],
   ['SIM քարտի քանակ', 'product.specs.labels.sim'],
+  ['SIM', 'product.specs.labels.sim'],
   ['Աուդիո', 'product.specs.labels.other'],
   ['Տեսախցիկ', 'product.specs.labels.camera'],
   ['Կապ', 'product.specs.labels.network'],
@@ -161,6 +166,19 @@ export const PRODUCT_SPEC_GENERIC_LABEL_KEYS: ReadonlyArray<readonly [string, st
   ['Веб-камера', 'product.specs.labels.webcam'],
   ['Фронтальная камера', 'product.specs.labels.frontCamera'],
   ['Основная камера', 'product.specs.labels.mainCamera'],
+  ['Front camera', 'product.specs.labels.frontCamera'],
+  ['Main camera', 'product.specs.labels.mainCamera'],
+  ['Connector', 'product.specs.labels.connector'],
+  ['GPS', 'product.specs.labels.gps'],
+  ['Gps', 'product.specs.labels.gps'],
+  ['SIM card', 'product.specs.labels.sim'],
+  ['SIM Card', 'product.specs.labels.sim'],
+  ['Sim card', 'product.specs.labels.sim'],
+  ['SIM card type', 'product.specs.labels.simCardType'],
+  ['Разъём', 'product.specs.labels.connector'],
+  ['Разъем', 'product.specs.labels.connector'],
+  ['SIM-карта', 'product.specs.labels.sim'],
+  ['Тип SIM-карты', 'product.specs.labels.simCardType'],
 ];
 
 export const PRODUCT_SPEC_ARMENIAN_LABEL_MAP = new Map<string, string>(
@@ -224,6 +242,7 @@ export const PRODUCT_SPEC_LABEL_SECTION_SLUG: Readonly<Record<string, string>> =
   'product.specs.labels.charging': 'power',
   'product.specs.labels.sim': 'connectivity',
   'product.specs.labels.camera': 'cameras',
+  'product.specs.labels.gps': 'connectivity',
 };
 
 export const PRODUCT_SPEC_SECTION_ORDER: readonly string[] = [

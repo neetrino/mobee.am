@@ -82,7 +82,8 @@
       "connector": "Connector",
       "charging": "Charging",
       "sim": "SIM",
-      "camera": "Camera"
+      "camera": "Camera",
+      "gps": "GPS"
     }
   },
   "aparik": {
