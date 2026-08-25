@@ -45,7 +45,7 @@ function CategoriesMenuFlyoutCard({
       onClick={onItemNavigate}
       className="group flex min-h-[52px] items-center gap-2.5 rounded-xl border border-transparent bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-[border-color,background-color,transform] duration-150 hover:-translate-y-px hover:border-[#dbeafe] hover:bg-[#f8fbff] active:translate-y-0 active:bg-[#f1f7fc]"
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eef2f7] text-[#4b5563] transition-colors duration-150 group-hover:bg-[#2db2ff] group-hover:text-white">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#2db2ff] text-white">
         {createElement(resolveCategoryMenuIcon(category), {
           className: 'size-5',
           strokeWidth: 2,
