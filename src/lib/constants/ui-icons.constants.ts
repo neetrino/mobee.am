@@ -33,12 +33,16 @@ export const WHY_CHOOSE_US_ICON_SRC = {
   original: `${UI_ICONS_BASE}/home/why-choose-us/original.webp`,
 } as const;
 
-/** Figma Mobee-Dev-Neew Why Choose Us collage photos (home section). */
+/** Why Choose Us collage photos — Cloudflare R2 (`static/home/why-choose-us/`). */
 export const WHY_CHOOSE_US_PHOTO_SRC = {
-  delivery: '/images/home/why-choose-us/delivery.webp',
-  installment: '/images/home/why-choose-us/installment.webp',
-  warranty: '/images/home/why-choose-us/warranty.webp',
-  original: '/images/home/why-choose-us/original.webp',
+  delivery:
+    'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/home/why-choose-us/delivery.webp',
+  installment:
+    'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/home/why-choose-us/installment.webp',
+  warranty:
+    'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/home/why-choose-us/warranty.webp',
+  original:
+    'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/home/why-choose-us/original.webp',
 } as const;
 
 export const PAYMENT_ICON_SRC = {
