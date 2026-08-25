@@ -18,6 +18,14 @@ import { productsService } from "@/lib/services/products.service";
 import { buildProductFiltersCacheKey, getCachedProductFilters } from "./products-filters-cached";
 
 describe("buildProductFiltersCacheKey", () => {
+  it("includes filter in the cache key", () => {
+    const withNew = buildProductFiltersCacheKey({ lang: "en", filter: "new" });
+    const without = buildProductFiltersCacheKey({ lang: "en" });
+    const featured = buildProductFiltersCacheKey({ lang: "en", filter: "featured" });
+    expect(withNew).not.toBe(without);
+    expect(withNew).not.toBe(featured);
+    expect(withNew).toContain("filter=new");
+  });
   it("is stable for same logical filters", () => {
     const a = buildProductFiltersCacheKey({
       lang: "en",
@@ -32,7 +40,7 @@ describe("buildProductFiltersCacheKey", () => {
       lang: "en",
     });
     expect(a).toBe(b);
-    expect(a.startsWith("products:filters:")).toBe(true);
+    expect(a.startsWith("products:filters:v2:")).toBe(true);
   });
 
   it("normalizes multi-category param order for cache key", () => {
@@ -77,5 +85,17 @@ describe("getCachedProductFilters", () => {
     expect(out.cacheStatus).toBe("MISS");
     expect(out.result).toEqual(payload);
     expect(cacheService.setex).toHaveBeenCalled();
+  });
+
+  it("does not cache a database failure", async () => {
+    vi.mocked(cacheService.get).mockResolvedValue(null);
+    vi.mocked(cacheService.setex).mockClear();
+    vi.mocked(productsService.getFilters).mockRejectedValue(
+      Object.assign(new Error("Can't reach database server at postgres://secret"), {
+        name: "PrismaClientInitializationError",
+      }),
+    );
+    await expect(getCachedProductFilters({ lang: "en" })).rejects.toThrow();
+    expect(cacheService.setex).not.toHaveBeenCalled();
   });
 });

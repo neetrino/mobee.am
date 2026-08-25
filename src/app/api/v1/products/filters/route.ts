@@ -1,55 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { getCachedProductFilters } from "@/lib/services/products-filters-cached";
+import { logger } from "@/lib/utils/logger";
+import { buildProductListFiltersFromUrlSearchParams } from "@/lib/shop/build-shop-product-filters";
+import { AppError } from "@/lib/errors/app-error";
 
 export async function GET(req: NextRequest) {
-  try {
-    let searchParams;
+  return runApiRoute(req, async () => {
+    let searchParams: URLSearchParams;
     try {
-      const url = req.url || '';
-      searchParams = new URL(url).searchParams;
-    } catch (urlError) {
-      console.error("❌ [PRODUCTS FILTERS] Error parsing URL:", urlError);
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/internal-error",
-          title: "Internal Server Error",
-          status: 500,
-          detail: "Invalid request URL",
-          instance: req.url || '',
-        },
-        { status: 500 }
-      );
+      searchParams = new URL(req.url || "").searchParams;
+    } catch (urlError: unknown) {
+      logger.error("Product filters URL parse failed", {
+        error: urlError instanceof Error ? urlError.message : String(urlError),
+      });
+      throw AppError.internal();
     }
 
+    const parsed = buildProductListFiltersFromUrlSearchParams(searchParams);
     const filters = {
-      category: searchParams.get("category") || undefined,
-      search: searchParams.get("search") || undefined,
-      minPrice: searchParams.get("minPrice")
-        ? parseFloat(searchParams.get("minPrice")!)
-        : undefined,
-      maxPrice: searchParams.get("maxPrice")
-        ? parseFloat(searchParams.get("maxPrice")!)
-        : undefined,
-      lang: searchParams.get("lang") || "en",
+      category: parsed.category,
+      search: parsed.search,
+      minPrice: parsed.minPrice,
+      maxPrice: parsed.maxPrice,
+      lang: parsed.lang,
+      brand: parsed.brand,
+      colors: parsed.colors,
+      sizes: parsed.sizes,
+      filter: parsed.filter,
     };
 
     const { result, cacheStatus } = await getCachedProductFilters(filters);
     return NextResponse.json(result, {
       headers: { "X-Cache": cacheStatus },
     });
-  } catch (error: any) {
-    console.error("❌ [PRODUCTS FILTERS] Error:", error);
-    console.error("❌ [PRODUCTS FILTERS] Error stack:", error.stack);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url || '',
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
-

@@ -6,6 +6,7 @@ import {
   ADMIN_ANALYTICS_PERIODS,
   type AdminAnalyticsPeriod,
 } from "@/lib/contracts/admin-analytics";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 /**
  * Force dynamic rendering for this route
@@ -25,8 +26,8 @@ function parsePeriod(value: string | null): AdminAnalyticsPeriod {
  * Get analytics data for admin dashboard
  */
 export async function GET(req: NextRequest) {
-  return withAdminPerfLog("/api/v1/admin/analytics", async (markAuthComplete) => {
-    try {
+  return runApiRoute(req, async () => {
+    return withAdminPerfLog("/api/v1/admin/analytics", async (markAuthComplete) => {
       const authResult = await requireAdminApiContext(req);
       if (authResult instanceof NextResponse) {
         return authResult;
@@ -41,26 +42,6 @@ export async function GET(req: NextRequest) {
       const result = await adminService.getAnalytics(period, startDate, endDate);
 
       return NextResponse.json(result);
-    } catch (error: unknown) {
-      const err = error as {
-        message?: string;
-        stack?: string;
-        type?: string;
-        status?: number;
-        detail?: string;
-      };
-      console.error("[ANALYTICS] Error:", err.message ?? err.detail);
-      return NextResponse.json(
-        {
-          type: err.type || "https://api.shop.am/problems/internal-error",
-          title: "Internal Server Error",
-          status: err.status || 500,
-          detail: err.detail || err.message || "An error occurred",
-          instance: req.url,
-        },
-        { status: err.status || 500 },
-      );
-    }
+    });
   });
 }
-

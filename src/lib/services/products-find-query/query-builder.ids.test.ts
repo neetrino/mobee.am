@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { buildWhereClause } from "./query-builder";
 
-describe("buildWhereClause ids shortcut", () => {
-  it("returns id-in filter and skips category work", async () => {
+describe("buildWhereClause ids constraint", () => {
+  it("keeps ids as a constraint and still applies published/deleted conditions", async () => {
     const result = await buildWhereClause({
       ids: ["prod-1", "prod-2"],
       lang: "en",
@@ -10,9 +10,10 @@ describe("buildWhereClause ids shortcut", () => {
       limit: 10,
     });
     expect(result.where).toEqual({
-      published: true,
-      deletedAt: null,
-      id: { in: ["prod-1", "prod-2"] },
+      AND: [
+        { published: true, deletedAt: null },
+        { id: { in: ["prod-1", "prod-2"] } },
+      ],
     });
     expect(result.bestsellerProductIds).toEqual([]);
   });

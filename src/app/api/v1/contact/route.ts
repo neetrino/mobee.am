@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@white-shop/db";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
 import { isValidEmail } from "@/lib/utils/email";
 
@@ -8,12 +9,11 @@ import { isValidEmail } from "@/lib/utils/email";
  * Submit contact form
  */
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const body = await req.json();
     const { name, email, subject, message } = body;
 
-    // Validation
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!email || typeof email !== 'string' || email.trim().length === 0) {
+    if (!email || typeof email !== "string" || email.trim().length === 0) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!subject || typeof subject !== 'string' || subject.trim().length === 0) {
+    if (!subject || typeof subject !== "string" || subject.trim().length === 0) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -65,7 +65,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Email validation (no regex on user input to avoid ReDoS)
     if (!isValidEmail(email)) {
       return NextResponse.json(
         {
@@ -79,7 +78,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create contact message
     const contactMessage = await db.contactMessage.create({
       data: {
         name: name.trim(),
@@ -104,21 +102,5 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error("Contact form error", { error });
-    return NextResponse.json(
-      {
-        type: "https://api.shop.am/problems/internal-error",
-        title: "Internal Server Error",
-        status: 500,
-        detail: errorMessage || "An error occurred while submitting the contact form",
-        instance: req.url,
-      },
-      { status: 500 }
-    );
-  }
+  });
 }
-
-
-

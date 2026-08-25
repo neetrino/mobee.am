@@ -1,5 +1,7 @@
 import { db } from "@white-shop/db";
+import { logger } from "@/lib/utils/logger";
 import { toSlug } from "@/lib/utils/slug";
+import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
 
 class AdminBrandsService {
   /**
@@ -96,6 +98,7 @@ class AdminBrandsService {
     const brandTranslations = Array.isArray(brand.translations) ? brand.translations : [];
     const translation = brandTranslations.find((t: { locale: string }) => t.locale === locale) || brandTranslations[0] || null;
 
+    await invalidateCatalogCaches();
     return {
       data: {
         id: brand.id,
@@ -116,7 +119,7 @@ class AdminBrandsService {
       logoUrl?: string;
     }
   ) {
-    console.log('🔄 [ADMIN SERVICE] updateBrand called:', brandId, data);
+    logger.info("updateBrand called", { brandId });
     
     const brand = await db.brand.findUnique({
       where: { id: brandId },
@@ -191,6 +194,7 @@ class AdminBrandsService {
       : [];
     const translation = brandTranslations[0] || null;
 
+    await invalidateCatalogCaches();
     return {
       data: {
         id: updatedBrand!.id,
@@ -204,7 +208,7 @@ class AdminBrandsService {
    * Delete brand (soft delete)
    */
   async deleteBrand(brandId: string) {
-    console.log('🗑️ [ADMIN SERVICE] deleteBrand called:', brandId);
+    logger.info('🗑️ [ADMIN SERVICE] deleteBrand called:', { value: brandId });
     
     const brand = await db.brand.findUnique({
       where: { id: brandId },
@@ -245,7 +249,8 @@ class AdminBrandsService {
       },
     });
 
-    console.log('✅ [ADMIN SERVICE] Brand deleted:', brandId);
+    logger.info('✅ [ADMIN SERVICE] Brand deleted:', { value: brandId });
+    await invalidateCatalogCaches();
     return { success: true };
   }
 }

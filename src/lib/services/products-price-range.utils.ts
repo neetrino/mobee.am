@@ -58,6 +58,7 @@ export async function buildPriceBoundsWhere(
       {
         variants: {
           some: {
+            published: true,
             sku: { contains: term, mode: "insensitive" },
           },
         },

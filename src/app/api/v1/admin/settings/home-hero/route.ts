@@ -7,6 +7,7 @@ import {
   getCachedAdminReferenceResponse,
   invalidateAdminReferenceServerCache,
 } from "@/lib/admin/admin-reference-server-cache";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 function problemResponse(
   req: NextRequest,
@@ -31,7 +32,7 @@ function problemResponse(
  * GET /api/v1/admin/settings/home-hero
  */
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -41,23 +42,14 @@ export async function GET(req: NextRequest) {
       adminService.getHomeHeroSettings(),
     );
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "An error occurred";
-    return problemResponse(
-      req,
-      500,
-      "Internal Server Error",
-      message,
-      "https://api.shop.am/problems/internal-error",
-    );
-  }
+  });
 }
 
 /**
  * PUT /api/v1/admin/settings/home-hero
  */
 export async function PUT(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -74,14 +66,5 @@ export async function PUT(req: NextRequest) {
     revalidatePath("/");
 
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "An error occurred";
-    return problemResponse(
-      req,
-      500,
-      "Internal Server Error",
-      message,
-      "https://api.shop.am/problems/internal-error",
-    );
-  }
+  });
 }

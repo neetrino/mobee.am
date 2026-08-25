@@ -15,6 +15,8 @@ import {
   buildProductFiltersCacheKey,
   type ProductFiltersCacheInput,
 } from '@/lib/shop/product-filters-cache-key';
+import { productFiltersToFacetParams } from '@/lib/shop/product-filters-to-api-params';
+import { parseCatalogHttpParams } from '@/lib/catalog/catalog-http-query';
 
 export interface ColorOption {
   value: string;
@@ -82,6 +84,10 @@ interface ProductsFiltersProviderProps {
   search?: string;
   minPrice?: string;
   maxPrice?: string;
+  brand?: string;
+  colors?: string;
+  sizes?: string;
+  filter?: string;
   initialFiltersData?: ProductsFiltersData;
   initialTopCategories?: ShopTopCategoryOption[];
   initialFiltersKey?: string;
@@ -93,14 +99,22 @@ function buildFiltersKeyFromProps(
   search?: string,
   minPrice?: string,
   maxPrice?: string,
+  brand?: string,
+  colors?: string,
+  sizes?: string,
+  filter?: string,
   lang?: string,
 ): string {
   const input: ProductFiltersCacheInput = {
     lang: lang || getStoredLanguage(),
     category,
     search,
-    minPrice: minPrice ? parseFloat(minPrice) : undefined,
-    maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    brand,
+    colors,
+    sizes,
+    filter,
   };
   return buildProductFiltersCacheKey(input);
 }
@@ -110,6 +124,10 @@ export function ProductsFiltersProvider({
   search,
   minPrice,
   maxPrice,
+  brand,
+  colors,
+  sizes,
+  filter,
   initialFiltersData,
   initialTopCategories,
   initialFiltersKey,
@@ -127,11 +145,12 @@ export function ProductsFiltersProvider({
     setError(false);
     try {
       const lang = getStoredLanguage();
-      const params: Record<string, string> = { lang };
-      if (category) params.category = category;
-      if (search) params.search = search;
-      if (minPrice) params.minPrice = minPrice;
-      if (maxPrice) params.maxPrice = maxPrice;
+      const params = productFiltersToFacetParams(
+        parseCatalogHttpParams(
+          { category, search, minPrice, maxPrice, brand, colors, sizes, filter },
+          lang,
+        ),
+      );
 
       const [filtersRes, topRes] = await Promise.all([
         apiClient.get<ProductsFiltersData>('/api/v1/products/filters', { params }),
@@ -154,11 +173,21 @@ export function ProductsFiltersProvider({
     } finally {
       setLoading(false);
     }
-  }, [category, search, minPrice, maxPrice]);
+  }, [category, search, minPrice, maxPrice, brand, colors, sizes, filter]);
 
   useEffect(() => {
     const lang = getStoredLanguage();
-    const currentKey = buildFiltersKeyFromProps(category, search, minPrice, maxPrice, lang);
+    const currentKey = buildFiltersKeyFromProps(
+      category,
+      search,
+      minPrice,
+      maxPrice,
+      brand,
+      colors,
+      sizes,
+      filter,
+      lang,
+    );
     if (initialFiltersKey && currentKey === initialFiltersKey && initialFiltersData) {
       setData(initialFiltersData);
       setTopCategories(initialTopCategories ?? []);
@@ -172,6 +201,10 @@ export function ProductsFiltersProvider({
     search,
     minPrice,
     maxPrice,
+    brand,
+    colors,
+    sizes,
+    filter,
     fetchFilters,
     initialFiltersKey,
     initialFiltersData,

@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import * as jwt from "jsonwebtoken";
 import { db } from "@white-shop/db";
+import { requireJwtSecret } from "@/config/env";
 import { getAccessTokenFromRequest } from "@/lib/security/auth-cookie";
 import { JWT_ALGORITHM } from "@/lib/security/jwt.constants";
-import { logger } from "@/lib/utils/logger";
 
 export interface AuthUser {
   id: string;
@@ -26,12 +26,9 @@ export async function authenticateToken(
       return null;
     }
 
-    if (!process.env.JWT_SECRET) {
-      logger.error("JWT_SECRET is not set");
-      return null;
-    }
+    const secret = requireJwtSecret();
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+    const decoded = jwt.verify(token, secret, {
       algorithms: [JWT_ALGORITHM],
     }) as {
       userId: string;

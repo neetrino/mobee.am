@@ -1,5 +1,6 @@
 import { createAttribute, updateAttributeTranslation } from "./admin-attributes-write/attribute-operations";
 import { addAttributeValue, updateAttributeValue } from "./admin-attributes-write/value-operations";
+import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
 
 /**
  * Service for admin attribute write operations
@@ -15,7 +16,9 @@ class AdminAttributesWriteService {
     filterable?: boolean;
     locale?: string;
   }) {
-    return createAttribute(data);
+    const result = await createAttribute(data);
+    await invalidateCatalogCaches();
+    return result;
   }
 
   /**
@@ -28,7 +31,9 @@ class AdminAttributesWriteService {
       locale?: string;
     }
   ) {
-    return updateAttributeTranslation(attributeId, data);
+    const result = await updateAttributeTranslation(attributeId, data);
+    await invalidateCatalogCaches();
+    return result;
   }
 
   /**
@@ -38,7 +43,9 @@ class AdminAttributesWriteService {
     attributeId: string,
     data: { label: string; locale?: string }
   ) {
-    return addAttributeValue(attributeId, data);
+    const result = await addAttributeValue(attributeId, data);
+    await invalidateCatalogCaches();
+    return result;
   }
 
   /**
@@ -54,7 +61,9 @@ class AdminAttributesWriteService {
       locale?: string;
     }
   ) {
-    return updateAttributeValue(attributeId, valueId, data);
+    const result = await updateAttributeValue(attributeId, valueId, data);
+    await invalidateCatalogCaches();
+    return result;
   }
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { reviewsService } from "@/lib/services/reviews.service";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { productsService } from "@/lib/services/products.service";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const { slug } = await params;
     const { searchParams } = new URL(req.url);
     const lang = searchParams.get("lang") || "en";
@@ -89,41 +90,24 @@ export async function GET(
     });
 
     return NextResponse.json(reviews);
-  } catch (error: unknown) {
-    const err = error as {
-      type?: string;
-      title?: string;
-      status?: number;
-      detail?: string;
-      message?: string;
-    };
-    console.error("❌ [REVIEWS API] GET Error:", error);
-    return NextResponse.json(
-      {
-        type: err.type || "https://api.shop.am/problems/internal-error",
-        title: err.title || "Internal Server Error",
-        status: err.status || 500,
-        detail: err.detail || err.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: err.status || 500 },
-    );
-  }
+  });
 }
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = await params;
-  return NextResponse.json(
-    {
-      type: "https://api.shop.am/problems/method-not-allowed",
-      title: "Method Not Allowed",
-      status: 405,
-      detail: `Review creation is disabled for v1 read-only scope on product '${slug}'`,
-      instance: req.url,
-    },
-    { status: 405 },
-  );
+  return runApiRoute(req, async () => {
+    const { slug } = await params;
+    return NextResponse.json(
+      {
+        type: "https://api.shop.am/problems/method-not-allowed",
+        title: "Method Not Allowed",
+        status: 405,
+        detail: `Review creation is disabled for v1 read-only scope on product '${slug}'`,
+        instance: req.url,
+      },
+      { status: 405 },
+    );
+  });
 }

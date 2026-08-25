@@ -1,9 +1,11 @@
 import { db } from "@white-shop/db";
+import { logger } from "@/lib/utils/logger";
 import {
   HOME_HERO_SETTING_KEY,
   resolveHomeHeroSettingsForRead,
   type HomeHeroSettings,
 } from "@/lib/home-hero";
+import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
 
 class AdminSettingsService {
   /**
@@ -50,7 +52,7 @@ class AdminSettingsService {
    * Update settings
    */
   async updateSettings(data: any) {
-    console.log('⚙️ [ADMIN SERVICE] Updating settings...', data);
+    logger.info("Updating settings");
     
     // Update global discount
     if (data.globalDiscount !== undefined) {
@@ -67,7 +69,7 @@ class AdminSettingsService {
           description: 'Global discount percentage for all products',
         },
       });
-      console.log('✅ [ADMIN SERVICE] Global discount updated:', globalDiscountValue);
+      logger.info('✅ [ADMIN SERVICE] Global discount updated:', { value: globalDiscountValue });
     }
     
     // Update category discounts
@@ -84,7 +86,7 @@ class AdminSettingsService {
           description: 'Discount percentages by category ID',
         },
       });
-      console.log('✅ [ADMIN SERVICE] Category discounts updated:', data.categoryDiscounts);
+      logger.info('✅ [ADMIN SERVICE] Category discounts updated:', { value: data.categoryDiscounts });
     }
     
     // Update brand discounts
@@ -101,7 +103,7 @@ class AdminSettingsService {
           description: 'Discount percentages by brand ID',
         },
       });
-      console.log('✅ [ADMIN SERVICE] Brand discounts updated:', data.brandDiscounts);
+      logger.info('✅ [ADMIN SERVICE] Brand discounts updated:', { value: data.brandDiscounts });
     }
     
     // Update default currency
@@ -119,7 +121,7 @@ class AdminSettingsService {
           description: 'Default currency for admin product pricing (USD, AMD, EUR)',
         },
       });
-      console.log('✅ [ADMIN SERVICE] Default currency updated:', currencyValue);
+      logger.info('✅ [ADMIN SERVICE] Default currency updated:', { value: currencyValue });
     }
     
     // Update currency rates
@@ -136,9 +138,10 @@ class AdminSettingsService {
           description: 'Currency exchange rates relative to USD (USD, AMD, EUR, RUB, GEL)',
         },
       });
-      console.log('✅ [ADMIN SERVICE] Currency rates updated:', data.currencyRates);
+      logger.info('✅ [ADMIN SERVICE] Currency rates updated:', { value: data.currencyRates });
     }
-    
+
+    await invalidateCatalogCaches();
     return { success: true };
   }
 
@@ -146,13 +149,13 @@ class AdminSettingsService {
    * Get price filter settings
    */
   async getPriceFilterSettings() {
-    console.log('⚙️ [ADMIN SERVICE] Fetching price filter settings...');
+    logger.info('⚙️ [ADMIN SERVICE] Fetching price filter settings...');
     const setting = await db.settings.findUnique({
       where: { key: 'price-filter' },
     });
 
     if (!setting) {
-      console.log('✅ [ADMIN SERVICE] Price filter settings not found, returning defaults');
+      logger.info('✅ [ADMIN SERVICE] Price filter settings not found, returning defaults');
       return {
         minPrice: null,
         maxPrice: null,
@@ -172,7 +175,7 @@ class AdminSettingsService {
         GEL?: number;
       };
     };
-    console.log('✅ [ADMIN SERVICE] Price filter settings loaded:', value);
+    logger.info('✅ [ADMIN SERVICE] Price filter settings loaded:', { value: value });
     return {
       minPrice: value.minPrice ?? null,
       maxPrice: value.maxPrice ?? null,
@@ -195,7 +198,7 @@ class AdminSettingsService {
       GEL?: number | null;
     } | null;
   }) {
-    console.log('⚙️ [ADMIN SERVICE] Updating price filter settings...', data);
+    logger.info("Updating price filter settings");
     
     const value: {
       minPrice?: number;
@@ -250,7 +253,8 @@ class AdminSettingsService {
       },
     });
 
-    console.log('✅ [ADMIN SERVICE] Price filter settings updated:', setting);
+    logger.info('✅ [ADMIN SERVICE] Price filter settings updated:', { value: setting });
+    await invalidateCatalogCaches();
     const stored = setting.value as any;
     return {
       success: true,

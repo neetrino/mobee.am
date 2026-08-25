@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { guestCartHydrateService } from "@/lib/services/guest-cart-hydrate.service";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ const hydrateBodySchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const parsed = hydrateBodySchema.safeParse(await req.json());
     if (!parsed.success) {
       return NextResponse.json(
@@ -37,18 +38,5 @@ export async function POST(req: NextRequest) {
     const lang = parsed.data.lang ?? "en";
     const result = await guestCartHydrateService.hydrateItems(parsed.data.items, lang);
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    console.error("❌ [CART GUEST HYDRATE] Error:", error);
-    const message = error instanceof Error ? error.message : "An error occurred";
-    return NextResponse.json(
-      {
-        type: "https://api.shop.am/problems/internal-error",
-        title: "Internal Server Error",
-        status: 500,
-        detail: message,
-        instance: req.url,
-      },
-      { status: 500 },
-    );
-  }
+  });
 }

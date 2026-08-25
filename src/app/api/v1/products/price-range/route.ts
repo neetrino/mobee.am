@@ -1,29 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { productsService } from "@/lib/services/products.service";
+import { buildProductListFiltersFromUrlSearchParams } from "@/lib/shop/build-shop-product-filters";
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const { searchParams } = new URL(req.url);
-    const filters = {
-      category: searchParams.get("category") || undefined,
-      search: searchParams.get("search") || undefined,
-      lang: searchParams.get("lang") || "en",
-    };
-
+    const filters = buildProductListFiltersFromUrlSearchParams(searchParams);
     const result = await productsService.getPriceRange(filters);
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("❌ [PRODUCTS] Error:", error);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
-

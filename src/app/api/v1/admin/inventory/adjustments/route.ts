@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminInventoryService } from "@/lib/services/admin/admin-inventory.service";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 interface AdjustmentPayload {
   variantId?: unknown;
@@ -26,7 +27,7 @@ function validatePayload(payload: AdjustmentPayload) {
 }
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(req, async (ctx) => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -47,26 +48,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await adminInventoryService.adjustInventory({
-      variantId: payload.variantId as string,
-      quantityDelta: payload.quantityDelta as number,
-      reason: (payload.reason as string).trim(),
-      note: payload.note as string | undefined,
-      adminUserId: authResult.userId,
-    });
+    const result = await adminInventoryService.adjustInventory(
+      {
+        variantId: payload.variantId as string,
+        quantityDelta: payload.quantityDelta as number,
+        reason: (payload.reason as string).trim(),
+        note: payload.note as string | undefined,
+      },
+      ctx.commerce({ actorUserId: authResult.userId, source: "admin" }),
+    );
 
     return NextResponse.json(result, { status: 200 });
-  } catch (error: unknown) {
-    const knownError = error as { status?: number; type?: string; title?: string; detail?: string; message?: string };
-    return NextResponse.json(
-      {
-        type: knownError.type || "https://api.shop.am/problems/internal-error",
-        title: knownError.title || "Internal Server Error",
-        status: knownError.status || 500,
-        detail: knownError.detail || knownError.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: knownError.status || 500 }
-    );
-  }
+  });
 }

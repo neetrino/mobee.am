@@ -29,19 +29,25 @@ import {
 } from "../products/variant-price-display";
 import { normalizeCheckoutDisplayCurrency } from "../checkout/checkout-email-money";
 import { adminService } from "./admin.service";
+import { availableUnreservedStock, hasUnreservedQuantity } from "./inventory/available-stock";
+import { decrementCheckoutStock } from "./inventory/decrement-checkout-stock";
+import type { CommerceRequestContext } from "./orders/order-transition.types";
+import { ORDER_EVENT_TYPE } from "./orders/order-fsm.constants";
 
 const ORDER_NUMBER_START = 1000;
+const ORDER_NUMBER_ADVISORY_LOCK_KEY = 4004001;
 
 /**
  * Generate the next sequential order number (>= 1000).
- * Looks up the current max purely-numeric order number inside the active
- * transaction so concurrent checkouts read a consistent value. Any rare
- * collision is still caught by the unique constraint on `orders.number`
- * and surfaces as a 409 (handled in `checkout`).
+ * Serializes MAX+1 with a transaction-scoped advisory lock so concurrent
+ * checkouts cannot collide. Unique `orders.number` remains a last-resort guard.
  */
 async function generateSequentialOrderNumber(
   tx: Prisma.TransactionClient
 ): Promise<string> {
+  await tx.$executeRaw(
+    Prisma.sql`SELECT pg_advisory_xact_lock(${ORDER_NUMBER_ADVISORY_LOCK_KEY})`,
+  );
   const rows = await tx.$queryRaw<Array<{ max: bigint | null }>>(
     Prisma.sql`SELECT MAX(CAST("number" AS BIGINT)) AS max FROM "orders" WHERE "number" ~ '^[0-9]+$'`
   );
@@ -285,7 +291,12 @@ class OrdersService {
   /**
    * Create order (checkout)
    */
-  async checkout(data: CheckoutData, userId?: string, baseUrl?: string) {
+  async checkout(
+    data: CheckoutData,
+    userId: string | undefined,
+    baseUrl: string | undefined,
+    context: CommerceRequestContext,
+  ) {
     try {
       const {
         cartId,
@@ -410,13 +421,13 @@ class OrdersService {
               locale: customerLocale,
             });
 
-            // Check stock availability for reserved cart item quantity
+            // User-cart lines already hold stockReserved; on-hand must still cover quantity.
             if (variant.stock < item.quantity) {
               throw {
                 status: 422,
                 type: "https://api.shop.am/problems/validation-error",
                 title: "Insufficient stock",
-                detail: `Product "${cartItemDetails.productTitle || "Unknown"}" - insufficient stock. Available: ${variant.stock}, Requested: ${item.quantity}`,
+                detail: `Product "${cartItemDetails.productTitle || "Unknown"}" - insufficient stock. Available: ${availableUnreservedStock(variant.stock, variant.stockReserved)}, Requested: ${item.quantity}`,
               };
             }
 
@@ -479,12 +490,12 @@ class OrdersService {
               detail: `Variant ${item.variantId} not found for product ${item.productId}`,
             };
           }
-          if (variant.stock < item.quantity) {
+          if (!hasUnreservedQuantity(variant.stock, variant.stockReserved, item.quantity)) {
             throw {
               status: 422,
               type: "https://api.shop.am/problems/validation-error",
               title: "Insufficient stock",
-              detail: `Insufficient stock. Available: ${variant.stock}, Requested: ${item.quantity}`,
+              detail: `Insufficient stock. Available: ${availableUnreservedStock(variant.stock, variant.stockReserved)}, Requested: ${item.quantity}`,
             };
           }
           assertVariantPurchasable(variant);
@@ -598,6 +609,7 @@ class OrdersService {
             customerPhone: phone,
             customerLocale,
             shippingMethod,
+            correlationId: context.requestId,
             shippingAddress: persistedShippingAddress
               ? JSON.parse(JSON.stringify(persistedShippingAddress))
               : null,
@@ -618,7 +630,12 @@ class OrdersService {
             },
             events: {
               create: {
-                type: 'order_created',
+                type: ORDER_EVENT_TYPE.CREATED,
+                fromState: null,
+                toState: "pending",
+                actorUserId: context.actorUserId,
+                isCustomerVisible: true,
+                correlationId: context.requestId,
                 data: {
                   source: userId ? 'user' : 'guest',
                   paymentMethod,
@@ -643,64 +660,19 @@ class OrdersService {
           },
         });
 
-        // Update stock atomically: only decrement if stock >= quantity (avoids race condition)
-        logger.debug('Updating stock for variants', { count: cartItems.length });
-        
-        try {
-          for (const item of cartItems) {
-            if (!item.variantId) {
-              logger.error('Missing variantId for item', { item });
-              throw {
-                status: 400,
-                type: "https://api.shop.am/problems/validation-error",
-                title: "Validation Error",
-                detail: `Missing variantId for item with SKU: ${item.sku}`,
-              };
-            }
-
-            const quantity = Number(item.quantity);
-            const variantId = item.variantId;
-            const updated = isUserCartCheckout
-              ? await tx.$executeRaw(
-                  Prisma.sql`UPDATE "product_variants"
-                             SET "stock" = "stock" - ${quantity},
-                                 "stockReserved" = "stockReserved" - ${quantity}
-                             WHERE "id" = ${variantId}
-                               AND "stock" >= ${quantity}
-                               AND "stockReserved" >= ${quantity}`
-                )
-              : await tx.$executeRaw(
-                  Prisma.sql`UPDATE "product_variants"
-                             SET "stock" = "stock" - ${quantity}
-                             WHERE "id" = ${variantId} AND "stock" >= ${quantity}`
-                );
-            if (updated === 0) {
-              const variant = await tx.productVariant.findUnique({
-                where: { id: variantId },
-                select: { sku: true, stock: true },
-              });
-              logger.error('Insufficient stock on atomic decrement', {
-                variantId,
-                sku: variant?.sku,
-                currentStock: variant?.stock,
-                requested: quantity,
-              });
-              throw {
-                status: 422,
-                type: "https://api.shop.am/problems/validation-error",
-                title: "Insufficient stock",
-                detail: `Insufficient stock for SKU ${variant?.sku ?? variantId}. Available: ${variant?.stock ?? 0}, requested: ${quantity}`,
-              };
-            }
-            logger.debug('Stock decremented', { variantId, quantity });
-          }
-          logger.info('All variant stocks updated successfully');
-        } catch (stockError: unknown) {
-          const err = stockError as { status?: number; type?: string };
-          if (err.status && err.type) throw stockError;
-          logger.error('Error updating stock', { error: stockError });
-          throw stockError;
-        }
+        logger.debug("Updating stock for variants", { count: cartItems.length });
+        await decrementCheckoutStock({
+          tx,
+          context,
+          orderId: newOrder.id,
+          items: cartItems.map((item) => ({
+            variantId: item.variantId,
+            quantity: Number(item.quantity),
+            sku: item.sku,
+          })),
+          isUserCartCheckout,
+        });
+        logger.info("All variant stocks updated successfully");
 
         // Create payment record
         const payment = await tx.payment.create({

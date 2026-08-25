@@ -1,4 +1,8 @@
 import type { ProductFilters } from "@/lib/services/products-find-query/types";
+import {
+  parseCatalogHttpParams,
+  urlSearchParamsToRecord,
+} from "@/lib/catalog/catalog-http-query";
 
 /**
  * Flat query params for GET /api/v1/products (matches buildProductListFiltersFromUrlSearchParams).
@@ -24,4 +28,27 @@ export function productFiltersToApiParams(filters: ProductFilters): Record<strin
   if (filters.sort && filters.sort !== "default") p.sort = filters.sort;
   if (filters.ids?.length) p.ids = filters.ids.join(",");
   return p;
+}
+
+/**
+ * Facet query params: same catalog filters, without pagination/sort/ids.
+ */
+export function productFiltersToFacetParams(
+  filters: ProductFilters,
+): Record<string, string> {
+  const params = productFiltersToApiParams(filters);
+  delete params.page;
+  delete params.limit;
+  delete params.sort;
+  delete params.ids;
+  return params;
+}
+
+export function facetParamsFromUrlSearchParams(
+  searchParams: Iterable<[string, string]>,
+  lang: string,
+): Record<string, string> {
+  return productFiltersToFacetParams(
+    parseCatalogHttpParams(urlSearchParamsToRecord(searchParams), lang),
+  );
 }

@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { usersService } from "@/lib/services/users.service";
-import { toApiError } from "@/lib/types/errors";
-import { logger } from "@/lib/utils/logger";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export async function PUT(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -21,12 +20,10 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    // Support both 'oldPassword' and 'currentPassword' field names
     const oldPassword = body.oldPassword || body.currentPassword;
     const { newPassword } = body;
 
-    // Validate required fields
-    if (!oldPassword || typeof oldPassword !== 'string' || oldPassword.trim() === '') {
+    if (!oldPassword || typeof oldPassword !== "string" || oldPassword.trim() === "") {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -39,7 +36,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    if (!newPassword || typeof newPassword !== 'string' || newPassword.trim() === '') {
+    if (!newPassword || typeof newPassword !== "string" || newPassword.trim() === "") {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -52,7 +49,6 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Validate password length
     if (newPassword.length < 6) {
       return NextResponse.json(
         {
@@ -68,17 +64,5 @@ export async function PUT(req: NextRequest) {
 
     const result = await usersService.changePassword(user.id, oldPassword.trim(), newPassword.trim());
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    logger.error("Password change error", { error });
-    if (error instanceof Error) {
-      logger.error("Password change error details", {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      });
-    }
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
-

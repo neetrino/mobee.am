@@ -2,15 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 import { safeParseAdminProductUpdate } from "@/lib/schemas/admin-product-update.schema";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
-
-type RouteError = {
-  type?: string;
-  title?: string;
-  status?: number;
-  detail?: string;
-  message?: string;
-};
 
 /**
  * GET /api/v1/admin/products/[id]
@@ -20,7 +13,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -30,22 +23,7 @@ export async function GET(
     const product = await adminService.getProductById(id);
 
     return NextResponse.json(product);
-  } catch (error: unknown) {
-    const err = error as RouteError;
-    logger.error("ADMIN PRODUCTS GET [id] Error", {
-      error: err.message || String(error),
-    });
-    return NextResponse.json(
-      {
-        type: err.type || "https://api.shop.am/problems/internal-error",
-        title: err.title || "Internal Server Error",
-        status: err.status || 500,
-        detail: err.detail || err.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: err.status || 500 }
-    );
-  }
+  });
 }
 
 /**
@@ -56,7 +34,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -93,26 +71,7 @@ export async function PUT(
     });
 
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    const err = error as RouteError;
-    logger.error("ADMIN PRODUCTS PUT Error", {
-      message: err.message || String(error),
-      type: err.type,
-      title: err.title,
-      status: err.status,
-      detail: err.detail,
-    });
-    return NextResponse.json(
-      {
-        type: err.type || "https://api.shop.am/problems/internal-error",
-        title: err.title || "Internal Server Error",
-        status: err.status || 500,
-        detail: err.detail || err.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: err.status || 500 }
-    );
-  }
+  });
 }
 
 /**
@@ -123,7 +82,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -136,20 +95,5 @@ export async function DELETE(
     logger.info("ADMIN PRODUCTS Product deleted", { id });
 
     return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    const err = error as RouteError;
-    logger.error("ADMIN PRODUCTS DELETE Error", {
-      error: err.message || String(error),
-    });
-    return NextResponse.json(
-      {
-        type: err.type || "https://api.shop.am/problems/internal-error",
-        title: err.title || "Internal Server Error",
-        status: err.status || 500,
-        detail: err.detail || err.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: err.status || 500 }
-    );
-  }
+  });
 }

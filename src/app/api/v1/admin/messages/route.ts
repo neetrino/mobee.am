@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { db } from "@white-shop/db";
-import { toApiError } from "@/lib/types/errors";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
 
 /**
@@ -9,7 +9,7 @@ import { logger } from "@/lib/utils/logger";
  * Get all contact messages (admin only)
  */
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -20,7 +20,6 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20", 10);
     const skip = (page - 1) * limit;
 
-    // Get total count
     let total: number;
     let messages: Array<{
       id: string;
@@ -31,27 +30,26 @@ export async function GET(req: NextRequest) {
       createdAt: Date;
       updatedAt: Date;
     }>;
-    
+
     try {
       total = await db.contactMessage.count();
     } catch (dbError: unknown) {
       logger.error("Database count error", { error: dbError });
-      const errorMessage = dbError instanceof Error ? dbError.message : 'Unknown database error';
+      const errorMessage = dbError instanceof Error ? dbError.message : "Unknown database error";
       throw new Error(`Database query failed: ${errorMessage}. Make sure Prisma Client is generated and migrations are applied.`);
     }
 
     try {
-      // Get messages
       messages = await db.contactMessage.findMany({
         skip,
         take: limit,
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       });
     } catch (dbError: unknown) {
       logger.error("Database findMany error", { error: dbError });
-      const errorMessage = dbError instanceof Error ? dbError.message : 'Unknown database error';
+      const errorMessage = dbError instanceof Error ? dbError.message : "Unknown database error";
       throw new Error(`Database query failed: ${errorMessage}. Make sure Prisma Client is generated and migrations are applied.`);
     }
 
@@ -66,14 +64,7 @@ export async function GET(req: NextRequest) {
         totalPages,
       },
     });
-  } catch (error: unknown) {
-    logger.error("Admin messages error", { error });
-    if (error instanceof Error) {
-      logger.error("Admin messages error stack", { stack: error.stack });
-    }
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
 
 /**
@@ -81,7 +72,7 @@ export async function GET(req: NextRequest) {
  * Delete multiple messages by IDs (admin only)
  */
 export async function DELETE(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -103,7 +94,6 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // Delete messages
     const result = await db.contactMessage.deleteMany({
       where: {
         id: {
@@ -112,19 +102,12 @@ export async function DELETE(req: NextRequest) {
       },
     });
 
-    logger.info('Deleted messages', { count: result.count });
+    logger.info("Deleted messages", { count: result.count });
 
     return NextResponse.json({
       data: {
         deletedCount: result.count,
       },
     });
-  } catch (error: unknown) {
-    logger.error("Admin messages delete error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
-
-
-

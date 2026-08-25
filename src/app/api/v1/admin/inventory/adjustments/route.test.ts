@@ -44,13 +44,18 @@ describe("POST /api/v1/admin/inventory/adjustments", () => {
     const body = await res.json();
 
     expect(res.status).toBe(200);
-    expect(adminInventoryService.adjustInventory).toHaveBeenCalledWith({
-      variantId: "variant-1",
-      quantityDelta: 2,
-      reason: "manual-adjustment",
-      note: undefined,
-      adminUserId: "admin-1",
-    });
+    expect(adminInventoryService.adjustInventory).toHaveBeenCalledWith(
+      {
+        variantId: "variant-1",
+        quantityDelta: 2,
+        reason: "manual-adjustment",
+        note: undefined,
+      },
+      expect.objectContaining({
+        actorUserId: "admin-1",
+        source: "admin",
+      }),
+    );
     expect(body.variantId).toBe("variant-1");
   });
 

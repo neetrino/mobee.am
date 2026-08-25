@@ -1,3 +1,4 @@
+import { getEnv, getPaymentCallbackSecretValue } from "@/config/env";
 import { logger } from "@/lib/utils/logger";
 
 let loggedJwtFallback = false;
@@ -7,7 +8,7 @@ let loggedJwtFallback = false;
  * In production JWT_SECRET fallback is disabled — set PAYMENT_CALLBACK_SECRET.
  */
 export function getPaymentCallbackSecret(): string {
-  const dedicated = process.env.PAYMENT_CALLBACK_SECRET?.trim();
+  const dedicated = getPaymentCallbackSecretValue();
   if (dedicated) {
     return dedicated;
   }
@@ -22,7 +23,7 @@ export function getPaymentCallbackSecret(): string {
     return "";
   }
 
-  const jwtSecret = process.env.JWT_SECRET?.trim() ?? "";
+  const jwtSecret = getEnv().JWT_SECRET ?? "";
   if (jwtSecret && !loggedJwtFallback) {
     loggedJwtFallback = true;
     logger.warn(

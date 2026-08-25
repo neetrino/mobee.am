@@ -1,229 +1,83 @@
 import { ProductFilters, ProductWithRelations } from "./products-find-query.service";
-import { minPricedVariantPrice } from "../products/variant-price-display";
+import { normalizeCatalogQuery } from "@/lib/catalog/catalog-query";
+import { productMatchesBrandTokens } from "@/lib/catalog/brand-where";
+import { variantMatchesColorAndSize, type CatalogOptionLike } from "@/lib/catalog/variant-option-where";
+import { rowMatchesPriceFilter } from "@/lib/catalog/catalog-price";
+import { sortCatalogRows } from "@/lib/catalog/catalog-sort";
 import { productHasMarcoListingImage } from "../products/marco-product-image";
+import type { CatalogLightRow } from "@/lib/catalog/catalog-light.types";
+import type { ProductDiscountContext } from "./products-find-transform.service";
+import type { CanonicalCatalogQuery } from "@/lib/catalog/catalog-query";
 
-/**
- * Normalize comma-separated filter values and drop placeholders like "undefined" or "null".
- */
-const normalizeFilterList = (
-  value?: string,
-  transform?: (v: string) => string
-): string[] => {
-  if (!value || typeof value !== "string") return [];
-
-  const invalidTokens = new Set(["undefined", "null", ""]);
-  const items = value
-    .split(",")
-    .map((v) => v.trim())
-    .filter((v) => !invalidTokens.has(v.toLowerCase()));
-
-  if (transform) {
-    return items.map(transform);
-  }
-
-  return items;
+const NO_DISCOUNTS: ProductDiscountContext = {
+  globalDiscount: 0,
+  categoryDiscounts: {},
+  brandDiscounts: {},
 };
+
+function asLightRow(product: ProductWithRelations): CatalogLightRow {
+  return product as unknown as CatalogLightRow;
+}
+
+function matchesCatalogFilters(
+  product: ProductWithRelations,
+  query: CanonicalCatalogQuery,
+  discounts: ProductDiscountContext,
+): boolean {
+  const row = asLightRow(product);
+  if (!productMatchesBrandTokens(row, query.brands)) {
+    return false;
+  }
+  if (query.colors.length > 0 || query.sizes.length > 0) {
+    const variants = Array.isArray(product.variants) ? product.variants : [];
+    const matched = variants.some((variant) =>
+          variantMatchesColorAndSize(
+            variant.options as CatalogOptionLike[],
+            query.colors,
+            query.sizes,
+            query.lang,
+          ),
+    );
+    if (!matched) {
+      return false;
+    }
+  }
+  if (!rowMatchesPriceFilter(row, discounts, query.minPrice, query.maxPrice)) {
+    return false;
+  }
+  return !(query.filter === "new" && productHasMarcoListingImage(product));
+}
 
 class ProductsFindFilterService {
   /**
-   * Filter products by price, colors, sizes, brand in memory
+   * In-memory matchers shared with tests. Live listing uses the DB pipeline.
    */
   filterProducts(
     products: ProductWithRelations[],
     filters: ProductFilters,
-    bestsellerProductIds: string[]
+    bestsellerProductIds: string[],
+    discounts: ProductDiscountContext = NO_DISCOUNTS,
   ): ProductWithRelations[] {
-    const { minPrice, maxPrice, colors, sizes, brand } = filters;
-
-    // Filter by price
-    if (minPrice || maxPrice) {
-      const min = minPrice || 0;
-      const max = maxPrice || Infinity;
-      products = products.filter((product: ProductWithRelations) => {
-        const variants = Array.isArray(product.variants) ? product.variants : [];
-        if (variants.length === 0) return false;
-        const listMin = minPricedVariantPrice(variants);
-        if (listMin == null) return false;
-        return listMin >= min && listMin <= max;
-      });
-    }
-
-    // Filter by brand(s) - support multiple brands (comma-separated)
-    const brandList = normalizeFilterList(brand);
-    if (brandList.length > 0) {
-      products = products.filter(
-        (product: ProductWithRelations) => 
-          product.brandId && brandList.includes(product.brandId)
-      );
-    }
-
-    // Filter by colors and sizes together if both are provided.
-    // Skip filtering when only placeholder values (e.g., "undefined") are passed.
-    const colorList = normalizeFilterList(colors, (v) => v.toLowerCase());
-    const sizeList = normalizeFilterList(sizes, (v) => v.toUpperCase());
-
-    if (colorList.length > 0 || sizeList.length > 0) {
-      products = products.filter((product: ProductWithRelations) => {
-        const variants = Array.isArray(product.variants) ? product.variants : [];
-        
-        if (variants.length === 0) {
-          return false;
-        }
-        
-        // Find variants that match ALL specified filters
-        const matchingVariants = variants.filter((variant: any) => {
-          const options = Array.isArray(variant.options) ? variant.options : [];
-          
-          if (options.length === 0) {
-            return false;
-          }
-          
-          // Helper function to get color value from option (support all formats)
-          const getColorValue = (opt: any, lang: string = 'en'): string | null => {
-            // New format: Use AttributeValue if available
-            if (opt.attributeValue && opt.attributeValue.attribute?.key === "color") {
-              const translation = opt.attributeValue.translations?.find((t: { locale: string }) => t.locale === lang) || opt.attributeValue.translations?.[0];
-              return (translation?.label || opt.attributeValue.value || "").trim().toLowerCase();
-            }
-            // Old format: check attributeKey, key, or attribute
-            if (opt.attributeKey === "color" || opt.key === "color" || opt.attribute === "color") {
-              return (opt.value || opt.label || "").trim().toLowerCase();
-            }
-            return null;
-          };
-          
-          // Helper function to get size value from option (support all formats)
-          const getSizeValue = (opt: any, lang: string = 'en'): string | null => {
-            // New format: Use AttributeValue if available
-            if (opt.attributeValue && opt.attributeValue.attribute?.key === "size") {
-              const translation = opt.attributeValue.translations?.find((t: { locale: string }) => t.locale === lang) || opt.attributeValue.translations?.[0];
-              return (translation?.label || opt.attributeValue.value || "").trim().toUpperCase();
-            }
-            // Old format: check attributeKey, key, or attribute
-            if (opt.attributeKey === "size" || opt.key === "size" || opt.attribute === "size") {
-              return (opt.value || opt.label || "").trim().toUpperCase();
-            }
-            return null;
-          };
-          
-          // Check color match if colors filter is provided
-          if (colorList.length > 0) {
-            let colorMatched = false;
-            for (const opt of options) {
-              const variantColorValue = getColorValue(opt, filters.lang || 'en');
-              if (variantColorValue && colorList.includes(variantColorValue)) {
-                colorMatched = true;
-                break;
-              }
-            }
-            if (!colorMatched) {
-              return false;
-            }
-          }
-          
-          // Check size match if sizes filter is provided
-          if (sizeList.length > 0) {
-            let sizeMatched = false;
-            for (const opt of options) {
-              const variantSizeValue = getSizeValue(opt, filters.lang || 'en');
-              if (variantSizeValue && sizeList.includes(variantSizeValue)) {
-                sizeMatched = true;
-                break;
-              }
-            }
-            if (!sizeMatched) {
-              return false;
-            }
-          }
-          
-          return true;
-        });
-        
-        const hasMatch = matchingVariants.length > 0;
-        return hasMatch;
-      });
-    }
-
-    // Sort
-    const { filter, sort = "default" } = filters;
-
-    // Home "The Best Choice" uses filter=new — never show Marco-image products there.
-    if (filter === "new") {
-      products = products.filter(
-        (product: ProductWithRelations) => !productHasMarcoListingImage(product),
-      );
-    }
-
-    const demoteMarco = (
-      a: ProductWithRelations,
-      b: ProductWithRelations,
-      compare: () => number,
-    ): number => {
-      const aMarco = productHasMarcoListingImage(a);
-      const bMarco = productHasMarcoListingImage(b);
-      if (aMarco !== bMarco) {
-        return aMarco ? 1 : -1;
-      }
-      return compare();
-    };
-
-    if (
-      bestsellerProductIds.length > 0 &&
-      (filter === "bestseller" || sort === "bestseller")
-    ) {
-      const rank = new Map<string, number>();
-      bestsellerProductIds.forEach((id, index) => rank.set(id, index));
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) =>
-        demoteMarco(a, b, () => {
-          const aRank = rank.get(a.id) ?? Number.MAX_SAFE_INTEGER;
-          const bRank = rank.get(b.id) ?? Number.MAX_SAFE_INTEGER;
-          return aRank - bRank;
-        }),
-      );
-    } else if (sort === "price-asc" || sort === "price-desc") {
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) =>
-        demoteMarco(a, b, () => {
-          const aVariants = Array.isArray(a.variants) ? a.variants : [];
-          const bVariants = Array.isArray(b.variants) ? b.variants : [];
-          const aPrice = aVariants.length > 0 ? Math.min(...aVariants.map((v: { price: number }) => v.price)) : 0;
-          const bPrice = bVariants.length > 0 ? Math.min(...bVariants.map((v: { price: number }) => v.price)) : 0;
-          return sort === "price-asc" ? aPrice - bPrice : bPrice - aPrice;
-        }),
-      );
-    } else if (sort === "name-asc" || sort === "name-desc") {
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) =>
-        demoteMarco(a, b, () => {
-          const locale = filters.lang || "en";
-          const aTitle =
-            a.translations.find((translation: { locale: string }) => translation.locale === locale)?.title ||
-            a.translations[0]?.title ||
-            "";
-          const bTitle =
-            b.translations.find((translation: { locale: string }) => translation.locale === locale)?.title ||
-            b.translations[0]?.title ||
-            "";
-          const compare = aTitle.localeCompare(bTitle, locale, { sensitivity: "base" });
-          return sort === "name-asc" ? compare : -compare;
-        }),
-      );
-    } else {
-      products.sort((a: ProductWithRelations, b: ProductWithRelations) =>
-        demoteMarco(
-          a,
-          b,
-          () => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        ),
-      );
-    }
-
-    return products;
+    const query = normalizeCatalogQuery(filters);
+    const filtered = products.filter((product) =>
+      matchesCatalogFilters(product, query, discounts),
+    );
+    const sort =
+      query.filter === "bestseller" || query.sort === "bestseller"
+        ? "bestseller"
+        : query.sort;
+    const sorted = sortCatalogRows(
+      filtered.map(asLightRow),
+      sort,
+      query.lang,
+      discounts,
+      bestsellerProductIds,
+    );
+    const order = new Map(sorted.map((row, index) => [row.id, index]));
+    return [...filtered].sort(
+      (a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
+    );
   }
 }
 
 export const productsFindFilterService = new ProductsFindFilterService();
-
-
-
-
-
-

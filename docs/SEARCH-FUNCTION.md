@@ -1,79 +1,68 @@
-# Поиск в проекте WhiteShop.am
+# Search on WhiteShop.am
 
-Документ описывает, как реализован поиск в проекте. **Сторонние поисковые движки (Meilisearch, Algolia и т.п.) не используются** — только собственный поиск через Prisma и PostgreSQL.
-
----
-
-## Текущая реализация
-
-### Общая схема
-
-- **Каталог товаров** (`/products`): поиск по строке `?search=...` обрабатывается API и сервисом `products-find-query`. Условие строится в Prisma (регистронезависимый `contains` по переводам и SKU).
-- **Сервер:** Next.js API и сервисный слой → Prisma → PostgreSQL. Никаких внешних поисковых сервисов.
-
-### Где реализовано
-
-| Место | Описание |
-|-------|----------|
-| `src/lib/services/products-find-query/query-builder.ts` | Построение фильтра поиска для Prisma: `buildSearchFilter(search)` |
-| `src/app/api/v1/products/route.ts` | API списка товаров, принимает параметр `search` |
-| `src/app/products/page.tsx` | Страница каталога: передаёт `search` из URL в API |
-
-### Логика поиска (query-builder)
-
-Поиск по полям (OR, регистронезависимо, `mode: "insensitive"`):
-
-- **Переводы товара:** `title`, `subtitle`
-- **Варианты:** `sku`
-
-Условие добавляется в общий `where` вместе с фильтрами категории, бренда и т.д.
+This document describes catalog search and filters. **No external search engine is used** (Meilisearch, Algolia, etc.) — only Prisma and PostgreSQL.
 
 ---
 
-## Вариант «хороший или лучше»
+## Current flow (Phase 1)
 
-**Текущий вариант (собственный поиск через Prisma) — хороший и достаточный** для типичного каталога на Vercel:
+```
+URL search params
+→ parseCatalogHttpParams (strict HTTP validation)
+→ normalizeCatalogQuery
+→ buildCatalogWhere (Prisma)
+→ light candidate rows (no result-window cap)
+→ effective price filter + global sort
+→ exact total + page IDs
+→ full relations for the current page only
+→ transform + cache (products:v4)
+```
 
-- Нет зависимостей от внешнего поискового сервиса (ни хостинг, ни лимиты).
-- Один источник правды — PostgreSQL; не нужно синхронизировать индекс.
-- Регистронезависимый поиск по названию, подзаголовку и SKU покрывает большинство сценариев.
-- Подходит для объёма в тысячи товаров при нормальных индексах БД.
+### HTTP validation
 
-**Когда имеет смысл подключать Meilisearch/Algolia:**
+Invalid `page` / `limit` / `minPrice` / `maxPrice` / `sort` / `filter` → **400** `application/problem+json`.
+If `category` contains at least one unknown slug (`phones,ghost`) → **400**; list and facets behave the same.
+Partial numbers (`1abc`) and negative prices are rejected.
 
-- Очень большой каталог (десятки/сотни тысяч позиций) и жёсткие требования к скорости и релевантности.
-- Нужны подсказки (autocomplete), исправление опечаток, фасетный поиск «из коробки».
+### DB `where`
 
-**Итог:** для WhiteShop.am оставляем собственный поиск через Prisma — этого достаточно. При росте требований можно отдельно добавить instant search в хедере (см. ниже) или позже рассмотреть внешний движок.
+- `published: true`, `deletedAt: null`
+- `search` — `title`, `subtitle`, published variant `sku` (`contains`, `mode: insensitive`)
+- `category` — category tree + locale fallback; unknown slug = 400
+- `brand` — DB id, slug, localized name
+- `colors` / `sizes` — same published variant
+- `filter=new|featured|bestseller` (same semantics on list and facets; `new` excludes Marco listing images)
+- `ids` constrains the candidate set but does not disable other filters
 
----
+### Two-phase (not a Prisma field)
 
-## Instant Search (поиск по мере ввода в хедере)
+Effective listing price = `variant.price * (1 - appliedDiscount%)`.
+Discount priority: product → category → brand → global.
+Price filter/sort and Marco demotion run on light rows, without `limit * 10` / 200 / 250 caps.
+Products without a display price (`priceOnRequest` / 0) are **last** for both `price-asc` and `price-desc`.
 
-**Сейчас не реализован.** Ниже — спецификация на будущее (как можно сделать, если понадобится).
+**Residual performance risk.** Default sort (Marco) and effective-price filter/sort require an uncapped light-row scan. Exact effective-price pagination in SQL is not possible without a materialized listing-price field.
 
-### Идея
+### Facets
 
-- Поле ввода в хедере → debounce → запрос `GET /api/search/instant?q=...&limit=...` → ответ с массивом товаров.
-- API: Prisma, поиск по названию/описанию (и при необходимости по переводам), без Meilisearch.
+`GET /api/v1/products/filters` uses the same semantics, including `filter`.
+Brand counts omit only the current `brand` filter, color counts omit `colors`, size counts omit `sizes`.
+Color/size counts are **product-based** (one product is counted once per color/size).
 
-### Файлы для реализации
+### Cache
 
-| Файл | Назначение |
-|------|------------|
-| `src/hooks/useInstantSearch.ts` | Хук: состояние, debounce, fetch к API, навигация с клавиатуры |
-| `src/app/api/search/instant/route.ts` | API: приём `q`, `limit`, запрос через Prisma, ответ `{ results }` |
-| `src/components/SearchDropdown.tsx` | UI выпадающего списка (карточки, лоадер, ссылка «Տեսնել բոլորը» на `/products?search=...`) |
-| Хедер (DesktopHeader / MobileHeader или общий Header) | Инпут + хук + SearchDropdown, Enter → `/products?search=...` |
+- List key prefix: `products:v4` (token order canonicalized)
+- Facet key prefix: `products:filters:v2` (`filter` is part of the key)
+- Invalidation: `invalidateCatalogCaches()` after product create/update/delete, discount, category/brand/attribute updates
+- TTL is unchanged (120s list, 600s featured)
+- A DB outage is **not** faked as an empty catalog and is **not** cached
 
-### Важно
+### Code
 
-- Отмена предыдущего запроса через `AbortController` при новом вводе.
-- Без кэша ответа, чтобы новые товары из админки сразу отображались.
-- Доступность: `aria-controls`, `aria-expanded`, `role="listbox"`, `role="option"`.
+| Location | Description |
+|----------|-------------|
+| `src/lib/catalog/` | Query model, where, price, sort, pagination, facets |
+| `src/app/api/v1/products/route.ts` | List API (`search`, filters, `{ data, meta }`) |
+| `src/app/api/v1/products/filters/route.ts` | Facets API |
 
-Реализацию можно взять из этого описания, когда решите добавить instant search.
-
----
-
-*Документ актуален для WhiteShop.am. Meilisearch из проекта удалён; используется только собственный поиск через Prisma.*
+Search/category **do not** enable over-fetch. `meta.total` is the exact size of the full matching set.

@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@white-shop/db";
+import { AppError } from "@/lib/errors/app-error";
+import { runApiRoute } from "@/lib/errors/run-api-route";
+import { getPaymentCallbackSecret } from "@/lib/security/payment-callback-secret";
 import {
   isFreshCallbackTimestamp,
   verifyPaymentCallbackSignature,
 } from "@/lib/services/orders/checkout-payment";
+import { applyPaymentCallback } from "@/lib/services/orders/apply-payment-callback";
 import { logger } from "@/lib/utils/logger";
 import {
   ORDER_PLACED_QUERY_PARAM,
   ORDER_PLACED_QUERY_VALUE,
 } from "@/app/orders/order-placed.constants";
+import type { PaymentStatus } from "@/lib/services/orders/payment-status";
 
 const ALLOWED_PROVIDERS = new Set(["idram", "arca"]);
-const ALLOWED_STATUSES = new Set(["paid", "failed"]);
+const ALLOWED_STATUSES = new Set<Extract<PaymentStatus, "paid" | "failed">>(["paid", "failed"]);
 
 function toOrderRedirect(req: NextRequest, orderNumber: string, showPlacedConfirmation = false): URL {
   const url = new URL(`/orders/${orderNumber}`, req.nextUrl.origin);
@@ -22,115 +26,65 @@ function toOrderRedirect(req: NextRequest, orderNumber: string, showPlacedConfir
 }
 
 export async function GET(req: NextRequest) {
-  const paymentId = req.nextUrl.searchParams.get("paymentId");
-  const orderNumber = req.nextUrl.searchParams.get("orderNumber");
-  const provider = req.nextUrl.searchParams.get("provider");
-  const status = req.nextUrl.searchParams.get("status");
-  const ts = req.nextUrl.searchParams.get("ts");
-  const sig = req.nextUrl.searchParams.get("sig");
+  return runApiRoute(req, async (ctx) => {
+    if (!getPaymentCallbackSecret()) {
+      throw AppError.serviceUnavailable();
+    }
 
-  if (!paymentId || !orderNumber || !provider || !status || !ts || !sig) {
-    return NextResponse.json(
+    const paymentId = req.nextUrl.searchParams.get("paymentId");
+    const orderNumber = req.nextUrl.searchParams.get("orderNumber");
+    const provider = req.nextUrl.searchParams.get("provider");
+    const status = req.nextUrl.searchParams.get("status");
+    const ts = req.nextUrl.searchParams.get("ts");
+    const sig = req.nextUrl.searchParams.get("sig");
+
+    if (!paymentId || !orderNumber || !provider || !status || !ts || !sig) {
+      throw AppError.badRequest("Missing payment callback parameters");
+    }
+
+    if (!ALLOWED_PROVIDERS.has(provider) || !ALLOWED_STATUSES.has(status as "paid" | "failed")) {
+      throw AppError.badRequest("Invalid provider or status");
+    }
+
+    const timestamp = Number(ts);
+    if (!Number.isFinite(timestamp) || !isFreshCallbackTimestamp(timestamp)) {
+      throw AppError.unauthorized("Expired callback signature");
+    }
+
+    const callbackStatus = status as "paid" | "failed";
+    const validSignature = verifyPaymentCallbackSignature(
       {
-        status: 400,
-        title: "Validation Error",
-        detail: "Missing payment callback parameters",
+        paymentId,
+        orderNumber,
+        provider: provider as "idram" | "arca",
+        status: callbackStatus,
+        timestamp,
       },
-      { status: 400 }
+      sig,
     );
-  }
 
-  if (!ALLOWED_PROVIDERS.has(provider) || !ALLOWED_STATUSES.has(status)) {
-    return NextResponse.json(
+    if (!validSignature) {
+      throw AppError.unauthorized("Invalid callback signature");
+    }
+
+    await applyPaymentCallback(
       {
-        status: 400,
-        title: "Validation Error",
-        detail: "Invalid provider or status",
+        paymentId,
+        orderNumber,
+        status: callbackStatus,
+        provider,
       },
-      { status: 400 }
+      ctx.commerce({ source: "payment_provider" }),
     );
-  }
 
-  const timestamp = Number(ts);
-  if (!Number.isFinite(timestamp) || !isFreshCallbackTimestamp(timestamp)) {
-    return NextResponse.json(
-      {
-        status: 401,
-        title: "Unauthorized",
-        detail: "Expired callback signature",
-      },
-      { status: 401 }
-    );
-  }
-
-  const validSignature = verifyPaymentCallbackSignature(
-    {
+    logger.info("Payment callback processed", {
+      requestId: ctx.requestId,
       paymentId,
       orderNumber,
-      provider: provider as "idram" | "arca",
-      status: status as "paid" | "failed",
-      timestamp,
-    },
-    sig
-  );
+      provider,
+      status: callbackStatus,
+    });
 
-  if (!validSignature) {
-    return NextResponse.json(
-      {
-        status: 401,
-        title: "Unauthorized",
-        detail: "Invalid callback signature",
-      },
-      { status: 401 }
-    );
-  }
-
-  const payment = await db.payment.findUnique({
-    where: { id: paymentId },
-    include: { order: true },
+    return NextResponse.redirect(toOrderRedirect(req, orderNumber, callbackStatus === "paid"));
   });
-
-  if (!payment || payment.order.number !== orderNumber) {
-    return NextResponse.json(
-      {
-        status: 404,
-        title: "Not Found",
-        detail: "Payment not found",
-      },
-      { status: 404 }
-    );
-  }
-
-  const paid = status === "paid";
-  await db.$transaction([
-    db.payment.update({
-      where: { id: payment.id },
-      data: {
-        status: paid ? "paid" : "failed",
-        providerResponse: {
-          callbackStatus: status,
-          provider,
-          receivedAt: new Date().toISOString(),
-        },
-        completedAt: paid ? new Date() : null,
-        failedAt: paid ? null : new Date(),
-      },
-    }),
-    db.order.update({
-      where: { id: payment.orderId },
-      data: {
-        paymentStatus: paid ? "paid" : "failed",
-        status: paid ? "confirmed" : "pending",
-      },
-    }),
-  ]);
-
-  logger.info("Payment callback processed", {
-    paymentId,
-    orderNumber,
-    provider,
-    status,
-  });
-
-  return NextResponse.redirect(toOrderRedirect(req, orderNumber, paid));
 }

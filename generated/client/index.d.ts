@@ -124,6 +124,16 @@ export type Payment = $Result.DefaultSelection<Prisma.$PaymentPayload>
  */
 export type OrderEvent = $Result.DefaultSelection<Prisma.$OrderEventPayload>
 /**
+ * Model StockMovement
+ * 
+ */
+export type StockMovement = $Result.DefaultSelection<Prisma.$StockMovementPayload>
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
+/**
  * Model ProductReview
  * 
  */
@@ -486,6 +496,26 @@ export class PrismaClient<
     * ```
     */
   get orderEvent(): Prisma.OrderEventDelegate<ExtArgs>;
+
+  /**
+   * `prisma.stockMovement`: Exposes CRUD operations for the **StockMovement** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StockMovements
+    * const stockMovements = await prisma.stockMovement.findMany()
+    * ```
+    */
+  get stockMovement(): Prisma.StockMovementDelegate<ExtArgs>;
+
+  /**
+   * `prisma.auditLog`: Exposes CRUD operations for the **AuditLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AuditLogs
+    * const auditLogs = await prisma.auditLog.findMany()
+    * ```
+    */
+  get auditLog(): Prisma.AuditLogDelegate<ExtArgs>;
 
   /**
    * `prisma.productReview`: Exposes CRUD operations for the **ProductReview** model.
@@ -989,6 +1019,8 @@ export namespace Prisma {
     OrderItem: 'OrderItem',
     Payment: 'Payment',
     OrderEvent: 'OrderEvent',
+    StockMovement: 'StockMovement',
+    AuditLog: 'AuditLog',
     ProductReview: 'ProductReview',
     PromoCode: 'PromoCode',
     Settings: 'Settings',
@@ -1008,7 +1040,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "address" | "category" | "categoryTranslation" | "brand" | "brandTranslation" | "attribute" | "attributeTranslation" | "attributeValue" | "attributeValueTranslation" | "product" | "productTranslation" | "productVariant" | "productVariantOption" | "productLabel" | "productAttribute" | "cart" | "cartItem" | "order" | "orderItem" | "payment" | "orderEvent" | "productReview" | "promoCode" | "settings" | "contactMessage"
+      modelProps: "user" | "address" | "category" | "categoryTranslation" | "brand" | "brandTranslation" | "attribute" | "attributeTranslation" | "attributeValue" | "attributeValueTranslation" | "product" | "productTranslation" | "productVariant" | "productVariantOption" | "productLabel" | "productAttribute" | "cart" | "cartItem" | "order" | "orderItem" | "payment" | "orderEvent" | "stockMovement" | "auditLog" | "productReview" | "promoCode" | "settings" | "contactMessage"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2552,6 +2584,146 @@ export namespace Prisma {
           }
         }
       }
+      StockMovement: {
+        payload: Prisma.$StockMovementPayload<ExtArgs>
+        fields: Prisma.StockMovementFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StockMovementFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StockMovementFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload>
+          }
+          findFirst: {
+            args: Prisma.StockMovementFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StockMovementFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload>
+          }
+          findMany: {
+            args: Prisma.StockMovementFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload>[]
+          }
+          create: {
+            args: Prisma.StockMovementCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload>
+          }
+          createMany: {
+            args: Prisma.StockMovementCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StockMovementCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload>[]
+          }
+          delete: {
+            args: Prisma.StockMovementDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload>
+          }
+          update: {
+            args: Prisma.StockMovementUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload>
+          }
+          deleteMany: {
+            args: Prisma.StockMovementDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StockMovementUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.StockMovementUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockMovementPayload>
+          }
+          aggregate: {
+            args: Prisma.StockMovementAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStockMovement>
+          }
+          groupBy: {
+            args: Prisma.StockMovementGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StockMovementGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StockMovementCountArgs<ExtArgs>
+            result: $Utils.Optional<StockMovementCountAggregateOutputType> | number
+          }
+        }
+      }
+      AuditLog: {
+        payload: Prisma.$AuditLogPayload<ExtArgs>
+        fields: Prisma.AuditLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AuditLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AuditLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload>
+          }
+          findFirst: {
+            args: Prisma.AuditLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AuditLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload>
+          }
+          findMany: {
+            args: Prisma.AuditLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
+          }
+          create: {
+            args: Prisma.AuditLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload>
+          }
+          createMany: {
+            args: Prisma.AuditLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AuditLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
+          }
+          delete: {
+            args: Prisma.AuditLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload>
+          }
+          update: {
+            args: Prisma.AuditLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.AuditLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AuditLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AuditLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditLogPayload>
+          }
+          aggregate: {
+            args: Prisma.AuditLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAuditLog>
+          }
+          groupBy: {
+            args: Prisma.AuditLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AuditLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AuditLogCountArgs<ExtArgs>
+            result: $Utils.Optional<AuditLogCountAggregateOutputType> | number
+          }
+        }
+      }
       ProductReview: {
         payload: Prisma.$ProductReviewPayload<ExtArgs>
         fields: Prisma.ProductReviewFieldRefs
@@ -2997,6 +3169,9 @@ export namespace Prisma {
     carts: number
     orders: number
     reviews: number
+    stockMovements: number
+    auditLogs: number
+    actedOrderEvents: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3004,6 +3179,9 @@ export namespace Prisma {
     carts?: boolean | UserCountOutputTypeCountCartsArgs
     orders?: boolean | UserCountOutputTypeCountOrdersArgs
     reviews?: boolean | UserCountOutputTypeCountReviewsArgs
+    stockMovements?: boolean | UserCountOutputTypeCountStockMovementsArgs
+    auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
+    actedOrderEvents?: boolean | UserCountOutputTypeCountActedOrderEventsArgs
   }
 
   // Custom InputTypes
@@ -3043,6 +3221,27 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountReviewsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ProductReviewWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountStockMovementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StockMovementWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuditLogWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountActedOrderEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderEventWhereInput
   }
 
 
@@ -3317,12 +3516,14 @@ export namespace Prisma {
     options: number
     cartItems: number
     orderItems: number
+    stockMovements: number
   }
 
   export type ProductVariantCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     options?: boolean | ProductVariantCountOutputTypeCountOptionsArgs
     cartItems?: boolean | ProductVariantCountOutputTypeCountCartItemsArgs
     orderItems?: boolean | ProductVariantCountOutputTypeCountOrderItemsArgs
+    stockMovements?: boolean | ProductVariantCountOutputTypeCountStockMovementsArgs
   }
 
   // Custom InputTypes
@@ -3355,6 +3556,13 @@ export namespace Prisma {
    */
   export type ProductVariantCountOutputTypeCountOrderItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OrderItemWhereInput
+  }
+
+  /**
+   * ProductVariantCountOutputType without action
+   */
+  export type ProductVariantCountOutputTypeCountStockMovementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StockMovementWhereInput
   }
 
 
@@ -3397,12 +3605,14 @@ export namespace Prisma {
     items: number
     payments: number
     events: number
+    stockMovements: number
   }
 
   export type OrderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     items?: boolean | OrderCountOutputTypeCountItemsArgs
     payments?: boolean | OrderCountOutputTypeCountPaymentsArgs
     events?: boolean | OrderCountOutputTypeCountEventsArgs
+    stockMovements?: boolean | OrderCountOutputTypeCountStockMovementsArgs
   }
 
   // Custom InputTypes
@@ -3435,6 +3645,13 @@ export namespace Prisma {
    */
   export type OrderCountOutputTypeCountEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OrderEventWhereInput
+  }
+
+  /**
+   * OrderCountOutputType without action
+   */
+  export type OrderCountOutputTypeCountStockMovementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StockMovementWhereInput
   }
 
 
@@ -3694,6 +3911,9 @@ export namespace Prisma {
     carts?: boolean | User$cartsArgs<ExtArgs>
     orders?: boolean | User$ordersArgs<ExtArgs>
     reviews?: boolean | User$reviewsArgs<ExtArgs>
+    stockMovements?: boolean | User$stockMovementsArgs<ExtArgs>
+    auditLogs?: boolean | User$auditLogsArgs<ExtArgs>
+    actedOrderEvents?: boolean | User$actedOrderEventsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3740,6 +3960,9 @@ export namespace Prisma {
     carts?: boolean | User$cartsArgs<ExtArgs>
     orders?: boolean | User$ordersArgs<ExtArgs>
     reviews?: boolean | User$reviewsArgs<ExtArgs>
+    stockMovements?: boolean | User$stockMovementsArgs<ExtArgs>
+    auditLogs?: boolean | User$auditLogsArgs<ExtArgs>
+    actedOrderEvents?: boolean | User$actedOrderEventsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3751,6 +3974,9 @@ export namespace Prisma {
       carts: Prisma.$CartPayload<ExtArgs>[]
       orders: Prisma.$OrderPayload<ExtArgs>[]
       reviews: Prisma.$ProductReviewPayload<ExtArgs>[]
+      stockMovements: Prisma.$StockMovementPayload<ExtArgs>[]
+      auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+      actedOrderEvents: Prisma.$OrderEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4137,6 +4363,9 @@ export namespace Prisma {
     carts<T extends User$cartsArgs<ExtArgs> = {}>(args?: Subset<T, User$cartsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CartPayload<ExtArgs>, T, "findMany"> | Null>
     orders<T extends User$ordersArgs<ExtArgs> = {}>(args?: Subset<T, User$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany"> | Null>
     reviews<T extends User$reviewsArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductReviewPayload<ExtArgs>, T, "findMany"> | Null>
+    stockMovements<T extends User$stockMovementsArgs<ExtArgs> = {}>(args?: Subset<T, User$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany"> | Null>
+    auditLogs<T extends User$auditLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany"> | Null>
+    actedOrderEvents<T extends User$actedOrderEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$actedOrderEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderEventPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4573,6 +4802,66 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ProductReviewScalarFieldEnum | ProductReviewScalarFieldEnum[]
+  }
+
+  /**
+   * User.stockMovements
+   */
+  export type User$stockMovementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    where?: StockMovementWhereInput
+    orderBy?: StockMovementOrderByWithRelationInput | StockMovementOrderByWithRelationInput[]
+    cursor?: StockMovementWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StockMovementScalarFieldEnum | StockMovementScalarFieldEnum[]
+  }
+
+  /**
+   * User.auditLogs
+   */
+  export type User$auditLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    where?: AuditLogWhereInput
+    orderBy?: AuditLogOrderByWithRelationInput | AuditLogOrderByWithRelationInput[]
+    cursor?: AuditLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AuditLogScalarFieldEnum | AuditLogScalarFieldEnum[]
+  }
+
+  /**
+   * User.actedOrderEvents
+   */
+  export type User$actedOrderEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderEvent
+     */
+    select?: OrderEventSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderEventInclude<ExtArgs> | null
+    where?: OrderEventWhereInput
+    orderBy?: OrderEventOrderByWithRelationInput | OrderEventOrderByWithRelationInput[]
+    cursor?: OrderEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderEventScalarFieldEnum | OrderEventScalarFieldEnum[]
   }
 
   /**
@@ -13580,10 +13869,12 @@ export namespace Prisma {
 
   export type ProductAvgAggregateOutputType = {
     discountPercent: number | null
+    warrantyYears: number | null
   }
 
   export type ProductSumAggregateOutputType = {
     discountPercent: number | null
+    warrantyYears: number | null
   }
 
   export type ProductMinAggregateOutputType = {
@@ -13595,6 +13886,7 @@ export namespace Prisma {
     publishedAt: Date | null
     primaryCategoryId: string | null
     discountPercent: number | null
+    warrantyYears: number | null
     deletedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -13609,6 +13901,7 @@ export namespace Prisma {
     publishedAt: Date | null
     primaryCategoryId: string | null
     discountPercent: number | null
+    warrantyYears: number | null
     deletedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -13626,6 +13919,7 @@ export namespace Prisma {
     primaryCategoryId: number
     attributeIds: number
     discountPercent: number
+    warrantyYears: number
     deletedAt: number
     createdAt: number
     updatedAt: number
@@ -13635,10 +13929,12 @@ export namespace Prisma {
 
   export type ProductAvgAggregateInputType = {
     discountPercent?: true
+    warrantyYears?: true
   }
 
   export type ProductSumAggregateInputType = {
     discountPercent?: true
+    warrantyYears?: true
   }
 
   export type ProductMinAggregateInputType = {
@@ -13650,6 +13946,7 @@ export namespace Prisma {
     publishedAt?: true
     primaryCategoryId?: true
     discountPercent?: true
+    warrantyYears?: true
     deletedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -13664,6 +13961,7 @@ export namespace Prisma {
     publishedAt?: true
     primaryCategoryId?: true
     discountPercent?: true
+    warrantyYears?: true
     deletedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -13681,6 +13979,7 @@ export namespace Prisma {
     primaryCategoryId?: true
     attributeIds?: true
     discountPercent?: true
+    warrantyYears?: true
     deletedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -13785,6 +14084,7 @@ export namespace Prisma {
     primaryCategoryId: string | null
     attributeIds: string[]
     discountPercent: number
+    warrantyYears: number | null
     deletedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -13821,6 +14121,7 @@ export namespace Prisma {
     primaryCategoryId?: boolean
     attributeIds?: boolean
     discountPercent?: boolean
+    warrantyYears?: boolean
     deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -13847,6 +14148,7 @@ export namespace Prisma {
     primaryCategoryId?: boolean
     attributeIds?: boolean
     discountPercent?: boolean
+    warrantyYears?: boolean
     deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -13865,6 +14167,7 @@ export namespace Prisma {
     primaryCategoryId?: boolean
     attributeIds?: boolean
     discountPercent?: boolean
+    warrantyYears?: boolean
     deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -13909,6 +14212,10 @@ export namespace Prisma {
       primaryCategoryId: string | null
       attributeIds: string[]
       discountPercent: number
+      /**
+       * Official warranty duration in years: 1 | 2 | 3, or null when none.
+       */
+      warrantyYears: number | null
       deletedAt: Date | null
       createdAt: Date
       updatedAt: Date
@@ -14324,6 +14631,7 @@ export namespace Prisma {
     readonly primaryCategoryId: FieldRef<"Product", 'String'>
     readonly attributeIds: FieldRef<"Product", 'String[]'>
     readonly discountPercent: FieldRef<"Product", 'Int'>
+    readonly warrantyYears: FieldRef<"Product", 'Int'>
     readonly deletedAt: FieldRef<"Product", 'DateTime'>
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
@@ -15833,6 +16141,7 @@ export namespace Prisma {
     sku: string | null
     barcode: string | null
     price: number | null
+    priceOnRequest: boolean | null
     compareAtPrice: number | null
     cost: number | null
     stock: number | null
@@ -15855,6 +16164,7 @@ export namespace Prisma {
     sku: string | null
     barcode: string | null
     price: number | null
+    priceOnRequest: boolean | null
     compareAtPrice: number | null
     cost: number | null
     stock: number | null
@@ -15877,6 +16187,7 @@ export namespace Prisma {
     sku: number
     barcode: number
     price: number
+    priceOnRequest: number
     compareAtPrice: number
     cost: number
     stock: number
@@ -15923,6 +16234,7 @@ export namespace Prisma {
     sku?: true
     barcode?: true
     price?: true
+    priceOnRequest?: true
     compareAtPrice?: true
     cost?: true
     stock?: true
@@ -15945,6 +16257,7 @@ export namespace Prisma {
     sku?: true
     barcode?: true
     price?: true
+    priceOnRequest?: true
     compareAtPrice?: true
     cost?: true
     stock?: true
@@ -15967,6 +16280,7 @@ export namespace Prisma {
     sku?: true
     barcode?: true
     price?: true
+    priceOnRequest?: true
     compareAtPrice?: true
     cost?: true
     stock?: true
@@ -16078,6 +16392,7 @@ export namespace Prisma {
     sku: string | null
     barcode: string | null
     price: number
+    priceOnRequest: boolean
     compareAtPrice: number | null
     cost: number | null
     stock: number
@@ -16121,6 +16436,7 @@ export namespace Prisma {
     sku?: boolean
     barcode?: boolean
     price?: boolean
+    priceOnRequest?: boolean
     compareAtPrice?: boolean
     cost?: boolean
     stock?: boolean
@@ -16141,6 +16457,7 @@ export namespace Prisma {
     product?: boolean | ProductDefaultArgs<ExtArgs>
     cartItems?: boolean | ProductVariant$cartItemsArgs<ExtArgs>
     orderItems?: boolean | ProductVariant$orderItemsArgs<ExtArgs>
+    stockMovements?: boolean | ProductVariant$stockMovementsArgs<ExtArgs>
     _count?: boolean | ProductVariantCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["productVariant"]>
 
@@ -16150,6 +16467,7 @@ export namespace Prisma {
     sku?: boolean
     barcode?: boolean
     price?: boolean
+    priceOnRequest?: boolean
     compareAtPrice?: boolean
     cost?: boolean
     stock?: boolean
@@ -16175,6 +16493,7 @@ export namespace Prisma {
     sku?: boolean
     barcode?: boolean
     price?: boolean
+    priceOnRequest?: boolean
     compareAtPrice?: boolean
     cost?: boolean
     stock?: boolean
@@ -16198,6 +16517,7 @@ export namespace Prisma {
     product?: boolean | ProductDefaultArgs<ExtArgs>
     cartItems?: boolean | ProductVariant$cartItemsArgs<ExtArgs>
     orderItems?: boolean | ProductVariant$orderItemsArgs<ExtArgs>
+    stockMovements?: boolean | ProductVariant$stockMovementsArgs<ExtArgs>
     _count?: boolean | ProductVariantCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProductVariantIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -16211,6 +16531,7 @@ export namespace Prisma {
       product: Prisma.$ProductPayload<ExtArgs>
       cartItems: Prisma.$CartItemPayload<ExtArgs>[]
       orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
+      stockMovements: Prisma.$StockMovementPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -16218,6 +16539,7 @@ export namespace Prisma {
       sku: string | null
       barcode: string | null
       price: number
+      priceOnRequest: boolean
       compareAtPrice: number | null
       cost: number | null
       stock: number
@@ -16602,6 +16924,7 @@ export namespace Prisma {
     product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     cartItems<T extends ProductVariant$cartItemsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$cartItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CartItemPayload<ExtArgs>, T, "findMany"> | Null>
     orderItems<T extends ProductVariant$orderItemsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany"> | Null>
+    stockMovements<T extends ProductVariant$stockMovementsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16636,6 +16959,7 @@ export namespace Prisma {
     readonly sku: FieldRef<"ProductVariant", 'String'>
     readonly barcode: FieldRef<"ProductVariant", 'String'>
     readonly price: FieldRef<"ProductVariant", 'Float'>
+    readonly priceOnRequest: FieldRef<"ProductVariant", 'Boolean'>
     readonly compareAtPrice: FieldRef<"ProductVariant", 'Float'>
     readonly cost: FieldRef<"ProductVariant", 'Float'>
     readonly stock: FieldRef<"ProductVariant", 'Int'>
@@ -17027,6 +17351,26 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: OrderItemScalarFieldEnum | OrderItemScalarFieldEnum[]
+  }
+
+  /**
+   * ProductVariant.stockMovements
+   */
+  export type ProductVariant$stockMovementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    where?: StockMovementWhereInput
+    orderBy?: StockMovementOrderByWithRelationInput | StockMovementOrderByWithRelationInput[]
+    cursor?: StockMovementWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StockMovementScalarFieldEnum | StockMovementScalarFieldEnum[]
   }
 
   /**
@@ -22000,6 +22344,10 @@ export namespace Prisma {
     paidAt: Date | null
     fulfilledAt: Date | null
     cancelledAt: Date | null
+    idempotencyScopeHash: string | null
+    idempotencyKeyHash: string | null
+    requestFingerprint: string | null
+    correlationId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -22029,6 +22377,10 @@ export namespace Prisma {
     paidAt: Date | null
     fulfilledAt: Date | null
     cancelledAt: Date | null
+    idempotencyScopeHash: string | null
+    idempotencyKeyHash: string | null
+    requestFingerprint: string | null
+    correlationId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -22060,6 +22412,10 @@ export namespace Prisma {
     paidAt: number
     fulfilledAt: number
     cancelledAt: number
+    idempotencyScopeHash: number
+    idempotencyKeyHash: number
+    requestFingerprint: number
+    correlationId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -22107,6 +22463,10 @@ export namespace Prisma {
     paidAt?: true
     fulfilledAt?: true
     cancelledAt?: true
+    idempotencyScopeHash?: true
+    idempotencyKeyHash?: true
+    requestFingerprint?: true
+    correlationId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -22136,6 +22496,10 @@ export namespace Prisma {
     paidAt?: true
     fulfilledAt?: true
     cancelledAt?: true
+    idempotencyScopeHash?: true
+    idempotencyKeyHash?: true
+    requestFingerprint?: true
+    correlationId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -22167,6 +22531,10 @@ export namespace Prisma {
     paidAt?: true
     fulfilledAt?: true
     cancelledAt?: true
+    idempotencyScopeHash?: true
+    idempotencyKeyHash?: true
+    requestFingerprint?: true
+    correlationId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -22285,6 +22653,10 @@ export namespace Prisma {
     paidAt: Date | null
     fulfilledAt: Date | null
     cancelledAt: Date | null
+    idempotencyScopeHash: string | null
+    idempotencyKeyHash: string | null
+    requestFingerprint: string | null
+    correlationId: string | null
     createdAt: Date
     updatedAt: Date
     _count: OrderCountAggregateOutputType | null
@@ -22335,11 +22707,16 @@ export namespace Prisma {
     paidAt?: boolean
     fulfilledAt?: boolean
     cancelledAt?: boolean
+    idempotencyScopeHash?: boolean
+    idempotencyKeyHash?: boolean
+    requestFingerprint?: boolean
+    correlationId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     items?: boolean | Order$itemsArgs<ExtArgs>
     payments?: boolean | Order$paymentsArgs<ExtArgs>
     events?: boolean | Order$eventsArgs<ExtArgs>
+    stockMovements?: boolean | Order$stockMovementsArgs<ExtArgs>
     user?: boolean | Order$userArgs<ExtArgs>
     _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
@@ -22371,6 +22748,10 @@ export namespace Prisma {
     paidAt?: boolean
     fulfilledAt?: boolean
     cancelledAt?: boolean
+    idempotencyScopeHash?: boolean
+    idempotencyKeyHash?: boolean
+    requestFingerprint?: boolean
+    correlationId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | Order$userArgs<ExtArgs>
@@ -22403,6 +22784,10 @@ export namespace Prisma {
     paidAt?: boolean
     fulfilledAt?: boolean
     cancelledAt?: boolean
+    idempotencyScopeHash?: boolean
+    idempotencyKeyHash?: boolean
+    requestFingerprint?: boolean
+    correlationId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -22411,6 +22796,7 @@ export namespace Prisma {
     items?: boolean | Order$itemsArgs<ExtArgs>
     payments?: boolean | Order$paymentsArgs<ExtArgs>
     events?: boolean | Order$eventsArgs<ExtArgs>
+    stockMovements?: boolean | Order$stockMovementsArgs<ExtArgs>
     user?: boolean | Order$userArgs<ExtArgs>
     _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -22424,6 +22810,7 @@ export namespace Prisma {
       items: Prisma.$OrderItemPayload<ExtArgs>[]
       payments: Prisma.$PaymentPayload<ExtArgs>[]
       events: Prisma.$OrderEventPayload<ExtArgs>[]
+      stockMovements: Prisma.$StockMovementPayload<ExtArgs>[]
       user: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -22453,6 +22840,10 @@ export namespace Prisma {
       paidAt: Date | null
       fulfilledAt: Date | null
       cancelledAt: Date | null
+      idempotencyScopeHash: string | null
+      idempotencyKeyHash: string | null
+      requestFingerprint: string | null
+      correlationId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["order"]>
@@ -22822,6 +23213,7 @@ export namespace Prisma {
     items<T extends Order$itemsArgs<ExtArgs> = {}>(args?: Subset<T, Order$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany"> | Null>
     payments<T extends Order$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Order$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany"> | Null>
     events<T extends Order$eventsArgs<ExtArgs> = {}>(args?: Subset<T, Order$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderEventPayload<ExtArgs>, T, "findMany"> | Null>
+    stockMovements<T extends Order$stockMovementsArgs<ExtArgs> = {}>(args?: Subset<T, Order$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany"> | Null>
     user<T extends Order$userArgs<ExtArgs> = {}>(args?: Subset<T, Order$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -22878,6 +23270,10 @@ export namespace Prisma {
     readonly paidAt: FieldRef<"Order", 'DateTime'>
     readonly fulfilledAt: FieldRef<"Order", 'DateTime'>
     readonly cancelledAt: FieldRef<"Order", 'DateTime'>
+    readonly idempotencyScopeHash: FieldRef<"Order", 'String'>
+    readonly idempotencyKeyHash: FieldRef<"Order", 'String'>
+    readonly requestFingerprint: FieldRef<"Order", 'String'>
+    readonly correlationId: FieldRef<"Order", 'String'>
     readonly createdAt: FieldRef<"Order", 'DateTime'>
     readonly updatedAt: FieldRef<"Order", 'DateTime'>
   }
@@ -23255,6 +23651,26 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: OrderEventScalarFieldEnum | OrderEventScalarFieldEnum[]
+  }
+
+  /**
+   * Order.stockMovements
+   */
+  export type Order$stockMovementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    where?: StockMovementWhereInput
+    orderBy?: StockMovementOrderByWithRelationInput | StockMovementOrderByWithRelationInput[]
+    cursor?: StockMovementWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StockMovementScalarFieldEnum | StockMovementScalarFieldEnum[]
   }
 
   /**
@@ -25478,6 +25894,13 @@ export namespace Prisma {
     type: string | null
     userId: string | null
     ipAddress: string | null
+    fromState: string | null
+    toState: string | null
+    actorUserId: string | null
+    isCustomerVisible: boolean | null
+    provider: string | null
+    providerEventId: string | null
+    correlationId: string | null
     createdAt: Date | null
   }
 
@@ -25487,6 +25910,13 @@ export namespace Prisma {
     type: string | null
     userId: string | null
     ipAddress: string | null
+    fromState: string | null
+    toState: string | null
+    actorUserId: string | null
+    isCustomerVisible: boolean | null
+    provider: string | null
+    providerEventId: string | null
+    correlationId: string | null
     createdAt: Date | null
   }
 
@@ -25497,6 +25927,13 @@ export namespace Prisma {
     data: number
     userId: number
     ipAddress: number
+    fromState: number
+    toState: number
+    actorUserId: number
+    isCustomerVisible: number
+    provider: number
+    providerEventId: number
+    correlationId: number
     createdAt: number
     _all: number
   }
@@ -25508,6 +25945,13 @@ export namespace Prisma {
     type?: true
     userId?: true
     ipAddress?: true
+    fromState?: true
+    toState?: true
+    actorUserId?: true
+    isCustomerVisible?: true
+    provider?: true
+    providerEventId?: true
+    correlationId?: true
     createdAt?: true
   }
 
@@ -25517,6 +25961,13 @@ export namespace Prisma {
     type?: true
     userId?: true
     ipAddress?: true
+    fromState?: true
+    toState?: true
+    actorUserId?: true
+    isCustomerVisible?: true
+    provider?: true
+    providerEventId?: true
+    correlationId?: true
     createdAt?: true
   }
 
@@ -25527,6 +25978,13 @@ export namespace Prisma {
     data?: true
     userId?: true
     ipAddress?: true
+    fromState?: true
+    toState?: true
+    actorUserId?: true
+    isCustomerVisible?: true
+    provider?: true
+    providerEventId?: true
+    correlationId?: true
     createdAt?: true
     _all?: true
   }
@@ -25610,6 +26068,13 @@ export namespace Prisma {
     data: JsonValue | null
     userId: string | null
     ipAddress: string | null
+    fromState: string | null
+    toState: string | null
+    actorUserId: string | null
+    isCustomerVisible: boolean
+    provider: string | null
+    providerEventId: string | null
+    correlationId: string | null
     createdAt: Date
     _count: OrderEventCountAggregateOutputType | null
     _min: OrderEventMinAggregateOutputType | null
@@ -25637,8 +26102,16 @@ export namespace Prisma {
     data?: boolean
     userId?: boolean
     ipAddress?: boolean
+    fromState?: boolean
+    toState?: boolean
+    actorUserId?: boolean
+    isCustomerVisible?: boolean
+    provider?: boolean
+    providerEventId?: boolean
+    correlationId?: boolean
     createdAt?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
+    actorUser?: boolean | OrderEvent$actorUserArgs<ExtArgs>
   }, ExtArgs["result"]["orderEvent"]>
 
   export type OrderEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -25648,8 +26121,16 @@ export namespace Prisma {
     data?: boolean
     userId?: boolean
     ipAddress?: boolean
+    fromState?: boolean
+    toState?: boolean
+    actorUserId?: boolean
+    isCustomerVisible?: boolean
+    provider?: boolean
+    providerEventId?: boolean
+    correlationId?: boolean
     createdAt?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
+    actorUser?: boolean | OrderEvent$actorUserArgs<ExtArgs>
   }, ExtArgs["result"]["orderEvent"]>
 
   export type OrderEventSelectScalar = {
@@ -25659,20 +26140,30 @@ export namespace Prisma {
     data?: boolean
     userId?: boolean
     ipAddress?: boolean
+    fromState?: boolean
+    toState?: boolean
+    actorUserId?: boolean
+    isCustomerVisible?: boolean
+    provider?: boolean
+    providerEventId?: boolean
+    correlationId?: boolean
     createdAt?: boolean
   }
 
   export type OrderEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     order?: boolean | OrderDefaultArgs<ExtArgs>
+    actorUser?: boolean | OrderEvent$actorUserArgs<ExtArgs>
   }
   export type OrderEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     order?: boolean | OrderDefaultArgs<ExtArgs>
+    actorUser?: boolean | OrderEvent$actorUserArgs<ExtArgs>
   }
 
   export type $OrderEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "OrderEvent"
     objects: {
       order: Prisma.$OrderPayload<ExtArgs>
+      actorUser: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -25681,6 +26172,13 @@ export namespace Prisma {
       data: Prisma.JsonValue | null
       userId: string | null
       ipAddress: string | null
+      fromState: string | null
+      toState: string | null
+      actorUserId: string | null
+      isCustomerVisible: boolean
+      provider: string | null
+      providerEventId: string | null
+      correlationId: string | null
       createdAt: Date
     }, ExtArgs["result"]["orderEvent"]>
     composites: {}
@@ -26047,6 +26545,7 @@ export namespace Prisma {
   export interface Prisma__OrderEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     order<T extends OrderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrderDefaultArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    actorUser<T extends OrderEvent$actorUserArgs<ExtArgs> = {}>(args?: Subset<T, OrderEvent$actorUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -26082,6 +26581,13 @@ export namespace Prisma {
     readonly data: FieldRef<"OrderEvent", 'Json'>
     readonly userId: FieldRef<"OrderEvent", 'String'>
     readonly ipAddress: FieldRef<"OrderEvent", 'String'>
+    readonly fromState: FieldRef<"OrderEvent", 'String'>
+    readonly toState: FieldRef<"OrderEvent", 'String'>
+    readonly actorUserId: FieldRef<"OrderEvent", 'String'>
+    readonly isCustomerVisible: FieldRef<"OrderEvent", 'Boolean'>
+    readonly provider: FieldRef<"OrderEvent", 'String'>
+    readonly providerEventId: FieldRef<"OrderEvent", 'String'>
+    readonly correlationId: FieldRef<"OrderEvent", 'String'>
     readonly createdAt: FieldRef<"OrderEvent", 'DateTime'>
   }
     
@@ -26401,6 +26907,21 @@ export namespace Prisma {
   }
 
   /**
+   * OrderEvent.actorUser
+   */
+  export type OrderEvent$actorUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * OrderEvent without action
    */
   export type OrderEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -26412,6 +26933,2122 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: OrderEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model StockMovement
+   */
+
+  export type AggregateStockMovement = {
+    _count: StockMovementCountAggregateOutputType | null
+    _avg: StockMovementAvgAggregateOutputType | null
+    _sum: StockMovementSumAggregateOutputType | null
+    _min: StockMovementMinAggregateOutputType | null
+    _max: StockMovementMaxAggregateOutputType | null
+  }
+
+  export type StockMovementAvgAggregateOutputType = {
+    delta: number | null
+    resultingBalance: number | null
+  }
+
+  export type StockMovementSumAggregateOutputType = {
+    delta: number | null
+    resultingBalance: number | null
+  }
+
+  export type StockMovementMinAggregateOutputType = {
+    id: string | null
+    variantId: string | null
+    variantIdSnapshot: string | null
+    skuSnapshot: string | null
+    delta: number | null
+    reason: string | null
+    orderId: string | null
+    actorUserId: string | null
+    resultingBalance: number | null
+    correlationId: string | null
+    createdAt: Date | null
+  }
+
+  export type StockMovementMaxAggregateOutputType = {
+    id: string | null
+    variantId: string | null
+    variantIdSnapshot: string | null
+    skuSnapshot: string | null
+    delta: number | null
+    reason: string | null
+    orderId: string | null
+    actorUserId: string | null
+    resultingBalance: number | null
+    correlationId: string | null
+    createdAt: Date | null
+  }
+
+  export type StockMovementCountAggregateOutputType = {
+    id: number
+    variantId: number
+    variantIdSnapshot: number
+    skuSnapshot: number
+    delta: number
+    reason: number
+    orderId: number
+    actorUserId: number
+    resultingBalance: number
+    correlationId: number
+    metadata: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type StockMovementAvgAggregateInputType = {
+    delta?: true
+    resultingBalance?: true
+  }
+
+  export type StockMovementSumAggregateInputType = {
+    delta?: true
+    resultingBalance?: true
+  }
+
+  export type StockMovementMinAggregateInputType = {
+    id?: true
+    variantId?: true
+    variantIdSnapshot?: true
+    skuSnapshot?: true
+    delta?: true
+    reason?: true
+    orderId?: true
+    actorUserId?: true
+    resultingBalance?: true
+    correlationId?: true
+    createdAt?: true
+  }
+
+  export type StockMovementMaxAggregateInputType = {
+    id?: true
+    variantId?: true
+    variantIdSnapshot?: true
+    skuSnapshot?: true
+    delta?: true
+    reason?: true
+    orderId?: true
+    actorUserId?: true
+    resultingBalance?: true
+    correlationId?: true
+    createdAt?: true
+  }
+
+  export type StockMovementCountAggregateInputType = {
+    id?: true
+    variantId?: true
+    variantIdSnapshot?: true
+    skuSnapshot?: true
+    delta?: true
+    reason?: true
+    orderId?: true
+    actorUserId?: true
+    resultingBalance?: true
+    correlationId?: true
+    metadata?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type StockMovementAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StockMovement to aggregate.
+     */
+    where?: StockMovementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockMovements to fetch.
+     */
+    orderBy?: StockMovementOrderByWithRelationInput | StockMovementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StockMovementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockMovements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockMovements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StockMovements
+    **/
+    _count?: true | StockMovementCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: StockMovementAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: StockMovementSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StockMovementMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StockMovementMaxAggregateInputType
+  }
+
+  export type GetStockMovementAggregateType<T extends StockMovementAggregateArgs> = {
+        [P in keyof T & keyof AggregateStockMovement]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStockMovement[P]>
+      : GetScalarType<T[P], AggregateStockMovement[P]>
+  }
+
+
+
+
+  export type StockMovementGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StockMovementWhereInput
+    orderBy?: StockMovementOrderByWithAggregationInput | StockMovementOrderByWithAggregationInput[]
+    by: StockMovementScalarFieldEnum[] | StockMovementScalarFieldEnum
+    having?: StockMovementScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StockMovementCountAggregateInputType | true
+    _avg?: StockMovementAvgAggregateInputType
+    _sum?: StockMovementSumAggregateInputType
+    _min?: StockMovementMinAggregateInputType
+    _max?: StockMovementMaxAggregateInputType
+  }
+
+  export type StockMovementGroupByOutputType = {
+    id: string
+    variantId: string | null
+    variantIdSnapshot: string
+    skuSnapshot: string | null
+    delta: number
+    reason: string
+    orderId: string | null
+    actorUserId: string | null
+    resultingBalance: number
+    correlationId: string | null
+    metadata: JsonValue | null
+    createdAt: Date
+    _count: StockMovementCountAggregateOutputType | null
+    _avg: StockMovementAvgAggregateOutputType | null
+    _sum: StockMovementSumAggregateOutputType | null
+    _min: StockMovementMinAggregateOutputType | null
+    _max: StockMovementMaxAggregateOutputType | null
+  }
+
+  type GetStockMovementGroupByPayload<T extends StockMovementGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StockMovementGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StockMovementGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StockMovementGroupByOutputType[P]>
+            : GetScalarType<T[P], StockMovementGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StockMovementSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    variantId?: boolean
+    variantIdSnapshot?: boolean
+    skuSnapshot?: boolean
+    delta?: boolean
+    reason?: boolean
+    orderId?: boolean
+    actorUserId?: boolean
+    resultingBalance?: boolean
+    correlationId?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    variant?: boolean | StockMovement$variantArgs<ExtArgs>
+    order?: boolean | StockMovement$orderArgs<ExtArgs>
+    actorUser?: boolean | StockMovement$actorUserArgs<ExtArgs>
+  }, ExtArgs["result"]["stockMovement"]>
+
+  export type StockMovementSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    variantId?: boolean
+    variantIdSnapshot?: boolean
+    skuSnapshot?: boolean
+    delta?: boolean
+    reason?: boolean
+    orderId?: boolean
+    actorUserId?: boolean
+    resultingBalance?: boolean
+    correlationId?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    variant?: boolean | StockMovement$variantArgs<ExtArgs>
+    order?: boolean | StockMovement$orderArgs<ExtArgs>
+    actorUser?: boolean | StockMovement$actorUserArgs<ExtArgs>
+  }, ExtArgs["result"]["stockMovement"]>
+
+  export type StockMovementSelectScalar = {
+    id?: boolean
+    variantId?: boolean
+    variantIdSnapshot?: boolean
+    skuSnapshot?: boolean
+    delta?: boolean
+    reason?: boolean
+    orderId?: boolean
+    actorUserId?: boolean
+    resultingBalance?: boolean
+    correlationId?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+  }
+
+  export type StockMovementInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    variant?: boolean | StockMovement$variantArgs<ExtArgs>
+    order?: boolean | StockMovement$orderArgs<ExtArgs>
+    actorUser?: boolean | StockMovement$actorUserArgs<ExtArgs>
+  }
+  export type StockMovementIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    variant?: boolean | StockMovement$variantArgs<ExtArgs>
+    order?: boolean | StockMovement$orderArgs<ExtArgs>
+    actorUser?: boolean | StockMovement$actorUserArgs<ExtArgs>
+  }
+
+  export type $StockMovementPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StockMovement"
+    objects: {
+      variant: Prisma.$ProductVariantPayload<ExtArgs> | null
+      order: Prisma.$OrderPayload<ExtArgs> | null
+      actorUser: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      variantId: string | null
+      variantIdSnapshot: string
+      skuSnapshot: string | null
+      delta: number
+      reason: string
+      orderId: string | null
+      actorUserId: string | null
+      resultingBalance: number
+      correlationId: string | null
+      metadata: Prisma.JsonValue | null
+      createdAt: Date
+    }, ExtArgs["result"]["stockMovement"]>
+    composites: {}
+  }
+
+  type StockMovementGetPayload<S extends boolean | null | undefined | StockMovementDefaultArgs> = $Result.GetResult<Prisma.$StockMovementPayload, S>
+
+  type StockMovementCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<StockMovementFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: StockMovementCountAggregateInputType | true
+    }
+
+  export interface StockMovementDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StockMovement'], meta: { name: 'StockMovement' } }
+    /**
+     * Find zero or one StockMovement that matches the filter.
+     * @param {StockMovementFindUniqueArgs} args - Arguments to find a StockMovement
+     * @example
+     * // Get one StockMovement
+     * const stockMovement = await prisma.stockMovement.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StockMovementFindUniqueArgs>(args: SelectSubset<T, StockMovementFindUniqueArgs<ExtArgs>>): Prisma__StockMovementClient<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one StockMovement that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {StockMovementFindUniqueOrThrowArgs} args - Arguments to find a StockMovement
+     * @example
+     * // Get one StockMovement
+     * const stockMovement = await prisma.stockMovement.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StockMovementFindUniqueOrThrowArgs>(args: SelectSubset<T, StockMovementFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StockMovementClient<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first StockMovement that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockMovementFindFirstArgs} args - Arguments to find a StockMovement
+     * @example
+     * // Get one StockMovement
+     * const stockMovement = await prisma.stockMovement.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StockMovementFindFirstArgs>(args?: SelectSubset<T, StockMovementFindFirstArgs<ExtArgs>>): Prisma__StockMovementClient<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first StockMovement that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockMovementFindFirstOrThrowArgs} args - Arguments to find a StockMovement
+     * @example
+     * // Get one StockMovement
+     * const stockMovement = await prisma.stockMovement.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StockMovementFindFirstOrThrowArgs>(args?: SelectSubset<T, StockMovementFindFirstOrThrowArgs<ExtArgs>>): Prisma__StockMovementClient<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more StockMovements that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockMovementFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StockMovements
+     * const stockMovements = await prisma.stockMovement.findMany()
+     * 
+     * // Get first 10 StockMovements
+     * const stockMovements = await prisma.stockMovement.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const stockMovementWithIdOnly = await prisma.stockMovement.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StockMovementFindManyArgs>(args?: SelectSubset<T, StockMovementFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a StockMovement.
+     * @param {StockMovementCreateArgs} args - Arguments to create a StockMovement.
+     * @example
+     * // Create one StockMovement
+     * const StockMovement = await prisma.stockMovement.create({
+     *   data: {
+     *     // ... data to create a StockMovement
+     *   }
+     * })
+     * 
+     */
+    create<T extends StockMovementCreateArgs>(args: SelectSubset<T, StockMovementCreateArgs<ExtArgs>>): Prisma__StockMovementClient<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many StockMovements.
+     * @param {StockMovementCreateManyArgs} args - Arguments to create many StockMovements.
+     * @example
+     * // Create many StockMovements
+     * const stockMovement = await prisma.stockMovement.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StockMovementCreateManyArgs>(args?: SelectSubset<T, StockMovementCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StockMovements and returns the data saved in the database.
+     * @param {StockMovementCreateManyAndReturnArgs} args - Arguments to create many StockMovements.
+     * @example
+     * // Create many StockMovements
+     * const stockMovement = await prisma.stockMovement.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StockMovements and only return the `id`
+     * const stockMovementWithIdOnly = await prisma.stockMovement.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StockMovementCreateManyAndReturnArgs>(args?: SelectSubset<T, StockMovementCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a StockMovement.
+     * @param {StockMovementDeleteArgs} args - Arguments to delete one StockMovement.
+     * @example
+     * // Delete one StockMovement
+     * const StockMovement = await prisma.stockMovement.delete({
+     *   where: {
+     *     // ... filter to delete one StockMovement
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StockMovementDeleteArgs>(args: SelectSubset<T, StockMovementDeleteArgs<ExtArgs>>): Prisma__StockMovementClient<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one StockMovement.
+     * @param {StockMovementUpdateArgs} args - Arguments to update one StockMovement.
+     * @example
+     * // Update one StockMovement
+     * const stockMovement = await prisma.stockMovement.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StockMovementUpdateArgs>(args: SelectSubset<T, StockMovementUpdateArgs<ExtArgs>>): Prisma__StockMovementClient<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more StockMovements.
+     * @param {StockMovementDeleteManyArgs} args - Arguments to filter StockMovements to delete.
+     * @example
+     * // Delete a few StockMovements
+     * const { count } = await prisma.stockMovement.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StockMovementDeleteManyArgs>(args?: SelectSubset<T, StockMovementDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StockMovements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockMovementUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StockMovements
+     * const stockMovement = await prisma.stockMovement.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StockMovementUpdateManyArgs>(args: SelectSubset<T, StockMovementUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one StockMovement.
+     * @param {StockMovementUpsertArgs} args - Arguments to update or create a StockMovement.
+     * @example
+     * // Update or create a StockMovement
+     * const stockMovement = await prisma.stockMovement.upsert({
+     *   create: {
+     *     // ... data to create a StockMovement
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StockMovement we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StockMovementUpsertArgs>(args: SelectSubset<T, StockMovementUpsertArgs<ExtArgs>>): Prisma__StockMovementClient<$Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of StockMovements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockMovementCountArgs} args - Arguments to filter StockMovements to count.
+     * @example
+     * // Count the number of StockMovements
+     * const count = await prisma.stockMovement.count({
+     *   where: {
+     *     // ... the filter for the StockMovements we want to count
+     *   }
+     * })
+    **/
+    count<T extends StockMovementCountArgs>(
+      args?: Subset<T, StockMovementCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StockMovementCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StockMovement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockMovementAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StockMovementAggregateArgs>(args: Subset<T, StockMovementAggregateArgs>): Prisma.PrismaPromise<GetStockMovementAggregateType<T>>
+
+    /**
+     * Group by StockMovement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockMovementGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StockMovementGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StockMovementGroupByArgs['orderBy'] }
+        : { orderBy?: StockMovementGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StockMovementGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStockMovementGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StockMovement model
+   */
+  readonly fields: StockMovementFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StockMovement.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StockMovementClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    variant<T extends StockMovement$variantArgs<ExtArgs> = {}>(args?: Subset<T, StockMovement$variantArgs<ExtArgs>>): Prisma__ProductVariantClient<$Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    order<T extends StockMovement$orderArgs<ExtArgs> = {}>(args?: Subset<T, StockMovement$orderArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    actorUser<T extends StockMovement$actorUserArgs<ExtArgs> = {}>(args?: Subset<T, StockMovement$actorUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StockMovement model
+   */ 
+  interface StockMovementFieldRefs {
+    readonly id: FieldRef<"StockMovement", 'String'>
+    readonly variantId: FieldRef<"StockMovement", 'String'>
+    readonly variantIdSnapshot: FieldRef<"StockMovement", 'String'>
+    readonly skuSnapshot: FieldRef<"StockMovement", 'String'>
+    readonly delta: FieldRef<"StockMovement", 'Int'>
+    readonly reason: FieldRef<"StockMovement", 'String'>
+    readonly orderId: FieldRef<"StockMovement", 'String'>
+    readonly actorUserId: FieldRef<"StockMovement", 'String'>
+    readonly resultingBalance: FieldRef<"StockMovement", 'Int'>
+    readonly correlationId: FieldRef<"StockMovement", 'String'>
+    readonly metadata: FieldRef<"StockMovement", 'Json'>
+    readonly createdAt: FieldRef<"StockMovement", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StockMovement findUnique
+   */
+  export type StockMovementFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * Filter, which StockMovement to fetch.
+     */
+    where: StockMovementWhereUniqueInput
+  }
+
+  /**
+   * StockMovement findUniqueOrThrow
+   */
+  export type StockMovementFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * Filter, which StockMovement to fetch.
+     */
+    where: StockMovementWhereUniqueInput
+  }
+
+  /**
+   * StockMovement findFirst
+   */
+  export type StockMovementFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * Filter, which StockMovement to fetch.
+     */
+    where?: StockMovementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockMovements to fetch.
+     */
+    orderBy?: StockMovementOrderByWithRelationInput | StockMovementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StockMovements.
+     */
+    cursor?: StockMovementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockMovements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockMovements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockMovements.
+     */
+    distinct?: StockMovementScalarFieldEnum | StockMovementScalarFieldEnum[]
+  }
+
+  /**
+   * StockMovement findFirstOrThrow
+   */
+  export type StockMovementFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * Filter, which StockMovement to fetch.
+     */
+    where?: StockMovementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockMovements to fetch.
+     */
+    orderBy?: StockMovementOrderByWithRelationInput | StockMovementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StockMovements.
+     */
+    cursor?: StockMovementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockMovements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockMovements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockMovements.
+     */
+    distinct?: StockMovementScalarFieldEnum | StockMovementScalarFieldEnum[]
+  }
+
+  /**
+   * StockMovement findMany
+   */
+  export type StockMovementFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * Filter, which StockMovements to fetch.
+     */
+    where?: StockMovementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockMovements to fetch.
+     */
+    orderBy?: StockMovementOrderByWithRelationInput | StockMovementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StockMovements.
+     */
+    cursor?: StockMovementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockMovements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockMovements.
+     */
+    skip?: number
+    distinct?: StockMovementScalarFieldEnum | StockMovementScalarFieldEnum[]
+  }
+
+  /**
+   * StockMovement create
+   */
+  export type StockMovementCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StockMovement.
+     */
+    data: XOR<StockMovementCreateInput, StockMovementUncheckedCreateInput>
+  }
+
+  /**
+   * StockMovement createMany
+   */
+  export type StockMovementCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StockMovements.
+     */
+    data: StockMovementCreateManyInput | StockMovementCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StockMovement createManyAndReturn
+   */
+  export type StockMovementCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many StockMovements.
+     */
+    data: StockMovementCreateManyInput | StockMovementCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StockMovement update
+   */
+  export type StockMovementUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StockMovement.
+     */
+    data: XOR<StockMovementUpdateInput, StockMovementUncheckedUpdateInput>
+    /**
+     * Choose, which StockMovement to update.
+     */
+    where: StockMovementWhereUniqueInput
+  }
+
+  /**
+   * StockMovement updateMany
+   */
+  export type StockMovementUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StockMovements.
+     */
+    data: XOR<StockMovementUpdateManyMutationInput, StockMovementUncheckedUpdateManyInput>
+    /**
+     * Filter which StockMovements to update
+     */
+    where?: StockMovementWhereInput
+  }
+
+  /**
+   * StockMovement upsert
+   */
+  export type StockMovementUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StockMovement to update in case it exists.
+     */
+    where: StockMovementWhereUniqueInput
+    /**
+     * In case the StockMovement found by the `where` argument doesn't exist, create a new StockMovement with this data.
+     */
+    create: XOR<StockMovementCreateInput, StockMovementUncheckedCreateInput>
+    /**
+     * In case the StockMovement was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StockMovementUpdateInput, StockMovementUncheckedUpdateInput>
+  }
+
+  /**
+   * StockMovement delete
+   */
+  export type StockMovementDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+    /**
+     * Filter which StockMovement to delete.
+     */
+    where: StockMovementWhereUniqueInput
+  }
+
+  /**
+   * StockMovement deleteMany
+   */
+  export type StockMovementDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StockMovements to delete
+     */
+    where?: StockMovementWhereInput
+  }
+
+  /**
+   * StockMovement.variant
+   */
+  export type StockMovement$variantArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductVariant
+     */
+    select?: ProductVariantSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductVariantInclude<ExtArgs> | null
+    where?: ProductVariantWhereInput
+  }
+
+  /**
+   * StockMovement.order
+   */
+  export type StockMovement$orderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+  }
+
+  /**
+   * StockMovement.actorUser
+   */
+  export type StockMovement$actorUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * StockMovement without action
+   */
+  export type StockMovementDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockMovement
+     */
+    select?: StockMovementSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockMovementInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AuditLog
+   */
+
+  export type AggregateAuditLog = {
+    _count: AuditLogCountAggregateOutputType | null
+    _min: AuditLogMinAggregateOutputType | null
+    _max: AuditLogMaxAggregateOutputType | null
+  }
+
+  export type AuditLogMinAggregateOutputType = {
+    id: string | null
+    actorUserId: string | null
+    action: string | null
+    targetType: string | null
+    targetId: string | null
+    requestId: string | null
+    correlationId: string | null
+    createdAt: Date | null
+  }
+
+  export type AuditLogMaxAggregateOutputType = {
+    id: string | null
+    actorUserId: string | null
+    action: string | null
+    targetType: string | null
+    targetId: string | null
+    requestId: string | null
+    correlationId: string | null
+    createdAt: Date | null
+  }
+
+  export type AuditLogCountAggregateOutputType = {
+    id: number
+    actorUserId: number
+    action: number
+    targetType: number
+    targetId: number
+    beforeDiff: number
+    afterDiff: number
+    requestId: number
+    correlationId: number
+    context: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AuditLogMinAggregateInputType = {
+    id?: true
+    actorUserId?: true
+    action?: true
+    targetType?: true
+    targetId?: true
+    requestId?: true
+    correlationId?: true
+    createdAt?: true
+  }
+
+  export type AuditLogMaxAggregateInputType = {
+    id?: true
+    actorUserId?: true
+    action?: true
+    targetType?: true
+    targetId?: true
+    requestId?: true
+    correlationId?: true
+    createdAt?: true
+  }
+
+  export type AuditLogCountAggregateInputType = {
+    id?: true
+    actorUserId?: true
+    action?: true
+    targetType?: true
+    targetId?: true
+    beforeDiff?: true
+    afterDiff?: true
+    requestId?: true
+    correlationId?: true
+    context?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AuditLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuditLog to aggregate.
+     */
+    where?: AuditLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditLogs to fetch.
+     */
+    orderBy?: AuditLogOrderByWithRelationInput | AuditLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AuditLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AuditLogs
+    **/
+    _count?: true | AuditLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AuditLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AuditLogMaxAggregateInputType
+  }
+
+  export type GetAuditLogAggregateType<T extends AuditLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateAuditLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAuditLog[P]>
+      : GetScalarType<T[P], AggregateAuditLog[P]>
+  }
+
+
+
+
+  export type AuditLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuditLogWhereInput
+    orderBy?: AuditLogOrderByWithAggregationInput | AuditLogOrderByWithAggregationInput[]
+    by: AuditLogScalarFieldEnum[] | AuditLogScalarFieldEnum
+    having?: AuditLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AuditLogCountAggregateInputType | true
+    _min?: AuditLogMinAggregateInputType
+    _max?: AuditLogMaxAggregateInputType
+  }
+
+  export type AuditLogGroupByOutputType = {
+    id: string
+    actorUserId: string | null
+    action: string
+    targetType: string
+    targetId: string | null
+    beforeDiff: JsonValue | null
+    afterDiff: JsonValue | null
+    requestId: string | null
+    correlationId: string | null
+    context: JsonValue | null
+    createdAt: Date
+    _count: AuditLogCountAggregateOutputType | null
+    _min: AuditLogMinAggregateOutputType | null
+    _max: AuditLogMaxAggregateOutputType | null
+  }
+
+  type GetAuditLogGroupByPayload<T extends AuditLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AuditLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AuditLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AuditLogGroupByOutputType[P]>
+            : GetScalarType<T[P], AuditLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AuditLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    actorUserId?: boolean
+    action?: boolean
+    targetType?: boolean
+    targetId?: boolean
+    beforeDiff?: boolean
+    afterDiff?: boolean
+    requestId?: boolean
+    correlationId?: boolean
+    context?: boolean
+    createdAt?: boolean
+    actorUser?: boolean | AuditLog$actorUserArgs<ExtArgs>
+  }, ExtArgs["result"]["auditLog"]>
+
+  export type AuditLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    actorUserId?: boolean
+    action?: boolean
+    targetType?: boolean
+    targetId?: boolean
+    beforeDiff?: boolean
+    afterDiff?: boolean
+    requestId?: boolean
+    correlationId?: boolean
+    context?: boolean
+    createdAt?: boolean
+    actorUser?: boolean | AuditLog$actorUserArgs<ExtArgs>
+  }, ExtArgs["result"]["auditLog"]>
+
+  export type AuditLogSelectScalar = {
+    id?: boolean
+    actorUserId?: boolean
+    action?: boolean
+    targetType?: boolean
+    targetId?: boolean
+    beforeDiff?: boolean
+    afterDiff?: boolean
+    requestId?: boolean
+    correlationId?: boolean
+    context?: boolean
+    createdAt?: boolean
+  }
+
+  export type AuditLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    actorUser?: boolean | AuditLog$actorUserArgs<ExtArgs>
+  }
+  export type AuditLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    actorUser?: boolean | AuditLog$actorUserArgs<ExtArgs>
+  }
+
+  export type $AuditLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AuditLog"
+    objects: {
+      actorUser: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      actorUserId: string | null
+      action: string
+      targetType: string
+      targetId: string | null
+      beforeDiff: Prisma.JsonValue | null
+      afterDiff: Prisma.JsonValue | null
+      requestId: string | null
+      correlationId: string | null
+      context: Prisma.JsonValue | null
+      createdAt: Date
+    }, ExtArgs["result"]["auditLog"]>
+    composites: {}
+  }
+
+  type AuditLogGetPayload<S extends boolean | null | undefined | AuditLogDefaultArgs> = $Result.GetResult<Prisma.$AuditLogPayload, S>
+
+  type AuditLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AuditLogFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AuditLogCountAggregateInputType | true
+    }
+
+  export interface AuditLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AuditLog'], meta: { name: 'AuditLog' } }
+    /**
+     * Find zero or one AuditLog that matches the filter.
+     * @param {AuditLogFindUniqueArgs} args - Arguments to find a AuditLog
+     * @example
+     * // Get one AuditLog
+     * const auditLog = await prisma.auditLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AuditLogFindUniqueArgs>(args: SelectSubset<T, AuditLogFindUniqueArgs<ExtArgs>>): Prisma__AuditLogClient<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AuditLog that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AuditLogFindUniqueOrThrowArgs} args - Arguments to find a AuditLog
+     * @example
+     * // Get one AuditLog
+     * const auditLog = await prisma.auditLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AuditLogFindUniqueOrThrowArgs>(args: SelectSubset<T, AuditLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AuditLogClient<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AuditLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditLogFindFirstArgs} args - Arguments to find a AuditLog
+     * @example
+     * // Get one AuditLog
+     * const auditLog = await prisma.auditLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AuditLogFindFirstArgs>(args?: SelectSubset<T, AuditLogFindFirstArgs<ExtArgs>>): Prisma__AuditLogClient<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AuditLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditLogFindFirstOrThrowArgs} args - Arguments to find a AuditLog
+     * @example
+     * // Get one AuditLog
+     * const auditLog = await prisma.auditLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AuditLogFindFirstOrThrowArgs>(args?: SelectSubset<T, AuditLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__AuditLogClient<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AuditLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AuditLogs
+     * const auditLogs = await prisma.auditLog.findMany()
+     * 
+     * // Get first 10 AuditLogs
+     * const auditLogs = await prisma.auditLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const auditLogWithIdOnly = await prisma.auditLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AuditLogFindManyArgs>(args?: SelectSubset<T, AuditLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AuditLog.
+     * @param {AuditLogCreateArgs} args - Arguments to create a AuditLog.
+     * @example
+     * // Create one AuditLog
+     * const AuditLog = await prisma.auditLog.create({
+     *   data: {
+     *     // ... data to create a AuditLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends AuditLogCreateArgs>(args: SelectSubset<T, AuditLogCreateArgs<ExtArgs>>): Prisma__AuditLogClient<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AuditLogs.
+     * @param {AuditLogCreateManyArgs} args - Arguments to create many AuditLogs.
+     * @example
+     * // Create many AuditLogs
+     * const auditLog = await prisma.auditLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AuditLogCreateManyArgs>(args?: SelectSubset<T, AuditLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AuditLogs and returns the data saved in the database.
+     * @param {AuditLogCreateManyAndReturnArgs} args - Arguments to create many AuditLogs.
+     * @example
+     * // Create many AuditLogs
+     * const auditLog = await prisma.auditLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AuditLogs and only return the `id`
+     * const auditLogWithIdOnly = await prisma.auditLog.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AuditLogCreateManyAndReturnArgs>(args?: SelectSubset<T, AuditLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AuditLog.
+     * @param {AuditLogDeleteArgs} args - Arguments to delete one AuditLog.
+     * @example
+     * // Delete one AuditLog
+     * const AuditLog = await prisma.auditLog.delete({
+     *   where: {
+     *     // ... filter to delete one AuditLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AuditLogDeleteArgs>(args: SelectSubset<T, AuditLogDeleteArgs<ExtArgs>>): Prisma__AuditLogClient<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AuditLog.
+     * @param {AuditLogUpdateArgs} args - Arguments to update one AuditLog.
+     * @example
+     * // Update one AuditLog
+     * const auditLog = await prisma.auditLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AuditLogUpdateArgs>(args: SelectSubset<T, AuditLogUpdateArgs<ExtArgs>>): Prisma__AuditLogClient<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AuditLogs.
+     * @param {AuditLogDeleteManyArgs} args - Arguments to filter AuditLogs to delete.
+     * @example
+     * // Delete a few AuditLogs
+     * const { count } = await prisma.auditLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AuditLogDeleteManyArgs>(args?: SelectSubset<T, AuditLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AuditLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AuditLogs
+     * const auditLog = await prisma.auditLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AuditLogUpdateManyArgs>(args: SelectSubset<T, AuditLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AuditLog.
+     * @param {AuditLogUpsertArgs} args - Arguments to update or create a AuditLog.
+     * @example
+     * // Update or create a AuditLog
+     * const auditLog = await prisma.auditLog.upsert({
+     *   create: {
+     *     // ... data to create a AuditLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AuditLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AuditLogUpsertArgs>(args: SelectSubset<T, AuditLogUpsertArgs<ExtArgs>>): Prisma__AuditLogClient<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AuditLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditLogCountArgs} args - Arguments to filter AuditLogs to count.
+     * @example
+     * // Count the number of AuditLogs
+     * const count = await prisma.auditLog.count({
+     *   where: {
+     *     // ... the filter for the AuditLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends AuditLogCountArgs>(
+      args?: Subset<T, AuditLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AuditLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AuditLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AuditLogAggregateArgs>(args: Subset<T, AuditLogAggregateArgs>): Prisma.PrismaPromise<GetAuditLogAggregateType<T>>
+
+    /**
+     * Group by AuditLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AuditLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AuditLogGroupByArgs['orderBy'] }
+        : { orderBy?: AuditLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AuditLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAuditLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AuditLog model
+   */
+  readonly fields: AuditLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AuditLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AuditLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    actorUser<T extends AuditLog$actorUserArgs<ExtArgs> = {}>(args?: Subset<T, AuditLog$actorUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AuditLog model
+   */ 
+  interface AuditLogFieldRefs {
+    readonly id: FieldRef<"AuditLog", 'String'>
+    readonly actorUserId: FieldRef<"AuditLog", 'String'>
+    readonly action: FieldRef<"AuditLog", 'String'>
+    readonly targetType: FieldRef<"AuditLog", 'String'>
+    readonly targetId: FieldRef<"AuditLog", 'String'>
+    readonly beforeDiff: FieldRef<"AuditLog", 'Json'>
+    readonly afterDiff: FieldRef<"AuditLog", 'Json'>
+    readonly requestId: FieldRef<"AuditLog", 'String'>
+    readonly correlationId: FieldRef<"AuditLog", 'String'>
+    readonly context: FieldRef<"AuditLog", 'Json'>
+    readonly createdAt: FieldRef<"AuditLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AuditLog findUnique
+   */
+  export type AuditLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditLog to fetch.
+     */
+    where: AuditLogWhereUniqueInput
+  }
+
+  /**
+   * AuditLog findUniqueOrThrow
+   */
+  export type AuditLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditLog to fetch.
+     */
+    where: AuditLogWhereUniqueInput
+  }
+
+  /**
+   * AuditLog findFirst
+   */
+  export type AuditLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditLog to fetch.
+     */
+    where?: AuditLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditLogs to fetch.
+     */
+    orderBy?: AuditLogOrderByWithRelationInput | AuditLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuditLogs.
+     */
+    cursor?: AuditLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuditLogs.
+     */
+    distinct?: AuditLogScalarFieldEnum | AuditLogScalarFieldEnum[]
+  }
+
+  /**
+   * AuditLog findFirstOrThrow
+   */
+  export type AuditLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditLog to fetch.
+     */
+    where?: AuditLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditLogs to fetch.
+     */
+    orderBy?: AuditLogOrderByWithRelationInput | AuditLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuditLogs.
+     */
+    cursor?: AuditLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuditLogs.
+     */
+    distinct?: AuditLogScalarFieldEnum | AuditLogScalarFieldEnum[]
+  }
+
+  /**
+   * AuditLog findMany
+   */
+  export type AuditLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditLogs to fetch.
+     */
+    where?: AuditLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditLogs to fetch.
+     */
+    orderBy?: AuditLogOrderByWithRelationInput | AuditLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AuditLogs.
+     */
+    cursor?: AuditLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditLogs.
+     */
+    skip?: number
+    distinct?: AuditLogScalarFieldEnum | AuditLogScalarFieldEnum[]
+  }
+
+  /**
+   * AuditLog create
+   */
+  export type AuditLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AuditLog.
+     */
+    data: XOR<AuditLogCreateInput, AuditLogUncheckedCreateInput>
+  }
+
+  /**
+   * AuditLog createMany
+   */
+  export type AuditLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AuditLogs.
+     */
+    data: AuditLogCreateManyInput | AuditLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AuditLog createManyAndReturn
+   */
+  export type AuditLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AuditLogs.
+     */
+    data: AuditLogCreateManyInput | AuditLogCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AuditLog update
+   */
+  export type AuditLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AuditLog.
+     */
+    data: XOR<AuditLogUpdateInput, AuditLogUncheckedUpdateInput>
+    /**
+     * Choose, which AuditLog to update.
+     */
+    where: AuditLogWhereUniqueInput
+  }
+
+  /**
+   * AuditLog updateMany
+   */
+  export type AuditLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AuditLogs.
+     */
+    data: XOR<AuditLogUpdateManyMutationInput, AuditLogUncheckedUpdateManyInput>
+    /**
+     * Filter which AuditLogs to update
+     */
+    where?: AuditLogWhereInput
+  }
+
+  /**
+   * AuditLog upsert
+   */
+  export type AuditLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AuditLog to update in case it exists.
+     */
+    where: AuditLogWhereUniqueInput
+    /**
+     * In case the AuditLog found by the `where` argument doesn't exist, create a new AuditLog with this data.
+     */
+    create: XOR<AuditLogCreateInput, AuditLogUncheckedCreateInput>
+    /**
+     * In case the AuditLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AuditLogUpdateInput, AuditLogUncheckedUpdateInput>
+  }
+
+  /**
+   * AuditLog delete
+   */
+  export type AuditLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
+    /**
+     * Filter which AuditLog to delete.
+     */
+    where: AuditLogWhereUniqueInput
+  }
+
+  /**
+   * AuditLog deleteMany
+   */
+  export type AuditLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuditLogs to delete
+     */
+    where?: AuditLogWhereInput
+  }
+
+  /**
+   * AuditLog.actorUser
+   */
+  export type AuditLog$actorUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * AuditLog without action
+   */
+  export type AuditLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditLog
+     */
+    select?: AuditLogSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditLogInclude<ExtArgs> | null
   }
 
 
@@ -30303,6 +32940,7 @@ export namespace Prisma {
     primaryCategoryId: 'primaryCategoryId',
     attributeIds: 'attributeIds',
     discountPercent: 'discountPercent',
+    warrantyYears: 'warrantyYears',
     deletedAt: 'deletedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -30332,6 +32970,7 @@ export namespace Prisma {
     sku: 'sku',
     barcode: 'barcode',
     price: 'price',
+    priceOnRequest: 'priceOnRequest',
     compareAtPrice: 'compareAtPrice',
     cost: 'cost',
     stock: 'stock',
@@ -30445,6 +33084,10 @@ export namespace Prisma {
     paidAt: 'paidAt',
     fulfilledAt: 'fulfilledAt',
     cancelledAt: 'cancelledAt',
+    idempotencyScopeHash: 'idempotencyScopeHash',
+    idempotencyKeyHash: 'idempotencyKeyHash',
+    requestFingerprint: 'requestFingerprint',
+    correlationId: 'correlationId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -30499,10 +33142,52 @@ export namespace Prisma {
     data: 'data',
     userId: 'userId',
     ipAddress: 'ipAddress',
+    fromState: 'fromState',
+    toState: 'toState',
+    actorUserId: 'actorUserId',
+    isCustomerVisible: 'isCustomerVisible',
+    provider: 'provider',
+    providerEventId: 'providerEventId',
+    correlationId: 'correlationId',
     createdAt: 'createdAt'
   };
 
   export type OrderEventScalarFieldEnum = (typeof OrderEventScalarFieldEnum)[keyof typeof OrderEventScalarFieldEnum]
+
+
+  export const StockMovementScalarFieldEnum: {
+    id: 'id',
+    variantId: 'variantId',
+    variantIdSnapshot: 'variantIdSnapshot',
+    skuSnapshot: 'skuSnapshot',
+    delta: 'delta',
+    reason: 'reason',
+    orderId: 'orderId',
+    actorUserId: 'actorUserId',
+    resultingBalance: 'resultingBalance',
+    correlationId: 'correlationId',
+    metadata: 'metadata',
+    createdAt: 'createdAt'
+  };
+
+  export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
+
+
+  export const AuditLogScalarFieldEnum: {
+    id: 'id',
+    actorUserId: 'actorUserId',
+    action: 'action',
+    targetType: 'targetType',
+    targetId: 'targetId',
+    beforeDiff: 'beforeDiff',
+    afterDiff: 'afterDiff',
+    requestId: 'requestId',
+    correlationId: 'correlationId',
+    context: 'context',
+    createdAt: 'createdAt'
+  };
+
+  export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
   export const ProductReviewScalarFieldEnum: {
@@ -30713,6 +33398,9 @@ export namespace Prisma {
     carts?: CartListRelationFilter
     orders?: OrderListRelationFilter
     reviews?: ProductReviewListRelationFilter
+    stockMovements?: StockMovementListRelationFilter
+    auditLogs?: AuditLogListRelationFilter
+    actedOrderEvents?: OrderEventListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -30736,6 +33424,9 @@ export namespace Prisma {
     carts?: CartOrderByRelationAggregateInput
     orders?: OrderOrderByRelationAggregateInput
     reviews?: ProductReviewOrderByRelationAggregateInput
+    stockMovements?: StockMovementOrderByRelationAggregateInput
+    auditLogs?: AuditLogOrderByRelationAggregateInput
+    actedOrderEvents?: OrderEventOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -30762,6 +33453,9 @@ export namespace Prisma {
     carts?: CartListRelationFilter
     orders?: OrderListRelationFilter
     reviews?: ProductReviewListRelationFilter
+    stockMovements?: StockMovementListRelationFilter
+    auditLogs?: AuditLogListRelationFilter
+    actedOrderEvents?: OrderEventListRelationFilter
   }, "id" | "email" | "phone">
 
   export type UserOrderByWithAggregationInput = {
@@ -31452,6 +34146,7 @@ export namespace Prisma {
     primaryCategoryId?: StringNullableFilter<"Product"> | string | null
     attributeIds?: StringNullableListFilter<"Product">
     discountPercent?: IntFilter<"Product"> | number
+    warrantyYears?: IntNullableFilter<"Product"> | number | null
     deletedAt?: DateTimeNullableFilter<"Product"> | Date | string | null
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -31477,6 +34172,7 @@ export namespace Prisma {
     primaryCategoryId?: SortOrderInput | SortOrder
     attributeIds?: SortOrder
     discountPercent?: SortOrder
+    warrantyYears?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -31505,6 +34201,7 @@ export namespace Prisma {
     primaryCategoryId?: StringNullableFilter<"Product"> | string | null
     attributeIds?: StringNullableListFilter<"Product">
     discountPercent?: IntFilter<"Product"> | number
+    warrantyYears?: IntNullableFilter<"Product"> | number | null
     deletedAt?: DateTimeNullableFilter<"Product"> | Date | string | null
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -31530,6 +34227,7 @@ export namespace Prisma {
     primaryCategoryId?: SortOrderInput | SortOrder
     attributeIds?: SortOrder
     discountPercent?: SortOrder
+    warrantyYears?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -31555,6 +34253,7 @@ export namespace Prisma {
     primaryCategoryId?: StringNullableWithAggregatesFilter<"Product"> | string | null
     attributeIds?: StringNullableListFilter<"Product">
     discountPercent?: IntWithAggregatesFilter<"Product"> | number
+    warrantyYears?: IntNullableWithAggregatesFilter<"Product"> | number | null
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Product"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
@@ -31645,6 +34344,7 @@ export namespace Prisma {
     sku?: StringNullableFilter<"ProductVariant"> | string | null
     barcode?: StringNullableFilter<"ProductVariant"> | string | null
     price?: FloatFilter<"ProductVariant"> | number
+    priceOnRequest?: BoolFilter<"ProductVariant"> | boolean
     compareAtPrice?: FloatNullableFilter<"ProductVariant"> | number | null
     cost?: FloatNullableFilter<"ProductVariant"> | number | null
     stock?: IntFilter<"ProductVariant"> | number
@@ -31665,6 +34365,7 @@ export namespace Prisma {
     product?: XOR<ProductRelationFilter, ProductWhereInput>
     cartItems?: CartItemListRelationFilter
     orderItems?: OrderItemListRelationFilter
+    stockMovements?: StockMovementListRelationFilter
   }
 
   export type ProductVariantOrderByWithRelationInput = {
@@ -31673,6 +34374,7 @@ export namespace Prisma {
     sku?: SortOrderInput | SortOrder
     barcode?: SortOrderInput | SortOrder
     price?: SortOrder
+    priceOnRequest?: SortOrder
     compareAtPrice?: SortOrderInput | SortOrder
     cost?: SortOrderInput | SortOrder
     stock?: SortOrder
@@ -31693,6 +34395,7 @@ export namespace Prisma {
     product?: ProductOrderByWithRelationInput
     cartItems?: CartItemOrderByRelationAggregateInput
     orderItems?: OrderItemOrderByRelationAggregateInput
+    stockMovements?: StockMovementOrderByRelationAggregateInput
   }
 
   export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
@@ -31704,6 +34407,7 @@ export namespace Prisma {
     productId?: StringFilter<"ProductVariant"> | string
     barcode?: StringNullableFilter<"ProductVariant"> | string | null
     price?: FloatFilter<"ProductVariant"> | number
+    priceOnRequest?: BoolFilter<"ProductVariant"> | boolean
     compareAtPrice?: FloatNullableFilter<"ProductVariant"> | number | null
     cost?: FloatNullableFilter<"ProductVariant"> | number | null
     stock?: IntFilter<"ProductVariant"> | number
@@ -31724,6 +34428,7 @@ export namespace Prisma {
     product?: XOR<ProductRelationFilter, ProductWhereInput>
     cartItems?: CartItemListRelationFilter
     orderItems?: OrderItemListRelationFilter
+    stockMovements?: StockMovementListRelationFilter
   }, "id" | "sku">
 
   export type ProductVariantOrderByWithAggregationInput = {
@@ -31732,6 +34437,7 @@ export namespace Prisma {
     sku?: SortOrderInput | SortOrder
     barcode?: SortOrderInput | SortOrder
     price?: SortOrder
+    priceOnRequest?: SortOrder
     compareAtPrice?: SortOrderInput | SortOrder
     cost?: SortOrderInput | SortOrder
     stock?: SortOrder
@@ -31764,6 +34470,7 @@ export namespace Prisma {
     sku?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
     barcode?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
     price?: FloatWithAggregatesFilter<"ProductVariant"> | number
+    priceOnRequest?: BoolWithAggregatesFilter<"ProductVariant"> | boolean
     compareAtPrice?: FloatNullableWithAggregatesFilter<"ProductVariant"> | number | null
     cost?: FloatNullableWithAggregatesFilter<"ProductVariant"> | number | null
     stock?: IntWithAggregatesFilter<"ProductVariant"> | number
@@ -32155,11 +34862,16 @@ export namespace Prisma {
     paidAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     fulfilledAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     cancelledAt?: DateTimeNullableFilter<"Order"> | Date | string | null
+    idempotencyScopeHash?: StringNullableFilter<"Order"> | string | null
+    idempotencyKeyHash?: StringNullableFilter<"Order"> | string | null
+    requestFingerprint?: StringNullableFilter<"Order"> | string | null
+    correlationId?: StringNullableFilter<"Order"> | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
     items?: OrderItemListRelationFilter
     payments?: PaymentListRelationFilter
     events?: OrderEventListRelationFilter
+    stockMovements?: StockMovementListRelationFilter
     user?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }
 
@@ -32190,11 +34902,16 @@ export namespace Prisma {
     paidAt?: SortOrderInput | SortOrder
     fulfilledAt?: SortOrderInput | SortOrder
     cancelledAt?: SortOrderInput | SortOrder
+    idempotencyScopeHash?: SortOrderInput | SortOrder
+    idempotencyKeyHash?: SortOrderInput | SortOrder
+    requestFingerprint?: SortOrderInput | SortOrder
+    correlationId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     items?: OrderItemOrderByRelationAggregateInput
     payments?: PaymentOrderByRelationAggregateInput
     events?: OrderEventOrderByRelationAggregateInput
+    stockMovements?: StockMovementOrderByRelationAggregateInput
     user?: UserOrderByWithRelationInput
   }
 
@@ -32228,11 +34945,16 @@ export namespace Prisma {
     paidAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     fulfilledAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     cancelledAt?: DateTimeNullableFilter<"Order"> | Date | string | null
+    idempotencyScopeHash?: StringNullableFilter<"Order"> | string | null
+    idempotencyKeyHash?: StringNullableFilter<"Order"> | string | null
+    requestFingerprint?: StringNullableFilter<"Order"> | string | null
+    correlationId?: StringNullableFilter<"Order"> | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
     items?: OrderItemListRelationFilter
     payments?: PaymentListRelationFilter
     events?: OrderEventListRelationFilter
+    stockMovements?: StockMovementListRelationFilter
     user?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }, "id" | "number">
 
@@ -32263,6 +34985,10 @@ export namespace Prisma {
     paidAt?: SortOrderInput | SortOrder
     fulfilledAt?: SortOrderInput | SortOrder
     cancelledAt?: SortOrderInput | SortOrder
+    idempotencyScopeHash?: SortOrderInput | SortOrder
+    idempotencyKeyHash?: SortOrderInput | SortOrder
+    requestFingerprint?: SortOrderInput | SortOrder
+    correlationId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: OrderCountOrderByAggregateInput
@@ -32302,6 +35028,10 @@ export namespace Prisma {
     paidAt?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
     fulfilledAt?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
     cancelledAt?: DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+    idempotencyScopeHash?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    idempotencyKeyHash?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    requestFingerprint?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    correlationId?: StringNullableWithAggregatesFilter<"Order"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
   }
@@ -32523,8 +35253,16 @@ export namespace Prisma {
     data?: JsonNullableFilter<"OrderEvent">
     userId?: StringNullableFilter<"OrderEvent"> | string | null
     ipAddress?: StringNullableFilter<"OrderEvent"> | string | null
+    fromState?: StringNullableFilter<"OrderEvent"> | string | null
+    toState?: StringNullableFilter<"OrderEvent"> | string | null
+    actorUserId?: StringNullableFilter<"OrderEvent"> | string | null
+    isCustomerVisible?: BoolFilter<"OrderEvent"> | boolean
+    provider?: StringNullableFilter<"OrderEvent"> | string | null
+    providerEventId?: StringNullableFilter<"OrderEvent"> | string | null
+    correlationId?: StringNullableFilter<"OrderEvent"> | string | null
     createdAt?: DateTimeFilter<"OrderEvent"> | Date | string
     order?: XOR<OrderRelationFilter, OrderWhereInput>
+    actorUser?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }
 
   export type OrderEventOrderByWithRelationInput = {
@@ -32534,8 +35272,16 @@ export namespace Prisma {
     data?: SortOrderInput | SortOrder
     userId?: SortOrderInput | SortOrder
     ipAddress?: SortOrderInput | SortOrder
+    fromState?: SortOrderInput | SortOrder
+    toState?: SortOrderInput | SortOrder
+    actorUserId?: SortOrderInput | SortOrder
+    isCustomerVisible?: SortOrder
+    provider?: SortOrderInput | SortOrder
+    providerEventId?: SortOrderInput | SortOrder
+    correlationId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     order?: OrderOrderByWithRelationInput
+    actorUser?: UserOrderByWithRelationInput
   }
 
   export type OrderEventWhereUniqueInput = Prisma.AtLeast<{
@@ -32548,8 +35294,16 @@ export namespace Prisma {
     data?: JsonNullableFilter<"OrderEvent">
     userId?: StringNullableFilter<"OrderEvent"> | string | null
     ipAddress?: StringNullableFilter<"OrderEvent"> | string | null
+    fromState?: StringNullableFilter<"OrderEvent"> | string | null
+    toState?: StringNullableFilter<"OrderEvent"> | string | null
+    actorUserId?: StringNullableFilter<"OrderEvent"> | string | null
+    isCustomerVisible?: BoolFilter<"OrderEvent"> | boolean
+    provider?: StringNullableFilter<"OrderEvent"> | string | null
+    providerEventId?: StringNullableFilter<"OrderEvent"> | string | null
+    correlationId?: StringNullableFilter<"OrderEvent"> | string | null
     createdAt?: DateTimeFilter<"OrderEvent"> | Date | string
     order?: XOR<OrderRelationFilter, OrderWhereInput>
+    actorUser?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type OrderEventOrderByWithAggregationInput = {
@@ -32559,6 +35313,13 @@ export namespace Prisma {
     data?: SortOrderInput | SortOrder
     userId?: SortOrderInput | SortOrder
     ipAddress?: SortOrderInput | SortOrder
+    fromState?: SortOrderInput | SortOrder
+    toState?: SortOrderInput | SortOrder
+    actorUserId?: SortOrderInput | SortOrder
+    isCustomerVisible?: SortOrder
+    provider?: SortOrderInput | SortOrder
+    providerEventId?: SortOrderInput | SortOrder
+    correlationId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: OrderEventCountOrderByAggregateInput
     _max?: OrderEventMaxOrderByAggregateInput
@@ -32575,7 +35336,197 @@ export namespace Prisma {
     data?: JsonNullableWithAggregatesFilter<"OrderEvent">
     userId?: StringNullableWithAggregatesFilter<"OrderEvent"> | string | null
     ipAddress?: StringNullableWithAggregatesFilter<"OrderEvent"> | string | null
+    fromState?: StringNullableWithAggregatesFilter<"OrderEvent"> | string | null
+    toState?: StringNullableWithAggregatesFilter<"OrderEvent"> | string | null
+    actorUserId?: StringNullableWithAggregatesFilter<"OrderEvent"> | string | null
+    isCustomerVisible?: BoolWithAggregatesFilter<"OrderEvent"> | boolean
+    provider?: StringNullableWithAggregatesFilter<"OrderEvent"> | string | null
+    providerEventId?: StringNullableWithAggregatesFilter<"OrderEvent"> | string | null
+    correlationId?: StringNullableWithAggregatesFilter<"OrderEvent"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"OrderEvent"> | Date | string
+  }
+
+  export type StockMovementWhereInput = {
+    AND?: StockMovementWhereInput | StockMovementWhereInput[]
+    OR?: StockMovementWhereInput[]
+    NOT?: StockMovementWhereInput | StockMovementWhereInput[]
+    id?: StringFilter<"StockMovement"> | string
+    variantId?: StringNullableFilter<"StockMovement"> | string | null
+    variantIdSnapshot?: StringFilter<"StockMovement"> | string
+    skuSnapshot?: StringNullableFilter<"StockMovement"> | string | null
+    delta?: IntFilter<"StockMovement"> | number
+    reason?: StringFilter<"StockMovement"> | string
+    orderId?: StringNullableFilter<"StockMovement"> | string | null
+    actorUserId?: StringNullableFilter<"StockMovement"> | string | null
+    resultingBalance?: IntFilter<"StockMovement"> | number
+    correlationId?: StringNullableFilter<"StockMovement"> | string | null
+    metadata?: JsonNullableFilter<"StockMovement">
+    createdAt?: DateTimeFilter<"StockMovement"> | Date | string
+    variant?: XOR<ProductVariantNullableRelationFilter, ProductVariantWhereInput> | null
+    order?: XOR<OrderNullableRelationFilter, OrderWhereInput> | null
+    actorUser?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }
+
+  export type StockMovementOrderByWithRelationInput = {
+    id?: SortOrder
+    variantId?: SortOrderInput | SortOrder
+    variantIdSnapshot?: SortOrder
+    skuSnapshot?: SortOrderInput | SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    orderId?: SortOrderInput | SortOrder
+    actorUserId?: SortOrderInput | SortOrder
+    resultingBalance?: SortOrder
+    correlationId?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    variant?: ProductVariantOrderByWithRelationInput
+    order?: OrderOrderByWithRelationInput
+    actorUser?: UserOrderByWithRelationInput
+  }
+
+  export type StockMovementWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: StockMovementWhereInput | StockMovementWhereInput[]
+    OR?: StockMovementWhereInput[]
+    NOT?: StockMovementWhereInput | StockMovementWhereInput[]
+    variantId?: StringNullableFilter<"StockMovement"> | string | null
+    variantIdSnapshot?: StringFilter<"StockMovement"> | string
+    skuSnapshot?: StringNullableFilter<"StockMovement"> | string | null
+    delta?: IntFilter<"StockMovement"> | number
+    reason?: StringFilter<"StockMovement"> | string
+    orderId?: StringNullableFilter<"StockMovement"> | string | null
+    actorUserId?: StringNullableFilter<"StockMovement"> | string | null
+    resultingBalance?: IntFilter<"StockMovement"> | number
+    correlationId?: StringNullableFilter<"StockMovement"> | string | null
+    metadata?: JsonNullableFilter<"StockMovement">
+    createdAt?: DateTimeFilter<"StockMovement"> | Date | string
+    variant?: XOR<ProductVariantNullableRelationFilter, ProductVariantWhereInput> | null
+    order?: XOR<OrderNullableRelationFilter, OrderWhereInput> | null
+    actorUser?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }, "id">
+
+  export type StockMovementOrderByWithAggregationInput = {
+    id?: SortOrder
+    variantId?: SortOrderInput | SortOrder
+    variantIdSnapshot?: SortOrder
+    skuSnapshot?: SortOrderInput | SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    orderId?: SortOrderInput | SortOrder
+    actorUserId?: SortOrderInput | SortOrder
+    resultingBalance?: SortOrder
+    correlationId?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: StockMovementCountOrderByAggregateInput
+    _avg?: StockMovementAvgOrderByAggregateInput
+    _max?: StockMovementMaxOrderByAggregateInput
+    _min?: StockMovementMinOrderByAggregateInput
+    _sum?: StockMovementSumOrderByAggregateInput
+  }
+
+  export type StockMovementScalarWhereWithAggregatesInput = {
+    AND?: StockMovementScalarWhereWithAggregatesInput | StockMovementScalarWhereWithAggregatesInput[]
+    OR?: StockMovementScalarWhereWithAggregatesInput[]
+    NOT?: StockMovementScalarWhereWithAggregatesInput | StockMovementScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StockMovement"> | string
+    variantId?: StringNullableWithAggregatesFilter<"StockMovement"> | string | null
+    variantIdSnapshot?: StringWithAggregatesFilter<"StockMovement"> | string
+    skuSnapshot?: StringNullableWithAggregatesFilter<"StockMovement"> | string | null
+    delta?: IntWithAggregatesFilter<"StockMovement"> | number
+    reason?: StringWithAggregatesFilter<"StockMovement"> | string
+    orderId?: StringNullableWithAggregatesFilter<"StockMovement"> | string | null
+    actorUserId?: StringNullableWithAggregatesFilter<"StockMovement"> | string | null
+    resultingBalance?: IntWithAggregatesFilter<"StockMovement"> | number
+    correlationId?: StringNullableWithAggregatesFilter<"StockMovement"> | string | null
+    metadata?: JsonNullableWithAggregatesFilter<"StockMovement">
+    createdAt?: DateTimeWithAggregatesFilter<"StockMovement"> | Date | string
+  }
+
+  export type AuditLogWhereInput = {
+    AND?: AuditLogWhereInput | AuditLogWhereInput[]
+    OR?: AuditLogWhereInput[]
+    NOT?: AuditLogWhereInput | AuditLogWhereInput[]
+    id?: StringFilter<"AuditLog"> | string
+    actorUserId?: StringNullableFilter<"AuditLog"> | string | null
+    action?: StringFilter<"AuditLog"> | string
+    targetType?: StringFilter<"AuditLog"> | string
+    targetId?: StringNullableFilter<"AuditLog"> | string | null
+    beforeDiff?: JsonNullableFilter<"AuditLog">
+    afterDiff?: JsonNullableFilter<"AuditLog">
+    requestId?: StringNullableFilter<"AuditLog"> | string | null
+    correlationId?: StringNullableFilter<"AuditLog"> | string | null
+    context?: JsonNullableFilter<"AuditLog">
+    createdAt?: DateTimeFilter<"AuditLog"> | Date | string
+    actorUser?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }
+
+  export type AuditLogOrderByWithRelationInput = {
+    id?: SortOrder
+    actorUserId?: SortOrderInput | SortOrder
+    action?: SortOrder
+    targetType?: SortOrder
+    targetId?: SortOrderInput | SortOrder
+    beforeDiff?: SortOrderInput | SortOrder
+    afterDiff?: SortOrderInput | SortOrder
+    requestId?: SortOrderInput | SortOrder
+    correlationId?: SortOrderInput | SortOrder
+    context?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    actorUser?: UserOrderByWithRelationInput
+  }
+
+  export type AuditLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AuditLogWhereInput | AuditLogWhereInput[]
+    OR?: AuditLogWhereInput[]
+    NOT?: AuditLogWhereInput | AuditLogWhereInput[]
+    actorUserId?: StringNullableFilter<"AuditLog"> | string | null
+    action?: StringFilter<"AuditLog"> | string
+    targetType?: StringFilter<"AuditLog"> | string
+    targetId?: StringNullableFilter<"AuditLog"> | string | null
+    beforeDiff?: JsonNullableFilter<"AuditLog">
+    afterDiff?: JsonNullableFilter<"AuditLog">
+    requestId?: StringNullableFilter<"AuditLog"> | string | null
+    correlationId?: StringNullableFilter<"AuditLog"> | string | null
+    context?: JsonNullableFilter<"AuditLog">
+    createdAt?: DateTimeFilter<"AuditLog"> | Date | string
+    actorUser?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }, "id">
+
+  export type AuditLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    actorUserId?: SortOrderInput | SortOrder
+    action?: SortOrder
+    targetType?: SortOrder
+    targetId?: SortOrderInput | SortOrder
+    beforeDiff?: SortOrderInput | SortOrder
+    afterDiff?: SortOrderInput | SortOrder
+    requestId?: SortOrderInput | SortOrder
+    correlationId?: SortOrderInput | SortOrder
+    context?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: AuditLogCountOrderByAggregateInput
+    _max?: AuditLogMaxOrderByAggregateInput
+    _min?: AuditLogMinOrderByAggregateInput
+  }
+
+  export type AuditLogScalarWhereWithAggregatesInput = {
+    AND?: AuditLogScalarWhereWithAggregatesInput | AuditLogScalarWhereWithAggregatesInput[]
+    OR?: AuditLogScalarWhereWithAggregatesInput[]
+    NOT?: AuditLogScalarWhereWithAggregatesInput | AuditLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AuditLog"> | string
+    actorUserId?: StringNullableWithAggregatesFilter<"AuditLog"> | string | null
+    action?: StringWithAggregatesFilter<"AuditLog"> | string
+    targetType?: StringWithAggregatesFilter<"AuditLog"> | string
+    targetId?: StringNullableWithAggregatesFilter<"AuditLog"> | string | null
+    beforeDiff?: JsonNullableWithAggregatesFilter<"AuditLog">
+    afterDiff?: JsonNullableWithAggregatesFilter<"AuditLog">
+    requestId?: StringNullableWithAggregatesFilter<"AuditLog"> | string | null
+    correlationId?: StringNullableWithAggregatesFilter<"AuditLog"> | string | null
+    context?: JsonNullableWithAggregatesFilter<"AuditLog">
+    createdAt?: DateTimeWithAggregatesFilter<"AuditLog"> | Date | string
   }
 
   export type ProductReviewWhereInput = {
@@ -32853,6 +35804,9 @@ export namespace Prisma {
     carts?: CartCreateNestedManyWithoutUserInput
     orders?: OrderCreateNestedManyWithoutUserInput
     reviews?: ProductReviewCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventCreateNestedManyWithoutActorUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -32876,6 +35830,9 @@ export namespace Prisma {
     carts?: CartUncheckedCreateNestedManyWithoutUserInput
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
     reviews?: ProductReviewUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventUncheckedCreateNestedManyWithoutActorUserInput
   }
 
   export type UserUpdateInput = {
@@ -32899,6 +35856,9 @@ export namespace Prisma {
     carts?: CartUpdateManyWithoutUserNestedInput
     orders?: OrderUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUpdateManyWithoutActorUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -32922,6 +35882,9 @@ export namespace Prisma {
     carts?: CartUncheckedUpdateManyWithoutUserNestedInput
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUncheckedUpdateManyWithoutActorUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -33669,6 +36632,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33694,6 +36658,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33717,6 +36682,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33742,6 +36708,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33766,6 +36733,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33782,6 +36750,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33799,6 +36768,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33892,6 +36862,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -33912,6 +36883,7 @@ export namespace Prisma {
     product: ProductCreateNestedOneWithoutVariantsInput
     cartItems?: CartItemCreateNestedManyWithoutVariantInput
     orderItems?: OrderItemCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateInput = {
@@ -33920,6 +36892,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -33939,6 +36912,7 @@ export namespace Prisma {
     options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
     cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUpdateInput = {
@@ -33946,6 +36920,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -33966,6 +36941,7 @@ export namespace Prisma {
     product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
     cartItems?: CartItemUpdateManyWithoutVariantNestedInput
     orderItems?: OrderItemUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateInput = {
@@ -33974,6 +36950,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -33993,6 +36970,7 @@ export namespace Prisma {
     options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
     cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantCreateManyInput = {
@@ -34001,6 +36979,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -34024,6 +37003,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -34048,6 +37028,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -34437,11 +37418,16 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     events?: OrderEventCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementCreateNestedManyWithoutOrderInput
     user?: UserCreateNestedOneWithoutOrdersInput
   }
 
@@ -34472,11 +37458,16 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     events?: OrderEventUncheckedCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUpdateInput = {
@@ -34505,11 +37496,16 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     events?: OrderEventUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutOrderNestedInput
     user?: UserUpdateOneWithoutOrdersNestedInput
   }
 
@@ -34540,11 +37536,16 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     events?: OrderEventUncheckedUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderCreateManyInput = {
@@ -34574,6 +37575,10 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -34604,6 +37609,10 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34635,6 +37644,10 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34880,8 +37893,15 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: string | null
     ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     order: OrderCreateNestedOneWithoutEventsInput
+    actorUser?: UserCreateNestedOneWithoutActedOrderEventsInput
   }
 
   export type OrderEventUncheckedCreateInput = {
@@ -34891,6 +37911,13 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: string | null
     ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    actorUserId?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
   }
 
@@ -34900,8 +37927,15 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     order?: OrderUpdateOneRequiredWithoutEventsNestedInput
+    actorUser?: UserUpdateOneWithoutActedOrderEventsNestedInput
   }
 
   export type OrderEventUncheckedUpdateInput = {
@@ -34911,6 +37945,13 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -34921,6 +37962,13 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: string | null
     ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    actorUserId?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
   }
 
@@ -34930,6 +37978,12 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -34940,6 +37994,212 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockMovementCreateInput = {
+    id?: string
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    variant?: ProductVariantCreateNestedOneWithoutStockMovementsInput
+    order?: OrderCreateNestedOneWithoutStockMovementsInput
+    actorUser?: UserCreateNestedOneWithoutStockMovementsInput
+  }
+
+  export type StockMovementUncheckedCreateInput = {
+    id?: string
+    variantId?: string | null
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    orderId?: string | null
+    actorUserId?: string | null
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type StockMovementUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    variant?: ProductVariantUpdateOneWithoutStockMovementsNestedInput
+    order?: OrderUpdateOneWithoutStockMovementsNestedInput
+    actorUser?: UserUpdateOneWithoutStockMovementsNestedInput
+  }
+
+  export type StockMovementUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    orderId?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockMovementCreateManyInput = {
+    id?: string
+    variantId?: string | null
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    orderId?: string | null
+    actorUserId?: string | null
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type StockMovementUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockMovementUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    orderId?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditLogCreateInput = {
+    id?: string
+    action: string
+    targetType: string
+    targetId?: string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: string | null
+    correlationId?: string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    actorUser?: UserCreateNestedOneWithoutAuditLogsInput
+  }
+
+  export type AuditLogUncheckedCreateInput = {
+    id?: string
+    actorUserId?: string | null
+    action: string
+    targetType: string
+    targetId?: string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: string | null
+    correlationId?: string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AuditLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetType?: StringFieldUpdateOperationsInput | string
+    targetId?: NullableStringFieldUpdateOperationsInput | string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    actorUser?: UserUpdateOneWithoutAuditLogsNestedInput
+  }
+
+  export type AuditLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    targetType?: StringFieldUpdateOperationsInput | string
+    targetId?: NullableStringFieldUpdateOperationsInput | string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditLogCreateManyInput = {
+    id?: string
+    actorUserId?: string | null
+    action: string
+    targetType: string
+    targetId?: string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: string | null
+    correlationId?: string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AuditLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetType?: StringFieldUpdateOperationsInput | string
+    targetId?: NullableStringFieldUpdateOperationsInput | string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    targetType?: StringFieldUpdateOperationsInput | string
+    targetId?: NullableStringFieldUpdateOperationsInput | string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -35303,6 +38563,24 @@ export namespace Prisma {
     none?: ProductReviewWhereInput
   }
 
+  export type StockMovementListRelationFilter = {
+    every?: StockMovementWhereInput
+    some?: StockMovementWhereInput
+    none?: StockMovementWhereInput
+  }
+
+  export type AuditLogListRelationFilter = {
+    every?: AuditLogWhereInput
+    some?: AuditLogWhereInput
+    none?: AuditLogWhereInput
+  }
+
+  export type OrderEventListRelationFilter = {
+    every?: OrderEventWhereInput
+    some?: OrderEventWhereInput
+    none?: OrderEventWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -35321,6 +38599,18 @@ export namespace Prisma {
   }
 
   export type ProductReviewOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StockMovementOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AuditLogOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type OrderEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -36061,6 +39351,7 @@ export namespace Prisma {
     primaryCategoryId?: SortOrder
     attributeIds?: SortOrder
     discountPercent?: SortOrder
+    warrantyYears?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -36068,6 +39359,7 @@ export namespace Prisma {
 
   export type ProductAvgOrderByAggregateInput = {
     discountPercent?: SortOrder
+    warrantyYears?: SortOrder
   }
 
   export type ProductMaxOrderByAggregateInput = {
@@ -36079,6 +39371,7 @@ export namespace Prisma {
     publishedAt?: SortOrder
     primaryCategoryId?: SortOrder
     discountPercent?: SortOrder
+    warrantyYears?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -36093,6 +39386,7 @@ export namespace Prisma {
     publishedAt?: SortOrder
     primaryCategoryId?: SortOrder
     discountPercent?: SortOrder
+    warrantyYears?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -36100,6 +39394,7 @@ export namespace Prisma {
 
   export type ProductSumOrderByAggregateInput = {
     discountPercent?: SortOrder
+    warrantyYears?: SortOrder
   }
 
   export type ProductRelationFilter = {
@@ -36186,6 +39481,7 @@ export namespace Prisma {
     sku?: SortOrder
     barcode?: SortOrder
     price?: SortOrder
+    priceOnRequest?: SortOrder
     compareAtPrice?: SortOrder
     cost?: SortOrder
     stock?: SortOrder
@@ -36220,6 +39516,7 @@ export namespace Prisma {
     sku?: SortOrder
     barcode?: SortOrder
     price?: SortOrder
+    priceOnRequest?: SortOrder
     compareAtPrice?: SortOrder
     cost?: SortOrder
     stock?: SortOrder
@@ -36242,6 +39539,7 @@ export namespace Prisma {
     sku?: SortOrder
     barcode?: SortOrder
     price?: SortOrder
+    priceOnRequest?: SortOrder
     compareAtPrice?: SortOrder
     cost?: SortOrder
     stock?: SortOrder
@@ -36491,17 +39789,7 @@ export namespace Prisma {
     none?: PaymentWhereInput
   }
 
-  export type OrderEventListRelationFilter = {
-    every?: OrderEventWhereInput
-    some?: OrderEventWhereInput
-    none?: OrderEventWhereInput
-  }
-
   export type PaymentOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type OrderEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -36532,6 +39820,10 @@ export namespace Prisma {
     paidAt?: SortOrder
     fulfilledAt?: SortOrder
     cancelledAt?: SortOrder
+    idempotencyScopeHash?: SortOrder
+    idempotencyKeyHash?: SortOrder
+    requestFingerprint?: SortOrder
+    correlationId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36569,6 +39861,10 @@ export namespace Prisma {
     paidAt?: SortOrder
     fulfilledAt?: SortOrder
     cancelledAt?: SortOrder
+    idempotencyScopeHash?: SortOrder
+    idempotencyKeyHash?: SortOrder
+    requestFingerprint?: SortOrder
+    correlationId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36598,6 +39894,10 @@ export namespace Prisma {
     paidAt?: SortOrder
     fulfilledAt?: SortOrder
     cancelledAt?: SortOrder
+    idempotencyScopeHash?: SortOrder
+    idempotencyKeyHash?: SortOrder
+    requestFingerprint?: SortOrder
+    correlationId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36747,6 +40047,13 @@ export namespace Prisma {
     data?: SortOrder
     userId?: SortOrder
     ipAddress?: SortOrder
+    fromState?: SortOrder
+    toState?: SortOrder
+    actorUserId?: SortOrder
+    isCustomerVisible?: SortOrder
+    provider?: SortOrder
+    providerEventId?: SortOrder
+    correlationId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -36756,6 +40063,13 @@ export namespace Prisma {
     type?: SortOrder
     userId?: SortOrder
     ipAddress?: SortOrder
+    fromState?: SortOrder
+    toState?: SortOrder
+    actorUserId?: SortOrder
+    isCustomerVisible?: SortOrder
+    provider?: SortOrder
+    providerEventId?: SortOrder
+    correlationId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -36765,6 +40079,107 @@ export namespace Prisma {
     type?: SortOrder
     userId?: SortOrder
     ipAddress?: SortOrder
+    fromState?: SortOrder
+    toState?: SortOrder
+    actorUserId?: SortOrder
+    isCustomerVisible?: SortOrder
+    provider?: SortOrder
+    providerEventId?: SortOrder
+    correlationId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type OrderNullableRelationFilter = {
+    is?: OrderWhereInput | null
+    isNot?: OrderWhereInput | null
+  }
+
+  export type StockMovementCountOrderByAggregateInput = {
+    id?: SortOrder
+    variantId?: SortOrder
+    variantIdSnapshot?: SortOrder
+    skuSnapshot?: SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    orderId?: SortOrder
+    actorUserId?: SortOrder
+    resultingBalance?: SortOrder
+    correlationId?: SortOrder
+    metadata?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type StockMovementAvgOrderByAggregateInput = {
+    delta?: SortOrder
+    resultingBalance?: SortOrder
+  }
+
+  export type StockMovementMaxOrderByAggregateInput = {
+    id?: SortOrder
+    variantId?: SortOrder
+    variantIdSnapshot?: SortOrder
+    skuSnapshot?: SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    orderId?: SortOrder
+    actorUserId?: SortOrder
+    resultingBalance?: SortOrder
+    correlationId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type StockMovementMinOrderByAggregateInput = {
+    id?: SortOrder
+    variantId?: SortOrder
+    variantIdSnapshot?: SortOrder
+    skuSnapshot?: SortOrder
+    delta?: SortOrder
+    reason?: SortOrder
+    orderId?: SortOrder
+    actorUserId?: SortOrder
+    resultingBalance?: SortOrder
+    correlationId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type StockMovementSumOrderByAggregateInput = {
+    delta?: SortOrder
+    resultingBalance?: SortOrder
+  }
+
+  export type AuditLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    actorUserId?: SortOrder
+    action?: SortOrder
+    targetType?: SortOrder
+    targetId?: SortOrder
+    beforeDiff?: SortOrder
+    afterDiff?: SortOrder
+    requestId?: SortOrder
+    correlationId?: SortOrder
+    context?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuditLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    actorUserId?: SortOrder
+    action?: SortOrder
+    targetType?: SortOrder
+    targetId?: SortOrder
+    requestId?: SortOrder
+    correlationId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuditLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    actorUserId?: SortOrder
+    action?: SortOrder
+    targetType?: SortOrder
+    targetId?: SortOrder
+    requestId?: SortOrder
+    correlationId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -36983,6 +40398,27 @@ export namespace Prisma {
     connect?: ProductReviewWhereUniqueInput | ProductReviewWhereUniqueInput[]
   }
 
+  export type StockMovementCreateNestedManyWithoutActorUserInput = {
+    create?: XOR<StockMovementCreateWithoutActorUserInput, StockMovementUncheckedCreateWithoutActorUserInput> | StockMovementCreateWithoutActorUserInput[] | StockMovementUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutActorUserInput | StockMovementCreateOrConnectWithoutActorUserInput[]
+    createMany?: StockMovementCreateManyActorUserInputEnvelope
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+  }
+
+  export type AuditLogCreateNestedManyWithoutActorUserInput = {
+    create?: XOR<AuditLogCreateWithoutActorUserInput, AuditLogUncheckedCreateWithoutActorUserInput> | AuditLogCreateWithoutActorUserInput[] | AuditLogUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: AuditLogCreateOrConnectWithoutActorUserInput | AuditLogCreateOrConnectWithoutActorUserInput[]
+    createMany?: AuditLogCreateManyActorUserInputEnvelope
+    connect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+  }
+
+  export type OrderEventCreateNestedManyWithoutActorUserInput = {
+    create?: XOR<OrderEventCreateWithoutActorUserInput, OrderEventUncheckedCreateWithoutActorUserInput> | OrderEventCreateWithoutActorUserInput[] | OrderEventUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: OrderEventCreateOrConnectWithoutActorUserInput | OrderEventCreateOrConnectWithoutActorUserInput[]
+    createMany?: OrderEventCreateManyActorUserInputEnvelope
+    connect?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+  }
+
   export type AddressUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AddressCreateWithoutUserInput, AddressUncheckedCreateWithoutUserInput> | AddressCreateWithoutUserInput[] | AddressUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AddressCreateOrConnectWithoutUserInput | AddressCreateOrConnectWithoutUserInput[]
@@ -37009,6 +40445,27 @@ export namespace Prisma {
     connectOrCreate?: ProductReviewCreateOrConnectWithoutUserInput | ProductReviewCreateOrConnectWithoutUserInput[]
     createMany?: ProductReviewCreateManyUserInputEnvelope
     connect?: ProductReviewWhereUniqueInput | ProductReviewWhereUniqueInput[]
+  }
+
+  export type StockMovementUncheckedCreateNestedManyWithoutActorUserInput = {
+    create?: XOR<StockMovementCreateWithoutActorUserInput, StockMovementUncheckedCreateWithoutActorUserInput> | StockMovementCreateWithoutActorUserInput[] | StockMovementUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutActorUserInput | StockMovementCreateOrConnectWithoutActorUserInput[]
+    createMany?: StockMovementCreateManyActorUserInputEnvelope
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+  }
+
+  export type AuditLogUncheckedCreateNestedManyWithoutActorUserInput = {
+    create?: XOR<AuditLogCreateWithoutActorUserInput, AuditLogUncheckedCreateWithoutActorUserInput> | AuditLogCreateWithoutActorUserInput[] | AuditLogUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: AuditLogCreateOrConnectWithoutActorUserInput | AuditLogCreateOrConnectWithoutActorUserInput[]
+    createMany?: AuditLogCreateManyActorUserInputEnvelope
+    connect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+  }
+
+  export type OrderEventUncheckedCreateNestedManyWithoutActorUserInput = {
+    create?: XOR<OrderEventCreateWithoutActorUserInput, OrderEventUncheckedCreateWithoutActorUserInput> | OrderEventCreateWithoutActorUserInput[] | OrderEventUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: OrderEventCreateOrConnectWithoutActorUserInput | OrderEventCreateOrConnectWithoutActorUserInput[]
+    createMany?: OrderEventCreateManyActorUserInputEnvelope
+    connect?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -37092,6 +40549,48 @@ export namespace Prisma {
     deleteMany?: ProductReviewScalarWhereInput | ProductReviewScalarWhereInput[]
   }
 
+  export type StockMovementUpdateManyWithoutActorUserNestedInput = {
+    create?: XOR<StockMovementCreateWithoutActorUserInput, StockMovementUncheckedCreateWithoutActorUserInput> | StockMovementCreateWithoutActorUserInput[] | StockMovementUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutActorUserInput | StockMovementCreateOrConnectWithoutActorUserInput[]
+    upsert?: StockMovementUpsertWithWhereUniqueWithoutActorUserInput | StockMovementUpsertWithWhereUniqueWithoutActorUserInput[]
+    createMany?: StockMovementCreateManyActorUserInputEnvelope
+    set?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    disconnect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    delete?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    update?: StockMovementUpdateWithWhereUniqueWithoutActorUserInput | StockMovementUpdateWithWhereUniqueWithoutActorUserInput[]
+    updateMany?: StockMovementUpdateManyWithWhereWithoutActorUserInput | StockMovementUpdateManyWithWhereWithoutActorUserInput[]
+    deleteMany?: StockMovementScalarWhereInput | StockMovementScalarWhereInput[]
+  }
+
+  export type AuditLogUpdateManyWithoutActorUserNestedInput = {
+    create?: XOR<AuditLogCreateWithoutActorUserInput, AuditLogUncheckedCreateWithoutActorUserInput> | AuditLogCreateWithoutActorUserInput[] | AuditLogUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: AuditLogCreateOrConnectWithoutActorUserInput | AuditLogCreateOrConnectWithoutActorUserInput[]
+    upsert?: AuditLogUpsertWithWhereUniqueWithoutActorUserInput | AuditLogUpsertWithWhereUniqueWithoutActorUserInput[]
+    createMany?: AuditLogCreateManyActorUserInputEnvelope
+    set?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+    disconnect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+    delete?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+    connect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+    update?: AuditLogUpdateWithWhereUniqueWithoutActorUserInput | AuditLogUpdateWithWhereUniqueWithoutActorUserInput[]
+    updateMany?: AuditLogUpdateManyWithWhereWithoutActorUserInput | AuditLogUpdateManyWithWhereWithoutActorUserInput[]
+    deleteMany?: AuditLogScalarWhereInput | AuditLogScalarWhereInput[]
+  }
+
+  export type OrderEventUpdateManyWithoutActorUserNestedInput = {
+    create?: XOR<OrderEventCreateWithoutActorUserInput, OrderEventUncheckedCreateWithoutActorUserInput> | OrderEventCreateWithoutActorUserInput[] | OrderEventUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: OrderEventCreateOrConnectWithoutActorUserInput | OrderEventCreateOrConnectWithoutActorUserInput[]
+    upsert?: OrderEventUpsertWithWhereUniqueWithoutActorUserInput | OrderEventUpsertWithWhereUniqueWithoutActorUserInput[]
+    createMany?: OrderEventCreateManyActorUserInputEnvelope
+    set?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+    disconnect?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+    delete?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+    connect?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+    update?: OrderEventUpdateWithWhereUniqueWithoutActorUserInput | OrderEventUpdateWithWhereUniqueWithoutActorUserInput[]
+    updateMany?: OrderEventUpdateManyWithWhereWithoutActorUserInput | OrderEventUpdateManyWithWhereWithoutActorUserInput[]
+    deleteMany?: OrderEventScalarWhereInput | OrderEventScalarWhereInput[]
+  }
+
   export type AddressUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AddressCreateWithoutUserInput, AddressUncheckedCreateWithoutUserInput> | AddressCreateWithoutUserInput[] | AddressUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AddressCreateOrConnectWithoutUserInput | AddressCreateOrConnectWithoutUserInput[]
@@ -37146,6 +40645,48 @@ export namespace Prisma {
     update?: ProductReviewUpdateWithWhereUniqueWithoutUserInput | ProductReviewUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ProductReviewUpdateManyWithWhereWithoutUserInput | ProductReviewUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ProductReviewScalarWhereInput | ProductReviewScalarWhereInput[]
+  }
+
+  export type StockMovementUncheckedUpdateManyWithoutActorUserNestedInput = {
+    create?: XOR<StockMovementCreateWithoutActorUserInput, StockMovementUncheckedCreateWithoutActorUserInput> | StockMovementCreateWithoutActorUserInput[] | StockMovementUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutActorUserInput | StockMovementCreateOrConnectWithoutActorUserInput[]
+    upsert?: StockMovementUpsertWithWhereUniqueWithoutActorUserInput | StockMovementUpsertWithWhereUniqueWithoutActorUserInput[]
+    createMany?: StockMovementCreateManyActorUserInputEnvelope
+    set?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    disconnect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    delete?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    update?: StockMovementUpdateWithWhereUniqueWithoutActorUserInput | StockMovementUpdateWithWhereUniqueWithoutActorUserInput[]
+    updateMany?: StockMovementUpdateManyWithWhereWithoutActorUserInput | StockMovementUpdateManyWithWhereWithoutActorUserInput[]
+    deleteMany?: StockMovementScalarWhereInput | StockMovementScalarWhereInput[]
+  }
+
+  export type AuditLogUncheckedUpdateManyWithoutActorUserNestedInput = {
+    create?: XOR<AuditLogCreateWithoutActorUserInput, AuditLogUncheckedCreateWithoutActorUserInput> | AuditLogCreateWithoutActorUserInput[] | AuditLogUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: AuditLogCreateOrConnectWithoutActorUserInput | AuditLogCreateOrConnectWithoutActorUserInput[]
+    upsert?: AuditLogUpsertWithWhereUniqueWithoutActorUserInput | AuditLogUpsertWithWhereUniqueWithoutActorUserInput[]
+    createMany?: AuditLogCreateManyActorUserInputEnvelope
+    set?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+    disconnect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+    delete?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+    connect?: AuditLogWhereUniqueInput | AuditLogWhereUniqueInput[]
+    update?: AuditLogUpdateWithWhereUniqueWithoutActorUserInput | AuditLogUpdateWithWhereUniqueWithoutActorUserInput[]
+    updateMany?: AuditLogUpdateManyWithWhereWithoutActorUserInput | AuditLogUpdateManyWithWhereWithoutActorUserInput[]
+    deleteMany?: AuditLogScalarWhereInput | AuditLogScalarWhereInput[]
+  }
+
+  export type OrderEventUncheckedUpdateManyWithoutActorUserNestedInput = {
+    create?: XOR<OrderEventCreateWithoutActorUserInput, OrderEventUncheckedCreateWithoutActorUserInput> | OrderEventCreateWithoutActorUserInput[] | OrderEventUncheckedCreateWithoutActorUserInput[]
+    connectOrCreate?: OrderEventCreateOrConnectWithoutActorUserInput | OrderEventCreateOrConnectWithoutActorUserInput[]
+    upsert?: OrderEventUpsertWithWhereUniqueWithoutActorUserInput | OrderEventUpsertWithWhereUniqueWithoutActorUserInput[]
+    createMany?: OrderEventCreateManyActorUserInputEnvelope
+    set?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+    disconnect?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+    delete?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+    connect?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+    update?: OrderEventUpdateWithWhereUniqueWithoutActorUserInput | OrderEventUpdateWithWhereUniqueWithoutActorUserInput[]
+    updateMany?: OrderEventUpdateManyWithWhereWithoutActorUserInput | OrderEventUpdateManyWithWhereWithoutActorUserInput[]
+    deleteMany?: OrderEventScalarWhereInput | OrderEventScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutAddressesInput = {
@@ -38067,6 +41608,13 @@ export namespace Prisma {
     connect?: OrderItemWhereUniqueInput | OrderItemWhereUniqueInput[]
   }
 
+  export type StockMovementCreateNestedManyWithoutVariantInput = {
+    create?: XOR<StockMovementCreateWithoutVariantInput, StockMovementUncheckedCreateWithoutVariantInput> | StockMovementCreateWithoutVariantInput[] | StockMovementUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutVariantInput | StockMovementCreateOrConnectWithoutVariantInput[]
+    createMany?: StockMovementCreateManyVariantInputEnvelope
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+  }
+
   export type ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput = {
     create?: XOR<ProductVariantOptionCreateWithoutVariantInput, ProductVariantOptionUncheckedCreateWithoutVariantInput> | ProductVariantOptionCreateWithoutVariantInput[] | ProductVariantOptionUncheckedCreateWithoutVariantInput[]
     connectOrCreate?: ProductVariantOptionCreateOrConnectWithoutVariantInput | ProductVariantOptionCreateOrConnectWithoutVariantInput[]
@@ -38086,6 +41634,13 @@ export namespace Prisma {
     connectOrCreate?: OrderItemCreateOrConnectWithoutVariantInput | OrderItemCreateOrConnectWithoutVariantInput[]
     createMany?: OrderItemCreateManyVariantInputEnvelope
     connect?: OrderItemWhereUniqueInput | OrderItemWhereUniqueInput[]
+  }
+
+  export type StockMovementUncheckedCreateNestedManyWithoutVariantInput = {
+    create?: XOR<StockMovementCreateWithoutVariantInput, StockMovementUncheckedCreateWithoutVariantInput> | StockMovementCreateWithoutVariantInput[] | StockMovementUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutVariantInput | StockMovementCreateOrConnectWithoutVariantInput[]
+    createMany?: StockMovementCreateManyVariantInputEnvelope
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -38159,6 +41714,20 @@ export namespace Prisma {
     deleteMany?: OrderItemScalarWhereInput | OrderItemScalarWhereInput[]
   }
 
+  export type StockMovementUpdateManyWithoutVariantNestedInput = {
+    create?: XOR<StockMovementCreateWithoutVariantInput, StockMovementUncheckedCreateWithoutVariantInput> | StockMovementCreateWithoutVariantInput[] | StockMovementUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutVariantInput | StockMovementCreateOrConnectWithoutVariantInput[]
+    upsert?: StockMovementUpsertWithWhereUniqueWithoutVariantInput | StockMovementUpsertWithWhereUniqueWithoutVariantInput[]
+    createMany?: StockMovementCreateManyVariantInputEnvelope
+    set?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    disconnect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    delete?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    update?: StockMovementUpdateWithWhereUniqueWithoutVariantInput | StockMovementUpdateWithWhereUniqueWithoutVariantInput[]
+    updateMany?: StockMovementUpdateManyWithWhereWithoutVariantInput | StockMovementUpdateManyWithWhereWithoutVariantInput[]
+    deleteMany?: StockMovementScalarWhereInput | StockMovementScalarWhereInput[]
+  }
+
   export type ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput = {
     create?: XOR<ProductVariantOptionCreateWithoutVariantInput, ProductVariantOptionUncheckedCreateWithoutVariantInput> | ProductVariantOptionCreateWithoutVariantInput[] | ProductVariantOptionUncheckedCreateWithoutVariantInput[]
     connectOrCreate?: ProductVariantOptionCreateOrConnectWithoutVariantInput | ProductVariantOptionCreateOrConnectWithoutVariantInput[]
@@ -38199,6 +41768,20 @@ export namespace Prisma {
     update?: OrderItemUpdateWithWhereUniqueWithoutVariantInput | OrderItemUpdateWithWhereUniqueWithoutVariantInput[]
     updateMany?: OrderItemUpdateManyWithWhereWithoutVariantInput | OrderItemUpdateManyWithWhereWithoutVariantInput[]
     deleteMany?: OrderItemScalarWhereInput | OrderItemScalarWhereInput[]
+  }
+
+  export type StockMovementUncheckedUpdateManyWithoutVariantNestedInput = {
+    create?: XOR<StockMovementCreateWithoutVariantInput, StockMovementUncheckedCreateWithoutVariantInput> | StockMovementCreateWithoutVariantInput[] | StockMovementUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutVariantInput | StockMovementCreateOrConnectWithoutVariantInput[]
+    upsert?: StockMovementUpsertWithWhereUniqueWithoutVariantInput | StockMovementUpsertWithWhereUniqueWithoutVariantInput[]
+    createMany?: StockMovementCreateManyVariantInputEnvelope
+    set?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    disconnect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    delete?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    update?: StockMovementUpdateWithWhereUniqueWithoutVariantInput | StockMovementUpdateWithWhereUniqueWithoutVariantInput[]
+    updateMany?: StockMovementUpdateManyWithWhereWithoutVariantInput | StockMovementUpdateManyWithWhereWithoutVariantInput[]
+    deleteMany?: StockMovementScalarWhereInput | StockMovementScalarWhereInput[]
   }
 
   export type ProductVariantCreateNestedOneWithoutOptionsInput = {
@@ -38394,6 +41977,13 @@ export namespace Prisma {
     connect?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
   }
 
+  export type StockMovementCreateNestedManyWithoutOrderInput = {
+    create?: XOR<StockMovementCreateWithoutOrderInput, StockMovementUncheckedCreateWithoutOrderInput> | StockMovementCreateWithoutOrderInput[] | StockMovementUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutOrderInput | StockMovementCreateOrConnectWithoutOrderInput[]
+    createMany?: StockMovementCreateManyOrderInputEnvelope
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+  }
+
   export type UserCreateNestedOneWithoutOrdersInput = {
     create?: XOR<UserCreateWithoutOrdersInput, UserUncheckedCreateWithoutOrdersInput>
     connectOrCreate?: UserCreateOrConnectWithoutOrdersInput
@@ -38419,6 +42009,13 @@ export namespace Prisma {
     connectOrCreate?: OrderEventCreateOrConnectWithoutOrderInput | OrderEventCreateOrConnectWithoutOrderInput[]
     createMany?: OrderEventCreateManyOrderInputEnvelope
     connect?: OrderEventWhereUniqueInput | OrderEventWhereUniqueInput[]
+  }
+
+  export type StockMovementUncheckedCreateNestedManyWithoutOrderInput = {
+    create?: XOR<StockMovementCreateWithoutOrderInput, StockMovementUncheckedCreateWithoutOrderInput> | StockMovementCreateWithoutOrderInput[] | StockMovementUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutOrderInput | StockMovementCreateOrConnectWithoutOrderInput[]
+    createMany?: StockMovementCreateManyOrderInputEnvelope
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
   }
 
   export type OrderItemUpdateManyWithoutOrderNestedInput = {
@@ -38461,6 +42058,20 @@ export namespace Prisma {
     update?: OrderEventUpdateWithWhereUniqueWithoutOrderInput | OrderEventUpdateWithWhereUniqueWithoutOrderInput[]
     updateMany?: OrderEventUpdateManyWithWhereWithoutOrderInput | OrderEventUpdateManyWithWhereWithoutOrderInput[]
     deleteMany?: OrderEventScalarWhereInput | OrderEventScalarWhereInput[]
+  }
+
+  export type StockMovementUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<StockMovementCreateWithoutOrderInput, StockMovementUncheckedCreateWithoutOrderInput> | StockMovementCreateWithoutOrderInput[] | StockMovementUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutOrderInput | StockMovementCreateOrConnectWithoutOrderInput[]
+    upsert?: StockMovementUpsertWithWhereUniqueWithoutOrderInput | StockMovementUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: StockMovementCreateManyOrderInputEnvelope
+    set?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    disconnect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    delete?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    update?: StockMovementUpdateWithWhereUniqueWithoutOrderInput | StockMovementUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: StockMovementUpdateManyWithWhereWithoutOrderInput | StockMovementUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: StockMovementScalarWhereInput | StockMovementScalarWhereInput[]
   }
 
   export type UserUpdateOneWithoutOrdersNestedInput = {
@@ -38515,6 +42126,20 @@ export namespace Prisma {
     deleteMany?: OrderEventScalarWhereInput | OrderEventScalarWhereInput[]
   }
 
+  export type StockMovementUncheckedUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<StockMovementCreateWithoutOrderInput, StockMovementUncheckedCreateWithoutOrderInput> | StockMovementCreateWithoutOrderInput[] | StockMovementUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: StockMovementCreateOrConnectWithoutOrderInput | StockMovementCreateOrConnectWithoutOrderInput[]
+    upsert?: StockMovementUpsertWithWhereUniqueWithoutOrderInput | StockMovementUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: StockMovementCreateManyOrderInputEnvelope
+    set?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    disconnect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    delete?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    connect?: StockMovementWhereUniqueInput | StockMovementWhereUniqueInput[]
+    update?: StockMovementUpdateWithWhereUniqueWithoutOrderInput | StockMovementUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: StockMovementUpdateManyWithWhereWithoutOrderInput | StockMovementUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: StockMovementScalarWhereInput | StockMovementScalarWhereInput[]
+  }
+
   export type OrderCreateNestedOneWithoutItemsInput = {
     create?: XOR<OrderCreateWithoutItemsInput, OrderUncheckedCreateWithoutItemsInput>
     connectOrCreate?: OrderCreateOrConnectWithoutItemsInput
@@ -38565,12 +42190,92 @@ export namespace Prisma {
     connect?: OrderWhereUniqueInput
   }
 
+  export type UserCreateNestedOneWithoutActedOrderEventsInput = {
+    create?: XOR<UserCreateWithoutActedOrderEventsInput, UserUncheckedCreateWithoutActedOrderEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActedOrderEventsInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type OrderUpdateOneRequiredWithoutEventsNestedInput = {
     create?: XOR<OrderCreateWithoutEventsInput, OrderUncheckedCreateWithoutEventsInput>
     connectOrCreate?: OrderCreateOrConnectWithoutEventsInput
     upsert?: OrderUpsertWithoutEventsInput
     connect?: OrderWhereUniqueInput
     update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutEventsInput, OrderUpdateWithoutEventsInput>, OrderUncheckedUpdateWithoutEventsInput>
+  }
+
+  export type UserUpdateOneWithoutActedOrderEventsNestedInput = {
+    create?: XOR<UserCreateWithoutActedOrderEventsInput, UserUncheckedCreateWithoutActedOrderEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActedOrderEventsInput
+    upsert?: UserUpsertWithoutActedOrderEventsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActedOrderEventsInput, UserUpdateWithoutActedOrderEventsInput>, UserUncheckedUpdateWithoutActedOrderEventsInput>
+  }
+
+  export type ProductVariantCreateNestedOneWithoutStockMovementsInput = {
+    create?: XOR<ProductVariantCreateWithoutStockMovementsInput, ProductVariantUncheckedCreateWithoutStockMovementsInput>
+    connectOrCreate?: ProductVariantCreateOrConnectWithoutStockMovementsInput
+    connect?: ProductVariantWhereUniqueInput
+  }
+
+  export type OrderCreateNestedOneWithoutStockMovementsInput = {
+    create?: XOR<OrderCreateWithoutStockMovementsInput, OrderUncheckedCreateWithoutStockMovementsInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutStockMovementsInput
+    connect?: OrderWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutStockMovementsInput = {
+    create?: XOR<UserCreateWithoutStockMovementsInput, UserUncheckedCreateWithoutStockMovementsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStockMovementsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ProductVariantUpdateOneWithoutStockMovementsNestedInput = {
+    create?: XOR<ProductVariantCreateWithoutStockMovementsInput, ProductVariantUncheckedCreateWithoutStockMovementsInput>
+    connectOrCreate?: ProductVariantCreateOrConnectWithoutStockMovementsInput
+    upsert?: ProductVariantUpsertWithoutStockMovementsInput
+    disconnect?: ProductVariantWhereInput | boolean
+    delete?: ProductVariantWhereInput | boolean
+    connect?: ProductVariantWhereUniqueInput
+    update?: XOR<XOR<ProductVariantUpdateToOneWithWhereWithoutStockMovementsInput, ProductVariantUpdateWithoutStockMovementsInput>, ProductVariantUncheckedUpdateWithoutStockMovementsInput>
+  }
+
+  export type OrderUpdateOneWithoutStockMovementsNestedInput = {
+    create?: XOR<OrderCreateWithoutStockMovementsInput, OrderUncheckedCreateWithoutStockMovementsInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutStockMovementsInput
+    upsert?: OrderUpsertWithoutStockMovementsInput
+    disconnect?: OrderWhereInput | boolean
+    delete?: OrderWhereInput | boolean
+    connect?: OrderWhereUniqueInput
+    update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutStockMovementsInput, OrderUpdateWithoutStockMovementsInput>, OrderUncheckedUpdateWithoutStockMovementsInput>
+  }
+
+  export type UserUpdateOneWithoutStockMovementsNestedInput = {
+    create?: XOR<UserCreateWithoutStockMovementsInput, UserUncheckedCreateWithoutStockMovementsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStockMovementsInput
+    upsert?: UserUpsertWithoutStockMovementsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStockMovementsInput, UserUpdateWithoutStockMovementsInput>, UserUncheckedUpdateWithoutStockMovementsInput>
+  }
+
+  export type UserCreateNestedOneWithoutAuditLogsInput = {
+    create?: XOR<UserCreateWithoutAuditLogsInput, UserUncheckedCreateWithoutAuditLogsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAuditLogsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneWithoutAuditLogsNestedInput = {
+    create?: XOR<UserCreateWithoutAuditLogsInput, UserUncheckedCreateWithoutAuditLogsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAuditLogsInput
+    upsert?: UserUpsertWithoutAuditLogsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAuditLogsInput, UserUpdateWithoutAuditLogsInput>, UserUncheckedUpdateWithoutAuditLogsInput>
   }
 
   export type ProductCreateNestedOneWithoutReviewsInput = {
@@ -38980,11 +42685,16 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
     events?: OrderEventCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutUserInput = {
@@ -39013,11 +42723,16 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     events?: OrderEventUncheckedCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutUserInput = {
@@ -39057,6 +42772,122 @@ export namespace Prisma {
 
   export type ProductReviewCreateManyUserInputEnvelope = {
     data: ProductReviewCreateManyUserInput | ProductReviewCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StockMovementCreateWithoutActorUserInput = {
+    id?: string
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    variant?: ProductVariantCreateNestedOneWithoutStockMovementsInput
+    order?: OrderCreateNestedOneWithoutStockMovementsInput
+  }
+
+  export type StockMovementUncheckedCreateWithoutActorUserInput = {
+    id?: string
+    variantId?: string | null
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    orderId?: string | null
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type StockMovementCreateOrConnectWithoutActorUserInput = {
+    where: StockMovementWhereUniqueInput
+    create: XOR<StockMovementCreateWithoutActorUserInput, StockMovementUncheckedCreateWithoutActorUserInput>
+  }
+
+  export type StockMovementCreateManyActorUserInputEnvelope = {
+    data: StockMovementCreateManyActorUserInput | StockMovementCreateManyActorUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AuditLogCreateWithoutActorUserInput = {
+    id?: string
+    action: string
+    targetType: string
+    targetId?: string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: string | null
+    correlationId?: string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AuditLogUncheckedCreateWithoutActorUserInput = {
+    id?: string
+    action: string
+    targetType: string
+    targetId?: string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: string | null
+    correlationId?: string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AuditLogCreateOrConnectWithoutActorUserInput = {
+    where: AuditLogWhereUniqueInput
+    create: XOR<AuditLogCreateWithoutActorUserInput, AuditLogUncheckedCreateWithoutActorUserInput>
+  }
+
+  export type AuditLogCreateManyActorUserInputEnvelope = {
+    data: AuditLogCreateManyActorUserInput | AuditLogCreateManyActorUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrderEventCreateWithoutActorUserInput = {
+    id?: string
+    type: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
+    createdAt?: Date | string
+    order: OrderCreateNestedOneWithoutEventsInput
+  }
+
+  export type OrderEventUncheckedCreateWithoutActorUserInput = {
+    id?: string
+    orderId: string
+    type: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type OrderEventCreateOrConnectWithoutActorUserInput = {
+    where: OrderEventWhereUniqueInput
+    create: XOR<OrderEventCreateWithoutActorUserInput, OrderEventUncheckedCreateWithoutActorUserInput>
+  }
+
+  export type OrderEventCreateManyActorUserInputEnvelope = {
+    data: OrderEventCreateManyActorUserInput | OrderEventCreateManyActorUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -39173,6 +43004,10 @@ export namespace Prisma {
     paidAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     fulfilledAt?: DateTimeNullableFilter<"Order"> | Date | string | null
     cancelledAt?: DateTimeNullableFilter<"Order"> | Date | string | null
+    idempotencyScopeHash?: StringNullableFilter<"Order"> | string | null
+    idempotencyKeyHash?: StringNullableFilter<"Order"> | string | null
+    requestFingerprint?: StringNullableFilter<"Order"> | string | null
+    correlationId?: StringNullableFilter<"Order"> | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
   }
@@ -39207,6 +43042,109 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ProductReview"> | Date | string
   }
 
+  export type StockMovementUpsertWithWhereUniqueWithoutActorUserInput = {
+    where: StockMovementWhereUniqueInput
+    update: XOR<StockMovementUpdateWithoutActorUserInput, StockMovementUncheckedUpdateWithoutActorUserInput>
+    create: XOR<StockMovementCreateWithoutActorUserInput, StockMovementUncheckedCreateWithoutActorUserInput>
+  }
+
+  export type StockMovementUpdateWithWhereUniqueWithoutActorUserInput = {
+    where: StockMovementWhereUniqueInput
+    data: XOR<StockMovementUpdateWithoutActorUserInput, StockMovementUncheckedUpdateWithoutActorUserInput>
+  }
+
+  export type StockMovementUpdateManyWithWhereWithoutActorUserInput = {
+    where: StockMovementScalarWhereInput
+    data: XOR<StockMovementUpdateManyMutationInput, StockMovementUncheckedUpdateManyWithoutActorUserInput>
+  }
+
+  export type StockMovementScalarWhereInput = {
+    AND?: StockMovementScalarWhereInput | StockMovementScalarWhereInput[]
+    OR?: StockMovementScalarWhereInput[]
+    NOT?: StockMovementScalarWhereInput | StockMovementScalarWhereInput[]
+    id?: StringFilter<"StockMovement"> | string
+    variantId?: StringNullableFilter<"StockMovement"> | string | null
+    variantIdSnapshot?: StringFilter<"StockMovement"> | string
+    skuSnapshot?: StringNullableFilter<"StockMovement"> | string | null
+    delta?: IntFilter<"StockMovement"> | number
+    reason?: StringFilter<"StockMovement"> | string
+    orderId?: StringNullableFilter<"StockMovement"> | string | null
+    actorUserId?: StringNullableFilter<"StockMovement"> | string | null
+    resultingBalance?: IntFilter<"StockMovement"> | number
+    correlationId?: StringNullableFilter<"StockMovement"> | string | null
+    metadata?: JsonNullableFilter<"StockMovement">
+    createdAt?: DateTimeFilter<"StockMovement"> | Date | string
+  }
+
+  export type AuditLogUpsertWithWhereUniqueWithoutActorUserInput = {
+    where: AuditLogWhereUniqueInput
+    update: XOR<AuditLogUpdateWithoutActorUserInput, AuditLogUncheckedUpdateWithoutActorUserInput>
+    create: XOR<AuditLogCreateWithoutActorUserInput, AuditLogUncheckedCreateWithoutActorUserInput>
+  }
+
+  export type AuditLogUpdateWithWhereUniqueWithoutActorUserInput = {
+    where: AuditLogWhereUniqueInput
+    data: XOR<AuditLogUpdateWithoutActorUserInput, AuditLogUncheckedUpdateWithoutActorUserInput>
+  }
+
+  export type AuditLogUpdateManyWithWhereWithoutActorUserInput = {
+    where: AuditLogScalarWhereInput
+    data: XOR<AuditLogUpdateManyMutationInput, AuditLogUncheckedUpdateManyWithoutActorUserInput>
+  }
+
+  export type AuditLogScalarWhereInput = {
+    AND?: AuditLogScalarWhereInput | AuditLogScalarWhereInput[]
+    OR?: AuditLogScalarWhereInput[]
+    NOT?: AuditLogScalarWhereInput | AuditLogScalarWhereInput[]
+    id?: StringFilter<"AuditLog"> | string
+    actorUserId?: StringNullableFilter<"AuditLog"> | string | null
+    action?: StringFilter<"AuditLog"> | string
+    targetType?: StringFilter<"AuditLog"> | string
+    targetId?: StringNullableFilter<"AuditLog"> | string | null
+    beforeDiff?: JsonNullableFilter<"AuditLog">
+    afterDiff?: JsonNullableFilter<"AuditLog">
+    requestId?: StringNullableFilter<"AuditLog"> | string | null
+    correlationId?: StringNullableFilter<"AuditLog"> | string | null
+    context?: JsonNullableFilter<"AuditLog">
+    createdAt?: DateTimeFilter<"AuditLog"> | Date | string
+  }
+
+  export type OrderEventUpsertWithWhereUniqueWithoutActorUserInput = {
+    where: OrderEventWhereUniqueInput
+    update: XOR<OrderEventUpdateWithoutActorUserInput, OrderEventUncheckedUpdateWithoutActorUserInput>
+    create: XOR<OrderEventCreateWithoutActorUserInput, OrderEventUncheckedCreateWithoutActorUserInput>
+  }
+
+  export type OrderEventUpdateWithWhereUniqueWithoutActorUserInput = {
+    where: OrderEventWhereUniqueInput
+    data: XOR<OrderEventUpdateWithoutActorUserInput, OrderEventUncheckedUpdateWithoutActorUserInput>
+  }
+
+  export type OrderEventUpdateManyWithWhereWithoutActorUserInput = {
+    where: OrderEventScalarWhereInput
+    data: XOR<OrderEventUpdateManyMutationInput, OrderEventUncheckedUpdateManyWithoutActorUserInput>
+  }
+
+  export type OrderEventScalarWhereInput = {
+    AND?: OrderEventScalarWhereInput | OrderEventScalarWhereInput[]
+    OR?: OrderEventScalarWhereInput[]
+    NOT?: OrderEventScalarWhereInput | OrderEventScalarWhereInput[]
+    id?: StringFilter<"OrderEvent"> | string
+    orderId?: StringFilter<"OrderEvent"> | string
+    type?: StringFilter<"OrderEvent"> | string
+    data?: JsonNullableFilter<"OrderEvent">
+    userId?: StringNullableFilter<"OrderEvent"> | string | null
+    ipAddress?: StringNullableFilter<"OrderEvent"> | string | null
+    fromState?: StringNullableFilter<"OrderEvent"> | string | null
+    toState?: StringNullableFilter<"OrderEvent"> | string | null
+    actorUserId?: StringNullableFilter<"OrderEvent"> | string | null
+    isCustomerVisible?: BoolFilter<"OrderEvent"> | boolean
+    provider?: StringNullableFilter<"OrderEvent"> | string | null
+    providerEventId?: StringNullableFilter<"OrderEvent"> | string | null
+    correlationId?: StringNullableFilter<"OrderEvent"> | string | null
+    createdAt?: DateTimeFilter<"OrderEvent"> | Date | string
+  }
+
   export type UserCreateWithoutAddressesInput = {
     id?: string
     email?: string | null
@@ -39227,6 +43165,9 @@ export namespace Prisma {
     carts?: CartCreateNestedManyWithoutUserInput
     orders?: OrderCreateNestedManyWithoutUserInput
     reviews?: ProductReviewCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventCreateNestedManyWithoutActorUserInput
   }
 
   export type UserUncheckedCreateWithoutAddressesInput = {
@@ -39249,6 +43190,9 @@ export namespace Prisma {
     carts?: CartUncheckedCreateNestedManyWithoutUserInput
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
     reviews?: ProductReviewUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventUncheckedCreateNestedManyWithoutActorUserInput
   }
 
   export type UserCreateOrConnectWithoutAddressesInput = {
@@ -39287,6 +43231,9 @@ export namespace Prisma {
     carts?: CartUpdateManyWithoutUserNestedInput
     orders?: OrderUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUpdateManyWithoutActorUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAddressesInput = {
@@ -39309,6 +43256,9 @@ export namespace Prisma {
     carts?: CartUncheckedUpdateManyWithoutUserNestedInput
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUncheckedUpdateManyWithoutActorUserNestedInput
   }
 
   export type CategoryTranslationCreateWithoutCategoryInput = {
@@ -39429,6 +43379,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39453,6 +43404,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39604,6 +43556,7 @@ export namespace Prisma {
     primaryCategoryId?: StringNullableFilter<"Product"> | string | null
     attributeIds?: StringNullableListFilter<"Product">
     discountPercent?: IntFilter<"Product"> | number
+    warrantyYears?: IntNullableFilter<"Product"> | number | null
     deletedAt?: DateTimeNullableFilter<"Product"> | Date | string | null
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -39720,6 +43673,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39743,6 +43697,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -40348,6 +44303,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -40367,6 +44323,7 @@ export namespace Prisma {
     options?: ProductVariantOptionCreateNestedManyWithoutVariantInput
     cartItems?: CartItemCreateNestedManyWithoutVariantInput
     orderItems?: OrderItemCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutProductInput = {
@@ -40374,6 +44331,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -40393,6 +44351,7 @@ export namespace Prisma {
     options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
     cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutProductInput = {
@@ -40633,6 +44592,7 @@ export namespace Prisma {
     sku?: StringNullableFilter<"ProductVariant"> | string | null
     barcode?: StringNullableFilter<"ProductVariant"> | string | null
     price?: FloatFilter<"ProductVariant"> | number
+    priceOnRequest?: BoolFilter<"ProductVariant"> | boolean
     compareAtPrice?: FloatNullableFilter<"ProductVariant"> | number | null
     cost?: FloatNullableFilter<"ProductVariant"> | number | null
     stock?: IntFilter<"ProductVariant"> | number
@@ -40801,6 +44761,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -40825,6 +44786,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -40863,6 +44825,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -40887,6 +44850,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -40935,6 +44899,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -40959,6 +44924,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41039,6 +45005,44 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type StockMovementCreateWithoutVariantInput = {
+    id?: string
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    order?: OrderCreateNestedOneWithoutStockMovementsInput
+    actorUser?: UserCreateNestedOneWithoutStockMovementsInput
+  }
+
+  export type StockMovementUncheckedCreateWithoutVariantInput = {
+    id?: string
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    orderId?: string | null
+    actorUserId?: string | null
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type StockMovementCreateOrConnectWithoutVariantInput = {
+    where: StockMovementWhereUniqueInput
+    create: XOR<StockMovementCreateWithoutVariantInput, StockMovementUncheckedCreateWithoutVariantInput>
+  }
+
+  export type StockMovementCreateManyVariantInputEnvelope = {
+    data: StockMovementCreateManyVariantInput | StockMovementCreateManyVariantInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProductVariantOptionUpsertWithWhereUniqueWithoutVariantInput = {
     where: ProductVariantOptionWhereUniqueInput
     update: XOR<ProductVariantOptionUpdateWithoutVariantInput, ProductVariantOptionUncheckedUpdateWithoutVariantInput>
@@ -41077,6 +45081,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41101,6 +45106,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41160,11 +45166,28 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"OrderItem"> | string | null
   }
 
+  export type StockMovementUpsertWithWhereUniqueWithoutVariantInput = {
+    where: StockMovementWhereUniqueInput
+    update: XOR<StockMovementUpdateWithoutVariantInput, StockMovementUncheckedUpdateWithoutVariantInput>
+    create: XOR<StockMovementCreateWithoutVariantInput, StockMovementUncheckedCreateWithoutVariantInput>
+  }
+
+  export type StockMovementUpdateWithWhereUniqueWithoutVariantInput = {
+    where: StockMovementWhereUniqueInput
+    data: XOR<StockMovementUpdateWithoutVariantInput, StockMovementUncheckedUpdateWithoutVariantInput>
+  }
+
+  export type StockMovementUpdateManyWithWhereWithoutVariantInput = {
+    where: StockMovementScalarWhereInput
+    data: XOR<StockMovementUpdateManyMutationInput, StockMovementUncheckedUpdateManyWithoutVariantInput>
+  }
+
   export type ProductVariantCreateWithoutOptionsInput = {
     id?: string
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -41184,6 +45207,7 @@ export namespace Prisma {
     product: ProductCreateNestedOneWithoutVariantsInput
     cartItems?: CartItemCreateNestedManyWithoutVariantInput
     orderItems?: OrderItemCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutOptionsInput = {
@@ -41192,6 +45216,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -41210,6 +45235,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutOptionsInput = {
@@ -41258,6 +45284,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -41277,6 +45304,7 @@ export namespace Prisma {
     product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
     cartItems?: CartItemUpdateManyWithoutVariantNestedInput
     orderItems?: OrderItemUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutOptionsInput = {
@@ -41285,6 +45313,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -41303,6 +45332,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type AttributeValueUpsertWithoutVariantOptionsInput = {
@@ -41347,6 +45377,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41371,6 +45402,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41409,6 +45441,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41433,6 +45466,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41455,6 +45489,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41479,6 +45514,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41546,6 +45582,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41570,6 +45607,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41666,6 +45704,9 @@ export namespace Prisma {
     addresses?: AddressCreateNestedManyWithoutUserInput
     orders?: OrderCreateNestedManyWithoutUserInput
     reviews?: ProductReviewCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventCreateNestedManyWithoutActorUserInput
   }
 
   export type UserUncheckedCreateWithoutCartsInput = {
@@ -41688,6 +45729,9 @@ export namespace Prisma {
     addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
     reviews?: ProductReviewUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventUncheckedCreateNestedManyWithoutActorUserInput
   }
 
   export type UserCreateOrConnectWithoutCartsInput = {
@@ -41742,6 +45786,9 @@ export namespace Prisma {
     addresses?: AddressUpdateManyWithoutUserNestedInput
     orders?: OrderUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUpdateManyWithoutActorUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCartsInput = {
@@ -41764,6 +45811,9 @@ export namespace Prisma {
     addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUncheckedUpdateManyWithoutActorUserNestedInput
   }
 
   export type CartCreateWithoutItemsInput = {
@@ -41802,6 +45852,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -41821,6 +45872,7 @@ export namespace Prisma {
     options?: ProductVariantOptionCreateNestedManyWithoutVariantInput
     product: ProductCreateNestedOneWithoutVariantsInput
     orderItems?: OrderItemCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutCartItemsInput = {
@@ -41829,6 +45881,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -41847,6 +45900,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutCartItemsInput = {
@@ -41865,6 +45919,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41889,6 +45944,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41958,6 +46014,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -41977,6 +46034,7 @@ export namespace Prisma {
     options?: ProductVariantOptionUpdateManyWithoutVariantNestedInput
     product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
     orderItems?: OrderItemUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutCartItemsInput = {
@@ -41985,6 +46043,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -42003,6 +46062,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductUpsertWithoutCartItemsInput = {
@@ -42027,6 +46087,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42051,6 +46112,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42152,7 +46214,14 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: string | null
     ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
+    actorUser?: UserCreateNestedOneWithoutActedOrderEventsInput
   }
 
   export type OrderEventUncheckedCreateWithoutOrderInput = {
@@ -42161,6 +46230,13 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: string | null
     ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    actorUserId?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
   }
 
@@ -42171,6 +46247,44 @@ export namespace Prisma {
 
   export type OrderEventCreateManyOrderInputEnvelope = {
     data: OrderEventCreateManyOrderInput | OrderEventCreateManyOrderInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StockMovementCreateWithoutOrderInput = {
+    id?: string
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    variant?: ProductVariantCreateNestedOneWithoutStockMovementsInput
+    actorUser?: UserCreateNestedOneWithoutStockMovementsInput
+  }
+
+  export type StockMovementUncheckedCreateWithoutOrderInput = {
+    id?: string
+    variantId?: string | null
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    actorUserId?: string | null
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type StockMovementCreateOrConnectWithoutOrderInput = {
+    where: StockMovementWhereUniqueInput
+    create: XOR<StockMovementCreateWithoutOrderInput, StockMovementUncheckedCreateWithoutOrderInput>
+  }
+
+  export type StockMovementCreateManyOrderInputEnvelope = {
+    data: StockMovementCreateManyOrderInput | StockMovementCreateManyOrderInput[]
     skipDuplicates?: boolean
   }
 
@@ -42194,6 +46308,9 @@ export namespace Prisma {
     addresses?: AddressCreateNestedManyWithoutUserInput
     carts?: CartCreateNestedManyWithoutUserInput
     reviews?: ProductReviewCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventCreateNestedManyWithoutActorUserInput
   }
 
   export type UserUncheckedCreateWithoutOrdersInput = {
@@ -42216,6 +46333,9 @@ export namespace Prisma {
     addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
     carts?: CartUncheckedCreateNestedManyWithoutUserInput
     reviews?: ProductReviewUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventUncheckedCreateNestedManyWithoutActorUserInput
   }
 
   export type UserCreateOrConnectWithoutOrdersInput = {
@@ -42295,17 +46415,20 @@ export namespace Prisma {
     data: XOR<OrderEventUpdateManyMutationInput, OrderEventUncheckedUpdateManyWithoutOrderInput>
   }
 
-  export type OrderEventScalarWhereInput = {
-    AND?: OrderEventScalarWhereInput | OrderEventScalarWhereInput[]
-    OR?: OrderEventScalarWhereInput[]
-    NOT?: OrderEventScalarWhereInput | OrderEventScalarWhereInput[]
-    id?: StringFilter<"OrderEvent"> | string
-    orderId?: StringFilter<"OrderEvent"> | string
-    type?: StringFilter<"OrderEvent"> | string
-    data?: JsonNullableFilter<"OrderEvent">
-    userId?: StringNullableFilter<"OrderEvent"> | string | null
-    ipAddress?: StringNullableFilter<"OrderEvent"> | string | null
-    createdAt?: DateTimeFilter<"OrderEvent"> | Date | string
+  export type StockMovementUpsertWithWhereUniqueWithoutOrderInput = {
+    where: StockMovementWhereUniqueInput
+    update: XOR<StockMovementUpdateWithoutOrderInput, StockMovementUncheckedUpdateWithoutOrderInput>
+    create: XOR<StockMovementCreateWithoutOrderInput, StockMovementUncheckedCreateWithoutOrderInput>
+  }
+
+  export type StockMovementUpdateWithWhereUniqueWithoutOrderInput = {
+    where: StockMovementWhereUniqueInput
+    data: XOR<StockMovementUpdateWithoutOrderInput, StockMovementUncheckedUpdateWithoutOrderInput>
+  }
+
+  export type StockMovementUpdateManyWithWhereWithoutOrderInput = {
+    where: StockMovementScalarWhereInput
+    data: XOR<StockMovementUpdateManyMutationInput, StockMovementUncheckedUpdateManyWithoutOrderInput>
   }
 
   export type UserUpsertWithoutOrdersInput = {
@@ -42339,6 +46462,9 @@ export namespace Prisma {
     addresses?: AddressUpdateManyWithoutUserNestedInput
     carts?: CartUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUpdateManyWithoutActorUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrdersInput = {
@@ -42361,6 +46487,9 @@ export namespace Prisma {
     addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
     carts?: CartUncheckedUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUncheckedUpdateManyWithoutActorUserNestedInput
   }
 
   export type OrderCreateWithoutItemsInput = {
@@ -42389,10 +46518,15 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     payments?: PaymentCreateNestedManyWithoutOrderInput
     events?: OrderEventCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementCreateNestedManyWithoutOrderInput
     user?: UserCreateNestedOneWithoutOrdersInput
   }
 
@@ -42423,10 +46557,15 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
     events?: OrderEventUncheckedCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutItemsInput = {
@@ -42439,6 +46578,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -42458,6 +46598,7 @@ export namespace Prisma {
     options?: ProductVariantOptionCreateNestedManyWithoutVariantInput
     product: ProductCreateNestedOneWithoutVariantsInput
     cartItems?: CartItemCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutOrderItemsInput = {
@@ -42466,6 +46607,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -42484,6 +46626,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
     cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutOrderItemsInput = {
@@ -42528,10 +46671,15 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     events?: OrderEventUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutOrderNestedInput
     user?: UserUpdateOneWithoutOrdersNestedInput
   }
 
@@ -42562,10 +46710,15 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     events?: OrderEventUncheckedUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type ProductVariantUpsertWithoutOrderItemsInput = {
@@ -42584,6 +46737,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -42603,6 +46757,7 @@ export namespace Prisma {
     options?: ProductVariantOptionUpdateManyWithoutVariantNestedInput
     product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
     cartItems?: CartItemUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutOrderItemsInput = {
@@ -42611,6 +46766,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -42629,6 +46785,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
     cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type OrderCreateWithoutPaymentsInput = {
@@ -42657,10 +46814,15 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: OrderItemCreateNestedManyWithoutOrderInput
     events?: OrderEventCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementCreateNestedManyWithoutOrderInput
     user?: UserCreateNestedOneWithoutOrdersInput
   }
 
@@ -42691,10 +46853,15 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     events?: OrderEventUncheckedCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutPaymentsInput = {
@@ -42739,10 +46906,15 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     events?: OrderEventUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutOrderNestedInput
     user?: UserUpdateOneWithoutOrdersNestedInput
   }
 
@@ -42773,10 +46945,15 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     events?: OrderEventUncheckedUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderCreateWithoutEventsInput = {
@@ -42805,10 +46982,15 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: OrderItemCreateNestedManyWithoutOrderInput
     payments?: PaymentCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementCreateNestedManyWithoutOrderInput
     user?: UserCreateNestedOneWithoutOrdersInput
   }
 
@@ -42839,15 +47021,75 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutEventsInput = {
     where: OrderWhereUniqueInput
     create: XOR<OrderCreateWithoutEventsInput, OrderUncheckedCreateWithoutEventsInput>
+  }
+
+  export type UserCreateWithoutActedOrderEventsInput = {
+    id?: string
+    email?: string | null
+    phone?: string | null
+    passwordHash?: string | null
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    firstName?: string | null
+    lastName?: string | null
+    emailVerified?: boolean
+    phoneVerified?: boolean
+    locale?: string
+    blocked?: boolean
+    roles?: UserCreaterolesInput | string[]
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    addresses?: AddressCreateNestedManyWithoutUserInput
+    carts?: CartCreateNestedManyWithoutUserInput
+    orders?: OrderCreateNestedManyWithoutUserInput
+    reviews?: ProductReviewCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorUserInput
+  }
+
+  export type UserUncheckedCreateWithoutActedOrderEventsInput = {
+    id?: string
+    email?: string | null
+    phone?: string | null
+    passwordHash?: string | null
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    firstName?: string | null
+    lastName?: string | null
+    emailVerified?: boolean
+    phoneVerified?: boolean
+    locale?: string
+    blocked?: boolean
+    roles?: UserCreaterolesInput | string[]
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
+    carts?: CartUncheckedCreateNestedManyWithoutUserInput
+    orders?: OrderUncheckedCreateNestedManyWithoutUserInput
+    reviews?: ProductReviewUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorUserInput
+  }
+
+  export type UserCreateOrConnectWithoutActedOrderEventsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutActedOrderEventsInput, UserUncheckedCreateWithoutActedOrderEventsInput>
   }
 
   export type OrderUpsertWithoutEventsInput = {
@@ -42887,10 +47129,15 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutOrderNestedInput
     user?: UserUpdateOneWithoutOrdersNestedInput
   }
 
@@ -42921,10 +47168,604 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type UserUpsertWithoutActedOrderEventsInput = {
+    update: XOR<UserUpdateWithoutActedOrderEventsInput, UserUncheckedUpdateWithoutActedOrderEventsInput>
+    create: XOR<UserCreateWithoutActedOrderEventsInput, UserUncheckedCreateWithoutActedOrderEventsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutActedOrderEventsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutActedOrderEventsInput, UserUncheckedUpdateWithoutActedOrderEventsInput>
+  }
+
+  export type UserUpdateWithoutActedOrderEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    locale?: StringFieldUpdateOperationsInput | string
+    blocked?: BoolFieldUpdateOperationsInput | boolean
+    roles?: UserUpdaterolesInput | string[]
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    addresses?: AddressUpdateManyWithoutUserNestedInput
+    carts?: CartUpdateManyWithoutUserNestedInput
+    orders?: OrderUpdateManyWithoutUserNestedInput
+    reviews?: ProductReviewUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutActedOrderEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    locale?: StringFieldUpdateOperationsInput | string
+    blocked?: BoolFieldUpdateOperationsInput | boolean
+    roles?: UserUpdaterolesInput | string[]
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
+    carts?: CartUncheckedUpdateManyWithoutUserNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
+    reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorUserNestedInput
+  }
+
+  export type ProductVariantCreateWithoutStockMovementsInput = {
+    id?: string
+    sku?: string | null
+    barcode?: string | null
+    price: number
+    priceOnRequest?: boolean
+    compareAtPrice?: number | null
+    cost?: number | null
+    stock?: number
+    stockReserved?: number
+    weightGrams?: number | null
+    imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
+    position?: number
+    published?: boolean
+    attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    options?: ProductVariantOptionCreateNestedManyWithoutVariantInput
+    product: ProductCreateNestedOneWithoutVariantsInput
+    cartItems?: CartItemCreateNestedManyWithoutVariantInput
+    orderItems?: OrderItemCreateNestedManyWithoutVariantInput
+  }
+
+  export type ProductVariantUncheckedCreateWithoutStockMovementsInput = {
+    id?: string
+    productId: string
+    sku?: string | null
+    barcode?: string | null
+    price: number
+    priceOnRequest?: boolean
+    compareAtPrice?: number | null
+    cost?: number | null
+    stock?: number
+    stockReserved?: number
+    weightGrams?: number | null
+    imageUrl?: string | null
+    media?: ProductVariantCreatemediaInput | InputJsonValue[]
+    position?: number
+    published?: boolean
+    attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: string | null
+    sourcePid?: string | null
+    visibleId?: string | null
+    sourceUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    options?: ProductVariantOptionUncheckedCreateNestedManyWithoutVariantInput
+    cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
+    orderItems?: OrderItemUncheckedCreateNestedManyWithoutVariantInput
+  }
+
+  export type ProductVariantCreateOrConnectWithoutStockMovementsInput = {
+    where: ProductVariantWhereUniqueInput
+    create: XOR<ProductVariantCreateWithoutStockMovementsInput, ProductVariantUncheckedCreateWithoutStockMovementsInput>
+  }
+
+  export type OrderCreateWithoutStockMovementsInput = {
+    id?: string
+    number: string
+    status?: string
+    paymentStatus?: string
+    fulfillmentStatus?: string
+    subtotal: number
+    discountAmount?: number
+    shippingAmount?: number
+    taxAmount?: number
+    total: number
+    currency?: string
+    customerEmail?: string | null
+    customerPhone?: string | null
+    customerLocale?: string
+    billingAddress?: NullableJsonNullValueInput | InputJsonValue
+    shippingAddress?: NullableJsonNullValueInput | InputJsonValue
+    shippingMethod?: string | null
+    trackingNumber?: string | null
+    notes?: string | null
+    adminNotes?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    paidAt?: Date | string | null
+    fulfilledAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: OrderItemCreateNestedManyWithoutOrderInput
+    payments?: PaymentCreateNestedManyWithoutOrderInput
+    events?: OrderEventCreateNestedManyWithoutOrderInput
+    user?: UserCreateNestedOneWithoutOrdersInput
+  }
+
+  export type OrderUncheckedCreateWithoutStockMovementsInput = {
+    id?: string
+    number: string
+    userId?: string | null
+    status?: string
+    paymentStatus?: string
+    fulfillmentStatus?: string
+    subtotal: number
+    discountAmount?: number
+    shippingAmount?: number
+    taxAmount?: number
+    total: number
+    currency?: string
+    customerEmail?: string | null
+    customerPhone?: string | null
+    customerLocale?: string
+    billingAddress?: NullableJsonNullValueInput | InputJsonValue
+    shippingAddress?: NullableJsonNullValueInput | InputJsonValue
+    shippingMethod?: string | null
+    trackingNumber?: string | null
+    notes?: string | null
+    adminNotes?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    paidAt?: Date | string | null
+    fulfilledAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutOrderInput
+    events?: OrderEventUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutStockMovementsInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutStockMovementsInput, OrderUncheckedCreateWithoutStockMovementsInput>
+  }
+
+  export type UserCreateWithoutStockMovementsInput = {
+    id?: string
+    email?: string | null
+    phone?: string | null
+    passwordHash?: string | null
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    firstName?: string | null
+    lastName?: string | null
+    emailVerified?: boolean
+    phoneVerified?: boolean
+    locale?: string
+    blocked?: boolean
+    roles?: UserCreaterolesInput | string[]
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    addresses?: AddressCreateNestedManyWithoutUserInput
+    carts?: CartCreateNestedManyWithoutUserInput
+    orders?: OrderCreateNestedManyWithoutUserInput
+    reviews?: ProductReviewCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventCreateNestedManyWithoutActorUserInput
+  }
+
+  export type UserUncheckedCreateWithoutStockMovementsInput = {
+    id?: string
+    email?: string | null
+    phone?: string | null
+    passwordHash?: string | null
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    firstName?: string | null
+    lastName?: string | null
+    emailVerified?: boolean
+    phoneVerified?: boolean
+    locale?: string
+    blocked?: boolean
+    roles?: UserCreaterolesInput | string[]
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
+    carts?: CartUncheckedCreateNestedManyWithoutUserInput
+    orders?: OrderUncheckedCreateNestedManyWithoutUserInput
+    reviews?: ProductReviewUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  }
+
+  export type UserCreateOrConnectWithoutStockMovementsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutStockMovementsInput, UserUncheckedCreateWithoutStockMovementsInput>
+  }
+
+  export type ProductVariantUpsertWithoutStockMovementsInput = {
+    update: XOR<ProductVariantUpdateWithoutStockMovementsInput, ProductVariantUncheckedUpdateWithoutStockMovementsInput>
+    create: XOR<ProductVariantCreateWithoutStockMovementsInput, ProductVariantUncheckedCreateWithoutStockMovementsInput>
+    where?: ProductVariantWhereInput
+  }
+
+  export type ProductVariantUpdateToOneWithWhereWithoutStockMovementsInput = {
+    where?: ProductVariantWhereInput
+    data: XOR<ProductVariantUpdateWithoutStockMovementsInput, ProductVariantUncheckedUpdateWithoutStockMovementsInput>
+  }
+
+  export type ProductVariantUpdateWithoutStockMovementsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
+    compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    cost?: NullableFloatFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    stockReserved?: IntFieldUpdateOperationsInput | number
+    weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
+    position?: IntFieldUpdateOperationsInput | number
+    published?: BoolFieldUpdateOperationsInput | boolean
+    attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    options?: ProductVariantOptionUpdateManyWithoutVariantNestedInput
+    product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
+    cartItems?: CartItemUpdateManyWithoutVariantNestedInput
+    orderItems?: OrderItemUpdateManyWithoutVariantNestedInput
+  }
+
+  export type ProductVariantUncheckedUpdateWithoutStockMovementsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
+    compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    cost?: NullableFloatFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    stockReserved?: IntFieldUpdateOperationsInput | number
+    weightGrams?: NullableIntFieldUpdateOperationsInput | number | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: ProductVariantUpdatemediaInput | InputJsonValue[]
+    position?: IntFieldUpdateOperationsInput | number
+    published?: BoolFieldUpdateOperationsInput | boolean
+    attributes?: NullableJsonNullValueInput | InputJsonValue
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    sourcePid?: NullableStringFieldUpdateOperationsInput | string | null
+    visibleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
+    cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
+    orderItems?: OrderItemUncheckedUpdateManyWithoutVariantNestedInput
+  }
+
+  export type OrderUpsertWithoutStockMovementsInput = {
+    update: XOR<OrderUpdateWithoutStockMovementsInput, OrderUncheckedUpdateWithoutStockMovementsInput>
+    create: XOR<OrderCreateWithoutStockMovementsInput, OrderUncheckedCreateWithoutStockMovementsInput>
+    where?: OrderWhereInput
+  }
+
+  export type OrderUpdateToOneWithWhereWithoutStockMovementsInput = {
+    where?: OrderWhereInput
+    data: XOR<OrderUpdateWithoutStockMovementsInput, OrderUncheckedUpdateWithoutStockMovementsInput>
+  }
+
+  export type OrderUpdateWithoutStockMovementsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    number?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: StringFieldUpdateOperationsInput | string
+    fulfillmentStatus?: StringFieldUpdateOperationsInput | string
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    discountAmount?: FloatFieldUpdateOperationsInput | number
+    shippingAmount?: FloatFieldUpdateOperationsInput | number
+    taxAmount?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    customerEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerLocale?: StringFieldUpdateOperationsInput | string
+    billingAddress?: NullableJsonNullValueInput | InputJsonValue
+    shippingAddress?: NullableJsonNullValueInput | InputJsonValue
+    shippingMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    trackingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: OrderItemUpdateManyWithoutOrderNestedInput
+    payments?: PaymentUpdateManyWithoutOrderNestedInput
+    events?: OrderEventUpdateManyWithoutOrderNestedInput
+    user?: UserUpdateOneWithoutOrdersNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutStockMovementsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    number?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: StringFieldUpdateOperationsInput | string
+    fulfillmentStatus?: StringFieldUpdateOperationsInput | string
+    subtotal?: FloatFieldUpdateOperationsInput | number
+    discountAmount?: FloatFieldUpdateOperationsInput | number
+    shippingAmount?: FloatFieldUpdateOperationsInput | number
+    taxAmount?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    customerEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerLocale?: StringFieldUpdateOperationsInput | string
+    billingAddress?: NullableJsonNullValueInput | InputJsonValue
+    shippingAddress?: NullableJsonNullValueInput | InputJsonValue
+    shippingMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    trackingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
+    events?: OrderEventUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type UserUpsertWithoutStockMovementsInput = {
+    update: XOR<UserUpdateWithoutStockMovementsInput, UserUncheckedUpdateWithoutStockMovementsInput>
+    create: XOR<UserCreateWithoutStockMovementsInput, UserUncheckedCreateWithoutStockMovementsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutStockMovementsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutStockMovementsInput, UserUncheckedUpdateWithoutStockMovementsInput>
+  }
+
+  export type UserUpdateWithoutStockMovementsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    locale?: StringFieldUpdateOperationsInput | string
+    blocked?: BoolFieldUpdateOperationsInput | boolean
+    roles?: UserUpdaterolesInput | string[]
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    addresses?: AddressUpdateManyWithoutUserNestedInput
+    carts?: CartUpdateManyWithoutUserNestedInput
+    orders?: OrderUpdateManyWithoutUserNestedInput
+    reviews?: ProductReviewUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUpdateManyWithoutActorUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutStockMovementsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    locale?: StringFieldUpdateOperationsInput | string
+    blocked?: BoolFieldUpdateOperationsInput | boolean
+    roles?: UserUpdaterolesInput | string[]
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
+    carts?: CartUncheckedUpdateManyWithoutUserNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
+    reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  }
+
+  export type UserCreateWithoutAuditLogsInput = {
+    id?: string
+    email?: string | null
+    phone?: string | null
+    passwordHash?: string | null
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    firstName?: string | null
+    lastName?: string | null
+    emailVerified?: boolean
+    phoneVerified?: boolean
+    locale?: string
+    blocked?: boolean
+    roles?: UserCreaterolesInput | string[]
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    addresses?: AddressCreateNestedManyWithoutUserInput
+    carts?: CartCreateNestedManyWithoutUserInput
+    orders?: OrderCreateNestedManyWithoutUserInput
+    reviews?: ProductReviewCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventCreateNestedManyWithoutActorUserInput
+  }
+
+  export type UserUncheckedCreateWithoutAuditLogsInput = {
+    id?: string
+    email?: string | null
+    phone?: string | null
+    passwordHash?: string | null
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    firstName?: string | null
+    lastName?: string | null
+    emailVerified?: boolean
+    phoneVerified?: boolean
+    locale?: string
+    blocked?: boolean
+    roles?: UserCreaterolesInput | string[]
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
+    carts?: CartUncheckedCreateNestedManyWithoutUserInput
+    orders?: OrderUncheckedCreateNestedManyWithoutUserInput
+    reviews?: ProductReviewUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  }
+
+  export type UserCreateOrConnectWithoutAuditLogsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutAuditLogsInput, UserUncheckedCreateWithoutAuditLogsInput>
+  }
+
+  export type UserUpsertWithoutAuditLogsInput = {
+    update: XOR<UserUpdateWithoutAuditLogsInput, UserUncheckedUpdateWithoutAuditLogsInput>
+    create: XOR<UserCreateWithoutAuditLogsInput, UserUncheckedCreateWithoutAuditLogsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAuditLogsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAuditLogsInput, UserUncheckedUpdateWithoutAuditLogsInput>
+  }
+
+  export type UserUpdateWithoutAuditLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    locale?: StringFieldUpdateOperationsInput | string
+    blocked?: BoolFieldUpdateOperationsInput | boolean
+    roles?: UserUpdaterolesInput | string[]
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    addresses?: AddressUpdateManyWithoutUserNestedInput
+    carts?: CartUpdateManyWithoutUserNestedInput
+    orders?: OrderUpdateManyWithoutUserNestedInput
+    reviews?: ProductReviewUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUpdateManyWithoutActorUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutAuditLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    locale?: StringFieldUpdateOperationsInput | string
+    blocked?: BoolFieldUpdateOperationsInput | boolean
+    roles?: UserUpdaterolesInput | string[]
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
+    carts?: CartUncheckedUpdateManyWithoutUserNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
+    reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUncheckedUpdateManyWithoutActorUserNestedInput
   }
 
   export type ProductCreateWithoutReviewsInput = {
@@ -42938,6 +47779,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -42962,6 +47804,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -42998,6 +47841,9 @@ export namespace Prisma {
     addresses?: AddressCreateNestedManyWithoutUserInput
     carts?: CartCreateNestedManyWithoutUserInput
     orders?: OrderCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventCreateNestedManyWithoutActorUserInput
   }
 
   export type UserUncheckedCreateWithoutReviewsInput = {
@@ -43020,6 +47866,9 @@ export namespace Prisma {
     addresses?: AddressUncheckedCreateNestedManyWithoutUserInput
     carts?: CartUncheckedCreateNestedManyWithoutUserInput
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
+    stockMovements?: StockMovementUncheckedCreateNestedManyWithoutActorUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorUserInput
+    actedOrderEvents?: OrderEventUncheckedCreateNestedManyWithoutActorUserInput
   }
 
   export type UserCreateOrConnectWithoutReviewsInput = {
@@ -43049,6 +47898,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43073,6 +47923,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43115,6 +47966,9 @@ export namespace Prisma {
     addresses?: AddressUpdateManyWithoutUserNestedInput
     carts?: CartUpdateManyWithoutUserNestedInput
     orders?: OrderUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUpdateManyWithoutActorUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviewsInput = {
@@ -43137,6 +47991,9 @@ export namespace Prisma {
     addresses?: AddressUncheckedUpdateManyWithoutUserNestedInput
     carts?: CartUncheckedUpdateManyWithoutUserNestedInput
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutActorUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorUserNestedInput
+    actedOrderEvents?: OrderEventUncheckedUpdateManyWithoutActorUserNestedInput
   }
 
   export type AddressCreateManyUserInput = {
@@ -43192,6 +48049,10 @@ export namespace Prisma {
     paidAt?: Date | string | null
     fulfilledAt?: Date | string | null
     cancelledAt?: Date | string | null
+    idempotencyScopeHash?: string | null
+    idempotencyKeyHash?: string | null
+    requestFingerprint?: string | null
+    correlationId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -43204,6 +48065,49 @@ export namespace Prisma {
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type StockMovementCreateManyActorUserInput = {
+    id?: string
+    variantId?: string | null
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    orderId?: string | null
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AuditLogCreateManyActorUserInput = {
+    id?: string
+    action: string
+    targetType: string
+    targetId?: string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: string | null
+    correlationId?: string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type OrderEventCreateManyActorUserInput = {
+    id?: string
+    orderId: string
+    type: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
+    createdAt?: Date | string
   }
 
   export type AddressUpdateWithoutUserInput = {
@@ -43315,11 +48219,16 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUpdateManyWithoutOrderNestedInput
     payments?: PaymentUpdateManyWithoutOrderNestedInput
     events?: OrderEventUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutUserInput = {
@@ -43348,11 +48257,16 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutOrderNestedInput
     events?: OrderEventUncheckedUpdateManyWithoutOrderNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateManyWithoutUserInput = {
@@ -43381,6 +48295,10 @@ export namespace Prisma {
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fulfilledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    idempotencyScopeHash?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKeyHash?: NullableStringFieldUpdateOperationsInput | string | null
+    requestFingerprint?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -43413,6 +48331,135 @@ export namespace Prisma {
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockMovementUpdateWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    variant?: ProductVariantUpdateOneWithoutStockMovementsNestedInput
+    order?: OrderUpdateOneWithoutStockMovementsNestedInput
+  }
+
+  export type StockMovementUncheckedUpdateWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    orderId?: NullableStringFieldUpdateOperationsInput | string | null
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockMovementUncheckedUpdateManyWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    orderId?: NullableStringFieldUpdateOperationsInput | string | null
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditLogUpdateWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetType?: StringFieldUpdateOperationsInput | string
+    targetId?: NullableStringFieldUpdateOperationsInput | string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditLogUncheckedUpdateWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetType?: StringFieldUpdateOperationsInput | string
+    targetId?: NullableStringFieldUpdateOperationsInput | string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditLogUncheckedUpdateManyWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetType?: StringFieldUpdateOperationsInput | string
+    targetId?: NullableStringFieldUpdateOperationsInput | string | null
+    beforeDiff?: NullableJsonNullValueInput | InputJsonValue
+    afterDiff?: NullableJsonNullValueInput | InputJsonValue
+    requestId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    context?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderEventUpdateWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    order?: OrderUpdateOneRequiredWithoutEventsNestedInput
+  }
+
+  export type OrderEventUncheckedUpdateWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderEventUncheckedUpdateManyWithoutActorUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type CategoryTranslationCreateManyCategoryInput = {
@@ -43524,6 +48571,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43548,6 +48596,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43571,6 +48620,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43594,6 +48644,7 @@ export namespace Prisma {
     primaryCategoryId?: string | null
     attributeIds?: ProductCreateattributeIdsInput | string[]
     discountPercent?: number
+    warrantyYears?: number | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -43631,6 +48682,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43654,6 +48706,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43677,6 +48730,7 @@ export namespace Prisma {
     primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
     attributeIds?: ProductUpdateattributeIdsInput | string[]
     discountPercent?: IntFieldUpdateOperationsInput | number
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43842,6 +48896,7 @@ export namespace Prisma {
     sku?: string | null
     barcode?: string | null
     price: number
+    priceOnRequest?: boolean
     compareAtPrice?: number | null
     cost?: number | null
     stock?: number
@@ -43933,6 +48988,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -43952,6 +49008,7 @@ export namespace Prisma {
     options?: ProductVariantOptionUpdateManyWithoutVariantNestedInput
     cartItems?: CartItemUpdateManyWithoutVariantNestedInput
     orderItems?: OrderItemUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutProductInput = {
@@ -43959,6 +49016,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -43978,6 +49036,7 @@ export namespace Prisma {
     options?: ProductVariantOptionUncheckedUpdateManyWithoutVariantNestedInput
     cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutVariantNestedInput
+    stockMovements?: StockMovementUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateManyWithoutProductInput = {
@@ -43985,6 +49044,7 @@ export namespace Prisma {
     sku?: NullableStringFieldUpdateOperationsInput | string | null
     barcode?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
     compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     cost?: NullableFloatFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
@@ -44181,6 +49241,20 @@ export namespace Prisma {
     imageUrl?: string | null
   }
 
+  export type StockMovementCreateManyVariantInput = {
+    id?: string
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    orderId?: string | null
+    actorUserId?: string | null
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
   export type ProductVariantOptionUpdateWithoutVariantInput = {
     id?: StringFieldUpdateOperationsInput | string
     attributeId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44271,6 +49345,48 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type StockMovementUpdateWithoutVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    order?: OrderUpdateOneWithoutStockMovementsNestedInput
+    actorUser?: UserUpdateOneWithoutStockMovementsNestedInput
+  }
+
+  export type StockMovementUncheckedUpdateWithoutVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    orderId?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockMovementUncheckedUpdateManyWithoutVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    orderId?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CartItemCreateManyCartInput = {
     id?: string
     variantId: string
@@ -44349,6 +49465,27 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: string | null
     ipAddress?: string | null
+    fromState?: string | null
+    toState?: string | null
+    actorUserId?: string | null
+    isCustomerVisible?: boolean
+    provider?: string | null
+    providerEventId?: string | null
+    correlationId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type StockMovementCreateManyOrderInput = {
+    id?: string
+    variantId?: string | null
+    variantIdSnapshot: string
+    skuSnapshot?: string | null
+    delta: number
+    reason: string
+    actorUserId?: string | null
+    resultingBalance: number
+    correlationId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -44454,7 +49591,14 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    actorUser?: UserUpdateOneWithoutActedOrderEventsNestedInput
   }
 
   export type OrderEventUncheckedUpdateWithoutOrderInput = {
@@ -44463,6 +49607,13 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -44472,6 +49623,55 @@ export namespace Prisma {
     data?: NullableJsonNullValueInput | InputJsonValue
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    fromState?: NullableStringFieldUpdateOperationsInput | string | null
+    toState?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    isCustomerVisible?: BoolFieldUpdateOperationsInput | boolean
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
+    providerEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockMovementUpdateWithoutOrderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    variant?: ProductVariantUpdateOneWithoutStockMovementsNestedInput
+    actorUser?: UserUpdateOneWithoutStockMovementsNestedInput
+  }
+
+  export type StockMovementUncheckedUpdateWithoutOrderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockMovementUncheckedUpdateManyWithoutOrderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    variantIdSnapshot?: StringFieldUpdateOperationsInput | string
+    skuSnapshot?: NullableStringFieldUpdateOperationsInput | string | null
+    delta?: IntFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    actorUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resultingBalance?: IntFieldUpdateOperationsInput | number
+    correlationId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -44604,6 +49804,14 @@ export namespace Prisma {
      * @deprecated Use OrderEventDefaultArgs instead
      */
     export type OrderEventArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = OrderEventDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use StockMovementDefaultArgs instead
+     */
+    export type StockMovementArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StockMovementDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AuditLogDefaultArgs instead
+     */
+    export type AuditLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AuditLogDefaultArgs<ExtArgs>
     /**
      * @deprecated Use ProductReviewDefaultArgs instead
      */

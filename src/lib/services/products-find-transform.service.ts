@@ -16,13 +16,15 @@ import { localizeCategoryTitle } from "../category-title-i18n";
 import { pickProductTranslation } from "../products/pickProductTranslation";
 import type { LanguageCode } from "../language";
 
+import { CATALOG_DISCOUNT_CACHE_KEY } from "@/lib/catalog/catalog.constants";
+
 export type ProductListingTransformContext = {
   colors?: string;
   /** Compare tray: include description HTML for spec extraction. */
   includeDescriptions?: boolean;
 };
 
-const DISCOUNT_CONTEXT_CACHE_KEY = "product-list:discount-context";
+const DISCOUNT_CONTEXT_CACHE_KEY = CATALOG_DISCOUNT_CACHE_KEY;
 const DISCOUNT_CONTEXT_TTL_SEC = 120;
 
 export type ProductDiscountContext = {

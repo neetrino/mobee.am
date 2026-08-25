@@ -1,7 +1,14 @@
-import { ProductsFiltersProvider, type ProductsFiltersData, type ShopTopCategoryOption } from '@/components/ProductsFiltersProvider';
+import {
+  ProductsFiltersProvider,
+  type ProductsFiltersData,
+  type ShopTopCategoryOption,
+} from '@/components/ProductsFiltersProvider';
 import { getCachedTopCategories } from '@/lib/services/categories-top-cached';
 import { getCachedProductFilters } from '@/lib/services/products-filters-cached';
 import { buildProductFiltersCacheKey } from '@/lib/shop/product-filters-cache-key';
+import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-product-filters';
+import { isCatalogQueryError } from '@/lib/catalog/catalog-query-error';
+import type { ProductFilters } from '@/lib/services/products-find-query/types';
 import type { LanguageCode } from '@/lib/language';
 import type { ReactNode } from 'react';
 
@@ -13,10 +20,29 @@ export type ShopFiltersShellProps = {
   children: ReactNode;
 };
 
-function parseOptionalPrice(value: string | undefined): number | undefined {
-  if (!value) return undefined;
-  const parsed = parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
+const EMPTY_FILTERS: ProductsFiltersData = {
+  colors: [],
+  sizes: [],
+  brands: [],
+  priceRange: { min: 0, max: 0, hasProducts: false, stepSize: null, stepSizePerCurrency: null },
+};
+
+function defaultShopFilters(language: LanguageCode): ProductFilters {
+  return { lang: language, page: 1, limit: 12, sort: 'default' };
+}
+
+function parseShopFilters(
+  searchParams: Record<string, string | undefined>,
+  language: LanguageCode,
+): ProductFilters {
+  try {
+    return buildShopProductFiltersFromSearchParams(searchParams, language);
+  } catch (error: unknown) {
+    if (!isCatalogQueryError(error)) {
+      throw error;
+    }
+    return defaultShopFilters(language);
+  }
 }
 
 /**
@@ -27,20 +53,35 @@ export async function ShopFiltersShell({
   searchParams,
   children,
 }: ShopFiltersShellProps) {
+  const filters = parseShopFilters(searchParams, language);
   const filterInput = {
-    category: searchParams.category,
-    search: searchParams.search,
-    minPrice: parseOptionalPrice(searchParams.minPrice),
-    maxPrice: parseOptionalPrice(searchParams.maxPrice),
-    lang: language,
+    category: filters.category,
+    search: filters.search,
+    minPrice: filters.minPrice,
+    maxPrice: filters.maxPrice,
+    lang: filters.lang,
+    brand: filters.brand,
+    colors: filters.colors,
+    sizes: filters.sizes,
+    filter: filters.filter,
   };
   const initialFiltersKey = buildProductFiltersCacheKey(filterInput);
 
-  const [{ result: initialFiltersData }, { result: topCategoriesResult }] = await Promise.all([
-    getCachedProductFilters(filterInput),
-    getCachedTopCategories(language, SHOP_CATEGORY_FILTER_LIMIT, { includeImages: false }),
-  ]);
+  const topCategoriesPromise = getCachedTopCategories(language, SHOP_CATEGORY_FILTER_LIMIT, {
+    includeImages: false,
+  });
 
+  let initialFiltersData = EMPTY_FILTERS;
+  try {
+    const { result } = await getCachedProductFilters(filterInput);
+    initialFiltersData = result as ProductsFiltersData;
+  } catch (error: unknown) {
+    if (!isCatalogQueryError(error)) {
+      throw error;
+    }
+  }
+
+  const { result: topCategoriesResult } = await topCategoriesPromise;
   const initialTopCategories: ShopTopCategoryOption[] = topCategoriesResult.data.map((item) => ({
     id: item.id,
     slug: item.slug,
@@ -50,11 +91,15 @@ export async function ShopFiltersShell({
 
   return (
     <ProductsFiltersProvider
-      category={searchParams.category}
-      search={searchParams.search}
-      minPrice={searchParams.minPrice}
-      maxPrice={searchParams.maxPrice}
-      initialFiltersData={initialFiltersData as ProductsFiltersData}
+      category={filters.category}
+      search={filters.search}
+      minPrice={filters.minPrice != null ? String(filters.minPrice) : undefined}
+      maxPrice={filters.maxPrice != null ? String(filters.maxPrice) : undefined}
+      brand={filters.brand}
+      colors={filters.colors}
+      sizes={filters.sizes}
+      filter={filters.filter}
+      initialFiltersData={initialFiltersData}
       initialTopCategories={initialTopCategories}
       initialFiltersKey={initialFiltersKey}
     >

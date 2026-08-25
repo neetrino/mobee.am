@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { usersService } from "@/lib/services/users.service";
-import { toApiError } from "@/lib/types/errors";
-import { logger } from "@/lib/utils/logger";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ addressId: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -26,10 +25,5 @@ export async function PATCH(
     const { addressId } = await params;
     const result = await usersService.setDefaultAddress(user.id, addressId);
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    logger.error("Users addresses default error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
-

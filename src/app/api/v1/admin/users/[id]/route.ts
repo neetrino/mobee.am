@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { safeParseAdminUserUpdate } from "@/lib/schemas/admin-users.schema";
 import { adminService } from "@/lib/services/admin.service";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -30,26 +31,14 @@ export async function PUT(
     }
     const result = await adminService.updateUser(id, parsed.data);
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("❌ [ADMIN] Error:", error);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
 
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -59,18 +48,5 @@ export async function DELETE(
     await adminService.deleteUser(id);
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error("❌ [ADMIN] Delete user error:", error);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
-
