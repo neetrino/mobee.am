@@ -91,11 +91,11 @@ export function ProductCardActions({
   /** Home mobile: wishlist/compare a bit closer to the image right edge; other cards keep uniform `right-*` below `lg`. */
   const cornerOnImageStackPositionClass = homeProductGridCard
     ? isCompact
-      ? 'top-[11px] gap-1.5 max-lg:right-[2px] lg:right-4'
-      : 'top-[12px] gap-[7px] max-lg:right-[4px] lg:right-[25px]'
+      ? 'top-[11px] gap-1.5 max-lg:right-[2px] lg:right-[11px]'
+      : 'top-[15px] gap-[7px] max-lg:right-[4px] lg:right-[11px]'
     : isCompact
-      ? 'top-[11px] gap-1.5 right-4'
-      : 'top-[12px] gap-[7px] right-[18px]';
+      ? 'top-[11px] gap-1.5 right-[11px]'
+      : 'top-[15px] gap-[7px] right-[11px]';
 
   if (cornerOnImage) {
     return (

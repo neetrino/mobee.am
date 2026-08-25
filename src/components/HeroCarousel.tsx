@@ -20,7 +20,7 @@ const FALLBACK_SLIDES = toHeroCarouselSlides({
  */
 export function HeroCarousel() {
   return (
-    <section className={`bg-white ${montserrat.className}`}>
+    <section className={`bg-gray-50 ${montserrat.className}`}>
       <div className={`pb-1 pt-6 sm:pt-7 lg:hidden ${SITE_CONTENT_GUTTERS_CLASS}`}>
         <HeroBannerAutoCarousel slides={FALLBACK_SLIDES} imageVariant="mobile" />
       </div>

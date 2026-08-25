@@ -239,7 +239,7 @@ export function HomeProductSections({
   );
 
   return (
-    <section className="bg-white pb-0 pt-2 lg:pb-16 lg:pt-0" aria-labelledby="home-product-sections">
+    <section className="bg-gray-50 pb-0 pt-2 lg:pb-16 lg:pt-0" aria-labelledby="home-product-sections">
       <HomeProductSectionsBody
         language={language}
         products={products}

@@ -23,6 +23,8 @@ interface ProductCardInfoProps {
   isCompact?: boolean;
   /** Figma mobee-new: price lives in the bordered footer row with the add button */
   hidePrice?: boolean;
+  /** Grid card: color swatches sit under the product image. */
+  hideColors?: boolean;
   /** Home mobile grid — hide small caps brand row. */
   omitBrandRow?: boolean;
   /** Home mobile grid — title at 12px regular on small screens. */
@@ -49,6 +51,7 @@ export function ProductCardInfo({
   colors,
   isCompact = false,
   hidePrice = false,
+  hideColors = false,
   omitBrandRow = false,
   titleSizeMobileFigma = false,
   listingCacheSource,
@@ -64,66 +67,72 @@ export function ProductCardInfo({
       if (omitBrandRow) {
         return 'px-3 pb-2 pt-2 max-lg:pt-4 lg:px-5 lg:pb-4 lg:pt-0';
       }
+      /** Figma 91:1313 — left 12 / right 18, gap 4 between brand and title. */
       return isCompact
-        ? 'px-3 pt-2 pb-2 max-lg:pt-4'
-        : 'px-5 pt-0 pb-4 max-lg:pt-3';
+        ? 'px-3 pb-4 pt-1'
+        : 'pl-3 pr-[18px] pb-4 pt-1';
     }
     return isCompact ? 'p-2.5' : 'p-4';
   })();
 
   const titleClass = (() => {
     if (titleSizeMobileFigma) {
-      return `line-clamp-2 text-gray-900 max-lg:text-xs max-lg:font-normal max-lg:leading-normal lg:text-[18px] lg:font-bold lg:leading-7 ${
-        categoryLine ? 'mb-0.5 lg:mb-1' : 'mb-1 lg:mb-2'
-      }`;
+      return 'line-clamp-2 text-[#111827] max-lg:text-xs max-lg:font-normal max-lg:leading-normal lg:text-[18px] lg:font-bold lg:leading-7';
     }
     if (isCompact) {
-      return `text-base font-bold text-gray-900 line-clamp-2 ${categoryLine ? 'mb-0.5' : 'mb-1'}`;
+      return 'line-clamp-2 text-base font-bold text-[#111827]';
     }
-    return `text-[18px] leading-7 font-bold text-gray-900 line-clamp-2 ${categoryLine ? 'mb-1' : 'mb-2'}`;
+    return 'line-clamp-2 text-[18px] font-bold leading-7 text-[#111827]';
   })();
   const priceClass = isCompact ? 'text-[1.06875rem]' : 'text-[1.425rem]';
+
+  const brandClass = isCompact
+    ? 'mb-0 text-[9px] font-bold uppercase tracking-[1px] text-[#9ca3af]'
+    : 'mb-0 text-[10px] font-bold uppercase tracking-[1px] text-[#9ca3af] leading-[15px]';
+
+  const categoryClass = isCompact
+    ? 'mt-1 flex items-center gap-2 text-[10px] text-[#6b7280]'
+    : 'mt-1 flex items-center gap-2 text-[11px] leading-[16.5px] text-[#6b7280]';
 
   return (
     <div className={paddingClass}>
       {listingCacheSource ? (
         <ProductCardNavLink slug={slug} cachePayload={listingCacheSource} linkColor={linkColor} className="block">
-          {!omitBrandRow ? (
-            <p
-              className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
-            >
-              {brandName || t('common.defaults.category')}
-            </p>
-          ) : null}
-          <h3 className={titleClass}>{title}</h3>
-          {categoryLine ? (
-            <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
-              <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
-              <span className="line-clamp-2">{categoryLine}</span>
-            </p>
-          ) : null}
+          <div className="flex flex-col gap-1">
+            {!omitBrandRow ? (
+              <p className={brandClass}>
+                {brandName || t('common.defaults.category')}
+              </p>
+            ) : null}
+            <h3 className={titleClass}>{title}</h3>
+            {categoryLine ? (
+              <p className={categoryClass}>
+                <span className="inline-block size-1 shrink-0 rounded-full bg-[#d1d5db]" aria-hidden />
+                <span className="line-clamp-2">{categoryLine}</span>
+              </p>
+            ) : null}
+          </div>
         </ProductCardNavLink>
       ) : (
         <Link href={buildProductPageHref(slug, { color: linkColor })} className="block" prefetch>
-          {!omitBrandRow ? (
-            <p
-              className={`${isCompact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} font-bold uppercase tracking-[0.08em] text-gray-400`}
-            >
-              {brandName || t('common.defaults.category')}
-            </p>
-          ) : null}
-          <h3 className={titleClass}>{title}</h3>
-          {categoryLine ? (
-            <p className={`flex items-center gap-2 ${isCompact ? 'text-[10px]' : 'text-[11px]'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
-              <span className="inline-block size-1 shrink-0 rounded-full bg-gray-300" aria-hidden />
-              <span className="line-clamp-2">{categoryLine}</span>
-            </p>
-          ) : null}
+          <div className="flex flex-col gap-1">
+            {!omitBrandRow ? (
+              <p className={brandClass}>
+                {brandName || t('common.defaults.category')}
+              </p>
+            ) : null}
+            <h3 className={titleClass}>{title}</h3>
+            {categoryLine ? (
+              <p className={categoryClass}>
+                <span className="inline-block size-1 shrink-0 rounded-full bg-[#d1d5db]" aria-hidden />
+                <span className="line-clamp-2">{categoryLine}</span>
+              </p>
+            ) : null}
+          </div>
         </Link>
       )}
 
-      {/* Available Colors */}
-      {colors && colors.length > 0 && (
+      {!hideColors && colors && colors.length > 0 ? (
         <ProductColors
           colors={colors}
           isCompact={isCompact}
@@ -131,7 +140,7 @@ export function ProductCardInfo({
           selectedLinkValue={selectedCardLinkColor ?? linkColor}
           onColorSelect={onCardColorSelect}
         />
-      )}
+      ) : null}
 
       {!hidePrice ? (
         <div className={`mt-2 flex items-center justify-between ${isCompact ? 'gap-2' : 'gap-4'}`}>

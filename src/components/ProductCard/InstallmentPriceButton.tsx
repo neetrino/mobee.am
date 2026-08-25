@@ -2,6 +2,7 @@
 
 import type { MouseEvent } from 'react';
 import { Calculator } from 'lucide-react';
+import { MoneyExchangeIcon } from '../icons/MoneyExchangeIcon';
 import { useTranslation } from '../../lib/i18n-client';
 
 interface InstallmentPriceButtonProps {
@@ -11,6 +12,11 @@ interface InstallmentPriceButtonProps {
   size?: 'sm' | 'md';
   /** Force two-line label (e.g. related products desktop). */
   stackLabel?: boolean;
+  /**
+   * `link` — text + icon (PDP / legacy footer).
+   * `pill` — outlined capsule (Figma product card 91:1325).
+   */
+  variant?: 'link' | 'pill';
 }
 
 const SIZE_STYLES = {
@@ -48,11 +54,28 @@ export function InstallmentPriceButton({
   className = '',
   size = 'sm',
   stackLabel = false,
+  variant = 'link',
 }: InstallmentPriceButtonProps) {
   const { t } = useTranslation();
   const styles = SIZE_STYLES[size];
   const buttonLabel = t('product.aparik.buttonLabel');
   const { line1, line2 } = splitButtonLabel(buttonLabel);
+
+  if (variant === 'pill') {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`inline-flex h-9 w-[118px] shrink-0 items-center gap-0.5 rounded-full border border-[#2db2ff] bg-transparent py-1 pl-2 pr-2.5 text-[#2db2ff] transition-opacity hover:opacity-90 max-lg:h-8 max-lg:w-auto max-lg:max-w-[108px] max-lg:px-1.5 ${className}`}
+        aria-label={buttonLabel}
+      >
+        <MoneyExchangeIcon size={18} className="shrink-0 max-lg:size-4" />
+        <span className="min-w-0 flex-1 text-center text-[11px] font-medium leading-tight max-lg:text-[10px]">
+          {buttonLabel}
+        </span>
+      </button>
+    );
+  }
 
   return (
     <button

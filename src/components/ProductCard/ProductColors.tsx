@@ -24,6 +24,8 @@ interface ProductColorsProps {
   interactive?: boolean;
   selectedLinkValue?: string | null;
   onColorSelect?: (color: ProductCardColorOption) => void;
+  /** Horizontal alignment of the swatch row (grid card centers under image). */
+  align?: 'start' | 'center';
 }
 
 function toColorOption(colorData: string | ColorData): ProductCardColorOption {
@@ -85,6 +87,7 @@ export function ProductColors({
   interactive = false,
   selectedLinkValue = null,
   onColorSelect,
+  align = 'start',
 }: ProductColorsProps) {
   const visibleLimit = useProductColorsVisibleLimit(maxVisible);
 
@@ -95,9 +98,10 @@ export function ProductColors({
   const swatchSizeClass = isCompact ? 'w-4 h-4' : 'w-5 h-5';
   const selectedRingClass = 'ring-2 ring-[#2db2ff] ring-offset-1';
   const orderedColors = orderColorsForDisplay(colors, selectedLinkValue);
+  const rowAlignClass = align === 'center' ? 'justify-center' : 'justify-start';
 
   return (
-    <div className={`flex flex-nowrap items-center gap-1.5 ${isCompact ? 'mb-1' : 'mb-2'}`}>
+    <div className={`mb-0 flex flex-nowrap items-center gap-1.5 ${rowAlignClass}`}>
       {orderedColors.slice(0, visibleLimit).map((colorData, index) => {
         const colorOption = toColorOption(colorData);
         const colorValue = colorOption.value;

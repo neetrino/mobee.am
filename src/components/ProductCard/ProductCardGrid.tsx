@@ -6,13 +6,13 @@ import { ProductCardImage } from './ProductCardImage';
 import { buildProductCardCachePayload } from '../../lib/products/product-card-cache';
 import { ProductCardInfo } from './ProductCardInfo';
 import { ProductCardActions } from './ProductCardActions';
-import { ProductCardPriceBlock } from './ProductCardPriceBlock';
+import { ProductColors } from './ProductColors';
 import { InstallmentPriceButton } from './InstallmentPriceButton';
 import { InstallmentRequestModal } from './InstallmentRequestModal';
 import { CartIcon } from '../icons/CartIcon';
 import { ProductLabels } from '../ProductLabels';
 import { useTranslation } from '../../lib/i18n-client';
-import type { CurrencyCode } from '../../lib/currency';
+import { formatPrice, type CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
 import type { ProductWarrantyYears } from '../../lib/constants/product-warranty';
 import { ProductWarrantyBadge } from './ProductWarrantyBadge';
@@ -67,7 +67,7 @@ interface ProductCardGridProps {
 }
 
 /**
- * Grid view layout for ProductCard
+ * Grid view layout for ProductCard — Figma Mobee-Dev-Neew node 91:1312.
  */
 export function ProductCardGrid({
   product,
@@ -92,41 +92,19 @@ export function ProductCardGrid({
   selectedCardLinkColor = null,
   colorsInteractive = false,
   onCardColorSelect,
-  stackInstallmentLabel = false,
+  stackInstallmentLabel: _stackInstallmentLabel = false,
 }: ProductCardGridProps) {
   const { t, lang } = useTranslation();
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
   const categoryLine = getProductCardCategoryLineLabel(product, lang);
-  const footerPriceClass = (() => {
-    if (smallerFooterPrice) {
-      return isCompact
-        ? 'text-[0.824687578125rem] leading-[1.28284734375rem] lg:text-[1.06875rem] lg:leading-[1.6625rem]'
-        : 'text-[0.91631953125rem] leading-[1.28284734375rem] max-lg:text-sm max-lg:leading-tight lg:text-[1.1875rem] lg:leading-[1.6625rem]';
-    }
-
-    return isCompact
-      ? 'text-[1.06875rem] leading-[1.6625rem]'
-      : 'text-[1.1875rem] leading-[1.6625rem]';
-  })();
 
   const productHasPrice = product.hasPrice ?? (product.price != null && product.price > 0);
   const listPrice = product.compareAtPrice ?? product.originalPrice ?? null;
   const showStrike =
-    homeProductGridCard &&
     productHasPrice &&
     listPrice != null &&
     product.price != null &&
     listPrice > product.price;
-
-  const mobileDiscountLabel =
-    homeProductGridCard &&
-    product.discountPercent != null &&
-    product.discountPercent > 0
-      ? t('home.mobile_home.discountLabel').replace(
-          '{{percent}}',
-          String(product.discountPercent),
-        )
-      : null;
 
   const primaryActionDisabled = addButtonNavigatesToProduct
     ? false
@@ -135,46 +113,13 @@ export function ProductCardGrid({
     ? true
     : product.inStock && productHasPrice && !isAddingToCart;
 
-  const cardShellClass = homeProductGridCard
-    ? 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] max-lg:rounded-2xl max-lg:border-0 max-lg:bg-[#f2f2f7] lg:min-h-[583px]'
-    : 'relative flex h-full min-h-0 flex-col overflow-hidden rounded-[12px] border border-[#f3f4f6] bg-[#f6f6f6] lg:min-h-[583px]';
-
-  /** Mobile: reserve in-flow height so absolutely positioned image/actions do not overlap the title. */
-  const imageStackClass = homeProductGridCard
-    ? 'relative shrink-0 max-lg:min-h-[176px] max-lg:overflow-hidden lg:h-[380px]'
-    : isCompact
-      ? 'relative shrink-0 max-lg:min-h-[240px] lg:h-[380px]'
-      : 'relative shrink-0 max-lg:min-h-[277px] lg:h-[380px]';
-
-  const imageFrameClass = homeProductGridCard
-    ? 'absolute inset-x-2 top-2 max-lg:inset-x-2 max-lg:top-2 lg:inset-x-5 lg:top-5 lg:h-[320px]'
-    : 'absolute inset-x-5 top-5 lg:h-[320px]';
-
-  const imageMatClass = homeProductGridCard
-    ? 'flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-[33px] max-lg:bg-transparent max-lg:py-2'
-    : 'flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white py-[33px]';
-
-  const footerPad = homeProductGridCard
+  const priceClass = smallerFooterPrice
     ? isCompact
-      ? 'px-3 pb-3'
-      : 'px-3 pb-3 max-lg:px-3 max-lg:pb-3 lg:px-5 lg:pb-5'
-    : isCompact
-      ? 'px-3 pb-3'
-      : 'px-5 pb-5';
+      ? 'text-[0.91631953125rem] leading-7 lg:text-[20px] lg:leading-7'
+      : 'text-[18px] leading-7 max-lg:text-base lg:text-[20px] lg:leading-7'
+    : 'text-[20px] leading-7';
 
-  const discountClass = smallerFooterPrice
-    ? isCompact
-      ? 'text-[0.54979171875rem] lg:text-[0.7125rem]'
-      : 'text-[0.641423671875rem] lg:text-[0.83125rem]'
-    : isCompact
-      ? 'text-[0.7125rem]'
-      : 'text-[0.83125rem]';
-
-  const infoPricePad = homeProductGridCard
-    ? 'px-3 pb-2 max-lg:pb-1.5 max-lg:pt-1 lg:px-5 lg:pb-3'
-    : isCompact
-      ? 'px-3 pb-2'
-      : 'px-5 pb-3';
+  const hasColors = Boolean(product.colors && product.colors.length > 0);
 
   const handleInstallmentClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -183,29 +128,45 @@ export function ProductCardGrid({
   };
 
   return (
-    <div className={cardShellClass} data-product-card-root>
-      <div className={imageStackClass}>
-        <div className={imageFrameClass}>
-          <div className={imageMatClass}>
-            <ProductCardImage
-              slug={product.slug}
-              image={product.image}
-              title={product.title}
-              imageError={imageError}
-              onImageError={onImageError}
-              isCompact={isCompact}
-              shiftImageInFrame={shiftImageInFrame}
-              squareImageFrame={squareImageFrame}
-              imageLoadPriority={imageLoadPriority}
-              listingCacheSource={buildProductCardCachePayload(product)}
-              linkColor={linkColor}
-            />
-          </div>
+    <div
+      className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[23px] border border-[#f3f4f6] bg-white lg:min-h-[556px]"
+      data-product-card-root
+    >
+      <div
+        className={`relative shrink-0 px-[15px] pt-5 ${
+          homeProductGridCard ? 'max-lg:min-h-[176px] max-lg:px-2 max-lg:pt-2' : 'max-lg:min-h-[220px]'
+        }`}
+      >
+        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-lg py-8 max-lg:py-4">
+          <ProductCardImage
+            slug={product.slug}
+            image={product.image}
+            title={product.title}
+            imageError={imageError}
+            onImageError={onImageError}
+            isCompact={isCompact}
+            shiftImageInFrame={shiftImageInFrame}
+            squareImageFrame={squareImageFrame}
+            imageLoadPriority={imageLoadPriority}
+            listingCacheSource={buildProductCardCachePayload(product)}
+            linkColor={linkColor}
+          />
+          {hasColors ? (
+            <div className="mt-2 flex w-full justify-center">
+              <ProductColors
+                colors={product.colors!}
+                isCompact={isCompact}
+                align="center"
+                interactive={colorsInteractive}
+                selectedLinkValue={selectedCardLinkColor ?? linkColor}
+                onColorSelect={onCardColorSelect}
+              />
+            </div>
+          ) : null}
         </div>
+
         {product.labels && product.labels.length > 0 ? (
-          <div className="pointer-events-none absolute inset-0 z-20">
-            <ProductLabels labels={product.labels} />
-          </div>
+          <ProductLabels labels={product.labels} variant="productCard" />
         ) : null}
         {product.warrantyYears ? (
           <div className="pointer-events-none absolute bottom-3 left-3 z-20 max-lg:bottom-2 max-lg:left-2">
@@ -235,61 +196,55 @@ export function ProductCardGrid({
           price={product.price}
           discountPercent={product.discountPercent}
           currency={currency}
-          colors={product.colors}
           isCompact={isCompact}
           hidePrice
-          omitBrandRow={homeProductGridCard}
-          titleSizeMobileFigma={homeProductGridCard}
+          hideColors
           listingCacheSource={buildProductCardCachePayload(product)}
           linkColor={linkColor}
-          selectedCardLinkColor={selectedCardLinkColor}
-          colorsInteractive={colorsInteractive}
-          onCardColorSelect={onCardColorSelect}
         />
-        <div className={`mt-auto ${infoPricePad}`}>
-          <ProductCardPriceBlock
-            price={product.price}
-            hasPrice={productHasPrice}
-            currency={currency}
-            discountPercent={product.discountPercent}
-            listPrice={listPrice}
-            priceClass={footerPriceClass}
-            discountClass={discountClass}
-            homeProductGridCard={homeProductGridCard}
-            showStrike={showStrike}
-          />
-        </div>
-      </div>
 
-      <div
-        className={`shrink-0 flex flex-col gap-2 border-t border-[#e5e5e5] pt-[17px] max-lg:border-0 max-lg:pt-2 ${footerPad} ${
-          homeProductGridCard ? 'max-lg:gap-1.5' : ''
-        }`}
-      >
-        <div className="flex items-center justify-between gap-2">
+        <div className="mt-auto flex flex-col px-[15px] pb-4 max-lg:px-3 max-lg:pb-3">
+          <div className="mb-3 h-px w-full bg-[#e5e7eb]" aria-hidden />
+          <div
+            className={`flex items-center justify-between gap-2 ${
+              showStrike ? '' : 'mb-5 max-lg:mb-4'
+            }`}
+          >
+            <div className="min-w-0 flex flex-col justify-center">
+              {productHasPrice && product.price != null ? (
+                <span className={`whitespace-nowrap font-bold tabular-nums text-[#111827] ${priceClass}`}>
+                  {formatPrice(product.price, currency)}
+                </span>
+              ) : (
+                <div className="min-h-7" aria-hidden="true" />
+              )}
+            </div>
+            {productHasPrice ? (
+              <InstallmentPriceButton onClick={handleInstallmentClick} variant="pill" />
+            ) : null}
+          </div>
+
+          {showStrike && listPrice != null ? (
+            <span className="mb-1 text-base font-medium leading-7 text-[#d0d0d0] line-through max-lg:text-sm max-lg:leading-5">
+              {formatPrice(listPrice, currency)}
+            </span>
+          ) : null}
+
           <button
             type="button"
             onClick={onAddToCart}
             disabled={primaryActionDisabled}
-            className={`inline-flex shrink-0 items-center justify-center bg-[#2db2ff] font-medium text-white transition-opacity ${
+            className={`inline-flex h-[55px] w-full items-center justify-center gap-2.5 rounded-[40px] bg-[#2db2ff] px-2 text-sm font-medium tracking-[0.2px] text-white transition-opacity max-lg:h-11 ${
               primaryActionEnabled
                 ? 'cursor-pointer hover:opacity-90'
                 : 'cursor-default opacity-50'
-            } ${
-              homeProductGridCard
-                ? isCompact
-                  ? 'max-lg:size-9 max-lg:min-h-9 max-lg:min-w-9 max-lg:gap-0 max-lg:rounded-full max-lg:p-0 lg:h-10 lg:min-w-[110px] lg:gap-2 lg:rounded-[20px] lg:px-3 lg:text-xs lg:tracking-wide'
-                  : 'max-lg:size-9 max-lg:min-h-9 max-lg:min-w-9 max-lg:gap-0 max-lg:rounded-full max-lg:p-0 lg:h-[38.88px] lg:min-w-[106.92px] lg:gap-[6.3px] lg:rounded-[16.2px] lg:px-[12.96px] lg:text-[11.34px] lg:leading-[21.6px] lg:tracking-[0.162px]'
-                : isCompact
-                  ? 'h-10 min-w-[110px] gap-2 rounded-[20px] px-3 text-xs tracking-wide'
-                  : 'h-[38.88px] min-w-[106.92px] gap-[6.3px] rounded-[16.2px] px-[12.96px] text-[11.34px] leading-[21.6px] tracking-[0.162px]'
             }`}
             title={product.inStock ? t('common.buttons.addToCart') : t('common.stock.outOfStock')}
             aria-label={product.inStock ? t('common.ariaLabels.addToCart') : t('common.ariaLabels.outOfStock')}
           >
             {isAddingToCart ? (
               <svg
-                className={`animate-spin ${homeProductGridCard || isCompact ? 'h-4 w-4' : 'h-[16.2px] w-[16.2px]'}`}
+                className="h-[23px] w-[23px] animate-spin"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -304,45 +259,25 @@ export function ProductCardGrid({
               </svg>
             ) : (
               <>
-                <CartIcon
-                  className="shrink-0"
-                  size={homeProductGridCard || isCompact ? 18 : 16.2}
-                />
-                <span
-                  className={`whitespace-nowrap ${homeProductGridCard ? 'max-lg:sr-only' : ''}`}
-                >
-                  {t('common.buttons.addToCart')}
-                </span>
+                <CartIcon className="shrink-0" size={23} />
+                <span className="whitespace-nowrap leading-7">{t('common.buttons.addToCart')}</span>
               </>
             )}
           </button>
-          {productHasPrice ? (
-            <InstallmentPriceButton
-              onClick={handleInstallmentClick}
-              stackLabel={stackInstallmentLabel}
-            />
-          ) : null}
         </div>
-        {homeProductGridCard && mobileDiscountLabel ? (
-          <div className="hidden max-lg:flex max-lg:items-center">
-            <span className="inline-flex h-[22px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold leading-none text-[#ff383c]">
-              {mobileDiscountLabel}
-            </span>
-          </div>
-        ) : null}
       </div>
 
       {productHasPrice && product.price != null ? (
-      <InstallmentRequestModal
-        isOpen={isInstallmentModalOpen}
-        onClose={() => setIsInstallmentModalOpen(false)}
-        productId={product.id}
-        productSlug={product.slug}
-        productTitle={product.title}
-        productPrice={product.price}
-        currency="AMD"
-        productImageUrl={product.image}
-      />
+        <InstallmentRequestModal
+          isOpen={isInstallmentModalOpen}
+          onClose={() => setIsInstallmentModalOpen(false)}
+          productId={product.id}
+          productSlug={product.slug}
+          productTitle={product.title}
+          productPrice={product.price}
+          currency="AMD"
+          productImageUrl={product.image}
+        />
       ) : null}
     </div>
   );

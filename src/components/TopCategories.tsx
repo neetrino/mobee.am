@@ -168,7 +168,7 @@ export function TopCategories({ initialItems, initialLocale }: TopCategoriesProp
 
   if (loading) {
     return (
-      <section className={`bg-white ${montserrat.className}`} aria-hidden>
+      <section className={`bg-gray-50 ${montserrat.className}`} aria-hidden>
         <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-4 pt-3 lg:pb-8 lg:pt-6 xl:pt-8`}>
           <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} lg:hidden`}>
             {Array.from({ length: CATEGORY_STRIP_LOADING_SKELETON_COUNT }, (_, index) => (
@@ -196,7 +196,7 @@ export function TopCategories({ initialItems, initialLocale }: TopCategoriesProp
   }
 
   return (
-      <section className={`bg-white ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
+      <section className={`bg-gray-50 ${montserrat.className}`} aria-label={t('common.navigation.categories')}>
       <div className={`${SITE_CONTENT_GUTTERS_CLASS} pb-6 pt-8 lg:pb-8 lg:pt-6 xl:pt-8`}>
         <div className={`${CATEGORY_STRIP_SCROLL_ROW_CLASS} lg:hidden`}>
           {mobileSortedItems.map((category) => {
