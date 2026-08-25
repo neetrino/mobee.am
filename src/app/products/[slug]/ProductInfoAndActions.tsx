@@ -120,15 +120,12 @@ export function ProductInfoAndActions({
     <div className="flex min-w-0 w-full flex-col">
       {product.brand && <p className="mb-1 text-sm text-gray-500">{product.brand.name}</p>}
       <div className="flex items-start justify-between gap-3">
-        <h1 className="min-w-0 flex-1 text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">
-          {title}
-        </h1>
-        <div className="mt-1 flex shrink-0 flex-col items-end gap-2 sm:flex-row sm:items-start">
-          {isProductWarrantyYears(product.warrantyYears) ? (
-            <ProductWarrantyBadge years={product.warrantyYears} size="promo" className="shrink-0" />
-          ) : null}
+        <div className="min-w-0 flex-1 flex flex-col gap-3 pt-0.5">
+          <h1 className="text-2xl font-semibold leading-tight text-gray-900 sm:text-3xl">
+            {title}
+          </h1>
           <span
-            className={`inline-flex items-center gap-1.5 text-sm font-medium ${
+            className={`mt-1 inline-flex items-center gap-1.5 text-sm font-medium ${
               isStockAvailable ? 'text-emerald-600' : 'text-red-600'
             }`}
             aria-live="polite"
@@ -145,6 +142,9 @@ export function ProductInfoAndActions({
             </span>
           </span>
         </div>
+        {isProductWarrantyYears(product.warrantyYears) ? (
+          <ProductWarrantyBadge years={product.warrantyYears} size="promo" className="mt-1 shrink-0" />
+        ) : null}
       </div>
 
       <hr className="my-5 border-0 border-t border-gray-200" />

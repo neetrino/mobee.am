@@ -259,70 +259,71 @@ export function ProductPageClient({
   }
 
   return (
-    <div
-      className={`max-w-7xl mx-auto px-4 py-12 max-lg:pb-4 sm:px-6 lg:py-12 ${PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS} ${PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS}`}
-    >
-      <div className="grid grid-cols-1 items-start gap-12 product-2col:grid-cols-[55%_45%] [&>*]:min-w-0">
-        <ProductImageGallery
-          key={galleryVariant?.id ?? selectedColor ?? product.id}
-          images={images}
-          product={product}
-          discountPercent={discountPercent}
-          language={language}
-          currentImageIndex={currentImageIndex}
-          onImageIndexChange={setCurrentImageIndex}
-          thumbnailStartIndex={thumbnailStartIndex}
-          onThumbnailStartIndexChange={setThumbnailStartIndex}
-        />
+    <>
+      <div
+        className={`max-w-7xl mx-auto px-4 py-12 max-lg:pb-4 sm:px-6 lg:py-12 ${PDP_IPAD_PRO_BAND_MAIN_SHELL_HORIZONTAL_CLASS} ${PDP_IPAD_PRO_BAND_CLIP_HORIZONTAL_OVERFLOW_CLASS}`}
+      >
+        <div className="grid grid-cols-1 items-start gap-12 product-2col:grid-cols-[55%_45%] [&>*]:min-w-0">
+          <ProductImageGallery
+            key={galleryVariant?.id ?? selectedColor ?? product.id}
+            images={images}
+            product={product}
+            discountPercent={discountPercent}
+            language={language}
+            currentImageIndex={currentImageIndex}
+            onImageIndexChange={setCurrentImageIndex}
+            thumbnailStartIndex={thumbnailStartIndex}
+            onThumbnailStartIndexChange={setThumbnailStartIndex}
+          />
 
-        <ProductInfoAndActions
+          <ProductInfoAndActions
+            product={product}
+            price={price}
+            hasPrice={hasPrice}
+            discountPercent={discountPercent}
+            currency={currency}
+            language={language}
+            quantity={quantity}
+            maxQuantity={maxQuantity}
+            isOutOfStock={isOutOfStock}
+            isVariationRequired={isVariationRequired}
+            hasUnavailableAttributes={hasUnavailableAttributes}
+            unavailableAttributes={unavailableAttributes}
+            canAddToCart={canAddToCart}
+            isInWishlist={isInWishlist}
+            isInCompare={isInCompare}
+            currentVariant={currentVariant}
+            attributeGroups={attributeGroups}
+            selectedColor={selectedColor}
+            selectedSize={selectedSize}
+            selectedAttributeValues={selectedAttributeValues}
+            colorGroups={colorGroups}
+            sizeGroups={sizeGroups}
+            onQuantityAdjust={adjustQuantity}
+            onAddToCart={handleAddToCart}
+            onAddToWishlist={handleAddToWishlist}
+            onCompareToggle={handleCompareToggle}
+            onScrollToDetails={scrollToProductDetails}
+            onColorSelect={handleColorSelect}
+            onSizeSelect={handleSizeSelect}
+            onAttributeValueSelect={handleAttributeValueSelect}
+            getOptionValue={getOptionValue}
+            getRequiredAttributesMessage={getRequiredAttributesMessage}
+          />
+        </div>
+
+        <ProductDescriptionSection
           product={product}
-          price={price}
-          hasPrice={hasPrice}
-          discountPercent={discountPercent}
-          currency={currency}
           language={language}
-          quantity={quantity}
-          maxQuantity={maxQuantity}
-          isOutOfStock={isOutOfStock}
-          isVariationRequired={isVariationRequired}
-          hasUnavailableAttributes={hasUnavailableAttributes}
-          unavailableAttributes={unavailableAttributes}
-          canAddToCart={canAddToCart}
-          isInWishlist={isInWishlist}
-          isInCompare={isInCompare}
-          currentVariant={currentVariant}
-          attributeGroups={attributeGroups}
-          selectedColor={selectedColor}
-          selectedSize={selectedSize}
-          selectedAttributeValues={selectedAttributeValues}
-          colorGroups={colorGroups}
-          sizeGroups={sizeGroups}
-          onQuantityAdjust={adjustQuantity}
-          onAddToCart={handleAddToCart}
-          onAddToWishlist={handleAddToWishlist}
-          onCompareToggle={handleCompareToggle}
-          onScrollToDetails={scrollToProductDetails}
-          onColorSelect={handleColorSelect}
-          onSizeSelect={handleSizeSelect}
-          onAttributeValueSelect={handleAttributeValueSelect}
-          getOptionValue={getOptionValue}
-          getRequiredAttributesMessage={getRequiredAttributesMessage}
+          mainImageUrl={images[0]}
         />
       </div>
 
-      <ProductDescriptionSection
-        product={product}
-        language={language}
-        mainImageUrl={images[0]}
+      {/* Full-bleed gutters like home Special Offers — not nested in PDP max-w-7xl. */}
+      <RelatedProducts
+        currentProductSlug={product.slug}
+        relatedContext={relatedContext}
       />
-
-      <div className="mt-16">
-        <RelatedProducts
-          currentProductSlug={product.slug}
-          relatedContext={relatedContext}
-        />
-      </div>
-    </div>
+    </>
   );
 }
