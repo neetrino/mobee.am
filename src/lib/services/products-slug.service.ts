@@ -1,5 +1,6 @@
 import { buildProductQuery, findProductIdBySlug } from "./products-slug/product-query-builder";
 import { transformProduct } from "./products-slug/product-transformer";
+import { getProductPdpFromReadModel } from "@/lib/read-model/products-pdp-read-model";
 
 /**
  * Service for fetching products by slug
@@ -16,7 +17,11 @@ class ProductsSlugService {
    * Get product by slug
    */
   async findBySlug(slug: string, lang: string = "en") {
-    // Build and execute query with comprehensive error handling
+    const fromReadModel = await getProductPdpFromReadModel(slug, lang);
+    if (fromReadModel) {
+      return fromReadModel;
+    }
+
     const product = await buildProductQuery(slug, lang);
 
     if (!product) {

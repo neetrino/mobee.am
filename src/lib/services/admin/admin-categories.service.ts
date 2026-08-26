@@ -8,13 +8,13 @@ import { DEFAULT_LANGUAGE } from "@/lib/language";
 import { getCategoryProductCountMap } from "@/lib/services/admin/category-product-counts";
 import { cacheService } from "@/lib/services/cache.service";
 import { toSlug } from "@/lib/utils/slug";
-import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
+import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
 
 const ADMIN_CATEGORY_LOCALE = DEFAULT_LANGUAGE;
 
 async function clearCategoriesCache(): Promise<void> {
   await cacheService.deletePattern("categories:*");
-  await invalidateCatalogCaches();
+  await rebuildProductListingReadModel();
 }
 
 function resolveCategorySlug(explicitSlug: string | undefined, title: string): string {

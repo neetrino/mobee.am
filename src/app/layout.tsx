@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
-import { cookies, headers } from 'next/headers';
+import Script from 'next/script';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
 import { SiteChrome } from '../components/SiteChrome';
@@ -11,11 +11,9 @@ import {
   SITE_SHARE_DESCRIPTION,
   SITE_SHARE_TITLE,
 } from '../lib/brand.constants';
-import { readLanguageFromCookies } from '../lib/language';
-import type { CategoryTreeNode } from '../lib/category-nav';
-import { getCachedCategoriesTree } from '../lib/services/categories-tree-cached';
+import { DEFAULT_LANGUAGE, STOREFRONT_LANGUAGE_INIT_SCRIPT } from '../lib/language';
+import { getLayoutCategoriesTree } from '../lib/services/categories-tree-cached';
 import { TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT } from '../lib/tablet-ipad-air-like-layout';
-import { withRootLayoutDevTiming } from '../lib/root-layout-dev-timing';
 
 const inter = siteInter;
 
@@ -52,25 +50,17 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Static shell: no cookies()/headers(). Language is default on the server;
+ * ClientProviders + STOREFRONT_LANGUAGE_INIT_SCRIPT re-localize in the browser.
+ */
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { initialLanguage, categoriesTree } = await withRootLayoutDevTiming(
-    async () => {
-      const cookieStore = await cookies();
-      const initialLanguage = readLanguageFromCookies(cookieStore);
-      const headersList = await headers();
-      const isAdminRoute = headersList.get('x-mobee-admin-route') === '1';
-      const categoriesTree = isAdminRoute
-        ? { data: [] as CategoryTreeNode[] }
-        : (await getCachedCategoriesTree(initialLanguage)).result;
-
-      return { initialLanguage, categoriesTree, isAdminRoute };
-    },
-    (result) => ({ isAdminRoute: result.isAdminRoute }),
-  );
+  const initialLanguage = DEFAULT_LANGUAGE;
+  const categoriesTree = await getLayoutCategoriesTree(initialLanguage);
 
   return (
     <html lang={initialLanguage} className="h-full" suppressHydrationWarning>
@@ -78,6 +68,9 @@ export default async function RootLayout({
         <script
           dangerouslySetInnerHTML={{ __html: TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT }}
         />
+        <Script id="lang-init" strategy="beforeInteractive">
+          {STOREFRONT_LANGUAGE_INIT_SCRIPT}
+        </Script>
       </head>
       <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
@@ -92,4 +85,3 @@ export default async function RootLayout({
     </html>
   );
 }
-

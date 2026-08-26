@@ -1,14 +1,16 @@
 import { Suspense } from 'react';
-import { cookies } from 'next/headers';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { HomeHeroManagedCarousel } from '../components/HomeHeroManagedCarousel';
 import { TopCategories } from '../components/TopCategories';
 import { FeaturedIntroHeading } from '../components/FeaturedIntroHeading';
 import { HomeProductSectionsSection } from '../components/home/HomeProductSectionsSection';
-import { readLanguageFromCookies } from '../lib/language';
+import { DEFAULT_LANGUAGE } from '../lib/language';
 import { getCachedHomeCategoryStrip } from '../lib/services/categories-home-strip-cached';
 import { getPublicHomeHeroSettings } from '../lib/services/home-hero.service';
 import { toHeroCarouselSlides } from '../lib/home-hero';
+
+export const revalidate = 300;
+export const dynamic = 'force-static';
 
 function HomeProductSectionsFallback() {
   return (
@@ -20,8 +22,7 @@ function HomeProductSectionsFallback() {
 }
 
 export default async function HomePage() {
-  const cookieStore = await cookies();
-  const language = readLanguageFromCookies(cookieStore);
+  const language = DEFAULT_LANGUAGE;
   const [{ result: homeStrip }, homeHero] = await Promise.all([
     getCachedHomeCategoryStrip(language),
     getPublicHomeHeroSettings(),

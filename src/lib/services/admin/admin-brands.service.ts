@@ -1,7 +1,7 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
 import { toSlug } from "@/lib/utils/slug";
-import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
+import { syncProductListingReadModelByBrand } from "@/lib/read-model/product-read-model-sync";
 
 class AdminBrandsService {
   /**
@@ -98,7 +98,7 @@ class AdminBrandsService {
     const brandTranslations = Array.isArray(brand.translations) ? brand.translations : [];
     const translation = brandTranslations.find((t: { locale: string }) => t.locale === locale) || brandTranslations[0] || null;
 
-    await invalidateCatalogCaches();
+    await syncProductListingReadModelByBrand(brand.id);
     return {
       data: {
         id: brand.id,
@@ -194,7 +194,7 @@ class AdminBrandsService {
       : [];
     const translation = brandTranslations[0] || null;
 
-    await invalidateCatalogCaches();
+    await syncProductListingReadModelByBrand(brand.id);
     return {
       data: {
         id: updatedBrand!.id,
@@ -250,7 +250,7 @@ class AdminBrandsService {
     });
 
     logger.info('✅ [ADMIN SERVICE] Brand deleted:', { value: brandId });
-    await invalidateCatalogCaches();
+    await syncProductListingReadModelByBrand(brandId);
     return { success: true };
   }
 }

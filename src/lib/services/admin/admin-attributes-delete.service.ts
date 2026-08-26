@@ -1,5 +1,5 @@
 import { db } from "@white-shop/db";
-import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
+import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
 import { AppError } from "@/lib/errors/app-error";
 import { logger } from "@/lib/utils/logger";
 
@@ -144,7 +144,7 @@ class AdminAttributesDeleteService {
         timestamp: new Date().toISOString(),
       });
       
-      await invalidateCatalogCaches();
+      await rebuildProductListingReadModel();
       return { success: true };
     } catch (error: unknown) {
       const err = error as { status?: number; type?: string; code?: string; name?: string };
@@ -244,7 +244,7 @@ class AdminAttributesDeleteService {
       const translation = attribute.translations[0];
       const values = attribute.values || [];
 
-      await invalidateCatalogCaches();
+      await rebuildProductListingReadModel();
       return {
         id: attribute.id,
         key: attribute.key,

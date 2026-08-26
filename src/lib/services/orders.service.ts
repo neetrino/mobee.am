@@ -28,6 +28,7 @@ import { normalizeCheckoutDisplayCurrency } from "../checkout/checkout-email-mon
 import { resolveCheckoutOutboxCurrencyRates } from "./orders/resolve-checkout-outbox-currency-rates";
 import { availableUnreservedStock, hasUnreservedQuantity } from "./inventory/available-stock";
 import { decrementCheckoutStock } from "./inventory/decrement-checkout-stock";
+import { syncProductListingReadModelByVariantIds } from "@/lib/read-model/product-read-model-sync";
 import { createOrderWithUniqueNumber } from "./orders/allocate-order-number";
 import { buildCheckoutSuccessResponse } from "./orders/build-checkout-response";
 import {
@@ -843,6 +844,16 @@ class OrdersService {
       }
 
       triggerOutboxDrainBestEffort();
+
+      try {
+        await syncProductListingReadModelByVariantIds(
+          cartItems.map((item) => item.variantId).filter((id): id is string => Boolean(id)),
+        );
+      } catch (error: unknown) {
+        logger.warn("Listing read-model sync after checkout failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
 
       return buildCheckoutSuccessResponse({
         order: order.order,

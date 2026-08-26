@@ -9,6 +9,8 @@ import { buildCatalogWhere, type CatalogWhereResult } from "./build-catalog-wher
 import { fetchCatalogLightRows } from "./fetch-catalog-light-rows";
 import { selectCatalogPage } from "./select-catalog-page";
 import type { CatalogLightRow } from "./catalog-light.types";
+import { isProductListingReadModelReady } from "@/lib/read-model/read-model-ready";
+import { findCatalogProductPageFromReadModel } from "@/lib/read-model/products-plp-query";
 
 const EMPTY_DISCOUNTS: ProductDiscountContext = {
   globalDiscount: 0,
@@ -69,16 +71,16 @@ function emptyResult(query: CanonicalCatalogQuery): CatalogFindResult {
 }
 
 /**
- * Filter in DB (except effective price) → exact total → sort → page relations.
- *
- * Residual performance risk: default sort (Marco demotion) and effective-price
- * filter/sort still require an uncapped light-row scan. Exact effective-price
- * pagination cannot move to SQL without a materialized listing-price field.
+ * Filter in DB via ProductListingRow when the projection is populated.
+ * Fallback: light-row scan then page relations (tests / empty projection).
  */
 export async function findCatalogProductPage(
   filters: ProductFilters,
   port: CatalogFindPort = defaultPort,
 ): Promise<CatalogFindResult> {
+  if (port === defaultPort && (await isProductListingReadModelReady())) {
+    return findCatalogProductPageFromReadModel(filters);
+  }
   const query = normalizeCatalogQuery(filters);
   const { where, bestsellerProductIds } = await port.buildWhere(query);
   if (where === null) {

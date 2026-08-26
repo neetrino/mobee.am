@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
-import { cookies } from 'next/headers';
-import { readLanguageFromCookies } from '../../lib/language';
+import { DEFAULT_LANGUAGE } from '../../lib/language';
 import { ShopCatalogSection } from '@/components/shop/ShopCatalogSection';
 import { ShopFiltersShell } from '@/components/shop/ShopFiltersShell';
 import { ShopDesktopFiltersAside } from '@/components/shop/ShopDesktopFiltersAside';
@@ -13,11 +12,12 @@ interface ProductsPageProps {
   searchParams?: Promise<Record<string, string | undefined>>;
 }
 
+export const revalidate = 300;
+
 /** Shop shell + filters render while the catalog section streams server-fetched list data (shared cache with the products API). */
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = searchParams ? await searchParams : {};
-  const cookieStore = await cookies();
-  const language = readLanguageFromCookies(cookieStore);
+  const language = DEFAULT_LANGUAGE;
 
   const colors = params?.colors;
   const brands = params?.brand;

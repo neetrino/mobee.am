@@ -25,6 +25,8 @@ import {
   type CatalogPriceBounds,
   type CatalogSizeFacet,
 } from "./catalog-facet-aggregate";
+import { isProductListingReadModelReady } from "@/lib/read-model/read-model-ready";
+import { getCatalogFacetsFromReadModel } from "@/lib/read-model/products-plp-facets";
 
 export type CatalogFacetsResult = {
   colors: CatalogColorFacet[];
@@ -99,6 +101,9 @@ export async function getCatalogFacets(
   filters: ProductFilters,
   port: CatalogFacetsPort = defaultPort,
 ): Promise<CatalogFacetsResult> {
+  if (port === defaultPort && (await isProductListingReadModelReady())) {
+    return getCatalogFacetsFromReadModel(filters);
+  }
   const query = normalizeCatalogQuery(filters);
   let stepSize: number | null = null;
   let stepSizePerCurrency: Record<string, number | undefined> | null = null;

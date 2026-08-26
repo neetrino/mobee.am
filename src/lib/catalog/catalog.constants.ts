@@ -48,5 +48,5 @@ export const CATALOG_SIZE_ORDER = [
   "XXXL",
 ] as const;
 
-export const CATALOG_LIST_CACHE_PREFIX = "products:v4";
-export const CATALOG_FILTERS_CACHE_PREFIX = "products:filters:v2";
+export const CATALOG_LIST_CACHE_PREFIX = "cache:products:plp:v1";
+export const CATALOG_FILTERS_CACHE_PREFIX = "cache:products:filters:v1";

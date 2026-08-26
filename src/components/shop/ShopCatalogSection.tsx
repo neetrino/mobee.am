@@ -1,5 +1,4 @@
-import { cookies } from 'next/headers';
-import { readLanguageFromCookies, type LanguageCode } from '@/lib/language';
+import { DEFAULT_LANGUAGE, type LanguageCode } from '@/lib/language';
 import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-product-filters';
 import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { getCachedProductList, type ProductListPayload } from '@/lib/services/products-list-cached';
@@ -25,8 +24,7 @@ const EMPTY_LIST_PAYLOAD: ProductListPayload = {
  * Server-fetched catalog: shares Redis/in-memory cache with GET /api/v1/products and hydrates the client grid without a duplicate first request.
  */
 export async function ShopCatalogSection({ searchParams }: ShopCatalogSectionProps) {
-  const cookieStore = await cookies();
-  const language: LanguageCode = readLanguageFromCookies(cookieStore);
+  const language: LanguageCode = DEFAULT_LANGUAGE;
 
   let initialPayload: ProductListPayload = EMPTY_LIST_PAYLOAD;
   let initialFiltersKey = `invalid:${language}`;

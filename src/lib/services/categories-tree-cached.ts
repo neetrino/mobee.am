@@ -1,25 +1,14 @@
+import { unstable_cache } from "next/cache";
 import { categoriesService } from "@/lib/services/categories.service";
-import { cacheService } from "@/lib/services/cache.service";
-import { logger } from "@/lib/utils/logger";
+import { getCachedJson } from "@/lib/services/read-through-json-cache";
+import { CATEGORIES_CACHE_TTL_SEC } from "@/lib/cache/public-cache-keys";
 import type { CategoryTreeNode } from "@/lib/category-nav";
-
-const CACHE_TTL_SECONDS = 300;
 
 export type CategoriesTreePayload = {
   data: CategoryTreeNode[];
 };
 
-function parseTreePayload(cached: string | unknown): CategoriesTreePayload | null {
-  try {
-    const data = typeof cached === "string" ? JSON.parse(cached) : cached;
-    if (!data || typeof data !== "object" || !Array.isArray((data as CategoriesTreePayload).data)) {
-      return null;
-    }
-    return data as CategoriesTreePayload;
-  } catch {
-    return null;
-  }
-}
+export const CATEGORIES_TREE_CACHE_TAG = "categories-tree";
 
 /**
  * Cached category tree. Cache failures fail-open to DB; DB failures propagate.
@@ -27,26 +16,19 @@ function parseTreePayload(cached: string | unknown): CategoriesTreePayload | nul
 export async function getCachedCategoriesTree(
   lang: string,
 ): Promise<{ result: CategoriesTreePayload; cacheStatus: "HIT" | "MISS" }> {
-  const cacheKey = `categories:tree:v2:${lang}`;
-  let cached: CategoriesTreePayload | null = null;
-  try {
-    cached = parseTreePayload(await cacheService.get(cacheKey));
-  } catch (error: unknown) {
-    logger.warn("Category tree cache read failed; falling back to database", {
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
-  if (cached) {
-    return { result: cached, cacheStatus: "HIT" };
-  }
-
-  const result = await categoriesService.getTree(lang);
-  try {
-    await cacheService.setex(cacheKey, CACHE_TTL_SECONDS, JSON.stringify(result));
-  } catch (error: unknown) {
-    logger.warn("Category tree cache write failed", {
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
-  return { result, cacheStatus: "MISS" };
+  const cacheKey = `cache:categories:tree:v1:${lang}`;
+  return getCachedJson<CategoriesTreePayload>(
+    cacheKey,
+    CATEGORIES_CACHE_TTL_SEC,
+    () => categoriesService.getTree(lang),
+  );
 }
+
+/**
+ * Layout/RSC tree: Next Data Cache only — no Upstash fetch, so the root layout stays static.
+ */
+export const getLayoutCategoriesTree = unstable_cache(
+  async (lang: string) => categoriesService.getTree(lang),
+  ["layout-categories-tree"],
+  { revalidate: 300, tags: [CATEGORIES_TREE_CACHE_TAG] },
+);

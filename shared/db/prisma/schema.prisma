@@ -676,3 +676,82 @@ model ContactMessage {
   @@index([email])
   @@map("contact_messages")
 }
+
+// ============================================
+// STOREFRONT READ MODELS (PLP / PDP hot path)
+// ============================================
+model ProductListingRow {
+  id                     String    @id @default(cuid())
+  productId              String
+  locale                 String
+  slug                   String
+  title                  String
+  subtitle               String?
+  brandId                String?
+  brandSlug              String?
+  brandName              String?
+  primaryCategoryId      String?
+  categoryIds            String[]  @default([])
+  categorySlugs          String[]  @default([])
+  price                  Float     @default(0)
+  compareAtPrice         Float?
+  originalPrice          Float?
+  priceSort              Float     @default(0)
+  hasPrice               Boolean   @default(false)
+  priceOnRequest         Boolean   @default(false)
+  discountPercent        Int       @default(0)
+  featured               Boolean   @default(false)
+  hasMarcoListingImage   Boolean   @default(false)
+  defaultVariantId       String?
+  stock                  Int       @default(0)
+  inStock                Boolean   @default(false)
+  image                  String?
+  labels                 Json      @default("[]")
+  colors                 Json      @default("[]")
+  colorTokens            String[]  @default([])
+  sizeTokens             String[]  @default([])
+  variantComboTokens     String[]  @default([])
+  searchText             String    @default("")
+  warrantyYears          Int?
+  publishedAt            DateTime?
+  productCreatedAt       DateTime
+  productUpdatedAt       DateTime
+  isPublished            Boolean   @default(true)
+  deletedAt              DateTime?
+  rebuiltAt              DateTime  @default(now())
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@unique([productId, locale])
+  @@unique([locale, slug])
+  @@index([locale, isPublished, deletedAt, hasMarcoListingImage, productCreatedAt(sort: Desc)])
+  @@index([locale, brandId])
+  @@index([locale, brandSlug])
+  @@index([locale, featured, productCreatedAt(sort: Desc)])
+  @@index([locale, hasPrice, priceSort])
+  @@index([categoryIds], type: Gin)
+  @@index([categorySlugs], type: Gin)
+  @@index([colorTokens], type: Gin)
+  @@index([sizeTokens], type: Gin)
+  @@index([variantComboTokens], type: Gin)
+  @@map("product_listing_rows")
+}
+
+model ProductPdpRow {
+  id               String    @id @default(cuid())
+  productId        String
+  locale           String
+  slug             String
+  slugs            String[]  @default([])
+  payload          Json
+  isPublished      Boolean   @default(true)
+  productUpdatedAt DateTime
+  rebuiltAt        DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([productId, locale])
+  @@index([locale, slug])
+  @@index([slugs], type: Gin)
+  @@map("product_pdp_rows")
+}

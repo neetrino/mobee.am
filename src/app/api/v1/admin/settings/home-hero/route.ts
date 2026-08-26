@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { invalidateHomeHeroCache } from "@/lib/services/read-through-json-cache";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 import { validateHomeHeroSettingsInput } from "@/lib/home-hero";
@@ -63,6 +64,7 @@ export async function PUT(req: NextRequest) {
 
     const result = await adminService.updateHomeHeroSettings(validated.data);
     await invalidateAdminReferenceServerCache("home-hero");
+    await invalidateHomeHeroCache();
     revalidatePath("/");
 
     return NextResponse.json(result);

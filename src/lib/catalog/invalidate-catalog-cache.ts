@@ -1,10 +1,11 @@
-import { cacheService } from "@/lib/services/cache.service";
-import { CATALOG_DISCOUNT_CACHE_KEY } from "./catalog.constants";
+import { revalidateTag } from "next/cache";
+import { invalidateCatalogReadCaches } from "@/lib/services/read-through-json-cache";
+import { CATEGORIES_TREE_CACHE_TAG } from "@/lib/services/categories-tree-cached";
 
 /**
- * Drop list/facet caches after catalog-affecting writes.
+ * Drop list/facet/PDP/category caches after catalog-affecting writes.
  */
 export async function invalidateCatalogCaches(): Promise<void> {
-  await cacheService.deletePattern("products:*");
-  await cacheService.del(CATALOG_DISCOUNT_CACHE_KEY);
+  await invalidateCatalogReadCaches();
+  revalidateTag(CATEGORIES_TREE_CACHE_TAG, "max");
 }

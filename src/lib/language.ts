@@ -11,6 +11,23 @@ export type LanguageCode = keyof typeof LANGUAGES;
 /** Default storefront language when no cookie/localStorage preference exists. */
 export const DEFAULT_LANGUAGE: LanguageCode = 'hy';
 
+/**
+ * Runs before hydration so `html lang` matches the visitor cookie without
+ * making the root layout dynamic via `cookies()`.
+ */
+export const STOREFRONT_LANGUAGE_INIT_SCRIPT = `
+(() => {
+  try {
+    const match = document.cookie.match(/(?:^|; )shop_language=([^;]*)/);
+    const raw = match ? decodeURIComponent(match[1]) : null;
+    const allowed = { en: 1, hy: 1, ru: 1, ka: 1 };
+    if (raw && allowed[raw]) {
+      document.documentElement.lang = raw === 'ka' ? 'en' : raw;
+    }
+  } catch (e) {}
+})();
+`;
+
 const LANGUAGE_STORAGE_KEY = 'shop_language';
 
 /** Cookie mirrored from localStorage so server components can read the UI language. */

@@ -5,9 +5,7 @@ import {
   CATALOG_LIST_CACHE_PREFIX,
 } from "@/lib/catalog/catalog.constants";
 
-const PRODUCTS_CACHE_TTL = 120;
-const FEATURED_CACHE_TTL = 600;
-const FEATURED_CACHE_MAX_LIMIT = 24;
+import { PRODUCTS_PLP_CACHE_TTL_SEC } from "@/lib/cache/public-cache-keys";
 
 /** Stable ordering for comma-separated URL params in cache keys (e.g. `category=a,b` vs `b,a`). */
 export function normalizeCommaListCacheValue(raw: string): string {
@@ -62,13 +60,9 @@ export function buildProductListCacheKey(filters: ProductFilters): string {
   return `${CATALOG_LIST_CACHE_PREFIX}:${qs}`;
 }
 
-export function productListCacheTtlSeconds(filters: ProductFilters): number {
-  const filterVal = filters.filter;
-  const onlyFeatured =
-    typeof filterVal === "string" &&
-    ["new", "bestseller", "featured"].includes(filterVal) &&
-    !filters.category &&
-    !filters.search &&
-    (filters.limit ?? CATALOG_DEFAULT_LIMIT) <= FEATURED_CACHE_MAX_LIMIT;
-  return onlyFeatured ? FEATURED_CACHE_TTL : PRODUCTS_CACHE_TTL;
+/**
+ * Storefront list TTL. Featured rails share the same long TTL; writes invalidate.
+ */
+export function productListCacheTtlSeconds(_filters: ProductFilters): number {
+  return PRODUCTS_PLP_CACHE_TTL_SEC;
 }

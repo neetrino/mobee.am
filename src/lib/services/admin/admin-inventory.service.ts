@@ -5,6 +5,9 @@ import {
   adjustVariantStock,
   type InventoryAdjustmentFields,
 } from "../inventory/adjust-variant-stock";
+import { syncProductListingReadModelByVariantIds } from "@/lib/read-model/product-read-model-sync";
+import { revalidatePath } from "next/cache";
+import { logger } from "@/lib/utils/logger";
 
 export interface InventoryListFilters {
   page: number;
@@ -167,10 +170,21 @@ class AdminInventoryService {
     input: InventoryAdjustmentInput,
     context: CommerceRequestContext,
   ) {
-    return db.$transaction(
+    const result = await db.$transaction(
       (tx) => adjustVariantStock(tx, input, context),
       { timeout: ORDER_TX_TIMEOUT_MS, maxWait: ORDER_TX_MAX_WAIT_MS },
     );
+    try {
+      await syncProductListingReadModelByVariantIds([result.variantId]);
+      revalidatePath("/");
+      revalidatePath("/shop");
+    } catch (error: unknown) {
+      logger.warn("Read-model sync after inventory adjust failed", {
+        variantId: result.variantId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+    return result;
   }
 }
 

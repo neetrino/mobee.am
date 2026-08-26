@@ -1,10 +1,15 @@
 import { db } from "@white-shop/db";
-import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
+import { deleteProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
+import { syncProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
 import { logger } from "@/lib/utils/logger";
 
-async function invalidateCatalogCachesSafely(action: string, productId: string): Promise<void> {
+async function syncProductSafely(action: string, productId: string, mode: "delete" | "update"): Promise<void> {
   try {
-    await invalidateCatalogCaches();
+    if (mode === "delete") {
+      await deleteProductListingReadModel(productId);
+      return;
+    }
+    await syncProductListingReadModel(productId);
   } catch (error: unknown) {
     logger.warn("Catalog cache invalidation failed after successful mutation", {
       action,
@@ -40,7 +45,7 @@ class AdminProductsDeleteService {
       },
     });
 
-    await invalidateCatalogCachesSafely("deleteProduct", productId);
+    await syncProductSafely("deleteProduct", productId, "delete");
     return { success: true };
   }
 
@@ -69,7 +74,7 @@ class AdminProductsDeleteService {
       },
     });
 
-    await invalidateCatalogCachesSafely("updateProductDiscount", productId);
+    await syncProductSafely("updateProductDiscount", productId, "update");
     return { success: true, discountPercent: updated.discountPercent };
   }
 }

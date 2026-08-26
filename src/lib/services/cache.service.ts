@@ -42,7 +42,11 @@ async function initRedis(): Promise<void> {
   if (rest) {
     try {
       const { Redis } = await import("@upstash/redis");
-      upstashClient = new Redis({ url: rest.url, token: rest.token });
+      upstashClient = new Redis({
+        url: rest.url,
+        token: rest.token,
+        automaticDeserialization: false,
+      });
       redisAvailable = true;
       connectionAttempted = true;
       return;
@@ -266,6 +270,24 @@ export function isAvailable(): boolean {
   return redisAvailable;
 }
 
+export type CacheBackend = "upstash" | "redis" | "memory" | "none";
+
+export async function getBackend(): Promise<CacheBackend> {
+  if (!connectionAttempted) {
+    await initRedis();
+  }
+  if (upstashClient && redisAvailable) {
+    return "upstash";
+  }
+  if (redisClient && redisAvailable) {
+    return "redis";
+  }
+  if (isMemoryCacheAllowed()) {
+    return "memory";
+  }
+  return "none";
+}
+
 export const cacheService = {
   get,
   set,
@@ -274,4 +296,5 @@ export const cacheService = {
   keys,
   deletePattern,
   isAvailable,
+  getBackend,
 };

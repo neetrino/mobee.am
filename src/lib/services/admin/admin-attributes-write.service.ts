@@ -1,6 +1,6 @@
 import { createAttribute, updateAttributeTranslation } from "./admin-attributes-write/attribute-operations";
 import { addAttributeValue, updateAttributeValue } from "./admin-attributes-write/value-operations";
-import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
+import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
 
 /**
  * Service for admin attribute write operations
@@ -17,7 +17,7 @@ class AdminAttributesWriteService {
     locale?: string;
   }) {
     const result = await createAttribute(data);
-    await invalidateCatalogCaches();
+    await rebuildProductListingReadModel();
     return result;
   }
 
@@ -32,7 +32,7 @@ class AdminAttributesWriteService {
     }
   ) {
     const result = await updateAttributeTranslation(attributeId, data);
-    await invalidateCatalogCaches();
+    await rebuildProductListingReadModel();
     return result;
   }
 
@@ -44,7 +44,7 @@ class AdminAttributesWriteService {
     data: { label: string; locale?: string }
   ) {
     const result = await addAttributeValue(attributeId, data);
-    await invalidateCatalogCaches();
+    await rebuildProductListingReadModel();
     return result;
   }
 
@@ -62,7 +62,7 @@ class AdminAttributesWriteService {
     }
   ) {
     const result = await updateAttributeValue(attributeId, valueId, data);
-    await invalidateCatalogCaches();
+    await rebuildProductListingReadModel();
     return result;
   }
 }

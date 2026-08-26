@@ -3,7 +3,8 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 const mocks = vi.hoisted(() => ({
   productFindUnique: vi.fn(),
   productUpdate: vi.fn(),
-  invalidateCatalogCaches: vi.fn(),
+  deleteProductListingReadModel: vi.fn(),
+  syncProductListingReadModel: vi.fn(),
   loggerWarn: vi.fn(),
 }));
 
@@ -20,8 +21,9 @@ vi.mock("@white-shop/db", async (importOriginal) => {
   };
 });
 
-vi.mock("@/lib/catalog/invalidate-catalog-cache", () => ({
-  invalidateCatalogCaches: mocks.invalidateCatalogCaches,
+vi.mock("@/lib/read-model/product-read-model-sync", () => ({
+  deleteProductListingReadModel: mocks.deleteProductListingReadModel,
+  syncProductListingReadModel: mocks.syncProductListingReadModel,
 }));
 
 vi.mock("@/lib/utils/logger", () => ({
@@ -39,9 +41,11 @@ describe("adminProductsDeleteService catalog invalidation", () => {
   beforeEach(() => {
     mocks.productFindUnique.mockReset();
     mocks.productUpdate.mockReset();
-    mocks.invalidateCatalogCaches.mockReset();
+    mocks.deleteProductListingReadModel.mockReset();
+    mocks.syncProductListingReadModel.mockReset();
     mocks.loggerWarn.mockReset();
-    mocks.invalidateCatalogCaches.mockResolvedValue(undefined);
+    mocks.deleteProductListingReadModel.mockResolvedValue(undefined);
+    mocks.syncProductListingReadModel.mockResolvedValue(undefined);
   });
 
   it("invalidates catalog caches after a successful soft delete", async () => {
@@ -50,7 +54,7 @@ describe("adminProductsDeleteService catalog invalidation", () => {
     await expect(adminProductsDeleteService.deleteProduct("p1")).resolves.toEqual({
       success: true,
     });
-    expect(mocks.invalidateCatalogCaches).toHaveBeenCalledTimes(1);
+    expect(mocks.deleteProductListingReadModel).toHaveBeenCalledTimes(1);
   });
 
   it("invalidates catalog caches after a successful discount update", async () => {
@@ -59,13 +63,13 @@ describe("adminProductsDeleteService catalog invalidation", () => {
     await expect(
       adminProductsDeleteService.updateProductDiscount("p1", 10),
     ).resolves.toEqual({ success: true, discountPercent: 10 });
-    expect(mocks.invalidateCatalogCaches).toHaveBeenCalledTimes(1);
+    expect(mocks.syncProductListingReadModel).toHaveBeenCalledTimes(1);
   });
 
   it("does not fail the mutation when invalidation throws", async () => {
     mocks.productFindUnique.mockResolvedValue({ id: "p1" });
     mocks.productUpdate.mockResolvedValue({ id: "p1" });
-    mocks.invalidateCatalogCaches.mockRejectedValue(new Error("redis down"));
+    mocks.deleteProductListingReadModel.mockRejectedValue(new Error("redis down"));
     await expect(adminProductsDeleteService.deleteProduct("p1")).resolves.toEqual({
       success: true,
     });

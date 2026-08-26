@@ -3,9 +3,8 @@ import type { CategoryTreeNode } from '@/lib/category-nav';
 import { pickHomeStripCategories } from '@/lib/categoryHomeStripOrder';
 import { resolveLocalizedCategoryFields } from '@/lib/category-title-i18n';
 import type { LanguageCode } from '@/lib/language';
-import { cacheService } from '@/lib/services/cache.service';
-
-const CACHE_TTL_SECONDS = 300;
+import { getCachedJson } from '@/lib/services/read-through-json-cache';
+import { CATEGORIES_CACHE_TTL_SEC } from '@/lib/cache/public-cache-keys';
 
 export type HomeStripCategoryItem = CategoryTreeNode & {
   position: number;
@@ -16,26 +15,10 @@ export type HomeCategoryStripPayload = {
 };
 
 function buildHomeStripCacheKey(lang: string): string {
-  // v5: localize titles via dictionary when DB en/ru rows are missing/Armenian.
-  return `categories:home-strip:v5:${lang}`;
+  return `cache:categories:home-strip:v1:${lang}`;
 }
 
-/**
- * Home page category strip follows `/supersudo/categories` display order (`position`).
- */
-export async function getCachedHomeCategoryStrip(
-  lang: string,
-): Promise<{ result: HomeCategoryStripPayload; cacheStatus: 'HIT' | 'MISS' }> {
-  const cacheKey = buildHomeStripCacheKey(lang);
-  const cached = await cacheService.get(cacheKey);
-  if (cached !== null && cached !== undefined) {
-    const result =
-      typeof cached === 'string'
-        ? (JSON.parse(cached) as HomeCategoryStripPayload)
-        : (cached as HomeCategoryStripPayload);
-    return { result, cacheStatus: 'HIT' };
-  }
-
+async function loadHomeCategoryStrip(lang: string): Promise<HomeCategoryStripPayload> {
   const categories = await db.category.findMany({
     where: {
       published: true,
@@ -86,6 +69,18 @@ export async function getCachedHomeCategoryStrip(
   });
 
   const result: HomeCategoryStripPayload = { data };
-  await cacheService.setex(cacheKey, CACHE_TTL_SECONDS, JSON.stringify(result));
-  return { result, cacheStatus: 'MISS' };
+  return result;
+}
+
+/**
+ * Home page category strip follows `/supersudo/categories` display order (`position`).
+ */
+export async function getCachedHomeCategoryStrip(
+  lang: string,
+): Promise<{ result: HomeCategoryStripPayload; cacheStatus: 'HIT' | 'MISS' }> {
+  return getCachedJson<HomeCategoryStripPayload>(
+    buildHomeStripCacheKey(lang),
+    CATEGORIES_CACHE_TTL_SEC,
+    () => loadHomeCategoryStrip(lang),
+  );
 }

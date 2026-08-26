@@ -40,7 +40,7 @@ describe("buildProductFiltersCacheKey", () => {
       lang: "en",
     });
     expect(a).toBe(b);
-    expect(a.startsWith("products:filters:v2:")).toBe(true);
+    expect(a.startsWith("cache:products:filters:v1:")).toBe(true);
   });
 
   it("normalizes multi-category param order for cache key", () => {

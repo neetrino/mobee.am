@@ -17,6 +17,7 @@ import { pickProductTranslation } from "../products/pickProductTranslation";
 import type { LanguageCode } from "../language";
 
 import { CATALOG_DISCOUNT_CACHE_KEY } from "@/lib/catalog/catalog.constants";
+import { DISCOUNT_CONTEXT_CACHE_TTL_SEC } from "@/lib/cache/public-cache-keys";
 
 export type ProductListingTransformContext = {
   colors?: string;
@@ -25,7 +26,6 @@ export type ProductListingTransformContext = {
 };
 
 const DISCOUNT_CONTEXT_CACHE_KEY = CATALOG_DISCOUNT_CACHE_KEY;
-const DISCOUNT_CONTEXT_TTL_SEC = 120;
 
 export type ProductDiscountContext = {
   globalDiscount: number;
@@ -77,7 +77,7 @@ export async function loadProductDiscountContext(): Promise<ProductDiscountConte
   const ctx: ProductDiscountContext = { globalDiscount, categoryDiscounts, brandDiscounts };
 
   try {
-    await cacheService.setex(DISCOUNT_CONTEXT_CACHE_KEY, DISCOUNT_CONTEXT_TTL_SEC, JSON.stringify(ctx));
+    await cacheService.setex(DISCOUNT_CONTEXT_CACHE_KEY, DISCOUNT_CONTEXT_CACHE_TTL_SEC, JSON.stringify(ctx));
   } catch {
     // ignore cache write failures
   }

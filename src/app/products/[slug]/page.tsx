@@ -1,11 +1,12 @@
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { readLanguageFromCookies, type LanguageCode } from '@/lib/language';
+import { DEFAULT_LANGUAGE, type LanguageCode } from '@/lib/language';
 import { getCachedProductBySlug } from '@/lib/services/products-slug-cached';
 import { ProductPageClient } from './ProductPageClient';
 import { parseProductSlugParam } from './parse-product-slug-param';
 import { parseProductPageColorParam } from '@/lib/products/product-page-href';
 import { RESERVED_ROUTES, type Product } from './types';
+
+export const revalidate = 300;
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -54,8 +55,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
     redirect(`/${slug}`);
   }
 
-  const cookieStore = await cookies();
-  const initialLocale = readLanguageFromCookies(cookieStore);
+  const initialLocale = DEFAULT_LANGUAGE;
   const { product: initialProduct, notFound: initialNotFound } = await loadInitialProduct(
     slug,
     initialLocale,

@@ -532,3 +532,5 @@ export async function transformProduct(
   };
 }
 
+export type ProductPdpPayload = Awaited<ReturnType<typeof transformProduct>>;
+

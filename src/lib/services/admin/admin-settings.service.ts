@@ -5,7 +5,7 @@ import {
   resolveHomeHeroSettingsForRead,
   type HomeHeroSettings,
 } from "@/lib/home-hero";
-import { invalidateCatalogCaches } from "@/lib/catalog/invalidate-catalog-cache";
+import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
 
 class AdminSettingsService {
   /**
@@ -141,7 +141,7 @@ class AdminSettingsService {
       logger.info('✅ [ADMIN SERVICE] Currency rates updated:', { value: data.currencyRates });
     }
 
-    await invalidateCatalogCaches();
+    await rebuildProductListingReadModel();
     return { success: true };
   }
 
@@ -254,7 +254,7 @@ class AdminSettingsService {
     });
 
     logger.info('✅ [ADMIN SERVICE] Price filter settings updated:', { value: setting });
-    await invalidateCatalogCaches();
+    await rebuildProductListingReadModel();
     const stored = setting.value as any;
     return {
       success: true,
