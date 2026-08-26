@@ -70,9 +70,7 @@ describe("Phase 3 schema contract", () => {
     );
   });
 
-  it("does not add unique on Payment.providerTransactionId or Outbox", () => {
-    expect(schema).not.toContain("model Outbox");
-    expect(schema).not.toContain('@@map("outbox');
+  it("does not add unique on Payment.providerTransactionId or Outbox in Phase 3 migration", () => {
     expect(migration).not.toContain('CREATE TABLE "outbox');
     expect(migration).not.toMatch(
       /UNIQUE INDEX .*payments.*providerTransactionId/,
@@ -87,19 +85,22 @@ describe("Phase 3 schema contract", () => {
     expect(schema).toContain('@relation("StockMovementOrder")');
   });
 
-  it("does not introduce Phase 5 idempotency writers", () => {
+  it("introduces Phase 5 idempotency writers in checkout and callback services", () => {
     const writerPaths = [
-      "src/lib/services/orders.service.ts",
-      "src/lib/services/admin/admin-orders/order-mutations.ts",
-      "src/lib/services/admin/admin-inventory.service.ts",
-      "src/lib/services/inventory/stock-reservation.ts",
-      "src/app/api/v1/payments/callback/route.ts",
+      { path: "src/lib/services/orders.service.ts", scope: true, provider: false },
+      { path: "src/lib/services/orders/apply-payment-callback.ts", scope: false, provider: true },
     ];
 
-    for (const relativePath of writerPaths) {
-      const source = readUtf8(path.join(REPO_ROOT, relativePath));
-      expect(source).not.toContain("idempotencyScopeHash");
-      expect(source).not.toContain("providerEventId");
+    for (const entry of writerPaths) {
+      const source = readUtf8(path.join(REPO_ROOT, entry.path));
+      if (entry.scope) {
+        expect(source).toContain("idempotencyScopeHash");
+        expect(source).toContain("requestFingerprint");
+      }
+      if (entry.provider) {
+        expect(source).toContain("providerEventId");
+      }
+      expect(source).not.toContain("model Outbox");
     }
   });
 });

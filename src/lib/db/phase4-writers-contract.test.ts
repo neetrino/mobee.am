@@ -29,12 +29,25 @@ describe("Phase 4 ledger writers contract", () => {
     expect(adjust).toContain("createAuditLog");
   });
 
-  it("does not add Phase 5 idempotency or Outbox writers", () => {
-    const callback = readUtf8(path.join(REPO_ROOT, "src/app/api/v1/payments/callback/route.ts"));
+  it("writes Phase 5 idempotency and Phase 6 outbox during checkout", () => {
+    const callback = readUtf8(path.join(REPO_ROOT, "src/lib/services/orders/apply-payment-callback.ts"));
     const checkout = readUtf8(path.join(REPO_ROOT, "src/lib/services/orders.service.ts"));
-    expect(callback).not.toContain("providerEventId");
-    expect(callback).not.toContain("idempotencyScopeHash");
-    expect(checkout).not.toContain("idempotencyScopeHash");
+    expect(callback).toContain("providerEventId");
+    expect(checkout).toContain("idempotencyScopeHash");
+    expect(checkout).toContain("requestFingerprint");
+    expect(checkout).toContain("enqueueAparikCheckoutOutbox");
+    expect(checkout).not.toContain("sendAparikCheckoutEmail");
     expect(checkout).not.toContain("model Outbox");
+    expect(callback).not.toContain("model Outbox");
+  });
+
+  it("does not serialize the whole checkout transaction with an advisory xact lock", () => {
+    const checkout = readUtf8(path.join(REPO_ROOT, "src/lib/services/orders.service.ts"));
+    const allocate = readUtf8(
+      path.join(REPO_ROOT, "src/lib/services/orders/allocate-order-number.ts"),
+    );
+    expect(checkout).not.toContain("pg_advisory_xact_lock");
+    expect(allocate).not.toContain("pg_advisory_xact_lock");
+    expect(allocate).toContain("createOrderWithUniqueNumber");
   });
 });

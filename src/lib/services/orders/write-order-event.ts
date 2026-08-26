@@ -8,6 +8,8 @@ export interface OrderEventWrite {
   toState: string | null;
   isCustomerVisible: boolean;
   data: Prisma.InputJsonValue;
+  provider?: string | null;
+  providerEventId?: string | null;
 }
 
 export async function createOrderEvent(
@@ -25,6 +27,8 @@ export async function createOrderEvent(
       isCustomerVisible: input.isCustomerVisible,
       data: input.data,
       correlationId: context.requestId,
+      provider: input.provider ?? null,
+      providerEventId: input.providerEventId ?? null,
     },
   });
 }

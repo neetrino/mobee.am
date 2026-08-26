@@ -42,8 +42,14 @@ const context = {
 describe("applyPaymentCallback", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.transaction.mockImplementation(async (fn: (tx: { payment: { findUnique: typeof mocks.findUnique } }) => unknown) => {
-      return fn({ payment: { findUnique: mocks.findUnique } });
+    mocks.transaction.mockImplementation(async (fn: (tx: {
+      payment: { findUnique: typeof mocks.findUnique };
+      orderEvent: { findFirst: ReturnType<typeof vi.fn> };
+    }) => unknown) => {
+      return fn({
+        payment: { findUnique: mocks.findUnique },
+        orderEvent: { findFirst: vi.fn().mockResolvedValue(null) },
+      });
     });
   });
 
@@ -83,7 +89,43 @@ describe("applyPaymentCallback", () => {
     expect(mocks.applyPlannedTransitions).not.toHaveBeenCalled();
   });
 
-  it("applies the payment-row FSM without requesting an Order.status change", async () => {
+  it("returns no_op when the provider event was already recorded", async () => {
+    mocks.findUnique.mockResolvedValue({
+      id: "pay-1",
+      orderId: "order-1",
+      order: { id: "order-1", number: "1001" },
+    });
+    mocks.lockOrderForUpdate.mockResolvedValue({
+      id: "order-1",
+      number: "1001",
+      status: "pending",
+      paymentStatus: "paid",
+      fulfillmentStatus: "unfulfilled",
+      paidAt: new Date("2026-01-02"),
+      fulfilledAt: null,
+      cancelledAt: null,
+    });
+    mocks.transaction.mockImplementation(async (fn: (tx: {
+      payment: { findUnique: typeof mocks.findUnique };
+      orderEvent: { findFirst: ReturnType<typeof vi.fn> };
+    }) => unknown) => {
+      const findFirst = vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce({ id: "evt-1" });
+      return fn({
+        payment: { findUnique: mocks.findUnique },
+        orderEvent: { findFirst },
+      });
+    });
+
+    await expect(
+      applyPaymentCallback(
+        { paymentId: "pay-1", orderNumber: "1001", status: "paid", provider: "idram" },
+        context,
+      ),
+    ).resolves.toBe("no_op");
+    expect(mocks.applyPlannedTransitions).not.toHaveBeenCalled();
+  });
+
+  it("writes provider replay metadata on the happy path", async () => {
     mocks.findUnique.mockResolvedValue({
       id: "pay-1",
       orderId: "order-1",
@@ -110,6 +152,15 @@ describe("applyPaymentCallback", () => {
       createdAt: new Date("2026-01-01"),
     });
     mocks.applyPlannedTransitions.mockResolvedValue(undefined);
+    mocks.transaction.mockImplementation(async (fn: (tx: {
+      payment: { findUnique: typeof mocks.findUnique };
+      orderEvent: { findFirst: ReturnType<typeof vi.fn> };
+    }) => unknown) => {
+      return fn({
+        payment: { findUnique: mocks.findUnique },
+        orderEvent: { findFirst: vi.fn().mockResolvedValue(null) },
+      });
+    });
 
     await expect(
       applyPaymentCallback(
@@ -120,6 +171,8 @@ describe("applyPaymentCallback", () => {
 
     expect(mocks.applyPlannedTransitions).toHaveBeenCalledWith(
       expect.objectContaining({
+        provider: "idram",
+        providerEventId: expect.stringMatching(/^[a-f0-9]{64}$/),
         paymentId: "pay-1",
         paymentRowChange: expect.objectContaining({ kind: "apply", to: "paid" }),
         planned: expect.objectContaining({

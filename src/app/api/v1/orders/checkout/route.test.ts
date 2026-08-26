@@ -72,6 +72,63 @@ describe("POST /api/v1/orders/checkout", () => {
     });
   });
 
+  it("returns 400 problem+json for an invalid idempotency key", async () => {
+    const req = new NextRequest("http://localhost:3000/api/v1/orders/checkout", {
+      method: "POST",
+      body: JSON.stringify(checkoutBody),
+      headers: {
+        "content-type": "application/json",
+        "Idempotency-Key": "bad key",
+        [REQUEST_ID_HEADER]: "checkout-req-invalid-key",
+      },
+    });
+    const res = await POST(req);
+    const body = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(res.headers.get("content-type")).toContain(PROBLEM_JSON);
+    expect(body.title).toBe("Validation Error");
+    expect(ordersService.checkout).not.toHaveBeenCalled();
+  });
+
+  it("forwards a valid Idempotency-Key header to the service", async () => {
+    vi.mocked(ordersService.checkout).mockResolvedValue({
+      order: {
+        id: "order-1",
+        number: "1001",
+        status: "pending",
+        paymentStatus: "pending",
+        total: 1000,
+        currency: "AMD",
+      },
+      payment: {
+        provider: "cash_on_delivery",
+        paymentUrl: null,
+        expiresAt: null,
+      },
+      nextAction: "view_order",
+    });
+
+    const req = new NextRequest("http://localhost:3000/api/v1/orders/checkout", {
+      method: "POST",
+      body: JSON.stringify(checkoutBody),
+      headers: {
+        "content-type": "application/json",
+        "Idempotency-Key": "checkout-key-12345678",
+      },
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(201);
+    expect(ordersService.checkout).toHaveBeenCalledWith(
+      expect.anything(),
+      undefined,
+      "http://localhost:3000",
+      expect.anything(),
+      { idempotencyKey: "checkout-key-12345678" },
+    );
+  });
+
   it("returns 422 problem+json for insufficient stock and echoes the request id", async () => {
     vi.mocked(ordersService.checkout).mockRejectedValue({
       status: 422,

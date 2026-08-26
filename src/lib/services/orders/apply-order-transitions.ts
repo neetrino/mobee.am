@@ -79,6 +79,8 @@ export async function applyPlannedTransitions(input: {
   paymentId?: string | null;
   paymentRowChange?: MachineChange<PaymentStatus>;
   providerResponse?: Prisma.InputJsonValue;
+  provider?: string | null;
+  providerEventId?: string | null;
 }): Promise<void> {
   const now = new Date();
   const timestamps = buildOrderTimestampPatch({
@@ -118,6 +120,8 @@ export async function applyPlannedTransitions(input: {
     planned: input.planned,
     paymentRowChange: input.paymentRowChange,
     paymentId: input.paymentId,
+    provider: input.provider,
+    providerEventId: input.providerEventId,
     restockSkipped: input.planned.isCancelRestock ? restockSkipped : undefined,
     before: {
       status: input.locked.status,

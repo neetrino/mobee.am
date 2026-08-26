@@ -31,4 +31,6 @@ export const PAYMENT_FEATURE_ENV_NAMES = [
   "APARIK_NOTIFICATION_EMAIL",
 ] as const;
 
+export const OUTBOX_FEATURE_ENV_NAMES = ["OUTBOX_DRAIN_SECRET"] as const;
+
 export type CoreEnvName = (typeof CORE_ENV_NAMES)[number];

@@ -51,9 +51,11 @@ async function writePaymentHistory(input: {
   tx: Prisma.TransactionClient;
   context: CommerceRequestContext;
   orderId: string;
-  orderPayment: MachineChange<PaymentStatus>;
+  orderPayment: MachineChange<string>;
   paymentRowChange?: MachineChange<PaymentStatus>;
   paymentId?: string | null;
+  provider?: string | null;
+  providerEventId?: string | null;
 }): Promise<void> {
   const orderWrite = isMachineWrite(input.orderPayment);
   const rowWrite = input.paymentRowChange ? isMachineWrite(input.paymentRowChange) : false;
@@ -74,6 +76,8 @@ async function writePaymentHistory(input: {
     fromState,
     toState: target,
     isCustomerVisible: true,
+    provider: input.provider ?? null,
+    providerEventId: input.providerEventId ?? null,
     data: {
       source: input.context.source,
       note: input.context.note ?? null,
@@ -129,6 +133,8 @@ export async function writeTransitionHistory(input: {
   restockSkipped?: RestockSkip[];
   paymentRowChange?: MachineChange<PaymentStatus>;
   paymentId?: string | null;
+  provider?: string | null;
+  providerEventId?: string | null;
   before: { status: string; paymentStatus: string; fulfillmentStatus: string };
 }): Promise<void> {
   await writeMachineEvent({
@@ -152,6 +158,8 @@ export async function writeTransitionHistory(input: {
     orderPayment: input.planned.payment,
     paymentRowChange: input.paymentRowChange,
     paymentId: input.paymentId,
+    provider: input.provider,
+    providerEventId: input.providerEventId,
   });
   await writeMachineEvent({
     tx: input.tx,

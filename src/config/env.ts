@@ -39,6 +39,7 @@ const envSchema = z.object({
   RESEND_FROM_EMAIL: z.string().min(1).optional(),
   EMAIL_FROM: z.string().min(1).optional(),
   APARIK_NOTIFICATION_EMAIL: z.string().min(1).optional(),
+  OUTBOX_DRAIN_SECRET: z.string().min(1).optional(),
   R2_ACCOUNT_ID: z.string().min(1).optional(),
   R2_ACCESS_KEY_ID: z.string().min(1).optional(),
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
@@ -73,6 +74,7 @@ function readEnvInput(): Record<string, string | undefined> {
     RESEND_FROM_EMAIL: optionalEnv(process.env.RESEND_FROM_EMAIL),
     EMAIL_FROM: optionalEnv(process.env.EMAIL_FROM),
     APARIK_NOTIFICATION_EMAIL: optionalEnv(process.env.APARIK_NOTIFICATION_EMAIL),
+    OUTBOX_DRAIN_SECRET: optionalEnv(process.env.OUTBOX_DRAIN_SECRET),
     R2_ACCOUNT_ID: optionalEnv(process.env.R2_ACCOUNT_ID),
     R2_ACCESS_KEY_ID: optionalEnv(process.env.R2_ACCESS_KEY_ID),
     R2_SECRET_ACCESS_KEY: optionalEnv(process.env.R2_SECRET_ACCESS_KEY),
@@ -234,6 +236,10 @@ export function getArcaPaymentUrl(): string | undefined {
 
 export function getAparikNotificationEmail(): string | undefined {
   return getEnv().APARIK_NOTIFICATION_EMAIL;
+}
+
+export function getOutboxDrainSecretValue(): string | undefined {
+  return getEnv().OUTBOX_DRAIN_SECRET;
 }
 
 export function getRedisTcpUrl(): string | undefined {

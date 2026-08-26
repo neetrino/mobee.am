@@ -6,6 +6,7 @@ import {
   calculateReservationDelta,
   releaseVariantStockReservation,
   reserveVariantStock,
+  type ReservationReleaseContext,
 } from "./inventory/stock-reservation";
 import { assertVariantPurchasable } from "../products/variant-price-display";
 
@@ -285,7 +286,12 @@ class CartService {
   /**
    * Update cart item
    */
-  async updateItem(userId: string, itemId: string, quantity: number) {
+  async updateItem(
+    userId: string,
+    itemId: string,
+    quantity: number,
+    context?: ReservationReleaseContext,
+  ) {
     if (!quantity || quantity < 1) {
       throw {
         status: 400,
@@ -328,7 +334,12 @@ class CartService {
       if (reservationDelta > 0) {
         await reserveVariantStock(tx, item.variantId, reservationDelta);
       } else if (reservationDelta < 0) {
-        await releaseVariantStockReservation(tx, item.variantId, Math.abs(reservationDelta));
+        await releaseVariantStockReservation(
+          tx,
+          item.variantId,
+          Math.abs(reservationDelta),
+          context,
+        );
       }
 
       return tx.cartItem.update({
@@ -348,7 +359,7 @@ class CartService {
   /**
    * Remove item from cart
    */
-  async removeItem(userId: string, itemId: string) {
+  async removeItem(userId: string, itemId: string, context?: ReservationReleaseContext) {
     const cart = await db.cart.findFirst({
       where: {
         userId,
@@ -382,7 +393,7 @@ class CartService {
     }
 
     await db.$transaction(async (tx: Prisma.TransactionClient) => {
-      await releaseVariantStockReservation(tx, item.variantId, item.quantity);
+      await releaseVariantStockReservation(tx, item.variantId, item.quantity, context);
       await tx.cartItem.delete({
         where: { id: itemId },
       });

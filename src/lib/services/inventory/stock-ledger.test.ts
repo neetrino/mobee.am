@@ -172,6 +172,27 @@ describe("cancellation restock", () => {
       },
     ]);
   });
+
+  it("records a nonexistent variant without creating a stock movement", async () => {
+    const tx = createTx({
+      $queryRaw: vi.fn().mockResolvedValueOnce([]),
+    });
+    const skipped = await restockCancelledOrder({
+      tx: tx as never,
+      context,
+      orderId: "order-1",
+      items: [{ variantId: "gone", sku: "SKU-GONE", quantity: 4 }],
+    });
+    expect(tx.stockMovement.create).not.toHaveBeenCalled();
+    expect(skipped).toEqual([
+      {
+        variantId: "gone",
+        skuSnapshot: "SKU-GONE",
+        quantity: 4,
+        reason: "variant_not_found",
+      },
+    ]);
+  });
 });
 
 describe("admin inventory adjustment boundaries", () => {

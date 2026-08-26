@@ -3,13 +3,33 @@ import { authenticateToken } from "@/lib/middleware/auth";
 import { parseCheckoutBody } from "@/lib/schemas/checkout.schema";
 import { ordersService } from "@/lib/services/orders.service";
 import { normalizeCheckoutLocale } from "@/lib/services/orders/checkout-calculations";
+import {
+  CHECKOUT_IDEMPOTENCY_KEY_INVALID,
+  parseIdempotencyKeyHeader,
+} from "@/lib/services/orders/checkout-idempotency";
 import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
 
 export async function POST(req: NextRequest) {
   return runApiRoute(req, async (ctx) => {
-    logger.info("Checkout request received", { requestId: ctx.requestId });
+    logger.info("Checkout request received", {
+      requestId: ctx.requestId,
+      hasIdempotencyKey: Boolean(
+        parseIdempotencyKeyHeader(
+          req.headers.get("Idempotency-Key"),
+          req.headers.get("X-Idempotency-Key"),
+        ).key,
+      ),
+    });
     const user = await authenticateToken(req);
+
+    const parsedIdempotency = parseIdempotencyKeyHeader(
+      req.headers.get("Idempotency-Key"),
+      req.headers.get("X-Idempotency-Key"),
+    );
+    if (parsedIdempotency.invalid) {
+      throw CHECKOUT_IDEMPOTENCY_KEY_INVALID;
+    }
 
     const body = await req.json();
     const data = parseCheckoutBody(body);
@@ -32,6 +52,7 @@ export async function POST(req: NextRequest) {
       user?.id,
       req.nextUrl.origin,
       ctx.commerce({ actorUserId: user?.id ?? null, source: "checkout" }),
+      { idempotencyKey: parsedIdempotency.key },
     );
 
     logger.info("Checkout successful", {

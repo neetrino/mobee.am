@@ -1,8 +1,13 @@
+import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearGuestCart } from '../checkoutUtils';
 import { buildOrderSuccessPath } from '../build-order-success-path';
+import {
+  getOrCreateCheckoutIdempotencyKey,
+  resetCheckoutIdempotencyKey,
+} from '../checkout-idempotency-key';
+import { postCheckoutOrder } from '../post-checkout-order';
 import type { CheckoutFormData, Cart, CartItem } from '../types';
 
 interface UseOrderSubmissionProps {
@@ -26,6 +31,7 @@ export function useOrderSubmission({
 }: UseOrderSubmissionProps) {
   const router = useRouter();
   const { t, lang } = useTranslation();
+  const idempotencyKeyRef = useRef<string | null>(null);
 
   const submitOrder = async (data: CheckoutFormData) => {
     setError(null);
@@ -65,41 +71,33 @@ export function useOrderSubmission({
       const shippingAmount =
         shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
 
-      const response = await apiClient.post<{
-        order: {
-          id: string;
-          number: string;
-          status: string;
-          paymentStatus: string;
-          total: number;
-          currency: string;
-        };
-        payment: {
-          provider: string;
-          paymentUrl: string | null;
-          expiresAt: string | null;
-        };
-        nextAction: string;
-      }>('/api/v1/orders/checkout', {
-        cartId: cartId,
-        ...(items ? { items } : {}),
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        shippingMethod,
-        ...(shippingMethod === 'delivery' ? { deliverySpeed: data.deliverySpeed } : {}),
-        ...(shippingAddress ? { shippingAddress } : {}),
-        shippingAmount: shippingAmount,
-        paymentMethod: data.paymentMethod,
-        promoCode: data.promoCode,
-        locale: lang,
-        currency,
-      });
+      const idempotencyKey = getOrCreateCheckoutIdempotencyKey(idempotencyKeyRef);
+
+      const response = await postCheckoutOrder(
+        {
+          cartId: cartId,
+          ...(items ? { items } : {}),
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          shippingMethod,
+          ...(shippingMethod === 'delivery' ? { deliverySpeed: data.deliverySpeed } : {}),
+          ...(shippingAddress ? { shippingAddress } : {}),
+          shippingAmount: shippingAmount,
+          paymentMethod: data.paymentMethod,
+          promoCode: data.promoCode,
+          locale: lang,
+          currency,
+        },
+        idempotencyKey,
+      );
 
       if (!isLoggedIn) {
         clearGuestCart();
       }
+
+      resetCheckoutIdempotencyKey(idempotencyKeyRef);
 
       if (response.payment?.paymentUrl) {
         window.location.href = response.payment.paymentUrl;

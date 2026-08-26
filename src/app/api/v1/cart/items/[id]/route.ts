@@ -7,7 +7,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return runApiRoute(req, async () => {
+  return runApiRoute(req, async (ctx) => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -24,7 +24,9 @@ export async function PATCH(
 
     const { id } = await params;
     const data = await req.json();
-    const result = await cartService.updateItem(user.id, id, data.quantity);
+    const result = await cartService.updateItem(user.id, id, data.quantity, {
+      requestId: ctx.requestId,
+    });
     return NextResponse.json(result);
   });
 }
@@ -33,7 +35,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return runApiRoute(req, async () => {
+  return runApiRoute(req, async (ctx) => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -49,7 +51,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await cartService.removeItem(user.id, id);
+    await cartService.removeItem(user.id, id, { requestId: ctx.requestId });
     return new NextResponse(null, { status: 204 });
   });
 }

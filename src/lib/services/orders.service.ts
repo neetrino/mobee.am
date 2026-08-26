@@ -8,7 +8,6 @@ import {
   normalizeCheckoutLocale,
   normalizePercent,
 } from "./orders/checkout-calculations";
-import { createPaymentUrl } from "./orders/checkout-payment";
 import {
   resolveCheckoutShippingAmount,
   type DeliverySpeed,
@@ -18,43 +17,37 @@ import { CART_MONEY_BASE_CURRENCY } from "../checkout/cart-money";
 import { MIN_ORDER_SUBTOTAL_FOR_DELIVERY_AMD } from "../constants/checkout-shipping.constants";
 import { convertPrice } from "../currency";
 import { removeOrphanCartItemsForCart } from "./cart-remove-orphan-items";
-import { sendAparikCheckoutEmail } from "../email/send-aparik-checkout-email";
-import {
-  buildCheckoutCartItemDetails,
-  type CheckoutCartItemDetails,
-} from "./orders/checkout-cart-item-details";
+import { buildAparikCheckoutOutboxPayload } from "../outbox/aparik-checkout-outbox-payload";
+import { enqueueAparikCheckoutOutbox } from "../outbox/enqueue-aparik-checkout-outbox";
+import { triggerOutboxDrainBestEffort } from "../outbox/trigger-outbox-drain";
 import {
   assertCartLinePurchasable,
   assertVariantPurchasable,
 } from "../products/variant-price-display";
 import { normalizeCheckoutDisplayCurrency } from "../checkout/checkout-email-money";
-import { adminService } from "./admin.service";
+import { resolveCheckoutOutboxCurrencyRates } from "./orders/resolve-checkout-outbox-currency-rates";
 import { availableUnreservedStock, hasUnreservedQuantity } from "./inventory/available-stock";
 import { decrementCheckoutStock } from "./inventory/decrement-checkout-stock";
+import { createOrderWithUniqueNumber } from "./orders/allocate-order-number";
+import { buildCheckoutSuccessResponse } from "./orders/build-checkout-response";
+import {
+  buildCheckoutRequestFingerprint,
+  buildIdempotencyKeyHash,
+  buildIdempotencyScopeHash,
+} from "./orders/checkout-idempotency";
+import {
+  isOrderIdempotencyUniqueConflict,
+  preflightCheckoutIdempotency,
+  resolveIdempotencyAfterUniqueConflict,
+  tryReplayExistingCheckout,
+} from "./orders/checkout-idempotency-resolve";
+import { throwMappedCheckoutFailure } from "./orders/map-checkout-unexpected-error";
+import {
+  buildCheckoutCartItemDetails,
+  type CheckoutCartItemDetails,
+} from "./orders/checkout-cart-item-details";
 import type { CommerceRequestContext } from "./orders/order-transition.types";
 import { ORDER_EVENT_TYPE } from "./orders/order-fsm.constants";
-
-const ORDER_NUMBER_START = 1000;
-const ORDER_NUMBER_ADVISORY_LOCK_KEY = 4004001;
-
-/**
- * Generate the next sequential order number (>= 1000).
- * Serializes MAX+1 with a transaction-scoped advisory lock so concurrent
- * checkouts cannot collide. Unique `orders.number` remains a last-resort guard.
- */
-async function generateSequentialOrderNumber(
-  tx: Prisma.TransactionClient
-): Promise<string> {
-  await tx.$executeRaw(
-    Prisma.sql`SELECT pg_advisory_xact_lock(${ORDER_NUMBER_ADVISORY_LOCK_KEY})`,
-  );
-  const rows = await tx.$queryRaw<Array<{ max: bigint | null }>>(
-    Prisma.sql`SELECT MAX(CAST("number" AS BIGINT)) AS max FROM "orders" WHERE "number" ~ '^[0-9]+$'`
-  );
-  const currentMax = Number(rows[0]?.max ?? 0);
-  const next = Math.max(currentMax + 1, ORDER_NUMBER_START);
-  return String(next);
-}
 type CartItemWithRelations = Prisma.CartItemGetPayload<{
   include: {
     product: {
@@ -266,6 +259,43 @@ class OrdersService {
     };
   }
 
+  private async assertCheckoutStockAvailable(input: {
+    cartItems: CheckoutCartItemDetails[];
+    isUserCartCheckout: boolean;
+  }): Promise<void> {
+    const variantIds = [...new Set(input.cartItems.map((item) => item.variantId))];
+    const variants = await db.productVariant.findMany({
+      where: { id: { in: variantIds } },
+      select: { id: true, stock: true, stockReserved: true },
+    });
+    const variantMap = new Map(variants.map((variant) => [variant.id, variant]));
+
+    for (const item of input.cartItems) {
+      const variant = variantMap.get(item.variantId);
+      if (!variant) {
+        throw {
+          status: 404,
+          type: "https://api.shop.am/problems/not-found",
+          title: "Variant not found",
+          detail: `Variant ${item.variantId} not found for checkout`,
+        };
+      }
+
+      const insufficient = input.isUserCartCheckout
+        ? variant.stock < item.quantity
+        : !hasUnreservedQuantity(variant.stock, variant.stockReserved, item.quantity);
+
+      if (insufficient) {
+        throw {
+          status: 422,
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Insufficient stock",
+          detail: `Product "${item.productTitle || "Unknown"}" - insufficient stock. Available: ${availableUnreservedStock(variant.stock, variant.stockReserved)}, Requested: ${item.quantity}`,
+        };
+      }
+    }
+  }
+
   private async resolvePromoDiscountPercent(code?: string): Promise<number> {
     if (!code) return 0;
     const normalizedCode = code.trim().toUpperCase();
@@ -296,8 +326,11 @@ class OrdersService {
     userId: string | undefined,
     baseUrl: string | undefined,
     context: CommerceRequestContext,
+    options?: { idempotencyKey?: string | null },
   ) {
     try {
+      const idempotencyKey = options?.idempotencyKey?.trim() || null;
+      const hasIdempotencyKey = Boolean(idempotencyKey);
       const {
         cartId,
         items: guestItems,
@@ -421,16 +454,6 @@ class OrdersService {
               locale: customerLocale,
             });
 
-            // User-cart lines already hold stockReserved; on-hand must still cover quantity.
-            if (variant.stock < item.quantity) {
-              throw {
-                status: 422,
-                type: "https://api.shop.am/problems/validation-error",
-                title: "Insufficient stock",
-                detail: `Product "${cartItemDetails.productTitle || "Unknown"}" - insufficient stock. Available: ${availableUnreservedStock(variant.stock, variant.stockReserved)}, Requested: ${item.quantity}`,
-              };
-            }
-
             const cartItem = cartItemDetails;
             
             logger.debug('Cart item formatted', {
@@ -490,14 +513,6 @@ class OrdersService {
               detail: `Variant ${item.variantId} not found for product ${item.productId}`,
             };
           }
-          if (!hasUnreservedQuantity(variant.stock, variant.stockReserved, item.quantity)) {
-            throw {
-              status: 422,
-              type: "https://api.shop.am/problems/validation-error",
-              title: "Insufficient stock",
-              detail: `Insufficient stock. Available: ${availableUnreservedStock(variant.stock, variant.stockReserved)}, Requested: ${item.quantity}`,
-            };
-          }
           assertVariantPurchasable(variant);
           const cartItemDetails = buildCheckoutCartItemDetails({
             variant,
@@ -525,6 +540,58 @@ class OrdersService {
         };
       }
 
+      const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+      const speed: DeliverySpeed =
+        requestedDeliverySpeed === "express" ? "express" : "standard";
+      const idempotencyScopeHash = hasIdempotencyKey
+        ? buildIdempotencyScopeHash({ userId, email, phone })
+        : null;
+      const idempotencyKeyHash = hasIdempotencyKey && idempotencyKey
+        ? buildIdempotencyKeyHash(idempotencyKey)
+        : null;
+      const requestFingerprint = hasIdempotencyKey
+        ? buildCheckoutRequestFingerprint({
+            items: cartItems.map((item) => ({
+              variantId: item.variantId,
+              quantity: Number(item.quantity),
+            })),
+            email,
+            phone,
+            shippingMethod,
+            paymentMethod,
+            deliverySpeed: shippingMethod === "delivery" ? speed : undefined,
+            city: shippingAddress?.city,
+            promoCode: promoCode ?? null,
+            userId: userId ?? null,
+            cartId: cartId ?? null,
+          })
+        : null;
+
+      if (hasIdempotencyKey && idempotencyScopeHash && idempotencyKeyHash && requestFingerprint) {
+        const preflight = await preflightCheckoutIdempotency({
+          scopeHash: idempotencyScopeHash,
+          keyHash: idempotencyKeyHash,
+          requestFingerprint,
+        });
+        if (preflight) {
+          logger.info("Checkout idempotency replay", {
+            requestId: context.requestId,
+            hasIdempotencyKey: true,
+            orderNumber: preflight.order.number,
+          });
+          return buildCheckoutSuccessResponse({
+            order: preflight.order,
+            payment: preflight.payment,
+            baseUrl: resolvedBaseUrl,
+          });
+        }
+      }
+
+      await this.assertCheckoutStockAvailable({
+        cartItems,
+        isUserCartCheckout,
+      });
+
       // Calculate totals
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const discountPercent = await this.resolvePromoDiscountPercent(promoCode);
@@ -546,8 +613,6 @@ class OrdersService {
           detail: `Delivery is only available for orders of ${MIN_ORDER_SUBTOTAL_FOR_DELIVERY_AMD} AMD or more. Please choose store pickup.`,
         };
       }
-      const speed: DeliverySpeed =
-        requestedDeliverySpeed === "express" ? "express" : "standard";
       // Shipping: computed server-side only (never trust client-provided amount)
       const shippingResolution = await resolveCheckoutShippingAmount({
         shippingMethod,
@@ -583,16 +648,36 @@ class OrdersService {
           ? { ...shippingAddress, deliverySpeed: speed }
           : shippingAddress;
 
+      logger.info("Checkout totals computed", {
+        requestId: context.requestId,
+        hasIdempotencyKey,
+        itemCount: cartItems.length,
+      });
+
+      const aparikOutboxCurrencyRates =
+        paymentMethod === "aparik"
+          ? await resolveCheckoutOutboxCurrencyRates()
+          : null;
+
       // Create order with items in a transaction (timeout to avoid hung connections)
       const order = await db.$transaction(
         async (tx: Prisma.TransactionClient) => {
-        // Generate sequential order number inside the transaction so the
-        // MAX lookup and the insert are atomic. Unique constraint on
-        // `orders.number` still guards against rare races (returns 409).
-        const orderNumber = await generateSequentialOrderNumber(tx);
+        if (hasIdempotencyKey && idempotencyScopeHash && idempotencyKeyHash && requestFingerprint) {
+          const replay = await tryReplayExistingCheckout({
+            tx,
+            scopeHash: idempotencyScopeHash,
+            keyHash: idempotencyKeyHash,
+            requestFingerprint,
+          });
+          if (replay) {
+            return replay;
+          }
+        }
 
-        // Create order
-        const newOrder = await tx.order.create({
+        let createdOrder;
+        try {
+          createdOrder = await createOrderWithUniqueNumber(tx, (orderNumber) =>
+          tx.order.create({
           data: {
             number: orderNumber,
             userId: userId || null,
@@ -610,6 +695,9 @@ class OrdersService {
             customerLocale,
             shippingMethod,
             correlationId: context.requestId,
+            idempotencyScopeHash,
+            idempotencyKeyHash,
+            requestFingerprint,
             shippingAddress: persistedShippingAddress
               ? JSON.parse(JSON.stringify(persistedShippingAddress))
               : null,
@@ -658,7 +746,27 @@ class OrdersService {
           include: {
             items: true,
           },
-        });
+        }),
+        );
+        } catch (error) {
+          if (
+            hasIdempotencyKey &&
+            idempotencyScopeHash &&
+            idempotencyKeyHash &&
+            requestFingerprint &&
+            isOrderIdempotencyUniqueConflict(error)
+          ) {
+            return resolveIdempotencyAfterUniqueConflict({
+              tx,
+              scopeHash: idempotencyScopeHash,
+              keyHash: idempotencyKeyHash,
+              requestFingerprint,
+            });
+          }
+          throw error;
+        }
+
+        const newOrder = createdOrder;
 
         logger.debug("Updating stock for variants", { count: cartItems.length });
         await decrementCheckoutStock({
@@ -693,116 +801,56 @@ class OrdersService {
           });
         }
 
-        return { order: newOrder, payment };
+        if (paymentMethod === "aparik" && aparikOutboxCurrencyRates) {
+          await enqueueAparikCheckoutOutbox(tx, {
+            orderId: newOrder.id,
+            correlationId: context.requestId,
+            payload: buildAparikCheckoutOutboxPayload({
+              orderNumber: newOrder.number,
+              email,
+              phone,
+              firstName,
+              lastName,
+              shippingMethod,
+              deliverySpeed: shippingMethod === "delivery" ? speed : undefined,
+              shippingAddress: persistedShippingAddress ?? null,
+              customerLocale,
+              displayCurrency,
+              currencyRates: aparikOutboxCurrencyRates,
+              promoCode,
+              cartItems,
+              totals,
+            }),
+          });
+        }
+
+        return { order: newOrder, payment, replay: false as const };
       },
         { timeout: 10000, maxWait: 5000 }
       );
 
-      // Return order and payment info
-      const paymentUrl = createPaymentUrl({
-        paymentId: order.payment.id,
-        orderNumber: order.order.number,
-        amount: Number(order.order.total),
-        provider: paymentMethod as "idram" | "arca" | "cash_on_delivery" | "aparik",
-        baseUrl: baseUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-      });
-
-      if (paymentMethod === "aparik") {
-        try {
-          const { currencyRates } = await adminService.getSettings();
-          await sendAparikCheckoutEmail({
-            orderNumber: order.order.number,
-            customerEmail: email,
-            customerPhone: phone,
-            firstName,
-            lastName,
-            shippingMethod,
-            deliverySpeed: shippingMethod === "delivery" ? speed : undefined,
-            shippingAddress: persistedShippingAddress ?? null,
-            locale: customerLocale,
-            displayCurrency,
-            currencyRates,
-            promoCode,
-            items: cartItems.map((item) => ({
-              productTitle: item.productTitle,
-              variantTitle: item.variantTitle,
-              sku: item.sku,
-              quantity: item.quantity,
-              price: item.price,
-              lineTotal: item.price * item.quantity,
-              imageUrl: item.imageUrl,
-              color: item.color,
-              colorHex: item.colorHex,
-            })),
-            subtotal: totals.subtotal,
-            discountAmount: totals.discountAmount,
-            shippingAmount: totals.shippingAmount,
-            taxAmount: totals.taxAmount,
-            total: totals.total,
-          });
-        } catch (emailError: unknown) {
-          logger.error("Aparik checkout notification email failed", {
-            orderNumber: order.order.number,
-            error: emailError,
-          });
-        }
+      if (order.replay) {
+        logger.info("Checkout idempotency replay", {
+          requestId: context.requestId,
+          hasIdempotencyKey: true,
+          orderNumber: order.order.number,
+        });
+        return buildCheckoutSuccessResponse({
+          order: order.order,
+          payment: order.payment,
+          baseUrl: resolvedBaseUrl,
+        });
       }
 
-      return {
-        order: {
-          id: order.order.id,
-          number: order.order.number,
-          status: order.order.status,
-          paymentStatus: order.order.paymentStatus,
-          total: order.order.total,
-          currency: order.order.currency,
-        },
-        payment: {
-          provider: order.payment.provider,
-          paymentUrl,
-          expiresAt: null, // TODO: Set expiration if needed
-        },
-        nextAction: (paymentMethod === 'idram' || paymentMethod === 'arca') && Boolean(paymentUrl)
-          ? 'redirect_to_payment' 
-          : 'view_order',
-      };
+      triggerOutboxDrainBestEffort();
+
+      return buildCheckoutSuccessResponse({
+        order: order.order,
+        payment: order.payment,
+        baseUrl: resolvedBaseUrl,
+      });
     } catch (error: unknown) {
-      // Type guard for custom error
-      const customError = error as { status?: number; type?: string; message?: string; code?: string; name?: string; meta?: unknown; stack?: string };
-      
-      // If it's already our custom error, re-throw it
-      if (customError.status && customError.type) {
-        throw error;
-      }
-
-      // Log unexpected errors
-      logger.error("Checkout error", {
-        error: {
-          name: customError?.name,
-          message: customError?.message,
-          code: customError?.code,
-          meta: customError?.meta,
-          stack: customError?.stack?.substring(0, 500),
-        },
-      });
-
-      // Handle Prisma errors
-      if (customError?.code === 'P2002') {
-        throw {
-          status: 409,
-          type: "https://api.shop.am/problems/conflict",
-          title: "Conflict",
-          detail: "Order number already exists, please try again",
-        };
-      }
-
-      // Generic error
-      throw {
-        status: 500,
-        type: "https://api.shop.am/problems/internal-error",
-        title: "Internal Server Error",
-        detail: customError?.message || "An error occurred during checkout",
-      };
+      throwMappedCheckoutFailure(error, context.requestId);
     }
   }
 

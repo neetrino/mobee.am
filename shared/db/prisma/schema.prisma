@@ -578,6 +578,35 @@ model AuditLog {
 }
 
 // ============================================
+// TRANSACTIONAL OUTBOX (Phase 6)
+// ============================================
+// Phase 6 transactional outbox. Status CHECK is SQL-only (Prisma 5).
+// pending | processing | completed | failed
+model OutboxEvent {
+  id             String    @id @default(cuid())
+  eventType      String
+  aggregateType  String
+  aggregateId    String
+  payload        Json
+  payloadVersion Int       @default(1)
+  status         String    @default("pending")
+  attemptCount   Int       @default(0)
+  availableAt    DateTime  @default(now())
+  processingAt   DateTime?
+  processedAt    DateTime?
+  lastError      String?   @db.Text
+  correlationId  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([eventType, aggregateType, aggregateId], map: "outbox_events_dedupe_uidx")
+  @@index([status, availableAt])
+  @@index([aggregateType, aggregateId])
+  @@index([correlationId])
+  @@map("outbox_events")
+}
+
+// ============================================
 // PRODUCT REVIEW MODEL
 // ============================================
 model ProductReview {

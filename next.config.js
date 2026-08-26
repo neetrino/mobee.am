@@ -74,7 +74,11 @@ const nextConfig = {
   /**
    * Prisma client is generated to shared/db/generated/client (not node_modules/.prisma).
    * Serverless output tracing can omit engines; keys use picomatch on route paths.
-   * `'/*'` matches only one segment (e.g. `/x`), not `/api/v1/...` — use `'/**'` for all routes.
+   * `'/**'` as a route key attaches extra files to every route. That is required so
+   * storefront server components that import Prisma still get query engines, but it
+   * is also the root cause of Next NFT "whole project traced" / next.config.js in
+   * the trace (dynamic fs from the generated client + catch-all include).
+   * Excludes keep tests, scripts, and migrations out of standalone/serverless traces.
    */
   outputFileTracingIncludes: {
     '/**': [
@@ -86,6 +90,19 @@ const nextConfig = {
       './shared/db/generated/client/**/*',
       './generated/client/**/*',
       './node_modules/.prisma/client/**/*',
+    ],
+  },
+  outputFileTracingExcludes: {
+    '*': [
+      './scripts/**',
+      './src/**/*.test.ts',
+      './src/**/*.test.tsx',
+      './shared/db/prisma/migrations/**',
+      './docs/**',
+      './.env',
+      './.env.*',
+      './audit/**',
+      './tmp/**',
     ],
   },
   /**

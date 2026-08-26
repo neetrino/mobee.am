@@ -453,6 +453,24 @@ exports.Prisma.AuditLogScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.OutboxEventScalarFieldEnum = {
+  id: 'id',
+  eventType: 'eventType',
+  aggregateType: 'aggregateType',
+  aggregateId: 'aggregateId',
+  payload: 'payload',
+  payloadVersion: 'payloadVersion',
+  status: 'status',
+  attemptCount: 'attemptCount',
+  availableAt: 'availableAt',
+  processingAt: 'processingAt',
+  processedAt: 'processedAt',
+  lastError: 'lastError',
+  correlationId: 'correlationId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ProductReviewScalarFieldEnum = {
   id: 'id',
   productId: 'productId',
@@ -548,6 +566,7 @@ exports.Prisma.ModelName = {
   OrderEvent: 'OrderEvent',
   StockMovement: 'StockMovement',
   AuditLog: 'AuditLog',
+  OutboxEvent: 'OutboxEvent',
   ProductReview: 'ProductReview',
   PromoCode: 'PromoCode',
   Settings: 'Settings',

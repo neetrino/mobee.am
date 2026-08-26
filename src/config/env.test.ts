@@ -81,6 +81,11 @@ describe("typed env contract", () => {
     }
   });
 
+  it("allows outbox drain secret to be absent until the drain route is used", () => {
+    delete process.env.OUTBOX_DRAIN_SECRET;
+    expect(getEnv().OUTBOX_DRAIN_SECRET).toBeUndefined();
+  });
+
   it("fails fast in production runtime when core env is missing", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PHASE", "");

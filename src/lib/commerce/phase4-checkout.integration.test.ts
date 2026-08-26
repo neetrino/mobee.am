@@ -209,4 +209,67 @@ describePhase4("Phase 4 full checkout", () => {
     expect(await db.orderItem.count({ where: { variantId: failFixture.variant.id } })).toBe(0);
     expect(await db.stockMovement.count({ where: { variantId: failFixture.variant.id } })).toBe(0);
   });
+
+  it("completes two parallel guest checkouts of different SKUs without a global lock", async () => {
+    const skuA = `p4i-${randomUUID().slice(0, 8)}`;
+    const skuB = `p4j-${randomUUID().slice(0, 8)}`;
+    const fixtureA = await createVariantFixture(db, { sku: skuA, stock: 2 });
+    const fixtureB = await createVariantFixture(db, { sku: skuB, stock: 2 });
+
+    const timed = async (productId: string, variantId: string, suffix: string) => {
+      const startedAt = Date.now();
+      const value = await ordersService.checkout(
+        guestCheckout({ productId, variantId, suffix }),
+        undefined,
+        "http://localhost:3000",
+        checkoutContext(),
+      );
+      return { value, startedAt, finishedAt: Date.now() };
+    };
+
+    const wallStarted = Date.now();
+    const [first, second] = await Promise.all([
+      timed(fixtureA.product.id, fixtureA.variant.id, `${skuA}a`),
+      timed(fixtureB.product.id, fixtureB.variant.id, `${skuB}b`),
+    ]);
+    const wallMs = Date.now() - wallStarted;
+    const firstDuration = first.finishedAt - first.startedAt;
+    const secondDuration = second.finishedAt - second.startedAt;
+
+    expect(first.value).toEqual({
+      order: expect.objectContaining({ status: "pending" }),
+      payment: expect.objectContaining({ provider: "cash_on_delivery" }),
+      nextAction: "view_order",
+    });
+    expect(second.value).toEqual({
+      order: expect.objectContaining({ status: "pending" }),
+      payment: expect.objectContaining({ provider: "cash_on_delivery" }),
+      nextAction: "view_order",
+    });
+    expect(first.value.order.number).not.toBe(second.value.order.number);
+    expect(wallMs).toBeLessThan(
+      firstDuration + secondDuration - Math.min(firstDuration, secondDuration) * 0.25,
+    );
+  });
+
+  it("assigns unique numeric numbers to several parallel checkouts", async () => {
+    const runs = await Promise.all(
+      Array.from({ length: 5 }, async (_, index) => {
+        const sku = `p4n${index}-${randomUUID().slice(0, 8)}`;
+        const { product, variant } = await createVariantFixture(db, { sku, stock: 1 });
+        return ordersService.checkout(
+          guestCheckout({ productId: product.id, variantId: variant.id, suffix: sku }),
+          undefined,
+          "http://localhost:3000",
+          checkoutContext(),
+        );
+      }),
+    );
+
+    const numbers = runs.map((row) => row.order.number);
+    expect(new Set(numbers).size).toBe(5);
+    for (const number of numbers) {
+      expect(Number(number)).toBeGreaterThanOrEqual(1000);
+    }
+  });
 });

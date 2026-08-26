@@ -23,12 +23,10 @@ function adminContext() {
 }
 
 async function deleteVariantIgnoringFk(variantId: string): Promise<void> {
-  await db.$executeRawUnsafe("SET session_replication_role = replica");
-  try {
-    await db.productVariant.delete({ where: { id: variantId } });
-  } finally {
-    await db.$executeRawUnsafe("SET session_replication_role = origin");
-  }
+  await db.$transaction(async (tx) => {
+    await tx.$executeRawUnsafe("SET LOCAL session_replication_role = replica");
+    await tx.productVariant.delete({ where: { id: variantId } });
+  });
 }
 
 describePhase4("Phase 4 payment, restock, and delete", () => {
@@ -101,6 +99,73 @@ describePhase4("Phase 4 payment, restock, and delete", () => {
     expect(audit?.correlationId).toBe(requestId);
   });
 
+  it("reconciles Order pending + Payment paid → paid without rewriting payment timestamps", async () => {
+    const sku = `p4rp-${randomUUID().slice(0, 8)}`;
+    const { variant } = await createVariantFixture(db, { sku, stock: 1 });
+    const order = await createOrderFixture(db, {
+      number: `RP${sku}`,
+      variantId: variant.id,
+      sku,
+      status: "pending",
+      paymentStatus: "pending",
+    });
+    const completedAt = new Date("2026-01-02T00:00:00.000Z");
+    await createPaymentFixture(db, {
+      orderId: order.id,
+      status: "paid",
+      completedAt,
+    });
+    const requestId = randomUUID();
+
+    await updateOrderStatuses(order.id, { paymentStatus: "paid" }, {
+      requestId,
+      actorUserId: null,
+      source: "admin",
+    });
+
+    const after = await db.order.findUnique({
+      where: { id: order.id },
+      include: { payments: true },
+    });
+    expect(after?.paymentStatus).toBe("paid");
+    expect(after?.payments[0]?.status).toBe("paid");
+    expect(after?.payments[0]?.completedAt?.toISOString()).toBe(completedAt.toISOString());
+    expect(after?.paidAt).not.toBeNull();
+    const event = await db.orderEvent.findFirst({
+      where: { orderId: order.id, type: "payment_status_changed" },
+    });
+    expect(event?.data).toMatchObject({
+      previousOrderPaymentStatus: "pending",
+      previousPaymentStatus: "paid",
+      target: "paid",
+      reconciliation: true,
+    });
+    expect(event?.correlationId).toBe(requestId);
+  });
+
+  it("returns 409 without writes when paymentStatus is requested and no payment exists", async () => {
+    const sku = `p4np-${randomUUID().slice(0, 8)}`;
+    const { variant } = await createVariantFixture(db, { sku, stock: 1 });
+    const order = await createOrderFixture(db, {
+      number: `NP${sku}`,
+      variantId: variant.id,
+      sku,
+      paymentStatus: "pending",
+    });
+
+    await expect(
+      updateOrderStatuses(order.id, { paymentStatus: "paid" }, adminContext()),
+    ).rejects.toMatchObject({ status: 409 });
+
+    const after = await db.order.findUnique({
+      where: { id: order.id },
+      include: { payments: true, events: true },
+    });
+    expect(after?.paymentStatus).toBe("pending");
+    expect(after?.payments).toHaveLength(0);
+    expect(after?.events.filter((row) => row.type === "payment_status_changed")).toHaveLength(0);
+  });
+
   it("records null and missing variants in restockSkipped without fake ledger rows", async () => {
     const sku = `p4s-${randomUUID().slice(0, 8)}`;
     const { variant } = await createVariantFixture(db, { sku, stock: 0 });
@@ -134,6 +199,10 @@ describePhase4("Phase 4 payment, restock, and delete", () => {
       },
     });
     await deleteVariantIgnoringFk(missing.variant.id);
+    const roleRows = await db.$queryRawUnsafe<Array<{ session_replication_role: string }>>(
+      "SHOW session_replication_role",
+    );
+    expect(roleRows[0]?.session_replication_role).toBe("origin");
 
     await updateOrderStatuses(order.id, { status: "cancelled" }, adminContext());
 
@@ -270,5 +339,44 @@ describePhase4("Phase 4 payment, restock, and delete", () => {
     expect(after?.status).toBe("pending");
     expect(after?.paymentStatus).toBe("paid");
     expect(after?.payments[0]?.status).toBe("paid");
+  });
+
+  it("returns 409 for a stale payment callback without writes", async () => {
+    const sku = `p4st-${randomUUID().slice(0, 8)}`;
+    const { variant } = await createVariantFixture(db, { sku, stock: 1 });
+    const order = await createOrderFixture(db, {
+      number: `ST${sku}`,
+      variantId: variant.id,
+      sku,
+      status: "pending",
+      paymentStatus: "pending",
+    });
+    const stale = await createPaymentFixture(db, {
+      orderId: order.id,
+      status: "pending",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+    const current = await createPaymentFixture(db, {
+      orderId: order.id,
+      status: "pending",
+      createdAt: new Date("2026-01-02T00:00:00.000Z"),
+    });
+
+    await expect(
+      applyPaymentCallback(
+        { paymentId: stale.id, orderNumber: order.number, status: "paid", provider: "idram" },
+        { requestId: randomUUID(), actorUserId: null, source: "payment_provider" },
+      ),
+    ).rejects.toMatchObject({ status: 409 });
+
+    const after = await db.order.findUnique({
+      where: { id: order.id },
+      include: { payments: { orderBy: { createdAt: "asc" } } },
+    });
+    expect(after?.status).toBe("pending");
+    expect(after?.paymentStatus).toBe("pending");
+    expect(after?.payments.map((row) => row.status)).toEqual(["pending", "pending"]);
+    expect(after?.payments[0]?.id).toBe(stale.id);
+    expect(after?.payments[1]?.id).toBe(current.id);
   });
 });

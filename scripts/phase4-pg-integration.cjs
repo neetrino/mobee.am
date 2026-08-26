@@ -3,26 +3,42 @@
 /**
  * Disposable PostgreSQL 16 for Phase 4 concurrency/rollback tests.
  *
- * Prisma CLI may log "Environment variables loaded from .env". That does not
- * mean Prisma overrides values already set on the process environment.
- * This script sets DATABASE_URL and DIRECT_URL to the disposable container
- * (process env wins over .env) and verifies the effective URLs before any
- * Prisma command. It never targets Neon or other cloud hosts.
+ * Prisma CLI may log "Environment variables loaded from .env". That log line
+ * is not proof that Prisma overrides process-env values. This script sets
+ * DATABASE_URL and DIRECT_URL on the child process (process env wins over
+ * .env), simulates Prisma's dotenv fill, and verifies the effective local
+ * URLs before any Prisma command. It never targets Neon or other cloud hosts.
+ * Credentials are never printed.
+ *
+ * Container ownership: unique name per run, labels mobee.phase4.owner / run.
+ * finally removes only the container this process created. It never docker rm
+ * a pre-existing mobee-phase4-pg or any unlabeled container.
  */
 
 const { spawnSync } = require("child_process");
+const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
+const {
+  assertEffectiveDatabaseTargets,
+  resolveEffectiveDatabaseEnv,
+} = require("./phase4-db-url-guard.cjs");
+const {
+  createPhase4RunIdentity,
+  dockerLabelArgs,
+  parsePublishedPort,
+  shouldRemoveOwnedContainer,
+} = require("./phase4-docker-owner.cjs");
 
 const ROOT = path.resolve(__dirname, "..");
-const CONTAINER = "mobee-phase4-pg";
-const PORT = "55432";
+const PREFERRED_PORT = "55432";
 const USER = "phase4";
 const PASSWORD = "phase4test";
 const DATABASE = "phase4";
-const DATABASE_URL = `postgresql://${USER}:${PASSWORD}@127.0.0.1:${PORT}/${DATABASE}?schema=public`;
-const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost"]);
-const CLOUD_HOST_RE = /neon|amazonaws|supabase|render\.com|azure|pooler/i;
+const IMAGE = "postgres:16-alpine";
+
+const identity = createPhase4RunIdentity(process.pid, crypto.randomBytes(4).toString("hex"));
+let ownedContainerId = null;
 
 function run(command, args, extraEnv, options = {}) {
   const result = spawnSync(command, args, {
@@ -39,27 +55,88 @@ function run(command, args, extraEnv, options = {}) {
 function docker(args) {
   return spawnSync("docker", args, {
     encoding: "utf8",
-    shell: process.platform === "win32",
+    windowsHide: true,
   });
 }
 
-function waitForPostgres() {
+function waitForPostgres(containerName) {
   const started = Date.now();
   while (Date.now() - started < 60_000) {
-    const ready = docker(["exec", CONTAINER, "pg_isready", "-U", USER, "-d", DATABASE]);
+    const ready = docker(["exec", containerName, "pg_isready", "-U", USER, "-d", DATABASE]);
     if (ready.status === 0) {
       return;
     }
-    spawnSync(process.platform === "win32" ? "timeout" : "sleep", process.platform === "win32" ? ["/t", "2", "/nobreak"] : ["2"], {
-      stdio: "ignore",
-      shell: process.platform === "win32",
-    });
+    spawnSync(
+      process.platform === "win32" ? "timeout" : "sleep",
+      process.platform === "win32" ? ["/t", "2", "/nobreak"] : ["2"],
+      { stdio: "ignore", shell: process.platform === "win32" },
+    );
   }
   throw new Error("PostgreSQL 16 container did not become ready");
 }
 
-function cleanup() {
-  docker(["rm", "-f", "-v", CONTAINER]);
+function inspectOwnedLabels(containerId) {
+  const inspected = docker(["inspect", "--format", "{{json .Config.Labels}}", containerId]);
+  if (inspected.status !== 0) {
+    return null;
+  }
+  try {
+    return { labels: JSON.parse(String(inspected.stdout || "{}").trim() || "{}") };
+  } catch {
+    return null;
+  }
+}
+
+function cleanupOwnContainer() {
+  if (!ownedContainerId) {
+    return;
+  }
+  const inspect = inspectOwnedLabels(ownedContainerId);
+  if (inspect && !shouldRemoveOwnedContainer(inspect, identity.runId)) {
+    return;
+  }
+  docker(["rm", "-f", "-v", ownedContainerId]);
+  ownedContainerId = null;
+}
+
+function runArgsForPort(hostPort) {
+  const publish = hostPort === "0" ? "127.0.0.1:0:5432" : `127.0.0.1:${hostPort}:5432`;
+  return [
+    "run",
+    "-d",
+    "--name",
+    identity.containerName,
+    ...dockerLabelArgs(identity.labels),
+    "-e",
+    `POSTGRES_USER=${USER}`,
+    "-e",
+    `POSTGRES_PASSWORD=${PASSWORD}`,
+    "-e",
+    `POSTGRES_DB=${DATABASE}`,
+    "-p",
+    publish,
+    IMAGE,
+  ];
+}
+
+function startOwnedPostgres() {
+  const preferred = docker(runArgsForPort(PREFERRED_PORT));
+  if (preferred.status === 0) {
+    return { id: String(preferred.stdout).trim(), port: PREFERRED_PORT };
+  }
+
+  const ephemeral = docker(runArgsForPort("0"));
+  if (ephemeral.status !== 0) {
+    throw new Error(
+      "Failed to start postgres:16 on a free local port (did not remove any existing container)",
+    );
+  }
+  const published = docker(["port", identity.containerName, "5432"]);
+  const port = parsePublishedPort(String(published.stdout || ""));
+  if (!port) {
+    throw new Error("Failed to resolve the published local Postgres port");
+  }
+  return { id: String(ephemeral.stdout).trim(), port };
 }
 
 function prismaArgs(args) {
@@ -74,74 +151,56 @@ function prismaArgs(args) {
   ];
 }
 
-function assertDisposableUrl(label, value) {
-  if (typeof value !== "string" || value.trim() === "") {
-    throw new Error(`${label} is missing`);
+function readLocalDotenvContents() {
+  const envPath = path.join(ROOT, ".env");
+  if (!fs.existsSync(envPath)) {
+    return "";
   }
-  let parsed;
-  try {
-    parsed = new URL(value);
-  } catch {
-    throw new Error(`${label} is not a valid connection URL`);
-  }
-  const host = parsed.hostname.toLowerCase();
-  if (!LOCAL_HOSTS.has(host) || CLOUD_HOST_RE.test(host)) {
-    throw new Error(`${label} host is not the disposable Postgres container`);
-  }
-  const port = parsed.port || "5432";
-  if (port !== PORT) {
-    throw new Error(`${label} port does not match the disposable container`);
-  }
-  const database = decodeURIComponent(parsed.pathname.replace(/^\//, "").split("/")[0]);
-  if (database !== DATABASE) {
-    throw new Error(`${label} database name does not match the disposable container`);
-  }
+  return fs.readFileSync(envPath, "utf8");
 }
 
-function assertEffectiveDatabaseTargets(dbEnv) {
-  assertDisposableUrl("DATABASE_URL", dbEnv.DATABASE_URL);
-  assertDisposableUrl("DIRECT_URL", dbEnv.DIRECT_URL);
+function assertChildProcessDatabaseTargets(childEnv, expected) {
+  const effective = resolveEffectiveDatabaseEnv(childEnv, readLocalDotenvContents());
+  assertEffectiveDatabaseTargets(effective, expected);
 }
 
-cleanup();
 try {
-  const started = docker([
-    "run",
-    "-d",
-    "--name",
-    CONTAINER,
-    "-e",
-    `POSTGRES_USER=${USER}`,
-    "-e",
-    `POSTGRES_PASSWORD=${PASSWORD}`,
-    "-e",
-    `POSTGRES_DB=${DATABASE}`,
-    "-p",
-    `${PORT}:5432`,
-    "postgres:16-alpine",
-  ]);
-  if (started.status !== 0) {
-    throw new Error(started.stderr || "Failed to start postgres:16");
-  }
+  const started = startOwnedPostgres();
+  ownedContainerId = started.id;
+  const port = started.port;
+  const databaseUrl = `postgresql://${USER}:${PASSWORD}@127.0.0.1:${port}/${DATABASE}?schema=public`;
+  const expectedTarget = { port, database: DATABASE };
 
-  waitForPostgres();
+  waitForPostgres(identity.containerName);
 
   const dbEnv = {
-    DATABASE_URL,
-    DIRECT_URL: DATABASE_URL,
+    DATABASE_URL: databaseUrl,
+    DIRECT_URL: databaseUrl,
     PHASE4_INTEGRATION: "1",
   };
-  assertEffectiveDatabaseTargets(dbEnv);
+  const childEnv = { ...process.env, ...dbEnv };
+  assertChildProcessDatabaseTargets(childEnv, expectedTarget);
 
   run(process.execPath, prismaArgs(["validate"]), dbEnv);
   run(process.execPath, prismaArgs(["migrate", "deploy"]), dbEnv);
   run(process.execPath, prismaArgs(["migrate", "status"]), dbEnv);
   run(
     "pnpm",
-    ["exec", "vitest", "run", "--fileParallelism=false", "src/lib/commerce/phase4.integration.test.ts", "src/lib/commerce/phase4-payment-delete.integration.test.ts", "src/lib/commerce/phase4-checkout.integration.test.ts"],
+    [
+      "exec",
+      "vitest",
+      "run",
+      "--fileParallelism=false",
+      "src/lib/commerce/phase4.integration.test.ts",
+      "src/lib/commerce/phase4-payment-delete.integration.test.ts",
+      "src/lib/commerce/phase4-checkout.integration.test.ts",
+      "src/lib/commerce/phase5-checkout.integration.test.ts",
+      "src/lib/commerce/phase5-payment-callback.integration.test.ts",
+      "src/lib/commerce/phase6-outbox.integration.test.ts",
+    ],
     dbEnv,
     { shell: process.platform === "win32" },
   );
 } finally {
-  cleanup();
+  cleanupOwnContainer();
 }

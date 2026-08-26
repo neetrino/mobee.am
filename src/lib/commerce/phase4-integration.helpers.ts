@@ -88,7 +88,13 @@ export async function createOrderFixture(
 
 export async function createPaymentFixture(
   client: DbClient,
-  input: { orderId: string; status?: string },
+  input: {
+    orderId: string;
+    status?: string;
+    createdAt?: Date;
+    completedAt?: Date | null;
+    failedAt?: Date | null;
+  },
 ) {
   return client.payment.create({
     data: {
@@ -98,6 +104,9 @@ export async function createPaymentFixture(
       amount: 1000,
       currency: "AMD",
       status: input.status ?? "pending",
+      ...(input.createdAt ? { createdAt: input.createdAt } : {}),
+      ...(input.completedAt !== undefined ? { completedAt: input.completedAt } : {}),
+      ...(input.failedAt !== undefined ? { failedAt: input.failedAt } : {}),
     },
   });
 }

@@ -7,6 +7,7 @@ import { lockOrderForUpdate } from "./lock-order";
 import { findLatestPayment, findPaymentByIdForOrder } from "./payment-row";
 import { planOrderTransitions } from "./plan-order-transitions";
 import { planPaymentRowChange } from "./plan-payment-row";
+import { buildProviderEventId } from "./provider-event-id";
 import { isMachineWrite } from "./resolve-payment-row-plan";
 import type { CommerceRequestContext } from "./order-transition.types";
 import type { PaymentStatus } from "./payment-status";
@@ -49,6 +50,20 @@ async function assertCurrentPaymentAttempt(
   }
 }
 
+async function findExistingProviderReplayEvent(
+  tx: Prisma.TransactionClient,
+  provider: string,
+  providerEventId: string,
+) {
+  return tx.orderEvent.findFirst({
+    where: {
+      provider,
+      providerEventId,
+    },
+    select: { id: true },
+  });
+}
+
 /**
  * Applies a provider callback to the specific Payment row and, when current, Order.paymentStatus.
  * Does not change Order.status. Stale attempts return 409 without writes.
@@ -57,8 +72,19 @@ export async function applyPaymentCallback(
   input: PaymentCallbackInput,
   context: CommerceRequestContext,
 ): Promise<"applied" | "no_op"> {
+  const providerEventId = buildProviderEventId(input);
+
   return db.$transaction(
     async (tx) => {
+      const replayBeforeLock = await findExistingProviderReplayEvent(
+        tx,
+        input.provider,
+        providerEventId,
+      );
+      if (replayBeforeLock) {
+        return "no_op";
+      }
+
       const existing = await tx.payment.findUnique({
         where: { id: input.paymentId },
         select: { id: true, orderId: true, order: { select: { id: true, number: true } } },
@@ -70,6 +96,15 @@ export async function applyPaymentCallback(
       const locked = await lockOrderForUpdate(tx, existing.orderId);
       if (!locked || locked.number !== input.orderNumber) {
         throw AppError.notFound("Payment not found");
+      }
+
+      const replayAfterLock = await findExistingProviderReplayEvent(
+        tx,
+        input.provider,
+        providerEventId,
+      );
+      if (replayAfterLock) {
+        return "no_op";
       }
 
       const payment = await loadCallbackPayment(tx, input, locked.id);
@@ -89,6 +124,8 @@ export async function applyPaymentCallback(
         paymentId: payment.id,
         paymentRowChange: rowChange,
         providerResponse: callbackProviderResponse(input.status, input.provider),
+        provider: input.provider,
+        providerEventId,
       });
       return "applied";
     },

@@ -132,4 +132,31 @@ describe("updateOrderStatuses", () => {
       }),
     );
   });
+
+  it("reconciles Order pending + Payment paid → paid as an order write and payment no-op", async () => {
+    mocks.lockOrderForUpdate.mockResolvedValue(locked);
+    mocks.findLatestPayment.mockResolvedValue({
+      id: "pay-1",
+      status: "paid",
+      createdAt: new Date("2026-01-01"),
+    });
+    mocks.applyPlannedTransitions.mockResolvedValue(undefined);
+
+    await updateOrderStatuses("order-1", { paymentStatus: "paid" }, context);
+
+    expect(mocks.applyPlannedTransitions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paymentId: "pay-1",
+        paymentRowChange: expect.objectContaining({
+          kind: "no_op",
+          fromStored: "paid",
+          to: "paid",
+        }),
+        planned: expect.objectContaining({
+          kind: "apply",
+          payment: expect.objectContaining({ kind: "apply", fromStored: "pending", to: "paid" }),
+        }),
+      }),
+    );
+  });
 });

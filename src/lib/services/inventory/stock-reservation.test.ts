@@ -88,5 +88,21 @@ describe("releaseVariantStockReservation", () => {
         nextReserved: 0,
       }),
     );
+    expect(mocks.warn.mock.calls[0]?.[1]).not.toMatchObject({ requestId: null });
+  });
+
+  it("logs null requestId only when the caller omitted context", async () => {
+    mocks.lockVariantForUpdate.mockResolvedValue({
+      id: "variant-1",
+      stock: 8,
+      stockReserved: 1,
+      sku: "SKU-1",
+    });
+    const tx = { $executeRaw: vi.fn().mockResolvedValue(1) };
+    await releaseVariantStockReservation(tx as never, "variant-1", 4);
+    expect(mocks.warn).toHaveBeenCalledWith(
+      "Stock reservation over-release clamped to zero",
+      expect.objectContaining({ requestId: null }),
+    );
   });
 });
