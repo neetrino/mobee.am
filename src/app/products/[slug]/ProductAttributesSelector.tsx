@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { t, getAttributeLabel } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
+import { resolveProductAttributeLabel } from './utils';
 import type {
   AttributeGroupValue,
   Product,
@@ -57,11 +58,7 @@ function resolveAttributeLabel(
   language: LanguageCode
 ): string {
   const productAttr = product.productAttributes?.find((pa: ProductAttribute) => pa.attribute?.key === attrKey);
-  const name = productAttr?.attribute?.name;
-  if (name) return name;
-  if (attrKey === 'color') return t(language, 'product.color');
-  if (attrKey === 'size') return t(language, 'product.size');
-  return attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
+  return resolveProductAttributeLabel(attrKey, language, productAttr?.attribute?.name);
 }
 
 function SpecRow({

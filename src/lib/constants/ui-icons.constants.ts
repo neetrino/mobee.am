@@ -33,6 +33,18 @@ export const WHY_CHOOSE_US_ICON_SRC = {
   original: `${UI_ICONS_BASE}/home/why-choose-us/original.webp`,
 } as const;
 
+/** Why Choose Us collage photos — Cloudflare R2 (`static/home/why-choose-us/`). */
+export const WHY_CHOOSE_US_PHOTO_SRC = {
+  delivery:
+    'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/home/why-choose-us/delivery.webp',
+  installment:
+    'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/home/why-choose-us/installment.webp',
+  warranty:
+    'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/home/why-choose-us/warranty.webp',
+  original:
+    'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/home/why-choose-us/original.webp',
+} as const;
+
 export const PAYMENT_ICON_SRC = {
   arca: `${UI_ICONS_BASE}/payments/arca.webp`,
   aparik: `${UI_ICONS_BASE}/payments/aparik.webp`,

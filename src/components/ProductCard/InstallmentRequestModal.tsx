@@ -257,6 +257,7 @@ export function InstallmentRequestModal({
                       onChange={(event) => handleFieldChange('firstName', event.target.value)}
                       error={errors.firstName}
                       disabled={isSubmitting}
+                      checkoutChrome
                       required
                     />
                   </div>
@@ -267,6 +268,7 @@ export function InstallmentRequestModal({
                       onChange={(event) => handleFieldChange('lastName', event.target.value)}
                       error={errors.lastName}
                       disabled={isSubmitting}
+                      checkoutChrome
                       required
                     />
                   </div>
@@ -278,6 +280,7 @@ export function InstallmentRequestModal({
                   onChange={(event) => handleFieldChange('email', event.target.value)}
                   error={errors.email}
                   disabled={isSubmitting}
+                  checkoutChrome
                   required
                 />
                 <Input
@@ -291,6 +294,7 @@ export function InstallmentRequestModal({
                   error={errors.phone}
                   disabled={isSubmitting}
                   maxLength={PHONE_DIGITS_MAX}
+                  checkoutChrome
                   required
                 />
 

@@ -8,15 +8,13 @@
   "hero_promo_body_line2": "professional camera system.",
   "hero_free_shipping": "Free shipping",
   "hero_cta_more": "More",
-  "hero_chat_line1": "Chat with an",
-  "hero_chat_bold": "Apple Specialist",
-  "hero_chat_line2": " online or in-store.",
+  "hero_chat_line1": "For our entire range:",
   "hero_discount_percent": "2%",
   "hero_iphone_title": "iPhone 17 Pro",
   "hero_banner_carousel_aria_label": "Featured promotions",
   "hero_banner_carousel_go_to_slide": "Go to slide",
   "featured_intro": {
-    "title": "The best choice",
+    "title": "Latest news",
     "subtitle": "A simple choice from the best",
     "cta": "More"
   },
@@ -29,9 +27,9 @@
     "scrollNext": "Next special offers"
   },
   "why_choose_us_heading": {
-    "title": "Why choose us",
-    "subtitle": "Solutions that work for your everyday use",
-    "cta": "More"
+    "title_lead": "Why choose",
+    "title_emphasis": "us",
+    "subtitle": "Solutions that work for your everyday use"
   },
   "why_choose_us_benefits": {
     "warranty_title": "Warranty",
@@ -45,10 +43,16 @@
   },
   "partner_logos": {
     "heading": "Featured brands",
+    "scrollPrevious": "Previous brands",
+    "scrollNext": "Next brands",
     "apple": "Apple",
+    "bosch": "Bosch",
+    "dyson": "Dyson",
+    "hisense": "Hisense",
     "lg": "LG",
+    "midea": "Midea",
     "samsung": "Samsung",
-    "xiaomi": "Xiaomi"
+    "sony": "Sony"
   },
   "featured_products": {
     "title": "Featured Products",

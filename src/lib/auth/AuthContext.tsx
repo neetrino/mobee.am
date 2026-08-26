@@ -37,11 +37,11 @@ interface AuthContextType {
 }
 
 interface RegisterData {
-  email?: string;
-  phone?: string;
+  email: string;
+  phone: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
 }
 
 interface AuthSessionResponse {

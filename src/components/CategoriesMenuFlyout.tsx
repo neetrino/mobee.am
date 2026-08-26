@@ -10,6 +10,8 @@ import { resolveCategoryMenuIcon } from '@/lib/categoryMenuIcon';
 import { getHeaderDropdownPanelMotionClass, useHeaderDropdownMotion } from './HeaderSecondaryBar';
 
 const FLYOUT_GRID_COLUMNS = 4;
+/** Wide enough for long Armenian titles (e.g. ՎԱՐՍԱՀԱՐԴԱՐԻՉ) in 4 columns. */
+const FLYOUT_PANEL_WIDTH_CLASS = 'w-[min(64rem,calc(100vw-2rem))]';
 const montserrat = siteMontserrat;
 
 export type CategoriesMenuFlyoutItem = CategoryTreeNode & {
@@ -45,14 +47,14 @@ function CategoriesMenuFlyoutCard({
       onClick={onItemNavigate}
       className="group flex min-h-[52px] items-center gap-2.5 rounded-xl border border-transparent bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-[border-color,background-color,transform] duration-150 hover:-translate-y-px hover:border-[#dbeafe] hover:bg-[#f8fbff] active:translate-y-0 active:bg-[#f1f7fc]"
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eef2f7] text-[#4b5563] transition-colors duration-150 group-hover:bg-[#2db2ff] group-hover:text-white">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#2db2ff] text-white">
         {createElement(resolveCategoryMenuIcon(category), {
           className: 'size-5',
           strokeWidth: 2,
           'aria-hidden': true,
         })}
       </span>
-      <span className="min-w-0 flex-1 text-[11px] font-bold uppercase leading-tight tracking-wide text-[#1a1a1a] [overflow-wrap:anywhere] line-clamp-2">
+      <span className="min-w-0 flex-1 whitespace-nowrap text-[11px] font-bold uppercase leading-tight tracking-normal text-[#1a1a1a]">
         {category.title}
       </span>
       <ChevronRight
@@ -102,7 +104,7 @@ export function CategoriesMenuFlyout({
       <div className="absolute left-0 top-full z-[55] h-2 w-full" aria-hidden />
       <div className={`absolute left-0 top-full z-[55] pt-2 ${montserrat.className}`}>
         <div
-          className={`w-[min(56rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#e5e7eb]/90 bg-white shadow-[0_22px_48px_-20px_rgba(15,23,42,0.32)] ${getHeaderDropdownPanelMotionClass(menuEntered)}`}
+          className={`${FLYOUT_PANEL_WIDTH_CLASS} overflow-hidden rounded-2xl border border-[#e5e7eb]/90 bg-white shadow-[0_22px_48px_-20px_rgba(15,23,42,0.32)] ${getHeaderDropdownPanelMotionClass(menuEntered)}`}
         >
           {loading ? (
             <div className="px-5 py-4 text-sm text-gray-500">{loadingLabel}</div>

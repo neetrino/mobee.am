@@ -6,6 +6,7 @@
   "description_title": "Նկարագրություն",
   "color": "Գույն",
   "size": "Չափ",
+  "storage": "Հիշողություն",
   "quantity": "Քանակ",
   "addToCart": "Ավելացնել",
   "outOfStock": "Առկա չէ",
@@ -81,7 +82,8 @@
       "connector": "Միացք",
       "charging": "Լիցքավորում",
       "sim": "SIM",
-      "camera": "Տեսախցիկ"
+      "camera": "Տեսախցիկ",
+      "gps": "GPS"
     }
   },
   "aparik": {

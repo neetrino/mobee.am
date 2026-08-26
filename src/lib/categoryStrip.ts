@@ -67,6 +67,20 @@ export interface CategoryStripVisual {
   imageClassName: string;
 }
 
+/**
+ * Neutral layout for strip items that are not one of the six curated Figma slots
+ * (e.g. hair dryers). Centered, no flip/rotate — avoids “crooked” art from
+ * index-based slot fallback inheriting computers/watches transforms.
+ */
+export const CATEGORY_STRIP_DEFAULT_VISUAL: CategoryStripVisual = {
+  imageWidth: 140,
+  imageHeight: 140,
+  tall: false,
+  imageWrapperClassName:
+    'absolute left-1/2 top-[22px] flex size-[140px] -translate-x-1/2 items-center justify-center',
+  imageClassName: 'object-contain',
+};
+
 export const CATEGORY_STRIP_VISUALS: Record<CategoryStripSlotKey, CategoryStripVisual> = {
   computers: {
     imageWidth: 146,
@@ -140,18 +154,18 @@ function categoryMatchesSlugParts(category: CategoryTreeNode, parts: readonly st
   return parts.some((part) => tokens.includes(part));
 }
 
+/**
+ * Resolves a curated strip slot from category slug only.
+ * Does not fall back by list index — index fallback was applying computers
+ * flip / watches rotate to unrelated categories (e.g. hair dryers).
+ */
 export function resolveCategoryStripSlotKey(
   category: CategoryTreeNode,
-  index?: number,
 ): CategoryStripSlotKey | null {
   for (const slotKey of CATEGORY_STRIP_SLOT_ORDER) {
     if (categoryMatchesSlugParts(category, SLOT_SLUG_PARTS[slotKey])) {
       return slotKey;
     }
-  }
-
-  if (index !== undefined && index >= 0) {
-    return CATEGORY_STRIP_SLOT_ORDER[index % CATEGORY_STRIP_SLOT_ORDER.length];
   }
 
   return null;
@@ -207,13 +221,16 @@ export function resolveCategoryStripImageForItem(
   return resolveCategoryStripImageSrc(slotKey);
 }
 
-export function getCategoryStripVisual(slotKey: CategoryStripSlotKey): CategoryStripVisual {
+export function getCategoryStripVisual(slotKey: CategoryStripSlotKey | null): CategoryStripVisual {
+  if (!slotKey) {
+    return CATEGORY_STRIP_DEFAULT_VISUAL;
+  }
   return CATEGORY_STRIP_VISUALS[slotKey];
 }
 
 export function getCategoryStripTitleTranslateClass(
   category: CategoryTreeNode,
-  slotKey: CategoryStripSlotKey,
+  slotKey: CategoryStripSlotKey | null,
 ): string {
   if (isHouseholdAppliancesStripCategory(category)) {
     return '-translate-y-[3px]';

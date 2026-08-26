@@ -28,6 +28,13 @@
     /* iOS Safari: avoid automatic text scaling that feels like a page zoom after load. */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /*
+     * Արգելում է էջի rubber-band / pull-to-refresh / կողային pan։
+     * Ուղղահայաց scroll-ը մնում է. ներքին carousel-ները ունեն իրենց overscroll-contain։
+     * `clip` (ոչ `hidden`) — որ sticky ֆիլտրերն ու header-ը չկոտրվեն։
+     */
+    overscroll-behavior: none;
+    overflow-x: clip;
   }
 
   /*
@@ -60,6 +67,17 @@
 
   body {
     @apply bg-white text-gray-900;
+    overscroll-behavior: none;
+    overflow-x: clip;
+  }
+
+  /*
+   * Նկարի/հղման native drag-ը տեսողականորեն նման է էջը քաշելուն։
+   * Տեքստի ընտրությունն ու ներքին carousel-ները չեն ազդվում։
+   */
+  img,
+  a {
+    -webkit-user-drag: none;
   }
 }
 
@@ -174,6 +192,36 @@
 
   .animate-mobile-drawer-panel-out {
     animation: mobile-drawer-panel-out 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes mobile-header-dropdown-in {
+    from {
+      opacity: 0;
+      transform: translateY(-14px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes mobile-header-dropdown-out {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-14px) scale(0.96);
+    }
+  }
+
+  .animate-mobile-header-dropdown-in {
+    animation: mobile-header-dropdown-in 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .animate-mobile-header-dropdown-out {
+    animation: mobile-header-dropdown-out 0.34s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   @keyframes mobile-sheet-panel-in {

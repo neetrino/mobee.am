@@ -1,23 +1,54 @@
 import { describe, expect, it } from 'vitest';
-import { Gamepad2, Headphones, Smartphone, Wind } from 'lucide-react';
+import {
+  AirVent,
+  Cable,
+  Gamepad2,
+  Headphones,
+  Laptop,
+  Microwave,
+  Refrigerator,
+  Smartphone,
+  Tablet,
+  Tv,
+  WandSparkles,
+  WashingMachine,
+  Watch,
+} from 'lucide-react';
+import { HairDryerIcon } from '@/components/icons/HairDryerIcon';
 import { resolveCategoryMenuIcon } from './categoryMenuIcon';
 
 describe('resolveCategoryMenuIcon', () => {
-  it('maps hair dryers to Wind', () => {
-    expect(resolveCategoryMenuIcon({ title: 'Ֆեներ', slug: 'hair-dryers' })).toBe(Wind);
+  it('maps real storefront categories to matching Lucide icons', () => {
+    const cases = [
+      { title: 'Խաղային կոնսոլ', slug: 'game-console', icon: Gamepad2 },
+      { title: 'Հեռախոս', slug: 'heraxos', icon: Smartphone },
+      { title: 'Համակարգիչ', slug: 'hamakargich', icon: Laptop },
+      { title: 'Պլանշետ', slug: 'planshet', fullPath: 'tablets', icon: Tablet },
+      { title: 'Վարսահարդարիչ', slug: 'varsahardarich', icon: HairDryerIcon },
+      { title: 'Ֆեն', slug: 'hair-dryer', icon: HairDryerIcon },
+      { title: 'Մազերի ուղղիչ', slug: 'hair-straightener', icon: WandSparkles },
+      { title: 'Հեռուստացույց', slug: 'herustacuyc', icon: Tv },
+      { title: 'Օդորակիչ', slug: 'ac', icon: AirVent },
+      { title: 'Լվացքի մեքենա', slug: 'lvacqi-meqena', icon: WashingMachine },
+      { title: 'Սառնարան', slug: 'sarnaran', icon: Refrigerator },
+      { title: 'Ժամացույց', slug: 'jamacuyc', icon: Watch },
+      { title: 'Ականջակալ', slug: 'akanjakal', icon: Headphones },
+      { title: 'Աքսեսուար', slug: 'aksesuar', icon: Cable },
+      { title: 'Կենցաղային տեխնիկա', slug: '', icon: Microwave },
+    ] as const;
+
+    for (const item of cases) {
+      expect(
+        resolveCategoryMenuIcon({
+          title: item.title,
+          slug: item.slug,
+          fullPath: 'fullPath' in item ? item.fullPath : item.slug,
+        }),
+      ).toBe(item.icon);
+    }
   });
 
-  it('maps game consoles to Gamepad2', () => {
-    expect(resolveCategoryMenuIcon({ title: 'Խաղային կոնսոլներ', slug: 'game-consoles' })).toBe(
-      Gamepad2,
-    );
-  });
-
-  it('maps phones by Armenian title', () => {
-    expect(resolveCategoryMenuIcon({ title: 'Հեռախոս', slug: 'phones' })).toBe(Smartphone);
-  });
-
-  it('maps headphones by slug', () => {
-    expect(resolveCategoryMenuIcon({ title: 'Headphones', slug: 'headphones' })).toBe(Headphones);
+  it('does not treat computer slugs as air conditioners', () => {
+    expect(resolveCategoryMenuIcon({ title: 'MacBook', slug: 'macbook' })).toBe(Laptop);
   });
 });

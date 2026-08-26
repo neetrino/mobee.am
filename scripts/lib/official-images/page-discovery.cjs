@@ -113,8 +113,6 @@ const SAMSUNG_LOCALES = [
   "ca",
 ];
 
-const LG_LOCALES = ["us", "uk", "ae", "eg_en", "in", "de", "pl", "sa"];
-
 function scoreCandidateUrl(url, model) {
   const compact = compactModel(model);
   const u = compactModel(url);
@@ -129,30 +127,6 @@ function scoreCandidateUrl(url, model) {
     score += 15;
   }
   return score;
-}
-
-function absoluteUrl(href, base) {
-  try {
-    return new URL(href, base).toString();
-  } catch {
-    return null;
-  }
-}
-
-function extractLinksContainingModel(html, baseUrl, model) {
-  const compact = compactModel(model);
-  const baseMatch = compact.match(/^(.+\d)([A-Z]{2,5})$/);
-  const bases = baseMatch ? [compact, baseMatch[1]] : [compact];
-  const out = [];
-  const re = /href=["']([^"']+)["']/gi;
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    const abs = absoluteUrl(m[1], baseUrl);
-    if (!abs) continue;
-    const c = compactModel(abs);
-    if (bases.some((b) => b.length >= 5 && c.includes(b))) out.push(abs);
-  }
-  return [...new Set(out)];
 }
 
 /**
@@ -334,22 +308,6 @@ async function evaluatePage(url, model, via) {
     score: scoreCandidateUrl(url, model),
     html: page.html,
   };
-}
-
-async function collectLinkedProductPages(brandKey, model, fromUrl, html) {
-  const links = [
-    ...extractLinksContainingModel(html, fromUrl, model),
-    ...extractUrlsFromEmbeddedJson(html, model),
-  ];
-  const out = [];
-  for (const link of links) {
-    let abs = link;
-    if (link.startsWith("/")) abs = absoluteUrl(link, fromUrl);
-    if (!abs || !isAllowedPageUrl(abs, brandKey)) continue;
-    if (/\/search/i.test(abs)) continue;
-    out.push(abs);
-  }
-  return [...new Set(out)];
 }
 
 /**

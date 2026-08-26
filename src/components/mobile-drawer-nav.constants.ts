@@ -50,3 +50,21 @@ export const MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS = 'animate-mobile-dra
 export const MOBILE_DRAWER_SHELL_PANEL_MOTION_IN_CLASS = 'animate-mobile-drawer-panel-in';
 
 export const MOBILE_DRAWER_SHELL_PANEL_MOTION_OUT_CLASS = 'animate-mobile-drawer-panel-out';
+
+/** Storefront mobile navigation — floating dropdown matching the Grill.am geometry. */
+export const MOBILE_HEADER_DROPDOWN_BACKDROP_CLASS =
+  'border-0 bg-black/25 backdrop-blur-[2px]';
+
+export const MOBILE_HEADER_DROPDOWN_PANEL_CLASS =
+  'pointer-events-auto fixed left-3 right-3 z-10 origin-top overflow-hidden rounded-[24px] bg-white px-5 shadow-[0_12px_40px_rgba(0,0,0,0.16)] will-change-transform';
+
+export const MOBILE_HEADER_DROPDOWN_PANEL_MOTION_IN_CLASS =
+  'animate-mobile-header-dropdown-in';
+
+export const MOBILE_HEADER_DROPDOWN_PANEL_MOTION_OUT_CLASS =
+  'animate-mobile-header-dropdown-out';
+
+export const MOBILE_HEADER_DROPDOWN_TRANSITION_MS = 340;
+
+export const MOBILE_HEADER_DROPDOWN_NAV_LINK_CLASS =
+  'flex-1 rounded-xl px-1 py-3.5 text-left text-base font-semibold transition-colors hover:bg-gray-50';

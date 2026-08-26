@@ -1,6 +1,7 @@
 'use client';
 
 import { Card } from '@shop/ui';
+import { PolicyBackButton } from '@/components/PolicyBackButton';
 import { useTranslation } from '../../lib/i18n-client';
 
 const DELIVERY_TERM_SECTIONS = [
@@ -36,6 +37,7 @@ export default function DeliveryTermsPage() {
   return (
     <div className="policy-page">
       <div className="policy-page-inner">
+        <PolicyBackButton />
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">{t('delivery-terms.title')}</h1>
         <p className="text-gray-600">
           {t('delivery-terms.lastUpdated')}{' '}

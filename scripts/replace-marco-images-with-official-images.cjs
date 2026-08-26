@@ -20,7 +20,6 @@ const {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
-  HeadObjectCommand,
 } = require("@aws-sdk/client-s3");
 
 const {
@@ -32,11 +31,9 @@ const {
   ALLOWED_BRAND_KEYS,
   categoryMatchesGroup,
   OVERRIDES_PATH_REL,
-  APPROVED_MATCH_TYPES,
   MIN_IMAGE_BYTES,
   MAX_OFFICIAL_IMAGES,
   APPROVED_PAGE_STATUSES,
-  MANUAL_IMAGE_EVIDENCE,
   MANUAL_IMAGE_EVIDENCE_SET,
 } = require("./lib/official-images/sources.constants.cjs");
 const {
@@ -46,7 +43,6 @@ const {
 } = require("./lib/official-images/model.utils.cjs");
 const {
   resolveOfficialProductPage,
-  findOverrideEntry,
   findOverrideEntryForTitle,
 } = require("./lib/official-images/page-discovery.cjs");
 const { extractOfficialImages } = require("./lib/official-images/page-extract.cjs");
@@ -456,7 +452,6 @@ async function loadProducts(mobee, args) {
     )`);
   }
 
-  let limitSql = "";
   // Category filter applied in JS; fetch a wider set then filter. Limit applies after.
   const { rows } = await mobee.query(
     `
@@ -782,7 +777,8 @@ async function processManualApprovedImages(base, overrideEntry, modelForPage) {
       continue;
     }
     if (result.sha256) seenSha.add(result.sha256);
-    const { buffer: _buf, ...rest } = result;
+    const rest = { ...result };
+    delete rest.buffer;
     validated.push(rest);
   }
 
@@ -1349,7 +1345,8 @@ async function processProduct(product, args, cache, r2, overrides) {
       continue;
     }
     if (result.sha256) seenSha.add(result.sha256);
-    const { buffer: _buf, ...rest } = result;
+    const rest = { ...result };
+    delete rest.buffer;
     validated.push(rest);
   }
 

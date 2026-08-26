@@ -3,6 +3,7 @@ import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 import { invalidateAdminReferenceServerCache } from "@/lib/admin/admin-reference-server-cache";
 import { runApiRoute } from "@/lib/errors/run-api-route";
+import { invalidateHomeBrandsCache } from "@/lib/services/home-brands-cached";
 
 /**
  * PUT /api/v1/admin/brands/[id]
@@ -22,6 +23,7 @@ export async function PUT(
     const body = await req.json();
     const result = await adminService.updateBrand(id, body);
     await invalidateAdminReferenceServerCache("brands");
+    await invalidateHomeBrandsCache();
 
     return NextResponse.json(result);
   });
@@ -44,6 +46,7 @@ export async function DELETE(
     const { id } = await params;
     await adminService.deleteBrand(id);
     await invalidateAdminReferenceServerCache("brands");
+    await invalidateHomeBrandsCache();
 
     return NextResponse.json({ success: true });
   });

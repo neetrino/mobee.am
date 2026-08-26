@@ -8,15 +8,13 @@
   "hero_promo_body_line2": "профессиональную камеру.",
   "hero_free_shipping": "Бесплатная доставка",
   "hero_cta_more": "Подробнее",
-  "hero_chat_line1": "Чат с",
-  "hero_chat_bold": "специалистом Apple",
-  "hero_chat_line2": " онлайн или в магазине.",
+  "hero_chat_line1": "На весь наш ассортимент:",
   "hero_discount_percent": "2%",
   "hero_iphone_title": "iPhone 17 Pro",
   "hero_banner_carousel_aria_label": "Рекламные предложения",
   "hero_banner_carousel_go_to_slide": "Перейти к слайду",
   "featured_intro": {
-    "title": "Лучший выбор",
+    "title": "Последние новости",
     "subtitle": "Простой выбор среди лучшего",
     "cta": "Ещё"
   },
@@ -29,9 +27,9 @@
     "scrollNext": "Следующие специальные предложения"
   },
   "why_choose_us_heading": {
-    "title": "Почему выбирают нас",
-    "subtitle": "Решения, удобные для повседневного использования",
-    "cta": "Ещё"
+    "title_lead": "Почему выбирают",
+    "title_emphasis": "нас",
+    "subtitle": "Решения, удобные для повседневного использования"
   },
   "why_choose_us_benefits": {
     "warranty_title": "Гарантия",
@@ -45,10 +43,16 @@
   },
   "partner_logos": {
     "heading": "Бренды",
+    "scrollPrevious": "Предыдущие бренды",
+    "scrollNext": "Следующие бренды",
     "apple": "Apple",
+    "bosch": "Bosch",
+    "dyson": "Dyson",
+    "hisense": "Hisense",
     "lg": "LG",
+    "midea": "Midea",
     "samsung": "Samsung",
-    "xiaomi": "Xiaomi"
+    "sony": "Sony"
   },
   "featured_products": {
     "title": "Рекомендуемые товары",

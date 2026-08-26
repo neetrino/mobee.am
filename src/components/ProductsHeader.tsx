@@ -16,7 +16,7 @@ function ProductsHeaderContent({ total, isCountPending }: ProductsHeaderProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="mx-auto w-full px-0 pt-6 pb-4">
+    <div className="mx-auto w-full px-0 pt-1 pb-2 sm:pt-6 sm:pb-4">
       {/* Desktop */}
       <div className="hidden sm:flex sm:items-center sm:gap-6">
         <h1 className="text-xl font-bold text-gray-900">

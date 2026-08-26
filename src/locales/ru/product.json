@@ -6,6 +6,7 @@
   "description_title": "Описание",
   "color": "Цвет",
   "size": "Размер",
+  "storage": "Память",
   "quantity": "Количество",
   "addToCart": "Добавить",
   "outOfStock": "Нет в наличии",
@@ -81,7 +82,8 @@
       "connector": "Разъём",
       "charging": "Зарядка",
       "sim": "SIM",
-      "camera": "Камера"
+      "camera": "Камера",
+      "gps": "GPS"
     }
   },
   "aparik": {

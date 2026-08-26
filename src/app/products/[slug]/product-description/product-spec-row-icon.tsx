@@ -1,46 +1,90 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+  Aperture,
+  BadgeCheck,
+  BatteryFull,
+  BatteryCharging,
   Bluetooth,
+  Box,
+  Calendar,
   Camera,
-  Cpu,
+  CardSim,
+  CircuitBoard,
+  Droplets,
+  Factory,
   HardDrive,
+  Info,
+  MemoryStick,
   Monitor,
+  Navigation,
+  Palette,
+  Plug,
   Shield,
+  ShieldCheck,
+  Signal,
   Smartphone,
+  Snowflake,
+  Store,
+  SwitchCamera,
+  Tag,
+  Usb,
+  Weight,
   Wifi,
 } from 'lucide-react';
+import { resolveSpecLabelKey } from '@/lib/products/product-spec-heuristics';
 
 const LABEL_KEY_ICONS: Readonly<Record<string, LucideIcon>> = {
-  'product.specs.labels.operatingSystem': Cpu,
-  'product.specs.labels.deviceType': Smartphone,
-  'product.specs.labels.screenDiagonal': Monitor,
-  'product.specs.labels.screenResolution': Monitor,
+  'product.specs.labels.availableInStores': Store,
+  'product.specs.labels.warranty': BadgeCheck,
+  'product.specs.labels.announcementYear': Calendar,
+  'product.specs.labels.operatingSystem': Smartphone,
   'product.specs.labels.displayType': Monitor,
+  'product.specs.labels.screenResolution': Monitor,
+  'product.specs.labels.screenDiagonal': Monitor,
+  'product.specs.labels.frontCamera': SwitchCamera,
+  'product.specs.labels.mainCamera': Aperture,
+  'product.specs.labels.webcam': Camera,
+  'product.specs.labels.camera': Camera,
   'product.specs.labels.builtInStorage': HardDrive,
-  'product.specs.labels.ram': HardDrive,
+  'product.specs.labels.ram': MemoryStick,
   'product.specs.labels.storageType': HardDrive,
-  'product.specs.labels.graphicsMemory': HardDrive,
-  'product.specs.labels.processor': Cpu,
-  'product.specs.labels.processorModel': Cpu,
+  'product.specs.labels.graphicsMemory': CircuitBoard,
+  'product.specs.labels.processor': CircuitBoard,
+  'product.specs.labels.processorModel': CircuitBoard,
+  'product.specs.labels.simCardType': CardSim,
+  'product.specs.labels.sim': CardSim,
   'product.specs.labels.bluetooth': Bluetooth,
   'product.specs.labels.wifi': Wifi,
-  'product.specs.labels.webcam': Camera,
-  'product.specs.labels.network': Wifi,
-  'product.specs.labels.simCardType': Smartphone,
-  'product.specs.labels.sim': Smartphone,
+  'product.specs.labels.network': Signal,
+  'product.specs.labels.connector': Usb,
+  'product.specs.labels.gps': Navigation,
+  'product.specs.labels.battery': BatteryFull,
+  'product.specs.labels.batteryType': BatteryFull,
+  'product.specs.labels.batteryCapacity': BatteryFull,
+  'product.specs.labels.charging': Plug,
+  'product.specs.labels.fastCharging': BatteryCharging,
+  'product.specs.labels.fastCooling': Snowflake,
+  'product.specs.labels.waterResistant': Droplets,
+  'product.specs.labels.dimensions': Box,
+  'product.specs.labels.weight': Weight,
+  'product.specs.labels.color': Palette,
+  'product.specs.labels.model': Tag,
+  'product.specs.labels.manufacturer': Factory,
+  'product.specs.labels.deviceType': Smartphone,
+  'product.specs.labels.other': Info,
 };
 
 const SECTION_ICONS: Readonly<Record<string, LucideIcon>> = {
-  general: Cpu,
+  general: Smartphone,
   screen: Monitor,
   memory: HardDrive,
-  processor: Cpu,
+  processor: CircuitBoard,
   connectivity: Wifi,
   cameras: Camera,
-  power: Cpu,
-  physical: Smartphone,
-  warranty: Shield,
-  other: Shield,
+  power: BatteryFull,
+  physical: Box,
+  warranty: ShieldCheck,
+  other: Info,
   security: Shield,
 };
 
@@ -62,11 +106,23 @@ export function getProductSpecSectionIconClassName(slug: string): string {
   return SECTION_ICON_CLASSNAMES[slug] ?? 'bg-gray-100 text-gray-600';
 }
 
-export function getProductSpecRowIcon(labelKey?: string): LucideIcon {
+/**
+ * Resolves a Lucide icon for a product-spec row by stable label key,
+ * then by raw label text when the key is missing.
+ */
+export function getProductSpecRowIcon(labelKey?: string, label?: string): LucideIcon {
   if (labelKey && LABEL_KEY_ICONS[labelKey]) {
     return LABEL_KEY_ICONS[labelKey];
   }
-  return Cpu;
+
+  if (label) {
+    const resolvedKey = resolveSpecLabelKey(label);
+    if (resolvedKey && LABEL_KEY_ICONS[resolvedKey]) {
+      return LABEL_KEY_ICONS[resolvedKey];
+    }
+  }
+
+  return Info;
 }
 
 export function getProductSpecSectionIcon(slug: string): LucideIcon {

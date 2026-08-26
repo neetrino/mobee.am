@@ -224,20 +224,23 @@ export function ShopCatalogArea({
   const totalPages = meta?.totalPages ?? 0;
 
   return (
-    <div className="min-w-0 w-full flex-1 pt-4 pb-0 lg:py-4">
+    <div className="min-w-0 w-full flex-1 pt-0 pb-0 lg:py-4">
       <div className="w-full">
         <ProductsHeader total={total} isCountPending={loading} />
       </div>
 
-      <div className="w-full py-4">
-        <nav className="mb-4 flex items-center text-sm" aria-label="Breadcrumb">
+      <div className="w-full pt-3 pb-4 sm:py-4">
+        <nav
+          className="mb-4 hidden items-center text-sm sm:flex"
+          aria-label="Breadcrumb"
+        >
           <Link href="/" className="text-gray-500 transition-colors hover:text-gray-700">
             {t('common.navigation.home')}
           </Link>
           <span className="mx-2 text-gray-400">/</span>
           <span className="font-semibold text-gray-900">{t('common.navigation.products')}</span>
         </nav>
-        <div className="mb-6 pt-2">
+        <div className="mb-6 pt-3 sm:pt-2">
           <ShopSortFilter />
         </div>
 

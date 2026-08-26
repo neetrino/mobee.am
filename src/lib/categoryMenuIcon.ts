@@ -1,20 +1,23 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+  AirVent,
   Battery,
   Cable,
   Gamepad2,
   Headphones,
   Laptop,
   LayoutGrid,
-  Package,
+  Microwave,
   Plug,
   Refrigerator,
   Smartphone,
   Tablet,
   Tv,
+  WandSparkles,
+  WashingMachine,
   Watch,
-  Wind,
 } from 'lucide-react';
+import { HairDryerIcon } from '@/components/icons/HairDryerIcon';
 import {
   ACCESSORIES_SLUG_PARTS,
   COMPUTERS_SLUG_PARTS,
@@ -30,7 +33,15 @@ export type CategoryIconSource = {
   fullPath?: string;
 };
 
-const TV_SLUG_PARTS = ['tvs', 'tv', 'television', 'televizory', 'herustatsuyts'] as const;
+const TV_SLUG_PARTS = [
+  'tvs',
+  'tv',
+  'television',
+  'televizory',
+  'herustatsuyts',
+  'herustacuyc',
+] as const;
+
 const GAME_CONSOLE_SLUG_PARTS = [
   'game-consoles',
   'game-console',
@@ -40,7 +51,47 @@ const GAME_CONSOLE_SLUG_PARTS = [
   'ps5',
   'xbox',
 ] as const;
-const HAIR_DRYER_SLUG_PARTS = ['hair-dryers', 'hair-dryer', 'hairdryer'] as const;
+
+const HAIR_DRYER_SLUG_PARTS = [
+  'hair-dryers',
+  'hair-dryer',
+  'hairdryer',
+  'fen',
+  'varsahardarich',
+] as const;
+
+const HAIR_STRAIGHTENER_SLUG_PARTS = [
+  'hair-straightener',
+  'hair-straighteners',
+  'straightener',
+  'straighteners',
+] as const;
+
+const AIR_CONDITIONER_SLUG_PARTS = [
+  'ac',
+  'air-conditioner',
+  'air-conditioners',
+  'airconditioner',
+  'conditioner',
+  'odorakich',
+] as const;
+
+const WASHING_MACHINE_SLUG_PARTS = [
+  'washing-machine',
+  'washing-machines',
+  'washer',
+  'lvacqi-meqena',
+  'lvacqi',
+] as const;
+
+const REFRIGERATOR_SLUG_PARTS = [
+  'refrigerator',
+  'refrigerators',
+  'fridge',
+  'fridges',
+  'sarnaran',
+] as const;
+
 const HOUSEHOLD_SLUG_PARTS = [
   'household-appliances',
   'household',
@@ -48,16 +99,33 @@ const HOUSEHOLD_SLUG_PARTS = [
   'bytovaya-tekhnika',
 ] as const;
 
+const EXTRA_PHONE_SLUG_PARTS = ['heraxos', 'herakhos'] as const;
+const EXTRA_TABLET_SLUG_PARTS = ['planshet'] as const;
+const EXTRA_ACCESSORY_SLUG_PARTS = ['aksesuar'] as const;
+
 function tokenizeCategory(value: string): string[] {
   return value.toLowerCase().split(/[-_/]/).filter(Boolean);
 }
 
-function matchesSlugParts(category: CategoryIconSource, parts: readonly string[]): boolean {
-  const tokens = [
+function categoryTokens(category: CategoryIconSource): string[] {
+  return [
     ...tokenizeCategory(category.slug),
     ...tokenizeCategory(category.fullPath ?? ''),
   ];
-  return parts.some((part) => tokens.includes(part));
+}
+
+function matchesSlugParts(category: CategoryIconSource, parts: readonly string[]): boolean {
+  const slug = category.slug.toLowerCase();
+  const fullPath = (category.fullPath ?? '').toLowerCase();
+  const pathSegments = fullPath.split('/').filter(Boolean);
+  const tokens = categoryTokens(category);
+  return parts.some(
+    (part) =>
+      tokens.includes(part) ||
+      slug === part ||
+      fullPath === part ||
+      pathSegments.includes(part),
+  );
 }
 
 function titleIncludes(category: CategoryIconSource, markers: readonly string[]): boolean {
@@ -66,30 +134,40 @@ function titleIncludes(category: CategoryIconSource, markers: readonly string[])
 }
 
 function resolveAccessoryIcon(category: CategoryIconSource): LucideIcon | null {
-  if (titleIncludes(category, ['cable', 'кабель']) || category.slug.includes('cable')) {
+  if (titleIncludes(category, ['cable', 'кабель', 'լար']) || category.slug.includes('cable')) {
     return Cable;
   }
   if (titleIncludes(category, ['charger', 'заряд', 'լիցք']) || category.slug.includes('charger')) {
     return Plug;
   }
   if (
-    titleIncludes(category, ['power bank', 'powerbank', 'բатар']) ||
-    category.slug.includes('power')
+    titleIncludes(category, ['power bank', 'powerbank', 'պաուեր', 'power']) ||
+    category.slug.includes('power-bank') ||
+    category.slug.includes('powerbank')
   ) {
     return Battery;
   }
-  if (matchesSlugParts(category, ACCESSORIES_SLUG_PARTS) || titleIncludes(category, ['աքսեսուար', 'аксессуар', 'accessory'])) {
-    return Package;
+  if (
+    matchesSlugParts(category, [...ACCESSORIES_SLUG_PARTS, ...EXTRA_ACCESSORY_SLUG_PARTS]) ||
+    titleIncludes(category, ['աքսեսուար', 'аксессуар', 'accessory'])
+  ) {
+    return Cable;
   }
   return null;
 }
 
 function resolvePrimaryIcon(category: CategoryIconSource): LucideIcon | null {
   if (
+    matchesSlugParts(category, HAIR_STRAIGHTENER_SLUG_PARTS) ||
+    titleIncludes(category, ['ուղղիչ', 'выпрямител', 'straightener', 'մազերի ուղղ'])
+  ) {
+    return WandSparkles;
+  }
+  if (
     matchesSlugParts(category, HAIR_DRYER_SLUG_PARTS) ||
     titleIncludes(category, ['ֆեն', 'фен', 'hair dryer', 'վարսահարդարիչ'])
   ) {
-    return Wind;
+    return HairDryerIcon;
   }
   if (
     matchesSlugParts(category, GAME_CONSOLE_SLUG_PARTS) ||
@@ -104,15 +182,39 @@ function resolvePrimaryIcon(category: CategoryIconSource): LucideIcon | null {
     return Tv;
   }
   if (
-    matchesSlugParts(category, HOUSEHOLD_SLUG_PARTS) ||
-    titleIncludes(category, ['կենցաղ', 'бытов', 'household'])
+    matchesSlugParts(category, AIR_CONDITIONER_SLUG_PARTS) ||
+    titleIncludes(category, ['օդորակիչ', 'кондиционер', 'air condition', 'conditioner'])
+  ) {
+    return AirVent;
+  }
+  if (
+    matchesSlugParts(category, WASHING_MACHINE_SLUG_PARTS) ||
+    titleIncludes(category, ['լվացքի', 'стиральн', 'washing machine', 'washer'])
+  ) {
+    return WashingMachine;
+  }
+  if (
+    matchesSlugParts(category, REFRIGERATOR_SLUG_PARTS) ||
+    titleIncludes(category, ['սառնարան', 'холодильник', 'refrigerator', 'fridge'])
   ) {
     return Refrigerator;
   }
-  if (matchesSlugParts(category, PHONES_SLUG_PARTS) || titleIncludes(category, ['հեռախոս', 'телефон', 'iphone'])) {
+  if (
+    matchesSlugParts(category, HOUSEHOLD_SLUG_PARTS) ||
+    titleIncludes(category, ['կենցաղ', 'бытов', 'household'])
+  ) {
+    return Microwave;
+  }
+  if (
+    matchesSlugParts(category, [...PHONES_SLUG_PARTS, ...EXTRA_PHONE_SLUG_PARTS]) ||
+    titleIncludes(category, ['հեռախոս', 'телефон', 'iphone'])
+  ) {
     return Smartphone;
   }
-  if (matchesSlugParts(category, TABLETS_SLUG_PARTS) || titleIncludes(category, ['պլանշետ', 'планшет', 'ipad'])) {
+  if (
+    matchesSlugParts(category, [...TABLETS_SLUG_PARTS, ...EXTRA_TABLET_SLUG_PARTS]) ||
+    titleIncludes(category, ['պլանշետ', 'планшет', 'ipad'])
+  ) {
     return Tablet;
   }
   if (
@@ -121,7 +223,10 @@ function resolvePrimaryIcon(category: CategoryIconSource): LucideIcon | null {
   ) {
     return Laptop;
   }
-  if (matchesSlugParts(category, WATCHES_SLUG_PARTS) || titleIncludes(category, ['ժամացույց', 'часы', 'watch'])) {
+  if (
+    matchesSlugParts(category, WATCHES_SLUG_PARTS) ||
+    titleIncludes(category, ['ժամացույց', 'часы', 'watch'])
+  ) {
     return Watch;
   }
   if (
