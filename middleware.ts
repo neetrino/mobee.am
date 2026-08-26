@@ -26,6 +26,7 @@ import {
   isEdgeSecurityEnvValid,
   isJwtSecretLengthValid,
 } from "@/config/env-core";
+import { handleStorefrontLocale } from "@/lib/i18n/middleware-locale";
 
 type AdminAuthResult =
   | { ok: true; userId: string; roles: string[] }
@@ -221,6 +222,11 @@ function withRequestIdHeaders(base: Headers, requestId: string): Headers {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  const localeResponse = handleStorefrontLocale(request);
+  if (localeResponse) {
+    return localeResponse;
+  }
+
   if (isAdminPageRoute(pathname)) {
     return forwardWithAdminPageHeader(request);
   }
@@ -316,12 +322,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/supersudo",
-    "/supersudo/:path*",
-    "/api/v1/admin/:path*",
-    "/api/v1/auth/login",
-    "/api/v1/auth/register",
-    "/api/v1/:path*",
-    "/api/health",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
   ],
 };

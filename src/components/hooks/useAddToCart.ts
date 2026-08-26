@@ -8,7 +8,7 @@ import { dispatchCartFlyAnimation } from '../../lib/cart/dispatchCartFlyAnimatio
 import type { CartFlyContext } from '../../lib/cart/cart-fly-animation.types';
 import { readGuestCart, upsertGuestCartItem } from '../../lib/cart/guest-cart';
 import { dispatchCartUpdated } from '../../lib/cart/dispatch-cart-updated';
-import { clearLoggedInCartCache } from '../../app/cart/cart-cache';
+import { clearLoggedInCartCache } from '../../app/[locale]/cart/cart-cache';
 import { fetchProductBySlugWithLang } from '../../lib/shop/fetchProductBySlugWithLang';
 import { showToast } from '../Toast';
 import { hasDisplayPrice } from '../../lib/products/variant-price-display';

@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient, ApiError } from '../api-client';
+import { resolveStorefrontHomeHref } from '../i18n/routing';
 import { clearLegacyAuthStorage } from '../api-client/auth-utils';
 import { mergeGuestCartIntoUserCart } from '../cart/guest-cart';
 import { applyPendingWishlistProductAfterAuth } from '../wishlist/pendingWishlistAfterLogin';
@@ -167,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await mergeGuestCartAfterAuth();
       await reconcileWishlistWithCatalog();
       router.refresh();
-      router.replace('/');
+      router.replace(resolveStorefrontHomeHref(window.location.pathname));
     } catch (error: unknown) {
       let errorMessage = 'Registration failed. Please try again.';
       const err = error as {
@@ -196,7 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearLegacyAuthStorage();
     setUser(null);
     window.dispatchEvent(new Event('auth-updated'));
-    router.push('/');
+    router.push(resolveStorefrontHomeHref(window.location.pathname));
   };
 
   const roles = user && Array.isArray(user.roles) ? user.roles : [];

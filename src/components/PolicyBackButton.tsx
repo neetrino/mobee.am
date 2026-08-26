@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { useTranslation } from '@/lib/i18n-client';
 
 /** Shared back navigation for policy hub and policy detail pages. */

@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { useLayoutEffect, useRef } from 'react';
 import type { AnimationEvent } from 'react';
 import {

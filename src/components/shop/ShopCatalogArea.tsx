@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { Link, useRouter } from '@/lib/i18n/navigation';
 import { useMemo, type MouseEvent, type ReactNode } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ProductsHeader } from '@/components/ProductsHeader';
 import { ProductsGrid } from '@/components/ProductsGrid';
 import { ShopSortFilter } from '@/components/ShopSortFilter';

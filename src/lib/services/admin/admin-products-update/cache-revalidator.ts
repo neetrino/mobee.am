@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidateStorefrontPath, revalidateStorefrontShell } from "@/lib/i18n/revalidate-storefront";
 import { logger } from "../../../utils/logger";
 import { syncProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
 import { invalidateCategoryCaches } from "@/lib/services/read-through-json-cache";
@@ -13,11 +13,9 @@ export async function revalidateProductCache(
   try {
     await syncProductListingReadModel(productId);
     if (productSlug) {
-      revalidatePath(`/products/${productSlug}`);
+      revalidateStorefrontPath(`/products/${productSlug}`);
     }
-    revalidatePath("/");
-    revalidatePath("/shop");
-    revalidatePath("/products");
+    revalidateStorefrontShell();
     await invalidateCategoryCaches();
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);

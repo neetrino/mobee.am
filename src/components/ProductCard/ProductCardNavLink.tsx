@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link } from '@/lib/i18n/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import type { ReactNode } from 'react';
 import type { ProductCardCachePayload } from '@/lib/products/product-card-cache';
 import { buildProductCardNavHandlers } from '@/lib/products/product-card-nav';

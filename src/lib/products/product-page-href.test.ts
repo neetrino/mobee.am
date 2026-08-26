@@ -52,7 +52,7 @@ describe('syncProductPageColorInUrl', () => {
   it('updates the browser URL with the selected color', () => {
     const replaceState = vi.fn();
     vi.stubGlobal('window', {
-      location: { pathname: '/products/iphone-16-pro', search: '?color=Black' },
+      location: { pathname: '/en/products/iphone-16-pro', search: '?color=Black' },
       history: { state: {}, replaceState },
     });
 
@@ -61,7 +61,7 @@ describe('syncProductPageColorInUrl', () => {
     expect(replaceState).toHaveBeenCalledWith(
       {},
       '',
-      `/products/iphone-16-pro?${PRODUCT_PAGE_COLOR_QUERY_PARAM}=White`,
+      `/en/products/iphone-16-pro?${PRODUCT_PAGE_COLOR_QUERY_PARAM}=White`,
     );
   });
 

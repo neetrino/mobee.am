@@ -1,0 +1,120 @@
+import { useRef } from 'react';
+import { useRouter } from '@/lib/i18n/navigation';
+import { useTranslation } from '../../../../lib/i18n-client';
+import { clearGuestCart } from '../checkoutUtils';
+import { buildOrderSuccessPath } from '../build-order-success-path';
+import {
+  getOrCreateCheckoutIdempotencyKey,
+  resetCheckoutIdempotencyKey,
+} from '../checkout-idempotency-key';
+import { postCheckoutOrder } from '../post-checkout-order';
+import type { CheckoutFormData, Cart, CartItem } from '../types';
+
+interface UseOrderSubmissionProps {
+  cart: Cart | null;
+  isLoggedIn: boolean;
+  deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
+  deliveryAvailable: boolean;
+  currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
+  setError: (error: string | null) => void;
+}
+
+export function useOrderSubmission({
+  cart,
+  isLoggedIn,
+  deliveryPrice,
+  requiresRegionalQuote,
+  deliveryAvailable,
+  currency,
+  setError,
+}: UseOrderSubmissionProps) {
+  const router = useRouter();
+  const { t, lang } = useTranslation();
+  const idempotencyKeyRef = useRef<string | null>(null);
+
+  const submitOrder = async (data: CheckoutFormData) => {
+    setError(null);
+
+    try {
+      if (!cart) {
+        throw new Error(t('checkout.errors.cartEmpty'));
+      }
+
+      const shippingMethod =
+        data.shippingMethod === 'delivery' && !deliveryAvailable ? 'pickup' : data.shippingMethod;
+
+      if (shippingMethod === 'delivery' && requiresRegionalQuote) {
+        throw new Error(t('checkout.errors.regionalQuoteRequired'));
+      }
+
+      let cartId = cart.id;
+      let items = undefined;
+
+      if (!isLoggedIn && cart.id === 'guest-cart') {
+        items = cart.items.map((item: CartItem) => ({
+          productId: item.variant.product.id,
+          variantId: item.variant.id,
+          quantity: item.quantity,
+        }));
+        cartId = 'guest-cart';
+      }
+
+      const shippingAddress =
+        shippingMethod === 'delivery' && data.shippingAddress && data.shippingCity
+          ? {
+              address: data.shippingAddress,
+              city: data.shippingCity,
+            }
+          : undefined;
+
+      const shippingAmount =
+        shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
+
+      const idempotencyKey = getOrCreateCheckoutIdempotencyKey(idempotencyKeyRef);
+
+      const response = await postCheckoutOrder(
+        {
+          cartId: cartId,
+          ...(items ? { items } : {}),
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          shippingMethod,
+          ...(shippingMethod === 'delivery' ? { deliverySpeed: data.deliverySpeed } : {}),
+          ...(shippingAddress ? { shippingAddress } : {}),
+          shippingAmount: shippingAmount,
+          paymentMethod: data.paymentMethod,
+          promoCode: data.promoCode,
+          locale: lang,
+          currency,
+        },
+        idempotencyKey,
+      );
+
+      if (!isLoggedIn) {
+        clearGuestCart();
+      }
+
+      resetCheckoutIdempotencyKey(idempotencyKeyRef);
+
+      if (response.payment?.paymentUrl) {
+        window.location.href = response.payment.paymentUrl;
+        return;
+      }
+
+      router.push(
+        buildOrderSuccessPath(response.order.number, {
+          email: data.email,
+          isLoggedIn,
+        })
+      );
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setError(error.message || t('checkout.errors.failedToCreateOrder'));
+    }
+  };
+
+  return { submitOrder };
+}

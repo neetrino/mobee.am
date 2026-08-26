@@ -1,7 +1,8 @@
 'use client';
 
-import { setStoredLanguage, type LanguageCode } from '../lib/language';
-import { useClientSyncedLanguage } from '../lib/useClientSyncedLanguage';
+import { useUiLanguage } from './UiLanguageProvider';
+import { useSwitchStorefrontLocale } from '../lib/i18n/use-switch-locale';
+import type { LanguageCode } from '../lib/language';
 
 /**
  * ՀԱՅ / EN / РУС — Figma mobee-new Component 5 (node 178:544): bordered pill, #2db2ff sliding inset.
@@ -15,7 +16,8 @@ function segmentForLang(lang: LanguageCode): PillSegment {
 }
 
 export function LanguageSwitcherPill() {
-  const lang = useClientSyncedLanguage();
+  const lang = useUiLanguage();
+  const switchLocale = useSwitchStorefrontLocale();
 
   const seg = segmentForLang(lang);
   const slideTranslate =
@@ -41,7 +43,7 @@ export function LanguageSwitcherPill() {
           type="button"
           className={`${segmentLabelClass} ${seg === 'hy' ? 'text-white' : 'text-[#4b5563]'}`}
           onClick={() => {
-            if (lang !== 'hy') setStoredLanguage('hy');
+            if (lang !== 'hy') switchLocale('hy');
           }}
         >
           ՀԱՅ
@@ -50,7 +52,7 @@ export function LanguageSwitcherPill() {
           type="button"
           className={`${segmentLabelClass} ${seg === 'en' ? 'text-white' : 'text-[#4b5563]'}`}
           onClick={() => {
-            if (lang !== 'en') setStoredLanguage('en');
+            if (lang !== 'en') switchLocale('en');
           }}
         >
           EN
@@ -59,7 +61,7 @@ export function LanguageSwitcherPill() {
           type="button"
           className={`${segmentLabelClass} ${seg === 'ru' ? 'text-white' : 'text-[#4b5563]'}`}
           onClick={() => {
-            if (lang !== 'ru') setStoredLanguage('ru');
+            if (lang !== 'ru') switchLocale('ru');
           }}
         >
           РУС

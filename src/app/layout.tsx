@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
-import { SiteChrome } from '../components/SiteChrome';
 import { siteInter } from '../lib/fonts/site-fonts';
 import {
   SITE_APP_ICON_HEIGHT_PX,
@@ -15,7 +14,6 @@ import {
 } from '../lib/brand.constants';
 import { DEFAULT_LANGUAGE, STOREFRONT_LANGUAGE_INIT_SCRIPT } from '../lib/language';
 import { getSiteAssetUrl, getSiteUrl } from '../lib/site-url';
-import { getLayoutCategoriesTree } from '../lib/services/categories-tree-cached';
 import { TABLET_IPAD_AIR_LIKE_HTML_INIT_SCRIPT } from '../lib/tablet-ipad-air-like-layout';
 
 const inter = siteInter;
@@ -64,8 +62,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Static shell: no cookies()/headers(). Language is default on the server;
- * ClientProviders + STOREFRONT_LANGUAGE_INIT_SCRIPT re-localize in the browser.
+ * Static shell: no cookies()/headers(). Storefront locale lives in `/[locale]/...`.
  */
 export default async function RootLayout({
   children,
@@ -73,7 +70,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const initialLanguage = DEFAULT_LANGUAGE;
-  const categoriesTree = await getLayoutCategoriesTree(initialLanguage);
 
   return (
     <html lang={initialLanguage} className="h-full" suppressHydrationWarning>
@@ -87,12 +83,7 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
-          <ClientProviders
-            initialLanguage={initialLanguage}
-            initialCategories={categoriesTree.data}
-          >
-            <SiteChrome>{children}</SiteChrome>
-          </ClientProviders>
+          <ClientProviders initialLanguage={initialLanguage}>{children}</ClientProviders>
         </Suspense>
       </body>
     </html>

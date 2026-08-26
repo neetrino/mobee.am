@@ -6,7 +6,7 @@ import {
   type InventoryAdjustmentFields,
 } from "../inventory/adjust-variant-stock";
 import { syncProductListingReadModelByVariantIds } from "@/lib/read-model/product-read-model-sync";
-import { revalidatePath } from "next/cache";
+import { revalidateStorefrontShell } from "@/lib/i18n/revalidate-storefront";
 import { logger } from "@/lib/utils/logger";
 
 export interface InventoryListFilters {
@@ -176,8 +176,7 @@ class AdminInventoryService {
     );
     try {
       await syncProductListingReadModelByVariantIds([result.variantId]);
-      revalidatePath("/");
-      revalidatePath("/shop");
+      revalidateStorefrontShell();
     } catch (error: unknown) {
       logger.warn("Read-model sync after inventory adjust failed", {
         variantId: result.variantId,

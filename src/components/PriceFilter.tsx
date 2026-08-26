@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, type PointerEvent } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { X } from 'lucide-react';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';

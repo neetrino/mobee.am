@@ -3,7 +3,7 @@ import {
   ADMIN_MOBILE_MENU_OFFSET_LEFT_PX,
   ADMIN_MOBILE_MENU_OFFSET_TOP_PX,
 } from './src/app/admin/admin-mobile-menu-layout.constants';
-import { CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX } from './src/app/checkout/constants';
+import { CHECKOUT_PAGE_VIEWPORT_SIDE_INSET_PX } from './src/app/[locale]/checkout/constants';
 import { LAYOUT_TABLET_IPAD_AIR_LIKE_HTML_CLASS } from './src/lib/tablet-ipad-air-like-layout.constants';
 import {
   LAYOUT_DESKTOP_MIN_WIDTH_PX,

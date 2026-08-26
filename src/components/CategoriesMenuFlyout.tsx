@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { ChevronRight } from 'lucide-react';
 import { createElement, useEffect, useMemo } from 'react';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';

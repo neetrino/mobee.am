@@ -11,7 +11,7 @@ import { logger } from "@/lib/utils/logger";
 import {
   ORDER_PLACED_QUERY_PARAM,
   ORDER_PLACED_QUERY_VALUE,
-} from "@/app/orders/order-placed.constants";
+} from "@/app/[locale]/orders/order-placed.constants";
 import type { PaymentStatus } from "@/lib/services/orders/payment-status";
 
 const ALLOWED_PROVIDERS = new Set(["idram", "arca"]);

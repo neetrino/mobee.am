@@ -1,4 +1,4 @@
-import { DEFAULT_LANGUAGE, type LanguageCode } from '@/lib/language';
+import { type LanguageCode } from '@/lib/language';
 import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-product-filters';
 import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { getCachedProductList, type ProductListPayload } from '@/lib/services/products-list-cached';
@@ -8,6 +8,7 @@ import { CATALOG_DEFAULT_LIMIT, CATALOG_DEFAULT_PAGE } from '@/lib/catalog/catal
 
 interface ShopCatalogSectionProps {
   searchParams: Record<string, string | undefined>;
+  language: LanguageCode;
 }
 
 const EMPTY_LIST_PAYLOAD: ProductListPayload = {
@@ -23,8 +24,7 @@ const EMPTY_LIST_PAYLOAD: ProductListPayload = {
 /**
  * Server-fetched catalog: shares Redis/in-memory cache with GET /api/v1/products and hydrates the client grid without a duplicate first request.
  */
-export async function ShopCatalogSection({ searchParams }: ShopCatalogSectionProps) {
-  const language: LanguageCode = DEFAULT_LANGUAGE;
+export async function ShopCatalogSection({ searchParams, language }: ShopCatalogSectionProps) {
 
   let initialPayload: ProductListPayload = EMPTY_LIST_PAYLOAD;
   let initialFiltersKey = `invalid:${language}`;

@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from '../lib/i18n-client';
 import { MOBILE_FILTERS_EVENT } from '@/lib/events';

@@ -1,7 +1,8 @@
 'use client';
 
 import { Suspense, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { useTranslation } from '../lib/i18n-client';
 import { useCategories } from './CategoryNavigation/hooks/useCategories';
 import { useCategoryProducts } from './CategoryNavigation/hooks/useCategoryProducts';

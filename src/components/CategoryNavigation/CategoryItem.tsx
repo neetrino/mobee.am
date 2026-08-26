@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { CategoryIcon } from './CategoryIcon';
 import type { Category } from './utils';
 

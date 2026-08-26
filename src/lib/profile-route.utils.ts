@@ -1,4 +1,6 @@
-/** Canonical profile path — keep in sync with `src/app/profile/page.tsx` route. */
+import { stripLocalePrefix } from '@/lib/i18n/routing';
+
+/** Canonical profile path — keep in sync with `src/app/[locale]/profile/page.tsx` route. */
 export const PROFILE_ROUTE_PATH = '/profile' as const;
 
 /**
@@ -8,8 +10,9 @@ export function isProfileRoutePath(pathname: string | null): boolean {
   if (!pathname) {
     return false;
   }
-  if (pathname === PROFILE_ROUTE_PATH) {
+  const normalized = stripLocalePrefix(pathname);
+  if (normalized === PROFILE_ROUTE_PATH) {
     return true;
   }
-  return pathname.startsWith(`${PROFILE_ROUTE_PATH}/`);
+  return normalized.startsWith(`${PROFILE_ROUTE_PATH}/`);
 }

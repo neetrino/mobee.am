@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { WHY_CHOOSE_US_PHOTO_SRC } from '../lib/constants/ui-icons.constants';

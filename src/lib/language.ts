@@ -12,14 +12,17 @@ export type LanguageCode = keyof typeof LANGUAGES;
 export const DEFAULT_LANGUAGE: LanguageCode = 'hy';
 
 /**
- * Runs before hydration so `html lang` matches the visitor cookie without
- * making the root layout dynamic via `cookies()`.
+ * Runs before hydration so `html lang` matches the URL locale (then cookie)
+ * without making the root layout dynamic via `cookies()`.
  */
 export const STOREFRONT_LANGUAGE_INIT_SCRIPT = `
 (() => {
   try {
-    const match = document.cookie.match(/(?:^|; )shop_language=([^;]*)/);
-    const raw = match ? decodeURIComponent(match[1]) : null;
+    const pathMatch = location.pathname.match(/^\\/(hy|en|ru)(?=\\/|$)/);
+    const fromPath = pathMatch ? pathMatch[1] : null;
+    const cookieMatch = document.cookie.match(/(?:^|; )shop_language=([^;]*)/);
+    const fromCookie = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
+    const raw = fromPath || fromCookie;
     const allowed = { en: 1, hy: 1, ru: 1, ka: 1 };
     if (raw && allowed[raw]) {
       document.documentElement.lang = raw === 'ka' ? 'en' : raw;
@@ -33,7 +36,7 @@ const LANGUAGE_STORAGE_KEY = 'shop_language';
 /** Cookie mirrored from localStorage so server components can read the UI language. */
 export const LANGUAGE_COOKIE_NAME = 'shop_language';
 
-const LANGUAGE_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 365;
+export const LANGUAGE_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 365;
 
 export function persistLanguageCookie(language: LanguageCode): void {
   if (typeof document === 'undefined') return;
@@ -78,11 +81,21 @@ export function getStoredLanguage(): LanguageCode {
   return DEFAULT_LANGUAGE;
 }
 
-export function setStoredLanguage(language: LanguageCode, options?: { skipReload?: boolean }): void {
+/** Persist locale without notifying listeners (URL navigation is the source of truth). */
+export function persistLanguagePreference(language: LanguageCode): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
     persistLanguageCookie(language);
+  } catch {
+    // Ignore quota / private-mode failures.
+  }
+}
+
+export function setStoredLanguage(language: LanguageCode, options?: { skipReload?: boolean }): void {
+  if (typeof window === 'undefined') return;
+  try {
+    persistLanguagePreference(language);
     window.dispatchEvent(new Event('language-updated'));
     // Default behavior is now reactive update without full reload.
     // Reload can still be explicitly requested with `skipReload: false`.

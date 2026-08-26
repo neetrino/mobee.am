@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/navigation";
 import Image from "next/image";
 import { resolveProductCardImageSrc } from "../../lib/productCardDisplayImage";
 import {
@@ -9,7 +9,7 @@ import {
 import { buildProductCardNavHandlers } from "../../lib/products/product-card-nav";
 import { buildProductPageHref } from "../../lib/products/product-page-href";
 import { ProductImagePlaceholder } from "../ProductImagePlaceholder";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/i18n/navigation";
 
 interface ProductCardImageProps {
   slug: string;
