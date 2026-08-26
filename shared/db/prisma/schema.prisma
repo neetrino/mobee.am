@@ -35,9 +35,12 @@ model User {
   updatedAt            DateTime  @updatedAt
 
   // Relations
-  carts  Cart[]
-  orders Order[]
-  reviews ProductReview[]
+  carts             Cart[]
+  orders            Order[]
+  reviews           ProductReview[]
+  stockMovements    StockMovement[] @relation("StockMovementActor")
+  auditLogs         AuditLog[]      @relation("AuditLogActor")
+  actedOrderEvents  OrderEvent[]    @relation("OrderEventActor")
 
   @@index([deletedAt])
   @@map("users")
@@ -285,9 +288,10 @@ model ProductVariant {
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
 
-  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  cartItems  CartItem[]
-  orderItems OrderItem[]
+  product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  stockMovements StockMovement[] @relation("StockMovementVariant")
 
   @@index([productId])
   @@index([stock, published])
@@ -417,12 +421,20 @@ model Order {
   userAgent         String?
   paidAt            DateTime?
   fulfilledAt       DateTime?
-  cancelledAt       DateTime?
-  items             OrderItem[]
-  payments          Payment[]
-  events            OrderEvent[]
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  cancelledAt           DateTime?
+  // Checkout idempotency foundation (Phase 3). Unique when both hashes are set:
+  // SQL partial unique index `orders_idempotency_scope_key_uidx`.
+  // requestFingerprint is intentionally excluded from uniqueness.
+  idempotencyScopeHash  String?
+  idempotencyKeyHash    String?
+  requestFingerprint    String?
+  correlationId         String?
+  items                 OrderItem[]
+  payments              Payment[]
+  events                OrderEvent[]
+  stockMovements        StockMovement[] @relation("StockMovementOrder")
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
 
   // Relations
   user User? @relation(fields: [userId], references: [id])
@@ -432,6 +444,7 @@ model Order {
   @@index([paymentStatus, createdAt(sort: Desc)])
   @@index([customerEmail])
   @@index([createdAt(sort: Desc)])
+  @@index([correlationId])
   @@map("orders")
 }
 
@@ -482,18 +495,115 @@ model Payment {
 }
 
 model OrderEvent {
-  id        String   @id @default(cuid())
-  orderId   String
-  type      String
-  data      Json?
-  userId    String?
-  ipAddress String?
-  createdAt DateTime @default(now())
+  id                String   @id @default(cuid())
+  orderId           String
+  type              String
+  data              Json?
+  userId            String?
+  ipAddress         String?
+  fromState         String?
+  toState           String?
+  actorUserId       String?
+  isCustomerVisible Boolean  @default(false)
+  provider          String?
+  providerEventId   String?
+  correlationId     String?
+  createdAt         DateTime @default(now())
 
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actorUser User? @relation("OrderEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
+  @@index([orderId, createdAt])
+  @@index([type])
+  @@index([correlationId])
+  // SQL partial unique `order_events_provider_providerEventId_uidx`
+  // on (provider, providerEventId) WHERE both are NOT NULL.
   @@map("order_events")
+}
+
+// ============================================
+// STOCK MOVEMENT LEDGER (Phase 3 foundation)
+// ============================================
+// reason allowed values are enforced in SQL CHECK (Prisma 5 cannot model CHECKs):
+// order | cancel | return | admin_adjustment | import
+// variantId is nullable SetNull so admin hard-delete of variants keeps ledger rows.
+model StockMovement {
+  id                String   @id @default(cuid())
+  variantId         String?
+  variantIdSnapshot String
+  skuSnapshot       String?
+  delta             Int
+  reason            String
+  orderId           String?
+  actorUserId       String?
+  resultingBalance  Int
+  correlationId     String?
+  metadata          Json?
+  createdAt         DateTime @default(now())
+
+  variant   ProductVariant? @relation("StockMovementVariant", fields: [variantId], references: [id], onDelete: SetNull)
+  order     Order?          @relation("StockMovementOrder", fields: [orderId], references: [id], onDelete: SetNull)
+  actorUser User?           @relation("StockMovementActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([variantId, createdAt])
+  @@index([orderId])
+  @@index([correlationId])
+  @@map("stock_movements")
+}
+
+// ============================================
+// AUDIT LOG (Phase 3 foundation; Phase 4 writes order and inventory audit records at runtime)
+// ============================================
+model AuditLog {
+  id            String   @id @default(cuid())
+  actorUserId   String?
+  action        String
+  targetType    String
+  targetId      String?
+  beforeDiff    Json?
+  afterDiff     Json?
+  requestId     String?
+  correlationId String?
+  context       Json?
+  createdAt     DateTime @default(now())
+
+  actorUser User? @relation("AuditLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([actorUserId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@index([requestId])
+  @@index([correlationId])
+  @@map("audit_logs")
+}
+
+// ============================================
+// TRANSACTIONAL OUTBOX (Phase 6)
+// ============================================
+// Phase 6 transactional outbox. Status CHECK is SQL-only (Prisma 5).
+// pending | processing | completed | failed
+model OutboxEvent {
+  id             String    @id @default(cuid())
+  eventType      String
+  aggregateType  String
+  aggregateId    String
+  payload        Json
+  payloadVersion Int       @default(1)
+  status         String    @default("pending")
+  attemptCount   Int       @default(0)
+  availableAt    DateTime  @default(now())
+  processingAt   DateTime?
+  processedAt    DateTime?
+  lastError      String?   @db.Text
+  correlationId  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([eventType, aggregateType, aggregateId], map: "outbox_events_dedupe_uidx")
+  @@index([status, availableAt])
+  @@index([aggregateType, aggregateId])
+  @@index([correlationId])
+  @@map("outbox_events")
 }
 
 // ============================================
@@ -565,4 +675,83 @@ model ContactMessage {
   @@index([createdAt(sort: Desc)])
   @@index([email])
   @@map("contact_messages")
+}
+
+// ============================================
+// STOREFRONT READ MODELS (PLP / PDP hot path)
+// ============================================
+model ProductListingRow {
+  id                     String    @id @default(cuid())
+  productId              String
+  locale                 String
+  slug                   String
+  title                  String
+  subtitle               String?
+  brandId                String?
+  brandSlug              String?
+  brandName              String?
+  primaryCategoryId      String?
+  categoryIds            String[]  @default([])
+  categorySlugs          String[]  @default([])
+  price                  Float     @default(0)
+  compareAtPrice         Float?
+  originalPrice          Float?
+  priceSort              Float     @default(0)
+  hasPrice               Boolean   @default(false)
+  priceOnRequest         Boolean   @default(false)
+  discountPercent        Int       @default(0)
+  featured               Boolean   @default(false)
+  hasMarcoListingImage   Boolean   @default(false)
+  defaultVariantId       String?
+  stock                  Int       @default(0)
+  inStock                Boolean   @default(false)
+  image                  String?
+  labels                 Json      @default("[]")
+  colors                 Json      @default("[]")
+  colorTokens            String[]  @default([])
+  sizeTokens             String[]  @default([])
+  variantComboTokens     String[]  @default([])
+  searchText             String    @default("")
+  warrantyYears          Int?
+  publishedAt            DateTime?
+  productCreatedAt       DateTime
+  productUpdatedAt       DateTime
+  isPublished            Boolean   @default(true)
+  deletedAt              DateTime?
+  rebuiltAt              DateTime  @default(now())
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@unique([productId, locale])
+  @@unique([locale, slug])
+  @@index([locale, isPublished, deletedAt, hasMarcoListingImage, productCreatedAt(sort: Desc)])
+  @@index([locale, brandId])
+  @@index([locale, brandSlug])
+  @@index([locale, featured, productCreatedAt(sort: Desc)])
+  @@index([locale, hasPrice, priceSort])
+  @@index([categoryIds], type: Gin)
+  @@index([categorySlugs], type: Gin)
+  @@index([colorTokens], type: Gin)
+  @@index([sizeTokens], type: Gin)
+  @@index([variantComboTokens], type: Gin)
+  @@map("product_listing_rows")
+}
+
+model ProductPdpRow {
+  id               String    @id @default(cuid())
+  productId        String
+  locale           String
+  slug             String
+  slugs            String[]  @default([])
+  payload          Json
+  isPublished      Boolean   @default(true)
+  productUpdatedAt DateTime
+  rebuiltAt        DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([productId, locale])
+  @@index([locale, slug])
+  @@index([slugs], type: Gin)
+  @@map("product_pdp_rows")
 }

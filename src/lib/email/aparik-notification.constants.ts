@@ -1,8 +1,11 @@
+import { getAparikNotificationEmail as readAparikNotificationEmail } from "@/config/env";
+import { AppError } from "@/lib/errors/app-error";
+
 /** Recipient for installment (aparik) checkout notifications. */
 export function getAparikNotificationEmail(): string {
-  const email = process.env.APARIK_NOTIFICATION_EMAIL?.trim();
+  const email = readAparikNotificationEmail();
   if (!email) {
-    throw new Error("APARIK_NOTIFICATION_EMAIL is not configured");
+    throw AppError.serviceUnavailable();
   }
   return email;
 }

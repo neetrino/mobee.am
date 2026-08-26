@@ -4,7 +4,7 @@ import { PriceFilter } from '@/components/PriceFilter';
 import { CategoryFilter } from '@/components/CategoryFilter';
 import { BrandFilter } from '@/components/BrandFilter';
 import { ColorFilter } from '@/components/ColorFilter';
-import { SHOP_FILTER_SECTIONS_STACK_CLASS } from '@/app/shop/shop-layout.constants';
+import { SHOP_FILTER_SECTIONS_STACK_CLASS } from '@/app/[locale]/shop/shop-layout.constants';
 
 export type ShopFilterSectionsProps = {
   currentMinPrice?: string;

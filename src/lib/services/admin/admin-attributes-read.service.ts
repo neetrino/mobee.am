@@ -1,13 +1,13 @@
 import { db } from "@white-shop/db";
+import { logger } from "@/lib/utils/logger";
 import { ensureColorsColumnsExist } from "@/lib/services/admin/admin-attributes-write/migration";
 
 class AdminAttributesReadService {
   async getAttributes() {
     try {
       await ensureColorsColumnsExist();
-    } catch (migrationError: unknown) {
-      const message = migrationError instanceof Error ? migrationError.message : String(migrationError);
-      console.warn('⚠️ [ADMIN ATTRIBUTES READ SERVICE] Migration check failed:', message);
+    } catch {
+      logger.warn("Attributes migration check failed");
     }
 
     let attributes;
@@ -37,7 +37,7 @@ class AdminAttributesReadService {
     } catch (error: any) {
       // If attribute_values.colors column doesn't exist, fetch without it
       if (error?.code === 'P2022' || error?.message?.includes('attribute_values.colors') || error?.message?.includes('does not exist')) {
-        console.warn('⚠️ [ADMIN ATTRIBUTES READ SERVICE] attribute_values.colors column not found, fetching without it:', error.message);
+        logger.warn("attribute_values.colors column not found; fetching without it");
         // Fetch attributes first
         const attributesList = await db.attribute.findMany({
           include: {
@@ -73,7 +73,7 @@ class AdminAttributesReadService {
         } catch (selectError: any) {
           // If select also fails, use raw query with correct column name
           // Try with quoted name first, then without quotes
-          console.warn('⚠️ [ADMIN ATTRIBUTES READ SERVICE] Using raw query for attribute values:', selectError.message);
+          logger.warn("Using raw query for attribute values");
           try {
             allValues = await db.$queryRaw`
               SELECT 
@@ -86,7 +86,7 @@ class AdminAttributesReadService {
             ` as any[];
           } catch (rawError: any) {
             // If quoted name doesn't work, try without quotes (snake_case)
-            console.warn('⚠️ [ADMIN ATTRIBUTES READ SERVICE] Trying with snake_case column name:', rawError.message);
+            logger.warn("Retrying attribute values with snake_case column name");
             allValues = await db.$queryRaw`
               SELECT 
                 av.id,
@@ -166,7 +166,7 @@ class AdminAttributesReadService {
                 try {
                   colorsArray = JSON.parse(colorsData);
                 } catch (e) {
-                  console.warn('⚠️ [ADMIN ATTRIBUTES READ SERVICE] Failed to parse colors JSON:', e);
+                  logger.warn("Failed to parse attribute colors JSON");
                   colorsArray = [];
                 }
               } else if (typeof colorsData === 'object') {

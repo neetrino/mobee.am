@@ -1,3 +1,5 @@
+import { addLocalePrefix, parseLocaleFromPathname } from '@/lib/i18n/routing';
+
 export const PRODUCT_PAGE_COLOR_QUERY_PARAM = 'color';
 
 export interface ProductPageHrefOptions {
@@ -69,10 +71,12 @@ export function syncProductPageColorInUrl(
   }
 
   const pathname = buildProductPagePathname(slug, variantIdFromUrl);
+  const locale = parseLocaleFromPathname(window.location.pathname);
+  const localizedPathname = locale ? addLocalePrefix(pathname, locale) : pathname;
   const normalizedColor = color?.trim();
   const nextUrl = normalizedColor
-    ? `${pathname}?${PRODUCT_PAGE_COLOR_QUERY_PARAM}=${encodeURIComponent(normalizedColor)}`
-    : pathname;
+    ? `${localizedPathname}?${PRODUCT_PAGE_COLOR_QUERY_PARAM}=${encodeURIComponent(normalizedColor)}`
+    : localizedPathname;
 
   const currentUrl = `${window.location.pathname}${window.location.search}`;
   if (currentUrl !== nextUrl) {

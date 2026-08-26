@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { safeParseAddressUpdate } from "@/lib/schemas/users.schema";
 import { usersService } from "@/lib/services/users.service";
-import { toApiError } from "@/lib/types/errors";
-import { logger } from "@/lib/utils/logger";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ addressId: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -46,18 +45,14 @@ export async function PUT(
 
     const result = await usersService.updateAddress(user.id, addressId, parsed.data);
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    logger.error("Users addresses error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
 
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ addressId: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -75,10 +70,5 @@ export async function DELETE(
     const { addressId } = await params;
     await usersService.deleteAddress(user.id, addressId);
     return new NextResponse(null, { status: 204 });
-  } catch (error: unknown) {
-    logger.error("Users addresses error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
-

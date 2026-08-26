@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Check } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { getColorHex } from '../lib/colorMap';
+import { facetParamsFromUrlSearchParams } from '@/lib/shop/product-filters-to-api-params';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
 import { ShopFilterSectionHeader } from './shop/ShopFilterSectionHeader';
@@ -61,14 +63,7 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
     try {
       setLoading(true);
       const language = getStoredLanguage();
-      const params: Record<string, string> = {
-        lang: language,
-      };
-      
-      if (category) params.category = category;
-      if (search) params.search = search;
-      if (minPrice) params.minPrice = minPrice;
-      if (maxPrice) params.maxPrice = maxPrice;
+      const params = facetParamsFromUrlSearchParams(searchParams.entries(), language);
 
       // Fetch filters from API
       const response = await apiClient.get<{ colors: ColorOption[]; sizes: unknown[] }>('/api/v1/products/filters', { params });

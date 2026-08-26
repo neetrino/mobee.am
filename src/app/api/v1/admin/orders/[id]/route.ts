@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 /**
  * GET /api/v1/admin/orders/[id]
@@ -10,43 +11,16 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
 
     const { id } = await params;
-    console.log("📦 [ADMIN ORDERS] GET by id:", id);
-
     const order = await adminService.getOrderById(id);
-    console.log("✅ [ADMIN ORDERS] Order loaded:", id);
-
     return NextResponse.json(order);
-  } catch (error: any) {
-    console.error("❌ [ADMIN ORDERS] GET Error:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
-      code: error?.code,
-      meta: error?.meta,
-      type: error?.type,
-      title: error?.title,
-      status: error?.status,
-      detail: error?.detail,
-      fullError: error,
-    });
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
 
 /**
@@ -57,7 +31,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return runApiRoute(req, async (ctx) => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -65,70 +39,33 @@ export async function PUT(
 
     const { id } = await params;
     const body = await req.json();
-    console.log("📤 [ADMIN ORDERS] PUT request:", { id, body });
-
-    const order = await adminService.updateOrder(id, body);
-    console.log("✅ [ADMIN ORDERS] Order updated:", id);
-
-    return NextResponse.json(order);
-  } catch (error: any) {
-    console.error("❌ [ADMIN ORDERS] PUT Error:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
-      code: error?.code,
-      meta: error?.meta,
-      type: error?.type,
-      title: error?.title,
-      status: error?.status,
-      detail: error?.detail,
-      fullError: error,
-    });
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
+    const order = await adminService.updateOrder(
+      id,
+      body,
+      ctx.commerce({ actorUserId: authResult.userId, source: "admin" }),
     );
-  }
+    return NextResponse.json(order);
+  });
 }
 
 /**
  * DELETE /api/v1/admin/orders/[id]
  * Delete an order
- * Հեռացնում է պատվերը
  */
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const startTime = Date.now();
-  let orderId: string | undefined;
-
-  try {
-    // Ստուգում ենք ավտորիզացիան
-    console.log("🔐 [ADMIN ORDERS] DELETE - Ստուգվում է ավտորիզացիան...");
+  return runApiRoute(req, async (ctx) => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
 
-    // Ստանում ենք պատվերի ID-ն
-    console.log("📋 [ADMIN ORDERS] DELETE - Ստանում ենք params...");
-    let resolvedParams;
+    let resolvedParams: { id: string };
     try {
       resolvedParams = await params;
-      console.log("✅ [ADMIN ORDERS] DELETE - Params ստացված:", resolvedParams);
-    } catch (paramsError: any) {
-      console.error("❌ [ADMIN ORDERS] DELETE - Params սխալ:", {
-        error: paramsError,
-        message: paramsError?.message,
-        stack: paramsError?.stack,
-      });
+    } catch {
       throw {
         status: 400,
         type: "https://api.shop.am/problems/bad-request",
@@ -137,11 +74,9 @@ export async function DELETE(
       };
     }
 
-    orderId = resolvedParams?.id;
-    
-    // Validation
-    if (!orderId || typeof orderId !== 'string' || orderId.trim() === '') {
-      console.error("❌ [ADMIN ORDERS] DELETE - Invalid orderId:", orderId);
+    const orderId = resolvedParams?.id;
+
+    if (!orderId || typeof orderId !== "string" || orderId.trim() === "") {
       throw {
         status: 400,
         type: "https://api.shop.am/problems/bad-request",
@@ -150,59 +85,14 @@ export async function DELETE(
       };
     }
 
-    console.log("🗑️ [ADMIN ORDERS] DELETE request:", {
+    await adminService.deleteOrder(
       orderId,
-      timestamp: new Date().toISOString(),
-    });
+      ctx.commerce({ actorUserId: authResult.userId, source: "admin" }),
+    );
 
-    // Հեռացնում ենք պատվերը
-    console.log("🔄 [ADMIN ORDERS] DELETE - Կանչվում է adminService.deleteOrder...");
-    await adminService.deleteOrder(orderId);
-    console.log("✅ [ADMIN ORDERS] DELETE - adminService.deleteOrder ավարտված");
-    
-    const duration = Date.now() - startTime;
-    console.log("✅ [ADMIN ORDERS] Order deleted successfully:", {
-      orderId,
-      duration: `${duration}ms`,
-      timestamp: new Date().toISOString(),
-    });
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       message: "Order deleted successfully",
     });
-  } catch (error: any) {
-    const duration = Date.now() - startTime;
-    
-    // Մանրամասն լոգավորում
-    console.error("❌ [ADMIN ORDERS] DELETE Error:", {
-      orderId: orderId || "unknown",
-      error: {
-        name: error?.name,
-        message: error?.message,
-        code: error?.code,
-        meta: error?.meta,
-        type: error?.type,
-        title: error?.title,
-        status: error?.status,
-        detail: error?.detail,
-      },
-      stack: error?.stack?.substring(0, 1000),
-      duration: `${duration}ms`,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Ստանդարտ սխալների մշակում
-    const statusCode = error?.status || 500;
-    const errorResponse = {
-      type: error?.type || "https://api.shop.am/problems/internal-error",
-      title: error?.title || "Internal Server Error",
-      status: statusCode,
-      detail: error?.detail || error?.message || "An error occurred while deleting the order",
-      instance: req.url,
-    };
-
-    return NextResponse.json(errorResponse, { status: statusCode });
-  }
+  });
 }
-

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, type PointerEvent } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { X } from 'lucide-react';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
@@ -14,6 +15,7 @@ import {
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
 import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
+import { facetParamsFromUrlSearchParams } from '@/lib/shop/product-filters-to-api-params';
 import {
   priceToSliderPercentage,
   resolvePriceFilterStepInBase,
@@ -139,15 +141,13 @@ export function PriceFilter({
   const fetchPriceRange = async () => {
     try {
       const language = getStoredLanguage();
-      const params: Record<string, string> = { lang: language };
-      if (category) params.category = category;
-      if (search) params.search = search;
+      const params = facetParamsFromUrlSearchParams(searchParams.entries(), language);
 
       const response = await apiClient.get<PriceRange>('/api/v1/products/price-range', { params });
       const { min, max } = readSliderValues(response, currentMinPrice, currentMaxPrice);
       syncRefs(min, max, response);
-    } catch (error) {
-      console.error('Error fetching price range:', error);
+    } catch {
+      // Fallback fetch failed; sidebar context will provide range when available.
     }
   };
 

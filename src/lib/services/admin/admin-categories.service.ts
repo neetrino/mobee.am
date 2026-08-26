@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { logger } from "@/lib/utils/logger";
 import {
   buildCategoryMediaFromImageUrl,
   extractCategoryImageUrl,
@@ -7,11 +8,13 @@ import { DEFAULT_LANGUAGE } from "@/lib/language";
 import { getCategoryProductCountMap } from "@/lib/services/admin/category-product-counts";
 import { cacheService } from "@/lib/services/cache.service";
 import { toSlug } from "@/lib/utils/slug";
+import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
 
 const ADMIN_CATEGORY_LOCALE = DEFAULT_LANGUAGE;
 
 async function clearCategoriesCache(): Promise<void> {
   await cacheService.deletePattern("categories:*");
+  await rebuildProductListingReadModel();
 }
 
 function resolveCategorySlug(explicitSlug: string | undefined, title: string): string {
@@ -640,7 +643,7 @@ class AdminCategoriesService {
    * Delete category (soft delete)
    */
   async deleteCategory(categoryId: string) {
-    console.log('🗑️ [ADMIN SERVICE] deleteCategory called:', categoryId);
+    logger.info('🗑️ [ADMIN SERVICE] deleteCategory called:', { value: categoryId });
     
     const category = await db.category.findUnique({
       where: { id: categoryId },
@@ -704,7 +707,7 @@ class AdminCategoriesService {
     });
     await clearCategoriesCache();
 
-    console.log('✅ [ADMIN SERVICE] Category deleted:', categoryId);
+    logger.info('✅ [ADMIN SERVICE] Category deleted:', { value: categoryId });
     return { success: true };
   }
 }

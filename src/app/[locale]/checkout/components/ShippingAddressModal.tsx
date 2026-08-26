@@ -1,0 +1,292 @@
+'use client';
+
+import { Button, Input } from '@shop/ui';
+import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
+import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
+import { useTranslation } from '../../../../lib/i18n-client';
+import { ContactInformation } from './ContactInformation';
+import { ShippingCitySelect } from './ShippingCitySelect';
+import { CardInputFields } from './CardInputFields';
+import { OrderSummaryModal } from './OrderSummaryModal';
+import { CHECKOUT_FORM_CARD_RADIUS_CLASS } from '../constants';
+import { CheckoutFormData, Cart } from '../types';
+import { FORM_INPUT_LATIN_LANG } from '../../../../lib/form-input-os.constants';
+
+interface ShippingAddressModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  register: UseFormRegister<CheckoutFormData>;
+  setValue: UseFormSetValue<CheckoutFormData>;
+  handleSubmit: UseFormHandleSubmit<CheckoutFormData>;
+  errors: FieldErrors<CheckoutFormData>;
+  isSubmitting: boolean;
+  shippingMethod: 'pickup' | 'delivery';
+  deliverySpeed: 'standard' | 'express';
+  paymentMethod: 'idram' | 'arca' | 'cash_on_delivery' | 'aparik';
+  cart: Cart | null;
+  orderSummary: {
+    subtotalDisplay: number;
+    taxDisplay: number;
+    shippingDisplay: number;
+    totalDisplay: number;
+    totalExcludesPendingShipping: boolean;
+  };
+  currency: 'USD' | 'AMD' | 'EUR' | 'RUB' | 'GEL';
+  shippingCity?: string;
+  loadingDeliveryPrice: boolean;
+  deliveryPrice: number | null;
+  requiresRegionalQuote: boolean;
+  onSubmit: (data: CheckoutFormData) => void;
+}
+
+export function ShippingAddressModal({
+  isOpen,
+  onClose,
+  register,
+  setValue,
+  handleSubmit,
+  errors,
+  isSubmitting,
+  shippingMethod,
+  deliverySpeed,
+  paymentMethod,
+  cart,
+  orderSummary,
+  currency,
+  shippingCity,
+  loadingDeliveryPrice,
+  deliveryPrice,
+  requiresRegionalQuote,
+  onSubmit,
+}: ShippingAddressModalProps) {
+  const { t } = useTranslation();
+
+  const handleValidationError = (validationErrors: FieldErrors<CheckoutFormData>) => {
+    const firstErrorField = Object.keys(validationErrors)[0];
+    if (firstErrorField) {
+      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  return (
+    <AnimatedModalPortal
+      isOpen={isOpen}
+      onClose={onClose}
+      closeAriaLabel={t('checkout.modals.closeModal')}
+      blockClose={isSubmitting}
+      panelClassName={`max-h-[90vh] w-full overflow-y-auto bg-white p-6 shadow-2xl ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+      panelProps={{ lang: FORM_INPUT_LATIN_LANG }}
+    >
+      {({ requestClose }) => (
+        <>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {shippingMethod === 'delivery' 
+              ? t('checkout.modals.completeOrder') 
+              : t('checkout.modals.confirmOrder')}
+          </h2>
+          <button
+            type="button"
+            onClick={requestClose}
+            className="rounded-full p-1 text-gray-400 transition-colors hover:text-admin-600"
+            aria-label={t('checkout.modals.closeModal')}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <ContactInformation
+          register={register}
+          errors={errors}
+          isSubmitting={isSubmitting}
+        />
+
+        {shippingMethod === 'delivery' ? (
+          <>
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('checkout.shippingAddress')}</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Input
+                    label={t('checkout.form.address')}
+                    type="text"
+                    placeholder={t('checkout.placeholders.address')}
+                    checkoutChrome
+                    {...register('shippingAddress')}
+                    error={errors.shippingAddress?.message}
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div>
+                  <ShippingCitySelect
+                    register={register}
+                    value={shippingCity ?? ''}
+                    error={errors.shippingCity?.message}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {(errors.shippingAddress || errors.shippingCity) && (
+              <div
+                className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-red-600">
+                  {errors.shippingAddress?.message || errors.shippingCity?.message}
+                </p>
+              </div>
+            )}
+
+            {(paymentMethod === 'arca' || paymentMethod === 'idram') && (
+              <div className="space-y-4 mb-6 mt-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('checkout.payment.paymentDetails')} (
+                  {paymentMethod === 'idram' ? t('checkout.payment.idram') : t('checkout.payment.arca')})
+                </h3>
+                <CardInputFields
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                />
+              </div>
+            )}
+
+            {paymentMethod === 'cash_on_delivery' && (
+              <div
+                className={`mb-6 mt-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-green-800">
+                  <strong>{t('checkout.payment.cashOnDelivery')}:</strong> {t('checkout.messages.cashOnDeliveryInfo')}
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === 'aparik' && (
+              <div
+                className={`mb-6 mt-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-green-800">
+                  <strong>{t('checkout.payment.aparik')}:</strong> {t('checkout.messages.aparikInfo')}
+                </p>
+              </div>
+            )}
+
+            <OrderSummaryModal
+              cart={cart}
+              orderSummary={orderSummary}
+              currency={currency}
+              shippingMethod={shippingMethod}
+              deliverySpeed={deliverySpeed}
+              shippingCity={shippingCity}
+              loadingDeliveryPrice={loadingDeliveryPrice}
+              deliveryPrice={deliveryPrice}
+              requiresRegionalQuote={requiresRegionalQuote}
+              register={register}
+              promoCodeError={errors.promoCode?.message}
+              isSubmitting={isSubmitting}
+            />
+          </>
+        ) : (
+          <div className="mb-6">
+            <div
+              className={`mb-4 border border-blue-200 bg-blue-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+            >
+              <p className="text-sm text-blue-800">
+                <strong>{t('checkout.shipping.storePickup')}:</strong> {t('checkout.messages.storePickupInfo')}
+              </p>
+            </div>
+
+            {(paymentMethod === 'arca' || paymentMethod === 'idram') && (
+              <div className="space-y-4 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('checkout.payment.paymentDetails')} (
+                  {paymentMethod === 'idram' ? t('checkout.payment.idram') : t('checkout.payment.arca')})
+                </h3>
+                <CardInputFields
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                />
+              </div>
+            )}
+
+            {paymentMethod === 'cash_on_delivery' && (
+              <div
+                className={`mb-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-green-800">
+                  <strong>{t('checkout.payment.cashOnDelivery')}:</strong> {t('checkout.messages.cashOnDeliveryPickup')}
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === 'aparik' && (
+              <div
+                className={`mb-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_CARD_RADIUS_CLASS}`}
+              >
+                <p className="text-sm text-green-800">
+                  <strong>{t('checkout.payment.aparik')}:</strong> {t('checkout.messages.aparikPickup')}
+                </p>
+              </div>
+            )}
+
+            <OrderSummaryModal
+              cart={cart}
+              orderSummary={orderSummary}
+              currency={currency}
+              shippingMethod={shippingMethod}
+              deliverySpeed={deliverySpeed}
+              shippingCity={shippingCity}
+              loadingDeliveryPrice={loadingDeliveryPrice}
+              deliveryPrice={deliveryPrice}
+              requiresRegionalQuote={requiresRegionalQuote}
+              register={register}
+              promoCodeError={errors.promoCode?.message}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+        )}
+
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1 !rounded-full"
+            onClick={requestClose}
+            disabled={isSubmitting}
+          >
+            {t('checkout.buttons.cancel')}
+          </Button>
+          <Button
+            type="button"
+            variant="brand"
+            className="flex-1 !rounded-full"
+            onClick={handleSubmit(
+              (data) => {
+                requestClose();
+                onSubmit(data);
+              },
+              handleValidationError
+            )}
+            disabled={
+              isSubmitting ||
+              (shippingMethod === 'delivery' && requiresRegionalQuote)
+            }
+          >
+            {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
+          </Button>
+        </div>
+        </>
+      )}
+    </AnimatedModalPortal>
+  );
+}
+

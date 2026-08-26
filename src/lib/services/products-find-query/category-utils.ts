@@ -1,9 +1,11 @@
 import { db } from "@white-shop/db";
 import type { Prisma } from "@white-shop/db";
 import { logger } from "../../utils/logger";
+import { CATALOG_MAX_CATEGORY_SLUGS } from "@/lib/catalog/catalog.constants";
+import { CatalogQueryError } from "@/lib/catalog/catalog-query-error";
 
 /** Max distinct category slugs in `category=a,b,c` shop URL (same order of magnitude as brand list). */
-export const MAX_CATEGORY_SLUGS = 15;
+export const MAX_CATEGORY_SLUGS = CATALOG_MAX_CATEGORY_SLUGS;
 
 /**
  * Get all child category IDs recursively
@@ -88,7 +90,7 @@ export async function findCategoryBySlug(
 
 /**
  * OR of category trees: each slug expands to primary + descendants (same rules as shop single-category).
- * Invalid slugs are skipped; returns null if none resolve (caller may treat as empty catalog).
+ * Any unknown slug is a client error; list and facets share this behavior.
  */
 export async function buildCategoryTreesOrWhere(
   categoryParam: string,
@@ -111,7 +113,7 @@ export async function buildCategoryTreesOrWhere(
   for (const slug of slugs) {
     const categoryDoc = await findCategoryBySlug(slug, lang);
     if (!categoryDoc) {
-      continue;
+      throw new CatalogQueryError(`Unknown category: ${slug}`);
     }
     const childCategoryIds = await getAllChildCategoryIds(categoryDoc.id);
     const allCategoryIds = [categoryDoc.id, ...childCategoryIds];
@@ -122,9 +124,6 @@ export async function buildCategoryTreesOrWhere(
     treeBlocks.push({ OR: categoryConditions });
   }
 
-  if (treeBlocks.length === 0) {
-    return null;
-  }
   return treeBlocks.length === 1 ? treeBlocks[0]! : { OR: treeBlocks };
 }
 

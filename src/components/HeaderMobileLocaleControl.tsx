@@ -1,7 +1,10 @@
 'use client';
 
 import type { Ref, AnimationEvent } from 'react';
-import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
+import { LANGUAGES, type LanguageCode } from '../lib/language';
+import { useSwitchStorefrontLocale } from '../lib/i18n/use-switch-locale';
+import { isAppLocale } from '../lib/i18n/routing';
+import { useUiLanguage } from './UiLanguageProvider';
 import type { CurrencyCode } from '../lib/currency';
 import { CURRENCIES } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
@@ -63,6 +66,8 @@ export function HeaderMobileLocaleControl({
   buttonClassName = MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS,
 }: HeaderMobileLocaleControlProps) {
   const { t } = useTranslation();
+  const lang = useUiLanguage();
+  const switchLocale = useSwitchStorefrontLocale();
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
@@ -92,7 +97,7 @@ export function HeaderMobileLocaleControl({
           </div>
           <div className="divide-y divide-gray-100" role="group" aria-labelledby="header-mobile-locale-lang-heading">
             {MOBILE_PRIMARY_LANG_PILL_CODES.map((code) => {
-              const active = getStoredLanguage() === code;
+              const active = lang === code;
               const label = LANGUAGES[code].nativeName;
               return (
                 <button
@@ -100,8 +105,8 @@ export function HeaderMobileLocaleControl({
                   type="button"
                   onClick={() => {
                     onClose();
-                    if (!active) {
-                      setStoredLanguage(code);
+                    if (!active && isAppLocale(code)) {
+                      switchLocale(code);
                     }
                   }}
                   className={mobileLocaleMenuLangRowClass(active)}

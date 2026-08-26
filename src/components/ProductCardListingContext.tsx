@@ -10,7 +10,8 @@ import {
   type MouseEvent,
   type ReactNode,
 } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useTranslation } from '@/lib/i18n-client';
 import { getLoginUrlWithRedirect } from '@/lib/auth/loginRedirectUrl';

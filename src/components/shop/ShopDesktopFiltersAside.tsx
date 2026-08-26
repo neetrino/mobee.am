@@ -10,7 +10,7 @@ import {
   SHOP_FILTER_SIDEBAR_SCROLL_CLASS,
   SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
   SHOP_FILTER_SIDEBAR_WIDTH_CSS,
-} from '@/app/shop/shop-layout.constants';
+} from '@/app/[locale]/shop/shop-layout.constants';
 import type { ShopFilterSectionsProps } from './ShopFilterSections';
 
 const ShopFilterSections = dynamic(

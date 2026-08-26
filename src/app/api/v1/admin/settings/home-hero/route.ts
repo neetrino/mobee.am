@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidateStorefrontPath } from "@/lib/i18n/revalidate-storefront";
+import { invalidateHomeHeroCache } from "@/lib/services/read-through-json-cache";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 import { validateHomeHeroSettingsInput } from "@/lib/home-hero";
@@ -7,6 +8,7 @@ import {
   getCachedAdminReferenceResponse,
   invalidateAdminReferenceServerCache,
 } from "@/lib/admin/admin-reference-server-cache";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 function problemResponse(
   req: NextRequest,
@@ -31,7 +33,7 @@ function problemResponse(
  * GET /api/v1/admin/settings/home-hero
  */
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -41,23 +43,14 @@ export async function GET(req: NextRequest) {
       adminService.getHomeHeroSettings(),
     );
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "An error occurred";
-    return problemResponse(
-      req,
-      500,
-      "Internal Server Error",
-      message,
-      "https://api.shop.am/problems/internal-error",
-    );
-  }
+  });
 }
 
 /**
  * PUT /api/v1/admin/settings/home-hero
  */
 export async function PUT(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -71,17 +64,9 @@ export async function PUT(req: NextRequest) {
 
     const result = await adminService.updateHomeHeroSettings(validated.data);
     await invalidateAdminReferenceServerCache("home-hero");
-    revalidatePath("/");
+    await invalidateHomeHeroCache();
+    revalidateStorefrontPath("/");
 
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "An error occurred";
-    return problemResponse(
-      req,
-      500,
-      "Internal Server Error",
-      message,
-      "https://api.shop.am/problems/internal-error",
-    );
-  }
+  });
 }

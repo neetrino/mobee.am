@@ -1,34 +1,24 @@
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateStorefrontPath, revalidateStorefrontShell } from "@/lib/i18n/revalidate-storefront";
 import { logger } from "../../../utils/logger";
-import { cacheService } from "../../cache.service";
+import { syncProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
+import { invalidateCategoryCaches } from "@/lib/services/read-through-json-cache";
 
 /**
- * Revalidate cache for product and related pages
+ * Sync read models, drop Redis, and revalidate public paths after a product write.
  */
 export async function revalidateProductCache(
   productId: string,
-  productSlug: string | undefined
+  productSlug: string | undefined,
 ) {
   try {
-    logger.debug('Revalidating paths for product', { productId });
+    await syncProductListingReadModel(productId);
     if (productSlug) {
-      revalidatePath(`/products/${productSlug}`);
+      revalidateStorefrontPath(`/products/${productSlug}`);
     }
-    revalidatePath('/');
-    revalidatePath('/products');
-    // @ts-expect-error - revalidateTag type issue in Next.js
-    revalidateTag('products');
-    // @ts-expect-error - revalidateTag type issue in Next.js
-    revalidateTag(`product-${productId}`);
-
-    await cacheService.deletePattern('products:*');
-    await cacheService.deletePattern('categories:*');
+    revalidateStorefrontShell();
+    await invalidateCategoryCaches();
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.warn('Revalidation failed (expected in some environments)', { error: errorMessage });
+    logger.warn("Revalidation failed (expected in some environments)", { error: errorMessage });
   }
 }
-
-
-
-

@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { usersService } from "@/lib/services/users.service";
 import { safeParseProfileUpdate } from "@/lib/schemas/users.schema";
-import { toApiError } from "@/lib/types/errors";
-import { logger } from "@/lib/utils/logger";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -23,15 +22,11 @@ export async function GET(req: NextRequest) {
 
     const result = await usersService.getProfile(user.id);
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    logger.error("Users profile error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
 
 export async function PUT(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -67,15 +62,11 @@ export async function PUT(req: NextRequest) {
 
     const result = await usersService.updateProfile(user.id, parsed.data);
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    logger.error("Users profile error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
 
 export async function DELETE(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -92,9 +83,5 @@ export async function DELETE(req: NextRequest) {
 
     const result = await usersService.deleteAccount(user.id);
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    logger.error("Users profile delete error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }

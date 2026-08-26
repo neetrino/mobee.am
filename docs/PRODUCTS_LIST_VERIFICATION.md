@@ -20,14 +20,12 @@
 
 | Խնդիր | Կարգավիճակ |
 |--------|-------------|
-| Ֆիլտրեր. category, search, minPrice, maxPrice, colors, sizes, brand, sort, page, limit, lang | ✅ API-ում և query-builder-ում կիրառվում են |
-| DB where. `published: true`, `deletedAt: null`, search/category/filter (new, featured, bestseller) | ✅ `query-builder.ts` |
-| In-memory ֆիլտր. գին, բրենդ, գույն, չափ — `productsFindFilterService.filterProducts` | ✅ |
-| **Պագինացիա.** `page` չէր օգտագործվում — միշտ վերադարձվում էին առաջին `limit` ապրանքները | ✅ **Ուղղված** `products-find.service.ts`-ում |
+| Ֆիլտրեր. category, search, minPrice, maxPrice, colors, sizes, brand, sort, page, limit, lang | ✅ Canonical `normalizeCatalogQuery` |
+| DB where. published, search, category tree, brand, color/size (same variant), filter | ✅ `src/lib/catalog/build-catalog-where.ts` |
+| Effective price filter/sort | ✅ two-phase light rows, առանց 200/250 cap |
+| Պագինացիա. `meta.total` / `totalPages` ամբողջ համընկնող հավաքածուից | ✅ `selectCatalogPage` |
 
-**Ուղղում.** `src/lib/services/products-find.service.ts` — պագինացիան այժմ `slice((page - 1) * limit, page * limit)`.
-
-**Նշում.** Query executor-ը ԲԴ-ից վերցնում է առավելագույնը `limit * 10` ապրանք (in-memory ֆիլտր/սորտի համար). Այսինքն պագինացիան «ճիշտ» է առաջին 10 էջերի համար (limit=24 → 240 ապրանք); 11-րդ էջից դատարկ արդյունք — `total` և `totalPages` ճիշտ են, UI-ում «Հաջորդ» չի ցույց տրվի:
+Over-fetch `limit * 10` and in-memory pagination are removed. Unknown category slug → HTTP 400 (same for list and facets).
 
 ---
 
@@ -70,7 +68,7 @@
 
 | Խնդիր | Կարգավիճակ |
 |--------|-------------|
-| ԲԴ. `take: limit * 10` — limit=9999 → 99990 ապրանք, ծանր query | ⚠️ Խորհուրդ. limit-ի առավելագույն արժեք (օր. 500–1000) API/query-executor-ում |
+| ԲԴ. light candidate rows + page-only relations, `limit` ≤ 200 | ✅ Phase 1 |
 | Էջի default 9999. բոլոր ապրանքները մի էջում — ժամանակը կախված է քանակից | ℹ️ |
 
 ---
@@ -89,11 +87,11 @@
 | Խնդիր | Կարգավիճակ |
 |--------|-------------|
 | Դատարկ ցանկ. «No products found» | ✅ |
-| Category not found. `buildWhereClause` → `where: null` → `products: []`, meta total 0 | ✅ |
-| API failure. empty data + meta; boundary եթե throw | ✅ |
+| Category not found. գոնե մեկ unknown slug → 400 problem+json | ✅ |
+| API failure. DB outage → 5xx problem+json (ոչ դատարկ catalog) | ✅ |
 | Չկա առկա (out of stock). labels / inStock — ProductCard-ում ցուցադրում | ✅ (նորմալացում `inStock ?? true`) |
 
-Սխալ/ոչ վալիդ ֆիլտրի արժեքներ — API-ում parse (օր. parseInt, parseFloat) կարող է NaN; արժե ստուգել և վերադարձնել 400 կամ default:
+Սխալ/ոչ վալիդ ֆիլտրի արժեքներ — խիստ HTTP parse; 400 `application/problem+json`։
 
 ---
 

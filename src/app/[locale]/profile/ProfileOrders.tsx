@@ -1,0 +1,166 @@
+import { Link } from '@/lib/i18n/navigation';
+import { Button } from '@shop/ui';
+import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../../lib/currency';
+import { PROFILE_PILL_BUTTON_CLASS } from './profileUi.constants';
+import { ProfileSectionCard } from './ProfileSectionCard';
+import { getStatusColor, getPaymentStatusColor } from './utils';
+import { getProfileOrdersPath } from './profile-orders-path';
+import type { OrderListItem } from './types';
+
+interface ProfileOrdersProps {
+  orders: OrderListItem[];
+  ordersLoading: boolean;
+  ordersPage: number;
+  setOrdersPage: (page: number | ((prev: number) => number)) => void;
+  ordersMeta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  } | null;
+  currency: CurrencyCode;
+  onOrderClick: (order: OrderListItem, e: React.MouseEvent<HTMLAnchorElement>) => void;
+  t: (key: string) => string;
+  embeddedInSheet?: boolean;
+}
+
+export function ProfileOrders({
+  orders,
+  ordersLoading,
+  ordersPage,
+  setOrdersPage,
+  ordersMeta,
+  currency,
+  onOrderClick,
+  t,
+  embeddedInSheet = false,
+}: ProfileOrdersProps) {
+  if (ordersLoading) {
+    return (
+      <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
+        {!embeddedInSheet ? (
+          <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+        ) : null}
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse">
+              <div className="h-24 bg-gray-200 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </ProfileSectionCard>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
+        {!embeddedInSheet ? (
+          <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+        ) : null}
+        <div className="py-12 text-center">
+          <p className="mb-4 text-gray-600">{t('profile.orders.noOrders')}</p>
+          <Link href="/products">
+            <Button variant="brand" className={PROFILE_PILL_BUTTON_CLASS}>
+              {t('profile.dashboard.startShopping')}
+            </Button>
+          </Link>
+        </div>
+      </ProfileSectionCard>
+    );
+  }
+
+  return (
+    <ProfileSectionCard embeddedInSheet={embeddedInSheet}>
+      {!embeddedInSheet ? (
+        <h2 className="mb-6 text-xl font-semibold text-gray-900">{t('profile.orders.title')}</h2>
+      ) : null}
+      <div className="space-y-4">
+        {orders.map((order) => (
+          <Link
+            key={order.id}
+            href={getProfileOrdersPath({ orderNumber: order.number })}
+            onClick={(e) => onOrderClick(order, e)}
+            className="block rounded-[15px] border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-md cursor-pointer"
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-6 mb-2">
+                  <h3 className="break-words text-lg font-semibold text-gray-900 [overflow-wrap:anywhere]">{t('profile.orders.orderNumber')}{order.number}</h3>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-0.5">{t('profile.dashboard.orderStatus')}</p>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-0.5">{t('profile.dashboard.paymentStatus')}</p>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getPaymentStatusColor(order.paymentStatus)}`}>
+                      {order.paymentStatus}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600">
+                  {order.itemsCount} {order.itemsCount !== 1 ? t('profile.orders.items') : t('profile.orders.item')} • {t('profile.dashboard.placedOn')} {new Date(order.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="shrink-0 text-left sm:ml-4 sm:text-right">
+                <p className="break-words text-lg font-bold text-gray-900 [overflow-wrap:anywhere]">
+                  {(() => {
+                    if (order.subtotal !== undefined && order.discountAmount !== undefined && order.taxAmount !== undefined) {
+                      const subtotalAMD = convertPrice(order.subtotal, 'USD', 'AMD');
+                      const discountAMD = convertPrice(order.discountAmount, 'USD', 'AMD');
+                      const taxAMD = convertPrice(order.taxAmount, 'USD', 'AMD');
+                      const totalWithoutShippingAMD = subtotalAMD - discountAMD + taxAMD;
+                      const totalDisplay = currency === 'AMD' ? totalWithoutShippingAMD : convertPrice(totalWithoutShippingAMD, 'AMD', currency);
+                      return formatPriceInCurrency(totalDisplay, currency);
+                    } else {
+                      const totalAMD = convertPrice(order.total, 'USD', 'AMD');
+                      const shippingAMD = order.shippingAmount || 0;
+                      const totalWithoutShippingAMD = totalAMD - shippingAMD;
+                      const totalDisplay = currency === 'AMD' ? totalWithoutShippingAMD : convertPrice(totalWithoutShippingAMD, 'AMD', currency);
+                      return formatPriceInCurrency(totalDisplay, currency);
+                    }
+                  })()}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">{t('profile.dashboard.viewDetails')}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+        
+        {/* Pagination */}
+        {ordersMeta && ordersMeta.totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
+            <p className="text-sm text-gray-600">
+              {t('profile.orders.page')} {ordersMeta.page} {t('profile.orders.of')} {ordersMeta.totalPages} • {ordersMeta.total} {t('profile.orders.totalOrders')}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className={PROFILE_PILL_BUTTON_CLASS}
+                onClick={() => setOrdersPage(prev => Math.max(1, prev - 1))}
+                disabled={ordersPage === 1 || ordersLoading}
+              >
+                {t('profile.orders.previous')}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className={PROFILE_PILL_BUTTON_CLASS}
+                onClick={() => setOrdersPage(prev => Math.min(ordersMeta.totalPages, prev + 1))}
+                disabled={ordersPage === ordersMeta.totalPages || ordersLoading}
+              >
+                {t('profile.orders.next')}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </ProfileSectionCard>
+  );
+}
+
+
+

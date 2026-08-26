@@ -7,6 +7,8 @@ const MUTATION_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 const CSRF_EXEMPT_PATH_PREFIXES = [
   "/api/v1/payments/callback",
   "/api/health",
+  "/api/v1/internal/warm-storefront-listing",
+  "/api/v1/internal/outbox/drain",
 ] as const;
 
 function isCsrfExemptPath(pathname: string): boolean {

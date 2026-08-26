@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { usePathname } from 'next/navigation';
+import { stripLocalePrefix } from '@/lib/i18n/routing';
 import { useTranslation } from '@/lib/i18n-client';
 import {
   MOBILE_DRAWER_NAV_BUTTON_CLASS,
@@ -66,7 +67,7 @@ export function FooterPoliciesNav({
   onNavigate,
 }: FooterPoliciesNavProps) {
   const { t, lang } = useTranslation();
-  const pathname = usePathname();
+  const pathname = stripLocalePrefix(usePathname());
 
   const isVisibleOnCurrentRoute = (href: string): boolean =>
     pathname === CART_ROUTE_PATH ? !FOOTER_POLICY_LINKS_HIDDEN_ON_CART.has(href) : true;

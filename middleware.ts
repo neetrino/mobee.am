@@ -3,7 +3,6 @@ import * as jose from "jose";
 import { getAccessTokenFromRequest } from "@/lib/security/auth-cookie";
 import { getCorsHeaders } from "@/lib/security/cors";
 import { verifyMutationOrigin } from "@/lib/security/csrf-origin";
-import { assertProductionSecurityEnv } from "@/lib/security/env";
 import { JWT_ALGORITHM } from "@/lib/security/jwt.constants";
 import { resolveAdminGateFromJwtPayload, type AccessTokenPayload } from "@/lib/security/jwt-payload";
 import {
@@ -19,13 +18,58 @@ import {
   RATE_LIMIT_GUEST_ORDER_EMAIL,
   RATE_LIMIT_PASSWORD,
 } from "@/lib/security/rate-limit";
+import { ERROR_CODES, problemType, PUBLIC_DETAILS, titleForStatus } from "@/lib/errors/error-codes";
+import { problemResponse } from "@/lib/errors/problem-response";
+import { REQUEST_ID_HEADER, requestInstance, resolveRequestId } from "@/lib/errors/request-id";
+import {
+  getEdgeJwtSecret,
+  isEdgeSecurityEnvValid,
+  isJwtSecretLengthValid,
+} from "@/config/env-core";
+import { handleStorefrontLocale } from "@/lib/i18n/middleware-locale";
 
 type AdminAuthResult =
   | { ok: true; userId: string; roles: string[] }
   | { ok: false; response: NextResponse };
 
+function edgeProblem(
+  request: NextRequest,
+  status: number,
+  code: (typeof ERROR_CODES)[keyof typeof ERROR_CODES],
+  detail: string,
+  requestId: string,
+): NextResponse {
+  return problemResponse(
+    {
+      type: problemType(code),
+      title: titleForStatus(status),
+      status,
+      detail,
+      code,
+    },
+    requestInstance(request),
+    requestId,
+  );
+}
+
+function applyCors(
+  response: NextResponse,
+  request: NextRequest,
+  requestId: string,
+): NextResponse {
+  response.headers.set(REQUEST_ID_HEADER, requestId);
+  const corsHeaders = getCorsHeaders(request);
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
+  return response;
+}
+
 /** Protect /api/v1/admin/* — valid JWT + admin role in token claims. */
-async function requireAdminAuth(request: NextRequest): Promise<AdminAuthResult> {
+async function requireAdminAuth(
+  request: NextRequest,
+  requestId: string,
+): Promise<AdminAuthResult> {
   const cleanedHeaders = stripTrustedAdminHeaders(request.headers);
   const token = getAccessTokenFromRequest(
     new NextRequest(request.url, { headers: cleanedHeaders, method: request.method }),
@@ -34,30 +78,30 @@ async function requireAdminAuth(request: NextRequest): Promise<AdminAuthResult> 
   if (!token) {
     return {
       ok: false,
-      response: NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/unauthorized",
-          title: "Unauthorized",
-          status: 401,
-          detail: "Missing or invalid session",
-        },
-        { status: 401 },
+      response: edgeProblem(
+        request,
+        401,
+        ERROR_CODES.UNAUTHORIZED,
+        "Missing or invalid session",
+        requestId,
       ),
     };
   }
 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
+  const secret = getEdgeJwtSecret();
+  if (!secret || (process.env.NODE_ENV === "production" && !isJwtSecretLengthValid(secret))) {
     return {
       ok: false,
-      response: NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/internal-error",
-          title: "Internal Server Error",
-          status: 500,
-          detail: "Server configuration error",
-        },
-        { status: 500 },
+      response: edgeProblem(
+        request,
+        process.env.NODE_ENV === "production" ? 503 : 500,
+        process.env.NODE_ENV === "production"
+          ? ERROR_CODES.SERVICE_UNAVAILABLE
+          : ERROR_CODES.INTERNAL_ERROR,
+        process.env.NODE_ENV === "production"
+          ? PUBLIC_DETAILS.UNAVAILABLE
+          : "Server configuration error",
+        requestId,
       ),
     };
   }
@@ -72,14 +116,12 @@ async function requireAdminAuth(request: NextRequest): Promise<AdminAuthResult> 
     if (gate === "deny") {
       return {
         ok: false,
-        response: NextResponse.json(
-          {
-            type: "https://api.shop.am/problems/forbidden",
-            title: "Forbidden",
-            status: 403,
-            detail: "Admin access required",
-          },
-          { status: 403 },
+        response: edgeProblem(
+          request,
+          403,
+          ERROR_CODES.FORBIDDEN,
+          "Admin access required",
+          requestId,
         ),
       };
     }
@@ -89,14 +131,12 @@ async function requireAdminAuth(request: NextRequest): Promise<AdminAuthResult> 
     if (!userId || !Array.isArray(roles) || roles.length === 0) {
       return {
         ok: false,
-        response: NextResponse.json(
-          {
-            type: "https://api.shop.am/problems/unauthorized",
-            title: "Unauthorized",
-            status: 401,
-            detail: "Invalid or expired token",
-          },
-          { status: 401 },
+        response: edgeProblem(
+          request,
+          401,
+          ERROR_CODES.UNAUTHORIZED,
+          "Invalid or expired token",
+          requestId,
         ),
       };
     }
@@ -105,14 +145,12 @@ async function requireAdminAuth(request: NextRequest): Promise<AdminAuthResult> 
   } catch {
     return {
       ok: false,
-      response: NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/unauthorized",
-          title: "Unauthorized",
-          status: 401,
-          detail: "Invalid or expired token",
-        },
-        { status: 401 },
+      response: edgeProblem(
+        request,
+        401,
+        ERROR_CODES.UNAUTHORIZED,
+        "Invalid or expired token",
+        requestId,
       ),
     };
   }
@@ -153,26 +191,13 @@ function isPasswordResetPath(pathname: string, method: string): boolean {
   return false;
 }
 
-function applyCors(
-  response: NextResponse,
-  request: NextRequest
-): NextResponse {
-  const corsHeaders = getCorsHeaders(request);
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
-  return response;
-}
-
-function csrfForbiddenResponse(): NextResponse {
-  return NextResponse.json(
-    {
-      type: "https://api.shop.am/problems/forbidden",
-      title: "Forbidden",
-      status: 403,
-      detail: "Cross-site request blocked",
-    },
-    { status: 403 }
+function csrfForbiddenResponse(request: NextRequest, requestId: string): NextResponse {
+  return edgeProblem(
+    request,
+    403,
+    ERROR_CODES.FORBIDDEN,
+    "Cross-site request blocked",
+    requestId,
   );
 }
 
@@ -188,10 +213,19 @@ function forwardWithAdminPageHeader(request: NextRequest): NextResponse {
   });
 }
 
-export async function middleware(request: NextRequest) {
-  assertProductionSecurityEnv();
+function withRequestIdHeaders(base: Headers, requestId: string): Headers {
+  const headers = new Headers(base);
+  headers.set(REQUEST_ID_HEADER, requestId);
+  return headers;
+}
 
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
+  const localeResponse = handleStorefrontLocale(request);
+  if (localeResponse) {
+    return localeResponse;
+  }
 
   if (isAdminPageRoute(pathname)) {
     return forwardWithAdminPageHeader(request);
@@ -201,70 +235,93 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const corsHeaders = getCorsHeaders(request);
-  if (request.method === "OPTIONS") {
-    return new NextResponse(null, { status: 204, headers: corsHeaders });
+  const requestId = resolveRequestId(request);
+  const requestHeaders = withRequestIdHeaders(request.headers, requestId);
+  const requestWithId = new NextRequest(request.url, {
+    method: request.method,
+    headers: requestHeaders,
+  });
+
+  if (process.env.NODE_ENV === "production" && !isEdgeSecurityEnvValid()) {
+    return applyCors(
+      edgeProblem(
+        requestWithId,
+        503,
+        ERROR_CODES.SERVICE_UNAVAILABLE,
+        PUBLIC_DETAILS.UNAVAILABLE,
+        requestId,
+      ),
+      requestWithId,
+      requestId,
+    );
   }
 
-  if (!verifyMutationOrigin(request)) {
-    return applyCors(csrfForbiddenResponse(), request);
+  const corsHeaders = getCorsHeaders(requestWithId);
+  if (request.method === "OPTIONS") {
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        ...corsHeaders,
+        [REQUEST_ID_HEADER]: requestId,
+      },
+    });
+  }
+
+  if (!verifyMutationOrigin(requestWithId)) {
+    return applyCors(csrfForbiddenResponse(requestWithId, requestId), requestWithId, requestId);
   }
 
   let rateLimitResponse: NextResponse | null = null;
   let adminForwardHeaders: Headers | null = null;
 
   if (pathname.startsWith("/api/v1/admin/")) {
-    const authRes = await requireAdminAuth(request);
+    const authRes = await requireAdminAuth(requestWithId, requestId);
     if (!authRes.ok) {
-      return applyCors(authRes.response, request);
+      return applyCors(authRes.response, requestWithId, requestId);
     }
 
-    adminForwardHeaders = stripTrustedAdminHeaders(request.headers);
+    adminForwardHeaders = stripTrustedAdminHeaders(requestWithId.headers);
     setTrustedAdminHeaders(adminForwardHeaders, {
       userId: authRes.userId,
       roles: authRes.roles,
     });
+    adminForwardHeaders.set(REQUEST_ID_HEADER, requestId);
   } else if (
     (pathname === "/api/v1/auth/login" || pathname === "/api/v1/auth/register") &&
     request.method === "POST"
   ) {
-    rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_AUTH);
+    rateLimitResponse = await checkRateLimitByIp(requestWithId, RATE_LIMIT_AUTH, requestId);
   } else if (isPasswordResetPath(pathname, request.method)) {
-    rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_PASSWORD);
+    rateLimitResponse = await checkRateLimitByIp(requestWithId, RATE_LIMIT_PASSWORD, requestId);
   } else if (pathname === "/api/v1/contact" && request.method === "POST") {
-    rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_CONTACT);
-  } else if (isGuestOrderLookup(request)) {
-    rateLimitResponse = await checkRateLimitByIp(request, RATE_LIMIT_GUEST_ORDER);
+    rateLimitResponse = await checkRateLimitByIp(requestWithId, RATE_LIMIT_CONTACT, requestId);
+  } else if (isGuestOrderLookup(requestWithId)) {
+    rateLimitResponse = await checkRateLimitByIp(requestWithId, RATE_LIMIT_GUEST_ORDER, requestId);
     if (!rateLimitResponse) {
-      const email = request.nextUrl.searchParams.get("email")?.trim();
+      const email = requestWithId.nextUrl.searchParams.get("email")?.trim();
       if (email) {
         rateLimitResponse = await checkRateLimitByIpAndSuffix(
-          request,
+          requestWithId,
           RATE_LIMIT_GUEST_ORDER_EMAIL,
-          await hashGuestOrderEmailKey(email)
+          await hashGuestOrderEmailKey(email),
+          requestId,
         );
       }
     }
   }
 
   if (rateLimitResponse) {
-    return applyCors(rateLimitResponse, request);
+    return applyCors(rateLimitResponse, requestWithId, requestId);
   }
 
   const response = adminForwardHeaders
     ? NextResponse.next({ request: { headers: adminForwardHeaders } })
-    : NextResponse.next();
-  return applyCors(response, request);
+    : NextResponse.next({ request: { headers: requestHeaders } });
+  return applyCors(response, requestWithId, requestId);
 }
 
 export const config = {
   matcher: [
-    "/supersudo",
-    "/supersudo/:path*",
-    "/api/v1/admin/:path*",
-    "/api/v1/auth/login",
-    "/api/v1/auth/register",
-    "/api/v1/:path*",
-    "/api/health",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
   ],
 };

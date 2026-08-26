@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { useState, type PointerEvent, type ReactNode } from 'react';
 
 type CtaArrowMotion = 'idle' | 'hoverIn' | 'hoverOut';

@@ -5,14 +5,14 @@ import {
   getCachedAdminReferenceResponse,
   invalidateAdminReferenceServerCache,
 } from "@/lib/admin/admin-reference-server-cache";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 /**
  * GET /api/v1/admin/settings/price-filter
  * Get price filter settings (minPrice, maxPrice, stepSize, stepSizePerCurrency)
  */
 export async function GET(req: NextRequest) {
-  try {
-    console.log('⚙️ [PRICE FILTER API] GET request received');
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -22,19 +22,7 @@ export async function GET(req: NextRequest) {
       adminService.getPriceFilterSettings(),
     );
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("❌ [PRICE FILTER API] GET Error:", error);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
 
 /**
@@ -42,18 +30,15 @@ export async function GET(req: NextRequest) {
  * Update price filter settings (minPrice, maxPrice, stepSize, stepSizePerCurrency)
  */
 export async function PUT(req: NextRequest) {
-  try {
-    console.log('⚙️ [PRICE FILTER API] PUT request received');
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
 
     const data = await req.json();
-    console.log('📤 [PRICE FILTER API] Update data received:', data);
-    
-    // Validate input
-    if (data.minPrice !== null && data.minPrice !== undefined && (typeof data.minPrice !== 'number' || data.minPrice < 0)) {
+
+    if (data.minPrice !== null && data.minPrice !== undefined && (typeof data.minPrice !== "number" || data.minPrice < 0)) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -66,7 +51,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    if (data.maxPrice !== null && data.maxPrice !== undefined && (typeof data.maxPrice !== 'number' || data.maxPrice < 0)) {
+    if (data.maxPrice !== null && data.maxPrice !== undefined && (typeof data.maxPrice !== "number" || data.maxPrice < 0)) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -79,7 +64,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    if (data.stepSize !== null && data.stepSize !== undefined && (typeof data.stepSize !== 'number' || data.stepSize <= 0)) {
+    if (data.stepSize !== null && data.stepSize !== undefined && (typeof data.stepSize !== "number" || data.stepSize <= 0)) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -92,9 +77,8 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Validate stepSizePerCurrency (optional map: { USD, AMD, RUB, GEL })
     if (data.stepSizePerCurrency !== null && data.stepSizePerCurrency !== undefined) {
-      if (typeof data.stepSizePerCurrency !== 'object') {
+      if (typeof data.stepSizePerCurrency !== "object") {
         return NextResponse.json(
           {
             type: "https://api.shop.am/problems/validation-error",
@@ -107,7 +91,7 @@ export async function PUT(req: NextRequest) {
         );
       }
 
-      const allowedCurrencies = ['USD', 'AMD', 'RUB', 'GEL'];
+      const allowedCurrencies = ["USD", "AMD", "RUB", "GEL"];
       for (const [code, value] of Object.entries(data.stepSizePerCurrency)) {
         if (!allowedCurrencies.includes(code)) {
           return NextResponse.json(
@@ -121,7 +105,7 @@ export async function PUT(req: NextRequest) {
             { status: 400 }
           );
         }
-        if (value !== null && value !== undefined && (typeof value !== 'number' || value <= 0)) {
+        if (value !== null && value !== undefined && (typeof value !== "number" || value <= 0)) {
           return NextResponse.json(
             {
               type: "https://api.shop.am/problems/validation-error",
@@ -156,18 +140,5 @@ export async function PUT(req: NextRequest) {
     const result = await adminService.updatePriceFilterSettings(data);
     await invalidateAdminReferenceServerCache("price-filter-settings");
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("❌ [PRICE FILTER API] PUT Error:", error);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
-

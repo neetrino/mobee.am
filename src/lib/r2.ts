@@ -1,48 +1,54 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getR2Config } from "@/config/env";
 
-const accountId = process.env.R2_ACCOUNT_ID;
-const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-const bucketName = process.env.R2_BUCKET_NAME;
-const publicUrl = process.env.R2_PUBLIC_URL;
+let r2Client: S3Client | null | undefined;
 
-const r2 =
-  accountId && accessKeyId && secretAccessKey && bucketName
-    ? new S3Client({
-        region: "auto",
-        endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-        credentials: {
-          accessKeyId,
-          secretAccessKey,
-        },
-      })
-    : null;
+function getR2Client(): S3Client | null {
+  if (r2Client !== undefined) {
+    return r2Client;
+  }
+  const config = getR2Config();
+  if (!config) {
+    r2Client = null;
+    return null;
+  }
+  r2Client = new S3Client({
+    region: "auto",
+    endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: config.accessKeyId,
+      secretAccessKey: config.secretAccessKey,
+    },
+  });
+  return r2Client;
+}
 
 /**
  * Upload a buffer to R2 and return the public URL.
- * Key will be prefixed with "products/" and get a unique suffix.
  */
 export async function uploadToR2(
   key: string,
   body: Buffer | Uint8Array,
   contentType: string
 ): Promise<string | null> {
-  if (!r2 || !bucketName || !publicUrl) {
+  const config = getR2Config();
+  const client = getR2Client();
+  if (!client || !config) {
     return null;
   }
-  await r2.send(
+  await client.send(
     new PutObjectCommand({
-      Bucket: bucketName,
+      Bucket: config.bucketName,
       Key: key,
       Body: body,
       ContentType: contentType,
     })
   );
-  const base = publicUrl.replace(/\/$/, "");
+  const base = config.publicUrl.replace(/\/$/, "");
   const path = key.startsWith("/") ? key.slice(1) : key;
   return `${base}/${path}`;
 }
 
 export function isR2Configured(): boolean {
-  return Boolean(accountId && accessKeyId && secretAccessKey && bucketName && publicUrl);
+  return getR2Config() !== null;
 }

@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { ordersService } from "@/lib/services/orders.service";
-import { toApiError } from "@/lib/types/errors";
-import { logger } from "@/lib/utils/logger";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ number: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -26,9 +25,5 @@ export async function POST(
     const { number } = await params;
     const result = await ordersService.reorder(number, user.id);
     return NextResponse.json(result, { status: 200 });
-  } catch (error: unknown) {
-    logger.error("Order reorder error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }

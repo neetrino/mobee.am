@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import type { LucideIcon } from 'lucide-react';
 import { Heart, Home, UserRound } from 'lucide-react';
@@ -15,6 +16,7 @@ import { useMdUpViewport } from './hooks/useMdUpViewport';
 import { useMobileBottomNavCartCount } from './hooks/useMobileBottomNavCartCount';
 import { useHeaderRoutePrefetch } from './hooks/useHeaderRoutePrefetch';
 import { isCompareAppRoute } from '../lib/compareAppRoute';
+import { stripLocalePrefix } from '@/lib/i18n/routing';
 import {
   MOBILE_BOTTOM_NAV_BADGE_CLASS,
   MOBILE_BOTTOM_NAV_COMPARE_ICON_ON_COMPARE_PAGE_SIZE_PX,
@@ -50,10 +52,11 @@ const INACTIVE_ICON_COLOR = 'text-[#9e9e9e]';
 const ACTIVE_ICON_COLOR = 'text-[#2db2ff]';
 
 function pathIsActive(pathname: string, item: MobileNavDef): boolean {
+  const path = stripLocalePrefix(pathname);
   if (item.key === 'home') {
-    return pathname === '/';
+    return path === '/';
   }
-  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  return path === item.href || path.startsWith(`${item.href}/`);
 }
 
 interface NavIconProps {

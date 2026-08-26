@@ -162,7 +162,7 @@ export function ProductsGrid({
     <ProductCardListingProvider>
       <div className={gridClass}>
         {sortedProducts.map((product, index) => (
-          <div key={product.id} className="h-full min-h-0">
+          <div key={product.id} className="h-full min-h-0" data-plp-slug={product.slug}>
             <ProductCard
               product={{
                 ...product,

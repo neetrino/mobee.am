@@ -2,7 +2,7 @@
  * Broadcast cart changes to Header / bottom nav, and keep cart-page session cache coherent.
  */
 
-import { clearLoggedInCartCache } from '@/app/cart/cart-cache';
+import { clearLoggedInCartCache } from '@/app/[locale]/cart/cart-cache';
 
 export type CartUpdatedDetail = {
   itemsCount?: number;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveCheckoutShippingAmount } from "@/lib/services/orders/checkout-shipping";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
 
 /**
@@ -7,7 +8,7 @@ import { logger } from "@/lib/utils/logger";
  * Quote delivery for checkout (city, cart subtotal after discount, speed).
  */
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const searchParams = req.nextUrl.searchParams;
     const city = searchParams.get("city");
     const country = searchParams.get("country") || "Armenia";
@@ -51,31 +52,5 @@ export async function GET(req: NextRequest) {
       price: result.requiresQuote ? null : result.amount,
       requiresQuote: result.requiresQuote,
     });
-  } catch (error: unknown) {
-    const err = error as {
-      message?: string;
-      stack?: string;
-      code?: string;
-      type?: string;
-      title?: string;
-      status?: number;
-      detail?: string;
-    };
-    logger.error("Delivery price error", {
-      message: err?.message,
-      code: err?.code,
-      type: err?.type,
-      status: err?.status,
-    });
-    return NextResponse.json(
-      {
-        type: err?.type ?? "https://api.shop.am/problems/internal-error",
-        title: err?.title ?? "Internal Server Error",
-        status: err?.status ?? 500,
-        detail: err?.detail ?? err?.message ?? "An error occurred",
-        instance: req.url,
-      },
-      { status: err?.status ?? 500 }
-    );
-  }
+  });
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ZodError } from "zod";
 import { parseAparikInquiryBody } from "@/lib/schemas/aparik-inquiry.schema";
 import { sendAparikProductInquiryEmail } from "@/lib/email/send-aparik-product-inquiry-email";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
 
 function createInquiryId(): string {
@@ -11,7 +11,7 @@ function createInquiryId(): string {
 }
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const body = await req.json();
     const data = parseAparikInquiryBody(body);
     const inquiryId = createInquiryId();
@@ -47,31 +47,5 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: unknown) {
-    if (error instanceof ZodError) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          status: 400,
-          detail: error.issues[0]?.message ?? "Invalid request body",
-          instance: req.url,
-        },
-        { status: 400 }
-      );
-    }
-
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error("Aparik product inquiry error", { error });
-    return NextResponse.json(
-      {
-        type: "https://api.shop.am/problems/internal-error",
-        title: "Internal Server Error",
-        status: 500,
-        detail: errorMessage || "Failed to submit aparik inquiry",
-        instance: req.url,
-      },
-      { status: 500 }
-    );
-  }
+  });
 }

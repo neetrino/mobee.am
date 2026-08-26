@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CatalogQueryError } from "@/lib/catalog/catalog-query-error";
 import {
   buildProductListFiltersFromUrlSearchParams,
   buildShopProductFiltersFromSearchParams,
@@ -17,9 +18,16 @@ describe("buildShopProductFiltersFromSearchParams", () => {
     expect(f.lang).toBe("hy");
   });
 
-  it("defaults page to 1 when invalid", () => {
-    const f = buildShopProductFiltersFromSearchParams({ page: "0" }, "en");
-    expect(f.page).toBe(1);
+  it("rejects invalid page, prices, and unknown sort", () => {
+    expect(() => buildShopProductFiltersFromSearchParams({ page: "0" }, "en")).toThrow(
+      CatalogQueryError,
+    );
+    expect(() =>
+      buildShopProductFiltersFromSearchParams({ minPrice: "abc" }, "en"),
+    ).toThrow(CatalogQueryError);
+    expect(() =>
+      buildShopProductFiltersFromSearchParams({ sort: "createdAt" }, "en"),
+    ).toThrow(CatalogQueryError);
   });
 });
 

@@ -1,41 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 /**
  * GET /api/v1/admin/dashboard/user-activity
  * Get user activity statistics (recent registrations and active users)
  */
 export async function GET(req: NextRequest) {
-  try {
-    console.log("👥 [USER-ACTIVITY] Request received");
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
 
-    // Get limit from query params
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
-
-    console.log(`✅ [USER-ACTIVITY] Request authenticated, limit: ${limit}`);
     const result = await adminService.getUserActivity(limit);
-    console.log("✅ [USER-ACTIVITY] User activity data retrieved successfully");
-    
+
     return NextResponse.json({ data: result });
-  } catch (error: any) {
-    console.error("❌ [USER-ACTIVITY] Error:", error);
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
-
-

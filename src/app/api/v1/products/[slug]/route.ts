@@ -1,40 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCachedProductBySlug } from "@/lib/services/products-slug-cached";
-
-export const dynamic = "force-dynamic";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  try {
+  return runApiRoute(req, async () => {
     const { searchParams } = new URL(req.url);
     const lang = searchParams.get("lang") || "en";
     const { slug } = await params;
     const { result } = await getCachedProductBySlug(slug, lang);
-    return NextResponse.json(result);
-  } catch (error: unknown) {
-    const err = error as { status?: number };
-    if (err.status !== 404) {
-      console.error("❌ [PRODUCTS] Error:", error);
-    }
-    const e = error as {
-      type?: string;
-      title?: string;
-      status?: number;
-      detail?: string;
-      message?: string;
-    };
-    return NextResponse.json(
-      {
-        type: e.type || "https://api.shop.am/problems/internal-error",
-        title: e.title || "Internal Server Error",
-        status: e.status || 500,
-        detail: e.detail || e.message || "An error occurred",
-        instance: req.url,
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=300",
       },
-      { status: e.status || 500 }
-    );
-  }
+    });
+  });
 }
-

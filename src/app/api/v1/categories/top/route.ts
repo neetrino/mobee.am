@@ -4,6 +4,7 @@ import {
   getCachedTopCategories,
   MAX_TOP_CATEGORY_LIMIT,
 } from "@/lib/services/categories-top-cached";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 function parseCategoryLimit(value: string | null): number {
   const parsedLimit = Number.parseInt(value || String(DEFAULT_TOP_CATEGORY_LIMIT), 10);
@@ -14,7 +15,7 @@ function parseCategoryLimit(value: string | null): number {
 }
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const { searchParams } = new URL(req.url);
     const lang = searchParams.get("lang") || "en";
     const limit = parseCategoryLimit(searchParams.get("limit"));
@@ -25,18 +26,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(result, {
       headers: { "X-Cache": cacheStatus },
     });
-  } catch (error: unknown) {
-    const err = error as { type?: string; title?: string; status?: number; detail?: string; message?: string };
-    console.error("❌ [TOP CATEGORIES] Error:", error);
-    return NextResponse.json(
-      {
-        type: err.type || "https://api.shop.am/problems/internal-error",
-        title: err.title || "Internal Server Error",
-        status: err.status || 500,
-        detail: err.detail || err.message || "An error occurred",
-        instance: req.url || "",
-      },
-      { status: err.status || 500 },
-    );
-  }
+  });
 }

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { ERROR_CODES, problemType, PUBLIC_DETAILS, titleForStatus } from "@/lib/errors/error-codes";
+import { problemResponse } from "@/lib/errors/problem-response";
+import { requestInstance, resolveRequestId } from "@/lib/errors/request-id";
 
 export function getClientIp(request: NextRequest): string {
   return (
@@ -50,68 +53,79 @@ function getLimiter(config: RateLimitConfig): Ratelimit | null {
   return limiter;
 }
 
-function rateLimitUnavailableResponse(): NextResponse {
-  return NextResponse.json(
+function securityUnavailableResponse(request: NextRequest, requestId: string): NextResponse {
+  return problemResponse(
     {
-      type: "https://api.shop.am/problems/service-unavailable",
-      title: "Service Unavailable",
+      type: problemType(ERROR_CODES.SERVICE_UNAVAILABLE),
+      title: titleForStatus(503),
       status: 503,
-      detail: "Rate limiting is not configured. Contact support.",
+      detail: PUBLIC_DETAILS.UNAVAILABLE,
+      code: ERROR_CODES.SERVICE_UNAVAILABLE,
     },
-    { status: 503 }
+    requestInstance(request),
+    requestId,
   );
 }
 
-function tooManyRequestsResponse(): NextResponse {
-  return NextResponse.json(
+function tooManyRequestsResponse(request: NextRequest, requestId: string): NextResponse {
+  return problemResponse(
     {
-      type: "https://api.shop.am/problems/too-many-requests",
-      title: "Too Many Requests",
+      type: problemType(ERROR_CODES.RATE_LIMITED),
+      title: titleForStatus(429),
       status: 429,
-      detail: "Too many requests. Try again later.",
+      detail: PUBLIC_DETAILS.RATE_LIMITED,
+      code: ERROR_CODES.RATE_LIMITED,
     },
-    { status: 429 }
+    requestInstance(request),
+    requestId,
   );
 }
 
 /**
- * Returns 429 when limit exceeded; 503 in production when Redis is missing;
+ * Returns 429 when limit exceeded; 503 in production when Redis is missing or fails;
  * `null` when allowed or rate limiting is skipped in development.
  */
 export async function checkRateLimitByKey(
   request: NextRequest,
   config: RateLimitConfig,
-  key: string
+  key: string,
+  requestId = resolveRequestId(request),
 ): Promise<NextResponse | null> {
   const limiter = getLimiter(config);
   if (!limiter) {
     if (process.env.NODE_ENV === "production") {
-      return rateLimitUnavailableResponse();
+      return securityUnavailableResponse(request, requestId);
     }
     return null;
   }
 
-  const { success } = await limiter.limit(key);
-  return success ? null : tooManyRequestsResponse();
+  try {
+    const { success } = await limiter.limit(key);
+    return success ? null : tooManyRequestsResponse(request, requestId);
+  } catch {
+    return securityUnavailableResponse(request, requestId);
+  }
 }
 
 /** IP-scoped rate limit (auth, contact, etc.). */
 export async function checkRateLimitByIp(
   request: NextRequest,
-  config: RateLimitConfig
+  config: RateLimitConfig,
+  requestId = resolveRequestId(request),
 ): Promise<NextResponse | null> {
   const ip = getClientIp(request);
-  return checkRateLimitByKey(request, config, ip);
+  return checkRateLimitByKey(request, config, ip, requestId);
 }
 
 /** IP + extra suffix (e.g. hashed email for guest order lookup). */
 export async function checkRateLimitByIpAndSuffix(
   request: NextRequest,
   config: RateLimitConfig,
-  suffix: string
+  suffix: string,
+  requestId = resolveRequestId(request),
 ): Promise<NextResponse | null> {
   const ip = getClientIp(request);
-  return checkRateLimitByKey(request, config, `${ip}:${suffix}`);
+  return checkRateLimitByKey(request, config, `${ip}:${suffix}`, requestId);
 }
 
 export { isRateLimitConfigured };
@@ -140,7 +154,6 @@ export const RATE_LIMIT_GUEST_ORDER: RateLimitConfig = {
   window: "60 s",
 };
 
-/** Stricter per-email cap against guest order enumeration. */
 export const RATE_LIMIT_GUEST_ORDER_EMAIL: RateLimitConfig = {
   prefix: "ratelimit:guest-order-email",
   requests: 10,

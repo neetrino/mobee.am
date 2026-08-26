@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { Card } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { facetParamsFromUrlSearchParams } from '@/lib/shop/product-filters-to-api-params';
 
 interface SizeFilterProps {
   category?: string;
@@ -52,17 +54,10 @@ export function SizeFilter({ category, search, minPrice, maxPrice, selectedSizes
     try {
       setLoading(true);
       const language = getStoredLanguage();
-      const params: Record<string, string> = {
-        lang: language,
-      };
-      
-      if (category) params.category = category;
-      if (search) params.search = search;
-      if (minPrice) params.minPrice = minPrice;
-      if (maxPrice) params.maxPrice = maxPrice;
+      const params = facetParamsFromUrlSearchParams(searchParams.entries(), language);
 
       // Fetch filters from API
-      const response = await apiClient.get<{ colors: any[]; sizes: SizeOption[] }>('/api/v1/products/filters', { params });
+      const response = await apiClient.get<{ colors: unknown[]; sizes: SizeOption[] }>('/api/v1/products/filters', { params });
       
       setSizes(response.sizes || []);
     } catch (error) {

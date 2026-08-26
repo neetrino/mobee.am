@@ -7,6 +7,7 @@ import {
   MAX_ADMIN_IMAGES_PER_REQUEST,
 } from "@/lib/security/image-upload.constants";
 import { uploadToR2, isR2Configured } from "@/lib/r2";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
 
 type R2HealthStatus = {
@@ -70,23 +71,25 @@ function getR2HealthStatus(): R2HealthStatus {
 }
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAdminUser(req);
-  if (auth instanceof NextResponse) {
-    return auth;
-  }
+  return runApiRoute(req, async () => {
+    const auth = await requireAdminUser(req);
+    if (auth instanceof NextResponse) {
+      return auth;
+    }
 
-  const health = getR2HealthStatus();
-  return NextResponse.json(
-    {
-      storage: {
-        provider: "r2",
-        configured: health.configured,
-        mode: health.configured ? "remote" : "inline-fallback",
-        missing: health.missing,
+    const health = getR2HealthStatus();
+    return NextResponse.json(
+      {
+        storage: {
+          provider: "r2",
+          configured: health.configured,
+          mode: health.configured ? "remote" : "inline-fallback",
+          missing: health.missing,
+        },
       },
-    },
-    { status: 200 }
-  );
+      { status: 200 }
+    );
+  });
 }
 
 /**
@@ -95,10 +98,10 @@ export async function GET(req: NextRequest) {
  * Requires R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL.
  */
 export async function POST(req: NextRequest) {
-  const requestStartTime = Date.now();
-  logger.debug("Admin upload images: POST received", { url: req.url });
+  return runApiRoute(req, async () => {
+    const requestStartTime = Date.now();
+    logger.debug("Admin upload images: POST received", { url: req.url });
 
-  try {
     const auth = await requireAdminUser(req);
     if (auth instanceof NextResponse) {
       return auth;
@@ -273,24 +276,5 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (error: unknown) {
-    const totalTime = Date.now() - requestStartTime;
-    const err = error as { message?: string; status?: number; type?: string; title?: string; detail?: string };
-    logger.error("Admin upload images: POST error", {
-      message: err?.message,
-      status: err?.status,
-      totalTime,
-    });
-    return NextResponse.json(
-      {
-        type: err?.type ?? "https://api.shop.am/problems/internal-error",
-        title: err?.title ?? "Internal Server Error",
-        status: err?.status ?? 500,
-        detail: err?.detail ?? err?.message ?? "An error occurred",
-        instance: req.url,
-      },
-      { status: err?.status ?? 500 }
-    );
-  }
+  });
 }
-

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { usersService } from "@/lib/services/users.service";
-import { toApiError } from "@/lib/types/errors";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
 
 /**
@@ -9,10 +9,10 @@ import { logger } from "@/lib/utils/logger";
  * Get user dashboard statistics and recent orders
  */
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     logger.info("Dashboard request received");
     const user = await authenticateToken(req);
-    
+
     if (!user) {
       logger.warn("Dashboard unauthorized");
       return NextResponse.json(
@@ -30,13 +30,7 @@ export async function GET(req: NextRequest) {
     logger.debug("User authenticated", { userId: user.id });
     const result = await usersService.getDashboard(user.id);
     logger.info("Dashboard data retrieved successfully");
-    
+
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    logger.error("Dashboard error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status || 500 });
-  }
+  });
 }
-
-

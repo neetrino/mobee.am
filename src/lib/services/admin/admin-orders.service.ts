@@ -1,6 +1,7 @@
 import { getOrders, getOrderById } from "./admin-orders/order-operations";
 import { deleteOrder, updateOrder } from "./admin-orders/order-mutations";
 import type { OrderFilters, UpdateOrderData } from "./admin-orders/types";
+import type { CommerceRequestContext } from "../orders/order-transition.types";
 
 /**
  * Service for admin order operations
@@ -24,15 +25,19 @@ class AdminOrdersService {
    * Delete order
    * Հեռացնում է պատվերը և բոլոր կապված գրառումները (cascade)
    */
-  async deleteOrder(orderId: string) {
-    return deleteOrder(orderId);
+  async deleteOrder(orderId: string, context: CommerceRequestContext) {
+    return deleteOrder(orderId, context);
   }
 
   /**
    * Update order
    */
-  async updateOrder(orderId: string, data: UpdateOrderData) {
-    return updateOrder(orderId, data);
+  async updateOrder(
+    orderId: string,
+    data: UpdateOrderData,
+    context: CommerceRequestContext,
+  ) {
+    return updateOrder(orderId, data, context);
   }
 }
 

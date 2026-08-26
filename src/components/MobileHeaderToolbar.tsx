@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { usePathname } from 'next/navigation';
 import type { Ref, FormEvent, AnimationEvent } from 'react';
 import type { CurrencyCode } from '../lib/currency';

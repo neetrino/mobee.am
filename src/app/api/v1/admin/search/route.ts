@@ -6,9 +6,10 @@ import {
   mapAdminGlobalProductResult,
   parseAdminGlobalSearchLimit,
 } from '@/lib/search/admin-global-search';
+import { runApiRoute } from '@/lib/errors/run-api-route';
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -43,16 +44,5 @@ export async function GET(req: NextRequest) {
         limit,
       },
     });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        type: 'https://api.shop.am/problems/internal-error',
-        title: 'Internal Server Error',
-        status: 500,
-        detail: error instanceof Error ? error.message : 'An error occurred',
-        instance: req.url,
-      },
-      { status: 500 }
-    );
-  }
+  });
 }

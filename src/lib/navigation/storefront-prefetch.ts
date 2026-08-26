@@ -9,6 +9,7 @@ import {
 } from '@/lib/shop/product-list-client-cache';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
 import { getStoredLanguage, type LanguageCode } from '@/lib/language';
+import { isAppLocale, localizeHref, stripLocalePrefix } from '@/lib/i18n/routing';
 
 const warmedRoutes = new Set<string>();
 const warmedApis = new Set<string>();
@@ -81,13 +82,15 @@ export function warmStorefrontHref(router: AppRouterInstance, href: string): voi
     return;
   }
 
-  prefetchStorefrontRoute(router, normalized);
+  const lang = getStoredLanguage();
+  const prefetchHref = isAppLocale(lang) ? localizeHref(normalized, lang) : normalized;
+  prefetchStorefrontRoute(router, prefetchHref);
 
   try {
     const url = new URL(normalized, 'http://localhost');
-    const lang = getStoredLanguage();
+    const pathname = stripLocalePrefix(url.pathname);
 
-    if (url.pathname === '/shop' || url.pathname.startsWith('/shop/')) {
+    if (pathname === '/shop' || pathname.startsWith('/shop/')) {
       const record: Record<string, string | undefined> = {};
       url.searchParams.forEach((value, key) => {
         record[key] = value;
@@ -96,7 +99,7 @@ export function warmStorefrontHref(router: AppRouterInstance, href: string): voi
       return;
     }
 
-    const productMatch = /^\/products\/([^/]+)/.exec(url.pathname);
+    const productMatch = /^\/products\/([^/]+)/.exec(pathname);
     const slug = productMatch?.[1];
     if (slug) {
       warmProductDetailApi(decodeURIComponent(slug), lang);

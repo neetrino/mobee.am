@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 /**
  * Валидация и нормализация параметров запроса для GET /api/v1/admin/products
@@ -26,7 +27,6 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
     detail: string;
   };
 } {
-  // Валидация page
   const pageParam = searchParams.get("page");
   const page = pageParam ? parseInt(pageParam, 10) : 1;
   if (pageParam && (isNaN(page) || page < 1)) {
@@ -40,7 +40,6 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
     };
   }
 
-  // Валидация limit
   const limitParam = searchParams.get("limit");
   const limit = limitParam ? parseInt(limitParam, 10) : 20;
   if (limitParam && (isNaN(limit) || limit < 1 || limit > 100)) {
@@ -54,7 +53,6 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
     };
   }
 
-  // Валидация minPrice
   const minPriceParam = searchParams.get("minPrice");
   let minPrice: number | undefined;
   if (minPriceParam) {
@@ -71,7 +69,6 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
     }
   }
 
-  // Валидация maxPrice
   const maxPriceParam = searchParams.get("maxPrice");
   let maxPrice: number | undefined;
   if (maxPriceParam) {
@@ -88,7 +85,6 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
     }
   }
 
-  // Проверка логики: minPrice не должен быть больше maxPrice
   if (minPrice !== undefined && maxPrice !== undefined && minPrice > maxPrice) {
     return {
       error: {
@@ -100,9 +96,8 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
     };
   }
 
-  // Обработка categories
   const categoryParam = searchParams.get("category");
-  const categories = categoryParam ? categoryParam.split(',').filter(Boolean) : undefined;
+  const categories = categoryParam ? categoryParam.split(",").filter(Boolean) : undefined;
   const stockParam = searchParams.get("stock")?.trim();
   const stockStatus =
     stockParam === "inStock" || stockParam === "outOfStock" ? stockParam : "all";
@@ -125,7 +120,7 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
 /**
  * GET /api/v1/admin/products
  * Get list of products with filters and pagination
- * 
+ *
  * Query parameters:
  * - page: number (default: 1, min: 1)
  * - limit: number (default: 20, min: 1, max: 100)
@@ -137,68 +132,29 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
  * - sort: string (optional)
  */
 export async function GET(req: NextRequest) {
-  const requestStartTime = Date.now();
-  console.log("🌐 [ADMIN PRODUCTS API] GET request received", { url: req.url });
-  
-  try {
-    // Аутентификация и проверка прав администратора
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
 
-    // Валидация и нормализация параметров
     const { searchParams } = new URL(req.url);
     const validationResult = validateAndNormalizeFilters(searchParams);
-    
+
     if (validationResult.error) {
-      console.warn("⚠️ [ADMIN PRODUCTS API] Validation error:", validationResult.error);
       return NextResponse.json(validationResult.error, { status: validationResult.error.status });
     }
 
     const filters = validationResult.filters!;
-    console.log("🌐 [ADMIN PRODUCTS API] Calling adminService.getProducts with filters:", filters);
-    
-    const serviceStartTime = Date.now();
     const result = await adminService.getProducts(filters);
-    const serviceTime = Date.now() - serviceStartTime;
-    
-    const totalTime = Date.now() - requestStartTime;
-    console.log(`✅ [ADMIN PRODUCTS API] Request completed in ${totalTime}ms (service: ${serviceTime}ms)`, {
-      page: filters.page,
-      limit: filters.limit,
-      resultCount: result.data?.length || 0,
-    });
-    
     return NextResponse.json(result);
-  } catch (error: any) {
-    const totalTime = Date.now() - requestStartTime;
-    console.error("❌ [ADMIN PRODUCTS API] GET Error:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
-      type: error?.type,
-      status: error?.status,
-      time: `${totalTime}ms`,
-    });
-    
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
 
 /**
  * POST /api/v1/admin/products
  * Create a new product
- * 
+ *
  * Request body should contain:
  * - title: string (required)
  * - slug: string (required)
@@ -216,22 +172,16 @@ export async function GET(req: NextRequest) {
  * - variants: Array<{price: string|number, compareAtPrice?: string|number, stock: string|number, sku?: string, color?: string, size?: string, imageUrl?: string, published?: boolean}> (required)
  */
 export async function POST(req: NextRequest) {
-  const requestStartTime = Date.now();
-  console.log("📤 [ADMIN PRODUCTS API] POST request received", { url: req.url });
-  
-  try {
-    // Аутентификация и проверка прав администратора
+  return runApiRoute(req, async () => {
     const authResult = await requireAdminApiContext(req);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
 
-    // Парсинг тела запроса
     let body;
     try {
       body = await req.json();
-    } catch (parseError) {
-      console.error("❌ [ADMIN PRODUCTS API] JSON parse error:", parseError);
+    } catch {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -244,8 +194,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Базовая валидация обязательных полей
-    if (!body.title || typeof body.title !== 'string' || body.title.trim().length === 0) {
+    if (!body.title || typeof body.title !== "string" || body.title.trim().length === 0) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -258,7 +207,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!body.slug || typeof body.slug !== 'string' || body.slug.trim().length === 0) {
+    if (!body.slug || typeof body.slug !== "string" || body.slug.trim().length === 0) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -271,7 +220,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (typeof body.published !== 'boolean') {
+    if (typeof body.published !== "boolean") {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -284,7 +233,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!body.locale || typeof body.locale !== 'string') {
+    if (!body.locale || typeof body.locale !== "string") {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
@@ -310,45 +259,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("📤 [ADMIN PRODUCTS API] Creating product:", {
-      title: body.title,
-      slug: body.slug,
-      variantsCount: body.variants?.length || 0,
-      hasMedia: !!body.media?.length,
-    });
-
-    const serviceStartTime = Date.now();
     const product = await adminService.createProduct(body);
-    const serviceTime = Date.now() - serviceStartTime;
-    
-    const totalTime = Date.now() - requestStartTime;
-    console.log(`✅ [ADMIN PRODUCTS API] Product created in ${totalTime}ms (service: ${serviceTime}ms)`, {
-      productId: product.id,
-      title: product.title,
-    });
-
     return NextResponse.json(product, { status: 201 });
-  } catch (error: any) {
-    const totalTime = Date.now() - requestStartTime;
-    console.error("❌ [ADMIN PRODUCTS API] POST Error:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
-      type: error?.type,
-      status: error?.status,
-      time: `${totalTime}ms`,
-    });
-    
-    return NextResponse.json(
-      {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
-        instance: req.url,
-      },
-      { status: error.status || 500 }
-    );
-  }
+  });
 }
-

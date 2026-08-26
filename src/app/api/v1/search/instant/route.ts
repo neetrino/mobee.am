@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@white-shop/db';
 import { db } from '@white-shop/db';
+import { runApiRoute } from '@/lib/errors/run-api-route';
 import { PRODUCT_VARIANT_DB_SELECT } from '@/lib/database/productVariantDb.constants';
 import { extractMediaUrl } from '@/lib/utils/extractMediaUrl';
 import { processImageUrl } from '@/lib/utils/image-utils';
@@ -40,7 +41,7 @@ function buildSearchWhere(search: string): Prisma.ProductWhereInput {
  * Query params: q (required), limit (default 8), lang (default en)
  */
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const { searchParams } = new URL(req.url);
     const q = searchParams.get('q')?.trim();
     const lang = searchParams.get('lang') || 'en';
@@ -124,14 +125,5 @@ export async function GET(req: NextRequest) {
       { results },
       { headers: { 'Cache-Control': 'no-store, must-revalidate' } }
     );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: 'Search failed',
-        results: [],
-        details: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500, headers: { 'Cache-Control': 'no-store, must-revalidate' } }
-    );
-  }
+  });
 }

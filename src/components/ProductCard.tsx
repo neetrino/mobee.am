@@ -2,7 +2,7 @@
 
 import { memo, useState, useCallback } from 'react';
 import type { MouseEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/lib/i18n/navigation';
 import { useWishlist } from './hooks/useWishlist';
 import { useCompare } from './hooks/useCompare';
 import { resolveProductCardImageSrc } from '../lib/productCardDisplayImage';

@@ -245,6 +245,7 @@ exports.Prisma.ProductScalarFieldEnum = {
   primaryCategoryId: 'primaryCategoryId',
   attributeIds: 'attributeIds',
   discountPercent: 'discountPercent',
+  warrantyYears: 'warrantyYears',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -268,6 +269,7 @@ exports.Prisma.ProductVariantScalarFieldEnum = {
   sku: 'sku',
   barcode: 'barcode',
   price: 'price',
+  priceOnRequest: 'priceOnRequest',
   compareAtPrice: 'compareAtPrice',
   cost: 'cost',
   stock: 'stock',
@@ -363,6 +365,10 @@ exports.Prisma.OrderScalarFieldEnum = {
   paidAt: 'paidAt',
   fulfilledAt: 'fulfilledAt',
   cancelledAt: 'cancelledAt',
+  idempotencyScopeHash: 'idempotencyScopeHash',
+  idempotencyKeyHash: 'idempotencyKeyHash',
+  requestFingerprint: 'requestFingerprint',
+  correlationId: 'correlationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -408,7 +414,61 @@ exports.Prisma.OrderEventScalarFieldEnum = {
   data: 'data',
   userId: 'userId',
   ipAddress: 'ipAddress',
+  fromState: 'fromState',
+  toState: 'toState',
+  actorUserId: 'actorUserId',
+  isCustomerVisible: 'isCustomerVisible',
+  provider: 'provider',
+  providerEventId: 'providerEventId',
+  correlationId: 'correlationId',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.StockMovementScalarFieldEnum = {
+  id: 'id',
+  variantId: 'variantId',
+  variantIdSnapshot: 'variantIdSnapshot',
+  skuSnapshot: 'skuSnapshot',
+  delta: 'delta',
+  reason: 'reason',
+  orderId: 'orderId',
+  actorUserId: 'actorUserId',
+  resultingBalance: 'resultingBalance',
+  correlationId: 'correlationId',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  targetType: 'targetType',
+  targetId: 'targetId',
+  beforeDiff: 'beforeDiff',
+  afterDiff: 'afterDiff',
+  requestId: 'requestId',
+  correlationId: 'correlationId',
+  context: 'context',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.OutboxEventScalarFieldEnum = {
+  id: 'id',
+  eventType: 'eventType',
+  aggregateType: 'aggregateType',
+  aggregateId: 'aggregateId',
+  payload: 'payload',
+  payloadVersion: 'payloadVersion',
+  status: 'status',
+  attemptCount: 'attemptCount',
+  availableAt: 'availableAt',
+  processingAt: 'processingAt',
+  processedAt: 'processedAt',
+  lastError: 'lastError',
+  correlationId: 'correlationId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ProductReviewScalarFieldEnum = {
@@ -504,6 +564,9 @@ exports.Prisma.ModelName = {
   OrderItem: 'OrderItem',
   Payment: 'Payment',
   OrderEvent: 'OrderEvent',
+  StockMovement: 'StockMovement',
+  AuditLog: 'AuditLog',
+  OutboxEvent: 'OutboxEvent',
   ProductReview: 'ProductReview',
   PromoCode: 'PromoCode',
   Settings: 'Settings',

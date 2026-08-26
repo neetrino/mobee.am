@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { getEnv } from "@/config/env";
 import { hashPassword, verifyPassword } from "@/lib/security/password-hash";
 import { signAccessToken } from "@/lib/security/sign-access-token";
 import { logger } from "../utils/logger";
@@ -128,8 +129,8 @@ class AuthService {
     }
 
     // Generate JWT token
-    if (!process.env.JWT_SECRET) {
-      logger.error("Auth config error: JWT_SECRET is not set");
+    if (!getEnv().JWT_SECRET) {
+      logger.error("Auth config error: JWT_SECRET is not set", { missing: ["JWT_SECRET"] });
       throw {
         status: 500,
         type: "https://api.shop.am/problems/internal-error",
@@ -239,7 +240,7 @@ class AuthService {
     }
 
     // Generate JWT token
-    if (!process.env.JWT_SECRET) {
+    if (!getEnv().JWT_SECRET) {
       throw {
         status: 500,
         type: "https://api.shop.am/problems/internal-error",

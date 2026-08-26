@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { Link, useRouter } from '@/lib/i18n/navigation';
 import { useMemo, type MouseEvent, type ReactNode } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ProductsHeader } from '@/components/ProductsHeader';
 import { ProductsGrid } from '@/components/ProductsGrid';
 import { ShopSortFilter } from '@/components/ShopSortFilter';
@@ -20,6 +20,7 @@ import {
 import { warmShopPaginationNavigation } from '@/lib/navigation/storefront-prefetch';
 import { useShopCatalog, type ShopCatalogProduct } from './useShopCatalog';
 import { useSmoothScrollToTopOnPageChange } from './useSmoothScrollToTopOnPageChange';
+import { usePlpViewportPdpSync } from './usePlpViewportPdpSync';
 
 type ShopPaginationPageItemsProps = {
   items: PaginationPageItem[];
@@ -165,6 +166,7 @@ export function ShopCatalogArea({
     serverLanguage,
   });
   const { t } = useTranslation();
+  usePlpViewportPdpSync(!loading && (productsData?.data.length ?? 0) > 0);
 
   const page = parseInt(searchParams.get('page') || '1', 10);
   const sort = parseProductSortOption(searchParams.get('sort') ?? undefined);

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getStoredLanguage, setStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
-import { useTranslation } from '../lib/i18n-client';
+import { getStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
+import { useSwitchStorefrontLocale } from '../lib/i18n/use-switch-locale';
+import { isAppLocale } from '../lib/i18n/routing';
 import { LanguageFlagIcon } from './LanguageFlagIcon';
 
 /**
@@ -15,7 +16,7 @@ import { LanguageFlagIcon } from './LanguageFlagIcon';
 export function LanguageSwitcher() {
   const [currentLang, setCurrentLang] = useState<LanguageCode>(getStoredLanguage());
   const [showMenu, setShowMenu] = useState(false);
-  const { t: _t } = useTranslation();
+  const switchLocale = useSwitchStorefrontLocale();
 
   useEffect(() => {
     const handleLanguageUpdate = () => {
@@ -29,9 +30,8 @@ export function LanguageSwitcher() {
   }, []);
 
   const handleLanguageChange = (langCode: LanguageCode) => {
-    if (langCode !== currentLang) {
-      setStoredLanguage(langCode);
-      // Language updates reactively via `language-updated` event.
+    if (langCode !== currentLang && isAppLocale(langCode)) {
+      switchLocale(langCode);
     }
     setShowMenu(false);
   };
@@ -119,6 +119,7 @@ export function LanguageSwitcher() {
  */
 export function SimpleLanguageSwitcher() {
   const [currentLang, setCurrentLang] = useState<LanguageCode>(getStoredLanguage());
+  const switchLocale = useSwitchStorefrontLocale();
 
   useEffect(() => {
     const handleLanguageUpdate = () => {
@@ -132,8 +133,8 @@ export function SimpleLanguageSwitcher() {
   }, []);
 
   const handleLanguageChange = (langCode: LanguageCode) => {
-    if (langCode !== currentLang) {
-      setStoredLanguage(langCode);
+    if (langCode !== currentLang && isAppLocale(langCode)) {
+      switchLocale(langCode);
     }
   };
 

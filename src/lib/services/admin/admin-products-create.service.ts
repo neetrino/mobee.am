@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { logger } from "@/lib/utils/logger";
 import { PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE } from "@/lib/database/productVariantDb.constants";
 import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import { revalidateProductCache } from "./admin-products-update/cache-revalidator";
@@ -36,13 +37,13 @@ class AdminProductsCreateService {
         
         if (!existing) {
           usedSkus.add(trimmedSku);
-          console.log(`✅ [ADMIN PRODUCTS CREATE SERVICE] Using provided SKU: ${trimmedSku}`);
+          logger.info(`✅ [ADMIN PRODUCTS CREATE SERVICE] Using provided SKU: ${trimmedSku}`);
           return trimmedSku;
         } else {
-          console.log(`⚠️ [ADMIN PRODUCTS CREATE SERVICE] SKU already exists in DB: ${trimmedSku}, generating new one`);
+          logger.info(`⚠️ [ADMIN PRODUCTS CREATE SERVICE] SKU already exists in DB: ${trimmedSku}, generating new one`);
         }
       } else {
-        console.log(`⚠️ [ADMIN PRODUCTS CREATE SERVICE] SKU already used in transaction: ${trimmedSku}, generating new one`);
+        logger.info(`⚠️ [ADMIN PRODUCTS CREATE SERVICE] SKU already used in transaction: ${trimmedSku}, generating new one`);
       }
     }
 
@@ -70,17 +71,17 @@ class AdminProductsCreateService {
       
       if (!existing) {
         usedSkus.add(newSku);
-        console.log(`✅ [ADMIN PRODUCTS CREATE SERVICE] Generated unique SKU: ${newSku}`);
+        logger.info(`✅ [ADMIN PRODUCTS CREATE SERVICE] Generated unique SKU: ${newSku}`);
         return newSku;
       }
       
-      console.log(`⚠️ [ADMIN PRODUCTS CREATE SERVICE] Generated SKU exists in DB: ${newSku}, trying again...`);
+      logger.info(`⚠️ [ADMIN PRODUCTS CREATE SERVICE] Generated SKU exists in DB: ${newSku}, trying again...`);
     } while (attempt < 100); // Safety limit
     
     // Fallback: use timestamp + random if all attempts failed
     const finalSku = `${baseSlug.toUpperCase()}-${Date.now()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
     usedSkus.add(finalSku);
-    console.log(`✅ [ADMIN PRODUCTS CREATE SERVICE] Using fallback SKU: ${finalSku}`);
+    logger.info(`✅ [ADMIN PRODUCTS CREATE SERVICE] Using fallback SKU: ${finalSku}`);
     return finalSku;
   }
 
@@ -125,7 +126,7 @@ class AdminProductsCreateService {
     }>;
   }) {
     try {
-      console.log('🆕 [ADMIN PRODUCTS CREATE SERVICE] Creating product:', data.title);
+      logger.info("Creating product");
 
       const result = await db.$transaction(async (tx: any) => {
         // Track used SKUs within this transaction to ensure uniqueness
@@ -247,7 +248,7 @@ class AdminProductsCreateService {
             // Convert attributesMap to JSONB format
             const attributesJson = Object.keys(attributesMap).length > 0 ? attributesMap : null;
 
-            console.log(`📦 [ADMIN PRODUCTS CREATE SERVICE] Variant ${variantIndex + 1} attributes:`, JSON.stringify(attributesJson, null, 2));
+            logger.info("Building variant attributes", { variantIndex: variantIndex + 1 });
 
             // Process and validate variant imageUrl
             let processedVariantImageUrl: string | undefined = undefined;
@@ -277,10 +278,10 @@ class AdminProductsCreateService {
         // Final validation: log all SKUs to ensure uniqueness
         const allSkus = variantsData.map(v => v.sku).filter(Boolean);
         const uniqueSkus = new Set(allSkus);
-        console.log(`📋 [ADMIN PRODUCTS CREATE SERVICE] Generated ${variantsData.length} variants with SKUs:`, allSkus);
+        logger.info("Generated variants", { count: variantsData.length });
         
         if (allSkus.length !== uniqueSkus.size) {
-          console.error('❌ [ADMIN PRODUCTS CREATE SERVICE] Duplicate SKUs detected!', {
+          logger.error('❌ [ADMIN PRODUCTS CREATE SERVICE] Duplicate SKUs detected!', {
             total: allSkus.length,
             unique: uniqueSkus.size,
             duplicates: allSkus.filter((sku, index) => allSkus.indexOf(sku) !== index)
@@ -288,7 +289,7 @@ class AdminProductsCreateService {
           throw new Error('Duplicate SKUs detected in variants. This should not happen.');
         }
         
-        console.log('✅ [ADMIN PRODUCTS CREATE SERVICE] All variant SKUs are unique');
+        logger.info('✅ [ADMIN PRODUCTS CREATE SERVICE] All variant SKUs are unique');
 
         // Collect all variant images to exclude from main media
         const allVariantImages: any[] = [];
@@ -304,7 +305,7 @@ class AdminProductsCreateService {
         if (data.mainProductImage && rawMedia.length === 0) {
           // If mainProductImage is provided but media is empty, use mainProductImage as first media item
           rawMedia = [data.mainProductImage];
-          console.log('📸 [ADMIN PRODUCTS CREATE SERVICE] Using mainProductImage as media:', data.mainProductImage.substring(0, 50) + '...');
+          logger.info("Using mainProductImage as media");
         } else if (data.mainProductImage && rawMedia.length > 0) {
           // If both are provided, ensure mainProductImage is first in media array
           const mainImageIndex = rawMedia.findIndex((m: any) => {
@@ -314,13 +315,13 @@ class AdminProductsCreateService {
           if (mainImageIndex === -1) {
             // mainProductImage not in media array, add it as first
             rawMedia = [data.mainProductImage, ...rawMedia];
-            console.log('📸 [ADMIN PRODUCTS CREATE SERVICE] Added mainProductImage as first media item');
+            logger.info('📸 [ADMIN PRODUCTS CREATE SERVICE] Added mainProductImage as first media item');
           } else if (mainImageIndex > 0) {
             // mainProductImage is in media but not first, move it to first
             const mainImage = rawMedia[mainImageIndex];
             rawMedia.splice(mainImageIndex, 1);
             rawMedia.unshift(mainImage);
-            console.log('📸 [ADMIN PRODUCTS CREATE SERVICE] Moved mainProductImage to first position in media');
+            logger.info('📸 [ADMIN PRODUCTS CREATE SERVICE] Moved mainProductImage to first position in media');
           }
         }
 
@@ -328,8 +329,10 @@ class AdminProductsCreateService {
         const { main } = separateMainAndVariantImages(rawMedia, allVariantImages);
         const finalMedia = cleanImageUrls(main);
         
-        console.log('📸 [ADMIN PRODUCTS CREATE SERVICE] Final main media count:', finalMedia.length);
-        console.log('📸 [ADMIN PRODUCTS CREATE SERVICE] Variant images excluded:', allVariantImages.length);
+        logger.info("Final media counts", {
+          mainMediaCount: finalMedia.length,
+          variantImageCount: allVariantImages.length,
+        });
 
         const product = await tx.product.create({
           data: {
@@ -372,7 +375,7 @@ class AdminProductsCreateService {
             // Ensure table exists (for Vercel deployments where migrations might not run)
             await ensureProductAttributesTable();
             
-            console.log('🔗 [ADMIN PRODUCTS CREATE SERVICE] Creating ProductAttribute relations for product:', product.id, 'attributes:', data.attributeIds);
+            logger.info("Creating ProductAttribute relations", { productId: product.id });
             await tx.productAttribute.createMany({
               data: data.attributeIds.map((attributeId) => ({
                 productId: product.id,
@@ -380,13 +383,12 @@ class AdminProductsCreateService {
               })),
               skipDuplicates: true,
             });
-            console.log('✅ [ADMIN PRODUCTS CREATE SERVICE] Created ProductAttribute relations:', data.attributeIds);
-          } catch (error: any) {
-            console.error('❌ [ADMIN PRODUCTS CREATE SERVICE] Failed to create ProductAttribute relations:', error);
-            console.error('   Product ID:', product.id);
-            console.error('   Attribute IDs:', data.attributeIds);
-            console.error('   Error code:', error.code);
-            console.error('   Error message:', error.message);
+            logger.info("Created ProductAttribute relations", { productId: product.id });
+          } catch (error: unknown) {
+            logger.error("Failed to create ProductAttribute relations", {
+              productId: product.id,
+              errorName: error instanceof Error ? error.name : undefined,
+            });
             // Re-throw to fail the transaction
             throw error;
           }
@@ -406,15 +408,17 @@ class AdminProductsCreateService {
 
       // Revalidate cache
       try {
-        console.log('🧹 [ADMIN PRODUCTS CREATE SERVICE] Revalidating paths for new product');
+        logger.info('🧹 [ADMIN PRODUCTS CREATE SERVICE] Revalidating paths for new product');
         await revalidateProductCache(result.id, result.translations?.[0]?.slug);
       } catch (e) {
-        console.warn('⚠️ [ADMIN PRODUCTS CREATE SERVICE] Revalidation failed:', e);
+        logger.warn("Product revalidation failed");
       }
 
       return result;
     } catch (error: any) {
-      console.error("❌ [ADMIN PRODUCTS CREATE SERVICE] createProduct error:", error);
+      logger.error("createProduct failed", {
+        errorName: error instanceof Error ? error.name : undefined,
+      });
       throw error;
     }
   }

@@ -67,7 +67,8 @@ export function getCorsHeaders(request?: NextRequest): Record<string, string> {
 
   const headers: Record<string, string> = {
     "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-ID",
+    "Access-Control-Expose-Headers": "X-Request-ID, X-Cache",
     "Access-Control-Max-Age": "86400",
   };
 

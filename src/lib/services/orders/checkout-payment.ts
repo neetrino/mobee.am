@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { getArcaPaymentUrl, getIdramPaymentUrl } from "@/config/env";
 import { getPaymentCallbackSecret } from "@/lib/security/payment-callback-secret";
 import { logger } from "@/lib/utils/logger";
 
@@ -87,8 +88,8 @@ export function createPaymentUrl(input: CreatePaymentUrlInput): string | null {
     return null;
   }
 
-  const idramBase = process.env.IDRAM_PAYMENT_URL;
-  const arcaBase = process.env.ARCA_PAYMENT_URL;
+  const idramBase = getIdramPaymentUrl();
+  const arcaBase = getArcaPaymentUrl();
   const providerBaseUrl = input.provider === "idram" ? idramBase : arcaBase;
 
   if (!providerBaseUrl) {

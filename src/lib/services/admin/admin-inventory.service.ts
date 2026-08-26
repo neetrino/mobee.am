@@ -1,4 +1,13 @@
 import { db } from "@white-shop/db";
+import { ORDER_TX_MAX_WAIT_MS, ORDER_TX_TIMEOUT_MS } from "../orders/order-fsm.constants";
+import type { CommerceRequestContext } from "../orders/order-transition.types";
+import {
+  adjustVariantStock,
+  type InventoryAdjustmentFields,
+} from "../inventory/adjust-variant-stock";
+import { syncProductListingReadModelByVariantIds } from "@/lib/read-model/product-read-model-sync";
+import { revalidateStorefrontShell } from "@/lib/i18n/revalidate-storefront";
+import { logger } from "@/lib/utils/logger";
 
 export interface InventoryListFilters {
   page: number;
@@ -6,13 +15,7 @@ export interface InventoryListFilters {
   search?: string;
 }
 
-export interface InventoryAdjustmentInput {
-  variantId: string;
-  quantityDelta: number;
-  reason: string;
-  note?: string;
-  adminUserId: string;
-}
+export type InventoryAdjustmentInput = InventoryAdjustmentFields;
 
 function buildInventorySearchWhere(search?: string) {
   const trimmedSearch = search?.trim();
@@ -163,63 +166,24 @@ class AdminInventoryService {
     };
   }
 
-  async adjustInventory(input: InventoryAdjustmentInput) {
-    return db.$transaction(async (tx) => {
-      const variant = await tx.productVariant.findUnique({
-        where: { id: input.variantId },
-        select: { id: true, stock: true, stockReserved: true, sku: true },
+  async adjustInventory(
+    input: InventoryAdjustmentInput,
+    context: CommerceRequestContext,
+  ) {
+    const result = await db.$transaction(
+      (tx) => adjustVariantStock(tx, input, context),
+      { timeout: ORDER_TX_TIMEOUT_MS, maxWait: ORDER_TX_MAX_WAIT_MS },
+    );
+    try {
+      await syncProductListingReadModelByVariantIds([result.variantId]);
+      revalidateStorefrontShell();
+    } catch (error: unknown) {
+      logger.warn("Read-model sync after inventory adjust failed", {
+        variantId: result.variantId,
+        error: error instanceof Error ? error.message : String(error),
       });
-
-      if (!variant) {
-        throw {
-          type: "https://api.shop.am/problems/not-found",
-          title: "Not Found",
-          status: 404,
-          detail: "Product variant not found",
-        };
-      }
-
-      const nextStock = variant.stock + input.quantityDelta;
-      if (nextStock < 0) {
-        throw {
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          status: 400,
-          detail: "Stock cannot be negative",
-        };
-      }
-
-      if (nextStock < variant.stockReserved) {
-        throw {
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          status: 400,
-          detail: "Stock cannot be lower than reserved stock",
-        };
-      }
-
-      const updated = await tx.productVariant.update({
-        where: { id: input.variantId },
-        data: { stock: nextStock },
-        select: { id: true, sku: true, stock: true, stockReserved: true, updatedAt: true },
-      });
-
-      return {
-        variantId: updated.id,
-        sku: updated.sku,
-        stock: updated.stock,
-        stockReserved: updated.stockReserved,
-        stockAvailable: updated.stock - updated.stockReserved,
-        change: {
-          reason: input.reason,
-          note: input.note?.trim() || null,
-          quantityDelta: input.quantityDelta,
-          previousStock: variant.stock,
-          nextStock: updated.stock,
-        },
-        updatedAt: updated.updatedAt.toISOString(),
-      };
-    });
+    }
+    return result;
   }
 }
 

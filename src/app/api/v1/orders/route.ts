@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken } from "@/lib/middleware/auth";
 import { ordersService } from "@/lib/services/orders.service";
-import { toApiError } from "@/lib/types/errors";
-import { logger } from "@/lib/utils/logger";
+import { runApiRoute } from "@/lib/errors/run-api-route";
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(req, async () => {
     const user = await authenticateToken(req);
     if (!user) {
       return NextResponse.json(
@@ -27,10 +26,5 @@ export async function GET(req: NextRequest) {
       limit: limit ? parseInt(limit, 10) : undefined,
     });
     return NextResponse.json(result);
-  } catch (error: unknown) {
-    logger.error("Orders list error", { error });
-    const apiError = toApiError(error, req.url);
-    return NextResponse.json(apiError, { status: apiError.status ?? 500 });
-  }
+  });
 }
-

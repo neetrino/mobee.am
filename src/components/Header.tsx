@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import { Link, useRouter } from '@/lib/i18n/navigation';
 import { siteMontserrat } from '@/lib/fonts/site-fonts';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { stripLocalePrefix } from '@/lib/i18n/routing';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, Suspense } from 'react';
 import type { AnimationEvent, FormEvent } from 'react';
 import { createPortal } from 'react-dom';
@@ -200,9 +201,10 @@ export function Header() {
   );
 
   const isNavActive = (href: string) => {
-    if (href === '/') return pathname === '/';
-    if (href === '/shop') return pathname.startsWith('/shop') || pathname.startsWith('/products');
-    return pathname === href || pathname.startsWith(`${href}/`);
+    const path = stripLocalePrefix(pathname);
+    if (href === '/') return path === '/';
+    if (href === '/shop') return path.startsWith('/shop') || path.startsWith('/products');
+    return path === href || path.startsWith(`${href}/`);
   };
 
   const navTextClass = (href: string) =>
