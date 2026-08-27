@@ -44,4 +44,12 @@ describe('storefront locale routing', () => {
     expect(buildLocaleSwitchHref('/en/shop', 'page=2', 'ru')).toBe('/ru/shop?page=2');
     expect(buildLocaleSwitchHref('/hy', '', 'en')).toBe('/en');
   });
+
+  it('replaces only the locale prefix and preserves query plus hash', () => {
+    expect(buildLocaleSwitchHref('/hy/products/iphone', 'foo=bar', 'ru', '#reviews')).toBe(
+      '/ru/products/iphone?foo=bar#reviews',
+    );
+    expect(buildLocaleSwitchHref('/en/shop?page=2', '', 'hy')).toBe('/hy/shop?page=2');
+    expect(buildLocaleSwitchHref('/ru/shop', '', 'ru')).toBe('/ru/shop');
+  });
 });

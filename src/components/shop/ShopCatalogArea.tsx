@@ -7,7 +7,7 @@ import { ProductsHeader } from '@/components/ProductsHeader';
 import { ProductsGrid } from '@/components/ProductsGrid';
 import { ShopSortFilter } from '@/components/ShopSortFilter';
 import type { LanguageCode } from '@/lib/language';
-import { getStoredLanguage } from '@/lib/language';
+import { useUiLanguage } from '@/components/UiLanguageProvider';
 import type { ProductListPayload } from '@/lib/services/products-list-cached';
 import { useTranslation } from '@/lib/i18n-client';
 import { parseProductSortOption } from '@/lib/products/sort';
@@ -90,9 +90,10 @@ function ShopPaginationLink({
   children,
 }: ShopPaginationLinkProps) {
   const router = useRouter();
+  const language = useUiLanguage();
 
   const warm = () => {
-    warmShopPaginationNavigation(router, searchParamsRecord, pageNum, getStoredLanguage());
+    warmShopPaginationNavigation(router, searchParamsRecord, pageNum, language);
   };
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {

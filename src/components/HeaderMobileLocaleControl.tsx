@@ -3,8 +3,8 @@
 import type { Ref, AnimationEvent } from 'react';
 import { LANGUAGES, type LanguageCode } from '../lib/language';
 import { useSwitchStorefrontLocale } from '../lib/i18n/use-switch-locale';
+import { localeSwitchIntentHandlers } from '../lib/i18n/prefetch-alternate-locales';
 import { isAppLocale } from '../lib/i18n/routing';
-import { useUiLanguage } from './UiLanguageProvider';
 import type { CurrencyCode } from '../lib/currency';
 import { CURRENCIES } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
@@ -66,8 +66,8 @@ export function HeaderMobileLocaleControl({
   buttonClassName = MOBILE_HEADER_TOOLBAR_ICON_BUTTON_CLASS,
 }: HeaderMobileLocaleControlProps) {
   const { t } = useTranslation();
-  const lang = useUiLanguage();
-  const switchLocale = useSwitchStorefrontLocale();
+  const { switchLocale, prefetchLocale, displayLocale } = useSwitchStorefrontLocale();
+  const lang = displayLocale;
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
@@ -103,6 +103,7 @@ export function HeaderMobileLocaleControl({
                 <button
                   key={code}
                   type="button"
+                  {...(isAppLocale(code) ? localeSwitchIntentHandlers(prefetchLocale, code) : {})}
                   onClick={() => {
                     onClose();
                     if (!active && isAppLocale(code)) {

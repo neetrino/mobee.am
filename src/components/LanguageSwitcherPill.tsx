@@ -1,8 +1,9 @@
 'use client';
 
-import { useUiLanguage } from './UiLanguageProvider';
 import { useSwitchStorefrontLocale } from '../lib/i18n/use-switch-locale';
+import { localeSwitchIntentHandlers } from '../lib/i18n/prefetch-alternate-locales';
 import type { LanguageCode } from '../lib/language';
+import type { AppLocale } from '../lib/i18n/routing';
 
 /**
  * ՀԱՅ / EN / РУС — Figma mobee-new Component 5 (node 178:544): bordered pill, #2db2ff sliding inset.
@@ -15,11 +16,39 @@ function segmentForLang(lang: LanguageCode): PillSegment {
   return 'en';
 }
 
-export function LanguageSwitcherPill() {
-  const lang = useUiLanguage();
-  const switchLocale = useSwitchStorefrontLocale();
+function LocalePillButton({
+  locale,
+  active,
+  label,
+  className,
+  onSwitch,
+  onPrefetch,
+}: {
+  locale: AppLocale;
+  active: boolean;
+  label: string;
+  className: string;
+  onSwitch: (next: AppLocale) => void;
+  onPrefetch: (next: AppLocale) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`${className} ${active ? 'text-white' : 'text-[#4b5563]'}`}
+      {...localeSwitchIntentHandlers(onPrefetch, locale)}
+      onClick={() => {
+        if (!active) onSwitch(locale);
+      }}
+    >
+      {label}
+    </button>
+  );
+}
 
-  const seg = segmentForLang(lang);
+export function LanguageSwitcherPill() {
+  const { switchLocale, prefetchLocale, displayLocale } = useSwitchStorefrontLocale();
+
+  const seg = segmentForLang(displayLocale);
   const slideTranslate =
     seg === 'hy' ? 'translateX(0%)' : seg === 'en' ? 'translateX(100%)' : 'translateX(200%)';
 
@@ -39,33 +68,30 @@ export function LanguageSwitcherPill() {
         aria-hidden
       />
       <div className="relative z-10 grid h-full grid-cols-3 items-stretch px-[1.9px]">
-        <button
-          type="button"
-          className={`${segmentLabelClass} ${seg === 'hy' ? 'text-white' : 'text-[#4b5563]'}`}
-          onClick={() => {
-            if (lang !== 'hy') switchLocale('hy');
-          }}
-        >
-          ՀԱՅ
-        </button>
-        <button
-          type="button"
-          className={`${segmentLabelClass} ${seg === 'en' ? 'text-white' : 'text-[#4b5563]'}`}
-          onClick={() => {
-            if (lang !== 'en') switchLocale('en');
-          }}
-        >
-          EN
-        </button>
-        <button
-          type="button"
-          className={`${segmentLabelClass} ${seg === 'ru' ? 'text-white' : 'text-[#4b5563]'}`}
-          onClick={() => {
-            if (lang !== 'ru') switchLocale('ru');
-          }}
-        >
-          РУС
-        </button>
+        <LocalePillButton
+          locale="hy"
+          active={seg === 'hy'}
+          label="ՀԱՅ"
+          className={segmentLabelClass}
+          onSwitch={switchLocale}
+          onPrefetch={prefetchLocale}
+        />
+        <LocalePillButton
+          locale="en"
+          active={seg === 'en'}
+          label="EN"
+          className={segmentLabelClass}
+          onSwitch={switchLocale}
+          onPrefetch={prefetchLocale}
+        />
+        <LocalePillButton
+          locale="ru"
+          active={seg === 'ru'}
+          label="РУС"
+          className={segmentLabelClass}
+          onSwitch={switchLocale}
+          onPrefetch={prefetchLocale}
+        />
       </div>
     </div>
   );

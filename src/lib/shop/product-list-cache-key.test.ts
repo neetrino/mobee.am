@@ -23,4 +23,12 @@ describe("buildProductListCacheKey", () => {
     expect(a).toBe(b);
     expect(a.startsWith(`${CATALOG_LIST_CACHE_PREFIX}:`)).toBe(true);
   });
+
+  it('includes lang so translated lists do not share a cache entry', () => {
+    const hy = buildProductListCacheKey({ lang: 'hy', page: 1, limit: 12 });
+    const ru = buildProductListCacheKey({ lang: 'ru', page: 1, limit: 12 });
+    expect(hy).not.toBe(ru);
+    expect(hy).toContain('lang=hy');
+    expect(ru).toContain('lang=ru');
+  });
 });

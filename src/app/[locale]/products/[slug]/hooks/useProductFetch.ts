@@ -1,7 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from '@/lib/i18n/navigation';
 import { apiClient } from '../../../../../lib/api-client';
-import { getStoredLanguage, type LanguageCode } from '../../../../../lib/language';
+import { type LanguageCode } from '../../../../../lib/language';
+import { useUiLanguage } from '../../../../../components/UiLanguageProvider';
+import { shouldApplyServerProductSnapshot } from '../../../../../lib/i18n/provider-locale-sync';
 import {
   readProductCardCache,
   type ProductCardCachePayload,
@@ -29,6 +31,7 @@ export function useProductFetch({
   initialNotFound = false,
 }: UseProductFetchProps) {
   const router = useRouter();
+  const uiLanguage = useUiLanguage();
   const hasInitialProduct = initialProduct !== null;
   const initialShell = !hasInitialProduct && slug ? readProductCardCache(slug) : null;
 
@@ -59,7 +62,7 @@ export function useProductFetch({
           setFetchPending(true);
         }
 
-        const currentLang = getStoredLanguage();
+        const currentLang = uiLanguage;
         let data: Product;
 
         try {
@@ -99,7 +102,7 @@ export function useProductFetch({
         setFetchPending(false);
       }
     },
-    [slug, variantIdFromUrl],
+    [slug, uiLanguage, variantIdFromUrl],
   );
 
   useEffect(() => {
@@ -120,19 +123,18 @@ export function useProductFetch({
       return;
     }
 
-    const clientLang = getStoredLanguage();
-    const localeMatchesInitial =
-      hasInitialProduct && initialLocale !== undefined && clientLang === initialLocale;
+    const localeMatchesInitial = shouldApplyServerProductSnapshot(
+      hasInitialProduct,
+      initialLocale,
+      uiLanguage,
+    );
 
-    if (localeMatchesInitial) {
-      const handleLanguageUpdate = () => {
-        void fetchProduct({ background: true });
-      };
-
-      window.addEventListener('language-updated', handleLanguageUpdate);
-      return () => {
-        window.removeEventListener('language-updated', handleLanguageUpdate);
-      };
+    if (localeMatchesInitial && initialProduct) {
+      setProduct(initialProduct);
+      setShellProduct(null);
+      setLoading(false);
+      setFetchPending(false);
+      return;
     }
 
     if (!hasInitialProduct) {
@@ -161,6 +163,8 @@ export function useProductFetch({
     hasInitialProduct,
     initialLocale,
     initialNotFound,
+    initialProduct,
+    uiLanguage,
   ]);
 
   const isNotFound =

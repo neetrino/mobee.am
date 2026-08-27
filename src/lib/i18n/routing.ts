@@ -102,18 +102,41 @@ export function resolveStorefrontHomeHref(currentPathname: string): string {
   return addLocalePrefix('/', locale);
 }
 
+function normalizeQuery(search: string): string {
+  const trimmed = search.trim();
+  if (!trimmed) {
+    return '';
+  }
+  return trimmed.startsWith('?') ? trimmed : `?${trimmed}`;
+}
+
+function normalizeHash(hash: string): string {
+  const trimmed = hash.trim();
+  if (!trimmed || trimmed === '#') {
+    return '';
+  }
+  return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
+}
+
+/**
+ * Same storefront page in another locale. Preserves query string and hash.
+ * Pathname may include query/hash; explicit `search`/`hash` win when provided.
+ */
 export function buildLocaleSwitchHref(
   currentPathname: string,
   search: string,
   nextLocale: AppLocale,
+  hash = '',
 ): string {
-  const rest = stripLocalePrefix(currentPathname);
-  const query = search
-    ? search.startsWith('?')
-      ? search
-      : `?${search}`
-    : '';
-  return `${addLocalePrefix(rest, nextLocale)}${query}`;
+  const stripped = stripLocalePrefix(currentPathname);
+  const parts = splitPathname(stripped);
+  const query = normalizeQuery(search) || parts.search;
+  const hashPart = normalizeHash(hash) || parts.hash;
+  return `${addLocalePrefix(parts.pathname, nextLocale)}${query}${hashPart}`;
+}
+
+export function listAlternateAppLocales(currentLocale: AppLocale): AppLocale[] {
+  return APP_LOCALES.filter((locale) => locale !== currentLocale);
 }
 
 export function readLocaleFromCookieValue(raw: string | undefined | null): AppLocale | null {

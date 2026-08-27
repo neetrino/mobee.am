@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { CategoriesTreeProvider } from '@/components/CategoriesTreeContext';
 import { SiteChrome } from '@/components/SiteChrome';
@@ -13,6 +14,7 @@ import {
 import { setRequestLocale } from '@/lib/i18n/request-locale';
 import { getLayoutCategoriesTree } from '@/lib/services/categories-tree-cached';
 import { LocalePreferenceSync } from './LocalePreferenceSync';
+import { StorefrontLocalePrefetch } from './StorefrontLocalePrefetch';
 
 export const dynamicParams = false;
 
@@ -48,13 +50,15 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const categoriesTree = await getLayoutCategoriesTree(language);
 
   return (
-    <UiLanguageProvider key={language} initialLanguage={language}>
+    <UiLanguageProvider initialLanguage={language}>
       <CategoriesTreeProvider
-        key={language}
         initialCategories={categoriesTree.data}
         initialLanguage={language}
       >
         <LocalePreferenceSync locale={language} />
+        <Suspense fallback={null}>
+          <StorefrontLocalePrefetch />
+        </Suspense>
         <SiteChrome>{children}</SiteChrome>
       </CategoriesTreeProvider>
     </UiLanguageProvider>
