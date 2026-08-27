@@ -18,6 +18,7 @@ describe('provider locale sync', () => {
   it('applies server categories when locale-bound props arrive', () => {
     expect(shouldApplyServerCategoriesSnapshot([{ id: '1' }], 'ru')).toBe(true);
     expect(shouldApplyServerCategoriesSnapshot(undefined, 'ru')).toBe(false);
+    expect(shouldApplyServerCategoriesSnapshot([], 'ru')).toBe(false);
     expect(shouldApplyServerCategoriesSnapshot([], undefined)).toBe(false);
   });
 

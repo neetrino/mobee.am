@@ -1,4 +1,3 @@
-import { containsArmenianScript } from './pickCategoryTranslation';
 import { localizeCategoryTitle } from './category-title-i18n';
 import type { LanguageCode } from './language';
 
@@ -30,8 +29,7 @@ export function getProductCardCategoryLineLabel(
         title: localized,
       };
     })
-    .filter((c) => c.title.length > 0)
-    .filter((c) => language === 'hy' || !containsArmenianScript(c.title));
+    .filter((c) => c.title.length > 0);
 
   if (titled.length === 0) {
     return null;

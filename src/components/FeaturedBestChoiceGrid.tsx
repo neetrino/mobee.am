@@ -34,7 +34,7 @@ export function FeaturedBestChoiceGrid({
   onRetry,
   onMobileCarouselViewChange,
 }: FeaturedBestChoiceGridProps) {
-  if (loading) {
+  if (loading && products.length === 0) {
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
@@ -44,20 +44,6 @@ export function FeaturedBestChoiceGrid({
         desktopPageRows={HOME_BEST_CHOICE_DESKTOP_PAGE_ROWS_DEFAULT}
         desktopPageCols={HOME_BEST_CHOICE_DESKTOP_PAGE_COLS_DEFAULT}
       />
-    );
-  }
-  if (error) {
-    return (
-      <div className="py-12 text-center">
-        <p className="mb-4 text-red-600">{error}</p>
-        <button
-          type="button"
-          onClick={onRetry}
-          className="rounded bg-gray-900 px-4 py-2 text-white transition-colors hover:bg-gray-800"
-        >
-          {t(language, 'home.featured_products.tryAgain')}
-        </button>
-      </div>
     );
   }
   if (products.length > 0) {
@@ -73,6 +59,20 @@ export function FeaturedBestChoiceGrid({
         desktopPrevAriaLabel={t(language, 'home.featured_products.scrollPrevious')}
         desktopNextAriaLabel={t(language, 'home.featured_products.scrollNext')}
       />
+    );
+  }
+  if (error) {
+    return (
+      <div className="py-12 text-center">
+        <p className="mb-4 text-red-600">{error}</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="rounded bg-gray-900 px-4 py-2 text-white transition-colors hover:bg-gray-800"
+        >
+          {t(language, 'home.featured_products.tryAgain')}
+        </button>
+      </div>
     );
   }
   return (

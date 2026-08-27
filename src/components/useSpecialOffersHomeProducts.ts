@@ -55,12 +55,11 @@ async function fetchSpecialOffersHomePage(
 }
 
 export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProductsOptions = {}) {
-  const { initialProducts, initialFiltersKey } = options;
-  // Same source as header/shop cards — not useClientSyncedLanguage (SSR snapshot is always `hy`).
+  const { initialProducts, initialFiltersKey, serverLanguage } = options;
   const language = useUiLanguage();
   const [products, setProducts] = useState<FeaturedHomeProduct[]>(() => initialProducts ?? []);
   const [loading, setLoading] = useState(
-    () => !(initialProducts && initialFiltersKey),
+    () => !(initialProducts && initialProducts.length > 0),
   );
   const [error, setError] = useState<string | null>(null);
 
@@ -72,13 +71,11 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
   const fetchProducts = useCallback(
     async (filter: string | null) => {
       try {
-        setLoading(true);
         setError(null);
         setProducts(await fetchSpecialOffersHomePage(language, filter));
       } catch (err) {
         console.error('[SpecialOffersHome] Error:', err);
         setError(t(language, 'home.featured_products.errorLoading'));
-        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -87,6 +84,12 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
   );
 
   useEffect(() => {
+    if (initialProducts && initialProducts.length > 0 && serverLanguage === language) {
+      setProducts(initialProducts);
+      setLoading(false);
+      setError(null);
+      return;
+    }
     if (initialFiltersKey && filtersKey === initialFiltersKey && initialProducts) {
       setProducts(initialProducts);
       setLoading(false);
@@ -94,7 +97,7 @@ export function useSpecialOffersHomeProducts(options: UseSpecialOffersHomeProduc
       return;
     }
     void fetchProducts(SPECIAL_OFFERS_HOME_FILTER_DEFAULT);
-  }, [fetchProducts, filtersKey, initialFiltersKey, initialProducts]);
+  }, [fetchProducts, filtersKey, initialFiltersKey, initialProducts, language, serverLanguage]);
 
   return {
     language,

@@ -1,129 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Prisma } from '@white-shop/db';
-import { db } from '@white-shop/db';
-import { runApiRoute } from '@/lib/errors/run-api-route';
-import { PRODUCT_VARIANT_DB_SELECT } from '@/lib/database/productVariantDb.constants';
-import { extractMediaUrl } from '@/lib/utils/extractMediaUrl';
-import { processImageUrl } from '@/lib/utils/image-utils';
-import { hasDisplayPrice, pickListingPriceVariant } from '@/lib/products/variant-price-display';
+import { NextRequest, NextResponse } from "next/server";
+import { runApiRoute } from "@/lib/errors/run-api-route";
+import {
+  findInstantSearchResults,
+  parseInstantSearchLang,
+  parseInstantSearchLimit,
+} from "@/lib/search/instant-search";
 
-const DEFAULT_LIMIT = 8;
-const MAX_LIMIT = 20;
-
-export interface InstantSearchResult {
-  id: string;
-  slug: string;
-  title: string;
-  price: number | null;
-  hasPrice: boolean;
-  compareAtPrice: number | null;
-  image: string | null;
-  category: string | null;
-}
-
-function buildSearchWhere(search: string): Prisma.ProductWhereInput {
-  const term = search.trim();
-  if (!term) {
-    return {};
-  }
-
-  return {
-    OR: [
-      { translations: { some: { title: { contains: term, mode: 'insensitive' } } } },
-      { translations: { some: { subtitle: { contains: term, mode: 'insensitive' } } } },
-      { variants: { some: { sku: { contains: term, mode: 'insensitive' } } } },
-    ],
-  };
-}
+const NO_STORE = { "Cache-Control": "no-store, must-revalidate" };
 
 /**
  * GET /api/v1/search/instant
- * Query params: q (required), limit (default 8), lang (default en)
+ * Query params: q (required), limit (default 8), lang (default hy)
  */
 export async function GET(req: NextRequest) {
   return runApiRoute(req, async () => {
     const { searchParams } = new URL(req.url);
-    const q = searchParams.get('q')?.trim();
-    const lang = searchParams.get('lang') || 'en';
-    const limit = Math.min(
-      parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT), 10) || DEFAULT_LIMIT,
-      MAX_LIMIT
-    );
+    const q = searchParams.get("q")?.trim();
+    const lang = parseInstantSearchLang(searchParams.get("lang"));
+    const limit = parseInstantSearchLimit(searchParams.get("limit"));
 
-    if (!q || q.length === 0) {
-      return NextResponse.json(
-        { results: [] },
-        { headers: { 'Cache-Control': 'no-store, must-revalidate' } }
-      );
+    if (!q) {
+      return NextResponse.json({ results: [] }, { headers: NO_STORE });
     }
 
-    const where: Prisma.ProductWhereInput = {
-      published: true,
-      deletedAt: null,
-      ...buildSearchWhere(q),
-    };
-
-    const products = await db.product.findMany({
-      where,
-      take: limit,
-      include: {
-        translations: true,
-        variants: {
-          where: { published: true },
-          select: PRODUCT_VARIANT_DB_SELECT,
-        },
-        categories: { include: { translations: true } },
-      },
-    });
-
-    const results: InstantSearchResult[] = products.map((product) => {
-      const translations = Array.isArray(product.translations) ? product.translations : [];
-      const translation =
-        translations.find((t: { locale: string }) => t.locale === lang) || translations[0];
-      const slug = translation?.slug ?? '';
-      const title = translation?.title ?? '';
-
-      const variants = Array.isArray(product.variants) ? product.variants : [];
-      const pricedVariant = pickListingPriceVariant(variants);
-      const variantHasPrice = hasDisplayPrice(pricedVariant);
-      const price = variantHasPrice ? pricedVariant!.price : null;
-      const compareAtPrice = variantHasPrice ? pricedVariant?.compareAtPrice ?? null : null;
-
-      let image: string | null = extractMediaUrl(product.media);
-      if (!image && pricedVariant?.imageUrl) {
-        image = processImageUrl(pricedVariant.imageUrl);
-      }
-
-      const categories = Array.isArray(product.categories) ? product.categories : [];
-      const primaryCategory =
-        product.primaryCategoryId &&
-        categories.find((c: { id: string }) => c.id === product.primaryCategoryId);
-      const categoryDoc = primaryCategory || categories[0];
-      const categoryTranslations = categoryDoc?.translations
-        ? Array.isArray(categoryDoc.translations)
-          ? categoryDoc.translations
-          : []
-        : [];
-      const categoryTranslation =
-        categoryTranslations.find((t: { locale: string }) => t.locale === lang) ||
-        categoryTranslations[0];
-      const category = categoryTranslation?.title ?? null;
-
-      return {
-        id: product.id,
-        slug,
-        title,
-        price,
-        hasPrice: variantHasPrice,
-        compareAtPrice,
-        image,
-        category,
-      };
-    });
-
-    return NextResponse.json(
-      { results },
-      { headers: { 'Cache-Control': 'no-store, must-revalidate' } }
-    );
+    const results = await findInstantSearchResults({ q, lang, limit });
+    return NextResponse.json({ results }, { headers: NO_STORE });
   });
 }

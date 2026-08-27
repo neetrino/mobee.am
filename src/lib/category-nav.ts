@@ -15,11 +15,13 @@ export const PHONES_SLUG_PARTS = [
   'smartphones',
   'smartphone',
   'herakhosner',
+  'heraxos',
+  'herakhos',
   'mobile-phones',
   'cell-phones',
 ] as const;
 
-export const TABLETS_SLUG_PARTS = ['tablets', 'tablet', 'planshetner', 'planshety', 'ipad'] as const;
+export const TABLETS_SLUG_PARTS = ['tablets', 'tablet', 'planshetner', 'planshety', 'planshet', 'ipad'] as const;
 
 export const COMPUTERS_SLUG_PARTS = [
   'computers',
@@ -62,6 +64,7 @@ export const ACCESSORIES_SLUG_PARTS = [
   'aksessuary',
   'aksesuarner',
   'aksessuarner',
+  'aksesuar',
 ] as const;
 
 function categoryMatchesSlugParts(category: CategoryTreeNode, parts: readonly string[]): boolean {

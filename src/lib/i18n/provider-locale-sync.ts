@@ -12,7 +12,11 @@ export function shouldApplyServerCategoriesSnapshot(
   initialCategories: unknown[] | undefined,
   initialLanguage: LanguageCode | undefined,
 ): boolean {
-  return Array.isArray(initialCategories) && initialLanguage !== undefined;
+  return (
+    Array.isArray(initialCategories) &&
+    initialCategories.length > 0 &&
+    initialLanguage !== undefined
+  );
 }
 
 export function shouldApplyServerProductSnapshot(

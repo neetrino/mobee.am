@@ -1,5 +1,6 @@
 import type { LanguageCode } from './language';
 import { localizeCategoryTitle } from './category-title-i18n';
+import { containsArmenianScript } from './pickCategoryTranslation';
 
 const STOREFRONT_LOCALES: readonly LanguageCode[] = ['hy', 'en', 'ru'];
 
@@ -22,6 +23,9 @@ export function categoryLocaleTitlesToWrite(sourceTitle: string): CategoryLocale
   for (const locale of STOREFRONT_LOCALES) {
     const localized = localizeCategoryTitle(trimmed, locale);
     if (!localized) {
+      continue;
+    }
+    if (locale !== 'hy' && containsArmenianScript(localized)) {
       continue;
     }
     writes.push({ locale, title: localized });

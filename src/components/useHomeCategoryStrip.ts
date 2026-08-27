@@ -48,7 +48,7 @@ export function useHomeCategoryStrip(options: UseHomeCategoryStripOptions = {}) 
       );
       setItems(localizeStripItems(response.data || [], lang));
     } catch {
-      setItems([]);
+      setItems((current) => current);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { instantSearchErrorMessage } from '@/lib/search/instant-search-error';
 
 export interface InstantSearchResultItem {
   id: string;
@@ -69,7 +70,7 @@ export function useInstantSearch(options: UseInstantSearchOptions = {}) {
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || data.details || `Search failed: ${res.status}`);
+          throw new Error(instantSearchErrorMessage(data, res.status));
         }
 
         const data = await res.json();

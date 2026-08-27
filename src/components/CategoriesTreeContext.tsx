@@ -61,7 +61,7 @@ export function CategoriesTreeProvider({
       });
       setCategories(response.data || []);
     } catch {
-      setCategories([]);
+      setCategories((current) => current);
     } finally {
       setLoadingCategories(false);
     }
