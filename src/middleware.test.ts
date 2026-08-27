@@ -50,6 +50,18 @@ describe("middleware request ID", () => {
     expect(headerId).toBe(bodyId);
   });
 
+  it("does not 503 catalog reads when origin env is unset", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("JWT_SECRET", "a".repeat(32));
+    vi.stubEnv("APP_URL", "");
+    vi.stubEnv("CORS_ORIGIN", "");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "https://example.upstash.io");
+    vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "token");
+    const response = await middleware(apiRequest("/api/v1/products"));
+    expect(response.status).not.toBe(503);
+  });
+
   it("uses one ID for Redis-unavailable 503", async () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("JWT_SECRET", "a".repeat(32));
