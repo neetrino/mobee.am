@@ -6,13 +6,24 @@ import {
 } from "./variant-option-mapping";
 import type { ProductVariantWithOptions } from "./types";
 
-function variantStub(
-  partial: Partial<ProductVariantWithOptions> & {
-    options?: ProductVariantWithOptions["options"];
-    media?: unknown;
-    attributes?: unknown;
-  },
-): ProductVariantWithOptions {
+type OptionStub = {
+  attributeKey?: string;
+  value?: string;
+  attributeValue?: {
+    id: string;
+    value: string;
+    attribute: { key: string; id: string };
+    translations: Array<{ locale: string; label: string }>;
+    colors: string[] | null;
+    imageUrl: string | null;
+  } | null;
+};
+
+function variantStub(partial: {
+  options?: OptionStub[];
+  media?: unknown;
+  attributes?: unknown;
+}): ProductVariantWithOptions {
   return {
     id: "v1",
     sku: "mobilecentre-32308",
@@ -21,7 +32,7 @@ function variantStub(
     published: true,
     options: [],
     ...partial,
-  } as ProductVariantWithOptions;
+  } as unknown as ProductVariantWithOptions;
 }
 
 describe("extractColorFromTrailingParentheses", () => {
@@ -55,7 +66,7 @@ describe("mapVariantOptions", () => {
               colors: ["#276787"],
               imageUrl: null,
             },
-          } as ProductVariantWithOptions["options"][number],
+          },
         ],
       }),
     );
@@ -66,8 +77,8 @@ describe("mapVariantOptions", () => {
     const options = mapVariantOptions(
       variantStub({
         options: [
-          { attributeKey: "storage", value: "256GB" } as ProductVariantWithOptions["options"][number],
-          { attributeKey: "sim", value: "eSIM" } as ProductVariantWithOptions["options"][number],
+          { attributeKey: "storage", value: "256GB" },
+          { attributeKey: "sim", value: "eSIM" },
         ],
         media: [{ url: "/jet.png", alt: "Samsung Galaxy Z Fold 7 256GB (Jetblack)" }],
         attributes: { storage: "256GB", connectivity: "5G", sim: "eSIM" },
@@ -81,7 +92,7 @@ describe("mapVariantOptions", () => {
     const options = mapVariantOptions(
       variantStub({
         options: [
-          { attributeKey: "storage", value: "512GB" } as ProductVariantWithOptions["options"][number],
+          { attributeKey: "storage", value: "512GB" },
         ],
         attributes: { color: "Silver Shadow", storage: "512GB" },
       }),
