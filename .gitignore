@@ -36,7 +36,7 @@ temp/
 # MobileCentre import / cleanup artifacts (local only)
 data/product-import/cache/
 mobilecentre_apple_variable_products.json
-audit/
+/audit/
 backups/
 
 # Marco import temporary files
