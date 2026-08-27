@@ -40,6 +40,8 @@ const STOREFRONT_SEED_BY_LANG: Partial<Record<LanguageCode, LocaleStore>> = {
 
 const localeStores: Partial<Record<LanguageCode, LocaleStore>> = {
   en: { ...STOREFRONT_SEED_BY_LANG.en },
+  hy: { ...STOREFRONT_SEED_BY_LANG.hy },
+  ru: { ...STOREFRONT_SEED_BY_LANG.ru },
 };
 
 const inflightLoads = new Map<string, Promise<void>>();
@@ -200,6 +202,10 @@ function getNamespaceLoader(lang: LanguageCode, namespace: Namespace): () => Pro
 
 export function syncLoadNamespace(lang: LanguageCode, namespace: Namespace): TranslationRecord | null {
   return localeStores[lang]?.[namespace] ?? null;
+}
+
+export function hasLoadedNamespace(lang: LanguageCode, namespace: Namespace): boolean {
+  return Boolean(localeStores[lang]?.[namespace]);
 }
 
 export async function ensureNamespace(lang: LanguageCode, namespace: Namespace): Promise<void> {

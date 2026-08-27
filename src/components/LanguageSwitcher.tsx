@@ -1,42 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { getStoredLanguage, LANGUAGES, type LanguageCode } from '../lib/language';
+import { useState } from 'react';
+import { LANGUAGES, type LanguageCode } from '../lib/language';
 import { useSwitchStorefrontLocale } from '../lib/i18n/use-switch-locale';
+import { localeSwitchIntentHandlers } from '../lib/i18n/prefetch-alternate-locales';
 import { isAppLocale } from '../lib/i18n/routing';
 import { LanguageFlagIcon } from './LanguageFlagIcon';
 
 /**
  * Language Switcher Component
  * Allows users to change the application language
- * 
+ *
  * @example
  * <LanguageSwitcher />
  */
 export function LanguageSwitcher() {
-  const [currentLang, setCurrentLang] = useState<LanguageCode>(getStoredLanguage());
   const [showMenu, setShowMenu] = useState(false);
-  const switchLocale = useSwitchStorefrontLocale();
-
-  useEffect(() => {
-    const handleLanguageUpdate = () => {
-      setCurrentLang(getStoredLanguage());
-    };
-
-    window.addEventListener('language-updated', handleLanguageUpdate);
-    return () => {
-      window.removeEventListener('language-updated', handleLanguageUpdate);
-    };
-  }, []);
+  const { switchLocale, prefetchLocale, displayLocale } = useSwitchStorefrontLocale();
 
   const handleLanguageChange = (langCode: LanguageCode) => {
-    if (langCode !== currentLang && isAppLocale(langCode)) {
+    if (langCode !== displayLocale && isAppLocale(langCode)) {
       switchLocale(langCode);
     }
     setShowMenu(false);
   };
 
-  const currentLanguage = LANGUAGES[currentLang];
+  const currentLanguage = LANGUAGES[displayLocale];
 
   return (
     <div className="relative">
@@ -46,7 +35,7 @@ export function LanguageSwitcher() {
         aria-label="Change language"
       >
         <span className="flex h-7 w-7 items-center justify-center" aria-label={currentLanguage.nativeName}>
-          <LanguageFlagIcon code={currentLang} />
+          <LanguageFlagIcon code={displayLocale} />
         </span>
         <span className="hidden sm:inline">{currentLanguage.nativeName}</span>
         <span className="sm:hidden">{currentLanguage.code.toUpperCase()}</span>
@@ -71,11 +60,12 @@ export function LanguageSwitcher() {
           {/* Dropdown Menu */}
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
             {Object.entries(LANGUAGES).map(([code, lang]) => {
-              const isActive = code === currentLang;
+              const isActive = code === displayLocale;
               
               return (
                 <button
                   key={code}
+                  {...(isAppLocale(code) ? localeSwitchIntentHandlers(prefetchLocale, code) : {})}
                   onClick={() => handleLanguageChange(code as LanguageCode)}
                   className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${
                     isActive
@@ -118,22 +108,10 @@ export function LanguageSwitcher() {
  * Just shows flags/icons without dropdown
  */
 export function SimpleLanguageSwitcher() {
-  const [currentLang, setCurrentLang] = useState<LanguageCode>(getStoredLanguage());
-  const switchLocale = useSwitchStorefrontLocale();
-
-  useEffect(() => {
-    const handleLanguageUpdate = () => {
-      setCurrentLang(getStoredLanguage());
-    };
-
-    window.addEventListener('language-updated', handleLanguageUpdate);
-    return () => {
-      window.removeEventListener('language-updated', handleLanguageUpdate);
-    };
-  }, []);
+  const { switchLocale, prefetchLocale, displayLocale } = useSwitchStorefrontLocale();
 
   const handleLanguageChange = (langCode: LanguageCode) => {
-    if (langCode !== currentLang && isAppLocale(langCode)) {
+    if (langCode !== displayLocale && isAppLocale(langCode)) {
       switchLocale(langCode);
     }
   };
@@ -141,11 +119,12 @@ export function SimpleLanguageSwitcher() {
   return (
     <div className="flex items-center gap-2">
       {Object.entries(LANGUAGES).map(([code, lang]) => {
-        const isActive = code === currentLang;
-        
+        const isActive = code === displayLocale;
+
         return (
           <button
             key={code}
+            {...(isAppLocale(code) ? localeSwitchIntentHandlers(prefetchLocale, code) : {})}
             onClick={() => handleLanguageChange(code as LanguageCode)}
             className={`px-2 py-1 rounded transition-all ${
               isActive

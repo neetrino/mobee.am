@@ -15,7 +15,7 @@ export type HomeCategoryStripPayload = {
 };
 
 function buildHomeStripCacheKey(lang: string): string {
-  return `cache:categories:home-strip:v1:${lang}`;
+  return `cache:categories:home-strip:v2:${lang}`;
 }
 
 async function loadHomeCategoryStrip(lang: string): Promise<HomeCategoryStripPayload> {

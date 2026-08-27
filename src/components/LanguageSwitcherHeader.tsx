@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { LANGUAGES, type LanguageCode, getStoredLanguage, setStoredLanguage } from '../lib/language';
+import { LANGUAGES, type LanguageCode } from '../lib/language';
+import { useSwitchStorefrontLocale } from '../lib/i18n/use-switch-locale';
+import { localeSwitchIntentHandlers } from '../lib/i18n/prefetch-alternate-locales';
+import { isAppLocale } from '../lib/i18n/routing';
 import { LanguageFlagIcon } from './LanguageFlagIcon';
 
 const ChevronDownIcon = () => (
@@ -30,33 +33,9 @@ const getLanguageColor = (code: LanguageCode, isActive: boolean): string => {
  */
 export function LanguageSwitcherHeader() {
   const [showMenu, setShowMenu] = useState(false);
-  // Start with 'en' to avoid hydration mismatch, then update in useEffect
-  const [currentLang, setCurrentLang] = useState<LanguageCode>(() => getStoredLanguage());
+  const { switchLocale, prefetchLocale, displayLocale } = useSwitchStorefrontLocale();
+  const currentLang = displayLocale;
   const menuRef = useRef<HTMLDivElement>(null);
-
-  // Update current language on mount and when it changes
-  useEffect(() => {
-    // Update on mount to ensure we have the latest language from localStorage
-    const storedLang = getStoredLanguage();
-    // If stored language is 'ka' (Georgian), fallback to 'en' for header display
-    const displayLang = storedLang === 'ka' ? 'en' : storedLang;
-    // Only update if different to avoid unnecessary re-renders
-    if (displayLang !== currentLang) {
-      setCurrentLang(displayLang);
-    }
-
-    const handleLanguageUpdate = () => {
-      const newLang = getStoredLanguage();
-      // If new language is 'ka' (Georgian), fallback to 'en' for header display
-      const displayLang = newLang === 'ka' ? 'en' : newLang;
-      setCurrentLang(displayLang);
-    };
-
-    window.addEventListener('language-updated', handleLanguageUpdate);
-    return () => {
-      window.removeEventListener('language-updated', handleLanguageUpdate);
-    };
-  }, [currentLang]); // Include currentLang to check for changes
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -72,27 +51,13 @@ export function LanguageSwitcherHeader() {
     };
   }, []);
 
-  /**
-   * Switches the page language using our i18n system
-   */
   const changeLanguage = (langCode: LanguageCode) => {
-    if (typeof window !== 'undefined' && currentLang !== langCode) {
-      console.info('[LanguageSwitcher] Changing language', {
-        from: currentLang,
-        to: langCode,
-      });
-
-      // Close menu first
+    if (currentLang === langCode || !isAppLocale(langCode)) {
       setShowMenu(false);
-      
-      // Immediately update the UI state to prevent showing 'en' during reload
-      const displayLang = langCode === 'ka' ? 'en' : langCode;
-      setCurrentLang(displayLang);
-      
-      // Update language - this will reload the page after a small delay
-      // The delay ensures the UI state is updated before reload
-      setStoredLanguage(langCode);
+      return;
     }
+    setShowMenu(false);
+    switchLocale(langCode);
   };
 
   return (
@@ -120,6 +85,7 @@ export function LanguageSwitcherHeader() {
             return (
               <button
                 key={lang.code}
+                {...(isAppLocale(lang.code) ? localeSwitchIntentHandlers(prefetchLocale, lang.code) : {})}
                 onClick={() => changeLanguage(lang.code)}
                 disabled={isActive}
                 className={`w-full text-left px-4 py-3 text-sm transition-all duration-150 border-l-4 ${

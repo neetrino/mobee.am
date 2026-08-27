@@ -5,14 +5,13 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from 'react';
 import { usePathname } from 'next/navigation';
 import { type LanguageCode, getStoredLanguage, persistLanguageCookie } from '../lib/language';
 import { parseLocaleFromPathname } from '../lib/i18n/routing';
-import { clearLazyTranslationStore, seedStorefrontLocale } from '../lib/i18n-lazy-loader';
+import { seedStorefrontLocale } from '../lib/i18n-lazy-loader';
 
 const UiLanguageContext = createContext<LanguageCode | null>(null);
 
@@ -29,23 +28,10 @@ export function UiLanguageProvider({
 }) {
   const pathname = usePathname();
   const urlLocale = parseLocaleFromPathname(pathname ?? '');
-  const [lang, setLang] = useState<LanguageCode>(initialLanguage);
-  const langRef = useRef(lang);
+  const [adminLang, setAdminLang] = useState<LanguageCode>(initialLanguage);
+  const lang = urlLocale ?? adminLang;
 
   seedStorefrontLocale(lang);
-
-  useEffect(() => {
-    langRef.current = lang;
-  }, [lang]);
-
-  useEffect(() => {
-    if (initialLanguage === langRef.current) {
-      return;
-    }
-    clearLazyTranslationStore();
-    seedStorefrontLocale(initialLanguage);
-    setLang(initialLanguage);
-  }, [initialLanguage]);
 
   useEffect(() => {
     if (urlLocale) {
@@ -53,33 +39,31 @@ export function UiLanguageProvider({
       return;
     }
     const stored = getStoredLanguage();
-    if (stored === langRef.current) {
+    if (stored === adminLang) {
       return;
     }
-    clearLazyTranslationStore();
     seedStorefrontLocale(stored);
     persistLanguageCookie(stored);
-    setLang(stored);
-  }, [urlLocale]);
+    setAdminLang(stored);
+  }, [adminLang, urlLocale]);
 
   useEffect(() => {
-    const handleLanguageUpdate = () => {
+    const handleLanguageUpdate = (): void => {
       if (parseLocaleFromPathname(window.location.pathname)) {
         return;
       }
       const next = getStoredLanguage();
-      if (next === langRef.current) {
+      if (next === adminLang) {
         return;
       }
-      clearLazyTranslationStore();
       seedStorefrontLocale(next);
       persistLanguageCookie(next);
-      setLang(next);
+      setAdminLang(next);
     };
 
     window.addEventListener('language-updated', handleLanguageUpdate);
     return () => window.removeEventListener('language-updated', handleLanguageUpdate);
-  }, []);
+  }, [adminLang]);
 
   const value = useMemo(() => lang, [lang]);
 

@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
-import { getStoredLanguage, type LanguageCode } from '@/lib/language';
+import { type LanguageCode } from '@/lib/language';
+import { useUiLanguage } from '@/components/UiLanguageProvider';
 import { buildShopProductFiltersFromSearchParams } from '@/lib/shop/build-shop-product-filters';
 import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { productFiltersToApiParams } from '@/lib/shop/product-filters-to-api-params';
@@ -86,7 +87,8 @@ export type UseShopCatalogOptions = {
 export function useShopCatalog(options: UseShopCatalogOptions = {}) {
   const { initialPayload, initialFiltersKey, serverLanguage } = options;
   const searchParams = useSearchParams();
-  const [language, setLanguage] = useState<LanguageCode>(() => serverLanguage ?? getStoredLanguage());
+  const uiLanguage = useUiLanguage();
+  const language = serverLanguage ?? uiLanguage;
   const [productsData, setProductsData] = useState<ProductsResponse | null>(() =>
     initialPayload && initialFiltersKey
       ? payloadToResponse(initialPayload, initialPayload.meta?.limit ?? 12)
@@ -107,12 +109,6 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
       setProductListClientCache(initialFiltersKey, initialPayload);
     }
   }, [initialFiltersKey, initialPayload]);
-
-  useEffect(() => {
-    const onLanguageUpdate = () => setLanguage(getStoredLanguage());
-    window.addEventListener('language-updated', onLanguageUpdate);
-    return () => window.removeEventListener('language-updated', onLanguageUpdate);
-  }, []);
 
   const filters = useMemo(() => {
     const record = searchParamsToRecord(searchParams);

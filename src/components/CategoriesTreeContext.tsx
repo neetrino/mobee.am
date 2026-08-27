@@ -13,6 +13,8 @@ import { usePathname } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import type { CategoryTreeNode } from '../lib/category-nav';
 import { getStoredLanguage, syncLanguageCookieFromStorage, type LanguageCode } from '../lib/language';
+import { parseLocaleFromPathname } from '../lib/i18n/routing';
+import { shouldApplyServerCategoriesSnapshot } from '../lib/i18n/provider-locale-sync';
 
 type CategoriesTreeContextValue = {
   categories: CategoryTreeNode[];
@@ -70,9 +72,8 @@ export function CategoriesTreeProvider({
   }, []);
 
   useEffect(() => {
-    const lang = getStoredLanguage();
-    if (initialCategories && initialLanguage && lang === initialLanguage) {
-      setCategories(initialCategories);
+    if (shouldApplyServerCategoriesSnapshot(initialCategories, initialLanguage)) {
+      setCategories(initialCategories ?? []);
       setLoadingCategories(false);
       return;
     }
@@ -80,7 +81,12 @@ export function CategoriesTreeProvider({
   }, [refetchCategories, initialCategories, initialLanguage]);
 
   useEffect(() => {
-    const onLang = () => void refetchCategories();
+    const onLang = () => {
+      if (parseLocaleFromPathname(window.location.pathname)) {
+        return;
+      }
+      void refetchCategories();
+    };
     window.addEventListener('language-updated', onLang);
     return () => window.removeEventListener('language-updated', onLang);
   }, [refetchCategories]);

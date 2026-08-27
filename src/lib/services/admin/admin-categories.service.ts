@@ -4,16 +4,17 @@ import {
   buildCategoryMediaFromImageUrl,
   extractCategoryImageUrl,
 } from "@/lib/categoryMedia";
+import { categoryLocaleTitlesToWrite } from "@/lib/category-locale-sync";
 import { DEFAULT_LANGUAGE } from "@/lib/language";
 import { getCategoryProductCountMap } from "@/lib/services/admin/category-product-counts";
-import { cacheService } from "@/lib/services/cache.service";
+import { invalidateCategoryCaches } from "@/lib/services/read-through-json-cache";
 import { toSlug } from "@/lib/utils/slug";
 import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
 
 const ADMIN_CATEGORY_LOCALE = DEFAULT_LANGUAGE;
 
 async function clearCategoriesCache(): Promise<void> {
-  await cacheService.deletePattern("categories:*");
+  await invalidateCategoryCaches();
   await rebuildProductListingReadModel();
 }
 
@@ -23,6 +24,53 @@ function resolveCategorySlug(explicitSlug: string | undefined, title: string): s
     return fromExplicit;
   }
   return toSlug(title);
+}
+
+async function syncCategoryLocaleTranslations(input: {
+  categoryId: string;
+  locale: string;
+  nextTitle: string;
+  nextSlug: string;
+  syncSlugOnAllLocales: boolean;
+}): Promise<void> {
+  const writes = categoryLocaleTitlesToWrite(input.nextTitle);
+  if (!writes.some((row) => row.locale === input.locale)) {
+    writes.unshift({ locale: "hy", title: input.nextTitle });
+  }
+
+  for (const write of writes) {
+    const title = write.locale === input.locale ? input.nextTitle : write.title;
+    await db.categoryTranslation.upsert({
+      where: {
+        categoryId_locale: {
+          categoryId: input.categoryId,
+          locale: write.locale,
+        },
+      },
+      create: {
+        categoryId: input.categoryId,
+        locale: write.locale,
+        title,
+        slug: input.nextSlug,
+        fullPath: input.nextSlug,
+      },
+      update: {
+        title,
+        ...(input.syncSlugOnAllLocales
+          ? { slug: input.nextSlug, fullPath: input.nextSlug }
+          : {}),
+      },
+    });
+  }
+
+  if (!input.syncSlugOnAllLocales) {
+    return;
+  }
+
+  await db.categoryTranslation.updateMany({
+    where: { categoryId: input.categoryId },
+    data: { slug: input.nextSlug, fullPath: input.nextSlug },
+  });
 }
 
 class AdminCategoriesService {
@@ -130,6 +178,7 @@ class AdminCategoriesService {
 
     const nextPosition = await this.getNextSiblingPosition(data.parentId ?? null);
 
+    const localeTitles = categoryLocaleTitlesToWrite(data.title);
     const category = await db.category.create({
       data: {
         parentId: data.parentId || undefined,
@@ -138,12 +187,12 @@ class AdminCategoriesService {
         published: true,
         media: buildCategoryMediaFromImageUrl(data.imageUrl ?? null),
         translations: {
-          create: {
-            locale,
-            title: data.title,
+          create: localeTitles.map((row) => ({
+            locale: row.locale,
+            title: row.locale === locale ? data.title.trim() : row.title,
             slug,
-            fullPath: slug, // Can be enhanced to build full path
-          },
+            fullPath: slug,
+          })),
         },
       },
       include: {
@@ -356,7 +405,7 @@ class AdminCategoriesService {
       updateData.media = buildCategoryMediaFromImageUrl(data.imageUrl);
     }
 
-    // Keep all locale rows in sync so storefront language switches stay consistent.
+    // Title is localized per storefront language; slug stays shared across locales.
     if (data.title !== undefined || data.slug !== undefined) {
       const categoryTranslations = Array.isArray(category.translations) ? category.translations : [];
       const existingTranslation =
@@ -389,27 +438,13 @@ class AdminCategoriesService {
       }
 
       await this.assertSlugAvailable(nextSlug, locale, categoryId);
-
-      if (categoryTranslations.length === 0) {
-        await db.categoryTranslation.create({
-          data: {
-            categoryId: category.id,
-            locale,
-            title: nextTitle,
-            slug: nextSlug,
-            fullPath: nextSlug,
-          },
-        });
-      } else {
-        await db.categoryTranslation.updateMany({
-          where: { categoryId: category.id },
-          data: {
-            title: nextTitle,
-            slug: nextSlug,
-            fullPath: nextSlug,
-          },
-        });
-      }
+      await syncCategoryLocaleTranslations({
+        categoryId: category.id,
+        locale,
+        nextTitle,
+        nextSlug,
+        syncSlugOnAllLocales: data.slug !== undefined,
+      });
     }
 
     // Update category base data
