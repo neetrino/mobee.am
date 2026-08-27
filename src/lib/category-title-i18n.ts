@@ -72,7 +72,7 @@ function isLanguageCode(value: string): value is LanguageCode {
 
 /**
  * Localize a category title for the active UI language.
- * Falls back to English for non-Armenian UI when the source string is Armenian.
+ * Known titles are mapped hy/en/ru; unknown titles stay visible in the source language.
  */
 export function localizeCategoryTitle(title: string, lang: LanguageCode): string {
   const trimmed = title.trim();
@@ -83,10 +83,6 @@ export function localizeCategoryTitle(title: string, lang: LanguageCode): string
   const bundle = CATEGORY_TITLE_LOOKUP.get(normalizeCategoryTitleKey(trimmed));
   if (bundle) {
     return pickBundleTitle(bundle, lang);
-  }
-
-  if (lang !== 'hy' && containsArmenianScript(trimmed)) {
-    return '';
   }
 
   return trimmed;
@@ -145,6 +141,13 @@ function firstUsableSlug(
     return trimmed;
   }
 
+  for (const slug of candidates) {
+    const trimmed = slug?.trim() ?? '';
+    if (trimmed) {
+      return trimmed;
+    }
+  }
+
   return '';
 }
 
@@ -164,12 +167,19 @@ export function resolveLocalizedCategoryFields(
   const byLocale = new Map(translations.map((row) => [row.locale, row]));
 
   const sourceTitle = firstNonEmptyTitle(translations, [lang, 'en', 'hy']);
-  const localizedTitle = localizeCategoryTitle(sourceTitle, lang);
+  const localizedTitle = localizeCategoryTitle(sourceTitle, lang) || sourceTitle;
   if (!localizedTitle) {
     return null;
   }
 
   const slug = firstUsableSlug(translations, lang);
+  if (!slug) {
+    return {
+      title: localizedTitle,
+      slug: 'category',
+      fullPath: 'category',
+    };
+  }
   const fullPathCandidate =
     (lang !== 'hy' &&
     byLocale.get(lang)?.fullPath &&

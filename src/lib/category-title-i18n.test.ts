@@ -35,4 +35,15 @@ describe('category-title-i18n', () => {
       fullPath: 'computers',
     });
   });
+
+  it('keeps unknown Armenian titles visible on EN/RU instead of dropping the category', () => {
+    const translations = [{ locale: 'hy', title: 'Նոր կատեգորիա', slug: 'nor-category' }];
+
+    expect(resolveLocalizedCategoryFields(translations, 'en')).toEqual({
+      title: 'Նոր կատեգորիա',
+      slug: 'nor-category',
+      fullPath: 'nor-category',
+    });
+    expect(localizeCategoryTitle('Նոր կատեգորիա', 'en')).toBe('Նոր կատեգորիա');
+  });
 });

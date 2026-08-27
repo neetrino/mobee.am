@@ -1,4 +1,11 @@
+import { setDefaultResultOrder } from "node:dns";
 import { PrismaClient } from "./generated/client";
+
+try {
+  setDefaultResultOrder("ipv4first");
+} catch {
+  // Node < 17
+}
 
 declare global {
   var prisma: PrismaClient | undefined;

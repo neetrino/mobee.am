@@ -37,7 +37,7 @@ export function SpecialOffersProductGrid({
   onRetry,
   onMobileCarouselViewChange,
 }: SpecialOffersProductGridProps) {
-  if (loading) {
+  if (loading && products.length === 0) {
     return (
       <HomeBestChoiceStyleProductGridSkeleton
         productsPerPage={productsPerPage}
@@ -47,20 +47,6 @@ export function SpecialOffersProductGrid({
         desktopPageRows={HOME_SPECIAL_OFFERS_DESKTOP_PAGE_ROWS}
         desktopPageCols={HOME_SPECIAL_OFFERS_DESKTOP_PAGE_COLS}
       />
-    );
-  }
-  if (error) {
-    return (
-      <div className="py-12 text-center">
-        <p className="mb-4 text-red-600">{error}</p>
-        <button
-          type="button"
-          onClick={onRetry}
-          className="rounded bg-gray-900 px-4 py-2 text-white transition-colors hover:bg-gray-800"
-        >
-          {t(language, 'home.featured_products.tryAgain')}
-        </button>
-      </div>
     );
   }
   if (products.length > 0) {
@@ -76,6 +62,20 @@ export function SpecialOffersProductGrid({
         desktopPrevAriaLabel={t(language, 'home.special_offers_heading.scrollPrevious')}
         desktopNextAriaLabel={t(language, 'home.special_offers_heading.scrollNext')}
       />
+    );
+  }
+  if (error) {
+    return (
+      <div className="py-12 text-center">
+        <p className="mb-4 text-red-600">{error}</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="rounded bg-gray-900 px-4 py-2 text-white transition-colors hover:bg-gray-800"
+        >
+          {t(language, 'home.featured_products.tryAgain')}
+        </button>
+      </div>
     );
   }
   return (

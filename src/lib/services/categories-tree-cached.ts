@@ -16,7 +16,7 @@ export const CATEGORIES_TREE_CACHE_TAG = "categories-tree";
 export async function getCachedCategoriesTree(
   lang: string,
 ): Promise<{ result: CategoriesTreePayload; cacheStatus: "HIT" | "MISS" }> {
-  const cacheKey = `cache:categories:tree:v2:${lang}`;
+  const cacheKey = `cache:categories:tree:v3:${lang}`;
   return getCachedJson<CategoriesTreePayload>(
     cacheKey,
     CATEGORIES_CACHE_TTL_SEC,
@@ -29,6 +29,6 @@ export async function getCachedCategoriesTree(
  */
 export const getLayoutCategoriesTree = unstable_cache(
   async (lang: string) => categoriesService.getTree(lang),
-  ["layout-categories-tree-v2"],
+  ["layout-categories-tree-v3"],
   { revalidate: 300, tags: [CATEGORIES_TREE_CACHE_TAG] },
 );
