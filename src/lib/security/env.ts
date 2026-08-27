@@ -27,7 +27,7 @@ const productionEnvSchema = z
 
 /**
  * Validates critical security env once per process in production.
- * Node-only: logs missing names. Request serving is blocked by assertProductionCoreEnv / Edge 503.
+ * Node-only: logs missing names including origin. Missing APP_URL does not block serving.
  */
 export function assertProductionSecurityEnv(): void {
   if (productionEnvChecked || process.env.NODE_ENV !== "production") {

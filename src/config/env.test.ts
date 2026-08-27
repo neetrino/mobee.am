@@ -107,6 +107,19 @@ describe("typed env contract", () => {
     expect(() => assertProductionCoreEnv()).not.toThrow();
   });
 
+  it("does not fail production runtime when only origin env is missing", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PHASE", "");
+    process.env.DATABASE_URL = "postgres://example";
+    process.env.JWT_SECRET = "a".repeat(32);
+    process.env.UPSTASH_REDIS_REST_URL = "https://example.upstash.io";
+    process.env.UPSTASH_REDIS_REST_TOKEN = "token";
+    delete process.env.APP_URL;
+    delete process.env.CORS_ORIGIN;
+    delete process.env.NEXT_PUBLIC_APP_URL;
+    expect(() => assertProductionCoreEnv()).not.toThrow();
+  });
+
   it("does not include secret values when JWT is missing", () => {
     delete process.env.JWT_SECRET;
     try {

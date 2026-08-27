@@ -28,6 +28,7 @@ export type CoreEnvValues = OriginEnvValues & {
 
 /**
  * Returns missing/invalid core names only. Never includes values.
+ * Origin (`APP_URL` / CORS) is advisory: same-origin storefront can serve without it.
  */
 export function collectMissingCoreEnvNames(input: CoreEnvValues): string[] {
   const missing: string[] = [];
@@ -42,9 +43,6 @@ export function collectMissingCoreEnvNames(input: CoreEnvValues): string[] {
   }
   if (!input.UPSTASH_REDIS_REST_TOKEN) {
     missing.push("UPSTASH_REDIS_REST_TOKEN");
-  }
-  if (!hasConfiguredOrigin(input)) {
-    missing.push("APP_URL");
   }
   return missing;
 }
@@ -61,9 +59,6 @@ export function collectMissingEdgeSecurityEnvNames(): string[] {
   const missing: string[] = [];
   if (!isJwtSecretLengthValid(readOptionalEnv(process.env.JWT_SECRET))) {
     missing.push("JWT_SECRET");
-  }
-  if (!hasConfiguredOrigin(readProcessOriginEnv())) {
-    missing.push("APP_URL");
   }
   if (!readOptionalEnv(process.env.UPSTASH_REDIS_REST_URL)) {
     missing.push("UPSTASH_REDIS_REST_URL");
