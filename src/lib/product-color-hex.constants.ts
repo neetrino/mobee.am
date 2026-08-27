@@ -9,6 +9,8 @@ import { isValidHexColor, normalizeHexToSixDigits } from './hexColorUtils';
 export const PRODUCT_COLOR_HEX: Record<string, string> = {
   beige: '#F5F5DC',
   black: '#1D1D1F',
+  jetblack: '#0A0A0A',
+  'jet black': '#0A0A0A',
   blue: '#276787',
   brown: '#A52A2A',
   gray: '#808080',

@@ -8,6 +8,7 @@ describe('getProductColorHex', () => {
   it('resolves English color names', () => {
     expect(getProductColorHex('blue')).toBe('#276787');
     expect(getProductColorHex('space black')).toBe('#1D1D1F');
+    expect(getProductColorHex('Jetblack')).toBe('#0A0A0A');
   });
 
   it('resolves Armenian and Russian labels instead of gray fallback', () => {

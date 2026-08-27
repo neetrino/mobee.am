@@ -6,29 +6,13 @@
 "use strict";
 
 const { normalizeColorKey } = require("./dyson-color-registry.cjs");
-
-const LOCALES = ["en", "hy", "ru"];
-
-/**
- * @param {import('@prisma/client').PrismaClient} prisma
- */
-async function ensureColorAttribute(prisma) {
-  let attr = await prisma.attribute.findUnique({ where: { key: "color" } });
-  if (!attr) {
-    attr = await prisma.attribute.create({
-      data: {
-        key: "color",
-        type: "select",
-        filterable: true,
-        position: 0,
-        translations: {
-          create: LOCALES.map((locale) => ({ locale, name: "Color" })),
-        },
-      },
-    });
-  }
-  return attr;
-}
+const {
+  LOCALES,
+  ensureColorAttribute,
+  ensureVariantColorOption,
+  ensureProductColorAttribute,
+  mergeAttributesColor,
+} = require("./catalog-color-attribute-sync.cjs");
 
 /**
  * Find existing AttributeValue for a canonical Dyson color without creating duplicates.
@@ -203,138 +187,12 @@ async function ensureDysonAttributeValue(prisma, attributeId, entry, opts) {
   };
 }
 
-/**
- * @param {import('@prisma/client').PrismaClient} prisma
- * @param {{
- *   variantId: string,
- *   attributeId: string,
- *   attributeValueId: string,
- *   canonicalName: string,
- *   apply: boolean,
- * }} args
- */
-async function ensureDysonVariantColorOption(prisma, args) {
-  const existing = await prisma.productVariantOption.findMany({
-    where: {
-      variantId: args.variantId,
-      OR: [{ attributeKey: "color" }, { attributeKey: "colour" }, { attributeId: args.attributeId }],
-    },
-  });
-
-  const colorOptions = existing.filter(
-    (o) =>
-      o.attributeKey === "color" ||
-      o.attributeKey === "colour" ||
-      o.attributeId === args.attributeId,
-  );
-
-  if (colorOptions.length > 1) {
-    return {
-      action: "manual_review",
-      reason: "multiple_color_options_on_variant",
-      optionIds: colorOptions.map((o) => o.id),
-    };
-  }
-
-  if (colorOptions.length === 1) {
-    const opt = colorOptions[0];
-    const needsUpdate =
-      opt.valueId !== args.attributeValueId ||
-      opt.value !== args.canonicalName ||
-      opt.attributeKey !== "color" ||
-      opt.attributeId !== args.attributeId;
-
-    if (!args.apply) {
-      return {
-        action: needsUpdate ? "update" : "reuse",
-        optionId: opt.id,
-      };
-    }
-
-    if (needsUpdate) {
-      await prisma.productVariantOption.update({
-        where: { id: opt.id },
-        data: {
-          attributeId: args.attributeId,
-          attributeKey: "color",
-          valueId: args.attributeValueId,
-          value: args.canonicalName,
-        },
-      });
-      return { action: "update", optionId: opt.id };
-    }
-    return { action: "reuse", optionId: opt.id };
-  }
-
-  if (!args.apply) {
-    return { action: "create", optionId: null };
-  }
-
-  const created = await prisma.productVariantOption.create({
-    data: {
-      variantId: args.variantId,
-      attributeId: args.attributeId,
-      attributeKey: "color",
-      valueId: args.attributeValueId,
-      value: args.canonicalName,
-    },
-  });
-  return { action: "create", optionId: created.id };
-}
-
-/**
- * @param {import('@prisma/client').PrismaClient} prisma
- * @param {string} productId
- * @param {string} attributeId
- * @param {boolean} apply
- */
-async function ensureDysonProductAttribute(prisma, productId, attributeId, apply) {
-  const existing = await prisma.productAttribute.findUnique({
-    where: { productId_attributeId: { productId, attributeId } },
-  });
-  if (existing) {
-    return { action: "reuse", productAttributeId: existing.id };
-  }
-  if (!apply) {
-    return { action: "create", productAttributeId: null };
-  }
-  const created = await prisma.productAttribute.create({
-    data: { productId, attributeId },
-  });
-
-  const product = await prisma.product.findUnique({
-    where: { id: productId },
-    select: { attributeIds: true },
-  });
-  const nextIds = Array.from(new Set([...(product?.attributeIds || []), attributeId]));
-  await prisma.product.update({
-    where: { id: productId },
-    data: { attributeIds: nextIds },
-  });
-
-  return { action: "create", productAttributeId: created.id };
-}
-
-/**
- * Merge canonical color into ProductVariant.attributes JSON without dropping other keys.
- * @param {unknown} attributes
- * @param {string} canonicalName
- */
-function mergeAttributesColor(attributes, canonicalName) {
-  const base =
-    attributes && typeof attributes === "object" && !Array.isArray(attributes)
-      ? { ...attributes }
-      : {};
-  base.color = canonicalName;
-  return base;
-}
-
 module.exports = {
   ensureColorAttribute,
   findExistingColorAttributeValue,
   ensureDysonAttributeValue,
-  ensureDysonVariantColorOption,
-  ensureDysonProductAttribute,
+  ensureDysonVariantColorOption: ensureVariantColorOption,
+  ensureDysonProductAttribute: ensureProductColorAttribute,
   mergeAttributesColor,
   LOCALES,
 };

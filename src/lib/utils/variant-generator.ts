@@ -1,5 +1,9 @@
 import { db } from "@white-shop/db";
 import { logger } from "./logger";
+import {
+  getProductColorHex,
+  isKnownProductColor,
+} from "../product-color-hex.constants";
 
 /**
  * Generate all possible combinations of AttributeValues
@@ -78,58 +82,72 @@ export async function getProductAttributeValues(
   return attributeValueMap;
 }
 
+function knownColorHexes(attributeKey: string, valueString: string): string[] {
+  if (attributeKey !== "color" || !isKnownProductColor(valueString)) return [];
+  return [getProductColorHex(valueString)];
+}
+
+async function fillMissingColorHexes(
+  attributeValueId: string,
+  colors: unknown,
+  hexes: string[],
+): Promise<void> {
+  if (hexes.length === 0) return;
+  const current = Array.isArray(colors) ? colors : [];
+  if (current.length > 0) return;
+  await db.attributeValue.update({
+    where: { id: attributeValueId },
+    data: { colors: hexes },
+  });
+}
+
 /**
- * Find or create AttributeValue by attribute key and value string
- * @param attributeKey Attribute key (e.g., "color", "size")
- * @param valueString Value string (e.g., "Red", "Large")
- * @param locale Locale for creating translation if needed
- * @returns AttributeValue ID or null if not found
+ * Find or create AttributeValue by attribute key and value string.
+ * Color values store HEX when the name is in PRODUCT_COLOR_HEX.
  */
 export async function findOrCreateAttributeValue(
   attributeKey: string,
   valueString: string,
   locale: string = "en"
 ): Promise<string | null> {
-  logger.debug('Finding/Creating AttributeValue', { attributeKey, valueString });
+  logger.debug("Finding/Creating AttributeValue", { attributeKey, valueString });
 
-  // Find attribute by key
   const attribute = await db.attribute.findUnique({
     where: { key: attributeKey },
-    include: {
-      values: {
-        where: {
-          value: valueString,
-        },
-      },
-    },
   });
-
   if (!attribute) {
-    logger.warn('Attribute not found', { attributeKey });
+    logger.warn("Attribute not found", { attributeKey });
     return null;
   }
 
-  // If value exists, return its ID
-  if (attribute.values.length > 0) {
-    logger.debug('Found existing AttributeValue', { attributeValueId: attribute.values[0].id });
-    return attribute.values[0].id;
+  const existing = await db.attributeValue.findFirst({
+    where: {
+      attributeId: attribute.id,
+      value: { equals: valueString, mode: "insensitive" },
+    },
+    select: { id: true, colors: true },
+  });
+  if (existing) {
+    await fillMissingColorHexes(
+      existing.id,
+      existing.colors,
+      knownColorHexes(attributeKey, valueString),
+    );
+    return existing.id;
   }
 
-  // Create new AttributeValue
+  const hexes = knownColorHexes(attributeKey, valueString);
   const newValue = await db.attributeValue.create({
     data: {
       attributeId: attribute.id,
       value: valueString,
+      colors: hexes.length > 0 ? hexes : undefined,
       translations: {
-        create: {
-          locale,
-          label: valueString,
-        },
+        create: { locale, label: valueString },
       },
     },
   });
-
-  logger.info('Created new AttributeValue', { attributeValueId: newValue.id });
+  logger.info("Created new AttributeValue", { attributeValueId: newValue.id });
   return newValue.id;
 }
 

@@ -8,6 +8,7 @@ import {
 } from "../../utils/image-utils";
 import { logger } from "../../utils/logger";
 import type { ProductWithFullRelations, ProductVariantWithOptions } from "./types";
+import { mapVariantOptions } from "./variant-option-mapping";
 import { hasDisplayPrice } from "../../products/variant-price-display";
 import { pickCategoryTranslation } from "../../pickCategoryTranslation";
 import { localizeCategoryTitle } from "../../category-title-i18n";
@@ -23,101 +24,6 @@ function normalizeAttributeValueColors(colors: unknown): string[] | null {
     return [colors.trim()];
   }
   return null;
-}
-
-type VariantOptionResponse = {
-  attribute: string;
-  value: string;
-  key: string;
-  valueId?: string;
-  attributeId?: string;
-  imageUrl?: string | null;
-  colors?: string[] | null;
-};
-
-const VARIANT_JSON_ATTRIBUTE_KEYS = [
-  ["color", "color"],
-  ["colour", "color"],
-  ["storage", "storage"],
-  ["memory", "storage"],
-  ["size", "size"],
-  ["ram", "ram"],
-  ["gb_ram", "ram"],
-  ["connectivity", "connectivity"],
-  ["sim", "sim"],
-] as const;
-
-function readVariantAttributeString(
-  attributes: Record<string, unknown>,
-  keys: readonly string[],
-): string | null {
-  for (const key of keys) {
-    const value = attributes[key];
-    if (typeof value === "string" && value.trim()) {
-      return value.trim();
-    }
-  }
-  return null;
-}
-
-function buildOptionsFromVariantAttributes(attributes: unknown): VariantOptionResponse[] {
-  if (!attributes || typeof attributes !== "object" || Array.isArray(attributes)) {
-    return [];
-  }
-
-  const record = attributes as Record<string, unknown>;
-  const options: VariantOptionResponse[] = [];
-
-  for (const [sourceKey, targetKey] of VARIANT_JSON_ATTRIBUTE_KEYS) {
-    const value = readVariantAttributeString(record, [sourceKey]);
-    if (!value) continue;
-    if (options.some((option) => option.key === targetKey)) continue;
-    options.push({
-      attribute: targetKey,
-      value,
-      key: targetKey,
-    });
-  }
-
-  return options;
-}
-
-function mapVariantOptions(
-  variant: ProductVariantWithOptions,
-): VariantOptionResponse[] {
-  if (Array.isArray(variant.options) && variant.options.length > 0) {
-    const mapped = variant.options
-      .map((opt: ProductVariantWithOptions["options"][number]) => {
-        if (opt.attributeValue) {
-          const attrValue = opt.attributeValue;
-          const attr = attrValue.attribute;
-          return {
-            attribute: attr?.key || "",
-            value: attrValue.value || "",
-            key: attr?.key || "",
-            valueId: attrValue.id,
-            attributeId: attr?.id,
-            imageUrl: attrValue.imageUrl || null,
-            colors: normalizeAttributeValueColors(attrValue.colors),
-          };
-        }
-
-        return {
-          attribute: opt.attributeKey || "",
-          value: opt.value || "",
-          key: opt.attributeKey || "",
-        };
-      })
-      .filter((option) => option.key && option.value);
-
-    if (mapped.length > 0) {
-      return mapped;
-    }
-  }
-
-  return buildOptionsFromVariantAttributes(
-    (variant as { attributes?: unknown }).attributes,
-  );
 }
 
 /**

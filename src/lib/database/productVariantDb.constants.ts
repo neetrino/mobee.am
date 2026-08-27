@@ -26,6 +26,7 @@ export const PRODUCT_VARIANT_DB_SELECT = {
 
 export const PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL = {
   ...PRODUCT_VARIANT_DB_SELECT,
+  media: true,
   options: {
     include: {
       attributeValue: {
