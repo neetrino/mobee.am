@@ -1,5 +1,12 @@
+import { setDefaultResultOrder } from "node:dns";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+
+try {
+  setDefaultResultOrder("ipv4first");
+} catch {
+  // Node < 17
+}
 
 /**
  * Load project-root `.env` into process.env for CLI scripts (tsx does not).
