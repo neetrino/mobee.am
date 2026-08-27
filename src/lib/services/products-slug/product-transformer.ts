@@ -31,6 +31,8 @@ type VariantOptionResponse = {
   key: string;
   valueId?: string;
   attributeId?: string;
+  imageUrl?: string | null;
+  colors?: string[] | null;
 };
 
 const VARIANT_JSON_ATTRIBUTE_KEYS = [
@@ -82,7 +84,6 @@ function buildOptionsFromVariantAttributes(attributes: unknown): VariantOptionRe
 
 function mapVariantOptions(
   variant: ProductVariantWithOptions,
-  lang: string,
 ): VariantOptionResponse[] {
   if (Array.isArray(variant.options) && variant.options.length > 0) {
     const mapped = variant.options
@@ -90,15 +91,14 @@ function mapVariantOptions(
         if (opt.attributeValue) {
           const attrValue = opt.attributeValue;
           const attr = attrValue.attribute;
-          const translation =
-            attrValue.translations?.find((t: { locale: string }) => t.locale === lang) ||
-            attrValue.translations?.[0];
           return {
             attribute: attr?.key || "",
-            value: translation?.label || attrValue.value || "",
+            value: attrValue.value || "",
             key: attr?.key || "",
             valueId: attrValue.id,
             attributeId: attr?.id,
+            imageUrl: attrValue.imageUrl || null,
+            colors: normalizeAttributeValueColors(attrValue.colors),
           };
         }
 
@@ -308,7 +308,6 @@ function transformVariants(
   actualDiscount: number,
   globalDiscount: number,
   productDiscount: number,
-  lang: string
 ) {
   return variants
     .sort((a: ProductVariantWithOptions, b: ProductVariantWithOptions) => {
@@ -351,7 +350,7 @@ function transformVariants(
         stock: variant.stock,
         imageUrl: variantImageUrl,
         media: variantMedia,
-        options: mapVariantOptions(variant, lang),
+        options: mapVariantOptions(variant),
         available: variant.stock > 0,
       };
     });
@@ -516,7 +515,6 @@ export async function transformProduct(
       actualDiscount,
       globalDiscount,
       productDiscount,
-      lang
     ) : [],
     globalDiscount: globalDiscount > 0 ? globalDiscount : null,
     productDiscount: productDiscount > 0 ? productDiscount : null,

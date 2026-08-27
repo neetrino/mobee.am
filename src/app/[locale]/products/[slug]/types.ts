@@ -16,6 +16,8 @@ export interface VariantOption {
   key: string;
   valueId?: string; // New format: AttributeValue ID
   attributeId?: string; // New format: Attribute ID
+  imageUrl?: string | null;
+  colors?: string[] | null;
 }
 
 export interface ProductVariant {

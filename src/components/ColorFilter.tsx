@@ -139,7 +139,7 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
             // Determine color hex: use colors[0] if available, otherwise use getColorHex
             const colorHex = color.colors && Array.isArray(color.colors) && color.colors.length > 0 
               ? color.colors[0] 
-              : getColorHex(color.label);
+              : getColorHex(color.value || color.label);
             const hasImage = color.imageUrl && color.imageUrl.trim() !== '';
 
             return (

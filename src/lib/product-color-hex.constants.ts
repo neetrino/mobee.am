@@ -1,3 +1,7 @@
+import hyAttributes from '../locales/hy/attributes.json';
+import ruAttributes from '../locales/ru/attributes.json';
+import { isValidHexColor, normalizeHexToSixDigits } from './hexColorUtils';
+
 /**
  * Hex colors for product attribute values (Apple / MobileCentre catalog).
  * Keys are normalized: lowercase, trimmed.
@@ -84,13 +88,41 @@ export function normalizeColorKey(colorName: string): string {
   return colorName.toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
-export function getProductColorHex(colorName: string): string {
+function buildTranslatedColorAliases(): Record<string, string> {
+  const aliases: Record<string, string> = {};
+  for (const colorMap of [hyAttributes.color, ruAttributes.color]) {
+    for (const [canonical, label] of Object.entries(colorMap)) {
+      if (typeof label !== 'string') continue;
+      const aliasKey = normalizeColorKey(label);
+      if (aliasKey && aliasKey !== canonical) {
+        aliases[aliasKey] = canonical;
+      }
+    }
+  }
+  return aliases;
+}
+
+const TRANSLATED_COLOR_ALIASES = buildTranslatedColorAliases();
+
+function resolveCanonicalColorKey(colorName: string): string | null {
   const key = normalizeColorKey(colorName);
-  return PRODUCT_COLOR_HEX[key] ?? UNKNOWN_COLOR_FALLBACK;
+  if (!key) return null;
+  if (key in PRODUCT_COLOR_HEX) return key;
+  const aliased = TRANSLATED_COLOR_ALIASES[key];
+  if (aliased && aliased in PRODUCT_COLOR_HEX) return aliased;
+  return null;
+}
+
+export function getProductColorHex(colorName: string): string {
+  const canonicalKey = resolveCanonicalColorKey(colorName);
+  if (canonicalKey) return PRODUCT_COLOR_HEX[canonicalKey];
+  if (isValidHexColor(colorName)) return normalizeHexToSixDigits(colorName);
+  return UNKNOWN_COLOR_FALLBACK;
 }
 
 export function isKnownProductColor(colorName: string): boolean {
-  return normalizeColorKey(colorName) in PRODUCT_COLOR_HEX;
+  if (resolveCanonicalColorKey(colorName)) return true;
+  return isValidHexColor(colorName);
 }
 
 /**

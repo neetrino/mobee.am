@@ -1,6 +1,7 @@
 import type { Product, ProductVariant, AttributeGroupValue } from '../types';
 import { getCurrentSelections } from './variant-compatibility';
 import { calculateStock } from './stock-calculator';
+import { pickSwatchFromVariantOptions } from './swatch-from-variant-options';
 
 interface BuildGroupsFromVariantsProps {
   product: Product;
@@ -90,11 +91,14 @@ export function buildGroupsFromVariants({
       'color',
       Array.from(colorMap.entries()).map(([value, variants]) => {
         const stock = calculateStock(variants, colorSelections, 'color');
+        const swatch = pickSwatchFromVariantOptions(variants, undefined, value);
         return {
           value,
           label: value,
           stock: stock,
           variants,
+          imageUrl: swatch.imageUrl,
+          colors: swatch.colors,
         };
       })
     );
@@ -123,13 +127,14 @@ export function buildGroupsFromVariants({
       attrKey,
       Array.from(valueMap.entries()).map(([value, variants]) => {
         const stock = calculateStock(variants, attrSelections, attrKey);
+        const swatch = pickSwatchFromVariantOptions(variants, undefined, value);
         return {
           value,
           label: value,
           stock: stock,
           variants,
-          imageUrl: null,
-          colors: null,
+          imageUrl: swatch.imageUrl,
+          colors: swatch.colors,
         };
       })
     );
