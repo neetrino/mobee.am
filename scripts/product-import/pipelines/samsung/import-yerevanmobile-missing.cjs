@@ -14,6 +14,7 @@ const {
 } = require("./check-existing-db.cjs");
 
 const { cache } = require("../../paths.cjs");
+const { syncCatalogVariantColor } = require("../../shared/catalog-color-variant-sync.cjs");
 
 const ROOT = path.join(__dirname, "../../../..");
 const OUT_DIR = path.join(ROOT, "audit/product-import/samsung/yerevanmobile-missing-check");
@@ -280,6 +281,13 @@ async function runImport({
                 ? row.variant.options
                 : undefined,
           },
+        });
+        await syncCatalogVariantColor(prisma, {
+          productId: created.id,
+          variantId: createdVariant.id,
+          attributes: row.variant.options,
+          media: row.media,
+          name: row.variant.name,
         });
         variantCount += 1;
         createdVariants.push({

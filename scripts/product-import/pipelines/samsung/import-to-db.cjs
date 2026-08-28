@@ -12,6 +12,7 @@ const {
   checkVariantExists,
 } = require("./check-existing-db.cjs");
 const { OUT_DIR } = require("./dry-run.cjs");
+const { syncCatalogVariantColor } = require("../../shared/catalog-color-variant-sync.cjs");
 
 const { cache } = require("../../paths.cjs");
 
@@ -21,6 +22,18 @@ const AMD_RATE = 400;
 const LOCALES = ["en", "hy", "ru"];
 const DEFAULT_STOCK = 10;
 const CATEGORY_SLUG = "phones";
+
+function withColorFromVariantName(options, name) {
+  if (options && typeof options === "object" && options.color) {
+    return options;
+  }
+  const match = String(name || "").trim().match(/\(([^)]+)\)\s*$/);
+  const color = match ? match[1].replace(/\s+/g, " ").trim() : "";
+  if (!color || /^(?:\d+\s*(?:GB|TB)|4G|5G|LTE|eSIM)$/i.test(color)) {
+    return options;
+  }
+  return { ...(options && typeof options === "object" ? options : {}), color };
+}
 
 const CATEGORY_LABELS = {
   phones: { en: "Phones", hy: "Հեռախոսներ", ru: "Телефоны" },
@@ -233,6 +246,7 @@ async function runImport({ skipR2 = false } = {}) {
       let variantCount = 0;
       for (const row of prepared) {
         const price = Math.round((Number(row.variant.price) / AMD_RATE) * 100) / 100;
+        const attributes = withColorFromVariantName(row.variant.options, row.variant.name);
         const createdVariant = await prisma.productVariant.create({
           data: {
             productId: created.id,
@@ -248,10 +262,15 @@ async function runImport({ skipR2 = false } = {}) {
             sourcePid: String(row.sourcePid),
             sourceUrl: row.variant.product_url || row.variant.source_url,
             attributes:
-              row.variant.options && Object.keys(row.variant.options).length
-                ? row.variant.options
-                : undefined,
+              attributes && Object.keys(attributes).length ? attributes : undefined,
           },
+        });
+        await syncCatalogVariantColor(prisma, {
+          productId: created.id,
+          variantId: createdVariant.id,
+          attributes,
+          media: row.media,
+          name: row.variant.name,
         });
         variantCount += 1;
         createdVariants.push({

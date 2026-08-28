@@ -17,6 +17,19 @@ const {
   CATEGORY_SLUG,
 } = require("./constants.cjs");
 const { bustProductDetailCache } = require("./bust-product-cache.cjs");
+const { syncCatalogVariantColor } = require("../../../shared/catalog-color-variant-sync.cjs");
+
+async function createVariantWithCatalogColor(prisma, productId, data, name) {
+  const createdVariant = await prisma.productVariant.create({ data });
+  await syncCatalogVariantColor(prisma, {
+    productId,
+    variantId: createdVariant.id,
+    attributes: data.attributes,
+    media: data.media,
+    name,
+  });
+  return createdVariant;
+}
 
 const CATEGORY_LABELS = {
   phones: { en: "Phones", hy: "Հեռախոսներ", ru: "Телефоны" },
@@ -251,8 +264,10 @@ async function applyCatalogPlan(payload, { skipR2 = false, confirmFlag = false }
 
         for (const row of prepared) {
           const price = Math.round((Number(row.variant.price) / AMD_RATE) * 100) / 100;
-          await prisma.productVariant.create({
-            data: {
+          await createVariantWithCatalogColor(
+            prisma,
+            created.id,
+            {
               productId: created.id,
               sku: row.variant.sku || `${source}-${row.variant.source_pid}`,
               price,
@@ -267,7 +282,8 @@ async function applyCatalogPlan(payload, { skipR2 = false, confirmFlag = false }
               sourceUrl: row.variant.source_url || row.variant.product_url || plan.sourceUrl,
               attributes: row.variant.options || undefined,
             },
-          });
+            row.variant.name,
+          );
           result.summary.variants_created += 1;
         }
 
@@ -307,6 +323,12 @@ async function applyCatalogPlan(payload, { skipR2 = false, confirmFlag = false }
             sourceUrl: row.parsed.source_url || row.parsed.product_url || plan.sourceUrl,
           },
         });
+        await syncCatalogVariantColor(prisma, {
+          productId: plan.db_product_id,
+          variantId: row.db.id,
+          attributes: row.parsed.options,
+          name: row.parsed.name,
+        });
         result.summary.variants_updated += 1;
         touched = true;
       }
@@ -342,8 +364,10 @@ async function applyCatalogPlan(payload, { skipR2 = false, confirmFlag = false }
         else result.summary.r2_uploaded += 1;
 
         const price = Math.round((Number(variant.price) / AMD_RATE) * 100) / 100;
-        await prisma.productVariant.create({
-          data: {
+        await createVariantWithCatalogColor(
+          prisma,
+          plan.db_product_id,
+          {
             productId: plan.db_product_id,
             sku: variant.sku || `${source}-${variant.source_pid}`,
             price,
@@ -358,7 +382,8 @@ async function applyCatalogPlan(payload, { skipR2 = false, confirmFlag = false }
             sourceUrl: variant.source_url || variant.product_url || plan.sourceUrl,
             attributes: variant.options || undefined,
           },
-        });
+          variant.name,
+        );
         position += 1;
         result.summary.variants_created += 1;
         touched = true;

@@ -19,7 +19,6 @@ interface VariantOption {
 interface Variant {
   color?: string;
   size?: string;
-  sku?: string;
   options?: VariantOption[];
 }
 
@@ -27,135 +26,68 @@ interface Variant {
  * Extracts color from variant options
  */
 export function extractColorFromOptions(variant: Variant): string {
-  if (variant.color) {
-    return variant.color;
-  }
-
   if (!variant.options || !Array.isArray(variant.options)) {
-    return '';
+    return variant.color || '';
   }
 
-  // Search for color in options
   const colorOption = variant.options.find((opt) => {
     return opt.attributeKey === 'color' || opt.key === 'color' || opt.attribute === 'color';
   });
-
   if (colorOption?.value) {
     return colorOption.value;
   }
 
-  // Search in attributeValue
   const colorOptionByValue = variant.options.find((opt) => {
-    if (opt.attributeValue) {
-      const attrValue = opt.attributeValue;
-      return attrValue.attribute?.key === 'color' || attrValue.attributeKey === 'color';
-    }
-    return false;
+    if (!opt.attributeValue) return false;
+    const attrValue = opt.attributeValue;
+    return attrValue.attribute?.key === 'color' || attrValue.attributeKey === 'color';
   });
-
   if (colorOptionByValue?.attributeValue?.value) {
     return colorOptionByValue.attributeValue.value;
   }
 
-  return '';
+  return variant.color || '';
 }
 
 /**
  * Extracts size from variant options
  */
 export function extractSizeFromOptions(variant: Variant): string {
-  if (variant.size) {
-    return variant.size;
-  }
-
   if (!variant.options || !Array.isArray(variant.options)) {
-    return '';
+    return variant.size || '';
   }
 
-  // Search for size in options
   const sizeOption = variant.options.find((opt) => {
     return opt.attributeKey === 'size' || opt.key === 'size' || opt.attribute === 'size';
   });
-
   if (sizeOption?.value) {
     return sizeOption.value;
   }
 
-  // Search in attributeValue
   const sizeOptionByValue = variant.options.find((opt) => {
-    if (opt.attributeValue) {
-      const attrValue = opt.attributeValue;
-      return attrValue.attribute?.key === 'size' || attrValue.attributeKey === 'size';
-    }
-    return false;
+    if (!opt.attributeValue) return false;
+    const attrValue = opt.attributeValue;
+    return attrValue.attribute?.key === 'size' || attrValue.attributeKey === 'size';
   });
-
   if (sizeOptionByValue?.attributeValue?.value) {
     return sizeOptionByValue.attributeValue.value;
   }
 
-  return '';
+  return variant.size || '';
 }
 
 /**
- * Extracts color from SKU (format: prefix-color-size)
- */
-export function extractColorFromSku(variant: Variant): string {
-  if (!variant.sku) {
-    return '';
-  }
-
-  const skuParts = variant.sku.split('-');
-  if (skuParts.length >= 2) {
-    const possibleColor = skuParts[1];
-    if (possibleColor && possibleColor.length > 0 && !/^\d+$/.test(possibleColor)) {
-      return possibleColor;
-    }
-  }
-
-  return '';
-}
-
-/**
- * Extracts size from SKU (format: prefix-color-size)
- */
-export function extractSizeFromSku(variant: Variant): string {
-  if (!variant.sku) {
-    return '';
-  }
-
-  const skuParts = variant.sku.split('-');
-  if (skuParts.length >= 3) {
-    const possibleSize = skuParts[2];
-    if (possibleSize) {
-      return possibleSize;
-    }
-  }
-
-  return '';
-}
-
-/**
- * Extracts color from variant (tries options first, then SKU)
+ * Extracts color from relational options, then the formatted color field.
+ * SKU is not a color source — that invented phantom swatches in admin.
  */
 export function extractColor(variant: Variant): string {
-  const colorFromOptions = extractColorFromOptions(variant);
-  if (colorFromOptions) {
-    return colorFromOptions;
-  }
-
-  return extractColorFromSku(variant);
+  return extractColorFromOptions(variant);
 }
 
 /**
- * Extracts size from variant (tries options first, then SKU)
+ * Extracts size from relational options, then the formatted size field.
  */
 export function extractSize(variant: Variant): string {
-  const sizeFromOptions = extractSizeFromOptions(variant);
-  if (sizeFromOptions) {
-    return sizeFromOptions;
-  }
-
-  return extractSizeFromSku(variant);
+  return extractSizeFromOptions(variant);
 }
 

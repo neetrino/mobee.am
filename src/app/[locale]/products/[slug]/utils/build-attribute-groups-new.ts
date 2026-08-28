@@ -2,6 +2,7 @@ import type { Product, ProductVariant, AttributeGroupValue } from '../types';
 import { getCurrentSelections } from './variant-compatibility';
 import { calculateStock } from './stock-calculator';
 import { findAttributeValue } from './attribute-value-finder';
+import { pickSwatchFromVariantOptions } from './swatch-from-variant-options';
 
 interface BuildGroupsFromProductAttributesProps {
   product: Product;
@@ -98,8 +99,12 @@ export function buildGroupsFromProductAttributes({
         item.label
       );
 
-      // Calculate stock
       const stock = calculateStock(item.variants, currentSelections, attrKey);
+      const fromOptions = pickSwatchFromVariantOptions(
+        item.variants,
+        item.valueId,
+        item.value,
+      );
 
       return {
         valueId: item.valueId,
@@ -107,8 +112,8 @@ export function buildGroupsFromProductAttributes({
         label: item.label,
         stock: stock,
         variants: item.variants,
-        imageUrl: attrValue?.imageUrl || null,
-        colors: attrValue?.colors || null,
+        imageUrl: attrValue?.imageUrl || fromOptions.imageUrl || null,
+        colors: attrValue?.colors || fromOptions.colors || null,
       };
     });
 
@@ -190,8 +195,12 @@ export function buildGroupsFromProductAttributes({
                 )
               : null;
 
-            // Calculate stock
             const stock = calculateStock(item.variants, currentSelections, attrKey);
+            const fromOptions = pickSwatchFromVariantOptions(
+              item.variants,
+              item.valueId,
+              item.value,
+            );
 
             return {
               valueId: item.valueId,
@@ -199,8 +208,8 @@ export function buildGroupsFromProductAttributes({
               label: item.label,
               stock: stock,
               variants: item.variants,
-              imageUrl: attrValue?.imageUrl || null,
-              colors: attrValue?.colors || null,
+              imageUrl: attrValue?.imageUrl || fromOptions.imageUrl || null,
+              colors: attrValue?.colors || fromOptions.colors || null,
             };
           });
 

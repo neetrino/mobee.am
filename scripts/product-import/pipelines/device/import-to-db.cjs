@@ -18,6 +18,7 @@ const {
   ensureDysonProductAttribute,
   mergeAttributesColor,
 } = require("../../shared/dyson-color-attribute-sync.cjs");
+const { syncCatalogVariantColor } = require("../../shared/catalog-color-variant-sync.cjs");
 
 const { cache } = require("../../paths.cjs");
 
@@ -398,6 +399,14 @@ async function runImport({ skipR2 = false } = {}) {
               throw new Error(`Dyson color option conflict: ${optionResult.reason}`);
             }
             await ensureDysonProductAttribute(prisma, productId, colorAttribute.id, true);
+          } else {
+            await syncCatalogVariantColor(prisma, {
+              productId,
+              variantId: createdVariant.id,
+              attributes,
+              media: row.media,
+              name: row.variant.name,
+            });
           }
 
           variantCount += 1;

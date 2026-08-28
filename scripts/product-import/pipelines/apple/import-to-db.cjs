@@ -8,6 +8,7 @@ const { buildDescriptionHtml } = require("../../shared/mobilecentre-description-
 const { slugify } = require("./normalize.cjs");
 const { loadExistingCatalog, checkProductExists, checkVariantExists } = require("./check-existing-db.cjs");
 const { OUT_DIR } = require("./dry-run.cjs");
+const { syncCatalogVariantColor } = require("../../shared/catalog-color-variant-sync.cjs");
 
 const { cache } = require("../../paths.cjs");
 
@@ -220,6 +221,13 @@ async function runImport({ skipR2 = false, importAsDraft = false } = {}) {
             sourceUrl: p.v.source_url,
             attributes: p.v.options && Object.keys(p.v.options).length ? p.v.options : undefined,
           },
+        });
+        await syncCatalogVariantColor(prisma, {
+          productId: created.id,
+          variantId: variant.id,
+          attributes: p.v.options,
+          media: p.media,
+          name: p.v.name,
         });
         variantCount += 1;
         void variant;

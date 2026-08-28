@@ -110,7 +110,7 @@ export function ProductColors({
         const linkValue = resolveProductCardColorLinkValue(colorOption);
         const isSelected = selectedLinkValue === linkValue;
 
-        const fallbackHex = getColorHex(colorValue);
+        const fallbackHex = getColorHex(linkValue || colorValue);
         const swatchStyle = imageUrl
           ? undefined
           : buildColorSwatchStyle(colorsHex, fallbackHex);
