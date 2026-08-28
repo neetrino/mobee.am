@@ -27,11 +27,11 @@ if (!databaseUrl.includes("client_encoding")) {
   process.env.DATABASE_URL = urlWithEncoding;
 }
 
+const PRISMA_LOG_DEV: Array<"query" | "error" | "warn"> = ["query", "error", "warn"];
+const PRISMA_LOG_PROD: Array<"error"> = ["error"];
+
 const PRISMA_CLIENT_OPTIONS = {
-  log:
-    process.env.NODE_ENV === "development"
-      ? (["query", "error", "warn"] as const)
-      : (["error"] as const),
+  log: process.env.NODE_ENV === "development" ? PRISMA_LOG_DEV : PRISMA_LOG_PROD,
   errorFormat: "pretty" as const,
 };
 
