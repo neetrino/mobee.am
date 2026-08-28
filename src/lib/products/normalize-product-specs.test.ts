@@ -362,6 +362,22 @@ describe('getProductDescriptionHtml fallback', () => {
     });
     expect(html).toContain('Device type</td><td class="spec-value">Notebook</td>');
   });
+
+  it('keeps Marco th/td spec tables instead of dropping the description', async () => {
+    const { getProductDescriptionHtml } = await import('./get-product-description-html');
+    const marcoHtml =
+      '<table class="product-specs"><tbody>' +
+      '<tr><th>Արտադրող երկիր</th><td>Չինաստան</td></tr>' +
+      '<tr><th>Գույն</th><td>Սպիտակ</td></tr>' +
+      '</tbody></table>';
+    const html = getProductDescriptionHtml('en', 'marco-hisense', {
+      description: marcoHtml,
+      sourceDescription: marcoHtml,
+    });
+    expect(html.trim().length).toBeGreaterThan(0);
+    expect(html).toContain('Չինաստան');
+    expect(html).toContain('spec-value');
+  });
 });
 
 describe('translateProductSpecsHtml', () => {

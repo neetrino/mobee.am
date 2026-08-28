@@ -1,6 +1,13 @@
 import hyAttributes from '../locales/hy/attributes.json';
 import ruAttributes from '../locales/ru/attributes.json';
 import { isValidHexColor, normalizeHexToSixDigits } from './hexColorUtils';
+import {
+  buildColorLookupIndexes,
+  normalizeColorKey,
+  resolveCanonicalColorKey as resolveColorKey,
+} from './resolve-product-color-key';
+
+export { normalizeColorKey } from './resolve-product-color-key';
 
 /**
  * Hex colors for product attribute values (Apple / MobileCentre catalog).
@@ -78,19 +85,32 @@ export const PRODUCT_COLOR_HEX: Record<string, string> = {
   'gold titanium': '#C9A227',
   'orange titanium': '#C65A30',
   'midnight titanium': '#3C3C3D',
+  'gray titanium': '#8B8D91',
+  'grey titanium': '#8B8D91',
   'twill black': '#1A1A1A',
   'gray/green': '#78866B',
   clear: '#F0F0F0',
   transparent: '#FFFFFF',
   sky: '#A7C7E7',
   titanium: '#837F7D',
+  graphite: '#53565A',
+  bronze: '#B08D57',
+  burgundy: '#6D2E4B',
+  jade: '#5B7F6E',
+  'jade green': '#5B7F6E',
+  jadegreen: '#5B7F6E',
+  silverblue: '#8FA4B8',
+  'silver blue': '#8FA4B8',
+  whitesilver: '#F2F1ED',
+  'white silver': '#F2F1ED',
+  pinkgold: '#E6C2B0',
+  'pink gold': '#E6C2B0',
+  'rose gold': '#E6C2B0',
+  rosegold: '#E6C2B0',
 };
 
 const UNKNOWN_COLOR_FALLBACK = '#CCCCCC';
-
-export function normalizeColorKey(colorName: string): string {
-  return colorName.toLowerCase().trim().replace(/\s+/g, ' ');
-}
+const PLACEHOLDER_SWATCH_HEX = new Set(['#cccccc', '#ccc']);
 
 function buildTranslatedColorAliases(): Record<string, string> {
   const aliases: Record<string, string> = {};
@@ -107,16 +127,29 @@ function buildTranslatedColorAliases(): Record<string, string> {
 }
 
 const TRANSLATED_COLOR_ALIASES = buildTranslatedColorAliases();
+const COLOR_LOOKUP_INDEXES = buildColorLookupIndexes(PRODUCT_COLOR_HEX);
 
 function resolveCanonicalColorKey(colorName: string): string | null {
-  const key = normalizeColorKey(colorName);
-  if (!key) return null;
-  if (key in PRODUCT_COLOR_HEX) return key;
-  const compact = key.replace(/ /g, '');
-  if (compact in PRODUCT_COLOR_HEX) return compact;
-  const aliased = TRANSLATED_COLOR_ALIASES[key];
-  if (aliased && aliased in PRODUCT_COLOR_HEX) return aliased;
-  return null;
+  return resolveColorKey(
+    colorName,
+    PRODUCT_COLOR_HEX,
+    COLOR_LOOKUP_INDEXES,
+    TRANSLATED_COLOR_ALIASES,
+  );
+}
+
+/**
+ * Drops the UI placeholder gray so named-color fallback can take over.
+ */
+export function pickUsableSwatchHexes(
+  colors: string[] | null | undefined,
+): string[] {
+  return (Array.isArray(colors) ? colors : [])
+    .map((value) => String(value || '').trim())
+    .filter((value) => {
+      if (!value) return false;
+      return !PLACEHOLDER_SWATCH_HEX.has(value.toLowerCase());
+    });
 }
 
 export function getProductColorHex(colorName: string): string {
@@ -139,9 +172,7 @@ export function buildColorSwatchBackground(
   colors: string[] | null | undefined,
   fallbackHex: string = UNKNOWN_COLOR_FALLBACK,
 ): string {
-  const hexes = (Array.isArray(colors) ? colors : [])
-    .map((value) => String(value || '').trim())
-    .filter(Boolean);
+  const hexes = pickUsableSwatchHexes(colors);
 
   if (hexes.length >= 2) {
     const primary = hexes[0];

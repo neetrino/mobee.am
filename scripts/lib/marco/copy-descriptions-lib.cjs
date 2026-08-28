@@ -11,12 +11,21 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
+function upgradeThTdSpecsTable(html) {
+  if (!html.includes("product-specs") || !/<th\b/i.test(html)) return html;
+  return html.replace(
+    /<tr>\s*<th>([\s\S]*?)<\/th>\s*<td>([\s\S]*?)<\/td>\s*<\/tr>/gi,
+    (_match, label, value) =>
+      `<tr class="spec-row"><td class="spec-label">${String(label).trim()}</td><td class="spec-value">${String(value).trim()}</td></tr>`
+  );
+}
+
 function descriptionToHtml(description) {
   if (description == null) return null;
   if (typeof description === "string") {
     const trimmed = description.trim();
     if (!trimmed) return null;
-    if (trimmed.startsWith("<")) return trimmed;
+    if (trimmed.startsWith("<")) return upgradeThTdSpecsTable(trimmed);
     if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
       try {
         return descriptionToHtml(JSON.parse(trimmed));
@@ -31,8 +40,10 @@ function descriptionToHtml(description) {
       .filter((item) => item && (item.title || item.value))
       .map(
         (item) =>
-          `<tr><th>${escapeHtml(item.title || "")}</th><td>${escapeHtml(
-            item.value || ""
+          `<tr class="spec-row"><td class="spec-label">${escapeHtml(
+            String(item.title || "").trim()
+          )}</td><td class="spec-value">${escapeHtml(
+            String(item.value || "").trim()
           )}</td></tr>`
       )
       .join("");

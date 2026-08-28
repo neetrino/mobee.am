@@ -34,7 +34,8 @@ export function getProductDescriptionHtml(
     '';
 
   if (localizedRaw.trim()) {
-    return translateProductSpecsHtml(locale, localizedRaw);
+    const localized = translateProductSpecsHtml(locale, localizedRaw);
+    return localized.trim() ? localized : localizedRaw;
   }
 
   if (locale !== 'hy') {
@@ -43,7 +44,8 @@ export function getProductDescriptionHtml(
       resolvedSources.sourceDescription ||
       '';
     if (armenianRaw.trim()) {
-      return translateProductSpecsHtml(locale, armenianRaw);
+      const armenian = translateProductSpecsHtml(locale, armenianRaw);
+      return armenian.trim() ? armenian : armenianRaw;
     }
   }
 
