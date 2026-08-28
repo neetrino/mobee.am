@@ -9,6 +9,8 @@ describe('getProductColorHex', () => {
     expect(getProductColorHex('blue')).toBe('#276787');
     expect(getProductColorHex('space black')).toBe('#1D1D1F');
     expect(getProductColorHex('Jetblack')).toBe('#0A0A0A');
+    expect(getProductColorHex('Blue Shadow')).toBe('#5C6E7A');
+    expect(getProductColorHex('Silver Shadow')).toBe('#C8C9CE');
   });
 
   it('resolves Armenian and Russian labels instead of gray fallback', () => {
