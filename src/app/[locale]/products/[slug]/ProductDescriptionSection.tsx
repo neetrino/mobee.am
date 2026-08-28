@@ -17,6 +17,28 @@ interface ProductDescriptionSectionProps {
   mainImageUrl?: string | null;
 }
 
+/**
+ * Picks the category used for PDP «Հիմնական» section icon (primary leaf preferred).
+ */
+function resolveProductCategoryForIcon(
+  product: Product,
+): { title: string; slug: string } | null {
+  const categories = product.categories;
+  if (!categories?.length) {
+    return null;
+  }
+
+  const primaryId = product.primaryCategoryId;
+  const primary =
+    primaryId != null ? categories.find((category) => category.id === primaryId) : undefined;
+  const chosen = primary ?? categories[0];
+  if (!chosen?.slug && !chosen?.title) {
+    return null;
+  }
+
+  return { title: chosen.title, slug: chosen.slug };
+}
+
 export function ProductDescriptionSection({
   product,
   language,
@@ -38,6 +60,7 @@ export function ProductDescriptionSection({
     };
   }, [language, product]);
 
+  const categoryForIcon = useMemo(() => resolveProductCategoryForIcon(product), [product]);
   const resolvedImageUrl = resolveProductCardImageSrc(mainImageUrl ?? product.image);
   const showDesktopCards = specsResult.hasSpecs && layout.hasLayout;
   const proseClassName =
@@ -63,6 +86,7 @@ export function ProductDescriptionSection({
           productId={product.id}
           productTitle={product.title}
           imageUrl={resolvedImageUrl}
+          category={categoryForIcon}
         />
       ) : (
         <div

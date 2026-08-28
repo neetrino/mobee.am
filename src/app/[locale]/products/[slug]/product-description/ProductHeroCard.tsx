@@ -1,13 +1,16 @@
 import Image from 'next/image';
 import type { LanguageCode } from '@/lib/language';
 import { t } from '@/lib/i18n';
+import {
+  resolveCategoryMenuIcon,
+  type CategoryIconSource,
+} from '@/lib/categoryMenuIcon';
 import type { ProductDescriptionSpecRow } from '@/lib/products/extract-product-description-specs';
 import { ProductSpecRow } from './ProductSpecCard';
 import { getProductSpecSectionIcon, getProductSpecSectionIconClassName } from './product-spec-row-icon';
 import { PRODUCT_DESCRIPTION_CARD_CLASS } from './product-description.constants';
 import { ProductImagePlaceholder } from '@/components/ProductImagePlaceholder';
 
-const HeroSectionIcon = getProductSpecSectionIcon('general');
 const HERO_SECTION_ICON_CLASS = getProductSpecSectionIconClassName('general');
 
 const HERO_GRID_CLASS =
@@ -18,6 +21,8 @@ interface ProductHeroCardProps {
   imageUrl: string | null;
   rows: ProductDescriptionSpecRow[];
   language: LanguageCode;
+  /** Primary / leaf category — drives «Հիմնական» icon (no phone icon for appliances). */
+  category?: CategoryIconSource | null;
 }
 
 function filterHeroRows(rows: ProductDescriptionSpecRow[], imageAlt: string): ProductDescriptionSpecRow[] {
@@ -36,8 +41,17 @@ function filterHeroRows(rows: ProductDescriptionSpecRow[], imageAlt: string): Pr
   });
 }
 
-export function ProductHeroCard({ imageAlt, imageUrl, rows, language }: ProductHeroCardProps) {
+export function ProductHeroCard({
+  imageAlt,
+  imageUrl,
+  rows,
+  language,
+  category = null,
+}: ProductHeroCardProps) {
   const visibleRows = filterHeroRows(rows, imageAlt);
+  const HeroSectionIcon = category
+    ? resolveCategoryMenuIcon(category)
+    : getProductSpecSectionIcon('general');
 
   return (
     <article className={PRODUCT_DESCRIPTION_CARD_CLASS}>

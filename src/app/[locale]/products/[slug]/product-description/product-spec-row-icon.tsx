@@ -14,6 +14,7 @@ import {
   Factory,
   HardDrive,
   Info,
+  LayoutGrid,
   MemoryStick,
   Monitor,
   Navigation,
@@ -70,12 +71,13 @@ const LABEL_KEY_ICONS: Readonly<Record<string, LucideIcon>> = {
   'product.specs.labels.color': Palette,
   'product.specs.labels.model': Tag,
   'product.specs.labels.manufacturer': Factory,
-  'product.specs.labels.deviceType': Smartphone,
+  'product.specs.labels.deviceType': LayoutGrid,
   'product.specs.labels.other': Info,
 };
 
 const SECTION_ICONS: Readonly<Record<string, LucideIcon>> = {
-  general: Smartphone,
+  /** Neutral fallback — phones get Smartphone via category icon on the hero card. */
+  general: LayoutGrid,
   screen: Monitor,
   memory: HardDrive,
   processor: CircuitBoard,
