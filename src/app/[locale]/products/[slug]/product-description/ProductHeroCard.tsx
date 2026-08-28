@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import Image from 'next/image';
 import type { LanguageCode } from '@/lib/language';
 import { t } from '@/lib/i18n';
@@ -49,7 +50,7 @@ export function ProductHeroCard({
   category = null,
 }: ProductHeroCardProps) {
   const visibleRows = filterHeroRows(rows, imageAlt);
-  const HeroSectionIcon = category
+  const heroSectionIcon = category
     ? resolveCategoryMenuIcon(category)
     : getProductSpecSectionIcon('general');
 
@@ -75,7 +76,10 @@ export function ProductHeroCard({
               <span
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${HERO_SECTION_ICON_CLASS}`}
               >
-                <HeroSectionIcon className="h-4 w-4" aria-hidden />
+                {createElement(heroSectionIcon, {
+                  className: 'h-4 w-4',
+                  'aria-hidden': true,
+                })}
               </span>
               <h3 className="min-w-0 break-words text-base font-bold text-gray-900">
                 {t(language, 'product.specs.sections.general')}
