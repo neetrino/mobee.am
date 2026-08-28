@@ -17,6 +17,8 @@ const HEX_BY_COMPACT = {
   black: "#1D1D1F",
   jetblack: "#0A0A0A",
   blue: "#276787",
+  blueshadow: "#5C6E7A",
+  silvershadow: "#C8C9CE",
   brown: "#A52A2A",
   gray: "#808080",
   grey: "#808080",

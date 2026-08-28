@@ -8,7 +8,7 @@ import { parseProductSlugParam } from './parse-product-slug-param';
 import { parseProductPageColorParam } from '@/lib/products/product-page-href';
 import { RESERVED_ROUTES, type Product } from './types';
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;

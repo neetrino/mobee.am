@@ -51,3 +51,14 @@ export function silencePrismaQueryLogsForCli(): void {
     env.NODE_ENV = "production";
   }
 }
+
+/**
+ * Prefer Neon DIRECT_URL for CLI. The pooled URL resets from Windows (error 10054).
+ * Must run before importing `@white-shop/db`.
+ */
+export function preferDirectDbUrlForCli(): void {
+  const direct = process.env.DIRECT_URL?.trim();
+  if (direct) {
+    process.env.DATABASE_URL = direct;
+  }
+}

@@ -1,6 +1,11 @@
-import { loadRootEnv, silencePrismaQueryLogsForCli } from "./load-root-env";
+import {
+  loadRootEnv,
+  preferDirectDbUrlForCli,
+  silencePrismaQueryLogsForCli,
+} from "./load-root-env";
 
 loadRootEnv();
+preferDirectDbUrlForCli();
 silencePrismaQueryLogsForCli();
 
 async function main(): Promise<void> {
