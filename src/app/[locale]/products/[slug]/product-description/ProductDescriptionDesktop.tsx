@@ -1,5 +1,6 @@
 import type { LanguageCode } from '@/lib/language';
 import { t, getProductText } from '@/lib/i18n';
+import type { CategoryIconSource } from '@/lib/categoryMenuIcon';
 import type { PdpSpecLayout } from '@/lib/products/build-pdp-spec-layout';
 import { ProductSpecCard } from './ProductSpecCard';
 import { ProductHeroCard } from './ProductHeroCard';
@@ -10,6 +11,7 @@ interface ProductDescriptionDesktopProps {
   productId: string;
   productTitle: string;
   imageUrl: string | null;
+  category?: CategoryIconSource | null;
 }
 
 export function ProductDescriptionDesktop({
@@ -18,6 +20,7 @@ export function ProductDescriptionDesktop({
   productId,
   productTitle,
   imageUrl,
+  category = null,
 }: ProductDescriptionDesktopProps) {
   const imageAlt = getProductText(language, productId, 'title') || productTitle;
 
@@ -29,6 +32,7 @@ export function ProductDescriptionDesktop({
           imageUrl={imageUrl}
           rows={layout.heroRows}
           language={language}
+          category={category}
         />
       ) : null}
 
@@ -57,10 +61,10 @@ export function ProductDescriptionDesktop({
 
       {layout.additionalRows.length > 0 ? (
         <ProductSpecCard
-          title={t(language, 'product.specs.sections.security')}
+          title={t(language, 'product.specs.sections.other')}
           rows={layout.additionalRows}
           language={language}
-          sectionSlug="security"
+          sectionSlug="other"
         />
       ) : null}
     </div>

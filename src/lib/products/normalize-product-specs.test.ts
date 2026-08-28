@@ -53,6 +53,15 @@ describe('product spec semantic validation', () => {
     );
   });
 
+  it('classifies appliance sizes as dimensions, not screen resolution', () => {
+    expect(classifySpecValue('80x49x25.5սմ')).toBe('dimensions');
+    expect(classifySpecValue('85 x 60 x 56 սմ')).toBe('dimensions');
+    expect(classifySpecValue('80x49սմ')).toBe('dimensions');
+    expect(classifySpecValue('1640 x 2360')).toBe('screen_resolution');
+    expect(recoverLabelKeyForValue('80x49x25.5սմ')).toBe('product.specs.labels.dimensions');
+    expect(isCompatibleSpecPair('product.specs.labels.dimensions', '80x49x25.5սմ')).toBe(true);
+  });
+
   it('classifies warranty and year patterns', () => {
     expect(classifySpecValue('12 months')).toBe('warranty');
     expect(classifySpecValue('1 year')).toBe('warranty');
