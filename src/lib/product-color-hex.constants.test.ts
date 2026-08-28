@@ -25,6 +25,21 @@ describe('getProductColorHex', () => {
     expect(getProductColorHex('#abc')).toBe('#aabbcc');
   });
 
+  it('resolves marketing names like Titanium Black instead of gray fallback', () => {
+    expect(getProductColorHex('Titanium Black')).toBe(getProductColorHex('black titanium'));
+    expect(getProductColorHex('Titanium Blue')).toBe(getProductColorHex('blue titanium'));
+    expect(getProductColorHex('Titanium Silver')).toBe(getProductColorHex('silver titanium'));
+    expect(getProductColorHex('Titanium Gray')).toBe(getProductColorHex('gray titanium'));
+    expect(getProductColorHex('Titanium Black')).not.toBe(getProductColorHex('Titanium Blue'));
+    expect(getProductColorHex('Titanium Blue')).not.toBe(getProductColorHex('Titanium Gray'));
+  });
+
+  it('strips Samsung marketing prefixes to the real hue', () => {
+    expect(getProductColorHex('Phantom Violet')).toBe(getProductColorHex('violet'));
+    expect(getProductColorHex('Awesome Lime')).toBe(getProductColorHex('lime'));
+    expect(getProductColorHex('Awesome Graphite')).toBe(getProductColorHex('graphite'));
+  });
+
   it('falls back to gray only for unknown names', () => {
     expect(getProductColorHex('jasper plum')).toBe('#CCCCCC');
   });
@@ -35,6 +50,7 @@ describe('isKnownProductColor', () => {
     expect(isKnownProductColor('blue')).toBe(true);
     expect(isKnownProductColor('Կապույտ')).toBe(true);
     expect(isKnownProductColor('Синий')).toBe(true);
+    expect(isKnownProductColor('Titanium Black')).toBe(true);
     expect(isKnownProductColor('jasper plum')).toBe(false);
   });
 });

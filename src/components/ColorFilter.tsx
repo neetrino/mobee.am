@@ -7,6 +7,7 @@ import { useRouter } from '@/lib/i18n/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { getColorHex } from '../lib/colorMap';
+import { pickUsableSwatchHexes } from '../lib/product-color-hex.constants';
 import { facetParamsFromUrlSearchParams } from '@/lib/shop/product-filters-to-api-params';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
@@ -137,9 +138,8 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
           {colors.map((color) => {
             const isSelected = selected.includes(color.value);
             // Determine color hex: use colors[0] if available, otherwise use getColorHex
-            const colorHex = color.colors && Array.isArray(color.colors) && color.colors.length > 0 
-              ? color.colors[0] 
-              : getColorHex(color.value || color.label);
+            const usableHexes = pickUsableSwatchHexes(color.colors);
+            const colorHex = usableHexes[0] ?? getColorHex(color.value || color.label);
             const hasImage = color.imageUrl && color.imageUrl.trim() !== '';
 
             return (

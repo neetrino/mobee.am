@@ -1,3 +1,8 @@
+import {
+  getProductColorHex,
+  isKnownProductColor,
+  pickUsableSwatchHexes,
+} from "@/lib/product-color-hex.constants";
 import type { ProductVariantWithOptions } from "./types";
 
 export type VariantOptionResponse = {
@@ -190,5 +195,15 @@ export function mapVariantOptions(
     }
   }
 
-  return merged;
+  return merged.map(withNamedColorHex);
+}
+
+function withNamedColorHex(option: VariantOptionResponse): VariantOptionResponse {
+  if (option.key !== "color") return option;
+  const stored = pickUsableSwatchHexes(option.colors);
+  if (stored.length > 0) {
+    return { ...option, colors: stored };
+  }
+  if (!isKnownProductColor(option.value)) return option;
+  return { ...option, colors: [getProductColorHex(option.value)] };
 }

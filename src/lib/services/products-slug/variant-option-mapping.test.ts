@@ -85,6 +85,7 @@ describe("mapVariantOptions", () => {
       }),
     );
     expect(options.find((option) => option.key === "color")?.value).toBe("Jetblack");
+    expect(options.find((option) => option.key === "color")?.colors).toEqual(["#0A0A0A"]);
     expect(options.find((option) => option.key === "storage")?.value).toBe("256GB");
   });
 
@@ -98,6 +99,31 @@ describe("mapVariantOptions", () => {
       }),
     );
     expect(options.find((option) => option.key === "color")?.value).toBe("Silver Shadow");
+  });
+
+  it("fills HEX for Titanium marketing names when AttributeValue.colors is empty", () => {
+    const options = mapVariantOptions(
+      variantStub({
+        options: [
+          {
+            attributeKey: "color",
+            value: "Titanium Black",
+            attributeValue: {
+              id: "c-black",
+              value: "Titanium Black",
+              attribute: { key: "color", id: "a-color" },
+              translations: [],
+              colors: null,
+              imageUrl: null,
+            },
+          },
+        ],
+      }),
+    );
+    const color = options.find((option) => option.key === "color");
+    expect(color?.value).toBe("Titanium Black");
+    expect(color?.colors?.[0]).toMatch(/^#[0-9A-Fa-f]{6}$/);
+    expect(color?.colors?.[0]).not.toBe("#CCCCCC");
   });
 });
 

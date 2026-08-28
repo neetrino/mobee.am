@@ -81,6 +81,10 @@ function buildSectionRowHtml(slug: string, title: string): string {
   return `<tr class="specs-section specs-section--${slug}"><td colspan="2"><span class="specs-section-icon" aria-hidden="true"></span><span class="specs-section-title">${escapeHtml(title)}</span></td></tr>`;
 }
 
+function cellText(html: string | undefined): string {
+  return decodeHtmlEntities(String(html ?? '').replace(/<[^>]+>/g, '')).trim();
+}
+
 function parseTableItems(tbodyHtml: string): ParsedItem[] {
   const items: ParsedItem[] = [];
   const rowRegex = /<tr[^>]*>[\s\S]*?<\/tr>/g;
@@ -94,17 +98,27 @@ function parseTableItems(tbodyHtml: string): ParsedItem[] {
       continue;
     }
 
-    if (!rowHtml.includes('spec-row')) {
+    if (rowHtml.includes('spec-row')) {
+      const labelMatch = rowHtml.match(/spec-label">([^<]*)/);
+      const valueMatch = rowHtml.match(/spec-value">([^<]*)/);
+      items.push({
+        type: 'row',
+        label: decodeHtmlEntities(labelMatch?.[1] ?? '').trim(),
+        value: decodeHtmlEntities(valueMatch?.[1] ?? '').trim(),
+      });
       continue;
     }
 
-    const labelMatch = rowHtml.match(/spec-label">([^<]*)/);
-    const valueMatch = rowHtml.match(/spec-value">([^<]*)/);
-    items.push({
-      type: 'row',
-      label: decodeHtmlEntities(labelMatch?.[1] ?? '').trim(),
-      value: decodeHtmlEntities(valueMatch?.[1] ?? '').trim(),
-    });
+    const thMatch = rowHtml.match(/<th\b[^>]*>([\s\S]*?)<\/th>/i);
+    const tdMatch = rowHtml.match(/<td\b[^>]*>([\s\S]*?)<\/td>/i);
+    if (!thMatch || !tdMatch) {
+      continue;
+    }
+    const label = cellText(thMatch[1]);
+    const value = cellText(tdMatch[1]);
+    if (label || value) {
+      items.push({ type: 'row', label, value });
+    }
   }
 
   return items;
