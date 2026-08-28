@@ -12,6 +12,7 @@ export const PRODUCT_COLOR_HEX: Record<string, string> = {
   jetblack: '#0A0A0A',
   'jet black': '#0A0A0A',
   blue: '#276787',
+  'blue shadow': '#5C6E7A',
   brown: '#A52A2A',
   gray: '#808080',
   grey: '#808080',
@@ -30,6 +31,7 @@ export const PRODUCT_COLOR_HEX: Record<string, string> = {
   magenta: '#FF00FF',
   lime: '#00FF00',
   silver: '#E2E3E4',
+  'silver shadow': '#C8C9CE',
   gold: '#F4E8CE',
   tan: '#D2B48C',
   khaki: '#F0E68C',
@@ -110,6 +112,8 @@ function resolveCanonicalColorKey(colorName: string): string | null {
   const key = normalizeColorKey(colorName);
   if (!key) return null;
   if (key in PRODUCT_COLOR_HEX) return key;
+  const compact = key.replace(/ /g, '');
+  if (compact in PRODUCT_COLOR_HEX) return compact;
   const aliased = TRANSLATED_COLOR_ALIASES[key];
   if (aliased && aliased in PRODUCT_COLOR_HEX) return aliased;
   return null;
