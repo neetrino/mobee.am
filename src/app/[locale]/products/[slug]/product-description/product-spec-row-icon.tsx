@@ -128,5 +128,5 @@ export function getProductSpecRowIcon(labelKey?: string, label?: string): Lucide
 }
 
 export function getProductSpecSectionIcon(slug: string): LucideIcon {
-  return SECTION_ICONS[slug] ?? Shield;
+  return SECTION_ICONS[slug] ?? Info;
 }

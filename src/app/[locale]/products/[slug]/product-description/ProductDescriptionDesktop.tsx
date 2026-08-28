@@ -61,10 +61,10 @@ export function ProductDescriptionDesktop({
 
       {layout.additionalRows.length > 0 ? (
         <ProductSpecCard
-          title={t(language, 'product.specs.sections.security')}
+          title={t(language, 'product.specs.sections.other')}
           rows={layout.additionalRows}
           language={language}
-          sectionSlug="security"
+          sectionSlug="other"
         />
       ) : null}
     </div>
