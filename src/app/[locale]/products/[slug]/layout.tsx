@@ -8,6 +8,8 @@ import {
   SITE_BRAND_NAME,
 } from "@/lib/brand.constants";
 
+export const dynamic = "force-dynamic";
+
 const DEFAULT_TITLE = "Product";
 const SITE_NAME = SITE_BRAND_NAME;
 

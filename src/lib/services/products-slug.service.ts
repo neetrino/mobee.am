@@ -1,9 +1,9 @@
 import { buildProductQuery, findProductIdBySlug } from "./products-slug/product-query-builder";
 import { transformProduct } from "./products-slug/product-transformer";
-import { getProductPdpFromReadModel } from "@/lib/read-model/products-pdp-read-model";
 
 /**
- * Service for fetching products by slug
+ * Service for fetching products by slug.
+ * Always reads live Product / ProductVariantOption — never a PDP snapshot or Redis.
  */
 class ProductsSlugService {
   /**
@@ -14,14 +14,9 @@ class ProductsSlugService {
   }
 
   /**
-   * Get product by slug
+   * Get product by slug from the database.
    */
   async findBySlug(slug: string, lang: string = "en") {
-    const fromReadModel = await getProductPdpFromReadModel(slug, lang);
-    if (fromReadModel) {
-      return fromReadModel;
-    }
-
     const product = await buildProductQuery(slug, lang);
 
     if (!product) {
@@ -33,7 +28,6 @@ class ProductsSlugService {
       };
     }
 
-    // Transform product data to response format
     return transformProduct(product, lang);
   }
 }

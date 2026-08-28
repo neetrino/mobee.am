@@ -2,7 +2,7 @@ import { db } from "@white-shop/db";
 import type { ProductPdpPayload } from "@/lib/services/products-slug/product-transformer";
 
 /**
- * Cheap indexed PDP read. Payload is the same shape as transformProduct.
+ * Stored PDP snapshot. Storefront reads live DB instead; this remains for rebuild/validate.
  */
 export async function getProductPdpFromReadModel(
   slug: string,

@@ -1,5 +1,4 @@
 import { productsService } from "@/lib/services/products.service";
-import { getCachedJson } from "@/lib/services/read-through-json-cache";
 import {
   buildProductDetailCacheKey,
   PRODUCT_DETAIL_CACHE_TTL_SECONDS,
@@ -9,29 +8,14 @@ export type ProductDetailPayload = Awaited<ReturnType<typeof productsService.fin
 
 export { buildProductDetailCacheKey, PRODUCT_DETAIL_CACHE_TTL_SECONDS };
 
-function isNotFoundError(error: unknown): boolean {
-  return (error as { status?: number }).status === 404;
-}
-
 /**
- * Redis / in-memory cached product detail — shared by API route, metadata, and related context.
+ * PDP loader shared by the API, metadata, and related context.
+ * Not Redis-backed: catalog options, stock, and prices must come from the DB.
  */
 export async function getCachedProductBySlug(
   slug: string,
   lang: string = "en",
 ): Promise<{ result: ProductDetailPayload; cacheStatus: "HIT" | "MISS" }> {
-  const cacheKey = buildProductDetailCacheKey(slug, lang);
-  try {
-    return await getCachedJson<ProductDetailPayload>(
-      cacheKey,
-      PRODUCT_DETAIL_CACHE_TTL_SECONDS,
-      () => productsService.findBySlug(slug, lang),
-      { requireSharedCache: true },
-    );
-  } catch (error: unknown) {
-    if (isNotFoundError(error)) {
-      throw error;
-    }
-    throw error;
-  }
+  const result = await productsService.findBySlug(slug, lang);
+  return { result, cacheStatus: "MISS" };
 }

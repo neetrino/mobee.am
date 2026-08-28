@@ -142,6 +142,26 @@ async function main() {
     fs.writeFileSync(outFile, JSON.stringify({ summary, rows }, null, 2), "utf8");
     console.log(JSON.stringify(summary, null, 2));
     console.log(`Wrote ${outFile}`);
+
+    if (APPLY) {
+      const productIds = [
+        ...new Set(
+          rows
+            .filter(
+              (row) =>
+                row.variantOptionAction === "create" ||
+                row.variantOptionAction === "update",
+            )
+            .map((row) => row.productId),
+        ),
+      ];
+      if (productIds.length > 0) {
+        const deleted = await prisma.productPdpRow.deleteMany({
+          where: { productId: { in: productIds } },
+        });
+        console.log(`Deleted stale PDP rows: ${deleted.count}`);
+      }
+    }
   } finally {
     await prisma.$disconnect();
   }

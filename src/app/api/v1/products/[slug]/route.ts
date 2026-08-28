@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCachedProductBySlug } from "@/lib/services/products-slug-cached";
+import { PRODUCT_DETAIL_HTTP_CACHE_CONTROL } from "@/lib/shop/product-detail-cache-key";
 import { runApiRoute } from "@/lib/errors/run-api-route";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
   req: NextRequest,
@@ -13,7 +16,7 @@ export async function GET(
     const { result } = await getCachedProductBySlug(slug, lang);
     return NextResponse.json(result, {
       headers: {
-        "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=300",
+        "Cache-Control": PRODUCT_DETAIL_HTTP_CACHE_CONTROL,
       },
     });
   });

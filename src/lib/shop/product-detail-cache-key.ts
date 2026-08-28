@@ -10,3 +10,7 @@ export function buildProductDetailCacheKey(slug: string, lang: string): string {
 }
 
 export const PRODUCT_DETAIL_CACHE_TTL_SECONDS = PRODUCTS_PDP_CACHE_TTL_SEC;
+
+/** PDP JSON must not be stored at the CDN. Variants are live from the database. */
+export const PRODUCT_DETAIL_HTTP_CACHE_CONTROL =
+  "private, no-store, no-cache, must-revalidate";
