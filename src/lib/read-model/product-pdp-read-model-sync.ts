@@ -81,12 +81,46 @@ export async function syncProductPdpReadModel(
   }
 }
 
+const PDP_REBUILD_BATCH_SIZE = 8;
+const PDP_SYNC_RETRY_COUNT = 3;
+
+function isTransientDbError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("Server has closed the connection") ||
+    message.includes("ConnectionReset") ||
+    message.includes("10054")
+  );
+}
+
+async function reconnectDb(): Promise<void> {
+  await db.$disconnect();
+  await db.$connect();
+}
+
+async function syncProductPdpReadModelWithRetry(
+  productId: string,
+  locales: readonly string[],
+): Promise<void> {
+  for (let attempt = 1; attempt <= PDP_SYNC_RETRY_COUNT; attempt += 1) {
+    try {
+      await syncProductPdpReadModel(productId, locales);
+      return;
+    } catch (error) {
+      if (!isTransientDbError(error) || attempt === PDP_SYNC_RETRY_COUNT) {
+        throw error;
+      }
+      await reconnectDb();
+    }
+  }
+}
+
 export async function syncProductPdpReadModelBatch(
   productIds: string[],
   locales: readonly string[] = PRODUCT_LISTING_READ_MODEL_DEFAULT_LOCALES,
 ): Promise<void> {
   for (const productId of productIds) {
-    await syncProductPdpReadModel(productId, locales);
+    await syncProductPdpReadModelWithRetry(productId, locales);
   }
 }
 
@@ -97,13 +131,18 @@ export async function rebuildProductPdpReadModel(
     where: { published: true, deletedAt: null },
     select: { id: true },
   });
-  await db.productPdpRow.deleteMany();
-  const batchSize = 25;
-  for (let index = 0; index < products.length; index += batchSize) {
-    const chunk = products.slice(index, index + batchSize);
-    await syncProductPdpReadModelBatch(
-      chunk.map((product) => product.id),
-      locales,
+  const publishedIds = products.map((product) => product.id);
+  for (let index = 0; index < publishedIds.length; index += PDP_REBUILD_BATCH_SIZE) {
+    const chunk = publishedIds.slice(index, index + PDP_REBUILD_BATCH_SIZE);
+    await syncProductPdpReadModelBatch(chunk, locales);
+    await reconnectDb();
+    process.stdout.write(
+      `PDP rebuild ${Math.min(index + chunk.length, publishedIds.length)}/${publishedIds.length}\n`,
     );
+  }
+  if (publishedIds.length > 0) {
+    await db.productPdpRow.deleteMany({
+      where: { productId: { notIn: publishedIds } },
+    });
   }
 }
