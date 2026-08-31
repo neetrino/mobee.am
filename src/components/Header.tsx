@@ -977,9 +977,13 @@ export function Header() {
               <MobileHeaderDropdown
                 pathname={pathname}
                 exiting={mobileMenuExiting}
+                shopLabel={t('common.navigation.products')}
                 aboutLabel={t('common.navigation.about')}
                 contactLabel={t('common.navigation.contact')}
                 policiesLabel={t('common.footer.policiesHeading')}
+                loginLabel={t('common.navigation.login')}
+                profileLabel={t('common.navigation.profile')}
+                isLoggedIn={isLoggedIn}
                 closeLabel={t('common.ariaLabels.closeMenu')}
                 onClose={closeMobileMenu}
                 onAnimationEnd={handleMobileMenuPanelAnimationEnd}

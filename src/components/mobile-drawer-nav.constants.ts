@@ -68,3 +68,7 @@ export const MOBILE_HEADER_DROPDOWN_TRANSITION_MS = 340;
 
 export const MOBILE_HEADER_DROPDOWN_NAV_LINK_CLASS =
   'flex-1 rounded-xl px-1 py-3.5 text-left text-base font-semibold transition-colors hover:bg-gray-50';
+
+/** Storefront mobile dropdown — primary login / account CTA under nav links. */
+export const MOBILE_HEADER_DROPDOWN_LOGIN_BUTTON_CLASS =
+  'mb-4 mt-1 flex w-full items-center justify-center rounded-2xl bg-[#00a1ff] px-4 py-3.5 text-base font-semibold text-white transition-colors hover:bg-[#0090e6] active:bg-[#0082d1]';
