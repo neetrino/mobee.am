@@ -5,6 +5,14 @@ import { CategoriesTreeProvider } from '@/components/CategoriesTreeContext';
 import { SiteChrome } from '@/components/SiteChrome';
 import { UiLanguageProvider } from '@/components/UiLanguageProvider';
 import {
+  SITE_BRAND_NAME,
+  SITE_SHARE_DESCRIPTION,
+  SITE_SHARE_IMAGE_HEIGHT_PX,
+  SITE_SHARE_IMAGE_PATH,
+  SITE_SHARE_IMAGE_WIDTH_PX,
+  SITE_SHARE_TITLE,
+} from '@/lib/brand.constants';
+import {
   APP_LOCALES,
   STOREFRONT_OG_LOCALE,
   asLanguageCode,
@@ -13,6 +21,7 @@ import {
 } from '@/lib/i18n/routing';
 import { setRequestLocale } from '@/lib/i18n/request-locale';
 import { getLayoutCategoriesTree } from '@/lib/services/categories-tree-cached';
+import { getSiteAssetUrl } from '@/lib/site-url';
 import { LocalePreferenceSync } from './LocalePreferenceSync';
 import { StorefrontLocalePrefetch } from './StorefrontLocalePrefetch';
 
@@ -27,6 +36,10 @@ type LocaleLayoutProps = {
   params: Promise<{ locale: string }>;
 };
 
+/**
+ * Re-emit full openGraph here: Next.js replaces parent `openGraph` when a child
+ * sets any openGraph fields, so locale-only overrides would drop `og:image`.
+ */
 export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
   const { locale } = await params;
   if (!isAppLocale(locale)) {
@@ -34,7 +47,19 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
   }
   return {
     openGraph: {
+      title: SITE_SHARE_TITLE,
+      description: SITE_SHARE_DESCRIPTION,
+      siteName: SITE_BRAND_NAME,
       locale: STOREFRONT_OG_LOCALE[locale],
+      type: 'website',
+      images: [
+        {
+          url: getSiteAssetUrl(SITE_SHARE_IMAGE_PATH),
+          width: SITE_SHARE_IMAGE_WIDTH_PX,
+          height: SITE_SHARE_IMAGE_HEIGHT_PX,
+          alt: SITE_BRAND_NAME,
+        },
+      ],
     },
   };
 }
