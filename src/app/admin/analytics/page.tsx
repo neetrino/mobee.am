@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Card } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminContentSkeleton } from '../components/AdminContentSkeleton';
+import { DashboardPeriodOverview } from '../components/DashboardPeriodOverview';
 import { useAnalytics } from './hooks/useAnalytics';
 import { AnalyticsHeader } from './components/AnalyticsHeader';
 import { PeriodSelector } from './components/PeriodSelector';
@@ -43,12 +44,15 @@ export default function AnalyticsPage() {
   });
 
   const showInitialLoading = loading && !analytics;
+  const analyticsReady = Boolean(isLoggedIn && isAdmin);
 
   useAdminPageNavDebug(showInitialLoading);
 
   return (
-    <div className="mx-auto w-full max-w-7xl">
+    <section>
       <AnalyticsHeader />
+
+      <DashboardPeriodOverview enabled={analyticsReady} showAnalyticsLink={false} />
 
       <PeriodSelector
         period={period}
@@ -61,7 +65,7 @@ export default function AnalyticsPage() {
       />
 
       {showInitialLoading ? (
-        <div className="space-y-6 py-8">
+        <div className="space-y-3 py-6">
           <AdminContentSkeleton lines={2} />
           <AdminContentSkeleton lines={4} />
         </div>
@@ -69,18 +73,18 @@ export default function AnalyticsPage() {
         <div className={loading ? 'opacity-80 transition-opacity' : ''}>
           <StatsCards analytics={analytics} totalUsers={totalUsers} />
 
-          <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <OrdersByDayChart ordersByDay={analytics.ordersByDay} currency={analytics.orders.currency} />
+
+          <div className="mb-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
             <TopProducts products={analytics.topProducts} currency={analytics.orders.currency} />
             <TopCategories categories={analytics.topCategories} currency={analytics.orders.currency} />
           </div>
-
-          <OrdersByDayChart ordersByDay={analytics.ordersByDay} currency={analytics.orders.currency} />
         </div>
       ) : (
         <Card className="p-6">
           <p className="text-center text-gray-600">{t('admin.analytics.noAnalyticsData')}</p>
         </Card>
       )}
-    </div>
+    </section>
   );
 }
