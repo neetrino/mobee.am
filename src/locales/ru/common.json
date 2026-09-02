@@ -250,8 +250,8 @@
     },
     "legalBar": {
       "brand": "MOBEE",
-      "copyrightLead": "Copyright © {year} | All Rights Reserved,",
-      "createdBy": "Создано",
+      "copyrightLead": "Copyright © {year} | All Rights Reserved",
+      "createdBy": "Created By",
       "creditCompany": "Neetrino IT Company",
       "privacyPolicy": "Политика конфиденциальности",
       "shippingPolicy": "Политика доставки",
