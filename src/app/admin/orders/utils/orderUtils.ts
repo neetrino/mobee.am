@@ -2,6 +2,44 @@
  * Order utilities - helper functions for order status colors and formatting
  */
 
+const ORDER_POSTED_TIME_PAD_LENGTH = 2;
+
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  cash_on_delivery: 'Cash',
+  idram: 'Idram',
+  arca: 'ArCa',
+  aparik: 'Aparik',
+};
+
+/**
+ * Maps checkout payment provider/method ids to admin table labels.
+ */
+export function formatPaymentMethodLabel(paymentMethod: string | null | undefined): string {
+  if (!paymentMethod) {
+    return '—';
+  }
+
+  const normalized = paymentMethod.trim().toLowerCase();
+  return PAYMENT_METHOD_LABELS[normalized] ?? paymentMethod;
+}
+
+/**
+ * Formats order createdAt as 24h time (HH:mm) and DD/MM/YYYY date for the orders table.
+ */
+export function formatOrderPostedDateTime(isoDate: string): { time: string; date: string } {
+  const postedAt = new Date(isoDate);
+  const hours = String(postedAt.getHours()).padStart(ORDER_POSTED_TIME_PAD_LENGTH, '0');
+  const minutes = String(postedAt.getMinutes()).padStart(ORDER_POSTED_TIME_PAD_LENGTH, '0');
+  const day = String(postedAt.getDate()).padStart(ORDER_POSTED_TIME_PAD_LENGTH, '0');
+  const month = String(postedAt.getMonth() + 1).padStart(ORDER_POSTED_TIME_PAD_LENGTH, '0');
+  const year = postedAt.getFullYear();
+
+  return {
+    time: `${hours}:${minutes}`,
+    date: `${day}/${month}/${year}`,
+  };
+}
+
 export function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {
     case 'pending':

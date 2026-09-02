@@ -209,13 +209,13 @@ export function OrderRowSelectDropdown({
         type="button"
         id={`${id}-trigger`}
         aria-controls={`${id}-listbox`}
-        className={`relative flex h-auto min-h-5 items-center justify-center overflow-hidden rounded-supersudo px-2.5 py-1.5 text-center text-xs font-medium ring-1 ring-black/5 transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-admin active:opacity-90 ${triggerTintClassName} ${triggerSizingClassName}`}
+        className={`relative flex h-8 items-center justify-center overflow-hidden rounded-supersudo px-2.5 py-1.5 text-center text-xs font-medium ring-1 ring-black/5 transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-admin active:opacity-90 ${triggerTintClassName} ${triggerSizingClassName}`}
         aria-expanded={isVisible}
         aria-haspopup="listbox"
         aria-label={ariaLabel}
         onClick={() => setIsOpen((o) => !o)}
       >
-        <span className="block w-full min-w-0 max-w-full whitespace-normal break-words px-6 text-center leading-snug">
+        <span className="whitespace-nowrap px-5 text-center leading-none">
           {displayLabel}
         </span>
         <span

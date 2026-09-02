@@ -28,6 +28,43 @@ interface OrdersTableProps {
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
 }
 
+function SortArrows({
+  active,
+  direction,
+}: {
+  active: boolean;
+  direction: 'asc' | 'desc' | null;
+}) {
+  return (
+    <div className="flex flex-col">
+      <svg
+        className={`h-3 w-3 ${active && direction === 'asc' ? 'text-admin-600' : 'text-gray-400'}`}
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        aria-hidden="true"
+      >
+        <path
+          fillRule="evenodd"
+          d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+          clipRule="evenodd"
+        />
+      </svg>
+      <svg
+        className={`-mt-1 h-3 w-3 ${active && direction === 'desc' ? 'text-admin-600' : 'text-gray-400'}`}
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        aria-hidden="true"
+      >
+        <path
+          fillRule="evenodd"
+          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+          clipRule="evenodd"
+        />
+      </svg>
+    </div>
+  );
+}
+
 export function OrdersTable({
   orders,
   loading,
@@ -47,7 +84,7 @@ export function OrdersTable({
   onPageChange,
   formatCurrency,
 }: OrdersTableProps) {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -60,7 +97,7 @@ export function OrdersTable({
   if (orders.length === 0) {
     return (
       <Card className="p-6">
-        <div className="text-center py-8">
+        <div className="py-8 text-center">
           <p className="text-gray-600">{t('admin.orders.noOrders')}</p>
         </div>
       </Card>
@@ -69,12 +106,21 @@ export function OrdersTable({
 
   return (
     <Card className="p-3 sm:p-4 lg:p-5">
-      <div className="w-full">
-        <table className="w-full table-fixed divide-y divide-gray-200">
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-[68rem] w-full table-fixed divide-y divide-gray-200">
+          <colgroup>
+            <col className="w-[8.5rem]" />
+            <col className="w-[16%]" />
+            <col className="w-[10%]" />
+            <col className="w-[11%]" />
+            <col className="w-[16%]" />
+            <col className="w-[16%]" />
+            <col className="w-[12%]" />
+          </colgroup>
           <thead className="bg-gray-50">
             <tr>
-              <th className="w-10 min-w-10 px-2 py-3 align-middle sm:px-3">
-                <div className="flex items-center">
+              <th className="px-3 py-3 text-left align-middle text-xs font-medium uppercase tracking-wider text-gray-500">
+                <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     className="size-4 shrink-0 rounded border-gray-300 text-admin-600 focus:outline-none focus:ring-2 focus:ring-admin focus:ring-offset-1"
@@ -82,84 +128,48 @@ export function OrdersTable({
                     checked={orders.length > 0 && orders.every((o) => selectedIds.has(o.id))}
                     onChange={onToggleSelectAll}
                   />
+                  <span>{t('admin.orders.orderNumber')}</span>
                 </div>
               </th>
-              <th className="w-[11%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[110px]">{t('admin.orders.orderNumber')}</span>
-              </th>
-              <th className="w-[18%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block -translate-x-[100px]">{t('admin.orders.customer')}</span>
+              <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                {t('admin.orders.customer')}
               </th>
               <th
-                className="w-[12%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"
+                className="cursor-pointer select-none px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 hover:bg-gray-100"
                 onClick={() => onSort('total')}
               >
-                <div className="-translate-x-[85px]">
-                  <div className="flex items-center gap-1">
-                    {t('admin.orders.total')}
-                    <div className="flex flex-col">
-                      <svg
-                        className={`w-3 h-3 ${sortBy === 'total' && sortOrder === 'asc' ? 'text-admin-600' : 'text-gray-400'}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
-                      </svg>
-                      <svg
-                        className={`w-3 h-3 -mt-1 ${sortBy === 'total' && sortOrder === 'desc' ? 'text-admin-600' : 'text-gray-400'}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
+                <div className="inline-flex items-center gap-1">
+                  {t('admin.orders.total')}
+                  <SortArrows
+                    active={sortBy === 'total'}
+                    direction={sortBy === 'total' ? sortOrder : null}
+                  />
                 </div>
               </th>
-              <th className="w-[7%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span
-                  className={`inline-block ${lang === 'en' || lang === 'ru' ? '-translate-x-[60px]' : '-translate-x-[80px]'}`}
-                >
-                  {t('admin.orders.items')}
-                </span>
+              <th className="px-3 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                {t('admin.orders.paymentMethod')}
               </th>
-              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span
-                  className={`inline-block ${lang === 'en' || lang === 'ru' ? 'translate-x-[5px]' : '-translate-x-[5px]'}`}
-                >
-                  {t('admin.orders.status')}
-                </span>
+              <th className="px-3 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                {t('admin.orders.status')}
               </th>
-              <th className="w-[14%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-3">
-                <span className="inline-block translate-x-[20px]">{t('admin.orders.payment')}</span>
+              <th className="px-3 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                {t('admin.orders.payment')}
               </th>
               <th
-                className="w-[10%] px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none sm:px-3"
+                className="cursor-pointer select-none px-3 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 hover:bg-gray-100"
                 onClick={() => onSort('createdAt')}
               >
-                <div className="flex items-center gap-1">
+                <div className="inline-flex items-center justify-center gap-1">
                   {t('admin.orders.date')}
-                  <div className="flex flex-col">
-                    <svg
-                      className={`w-3 h-3 ${sortBy === 'createdAt' && sortOrder === 'asc' ? 'text-admin-600' : 'text-gray-400'}`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
-                    </svg>
-                    <svg
-                      className={`w-3 h-3 -mt-1 ${sortBy === 'createdAt' && sortOrder === 'desc' ? 'text-admin-600' : 'text-gray-400'}`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </div>
+                  <SortArrows
+                    active={sortBy === 'createdAt'}
+                    direction={sortBy === 'createdAt' ? sortOrder : null}
+                  />
                 </div>
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 bg-white">
             {orders.map((order) => (
               <OrderRow
                 key={order.id}
@@ -189,4 +199,3 @@ export function OrdersTable({
     </Card>
   );
 }
-

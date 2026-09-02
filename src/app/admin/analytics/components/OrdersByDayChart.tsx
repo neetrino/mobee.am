@@ -1,102 +1,107 @@
 ﻿'use client';
 
 import { useMemo } from 'react';
-import { Card } from '@/app/admin/lib/adminShopUi';
+import { TrendingUp } from 'lucide-react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { LineChart } from '../LineChart';
-import { formatCurrency, formatDateShort } from '../utils';
+import { formatCurrency } from '../utils';
 import type { AnalyticsData } from '../types';
+import {
+  ADMIN_DASH_CARD_CLASS,
+  ADMIN_DASH_CARD_HOVER_CLASS,
+  ADMIN_DASH_TONE,
+} from '../../dashboard-ui.constants';
 
 interface OrdersByDayChartProps {
   ordersByDay: AnalyticsData['ordersByDay'];
   currency: string;
 }
 
-export function OrdersByDayChart({ ordersByDay, currency }: OrdersByDayChartProps) {
-  const { t } = useTranslation();
-
-  const maxCount = useMemo(
-    () => Math.max(...ordersByDay.map((day) => day.count), 1),
-    [ordersByDay],
-  );
-
-  const dayRows = useMemo(
-    () =>
-      ordersByDay.map((day) => ({
-        day,
-        percentage: (day.count / maxCount) * 100,
-      })),
-    [ordersByDay, maxCount],
-  );
-
+function StackStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: keyof typeof ADMIN_DASH_TONE;
+}) {
   return (
-    <Card className="p-8 bg-white shadow-lg border border-gray-200 rounded-supersudo hover:shadow-xl transition-shadow duration-300">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.analytics.ordersByDay')}</h2>
-          <p className="text-sm text-gray-500 font-medium">{t('admin.analytics.dailyOrderTrends')}</p>
-        </div>
-        <div className="w-12 h-12 bg-gradient-to-br from-admin-500 to-admin-800 rounded-supersudo flex items-center justify-center shadow-md">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-        </div>
-      </div>
-      
-      {ordersByDay.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <p className="text-sm font-medium text-gray-500">{t('admin.analytics.noDataAvailable')}</p>
-        </div>
-      ) : (
-        <>
-          {/* SVG Line Chart - Modern Container */}
-          <div className="mb-8 bg-gradient-to-br from-gray-50 to-white rounded-supersudo p-6 border border-gray-100 shadow-inner">
-            <LineChart data={ordersByDay} />
-          </div>
-          
-          {/* Detailed List - Modern Design */}
-          <div className="space-y-3">
-            {dayRows.map(({ day, percentage }) => (
-              <div
-                key={day._id} 
-                  className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-supersudo border border-gray-200 hover:border-admin-300 hover:shadow-md transition-all duration-300 group"
-                >
-                  <div className="w-32 text-sm font-semibold text-gray-700 flex-shrink-0">
-                    {formatDateShort(day._id)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1 bg-gray-200 rounded-full h-10 relative overflow-hidden shadow-inner">
-                        <div
-                          className="bg-gradient-to-r from-admin-400 via-admin-500 to-admin-700 h-10 rounded-full flex items-center justify-between px-4 transition-all duration-700 group-hover:shadow-lg"
-                          style={{ width: `${percentage}%` }}
-                        >
-                          <span className="text-xs text-white font-bold">{t('admin.analytics.ordersLabel').replace('{count}', day.count.toString())}</span>
-                          <div className="w-2 h-2 bg-white rounded-full opacity-80"></div>
-                        </div>
-                      </div>
-                      <div className="w-36 text-right flex-shrink-0">
-                        <p className="text-sm font-bold text-gray-900">
-                          {formatCurrency(day.revenue, currency)}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">{t('admin.analytics.revenue')}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-            ))}
-          </div>
-        </>
-      )}
-    </Card>
+    <div className={`rounded-[12px] px-3.5 py-3 ring-1 ${ADMIN_DASH_TONE[tone]} ${ADMIN_DASH_CARD_HOVER_CLASS}`}>
+      <p className="text-[11px] font-medium text-gray-500">{label}</p>
+      <p className="mt-1 break-words text-base font-bold leading-snug text-gray-900">{value}</p>
+    </div>
   );
 }
 
+export function OrdersByDayChart({ ordersByDay, currency }: OrdersByDayChartProps) {
+  const { t } = useTranslation();
 
+  const totals = useMemo(() => {
+    const totalRevenue = ordersByDay.reduce((sum, day) => sum + day.revenue, 0);
+    const totalOrders = ordersByDay.reduce((sum, day) => sum + day.count, 0);
+    const aov = totalOrders > 0 ? Math.round((totalRevenue / totalOrders) * 100) / 100 : 0;
+    return { totalRevenue, totalOrders, aov };
+  }, [ordersByDay]);
 
+  return (
+    <div className={`mb-3 ${ADMIN_DASH_CARD_CLASS} p-4`}>
+      <div className="mb-3 flex min-w-0 items-center gap-2">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-admin-100 text-admin-700">
+          <TrendingUp className="h-4 w-4" aria-hidden />
+        </div>
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold text-gray-900">{t('admin.analytics.ordersByDay')}</h2>
+          <p className="text-xs text-gray-500">{t('admin.analytics.dailyOrderTrends')}</p>
+        </div>
+      </div>
 
+      {ordersByDay.length === 0 ? (
+        <p className="py-10 text-center text-sm text-gray-500">{t('admin.analytics.noDataAvailable')}</p>
+      ) : (
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-stretch">
+          <div className="flex min-w-0 flex-col items-center justify-center rounded-[12px] bg-gradient-to-b from-gray-50 to-white p-3 ring-1 ring-gray-100/80">
+            <LineChart
+              data={ordersByDay}
+              currency={currency}
+              chartAria={t('admin.analytics.ordersByDay')}
+              tooltip={{
+                revenueLabel: t('admin.analytics.totalRevenue'),
+                ordersLabel: t('admin.analytics.totalOrders'),
+                formatRevenue: (amount) => formatCurrency(amount, currency),
+                formatOrders: (count) => String(count),
+              }}
+            />
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-4 text-[11px] text-gray-500">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-admin-500" />
+                {t('admin.analytics.totalRevenue')}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-amber-400" />
+                {t('admin.analytics.totalOrders')}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <StackStat
+              label={t('admin.analytics.totalRevenue')}
+              value={formatCurrency(totals.totalRevenue, currency)}
+              tone="primary"
+            />
+            <StackStat
+              label={t('admin.analytics.totalOrders')}
+              value={String(totals.totalOrders)}
+              tone="accent"
+            />
+            <StackStat
+              label={t('admin.analytics.aov')}
+              value={formatCurrency(totals.aov, currency)}
+              tone="ink"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

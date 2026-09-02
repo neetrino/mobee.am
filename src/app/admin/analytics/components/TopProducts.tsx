@@ -1,10 +1,13 @@
-﻿'use client';
+'use client';
 
-import { Card } from '@/app/admin/lib/adminShopUi';
 import { resolveAdminProductThumbnailSrc } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatCurrency } from '../utils';
 import type { AnalyticsData } from '../types';
+import {
+  ADMIN_DASH_CARD_CLASS,
+  ADMIN_DASH_CARD_HOVER_CLASS,
+} from '../../dashboard-ui.constants';
 
 interface TopProductsProps {
   products: AnalyticsData['topProducts'];
@@ -15,74 +18,39 @@ export function TopProducts({ products, currency }: TopProductsProps) {
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6 bg-white shadow-sm border border-gray-200 rounded-supersudo">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">{t('admin.analytics.topSellingProducts')}</h2>
-        <div className="w-10 h-10 bg-admin-100 rounded-supersudo flex items-center justify-center">
-          <svg className="w-5 h-5 text-admin-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          </svg>
-        </div>
-      </div>
-      <div className="space-y-3">
+    <div className={`${ADMIN_DASH_CARD_CLASS} p-4`}>
+      <h2 className="mb-2 text-base font-semibold text-gray-900">{t('admin.analytics.topSellingProducts')}</h2>
+      <div className="space-y-2">
         {products.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-sm text-gray-500">{t('admin.analytics.noSalesDataAvailable')}</p>
-          </div>
+          <p className="py-6 text-center text-sm text-gray-600">{t('admin.analytics.noSalesDataAvailable')}</p>
         ) : (
           products.map((product, index) => (
             <div
               key={product.variantId}
-              className="flex items-center gap-4 p-4 border border-gray-200 rounded-supersudo hover:border-admin-300 hover:shadow-md transition-all duration-200 bg-gray-50 hover:bg-white group"
+              className={`flex items-center gap-3 rounded-[12px] px-2.5 py-2 ring-1 ring-gray-100/80 ${ADMIN_DASH_CARD_HOVER_CLASS}`}
             >
-              <div className="flex-shrink-0">
-                <div className={`w-10 h-10 rounded-supersudo flex items-center justify-center text-sm font-bold transition-colors ${
-                  index === 0 ? 'bg-yellow-400 text-yellow-900' :
-                  index === 1 ? 'bg-gray-300 text-gray-700' :
-                  index === 2 ? 'bg-orange-300 text-orange-900' :
-                  'bg-gray-200 text-gray-600'
-                }`}>
-                  {index + 1}
-                </div>
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[11px] font-bold text-amber-900">
+                {index + 1}
               </div>
-              <div className="flex-shrink-0">
-                <img
-                  src={resolveAdminProductThumbnailSrc(product.image)}
-                  alt={product.title}
-                  className="w-14 h-14 object-cover rounded-supersudo border border-gray-200 group-hover:scale-105 transition-transform"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate mb-1">{product.title}</p>
-                <p className="text-xs text-gray-500 mb-1">{t('admin.analytics.skuLabel')}: {product.sku}</p>
-                <div className="flex items-center gap-3 text-xs text-gray-600">
-                  <span className="flex items-center gap-1">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                    {t('admin.analytics.sold').replace('{count}', product.totalQuantity.toString())}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    {t('admin.analytics.orders').replace('{count}', product.orderCount.toString())}
-                  </span>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-base font-bold text-gray-900">
-                  {formatCurrency(product.totalRevenue, currency)}
+              <img
+                src={resolveAdminProductThumbnailSrc(product.image)}
+                alt={product.title}
+                className="h-10 w-10 shrink-0 rounded-lg object-cover"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-gray-900">{product.title}</p>
+                <p className="text-[11px] text-gray-500">
+                  {product.totalQuantity} {t('admin.analytics.sold')} · {product.orderCount}{' '}
+                  {t('admin.analytics.orders')}
                 </p>
               </div>
+              <p className="shrink-0 text-sm font-semibold text-gray-900">
+                {formatCurrency(product.totalRevenue, currency)}
+              </p>
             </div>
           ))
         )}
       </div>
-    </Card>
+    </div>
   );
 }
-
-
-
-

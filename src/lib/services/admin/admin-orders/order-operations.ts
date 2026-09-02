@@ -51,18 +51,28 @@ export async function getOrders(filters: OrderFilters = {}) {
             phone: true,
           },
         },
+        payments: {
+          select: {
+            provider: true,
+            method: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
       },
     }),
     db.order.count({ where }),
   ]);
 
   // Format orders for response
-  const formattedOrders = orders.map((order) =>
-    formatOrderForList({
+  const formattedOrders = orders.map((order) => {
+    const primaryPayment = order.payments[0];
+    return formatOrderForList({
       ...order,
       itemsCount: order._count.items,
-    }),
-  );
+      paymentMethod: primaryPayment?.provider || primaryPayment?.method || null,
+    });
+  });
 
   return {
     data: formattedOrders,

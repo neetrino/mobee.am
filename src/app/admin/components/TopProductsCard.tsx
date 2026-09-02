@@ -1,10 +1,14 @@
 'use client';
 
-import { Card, Button } from '@/app/admin/lib/adminShopUi';
-import { resolveAdminProductThumbnailSrc } from '@/app/admin/admin-uniform-product-thumbnail.constants';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { resolveAdminProductThumbnailSrc } from '@/app/admin/admin-uniform-product-thumbnail.constants';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatCurrency } from '../utils/dashboardUtils';
+import {
+  ADMIN_DASH_CARD_CLASS,
+  ADMIN_DASH_CARD_HOVER_CLASS,
+} from '../dashboard-ui.constants';
 
 interface TopProduct {
   variantId: string;
@@ -27,66 +31,52 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
   const router = useRouter();
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">{t('admin.dashboard.topSellingProducts')}</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.push('/supersudo/products')}
+    <div className={`${ADMIN_DASH_CARD_CLASS} p-4`}>
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="text-base font-semibold text-gray-900">{t('admin.dashboard.topSellingProducts')}</h2>
+        <Link
+          href="/supersudo/products"
+          className="rounded-[12px] px-2 py-1 text-xs font-medium text-admin-600 hover:bg-admin-50"
         >
           {t('admin.dashboard.viewAll')}
-        </Button>
+        </Link>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-2">
         {topProductsLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-16 bg-gray-200 rounded-supersudo"></div>
-              </div>
-            ))}
-          </div>
+          [1, 2, 3].map((i) => (
+            <div key={i} className="h-14 animate-pulse rounded-[12px] bg-gray-100" />
+          ))
         ) : topProducts.length === 0 ? (
-          <div className="text-sm text-gray-600 text-center py-8">
-            <p>{t('admin.dashboard.noSalesData')}</p>
-          </div>
+          <p className="py-6 text-center text-sm text-gray-600">{t('admin.dashboard.noSalesData')}</p>
         ) : (
           topProducts.map((product, index) => (
-            <div
+            <button
               key={product.variantId}
-              className="flex items-center gap-4 p-3 border border-gray-200 rounded-supersudo hover:bg-gray-50 cursor-pointer transition-colors"
-              onClick={() => router.push(`/supersudo/products/${product.productId}`)}
+              type="button"
+              onClick={() => router.push(`/supersudo/products/add?id=${product.productId}`)}
+              className={`flex w-full items-center gap-3 rounded-[12px] px-2.5 py-2 text-left ring-1 ring-gray-100/80 ${ADMIN_DASH_CARD_HOVER_CLASS}`}
             >
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gray-200 rounded-supersudo flex items-center justify-center text-xs font-bold text-gray-500">
-                  {index + 1}
-                </div>
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[11px] font-bold text-amber-900">
+                {index + 1}
               </div>
-              <div className="flex-shrink-0">
-                <img
-                  src={resolveAdminProductThumbnailSrc(product.image)}
-                  alt={product.title}
-                  className="w-12 h-12 object-cover rounded-supersudo"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{product.title}</p>
-                <p className="text-xs text-gray-600">SKU: {product.sku}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {t('admin.dashboard.sold').replace('{count}', product.totalQuantity.toString())} • {t('admin.dashboard.orders').replace('{count}', product.orderCount.toString())}
+              <img
+                src={resolveAdminProductThumbnailSrc(product.image)}
+                alt={product.title}
+                className="h-10 w-10 shrink-0 rounded-lg object-cover"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-gray-900">{product.title}</p>
+                <p className="text-[11px] text-gray-500">
+                  {t('admin.dashboard.sold').replace('{count}', product.totalQuantity.toString())}
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-semibold text-gray-900">
-                  {formatCurrency(product.totalRevenue, 'USD')}
-                </p>
-              </div>
-            </div>
+              <p className="shrink-0 text-sm font-semibold text-gray-900">
+                {formatCurrency(product.totalRevenue, 'USD')}
+              </p>
+            </button>
           ))
         )}
       </div>
-    </Card>
+    </div>
   );
 }
-
