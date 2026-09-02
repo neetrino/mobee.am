@@ -2,9 +2,17 @@
 
 import type { AdminMenuItem } from '../../../components/AdminMenuDrawer';
 import { MOBILE_DRAWER_ADMIN_NAV_LABEL_CLASS } from '../../../components/mobile-drawer-nav.constants';
-import { ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS } from '../admin-sidebar-layout.constants';
+import {
+  ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS,
+  ADMIN_SIDEBAR_NAV_ACTIVE_TEXT_CLASS,
+  ADMIN_SIDEBAR_NAV_ICON_ACTIVE_CLASS,
+  ADMIN_SIDEBAR_NAV_ICON_INACTIVE_CLASS,
+  ADMIN_SIDEBAR_NAV_INACTIVE_ROW_CLASS,
+  ADMIN_SIDEBAR_NAV_ROW_BASE_CLASS,
+} from '../admin-sidebar-layout.constants';
 import type { AdminSidebarNavPresentation } from './admin-sidebar-nav.types';
 import { AdminSidebarNavLink } from './AdminSidebarNavLink';
+import styles from './AdminSidebarNav.module.css';
 
 export interface ProductsNavRowProps {
   tab: AdminMenuItem;
@@ -16,11 +24,15 @@ export interface ProductsNavRowProps {
   presentation: AdminSidebarNavPresentation;
   iconRail?: boolean;
   onAfterNavigate?: () => void;
+  /** Desktop sliding indicator: attach row measure ref. */
+  setRowRef?: (node: HTMLElement | null) => void;
+  /** Desktop: active background comes from sliding pill, not row fill. */
+  useSlidingIndicator?: boolean;
 }
 
 type ProductsNavRowBranchProps = Pick<
   ProductsNavRowProps,
-  'tab' | 'isActive' | 'isExpanded' | 'onToggleExpand' | 'onAfterNavigate'
+  'tab' | 'isActive' | 'isExpanded' | 'onToggleExpand' | 'onAfterNavigate' | 'setRowRef' | 'useSlidingIndicator'
 > & { toggleAriaLabel: string };
 
 function ProductsNavRowMobile({
@@ -77,7 +89,69 @@ function ProductsNavRowDesktop({
   onAfterNavigate,
   toggleAriaLabel,
   iconRail = false,
+  setRowRef,
+  useSlidingIndicator = false,
 }: ProductsNavRowBranchProps & { iconRail?: boolean }) {
+  if (useSlidingIndicator) {
+    const iconTone = isActive
+      ? ADMIN_SIDEBAR_NAV_ICON_ACTIVE_CLASS
+      : ADMIN_SIDEBAR_NAV_ICON_INACTIVE_CLASS;
+    const labelTone = isActive ? ADMIN_SIDEBAR_NAV_ACTIVE_TEXT_CLASS : 'text-inherit';
+    const chevronTone = isActive
+      ? `${ADMIN_SIDEBAR_NAV_ACTIVE_TEXT_CLASS} hover:bg-admin-50`
+      : 'text-gray-600 hover:bg-black/5';
+
+    return (
+      <div
+        ref={setRowRef}
+        className={`relative ${ADMIN_SIDEBAR_NAV_ROW_BASE_CLASS} ${
+          isActive ? '' : ADMIN_SIDEBAR_NAV_INACTIVE_ROW_CLASS
+        }`}
+      >
+        <AdminSidebarNavLink
+          href={tab.path}
+          onAfterNavigate={onAfterNavigate}
+          title={iconRail ? tab.label : undefined}
+          aria-label={iconRail ? tab.label : undefined}
+          aria-current={isActive ? 'page' : undefined}
+          className={`flex min-w-0 flex-1 items-center py-3 ${
+            iconRail ? 'justify-center px-2' : 'gap-3 px-4 pr-12 text-left'
+          }`}
+        >
+          <span className={`flex-shrink-0 ${iconTone}`}>{tab.icon}</span>
+          <span
+            className={`${styles.tabLabel} min-w-0 truncate font-medium ${labelTone} ${ADMIN_SIDEBAR_LABEL_COLLAPSE_TRANSITION_CLASS} ${
+              iconRail ? 'max-w-0 opacity-0' : 'max-w-full flex-1 opacity-100'
+            }`}
+          >
+            {tab.label}
+          </span>
+        </AdminSidebarNavLink>
+        <button
+          type="button"
+          onClick={onToggleExpand}
+          aria-expanded={isExpanded}
+          aria-label={`${tab.label}. ${toggleAriaLabel}`}
+          aria-controls="admin-products-submenu"
+          tabIndex={iconRail ? -1 : undefined}
+          className={`absolute inset-y-0 right-0 z-10 inline-flex items-center justify-center overflow-hidden rounded-r-[15px] transition-all duration-300 ease-in-out motion-reduce:transition-none ${
+            iconRail ? 'max-w-0 px-0 opacity-0' : `w-11 ${chevronTone}`
+          }`}
+        >
+          <svg
+            className={`h-5 w-5 shrink-0 transition-transform duration-200 ${isExpanded ? '' : '-rotate-90'}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+    );
+  }
+
   const iconColor = isActive ? 'text-white' : 'text-gray-500';
   const containerColors = isActive
     ? 'bg-admin text-white'
