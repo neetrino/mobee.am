@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { getCachedProductBySlug } from "@/lib/services/products-slug-cached";
 import { getSiteAssetUrl } from "@/lib/site-url";
 import {
-  SITE_APP_ICON_HEIGHT_PX,
-  SITE_APP_ICON_PATH,
-  SITE_APP_ICON_WIDTH_PX,
   SITE_BRAND_NAME,
+  SITE_SHARE_IMAGE_HEIGHT_PX,
+  SITE_SHARE_IMAGE_PATH,
+  SITE_SHARE_IMAGE_WIDTH_PX,
 } from "@/lib/brand.constants";
 
 export const dynamic = "force-dynamic";
@@ -30,9 +30,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const previewImage = firstImage
       ? { url: firstImage, alt: title }
       : {
-          url: getSiteAssetUrl(SITE_APP_ICON_PATH),
-          width: SITE_APP_ICON_WIDTH_PX,
-          height: SITE_APP_ICON_HEIGHT_PX,
+          url: getSiteAssetUrl(SITE_SHARE_IMAGE_PATH),
+          width: SITE_SHARE_IMAGE_WIDTH_PX,
+          height: SITE_SHARE_IMAGE_HEIGHT_PX,
           alt: SITE_BRAND_NAME,
         };
 
