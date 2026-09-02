@@ -33,7 +33,7 @@ export const SITE_APP_ICON_HEIGHT_PX = 1024;
  * Default Open Graph / Twitter / messenger link-preview image (landscape 1200×630).
  * Cache-bust query when the asset changes (crawlers cache aggressively).
  */
-export const SITE_SHARE_IMAGE_PATH = '/images/brand/mobee-og.png?v=2';
+export const SITE_SHARE_IMAGE_PATH = '/images/brand/mobee-og.png?v=3';
 
 /** Intrinsic pixel size of `mobee-og.png` under `public/` (query string ignored by the file). */
 export const SITE_SHARE_IMAGE_WIDTH_PX = 1200;
