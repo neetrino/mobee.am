@@ -29,7 +29,8 @@ type IndicatorBox = { top: number; height: number };
 export function DesktopPrimaryNavWithSlider(props: PrimaryNavListProps) {
   const { primaryTabs, currentPath, isProductsExpanded, desktopCollapsed } = props;
   const navRef = useRef<HTMLElement>(null);
-  const rowRefs = useRef<Map<string, HTMLElement>>(new Map());
+  /** Stable map (not a ref) so callback refs can register rows without react-hooks/refs. */
+  const [rowElements] = useState(() => new Map<string, HTMLElement>());
   const [indicator, setIndicator] = useState<IndicatorBox | null>(null);
   const [slideEnabled, setSlideEnabled] = useState(false);
 
@@ -57,7 +58,7 @@ export function DesktopPrimaryNavWithSlider(props: PrimaryNavListProps) {
   );
 
   useLayoutEffect(() => {
-    const row = rowRefs.current.get(activeId);
+    const row = rowElements.get(activeId);
     if (!row) {
       return;
     }
@@ -65,7 +66,7 @@ export function DesktopPrimaryNavWithSlider(props: PrimaryNavListProps) {
       top: row.offsetTop,
       height: row.offsetHeight,
     });
-  }, [activeId, visibleTabIds, desktopCollapsed]);
+  }, [activeId, visibleTabIds, desktopCollapsed, rowElements]);
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
@@ -82,7 +83,7 @@ export function DesktopPrimaryNavWithSlider(props: PrimaryNavListProps) {
       return;
     }
     const update = () => {
-      const row = rowRefs.current.get(activeId);
+      const row = rowElements.get(activeId);
       if (!row) {
         return;
       }
@@ -93,20 +94,20 @@ export function DesktopPrimaryNavWithSlider(props: PrimaryNavListProps) {
     };
     const observer = new ResizeObserver(update);
     observer.observe(nav);
-    for (const row of rowRefs.current.values()) {
+    for (const row of rowElements.values()) {
       observer.observe(row);
     }
     return () => {
       observer.disconnect();
     };
-  }, [activeId, visibleTabIds, desktopCollapsed]);
+  }, [activeId, visibleTabIds, desktopCollapsed, rowElements]);
 
   function setRowRef(id: string, node: HTMLElement | null): void {
     if (node) {
-      rowRefs.current.set(id, node);
+      rowElements.set(id, node);
       return;
     }
-    rowRefs.current.delete(id);
+    rowElements.delete(id);
   }
 
   return (

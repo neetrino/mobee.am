@@ -2,7 +2,6 @@
 
 import { DesktopPrimaryNavWithSlider } from './DesktopPrimaryNavWithSlider';
 import {
-  isProductGroupPathActive,
   renderPrimaryNavItem,
   type PrimaryNavListProps,
 } from './AdminSidebarPrimaryNav.shared';
