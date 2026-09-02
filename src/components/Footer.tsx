@@ -16,6 +16,14 @@ const montserrat = siteMontserrat;
 /** Footer credit company name links to Neetrino site. */
 const FOOTER_CREDIT_COMPANY_HREF = 'https://neetrino.com/';
 
+/** Mobile credit — company name (matches common Neetrino storefront footers). */
+const FOOTER_CREDIT_COMPANY_MOBILE_CLASS =
+  'mt-1 inline-block text-[15px] font-bold leading-5 text-[#2db2ff] transition-opacity hover:opacity-80';
+
+/** Desktop credit link — Figma legal bar gray. */
+const FOOTER_CREDIT_COMPANY_DESKTOP_CLASS =
+  'font-semibold text-[#a1a1aa] transition-opacity hover:opacity-80';
+
 /** Figma mobee-new footer info (1:1477) — column heading. */
 const FOOTER_COLUMN_HEADING_CLASS =
   'text-[16px] font-bold uppercase leading-[16.5px] tracking-[0.55px] text-black';
@@ -175,42 +183,61 @@ function FooterTermsAndSocialColumn({ phoneHref }: { readonly phoneHref: string 
 }
 
 /**
- * Bottom legal bar — Figma mobee-new HorizontalBorder (node 1:1509).
- * MOBEE + copyright · payment logos.
+ * Bottom legal bar — desktop: Figma HorizontalBorder (1:1509);
+ * mobile: centered copyright + Neetrino credit (two lines).
  */
 function FooterLegalBar() {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
   const copyrightLead = t('common.footer.legalBar.copyrightLead').replace('{year}', String(year));
+  const createdBy = t('common.footer.legalBar.createdBy');
+  const creditCompany = t('common.footer.legalBar.creditCompany');
 
   return (
-    <div className="border-t border-[#eeeef0] pt-[33px]">
-      <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-6">
-        <div className="flex min-w-0 flex-wrap items-center gap-[17px]">
-          <p className="shrink-0 text-[18px] font-black leading-7 text-black">
-            {t('common.footer.legalBar.brand')}
-          </p>
-          <p className="min-w-0 text-[16px] leading-5 text-[#a1a1aa]">
-            <span>{copyrightLead} </span>
-            <span>{t('common.footer.legalBar.createdBy')} </span>
-            <Link
-              href={FOOTER_CREDIT_COMPANY_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-[#a1a1aa] transition-opacity hover:opacity-80"
-            >
-              {t('common.footer.legalBar.creditCompany')}
-            </Link>
-          </p>
-        </div>
-        <FooterPaymentMethodsRow />
+    <>
+      <div className="px-2 py-5 text-center lg:hidden">
+        <p className="whitespace-nowrap text-[12px] leading-4 text-[#71717a]">
+          {copyrightLead} | {createdBy}
+        </p>
+        <Link
+          href={FOOTER_CREDIT_COMPANY_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={FOOTER_CREDIT_COMPANY_MOBILE_CLASS}
+        >
+          {creditCompany}
+        </Link>
       </div>
-    </div>
+
+      <div className="hidden border-t border-[#eeeef0] pt-[33px] lg:block">
+        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-6">
+          <div className="flex min-w-0 flex-wrap items-center gap-[17px]">
+            <p className="shrink-0 text-[18px] font-black leading-7 text-black">
+              {t('common.footer.legalBar.brand')}
+            </p>
+            <p className="min-w-0 text-[16px] leading-5 text-[#a1a1aa]">
+              <span>
+                {copyrightLead} | {createdBy}{' '}
+              </span>
+              <Link
+                href={FOOTER_CREDIT_COMPANY_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={FOOTER_CREDIT_COMPANY_DESKTOP_CLASS}
+              >
+                {creditCompany}
+              </Link>
+            </p>
+          </div>
+          <FooterPaymentMethodsRow />
+        </div>
+      </div>
+    </>
   );
 }
 
 /**
- * Desktop storefront footer — Figma mobee-new «footer info» (1:1477) + legal bar (1:1509).
+ * Storefront footer — desktop columns (Figma 1:1477) + legal/copyright bar on all breakpoints.
  */
 export function Footer() {
   const { t } = useTranslation();
@@ -221,10 +248,10 @@ export function Footer() {
 
   return (
     <footer
-      className={`${montserrat.className} hidden border-t border-[#eee] bg-white pb-8 pt-8 lg:block`}
+      className={`${montserrat.className} border-t border-[#eee] bg-white pb-8 pt-8 max-lg:border-t-0 max-lg:bg-gray-50 max-lg:pb-5 max-lg:pt-2`}
     >
-      <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-8`}>
-        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-x-12 gap-y-10 xl:gap-x-20">
+      <div className={`${SITE_CONTENT_GUTTERS_CLASS} flex flex-col gap-8 max-lg:gap-0`}>
+        <div className="hidden grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-x-12 gap-y-10 lg:grid xl:gap-x-20">
           <FooterVisitColumn addressText={addressText} />
           <FooterSectionsColumn />
           <FooterTermsAndSocialColumn phoneHref={phoneHref} />
