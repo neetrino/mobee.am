@@ -19,6 +19,7 @@ export function formatOrderForList(order: {
   customerPhone: string | null;
   createdAt: Date;
   itemsCount: number;
+  paymentMethod?: string | null;
   user?: {
     id: string;
     firstName: string | null;
@@ -49,6 +50,7 @@ export function formatOrderForList(order: {
     customerLastName: lastName,
     customerId: customer?.id || null,
     itemsCount: order.itemsCount,
+    paymentMethod: order.paymentMethod || null,
     createdAt: order.createdAt.toISOString(),
   };
 }

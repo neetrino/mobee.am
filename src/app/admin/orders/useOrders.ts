@@ -31,6 +31,7 @@ export interface Order {
   customerLastName?: string;
   customerId?: string | null;
   itemsCount: number;
+  paymentMethod?: string | null;
   createdAt: string;
 }
 

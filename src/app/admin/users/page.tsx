@@ -268,9 +268,6 @@ export default function UsersPage() {
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.orders')}
                       </th>
-                      <th className="pl-[calc(1.5rem-5px)] pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {t('admin.users.roles')}
-                      </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.status')}
                       </th>
@@ -294,7 +291,6 @@ export default function UsersPage() {
                           <div className="text-sm font-medium text-gray-900">
                             {user.firstName} {user.lastName}
                           </div>
-                          <div className="text-sm text-gray-500">{user.id}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">{user.email}</div>
@@ -304,20 +300,6 @@ export default function UsersPage() {
                         </td>
                         <td className="px-16 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                           {user.ordersCount ?? 0}
-                        </td>
-                        <td className="pl-[calc(1.5rem-18px)] pr-6 py-4 whitespace-nowrap">
-                          <div className="flex gap-2">
-                            {user.roles?.map((role) => (
-                              <span
-                                key={role}
-                                className={`px-2 py-1 text-xs font-medium bg-admin-100 text-admin-800 rounded-full ${
-                                  roleFilter === 'admin' && role === 'admin' ? 'ml-[10px]' : ''
-                                }`}
-                              >
-                                {role}
-                              </span>
-                            ))}
-                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
