@@ -180,9 +180,6 @@ export default function UsersPage() {
 
             {/* Admin / Customer filter */}
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                {t('admin.users.adminCustomer')}
-              </span>
               <div className="inline-flex rounded-full bg-gray-100 p-1.5 text-sm font-medium">
                 <button
                   type="button"
