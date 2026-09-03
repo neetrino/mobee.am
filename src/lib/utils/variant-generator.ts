@@ -1,7 +1,7 @@
 import { db } from "@white-shop/db";
 import { logger } from "./logger";
 import {
-  getProductColorHex,
+  getProductColorHexes,
   isKnownProductColor,
 } from "../product-color-hex.constants";
 
@@ -84,7 +84,7 @@ export async function getProductAttributeValues(
 
 function knownColorHexes(attributeKey: string, valueString: string): string[] {
   if (attributeKey !== "color" || !isKnownProductColor(valueString)) return [];
-  return [getProductColorHex(valueString)];
+  return getProductColorHexes(valueString);
 }
 
 async function fillMissingColorHexes(

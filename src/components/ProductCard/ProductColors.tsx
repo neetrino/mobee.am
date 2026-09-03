@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getColorHex } from '../../lib/colorMap';
-import { buildColorSwatchStyle } from '../../lib/product-color-hex.constants';
+import { buildColorSwatchStyle, resolveProductSwatchHexes } from '../../lib/product-color-hex.constants';
 import { LAYOUT_DESKTOP_MIN_WIDTH_MEDIA_QUERY } from '../../lib/layout-breakpoints.constants';
 import { resolveProductCardColorLinkValue, type ProductCardColorOption } from './useProductCardColorState';
 
@@ -110,10 +109,12 @@ export function ProductColors({
         const linkValue = resolveProductCardColorLinkValue(colorOption);
         const isSelected = selectedLinkValue === linkValue;
 
-        const fallbackHex = getColorHex(linkValue || colorValue);
-        const swatchStyle = imageUrl
-          ? undefined
-          : buildColorSwatchStyle(colorsHex, fallbackHex);
+        const hexes = resolveProductSwatchHexes({
+          names: [linkValue, colorValue],
+          stored: colorsHex,
+        });
+        const fallbackHex = hexes[0];
+        const swatchStyle = imageUrl ? undefined : buildColorSwatchStyle(hexes);
 
         const swatchContent = imageUrl ? (
           <img

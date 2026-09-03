@@ -86,6 +86,7 @@ export interface Product {
   labels?: ProductLabel[];
   brand?: {
     id: string;
+    slug?: string;
     name: string;
   };
   /** Leaf / primary category for compare grouping. */

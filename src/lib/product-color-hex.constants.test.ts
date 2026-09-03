@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   getProductColorHex,
+  getProductColorHexes,
   isKnownProductColor,
+  resolveProductSwatchHexes,
 } from './product-color-hex.constants';
 
 describe('getProductColorHex', () => {
@@ -34,6 +36,18 @@ describe('getProductColorHex', () => {
     expect(getProductColorHex('Titanium Blue')).not.toBe(getProductColorHex('Titanium Gray'));
   });
 
+  it('uses Dyson CMF HEX instead of generic hue tokens', () => {
+    expect(getProductColorHex('Ceramic Pink')).toBe('#E8B4B8');
+    expect(getProductColorHex('Ceramic Pink')).not.toBe(getProductColorHex('pink'));
+    expect(getProductColorHex('Prussian Blue')).toBe('#003153');
+    expect(getProductColorHex('Prussian Blue')).not.toBe(getProductColorHex('blue'));
+    expect(getProductColorHex('Jasper Plum')).toBe('#6B3A5C');
+    expect(getProductColorHex('Sakura Cherry')).toBe('#E8A0B4');
+    expect(getProductColorHex('Ceramic Patina')).toBe('#8B9A8C');
+    expect(getProductColorHex('Amber Silk')).toBe('#C9A26B');
+    expect(getProductColorHex('Kanzan Pink')).not.toBe(getProductColorHex('pink'));
+  });
+
   it('strips Samsung marketing prefixes to the real hue', () => {
     expect(getProductColorHex('Phantom Violet')).toBe(getProductColorHex('violet'));
     expect(getProductColorHex('Awesome Lime')).toBe(getProductColorHex('lime'));
@@ -41,7 +55,35 @@ describe('getProductColorHex', () => {
   });
 
   it('falls back to gray only for unknown names', () => {
-    expect(getProductColorHex('jasper plum')).toBe('#CCCCCC');
+    expect(getProductColorHex('unobtainium glow')).toBe('#CCCCCC');
+  });
+});
+
+describe('getProductColorHexes', () => {
+  it('returns dual-tone HEX for Dyson compound finishes', () => {
+    expect(getProductColorHexes('Vinca Blue / Topaz')).toEqual(['#6B8CB4', '#D4A05A']);
+    expect(getProductColorHexes('Nickel / Copper')).toEqual(['#A8A9AD', '#B87333']);
+    expect(getProductColorHexes('Red Velvet / Gold')).toEqual(['#8B1E2D', '#C9A962']);
+  });
+});
+
+describe('resolveProductSwatchHexes', () => {
+  it('overrides stored generic HEX when the name is a Dyson finish', () => {
+    expect(
+      resolveProductSwatchHexes({
+        names: ['Ceramic Pink'],
+        stored: ['#FADDD7'],
+      }),
+    ).toEqual(['#E8B4B8']);
+  });
+
+  it('keeps stored HEX for non-Dyson names', () => {
+    expect(
+      resolveProductSwatchHexes({
+        names: ['Blue Shadow'],
+        stored: ['#276787'],
+      }),
+    ).toEqual(['#276787']);
   });
 });
 
@@ -51,6 +93,7 @@ describe('isKnownProductColor', () => {
     expect(isKnownProductColor('Կապույտ')).toBe(true);
     expect(isKnownProductColor('Синий')).toBe(true);
     expect(isKnownProductColor('Titanium Black')).toBe(true);
-    expect(isKnownProductColor('jasper plum')).toBe(false);
+    expect(isKnownProductColor('Ceramic Pink')).toBe(true);
+    expect(isKnownProductColor('unobtainium glow')).toBe(false);
   });
 });

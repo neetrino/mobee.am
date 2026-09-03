@@ -125,6 +125,53 @@ describe("mapVariantOptions", () => {
     expect(color?.colors?.[0]).toMatch(/^#[0-9A-Fa-f]{6}$/);
     expect(color?.colors?.[0]).not.toBe("#CCCCCC");
   });
+
+  it("overrides stored generic HEX for Dyson CMF names", () => {
+    const options = mapVariantOptions(
+      variantStub({
+        options: [
+          {
+            attributeKey: "color",
+            value: "Ceramic Pink",
+            attributeValue: {
+              id: "c-pink",
+              value: "Ceramic Pink",
+              attribute: { key: "color", id: "a-color" },
+              translations: [],
+              colors: ["#FADDD7"],
+              imageUrl: null,
+            },
+          },
+        ],
+      }),
+    );
+    expect(options.find((option) => option.key === "color")?.colors).toEqual(["#E8B4B8"]);
+  });
+
+  it("fills dual-tone HEX for Dyson compound finishes", () => {
+    const options = mapVariantOptions(
+      variantStub({
+        options: [
+          {
+            attributeKey: "color",
+            value: "Vinca Blue / Topaz",
+            attributeValue: {
+              id: "c-vinca",
+              value: "Vinca Blue / Topaz",
+              attribute: { key: "color", id: "a-color" },
+              translations: [],
+              colors: null,
+              imageUrl: null,
+            },
+          },
+        ],
+      }),
+    );
+    expect(options.find((option) => option.key === "color")?.colors).toEqual([
+      "#6B8CB4",
+      "#D4A05A",
+    ]);
+  });
 });
 
 describe("recoverMissingColorFromVariant", () => {

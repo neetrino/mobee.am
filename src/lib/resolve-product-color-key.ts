@@ -23,6 +23,8 @@ const GENERIC_MATERIAL_TOKENS = new Set([
   'frost',
   'satin',
   'pearl',
+  'silk',
+  'velvet',
 ]);
 
 const MIN_COMPOUND_PART_LENGTH = 3;

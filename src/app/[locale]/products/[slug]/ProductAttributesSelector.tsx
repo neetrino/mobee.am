@@ -2,8 +2,7 @@
 
 import {
   buildColorSwatchStyle,
-  getProductColorHex,
-  isKnownProductColor,
+  resolveProductSwatchHexes,
 } from '../../../../lib/product-color-hex.constants';
 import type { ReactNode } from 'react';
 import { processImageUrl } from '../../../../lib/utils/image-utils';
@@ -34,12 +33,6 @@ export interface ProductAttributesSelectorProps {
   getOptionValue: (options: VariantOption[] | undefined, key: string) => string | null;
 }
 
-
-function resolveSwatchFallbackHex(value: string, label: string): string {
-  if (isKnownProductColor(value)) return getProductColorHex(value);
-  if (isKnownProductColor(label)) return getProductColorHex(label);
-  return getProductColorHex(value);
-}
 
 function sortAttributeEntries(
   entries: Array<[string, AttributeGroupValue[]]>
@@ -107,7 +100,7 @@ function renderColorSwatch({
 }) {
   const processedImageUrl = imageUrl ? processImageUrl(imageUrl) : null;
   const hasImage = Boolean(processedImageUrl?.trim());
-  const fallbackHex = resolveSwatchFallbackHex(value, label);
+  const hexes = resolveProductSwatchHexes({ names: [value, label], stored: colors });
   const borderClass =
     isSelected ? 'border-admin ring-2 ring-admin/25' : 'border-gray-200 hover:border-gray-400';
 
@@ -121,7 +114,7 @@ function renderColorSwatch({
     />
   ) : null;
 
-  const style = hasImage ? undefined : buildColorSwatchStyle(colors, fallbackHex);
+  const style = hasImage ? undefined : buildColorSwatchStyle(hexes);
 
   if (onClick) {
     return (

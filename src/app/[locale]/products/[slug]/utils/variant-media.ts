@@ -45,6 +45,19 @@ function isMultiVariantProduct(product: Product): boolean {
   return (product.variants?.length ?? 0) > 1;
 }
 
+function isDysonProduct(product: Product | null): boolean {
+  if (!product?.brand) return false;
+  if (product.brand.slug?.trim().toLowerCase() === 'dyson') return true;
+  return product.brand.name?.trim().toLowerCase() === 'dyson';
+}
+
+function limitGalleryForBrandPolicy(product: Product | null, urls: string[]): string[] {
+  if (!isDysonProduct(product) || urls.length <= 1) {
+    return urls;
+  }
+  return [urls[0]];
+}
+
 function mergeVariantAndProductGallery(
   variantUrls: string[],
   productUrls: string[],
@@ -76,12 +89,15 @@ export function getVariantMedia(
   const productUrls = collectProductMediaUrls(product);
 
   if (!selectedVariant) {
-    return dedupeUrls(productUrls);
+    return limitGalleryForBrandPolicy(product, dedupeUrls(productUrls));
   }
 
   const variantUrls = collectVariantImageUrls(selectedVariant);
   const allowProductExtras = !isMultiVariantProduct(product) || variantUrls.length === 0;
-  return mergeVariantAndProductGallery(variantUrls, productUrls, allowProductExtras);
+  return limitGalleryForBrandPolicy(
+    product,
+    mergeVariantAndProductGallery(variantUrls, productUrls, allowProductExtras),
+  );
 }
 
 export function getVariantMainImageIndex(
