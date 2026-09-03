@@ -1,5 +1,6 @@
 import hyAttributes from '../locales/hy/attributes.json';
 import ruAttributes from '../locales/ru/attributes.json';
+import { resolveDysonSwatchHexes } from './dyson-color-registry';
 import { isValidHexColor, normalizeHexToSixDigits } from './hexColorUtils';
 import {
   buildColorLookupIndexes,
@@ -107,6 +108,18 @@ export const PRODUCT_COLOR_HEX: Record<string, string> = {
   'pink gold': '#E6C2B0',
   'rose gold': '#E6C2B0',
   rosegold: '#E6C2B0',
+  patina: '#6A8F7A',
+  nickel: '#C0C5C7',
+  copper: '#B87333',
+  sakura: '#F3C6C6',
+  cherry: '#C44B6A',
+  amber: '#D4A017',
+  apricot: '#FBCEB1',
+  topaz: '#E6C35C',
+  plum: '#6B3A6B',
+  rose: '#E8B4B8',
+  strawberry: '#E25C5C',
+  'light violet': '#C5A8D4',
 };
 
 const UNKNOWN_COLOR_FALLBACK = '#CCCCCC';
@@ -152,16 +165,79 @@ export function pickUsableSwatchHexes(
     });
 }
 
-export function getProductColorHex(colorName: string): string {
+function hexesFromSlashParts(colorName: string): string[] {
+  const parts = colorName
+    .split('/')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length < 2) return [];
+
+  const hexes: string[] = [];
+  for (const part of parts.slice(0, 2)) {
+    const canonicalKey = resolveCanonicalColorKey(part);
+    if (!canonicalKey) continue;
+    hexes.push(PRODUCT_COLOR_HEX[canonicalKey]);
+  }
+  return hexes;
+}
+
+/**
+ * HEX ցուցակ գույնի անվան համար։ Dyson CMF alias-ները հաղթում են generic hue token-ներին։
+ */
+export function getProductColorHexes(colorName: string): string[] {
+  const dyson = resolveDysonSwatchHexes(colorName);
+  if (dyson.length > 0) return dyson;
+
   const canonicalKey = resolveCanonicalColorKey(colorName);
-  if (canonicalKey) return PRODUCT_COLOR_HEX[canonicalKey];
-  if (isValidHexColor(colorName)) return normalizeHexToSixDigits(colorName);
+  if (canonicalKey) return [PRODUCT_COLOR_HEX[canonicalKey]];
+
+  const dual = hexesFromSlashParts(colorName);
+  if (dual.length > 0) return dual;
+
+  if (isValidHexColor(colorName)) return [normalizeHexToSixDigits(colorName)];
+  return [];
+}
+
+export function getProductColorHex(colorName: string): string {
+  const hexes = getProductColorHexes(colorName);
+  if (hexes.length > 0) return hexes[0];
   return UNKNOWN_COLOR_FALLBACK;
 }
 
 export function isKnownProductColor(colorName: string): boolean {
+  if (resolveDysonSwatchHexes(colorName).length > 0) return true;
   if (resolveCanonicalColorKey(colorName)) return true;
   return isValidHexColor(colorName);
+}
+
+export type ResolveProductSwatchHexesParams = {
+  names: string[];
+  stored?: string[] | null;
+};
+
+/**
+ * Dyson CMF անունները միշտ գերակայում են պահված generic HEX-ին (սխալ catalog backfill)։
+ * Այլ դեպքում պահված HEX-ն է աղբյուրը; վերջին տարբերակը անվան lookup-ն է։
+ */
+export function resolveProductSwatchHexes(
+  params: ResolveProductSwatchHexesParams,
+): string[] {
+  for (const name of params.names) {
+    if (!name?.trim()) continue;
+    const dyson = resolveDysonSwatchHexes(name);
+    if (dyson.length > 0) return dyson;
+  }
+
+  const stored = pickUsableSwatchHexes(params.stored);
+  if (stored.length > 0) return stored;
+
+  for (const name of params.names) {
+    if (!name?.trim()) continue;
+    const hexes = getProductColorHexes(name);
+    if (hexes.length > 0) return hexes;
+  }
+
+  return [];
 }
 
 /**

@@ -122,6 +122,31 @@ describe('getVariantMedia', () => {
       'https://r2.example/products/p1/fallback.png',
     ]);
   });
+
+  it('shows only the main photo for Dyson products', () => {
+    const dysonProduct: Product = {
+      ...multiVariantProduct,
+      brand: { id: 'b-dyson', slug: 'dyson', name: 'Dyson' },
+    };
+    const variant: ProductVariant = {
+      id: 'v1',
+      sku: 'dyson-1',
+      price: 100,
+      stock: 5,
+      available: true,
+      options: [{ key: 'color', attribute: 'color', value: 'ceramic pink' }],
+      imageUrl: 'https://r2.example/products/dyson/main.png',
+      media: [
+        { url: 'https://r2.example/products/dyson/main.png' },
+        { url: 'https://r2.example/products/dyson/gallery-1.png' },
+        { url: 'https://r2.example/products/dyson/gallery-2.png' },
+      ],
+    };
+
+    expect(getVariantMedia(dysonProduct, variant)).toEqual([
+      'https://r2.example/products/dyson/main.png',
+    ]);
+  });
 });
 
 describe('getVariantMainImageIndex', () => {

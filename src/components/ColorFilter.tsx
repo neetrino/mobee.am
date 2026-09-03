@@ -6,8 +6,10 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/lib/i18n/navigation';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
-import { getColorHex } from '../lib/colorMap';
-import { pickUsableSwatchHexes } from '../lib/product-color-hex.constants';
+import {
+  buildColorSwatchStyle,
+  resolveProductSwatchHexes,
+} from '../lib/product-color-hex.constants';
 import { facetParamsFromUrlSearchParams } from '@/lib/shop/product-filters-to-api-params';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
@@ -137,9 +139,11 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
         <div className="mt-4 grid grid-cols-5 gap-x-[22px] gap-y-4">
           {colors.map((color) => {
             const isSelected = selected.includes(color.value);
-            // Determine color hex: use colors[0] if available, otherwise use getColorHex
-            const usableHexes = pickUsableSwatchHexes(color.colors);
-            const colorHex = usableHexes[0] ?? getColorHex(color.value || color.label);
+            const hexes = resolveProductSwatchHexes({
+              names: [color.value, color.label],
+              stored: color.colors,
+            });
+            const colorHex = hexes[0] ?? '#CCCCCC';
             const hasImage = color.imageUrl && color.imageUrl.trim() !== '';
 
             return (
@@ -162,7 +166,7 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
                 </span>
                 <div
                   className="relative h-8 w-8 overflow-hidden rounded-full border border-[#CAD5E2]"
-                  style={hasImage ? {} : { backgroundColor: colorHex }}
+                  style={hasImage ? {} : buildColorSwatchStyle(hexes)}
                   aria-hidden
                 >
                   {hasImage ? (
