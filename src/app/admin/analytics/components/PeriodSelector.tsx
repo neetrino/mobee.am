@@ -1,9 +1,10 @@
-﻿'use client';
+'use client';
 
-import { Button, Card } from '@/app/admin/lib/adminShopUi';
+import { CalendarRange } from 'lucide-react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { formatDate } from '../utils';
 import type { AnalyticsData } from '../types';
+import { ADMIN_DASH_CARD_CLASS } from '../../dashboard-ui.constants';
 
 const ANALYTICS_PERIOD_OPTIONS = [
   { value: 'day', i18nKey: 'admin.analytics.today' },
@@ -23,58 +24,6 @@ interface PeriodSelectorProps {
   onEndDateChange: (date: string) => void;
 }
 
-interface AnalyticsPeriodButtonGroupProps {
-  period: string;
-  onPeriodChange: (period: string) => void;
-  onStartDateChange: (date: string) => void;
-  onEndDateChange: (date: string) => void;
-  t: (key: string) => string;
-}
-
-function AnalyticsPeriodButtonGroup({
-  period,
-  onPeriodChange,
-  onStartDateChange,
-  onEndDateChange,
-  t,
-}: AnalyticsPeriodButtonGroupProps) {
-  return (
-    <div className="w-full min-w-0">
-      <div
-        className="flex flex-wrap gap-2"
-        role="group"
-        aria-labelledby="analytics-time-period-heading"
-      >
-        {ANALYTICS_PERIOD_OPTIONS.map((opt) => {
-          const isSelected = period === opt.value;
-          const focusRingClass = isSelected
-            ? 'outline-none focus:outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-white/90'
-            : 'outline-none focus:outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-gray-400';
-
-          return (
-            <Button
-              key={opt.value}
-              type="button"
-              size="sm"
-              variant={isSelected ? 'admin' : 'outline'}
-              className={focusRingClass}
-              onClick={() => {
-                onPeriodChange(opt.value);
-                if (opt.value !== 'custom') {
-                  onStartDateChange('');
-                  onEndDateChange('');
-                }
-              }}
-            >
-              {t(opt.i18nKey)}
-            </Button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export function PeriodSelector({
   period,
   startDate,
@@ -87,52 +36,73 @@ export function PeriodSelector({
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6 mb-6 bg-white shadow-sm border border-gray-200 rounded-supersudo">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <h2 id="analytics-time-period-heading" className="text-xl font-semibold text-gray-900">
-          {t('admin.analytics.timePeriod')}
-        </h2>
-        {analytics && (
-          <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1.5 rounded-supersudo">
-            {formatDate(analytics.dateRange.start)} - {formatDate(analytics.dateRange.end)}
+    <div className={`mb-3 ${ADMIN_DASH_CARD_CLASS} p-4`}>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-900">
+            <CalendarRange className="h-4 w-4" aria-hidden />
           </div>
-        )}
+          <div className="min-w-0">
+            <h2 className="text-base font-semibold text-gray-900">{t('admin.analytics.timePeriod')}</h2>
+            {analytics ? (
+              <p className="text-xs text-gray-500">
+                {formatDate(analytics.dateRange.start)} – {formatDate(analytics.dateRange.end)}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-500">{t('admin.analytics.period')}</p>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="flex flex-wrap gap-3 items-end">
-        <AnalyticsPeriodButtonGroup
-          period={period}
-          onPeriodChange={onPeriodChange}
-          onStartDateChange={onStartDateChange}
-          onEndDateChange={onEndDateChange}
-          t={t}
-        />
-        {period === 'custom' && (
-          <>
-            <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.analytics.startDate')}
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => onStartDateChange(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin transition-all bg-white"
-              />
-            </div>
-            <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.analytics.endDate')}
-              </label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => onEndDateChange(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin focus:border-admin transition-all bg-white"
-              />
-            </div>
-          </>
-        )}
+
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t('admin.analytics.timePeriod')}>
+        {ANALYTICS_PERIOD_OPTIONS.map((opt) => {
+          const isSelected = period === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                onPeriodChange(opt.value);
+                if (opt.value !== 'custom') {
+                  onStartDateChange('');
+                  onEndDateChange('');
+                }
+              }}
+              className={`rounded-[10px] px-3 py-1.5 text-xs font-semibold transition ${
+                isSelected
+                  ? 'bg-admin-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {t(opt.i18nKey)}
+            </button>
+          );
+        })}
       </div>
-    </Card>
+
+      {period === 'custom' ? (
+        <div className="mt-3 flex flex-wrap items-end gap-2">
+          <label className="min-w-[120px] flex-1 text-xs font-medium text-gray-600">
+            {t('admin.analytics.startDate')}
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => onStartDateChange(e.target.value)}
+              className="mt-1 h-10 w-full rounded-[12px] border border-gray-200 px-3 text-sm text-gray-900 outline-none focus:border-admin-400 focus:ring-2 focus:ring-admin-100"
+            />
+          </label>
+          <label className="min-w-[120px] flex-1 text-xs font-medium text-gray-600">
+            {t('admin.analytics.endDate')}
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => onEndDateChange(e.target.value)}
+              className="mt-1 h-10 w-full rounded-[12px] border border-gray-200 px-3 text-sm text-gray-900 outline-none focus:border-admin-400 focus:ring-2 focus:ring-admin-100"
+            />
+          </label>
+        </div>
+      ) : null}
+    </div>
   );
 }

@@ -1,13 +1,17 @@
+import { createElement } from 'react';
 import Image from 'next/image';
 import type { LanguageCode } from '@/lib/language';
 import { t } from '@/lib/i18n';
+import {
+  resolveCategoryMenuIcon,
+  type CategoryIconSource,
+} from '@/lib/categoryMenuIcon';
 import type { ProductDescriptionSpecRow } from '@/lib/products/extract-product-description-specs';
 import { ProductSpecRow } from './ProductSpecCard';
 import { getProductSpecSectionIcon, getProductSpecSectionIconClassName } from './product-spec-row-icon';
 import { PRODUCT_DESCRIPTION_CARD_CLASS } from './product-description.constants';
 import { ProductImagePlaceholder } from '@/components/ProductImagePlaceholder';
 
-const HeroSectionIcon = getProductSpecSectionIcon('general');
 const HERO_SECTION_ICON_CLASS = getProductSpecSectionIconClassName('general');
 
 const HERO_GRID_CLASS =
@@ -18,6 +22,8 @@ interface ProductHeroCardProps {
   imageUrl: string | null;
   rows: ProductDescriptionSpecRow[];
   language: LanguageCode;
+  /** Primary / leaf category — drives «Հիմնական» icon (no phone icon for appliances). */
+  category?: CategoryIconSource | null;
 }
 
 function filterHeroRows(rows: ProductDescriptionSpecRow[], imageAlt: string): ProductDescriptionSpecRow[] {
@@ -36,8 +42,17 @@ function filterHeroRows(rows: ProductDescriptionSpecRow[], imageAlt: string): Pr
   });
 }
 
-export function ProductHeroCard({ imageAlt, imageUrl, rows, language }: ProductHeroCardProps) {
+export function ProductHeroCard({
+  imageAlt,
+  imageUrl,
+  rows,
+  language,
+  category = null,
+}: ProductHeroCardProps) {
   const visibleRows = filterHeroRows(rows, imageAlt);
+  const heroSectionIcon = category
+    ? resolveCategoryMenuIcon(category)
+    : getProductSpecSectionIcon('general');
 
   return (
     <article className={PRODUCT_DESCRIPTION_CARD_CLASS}>
@@ -61,7 +76,10 @@ export function ProductHeroCard({ imageAlt, imageUrl, rows, language }: ProductH
               <span
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${HERO_SECTION_ICON_CLASS}`}
               >
-                <HeroSectionIcon className="h-4 w-4" aria-hidden />
+                {createElement(heroSectionIcon, {
+                  className: 'h-4 w-4',
+                  'aria-hidden': true,
+                })}
               </span>
               <h3 className="min-w-0 break-words text-base font-bold text-gray-900">
                 {t(language, 'product.specs.sections.general')}

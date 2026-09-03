@@ -7,6 +7,7 @@ import {
   MOBILE_DRAWER_SHELL_BACKDROP_MOTION_IN_CLASS,
   MOBILE_DRAWER_SHELL_BACKDROP_MOTION_OUT_CLASS,
   MOBILE_HEADER_DROPDOWN_BACKDROP_CLASS,
+  MOBILE_HEADER_DROPDOWN_LOGIN_BUTTON_CLASS,
   MOBILE_HEADER_DROPDOWN_NAV_LINK_CLASS,
   MOBILE_HEADER_DROPDOWN_PANEL_CLASS,
   MOBILE_HEADER_DROPDOWN_PANEL_MOTION_IN_CLASS,
@@ -19,15 +20,23 @@ const DROPDOWN_HEADER_GAP_PX = 8;
 type MobileHeaderDropdownProps = {
   pathname: string;
   exiting: boolean;
+  shopLabel: string;
   aboutLabel: string;
   contactLabel: string;
   policiesLabel: string;
+  loginLabel: string;
+  profileLabel: string;
+  isLoggedIn: boolean;
   closeLabel: string;
   onClose: () => void;
   onAnimationEnd: (event: AnimationEvent<HTMLDivElement>) => void;
 };
 
 function isRouteActive(pathname: string, href: string): boolean {
+  if (href === '/shop') {
+    return pathname.startsWith('/shop') || pathname.startsWith('/products');
+  }
+
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -35,9 +44,13 @@ function isRouteActive(pathname: string, href: string): boolean {
 export function MobileHeaderDropdown({
   pathname,
   exiting,
+  shopLabel,
   aboutLabel,
   contactLabel,
   policiesLabel,
+  loginLabel,
+  profileLabel,
+  isLoggedIn,
   closeLabel,
   onClose,
   onAnimationEnd,
@@ -75,6 +88,9 @@ export function MobileHeaderDropdown({
       isRouteActive(pathname, href) ? 'text-[#00a1ff]' : 'text-[#171717]'
     }`;
 
+  const accountHref = isLoggedIn ? '/profile' : '/login';
+  const accountLabel = isLoggedIn ? profileLabel : loginLabel;
+
   return (
     <>
       <button
@@ -99,6 +115,9 @@ export function MobileHeaderDropdown({
       >
         <nav className="flex max-h-[inherit] flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="flex flex-col py-3">
+            <Link href="/shop" prefetch onClick={onClose} className={linkClassName('/shop')}>
+              {shopLabel}
+            </Link>
             <Link href="/about" prefetch onClick={onClose} className={linkClassName('/about')}>
               {aboutLabel}
             </Link>
@@ -109,6 +128,14 @@ export function MobileHeaderDropdown({
               {policiesLabel}
             </Link>
           </div>
+          <Link
+            href={accountHref}
+            prefetch
+            onClick={onClose}
+            className={MOBILE_HEADER_DROPDOWN_LOGIN_BUTTON_CLASS}
+          >
+            {accountLabel}
+          </Link>
         </nav>
       </div>
     </>

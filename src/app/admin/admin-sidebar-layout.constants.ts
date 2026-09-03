@@ -96,3 +96,25 @@ export const ADMIN_PAGE_MAIN_COLLAPSED_MAX_WIDTH_CLASS = [
 
 /** sessionStorage: persist desktop sidebar icon-rail across admin navigations (each page mounts its own shell). */
 export const ADMIN_SIDEBAR_DESKTOP_COLLAPSED_SESSION_STORAGE_KEY = 'mobee.admin.sidebarDesktopCollapsed';
+
+/** Grill-style sliding active nav pill timing. */
+export const ADMIN_SIDEBAR_NAV_SLIDE_MS = 380;
+
+/** Sliding active pill colors (indicator element). */
+export const ADMIN_SIDEBAR_NAV_INDICATOR = {
+  background: '#f4f4f4',
+  border: '#2DB2FF',
+} as const;
+
+/** Active label/icon when sliding indicator is behind the row. */
+export const ADMIN_SIDEBAR_NAV_ACTIVE_TEXT_CLASS = 'text-admin-600';
+
+export const ADMIN_SIDEBAR_NAV_ICON_ACTIVE_CLASS = 'text-admin-600';
+
+export const ADMIN_SIDEBAR_NAV_ICON_INACTIVE_CLASS = 'text-gray-500';
+
+export const ADMIN_SIDEBAR_NAV_INACTIVE_ROW_CLASS =
+  'text-gray-700 hover:bg-gray-100/80 hover:text-gray-900';
+
+export const ADMIN_SIDEBAR_NAV_ROW_BASE_CLASS =
+  'relative z-10 flex w-full min-w-0 items-center rounded-[15px] text-sm font-medium';

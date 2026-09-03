@@ -66,9 +66,20 @@ const YES_NO_VALUES = new Set(['այո', 'ոչ', 'yes', 'no', 'да', 'нет'])
 const SCREEN_SIZE_PATTERN =
   /^\d+(\.\d+)?\s*(inch|inches|in)\b(\s*\([\d.]+\s*cm\))?/i;
 const RESOLUTION_PATTERN = /^\d+\s*(x|×|\*|-by-)\s*\d+/i;
+/** Physical size: `80x49x25.5սմ`, `85 x 60 x 56 սմ`, or any NxN with a length unit. */
+const LENGTH_UNIT_PATTERN = /սմ|մմ|см|мм|(?<![a-zA-Z])(?:cm|mm)(?![a-zA-Z])/i;
+const THREE_AXIS_SIZE_PATTERN =
+  /^\d+(\.\d+)?\s*(x|×)\s*\d+(\.\d+)?\s*(x|×)\s*\d+(\.\d+)?/i;
 const WARRANTY_PATTERN = /^\d+\s*(months?|years?)\b/i;
 const STORAGE_CAPACITY_TB_PATTERN = /^\d+\s*TB\b/i;
 const GB_VALUE_PATTERN = /^(\d+)\s*GB\b/i;
+
+function looksLikeDimensionsValue(trimmed: string): boolean {
+  if (THREE_AXIS_SIZE_PATTERN.test(trimmed)) {
+    return true;
+  }
+  return RESOLUTION_PATTERN.test(trimmed) && LENGTH_UNIT_PATTERN.test(trimmed);
+}
 
 const RAM_LABEL_PATTERN =
   /\u0555\u057a\u0565\u0580\u0561\u057f\u056b\u057e|operativ|\u043e\u043f\u0435\u0440\u0430\u0442\u0438\u0432|\bram\b|\u0563\u0580\u0561\u0566\u056b\u056f/i;
@@ -158,6 +169,9 @@ export function classifySpecValue(value: string, context?: SpecValueContext): Sp
     return 'processor';
   }
 
+  if (looksLikeDimensionsValue(trimmed)) {
+    return 'dimensions';
+  }
   if (SCREEN_LABEL_PATTERN.test(rawLabel) && SCREEN_SIZE_PATTERN.test(trimmed)) {
     return 'screen_size';
   }
@@ -211,6 +225,7 @@ const VALUE_KIND_TO_LABEL_KEY: Readonly<Partial<Record<SpecValueKind, string>>> 
   display_type: 'product.specs.labels.displayType',
   screen_size: 'product.specs.labels.screenDiagonal',
   screen_resolution: 'product.specs.labels.screenResolution',
+  dimensions: 'product.specs.labels.dimensions',
   yes_no: 'product.specs.labels.other',
   warranty: 'product.specs.labels.warranty',
   processor: 'product.specs.labels.processor',

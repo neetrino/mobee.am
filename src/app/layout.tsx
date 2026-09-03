@@ -5,11 +5,12 @@ import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
 import { siteInter } from '../lib/fonts/site-fonts';
 import {
-  SITE_APP_ICON_HEIGHT_PX,
   SITE_APP_ICON_PATH,
-  SITE_APP_ICON_WIDTH_PX,
   SITE_BRAND_NAME,
   SITE_SHARE_DESCRIPTION,
+  SITE_SHARE_IMAGE_HEIGHT_PX,
+  SITE_SHARE_IMAGE_PATH,
+  SITE_SHARE_IMAGE_WIDTH_PX,
   SITE_SHARE_TITLE,
 } from '../lib/brand.constants';
 import { DEFAULT_LANGUAGE, STOREFRONT_LANGUAGE_INIT_SCRIPT } from '../lib/language';
@@ -24,9 +25,9 @@ export const viewport: Viewport = {
 };
 
 const siteShareImage = {
-  url: getSiteAssetUrl(SITE_APP_ICON_PATH),
-  width: SITE_APP_ICON_WIDTH_PX,
-  height: SITE_APP_ICON_HEIGHT_PX,
+  url: getSiteAssetUrl(SITE_SHARE_IMAGE_PATH),
+  width: SITE_SHARE_IMAGE_WIDTH_PX,
+  height: SITE_SHARE_IMAGE_HEIGHT_PX,
   alt: SITE_BRAND_NAME,
 };
 
@@ -57,7 +58,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: SITE_SHARE_TITLE,
     description: SITE_SHARE_DESCRIPTION,
-    images: [getSiteAssetUrl(SITE_APP_ICON_PATH)],
+    images: [getSiteAssetUrl(SITE_SHARE_IMAGE_PATH)],
   },
 };
 

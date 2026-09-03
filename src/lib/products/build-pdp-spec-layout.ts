@@ -38,8 +38,8 @@ const HERO_PANEL_FALLBACKS: ReadonlyArray<{
   },
   {
     bucket: 'additionalRows',
-    sectionSlug: 'security',
-    titleKey: 'product.specs.sections.security',
+    sectionSlug: 'other',
+    titleKey: 'product.specs.sections.other',
   },
 ];
 

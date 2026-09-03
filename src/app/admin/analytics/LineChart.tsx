@@ -1,296 +1,283 @@
 ﻿'use client';
 
+import { useState } from 'react';
 import { useTranslation } from '../../../lib/i18n-client';
+import {
+  TREND_ORDERS_COLOR,
+  TREND_REVENUE_COLOR,
+  dayNumberFromIso,
+  defaultFormatCurrency,
+  formatAxisAmount,
+  formatPointLabel,
+  niceCeiling,
+  shouldShowDayLabel,
+  xForIndex,
+} from './lineChart.utils';
 
-interface LineChartData {
+export { TREND_ORDERS_COLOR, TREND_REVENUE_COLOR } from './lineChart.utils';
+
+export interface TrendChartPoint {
   _id: string;
   count: number;
   revenue: number;
 }
 
-interface LineChartProps {
-  data: Array<LineChartData>;
+export interface TrendChartTooltipCopy {
+  revenueLabel: string;
+  ordersLabel: string;
+  formatRevenue: (amount: number) => string;
+  formatOrders: (count: number) => string;
 }
 
-export function LineChart({ data }: LineChartProps) {
+interface LineChartProps {
+  data: TrendChartPoint[];
+  currency?: string;
+  chartAria?: string;
+  tooltip?: TrendChartTooltipCopy;
+}
+
+/**
+ * Grill-style dual trend chart: revenue line + orders bars, hover tooltip on dots.
+ */
+export function LineChart({
+  data,
+  currency = 'AMD',
+  chartAria,
+  tooltip,
+}: LineChartProps) {
   const { t } = useTranslation();
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
-  if (!data || data.length === 0) return null;
+  if (!data || data.length === 0) {
+    return null;
+  }
 
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-    }).format(amount);
+  const resolvedTooltip: TrendChartTooltipCopy = tooltip ?? {
+    revenueLabel: t('admin.dashboard.chartRevenue'),
+    ordersLabel: t('admin.dashboard.chartOrders'),
+    formatRevenue: (amount) => defaultFormatCurrency(amount, currency),
+    formatOrders: (count) => String(count),
   };
 
-  const formatDateShort = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('hy-AM', {
-      month: 'short',
-      day: 'numeric',
-    }).format(date);
-  };
+  const width = 720;
+  const height = 236;
+  const padding = { top: 16, right: 44, bottom: 36, left: 56 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const pointCount = Math.max(data.length, 1);
+  const slotWidth = plotWidth / pointCount;
 
-  const maxCount = Math.max(...data.map(d => d.count), 1);
-  const width = 800;
-  const height = 300;
-  const padding = { top: 30, right: 40, bottom: 50, left: 50 };
-  const chartWidth = width - padding.left - padding.right;
-  const chartHeight = height - padding.top - padding.bottom;
+  const maxRevenue = niceCeiling(Math.max(...data.map((point) => point.revenue), 1));
+  const maxOrders = niceCeiling(Math.max(...data.map((point) => point.count), 1));
 
-  const points = data.map((d, i) => {
-    const x = padding.left + (i / (data.length - 1 || 1)) * chartWidth;
-    const y = padding.top + chartHeight - (d.count / maxCount) * chartHeight;
-    return { x, y, ...d };
+  const revenuePoints = data.map((point, index) => {
+    const x = xForIndex(index, data.length, padding.left, plotWidth);
+    const y = padding.top + plotHeight - (point.revenue / maxRevenue) * plotHeight;
+    return { x, y, point, index };
   });
 
-  // Smooth curve using quadratic bezier
-  const getSmoothPath = (points: Array<{ x: number; y: number }>) => {
-    if (points.length < 2) return '';
-    
-    let path = `M ${points[0].x} ${points[0].y}`;
-    
-    for (let i = 1; i < points.length; i++) {
-      const prev = points[i - 1];
-      const curr = points[i];
-      const next = points[i + 1];
-      
-      if (next) {
-        const cp1x = prev.x + (curr.x - prev.x) * 0.5;
-        const cp1y = prev.y;
-        const cp2x = curr.x - (next.x - curr.x) * 0.5;
-        const cp2y = curr.y;
-        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
-      } else {
-        path += ` L ${curr.x} ${curr.y}`;
-      }
-    }
-    
-    return path;
-  };
+  const linePath = revenuePoints
+    .map(
+      (entry, index) =>
+        `${index === 0 ? 'M' : 'L'} ${entry.x.toFixed(1)} ${entry.y.toFixed(1)}`,
+    )
+    .join(' ');
+  const lastX = revenuePoints[revenuePoints.length - 1]?.x ?? padding.left;
+  const firstX = revenuePoints[0]?.x ?? padding.left;
+  const areaPath = `${linePath} L ${lastX} ${padding.top + plotHeight} L ${firstX} ${padding.top + plotHeight} Z`;
+  const barWidth = Math.min(22, Math.max(6, slotWidth * 0.5));
 
-  const smoothPath = getSmoothPath(points);
-  const areaPath = `${smoothPath} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${points[0].x} ${padding.top + chartHeight} Z`;
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map((ratio) => ({
+    ratio,
+    revenue: Math.round(maxRevenue * ratio),
+    orders: Math.round(maxOrders * ratio),
+  }));
 
-  // Y-axis values
-  const yAxisSteps = 5;
-  const yAxisValues = Array.from({ length: yAxisSteps + 1 }, (_, i) => {
-    const value = Math.round((maxCount / yAxisSteps) * (yAxisSteps - i));
-    const y = padding.top + (chartHeight / yAxisSteps) * i;
-    return { value, y };
-  });
+  const hovered = revenuePoints.find((entry) => entry.point._id === hoveredKey);
 
   return (
-    <div className="w-full relative">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-64" preserveAspectRatio="xMidYMid meet">
+    <div
+      className="relative mx-auto w-full max-w-4xl"
+      onMouseLeave={() => {
+        setHoveredKey(null);
+      }}
+    >
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="block h-56 w-full sm:h-64"
+        role="img"
+        aria-label={chartAria ?? t('admin.dashboard.chartTitle')}
+      >
         <defs>
-          {/* Modern gradient for area */}
-          <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#2DB2FF" stopOpacity="0.4" />
-            <stop offset="50%" stopColor="#6366f1" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+          <linearGradient id="mobeeTrendRevenueFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={TREND_REVENUE_COLOR} stopOpacity="0.28" />
+            <stop offset="100%" stopColor={TREND_REVENUE_COLOR} stopOpacity="0.02" />
           </linearGradient>
-          
-          {/* Gradient for line */}
-          <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#2DB2FF" />
-            <stop offset="50%" stopColor="#6366f1" />
-            <stop offset="100%" stopColor="#8b5cf6" />
-          </linearGradient>
-          
-          {/* Shadow filter for depth */}
-          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-            <feOffset dx="0" dy="2" result="offsetblur"/>
-            <feComponentTransfer>
-              <feFuncA type="linear" slope="0.3"/>
-            </feComponentTransfer>
-            <feMerge>
-              <feMergeNode/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          
-          {/* Glow effect for points */}
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
         </defs>
-        
-        {/* Background grid lines - subtle and modern */}
-        {[0, 0.25, 0.5, 0.75, 1].map((ratio) => (
-          <line
-            key={ratio}
-            x1={padding.left}
-            y1={padding.top + chartHeight * ratio}
-            x2={width - padding.right}
-            y2={padding.top + chartHeight * ratio}
-            stroke="#f1f5f9"
-            strokeWidth="1"
-            strokeDasharray="4 4"
-          />
-        ))}
-        
-        {/* Y-axis grid lines */}
-        {points.map((point, i) => {
-          if (i === 0 || i === points.length - 1) return null;
+
+        {yTicks.map((tick) => {
+          const y = padding.top + plotHeight - tick.ratio * plotHeight;
           return (
-            <line
-              key={`y-grid-${i}`}
-              x1={point.x}
-              y1={padding.top}
-              x2={point.x}
-              y2={padding.top + chartHeight}
-              stroke="#f1f5f9"
-              strokeWidth="1"
-              strokeDasharray="2 2"
-              opacity="0.5"
+            <g key={tick.ratio}>
+              <line
+                x1={padding.left}
+                y1={y}
+                x2={width - padding.right}
+                y2={y}
+                stroke="#E5E7EB"
+                strokeDasharray="4 4"
+              />
+              <text x={padding.left - 8} y={y + 3} textAnchor="end" fill="#9CA3AF" fontSize="10">
+                {formatAxisAmount(tick.revenue)}
+              </text>
+              <text
+                x={width - padding.right + 8}
+                y={y + 3}
+                textAnchor="start"
+                fill="#9CA3AF"
+                fontSize="10"
+              >
+                {tick.orders}
+              </text>
+            </g>
+          );
+        })}
+
+        {data.map((point, index) => {
+          const x = xForIndex(index, data.length, padding.left, plotWidth);
+          const barHeight = (point.count / maxOrders) * plotHeight;
+          const y = padding.top + plotHeight - barHeight;
+          const active = point._id === hoveredKey;
+          return (
+            <rect
+              key={`bar-${point._id}`}
+              x={x - barWidth / 2}
+              y={y}
+              width={barWidth}
+              height={Math.max(barHeight, point.count > 0 ? 2 : 0)}
+              rx={5}
+              fill={TREND_ORDERS_COLOR}
+              opacity={active ? 1 : 0.85}
             />
           );
         })}
-        
-        {/* Area under line with gradient */}
+
+        <path d={areaPath} fill="url(#mobeeTrendRevenueFill)" />
         <path
-          d={areaPath}
-          fill="url(#chartGradient)"
-          opacity="0.6"
-        />
-        
-        {/* Main line with gradient and shadow */}
-        <path
-          d={smoothPath}
+          d={linePath}
           fill="none"
-          stroke="url(#lineGradient)"
-          strokeWidth="3.5"
-          strokeLinecap="round"
+          stroke={TREND_REVENUE_COLOR}
+          strokeWidth="2.5"
           strokeLinejoin="round"
-          filter="url(#shadow)"
+          strokeLinecap="round"
         />
-        
-        {/* Y-axis labels */}
-        {yAxisValues.map(({ value, y }, i) => (
-          <g key={`y-label-${i}`}>
-            <line
-              x1={padding.left - 5}
-              y1={y}
-              x2={padding.left}
-              y2={y}
-              stroke="#64748b"
-              strokeWidth="1"
+
+        {hovered ? (
+          <line
+            x1={hovered.x}
+            y1={padding.top}
+            x2={hovered.x}
+            y2={padding.top + plotHeight}
+            stroke="#D1D5DB"
+            strokeDasharray="3 3"
+            strokeWidth="1"
+          />
+        ) : null}
+
+        {revenuePoints.map((entry) => {
+          const active = entry.point._id === hoveredKey;
+          return (
+            <circle
+              key={`dot-${entry.point._id}`}
+              cx={entry.x}
+              cy={entry.y}
+              r={active ? 6 : 4}
+              fill={TREND_REVENUE_COLOR}
+              stroke="white"
+              strokeWidth="2"
             />
+          );
+        })}
+
+        {revenuePoints.map((entry) => (
+          <rect
+            key={`hit-${entry.point._id}`}
+            x={entry.x - slotWidth / 2}
+            y={padding.top}
+            width={slotWidth}
+            height={plotHeight}
+            fill="transparent"
+            className="cursor-pointer"
+            onMouseEnter={() => {
+              setHoveredKey(entry.point._id);
+            }}
+          />
+        ))}
+
+        {revenuePoints.map((entry) => {
+          if (!shouldShowDayLabel(entry.index, data.length)) {
+            return null;
+          }
+          return (
             <text
-              x={padding.left - 10}
-              y={y + 4}
-              textAnchor="end"
-              fontSize="11"
-              fill="#64748b"
-              fontWeight="500"
+              key={`tick-${entry.point._id}`}
+              x={entry.x}
+              y={height - 14}
+              textAnchor="middle"
+              fill="#6B7280"
+              fontSize="10"
             >
-              {value}
+              {dayNumberFromIso(entry.point._id)}
             </text>
-          </g>
-        ))}
-        
-        {/* Data points with hover effect */}
-        {points.map((point, i) => (
-          <g key={i} className="cursor-pointer group">
-            {/* Hover circle (invisible but interactive) */}
-            <circle
-              cx={point.x}
-              cy={point.y}
-              r="8"
-              fill="transparent"
-              className="hover:fill-admin-100 hover:fill-opacity-30 transition-all duration-200"
-            />
-            
-            {/* Outer glow circle */}
-            <circle
-              cx={point.x}
-              cy={point.y}
-              r="5"
-              fill="#2DB2FF"
-              opacity="0.3"
-              className="group-hover:opacity-0.6 group-hover:r-7 transition-all duration-200"
-            />
-            
-            {/* Main point */}
-            <circle
-              cx={point.x}
-              cy={point.y}
-              r="4"
-              fill="white"
-              stroke="#2DB2FF"
-              strokeWidth="3"
-              className="group-hover:r-5 group-hover:stroke-[#6366f1] transition-all duration-200"
-              filter="url(#glow)"
-            />
-            
-            {/* Inner dot */}
-            <circle
-              cx={point.x}
-              cy={point.y}
-              r="2"
-              fill="#2DB2FF"
-              className="group-hover:fill-[#6366f1] transition-all duration-200"
-            />
-            
-            {/* Tooltip on hover */}
-            <title>
-              {formatDateShort(point._id)}: {t('admin.analytics.ordersLabel').replace('{count}', point.count.toString())}, {formatCurrency(point.revenue)}
-            </title>
-          </g>
-        ))}
-        
-        {/* X-axis line */}
-        <line
-          x1={padding.left}
-          y1={padding.top + chartHeight}
-          x2={width - padding.right}
-          y2={padding.top + chartHeight}
-          stroke="#cbd5e1"
-          strokeWidth="2"
-        />
+          );
+        })}
       </svg>
-      
-      {/* X-axis labels - Modern styling */}
-      <div className="flex justify-between mt-4 px-2">
-        {data.length <= 10 ? (
-          data.map((d, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <span className="text-xs font-medium text-gray-600 transform -rotate-45 origin-center whitespace-nowrap">
-                {formatDateShort(d._id)}
+
+      {hovered ? (
+        <div
+          className={`pointer-events-none absolute z-10 min-w-[10.5rem] -translate-x-1/2 rounded-xl bg-white px-3 py-2.5 shadow-lg ring-1 ring-black/5 ${
+            hovered.y < 72 ? 'translate-y-3' : '-translate-y-[calc(100%+10px)]'
+          }`}
+          style={{
+            left: `${Math.min(88, Math.max(12, (hovered.x / width) * 100))}%`,
+            top: `${(hovered.y / height) * 100}%`,
+          }}
+          role="tooltip"
+        >
+          <p className="text-xs font-semibold text-gray-900">
+            {formatPointLabel(hovered.point._id)}
+          </p>
+          <div className="mt-1.5 space-y-1 text-[11px] leading-snug text-gray-600">
+            <p className="flex items-center gap-1.5">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: TREND_REVENUE_COLOR }}
+                aria-hidden
+              />
+              <span>
+                {resolvedTooltip.revenueLabel}:{' '}
+                <span className="font-semibold text-gray-900">
+                  {resolvedTooltip.formatRevenue(hovered.point.revenue)}
+                </span>
               </span>
-            </div>
-          ))
-        ) : (
-          <>
-            <div className="flex flex-col items-center">
-              <span className="text-xs font-medium text-gray-600">
-                {formatDateShort(data[0]._id)}
+            </p>
+            <p className="flex items-center gap-1.5">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: TREND_ORDERS_COLOR }}
+                aria-hidden
+              />
+              <span>
+                {resolvedTooltip.ordersLabel}:{' '}
+                <span className="font-semibold text-gray-900">
+                  {resolvedTooltip.formatOrders(hovered.point.count)}
+                </span>
               </span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-xs font-medium text-gray-600">
-                {formatDateShort(data[Math.floor(data.length / 2)]._id)}
-              </span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-xs font-medium text-gray-600">
-                {formatDateShort(data[data.length - 1]._id)}
-              </span>
-            </div>
-          </>
-        )}
-      </div>
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
-
-
-

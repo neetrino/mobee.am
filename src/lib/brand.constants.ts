@@ -21,7 +21,6 @@ export const SITE_WORDMARK_HEIGHT_PX = 102;
 
 /**
  * Square mark for favicon / Apple touch icon only — tab icons need a compact asset, not the wide wordmark.
- * Also used as the default Open Graph / Twitter preview image when sharing site links.
  */
 export const SITE_APP_ICON_PATH = '/images/brand/mobee-logo.png';
 
@@ -29,3 +28,14 @@ export const SITE_APP_ICON_PATH = '/images/brand/mobee-logo.png';
 export const SITE_APP_ICON_WIDTH_PX = 1024;
 
 export const SITE_APP_ICON_HEIGHT_PX = 1024;
+
+/**
+ * Default Open Graph / Twitter / messenger link-preview image (landscape 1200×630).
+ * Cache-bust query when the asset changes (crawlers cache aggressively).
+ */
+export const SITE_SHARE_IMAGE_PATH = '/images/brand/mobee-og.png?v=3';
+
+/** Intrinsic pixel size of `mobee-og.png` under `public/` (query string ignored by the file). */
+export const SITE_SHARE_IMAGE_WIDTH_PX = 1200;
+
+export const SITE_SHARE_IMAGE_HEIGHT_PX = 630;

@@ -14,13 +14,13 @@ const Footer = dynamic(
 function FooterLazyPlaceholder() {
   return (
     <footer
-      className="hidden min-h-[440px] border-t border-[#eee] bg-white lg:block"
+      className="min-h-[96px] border-t border-[#eee] bg-white max-lg:border-t-0 max-lg:bg-gray-50 lg:min-h-[440px]"
       aria-hidden
     />
   );
 }
 
-/** Desktop footer — deferred until the user nears the page bottom. */
+/** Footer (legal bar always; desktop columns from lg) — deferred until near page bottom. */
 export function DeferredFooter() {
   return (
     <LazyWhenVisible
