@@ -6,7 +6,11 @@ import { siteMontserrat } from '@/lib/fonts/site-fonts';
 import { useTranslation } from '../lib/i18n-client';
 import { WHY_CHOOSE_US_PHOTO_SRC } from '../lib/constants/ui-icons.constants';
 import { SITE_CONTENT_GUTTERS_CLASS } from './header-strip-layout';
-import { HomeCtaPillArrowIcon } from './HomeMoreCtaPillLink';
+import {
+  getCtaArrowMotionClass,
+  HomeCtaPillArrowIcon,
+  useCtaPillArrowHoverMotion,
+} from './HomeMoreCtaPillLink';
 
 const montserrat = siteMontserrat;
 
@@ -63,18 +67,31 @@ const BENEFIT_CARDS: Record<BenefitId, BenefitCardConfig> = {
 };
 
 function WhyChooseUsGlassCta({ label }: { readonly label: string }) {
+  const { motion, motionKey, triggerIn, triggerOut } = useCtaPillArrowHoverMotion(true);
+
   return (
     <span
-      className={`pointer-events-none absolute bottom-[18px] left-1/2 flex h-12 ${WHY_CHOOSE_US_GLASS_PILL_WIDTH_CLASS} -translate-x-1/2 items-center gap-2 rounded-full border border-white/40 bg-white/30 pl-4 pr-1 backdrop-blur-[6px]`}
+      onPointerEnter={triggerIn}
+      onPointerLeave={triggerOut}
+      className={`group/cta absolute bottom-[18px] left-1/2 z-10 flex h-12 ${WHY_CHOOSE_US_GLASS_PILL_WIDTH_CLASS} -translate-x-1/2 items-center gap-2 overflow-hidden rounded-full border border-white/40 bg-white/30 pl-4 pr-1 backdrop-blur-[6px] active:scale-[0.99]`}
     >
-      <span className="whitespace-nowrap px-1 text-center text-[14px] font-medium leading-none text-white">
+      <span
+        className="pointer-events-none absolute inset-0 origin-[calc(100%-22px)_50%] scale-x-0 bg-white transition-transform duration-500 ease-in-out group-hover/cta:scale-x-100"
+        aria-hidden
+      />
+      <span className="relative z-10 whitespace-nowrap px-1 text-center text-[14px] font-medium leading-none text-white transition-colors duration-500 ease-in-out group-hover/cta:text-[#1a1c1d]">
         {label}
       </span>
       <span
-        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white"
+        className="relative z-10 flex size-9 shrink-0 items-center justify-center rounded-full bg-white"
         aria-hidden
       >
-        <HomeCtaPillArrowIcon className="size-[18px] text-[#1a1c1d]" />
+        <span
+          key={motionKey}
+          className={`inline-flex items-center justify-center ${getCtaArrowMotionClass(motion)}`}
+        >
+          <HomeCtaPillArrowIcon className="size-[18px] text-[#1a1c1d]" />
+        </span>
       </span>
     </span>
   );
