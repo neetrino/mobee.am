@@ -16,13 +16,9 @@ const montserrat = siteMontserrat;
 /** Footer credit company name links to Neetrino site. */
 const FOOTER_CREDIT_COMPANY_HREF = 'https://neetrino.com/';
 
-/** Mobile credit — company name (matches common Neetrino storefront footers). */
-const FOOTER_CREDIT_COMPANY_MOBILE_CLASS =
-  'mt-1 inline-block text-[15px] font-bold leading-5 text-[#2db2ff] transition-opacity hover:opacity-80';
-
-/** Desktop credit link — Figma legal bar gray. */
-const FOOTER_CREDIT_COMPANY_DESKTOP_CLASS =
-  'font-semibold text-[#a1a1aa] transition-opacity hover:opacity-80';
+/** Credit company name — brand blue on every breakpoint. */
+const FOOTER_CREDIT_COMPANY_LINK_CLASS =
+  'font-semibold text-[#2db2ff] transition-opacity hover:opacity-80';
 
 /** Figma mobee-new footer info (1:1477) — column heading. */
 const FOOTER_COLUMN_HEADING_CLASS =
@@ -184,7 +180,7 @@ function FooterTermsAndSocialColumn({ phoneHref }: { readonly phoneHref: string 
 
 /**
  * Bottom legal bar — desktop: Figma HorizontalBorder (1:1509);
- * mobile: centered copyright + Neetrino credit (two lines).
+ * mobile: "© {year} | Created By Neetrino" only.
  */
 function FooterLegalBar() {
   const { t } = useTranslation();
@@ -193,20 +189,23 @@ function FooterLegalBar() {
   const createdBy = t('common.footer.legalBar.createdBy');
   const creditCompany = t('common.footer.legalBar.creditCompany');
 
+  const creditLink = (
+    <Link
+      href={FOOTER_CREDIT_COMPANY_HREF}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={FOOTER_CREDIT_COMPANY_LINK_CLASS}
+    >
+      {creditCompany}
+    </Link>
+  );
+
   return (
     <>
       <div className="px-2 py-5 text-center lg:hidden">
-        <p className="whitespace-nowrap text-[12px] leading-4 text-[#71717a]">
-          {copyrightLead} | {createdBy}
+        <p className="text-[15px] leading-5 text-[#71717a]">
+          © {year} | {createdBy} {creditLink}
         </p>
-        <Link
-          href={FOOTER_CREDIT_COMPANY_HREF}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={FOOTER_CREDIT_COMPANY_MOBILE_CLASS}
-        >
-          {creditCompany}
-        </Link>
       </div>
 
       <div className="hidden border-t border-[#eeeef0] pt-[33px] lg:block">
@@ -217,16 +216,8 @@ function FooterLegalBar() {
             </p>
             <p className="min-w-0 text-[16px] leading-5 text-[#a1a1aa]">
               <span>
-                {copyrightLead} | {createdBy}{' '}
+                {copyrightLead} | {createdBy} {creditLink}
               </span>
-              <Link
-                href={FOOTER_CREDIT_COMPANY_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={FOOTER_CREDIT_COMPANY_DESKTOP_CLASS}
-              >
-                {creditCompany}
-              </Link>
             </p>
           </div>
           <FooterPaymentMethodsRow />

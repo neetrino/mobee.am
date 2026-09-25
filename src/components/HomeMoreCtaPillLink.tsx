@@ -5,7 +5,7 @@ import { useState, type PointerEvent, type ReactNode } from 'react';
 
 type CtaArrowMotion = 'idle' | 'hoverIn' | 'hoverOut';
 
-function getCtaArrowMotionClass(motion: CtaArrowMotion): string {
+export function getCtaArrowMotionClass(motion: CtaArrowMotion): string {
   if (motion === 'hoverIn') {
     return 'animate-cta-arrow-nudge-in';
   }
@@ -15,7 +15,7 @@ function getCtaArrowMotionClass(motion: CtaArrowMotion): string {
   return '';
 }
 
-function useCtaPillArrowHoverMotion(active: boolean) {
+export function useCtaPillArrowHoverMotion(active: boolean) {
   const [motion, setMotion] = useState<CtaArrowMotion>('idle');
   const [motionKey, setMotionKey] = useState(0);
 
