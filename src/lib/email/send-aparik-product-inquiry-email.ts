@@ -1,8 +1,17 @@
-import { formatCatalogMoneyForEmail, type CheckoutDisplayCurrency } from "../checkout/checkout-email-money";
-import type { CurrencyCode } from "../currency";
-import { getAparikNotificationEmail } from "./aparik-notification.constants";
-import { getResendClient, getResendFromEmail } from "./resend-client";
-import { logger } from "../utils/logger";
+import { formatCatalogMoneyForEmail, type CheckoutDisplayCurrency } from '../checkout/checkout-email-money';
+import type { CurrencyCode } from '../currency';
+import { APARIK_BANK_LABELS, type AparikBankId } from '../aparik/banks.constants';
+import type { AparikDocumentTypeId } from '../aparik/document-types.constants';
+import { getAparikNotificationEmail } from './aparik-notification.constants';
+import { getResendClient, getResendFromEmail } from './resend-client';
+import { logger } from '../utils/logger';
+
+export interface AparikInquiryDocumentAttachment {
+  type: AparikDocumentTypeId;
+  filename: string;
+  contentType: string;
+  content: Buffer;
+}
 
 export interface AparikProductInquiryEmailPayload {
   inquiryId: string;
@@ -21,18 +30,27 @@ export interface AparikProductInquiryEmailPayload {
   lastName: string;
   email: string;
   phone: string;
+  bankId: AparikBankId;
+  documents: AparikInquiryDocumentAttachment[];
 }
+
+const DOCUMENT_TYPE_LABELS: Record<AparikDocumentTypeId, string> = {
+  id_passport: 'ID / Passport',
+  id_social: 'ID / Social №',
+  selfie: 'Selfie',
+  other: 'Other',
+};
 
 function escapeHtml(value: string): string {
   return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function formatCustomerName(firstName: string, lastName: string): string {
-  return [firstName.trim(), lastName.trim()].filter(Boolean).join(" ");
+  return [firstName.trim(), lastName.trim()].filter(Boolean).join(' ');
 }
 
 function resolveAbsoluteImageUrl(imageUrl?: string | null): string | undefined {
@@ -42,15 +60,15 @@ function resolveAbsoluteImageUrl(imageUrl?: string | null): string | undefined {
   }
 
   if (
-    trimmed.startsWith("http://") ||
-    trimmed.startsWith("https://") ||
-    trimmed.startsWith("data:image/")
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('data:image/')
   ) {
     return trimmed;
   }
 
-  const base = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
-  return trimmed.startsWith("/") ? `${base}${trimmed}` : `${base}/${trimmed}`;
+  const base = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+  return trimmed.startsWith('/') ? `${base}${trimmed}` : `${base}/${trimmed}`;
 }
 
 function buildItemImageHtml(imageUrl?: string, title?: string): string {
@@ -58,7 +76,7 @@ function buildItemImageHtml(imageUrl?: string, title?: string): string {
     return `<div style="width:72px;height:72px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:11px">No img</div>`;
   }
 
-  return `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title ?? "Product")}" width="72" height="72" style="display:block;width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb">`;
+  return `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title ?? 'Product')}" width="72" height="72" style="display:block;width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb">`;
 }
 
 function buildVariantDetailsHtml(payload: AparikProductInquiryEmailPayload): string {
@@ -67,23 +85,23 @@ function buildVariantDetailsHtml(payload: AparikProductInquiryEmailPayload): str
   if (payload.color) {
     const swatch = payload.colorHex
       ? `<span style="display:inline-block;width:14px;height:14px;border-radius:9999px;border:1px solid #d1d5db;background:${escapeHtml(payload.colorHex)};vertical-align:middle;margin-right:6px"></span>`
-      : "";
+      : '';
     parts.push(
-      `<span style="color:#374151;font-size:13px">Գույն՝ ${swatch}${escapeHtml(payload.color)}</span>`
+      `<span style="color:#374151;font-size:13px">Գույն՝ ${swatch}${escapeHtml(payload.color)}</span>`,
     );
   }
 
   if (payload.variantTitle?.trim()) {
     parts.push(
-      `<span style="color:#6b7280;font-size:13px">${escapeHtml(payload.variantTitle)}</span>`
+      `<span style="color:#6b7280;font-size:13px">${escapeHtml(payload.variantTitle)}</span>`,
     );
   }
 
   if (parts.length === 0) {
-    return "";
+    return '';
   }
 
-  return `<br>${parts.join("<br>")}`;
+  return `<br>${parts.join('<br>')}`;
 }
 
 function buildVariantDetailsText(payload: AparikProductInquiryEmailPayload): string {
@@ -94,28 +112,28 @@ function buildVariantDetailsText(payload: AparikProductInquiryEmailPayload): str
   if (payload.variantTitle?.trim()) {
     lines.push(`   ${payload.variantTitle}`);
   }
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 function formatMoneyHtml(formattedAmount: string): string {
-  const withNbsp = formattedAmount.replace(/\u00A0/g, "&nbsp;");
+  const withNbsp = formattedAmount.replace(/\u00A0/g, '&nbsp;');
   return `<span style="white-space:nowrap;display:inline-block">${withNbsp}</span>`;
 }
 
 function formatCatalogPriceHtml(
   amountInUsd: number,
-  displayCurrency: CheckoutDisplayCurrency
+  displayCurrency: CheckoutDisplayCurrency,
 ): string {
   return formatMoneyHtml(formatCatalogMoneyForEmail(amountInUsd, displayCurrency));
 }
 
 function buildProductHtml(payload: AparikProductInquiryEmailPayload): string {
   const displayCurrency = payload.currency as CheckoutDisplayCurrency;
-  const productUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/products/${encodeURIComponent(payload.productSlug)}`;
+  const productUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/products/${encodeURIComponent(payload.productSlug)}`;
   const imageUrl = resolveAbsoluteImageUrl(payload.productImageUrl);
   const skuLine = payload.sku
     ? `<br><span style="color:#6b7280;font-size:12px">SKU: ${escapeHtml(payload.sku)}</span>`
-    : "";
+    : '';
 
   return `<table style="width:100%;border-collapse:collapse;font-size:14px">
   <thead>
@@ -141,8 +159,24 @@ function buildProductHtml(payload: AparikProductInquiryEmailPayload): string {
 </table>`;
 }
 
+function buildDocumentsHtml(payload: AparikProductInquiryEmailPayload): string {
+  if (payload.documents.length === 0) {
+    return '<p style="margin:0;font-size:14px;color:#6b7280">Փաստաթղթեր չեն կցվել։</p>';
+  }
+
+  const items = payload.documents
+    .map(
+      (doc, index) =>
+        `<li style="margin:0 0 6px">#${index + 1} — ${escapeHtml(DOCUMENT_TYPE_LABELS[doc.type])}: ${escapeHtml(doc.filename)} (${escapeHtml(doc.contentType)})</li>`,
+    )
+    .join('');
+
+  return `<p style="margin:0 0 8px;font-size:14px">Կցված են նամակին որպես attachment։</p><ul style="margin:0;padding-left:18px;font-size:14px">${items}</ul>`;
+}
+
 function buildHtml(payload: AparikProductInquiryEmailPayload): string {
   const customerName = formatCustomerName(payload.firstName, payload.lastName);
+  const bankLabel = APARIK_BANK_LABELS[payload.bankId];
 
   return `
 <!DOCTYPE html>
@@ -156,11 +190,15 @@ function buildHtml(payload: AparikProductInquiryEmailPayload): string {
   <p style="margin:0 0 16px;font-size:14px">
     Անուն՝ ${escapeHtml(customerName)}<br>
     Email՝ ${escapeHtml(payload.email)}<br>
-    Հեռախոս՝ ${escapeHtml(payload.phone)}
+    Հեռախոս՝ ${escapeHtml(payload.phone)}<br>
+    Բանկ՝ ${escapeHtml(bankLabel)}
   </p>
 
   <h2 style="font-size:16px;margin:0 0 12px">Ապրանք</h2>
   ${buildProductHtml(payload)}
+
+  <h2 style="font-size:16px;margin:24px 0 12px">Փաստաթղթեր</h2>
+  ${buildDocumentsHtml(payload)}
 
   <p style="margin:24px 0 0;font-size:13px;color:#6b7280">Հարցումը ուղարկվել է ապրանքի քարտից։</p>
 </body>
@@ -171,22 +209,27 @@ function buildText(payload: AparikProductInquiryEmailPayload): string {
   const customerName = formatCustomerName(payload.firstName, payload.lastName);
   const formattedPrice = formatCatalogMoneyForEmail(
     payload.productPrice,
-    payload.currency as CheckoutDisplayCurrency
+    payload.currency as CheckoutDisplayCurrency,
   );
-  const productUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/products/${payload.productSlug}`;
+  const productUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/products/${payload.productSlug}`;
   const imageUrl = resolveAbsoluteImageUrl(payload.productImageUrl);
   const variantDetails = buildVariantDetailsText(payload);
+  const documentLines = payload.documents.map(
+    (doc, index) =>
+      `  ${index + 1}. ${DOCUMENT_TYPE_LABELS[doc.type]} — ${doc.filename} (${doc.contentType})`,
+  );
 
   return [
-    "Նոր ապառիկ հարցում",
+    'Նոր ապառիկ հարցում',
     `Հարցման համար: ${payload.inquiryId}`,
-    "",
-    "Հաճախորդ",
+    '',
+    'Հաճախորդ',
     `Անուն: ${customerName}`,
     `Email: ${payload.email}`,
     `Հեռախոս: ${payload.phone}`,
-    "",
-    "Ապրանք",
+    `Բանկ: ${APARIK_BANK_LABELS[payload.bankId]}`,
+    '',
+    'Ապրանք',
     `Անվանում: ${payload.productTitle}`,
     variantDetails || undefined,
     payload.sku ? `SKU: ${payload.sku}` : undefined,
@@ -195,25 +238,30 @@ function buildText(payload: AparikProductInquiryEmailPayload): string {
     `Արժույթ: ${payload.currency}`,
     imageUrl ? `Նկար: ${imageUrl}` : undefined,
     `Հղում: ${productUrl}`,
-    "",
-    "Հարցումը ուղարկվել է ապրանքի քարտից։",
+    '',
+    'Փաստաթղթեր (attachments)',
+    ...documentLines,
+    '',
+    'Հարցումը ուղարկվել է ապրանքի քարտից։',
   ]
     .filter(Boolean)
-    .join("\n");
+    .join('\n');
 }
 
 export async function sendAparikProductInquiryEmail(
-  payload: AparikProductInquiryEmailPayload
+  payload: AparikProductInquiryEmailPayload,
 ): Promise<void> {
   const to = getAparikNotificationEmail();
-  const subject = `Նոր ապառիկ հարցում — ${payload.productTitle}`;
+  const subject = `Նոր ապառիկ հարցում — ${payload.productTitle} (${APARIK_BANK_LABELS[payload.bankId]})`;
   const html = buildHtml(payload);
   const text = buildText(payload);
 
-  if (process.env.NODE_ENV === "development" && !process.env.RESEND_API_KEY?.trim()) {
-    logger.warn("Aparik product inquiry email skipped (RESEND_API_KEY missing)", {
+  if (process.env.NODE_ENV === 'development' && !process.env.RESEND_API_KEY?.trim()) {
+    logger.warn('Aparik product inquiry email skipped (RESEND_API_KEY missing)', {
       to,
       inquiryId: payload.inquiryId,
+      bankId: payload.bankId,
+      documentCount: payload.documents.length,
     });
     return;
   }
@@ -225,19 +273,26 @@ export async function sendAparikProductInquiryEmail(
     subject,
     html,
     text,
+    attachments: payload.documents.map((doc) => ({
+      filename: doc.filename,
+      content: doc.content,
+      contentType: doc.contentType,
+    })),
   });
 
   if (error) {
-    logger.error("Failed to send aparik product inquiry email", {
+    logger.error('Failed to send aparik product inquiry email', {
       error,
       to,
       inquiryId: payload.inquiryId,
     });
-    throw new Error(error.message || "Failed to send aparik product inquiry email");
+    throw new Error(error.message || 'Failed to send aparik product inquiry email');
   }
 
-  logger.info("Aparik product inquiry email sent", {
+  logger.info('Aparik product inquiry email sent', {
     to,
     inquiryId: payload.inquiryId,
+    bankId: payload.bankId,
+    documentCount: payload.documents.length,
   });
 }

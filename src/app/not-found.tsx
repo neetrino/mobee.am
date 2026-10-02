@@ -17,7 +17,7 @@ export default function NotFound() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-16">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center px-4 py-16">
       <div className="flex w-full max-w-md flex-col items-center text-center">
         <div
           className="relative mb-8 flex items-center justify-center"

@@ -90,6 +90,31 @@
     "buttonLabel": "Online installment",
     "modalTitle": "Installment Inquiry",
     "modalIntro": "Fill in the details below to send an installment request. Our specialist will review your application and contact you as soon as possible to present the terms and answer your questions.",
+    "termsSummary": "Main terms: down payment from 0%, annual interest rate 21%, monthly service fee 0%, term 12–48 months, age 20–65 for RA citizens. To complete the loan application you only need identity documents, and our specialists will process your request. More details:",
+    "termsDetails": "Selected bank terms may vary depending on your credit history and bank approval. Final terms will be provided by our specialist after reviewing your request.",
+    "termsHere": "here",
+    "seeMore": "See more",
+    "seeLess": "Show less",
+    "documentsTitle": "Documents",
+    "documentsInstructions": "Please provide\n\n1) either photos of both sides of your ID card and a selfie with the ID card;\n\n2) or photos of the first two passport pages and your social card, plus a selfie with the passport.",
+    "documentsArtsakhNote": "* Citizens with Artsakh registration must also provide a residence certificate.",
+    "dropHint": "Drag and drop your images here or",
+    "uploadLabel": "upload",
+    "formatsHint": "Document types: .jpg, .png, .pdf",
+    "tileClickHint": "Click to upload",
+    "tileReplaceHint": "Click to replace",
+    "docTypes": {
+      "idPassport": "ID / Passport",
+      "idSocial": "ID / Social №",
+      "selfie": "Selfie",
+      "other": "Other"
+    },
+    "consentAgreePrefix": "I agree to the",
+    "errors": {
+      "bankRequired": "Please select a bank",
+      "documentsRequired": "ID/passport and selfie are required (social card also for passport option)",
+      "consentsRequired": "Please agree to the installment terms"
+    },
     "submitting": "Sending...",
     "submitSuccess": "Your request was sent successfully. Our specialist will contact you soon.",
     "submitError": "Failed to send the request. Please try again."

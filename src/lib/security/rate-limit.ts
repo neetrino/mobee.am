@@ -148,6 +148,12 @@ export const RATE_LIMIT_CONTACT: RateLimitConfig = {
   window: "60 s",
 };
 
+export const RATE_LIMIT_APARIK: RateLimitConfig = {
+  prefix: "ratelimit:aparik",
+  requests: 5,
+  window: "60 s",
+};
+
 export const RATE_LIMIT_GUEST_ORDER: RateLimitConfig = {
   prefix: "ratelimit:guest-order",
   requests: 30,
