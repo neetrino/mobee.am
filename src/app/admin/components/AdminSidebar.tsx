@@ -4,7 +4,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useMemo } from 'react';
+import { useUiLanguage } from '@/components/UiLanguageProvider';
 import { adminNavMarkMount } from '@/lib/admin/admin-nav-debug';
+import {
+  DEFAULT_APP_LOCALE,
+  isAppLocale,
+  localizeHref,
+} from '@/lib/i18n/routing';
 import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { SiteBrandLogo } from '../../../components/SiteBrandLogo';
@@ -38,11 +44,14 @@ export function AdminSidebar({
 }: AdminSidebarProps) {
   useEffect(() => adminNavMarkMount('AdminSidebar'), []);
 
+  const uiLanguage = useUiLanguage();
   const menuTabs = useMemo(() => getAdminMenuTABS(t), [t]);
-  const siteHomeHref = useMemo(
-    () => menuTabs.find((tab) => tab.id === 'home')?.path ?? '/',
-    [menuTabs],
-  );
+  /** Storefront home must include locale (`/hy`); bare `/` has no page and 404s on client nav. */
+  const siteHomeHref = useMemo(() => {
+    const homePath = menuTabs.find((tab) => tab.id === 'home')?.path ?? '/';
+    const locale = isAppLocale(uiLanguage) ? uiLanguage : DEFAULT_APP_LOCALE;
+    return localizeHref(homePath, locale);
+  }, [menuTabs, uiLanguage]);
 
   const toggleDesktopSidebar = () => {
     onDesktopCollapsedChange((prev) => !prev);
