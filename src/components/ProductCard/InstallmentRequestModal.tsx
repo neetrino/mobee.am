@@ -1,14 +1,27 @@
 'use client';
 
 import { useEffect, useState, type FormEvent } from 'react';
-import { Input } from '@shop/ui';
 import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
+import type { AparikBankId } from '@/lib/aparik/banks.constants';
+import { hasValidAparikDocumentSet } from '@/lib/aparik/document-rules';
 import { useTranslation } from '../../lib/i18n-client';
-import { apiClient } from '../../lib/api-client';
 import { isValidEmail } from '../../lib/utils/email';
 import { FORM_INPUT_LATIN_LANG } from '../../lib/form-input-os.constants';
 import { STOREFRONT_MODAL_TRANSITION_MS } from '../../lib/storefront-modal-motion.constants';
 import type { CurrencyCode } from '../../lib/currency';
+import type { AparikSelectedDocument } from './installment-request/AparikDocumentsSection';
+import {
+  APARIK_PHONE_DIGITS_MAX,
+  isValidAparikPhoneDigits,
+  sanitizeAparikPhoneDigits,
+} from './installment-request/aparik-phone';
+import {
+  InstallmentRequestFormBody,
+  type InstallmentRequestFormErrors,
+  type InstallmentRequestFormValues,
+} from './installment-request/InstallmentRequestFormBody';
+import { scrollToFirstAparikFormError } from './installment-request/scroll-to-aparik-form-error';
+import { InstallmentRequestSuccessView } from './installment-request/InstallmentRequestSuccessView';
 
 interface InstallmentRequestModalProps {
   isOpen: boolean;
@@ -25,98 +38,12 @@ interface InstallmentRequestModalProps {
   sku?: string;
 }
 
-interface FormState {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-}
-
-interface FormErrors {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-  submit?: string;
-}
-
-const EMPTY_FORM: FormState = {
+const EMPTY_FORM: InstallmentRequestFormValues = {
   firstName: '',
   lastName: '',
   email: '',
   phone: '',
 };
-
-const PHONE_DIGITS_MIN = 8;
-const PHONE_DIGITS_MAX = 15;
-
-function sanitizePhoneDigits(value: string): string {
-  let digits = '';
-  for (const char of value) {
-    if (char >= '0' && char <= '9') {
-      digits += char;
-    }
-  }
-  return digits.slice(0, PHONE_DIGITS_MAX);
-}
-
-function isValidPhoneDigits(phone: string): boolean {
-  const trimmed = phone.trim();
-  if (trimmed.length < PHONE_DIGITS_MIN || trimmed.length > PHONE_DIGITS_MAX) {
-    return false;
-  }
-  for (const char of trimmed) {
-    if (char < '0' || char > '9') {
-      return false;
-    }
-  }
-  return true;
-}
-
-function validateForm(values: FormState, t: (key: string) => string): FormErrors {
-  const errors: FormErrors = {};
-
-  if (!values.firstName.trim()) {
-    errors.firstName = t('checkout.errors.firstNameRequired');
-  }
-  if (!values.lastName.trim()) {
-    errors.lastName = t('checkout.errors.lastNameRequired');
-  }
-  if (!values.email.trim()) {
-    errors.email = t('checkout.errors.emailRequired');
-  } else if (!isValidEmail(values.email)) {
-    errors.email = t('checkout.errors.invalidEmail');
-  }
-  if (!values.phone.trim()) {
-    errors.phone = t('checkout.errors.phoneRequired');
-  } else if (!isValidPhoneDigits(values.phone)) {
-    errors.phone = t('checkout.errors.invalidPhone');
-  }
-
-  return errors;
-}
-
-function InstallmentRequestSuccessView({ message }: { message: string }) {
-  return (
-    <div className="flex flex-col items-start py-4">
-      <div
-        className="mb-5 flex size-16 items-center justify-center rounded-full bg-[#e8f5e9]"
-        aria-hidden
-      >
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M20 6L9 17l-5-5"
-            stroke="#2e7d32"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-      <p className="text-left text-sm leading-relaxed text-gray-800">{message}</p>
-    </div>
-  );
-}
 
 export function InstallmentRequestModal({
   isOpen,
@@ -133,10 +60,13 @@ export function InstallmentRequestModal({
   sku,
 }: InstallmentRequestModalProps) {
   const { t } = useTranslation();
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [form, setForm] = useState<InstallmentRequestFormValues>(EMPTY_FORM);
+  const [errors, setErrors] = useState<InstallmentRequestFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [bankId, setBankId] = useState<AparikBankId | null>(null);
+  const [documents, setDocuments] = useState<AparikSelectedDocument[]>([]);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -146,24 +76,58 @@ export function InstallmentRequestModal({
       setForm(EMPTY_FORM);
       setErrors({});
       setIsSuccess(false);
+      setBankId(null);
+      setDocuments([]);
+      setAcceptedTerms(false);
     }, STOREFRONT_MODAL_TRANSITION_MS);
     return () => window.clearTimeout(timeoutId);
   }, [isOpen]);
 
-  const handleFieldChange = (field: keyof FormState, value: string) => {
+  const handleFieldChange = (field: keyof InstallmentRequestFormValues, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined, submit: undefined }));
   };
 
-  const handlePhoneChange = (value: string) => {
-    handleFieldChange('phone', sanitizePhoneDigits(value));
+  const validate = (): InstallmentRequestFormErrors => {
+    const next: InstallmentRequestFormErrors = {};
+    if (!form.firstName.trim()) {
+      next.firstName = t('checkout.errors.firstNameRequired');
+    }
+    if (!form.lastName.trim()) {
+      next.lastName = t('checkout.errors.lastNameRequired');
+    }
+    if (!form.email.trim()) {
+      next.email = t('checkout.errors.emailRequired');
+    } else if (!isValidEmail(form.email)) {
+      next.email = t('checkout.errors.invalidEmail');
+    }
+    if (!form.phone.trim()) {
+      next.phone = t('checkout.errors.phoneRequired');
+    } else if (!isValidAparikPhoneDigits(form.phone)) {
+      next.phone = t('checkout.errors.invalidPhone');
+    }
+    if (!bankId) {
+      next.bankId = t('product.aparik.errors.bankRequired');
+    }
+    if (!hasValidAparikDocumentSet(documents.map((doc) => doc.type))) {
+      next.documents = t('product.aparik.errors.documentsRequired');
+    }
+    if (!acceptedTerms) {
+      next.consents = t('product.aparik.errors.consentsRequired');
+    }
+    return next;
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    const validationErrors = validateForm(form, t);
-    if (Object.keys(validationErrors).length > 0) {
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0 || !bankId) {
       setErrors(validationErrors);
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          scrollToFirstAparikFormError(validationErrors);
+        });
+      });
       return;
     }
 
@@ -171,24 +135,52 @@ export function InstallmentRequestModal({
     setErrors({});
 
     try {
-      await apiClient.post('/api/v1/aparik/inquiry', {
-        productId,
-        productSlug,
-        productTitle,
-        productPrice,
-        currency,
-        productImageUrl: productImageUrl ?? undefined,
-        color: color?.trim() || undefined,
-        colorHex: colorHex?.trim() || undefined,
-        variantTitle: variantTitle?.trim() || undefined,
-        sku: sku?.trim() || undefined,
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
+      const body = new FormData();
+      body.append('productId', productId);
+      body.append('productSlug', productSlug);
+      body.append('productTitle', productTitle);
+      body.append('productPrice', String(productPrice));
+      body.append('currency', currency);
+      if (productImageUrl?.trim()) {
+        body.append('productImageUrl', productImageUrl.trim());
+      }
+      if (color?.trim()) {
+        body.append('color', color.trim());
+      }
+      if (colorHex?.trim()) {
+        body.append('colorHex', colorHex.trim());
+      }
+      if (variantTitle?.trim()) {
+        body.append('variantTitle', variantTitle.trim());
+      }
+      if (sku?.trim()) {
+        body.append('sku', sku.trim());
+      }
+      body.append('firstName', form.firstName.trim());
+      body.append('lastName', form.lastName.trim());
+      body.append('email', form.email.trim());
+      body.append('phone', form.phone.trim());
+      body.append('bankId', bankId);
+      body.append('acceptedTerms', 'true');
+      for (const doc of documents) {
+        body.append('documents', doc.file);
+        body.append('documentTypes', doc.type);
+      }
+
+      const response = await fetch('/api/v1/aparik/inquiry', {
+        method: 'POST',
+        body,
+        credentials: 'include',
       });
+      if (!response.ok) {
+        throw new Error('submit_failed');
+      }
+
       setIsSuccess(true);
       setForm(EMPTY_FORM);
+      setDocuments([]);
+      setBankId(null);
+      setAcceptedTerms(false);
     } catch {
       setErrors({ submit: t('product.aparik.submitError') });
     } finally {
@@ -204,24 +196,19 @@ export function InstallmentRequestModal({
       panelMotionVariant="sheet"
       blockClose={isSubmitting}
       labelledBy="installment-request-modal-title"
-      panelClassName="flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-2xl sm:mx-auto sm:max-w-lg sm:rounded-2xl"
+      panelClassName="flex max-h-[min(92dvh,920px)] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-2xl sm:mx-auto sm:max-w-2xl sm:rounded-2xl"
       panelProps={{ lang: FORM_INPUT_LATIN_LANG }}
     >
       {({ requestClose }) => (
         <>
           <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-100 px-4 py-4 sm:px-6">
             {!isSuccess ? (
-              <div className="min-w-0 pr-2 text-left">
-                <h2
-                  id="installment-request-modal-title"
-                  className="text-lg font-semibold text-gray-900"
-                >
-                  {t('product.aparik.modalTitle')}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-gray-700">
-                  {t('product.aparik.modalIntro')}
-                </p>
-              </div>
+              <h2
+                id="installment-request-modal-title"
+                className="min-w-0 pr-2 text-left text-lg font-semibold text-gray-900"
+              >
+                {t('product.aparik.modalTitle')}
+              </h2>
             ) : (
               <h2 id="installment-request-modal-title" className="sr-only">
                 {t('product.aparik.modalTitle')}
@@ -248,69 +235,33 @@ export function InstallmentRequestModal({
             {isSuccess ? (
               <InstallmentRequestSuccessView message={t('product.aparik.submitSuccess')} />
             ) : (
-              <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <div className="min-w-0">
-                    <Input
-                      label={t('checkout.form.firstName')}
-                      value={form.firstName}
-                      onChange={(event) => handleFieldChange('firstName', event.target.value)}
-                      error={errors.firstName}
-                      disabled={isSubmitting}
-                      checkoutChrome
-                      required
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <Input
-                      label={t('checkout.form.lastName')}
-                      value={form.lastName}
-                      onChange={(event) => handleFieldChange('lastName', event.target.value)}
-                      error={errors.lastName}
-                      disabled={isSubmitting}
-                      checkoutChrome
-                      required
-                    />
-                  </div>
-                </div>
-                <Input
-                  label={t('checkout.form.email')}
-                  type="email"
-                  value={form.email}
-                  onChange={(event) => handleFieldChange('email', event.target.value)}
-                  error={errors.email}
-                  disabled={isSubmitting}
-                  checkoutChrome
-                  required
+              <form onSubmit={handleSubmit} noValidate>
+                <InstallmentRequestFormBody
+                  t={t}
+                  form={form}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                  bankId={bankId}
+                  onBankSelect={(id) => {
+                    setBankId(id);
+                    setErrors((prev) => ({ ...prev, bankId: undefined, submit: undefined }));
+                  }}
+                  documents={documents}
+                  onDocumentsChange={(next) => {
+                    setDocuments(next);
+                    setErrors((prev) => ({ ...prev, documents: undefined, submit: undefined }));
+                  }}
+                  acceptedTerms={acceptedTerms}
+                  onTermsChange={(checked) => {
+                    setAcceptedTerms(checked);
+                    setErrors((prev) => ({ ...prev, consents: undefined, submit: undefined }));
+                  }}
+                  onFieldChange={handleFieldChange}
+                  onPhoneChange={(value) =>
+                    handleFieldChange('phone', sanitizeAparikPhoneDigits(value))
+                  }
+                  phoneMaxLength={APARIK_PHONE_DIGITS_MAX}
                 />
-                <Input
-                  label={t('checkout.form.phone')}
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel-national"
-                  placeholder="+374 XX XXX XXX"
-                  value={form.phone}
-                  onChange={(event) => handlePhoneChange(event.target.value)}
-                  error={errors.phone}
-                  disabled={isSubmitting}
-                  maxLength={PHONE_DIGITS_MAX}
-                  checkoutChrome
-                  required
-                />
-
-                {errors.submit ? (
-                  <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                    {errors.submit}
-                  </div>
-                ) : null}
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full rounded-xl bg-[#2db2ff] px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isSubmitting ? t('product.aparik.submitting') : t('common.buttons.submit')}
-                </button>
               </form>
             )}
           </div>

@@ -12,6 +12,7 @@ import {
 import {
   checkRateLimitByIp,
   checkRateLimitByIpAndSuffix,
+  RATE_LIMIT_APARIK,
   RATE_LIMIT_AUTH,
   RATE_LIMIT_CONTACT,
   RATE_LIMIT_GUEST_ORDER,
@@ -295,6 +296,8 @@ export async function middleware(request: NextRequest) {
     rateLimitResponse = await checkRateLimitByIp(requestWithId, RATE_LIMIT_PASSWORD, requestId);
   } else if (pathname === "/api/v1/contact" && request.method === "POST") {
     rateLimitResponse = await checkRateLimitByIp(requestWithId, RATE_LIMIT_CONTACT, requestId);
+  } else if (pathname === "/api/v1/aparik/inquiry" && request.method === "POST") {
+    rateLimitResponse = await checkRateLimitByIp(requestWithId, RATE_LIMIT_APARIK, requestId);
   } else if (isGuestOrderLookup(requestWithId)) {
     rateLimitResponse = await checkRateLimitByIp(requestWithId, RATE_LIMIT_GUEST_ORDER, requestId);
     if (!rateLimitResponse) {

@@ -5,6 +5,8 @@ import React, { InputHTMLAttributes, forwardRef } from 'react';
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  /** Keep invalid chrome without the message under the field. */
+  hideErrorMessage?: boolean;
   /** When true, use admin panel corner radius (`rounded-supersudo` / 15px). */
   adminChrome?: boolean;
   /** Checkout form fields — 15px radius + Mobee blue focus (matches city select). */
@@ -16,6 +18,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     {
       label,
       error,
+      hideErrorMessage = false,
       className = '',
       onKeyDown,
       adminChrome = false,
@@ -79,7 +82,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           onKeyDown={handleKeyDown}
           {...props}
         />
-        {error ? (
+        {error && !hideErrorMessage ? (
           <p className="mt-1 text-sm font-medium text-red-600" role="alert">
             {error}
           </p>
