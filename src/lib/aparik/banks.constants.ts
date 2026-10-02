@@ -2,6 +2,10 @@ export const APARIK_BANK_IDS = ['evoca', 'acba', 'ameria', 'vtb'] as const;
 
 export type AparikBankId = (typeof APARIK_BANK_IDS)[number];
 
+/** Cloudflare R2 public base for installment bank logos. */
+const APARIK_BANK_LOGO_BASE =
+  'https://pub-1fb400d29b23441eab283310115c4542.r2.dev/static/aparik/banks';
+
 export interface AparikBankOption {
   id: AparikBankId;
   logoSrc: string;
@@ -13,25 +17,25 @@ export interface AparikBankOption {
 export const APARIK_BANK_OPTIONS: readonly AparikBankOption[] = [
   {
     id: 'evoca',
-    logoSrc: '/images/aparik/banks/evoca.png',
+    logoSrc: `${APARIK_BANK_LOGO_BASE}/evoca.webp`,
     logoAlt: 'Evocabank',
     logoObjectFit: 'contain',
   },
   {
     id: 'acba',
-    logoSrc: '/images/aparik/banks/acba.png',
+    logoSrc: `${APARIK_BANK_LOGO_BASE}/acba.webp`,
     logoAlt: 'ACBA Bank',
     logoObjectFit: 'contain',
   },
   {
     id: 'ameria',
-    logoSrc: '/images/aparik/banks/ameria.jpg',
+    logoSrc: `${APARIK_BANK_LOGO_BASE}/ameria.webp`,
     logoAlt: 'Ameriabank',
     logoObjectFit: 'cover',
   },
   {
     id: 'vtb',
-    logoSrc: '/images/aparik/banks/vtb.png',
+    logoSrc: `${APARIK_BANK_LOGO_BASE}/vtb.webp`,
     logoAlt: 'VTB Bank',
     logoObjectFit: 'contain',
   },
