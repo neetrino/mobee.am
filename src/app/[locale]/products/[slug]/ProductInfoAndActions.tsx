@@ -4,6 +4,7 @@ import { useMemo, useState, type MouseEvent } from 'react';
 import { CheckCircle2, FileText, Heart, XCircle } from 'lucide-react';
 import { formatPrice, type CurrencyCode } from '../../../../lib/currency';
 import { t, getProductText } from '../../../../lib/i18n';
+import { getProductDescriptionHtml } from '../../../../lib/products/get-product-description-html';
 import type { LanguageCode } from '../../../../lib/language';
 import { CompareIcon } from '../../../../components/icons/CompareIcon';
 import { InstallmentPriceButton } from '../../../../components/ProductCard/InstallmentPriceButton';
@@ -94,6 +95,14 @@ export function ProductInfoAndActions({
 }: ProductInfoAndActionsProps) {
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
   const title = getProductText(language, product.id, 'title') || product.title;
+  const hasDescription = useMemo(
+    () =>
+      getProductDescriptionHtml(language, product.id, {
+        description: product.description,
+        sourceDescription: product.sourceDescription,
+      }).trim().length > 0,
+    [language, product.description, product.id, product.sourceDescription],
+  );
   const productImageUrl = currentVariant?.imageUrl?.trim() || product.image || null;
   const inquiryVariantDetails = useMemo(
     () => ({
@@ -234,23 +243,29 @@ export function ProductInfoAndActions({
         getOptionValue={getOptionValue}
       />
 
-      <div className="mt-8 flex w-full min-w-0 flex-row flex-wrap items-center justify-between gap-2 text-sm sm:gap-3">
-        <button
-          type="button"
-          onClick={onScrollToDetails}
-          className="inline-flex max-w-full items-center gap-2 font-medium text-admin hover:underline"
-        >
-          <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
-          {t(language, 'product.moreDetails')}
-        </button>
-        {hasPrice ? (
-          <InstallmentPriceButton
-            onClick={handleInstallmentClick}
-            size="md"
-            className="shrink-0"
-          />
-        ) : null}
-      </div>
+      {hasDescription || hasPrice ? (
+        <div className="mt-8 flex w-full min-w-0 flex-row flex-wrap items-center justify-between gap-2 text-sm sm:gap-3">
+          {hasDescription ? (
+            <button
+              type="button"
+              onClick={onScrollToDetails}
+              className="inline-flex max-w-full items-center gap-2 font-medium text-admin hover:underline"
+            >
+              <FileText className="h-4 w-4 shrink-0" strokeWidth={2} />
+              {t(language, 'product.moreDetails')}
+            </button>
+          ) : (
+            <span />
+          )}
+          {hasPrice ? (
+            <InstallmentPriceButton
+              onClick={handleInstallmentClick}
+              size="md"
+              className="shrink-0"
+            />
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-6">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
