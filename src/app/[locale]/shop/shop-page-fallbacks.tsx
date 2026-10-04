@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { SHOP_PAGE_DEFAULT_LIMIT } from '@/lib/catalog/catalog.constants';
 import {
   SHOP_FILTER_SIDEBAR_BODY_CLASS,
   SHOP_FILTER_SIDEBAR_CLASS,
@@ -31,7 +32,7 @@ export function ShopCatalogFallback() {
       <div className="mb-6 h-8 w-48 animate-pulse rounded bg-gray-200" />
       <div className="mb-6 h-10 w-full max-w-md animate-pulse rounded bg-gray-200" />
       <div className="grid grid-cols-2 gap-x-2 gap-y-5 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-5 xl:grid-cols-3 xl:gap-6">
-        {Array.from({ length: 6 }).map((_, i) => (
+        {Array.from({ length: SHOP_PAGE_DEFAULT_LIMIT }).map((_, i) => (
           <div key={i} className="aspect-[3/4] animate-pulse rounded-lg bg-gray-200" aria-hidden />
         ))}
       </div>

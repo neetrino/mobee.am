@@ -14,6 +14,7 @@ import {
   setProductListClientCache,
 } from '@/lib/shop/product-list-client-cache';
 import { usePrefetchAdjacentProductListPages } from './usePrefetchAdjacentProductListPages';
+import { SHOP_PAGE_DEFAULT_LIMIT } from '@/lib/catalog/catalog.constants';
 
 export interface ShopCatalogProduct {
   id: string;
@@ -91,7 +92,10 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
   const language = serverLanguage ?? uiLanguage;
   const [productsData, setProductsData] = useState<ProductsResponse | null>(() =>
     initialPayload && initialFiltersKey
-      ? payloadToResponse(initialPayload, initialPayload.meta?.limit ?? 12)
+      ? payloadToResponse(
+          initialPayload,
+          initialPayload.meta?.limit ?? SHOP_PAGE_DEFAULT_LIMIT,
+        )
       : null,
   );
   const [loading, setLoading] = useState(() => !(initialPayload && initialFiltersKey));
@@ -127,9 +131,10 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
 
   const fetchList = useCallback(async () => {
     const requestId = ++requestIdRef.current;
+    const listLimit = filters.limit ?? SHOP_PAGE_DEFAULT_LIMIT;
     const cached = getProductListClientCache(filtersKey);
     if (cached) {
-      applyPayload(cached, filters.limit ?? 12);
+      applyPayload(cached, listLimit);
       return;
     }
 
@@ -152,11 +157,11 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
         meta: result.meta ?? {
           total: 0,
           page: 1,
-          limit: filters.limit ?? 12,
+          limit: listLimit,
           totalPages: 0,
         },
       };
-      applyPayload(payload, filters.limit ?? 12);
+      applyPayload(payload, listLimit);
     } catch (e) {
       if (requestId !== requestIdRef.current) {
         return;
@@ -169,7 +174,7 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
           meta: {
             total: 0,
             page: 1,
-            limit: filters.limit ?? 12,
+            limit: listLimit,
             totalPages: 0,
           },
         });
@@ -180,14 +185,15 @@ export function useShopCatalog(options: UseShopCatalogOptions = {}) {
   }, [applyPayload, filters, filtersKey]);
 
   useEffect(() => {
+    const listLimit = filters.limit ?? SHOP_PAGE_DEFAULT_LIMIT;
     if (initialFiltersKey && filtersKey === initialFiltersKey && initialPayload) {
-      applyPayload(initialPayload, filters.limit ?? 12);
+      applyPayload(initialPayload, listLimit);
       return;
     }
 
     const cached = getProductListClientCache(filtersKey);
     if (cached) {
-      applyPayload(cached, filters.limit ?? 12);
+      applyPayload(cached, listLimit);
       return;
     }
 

@@ -3,15 +3,22 @@ import {
   parseCatalogHttpParams,
   searchParamsToRecord,
 } from "@/lib/catalog/catalog-http-query";
+import { SHOP_PAGE_DEFAULT_LIMIT } from "@/lib/catalog/catalog.constants";
 
 /**
- * Build product list filters for the shop page — same rules as GET /api/v1/products.
+ * Build product list filters for the shop page — same rules as GET /api/v1/products,
+ * except a missing `limit` uses the taller shop default so the grid fills the filter column.
  */
 export function buildShopProductFiltersFromSearchParams(
   params: Record<string, string | undefined>,
   lang: string,
 ): ProductFilters {
-  return parseCatalogHttpParams(params, lang);
+  const filters = parseCatalogHttpParams(params, lang);
+  const hasExplicitLimit = Boolean(params.limit?.trim());
+  if (hasExplicitLimit) {
+    return filters;
+  }
+  return { ...filters, limit: SHOP_PAGE_DEFAULT_LIMIT };
 }
 
 /**

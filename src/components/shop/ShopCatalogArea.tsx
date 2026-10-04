@@ -22,6 +22,7 @@ import { useShopCatalog, type ShopCatalogProduct } from './useShopCatalog';
 import { useSmoothScrollToTopOnPageChange } from './useSmoothScrollToTopOnPageChange';
 import { usePlpViewportPdpSync } from './usePlpViewportPdpSync';
 import { useShopPageLimitFromFilters } from './useShopPageLimitFromFilters';
+import { SHOP_PAGE_DEFAULT_LIMIT } from '@/lib/catalog/catalog.constants';
 
 type ShopPaginationPageItemsProps = {
   items: PaginationPageItem[];
@@ -145,7 +146,7 @@ export type ShopCatalogAreaProps = {
 function ShopGridSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-x-2 gap-y-5 md:grid-cols-3 md:gap-5 lg:grid-cols-2 lg:gap-4 xl:grid-cols-3 xl:gap-6">
-      {Array.from({ length: 6 }).map((_, i) => (
+      {Array.from({ length: SHOP_PAGE_DEFAULT_LIMIT }).map((_, i) => (
         <div
           key={i}
           className="aspect-[3/4] animate-pulse rounded-lg bg-gray-200"
@@ -214,7 +215,7 @@ export function ShopCatalogArea({
   const buildPaginationUrl = (num: number) => {
     const q = new URLSearchParams();
     q.set('page', num.toString());
-    const currentLimit = searchParams.get('limit') || '12';
+    const currentLimit = searchParams.get('limit') || String(SHOP_PAGE_DEFAULT_LIMIT);
     q.set('limit', currentLimit);
     searchParams.forEach((v, k) => {
       if (k !== 'page' && k !== 'limit' && v) q.set(k, v);
