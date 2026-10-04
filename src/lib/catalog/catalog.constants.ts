@@ -40,6 +40,23 @@ export const SHOP_MIN_PRODUCT_ROWS = 4;
 /** Desktop shop grid columns used for page-size = rows × columns. */
 export const SHOP_DESKTOP_GRID_COLUMNS = 3;
 
+/**
+ * Default `/shop` page size when URL has no `limit`.
+ * ≈10 desktop rows × 3 cols — fills a typical filter column on first paint
+ * instead of flashing the old 4-row (12) page then growing after measurement.
+ */
+export const SHOP_PAGE_DEFAULT_LIMIT = 10 * SHOP_DESKTOP_GRID_COLUMNS;
+
+/** Desktop shop card min-height (`ProductCardGridDesktop`). */
+export const SHOP_PRODUCT_CARD_MIN_HEIGHT_PX = 556;
+
+/** Desktop shop grid row gap (`lg`/`xl` `gap-6`). */
+export const SHOP_PRODUCT_GRID_ROW_GAP_PX = 24;
+
+/** Card + row gap — used to size page length against the filter column. */
+export const SHOP_PRODUCT_ROW_HEIGHT_PX =
+  SHOP_PRODUCT_CARD_MIN_HEIGHT_PX + SHOP_PRODUCT_GRID_ROW_GAP_PX;
+
 /** `filter=new` window in days. */
 export const CATALOG_NEW_ARRIVAL_DAYS = 30;
 

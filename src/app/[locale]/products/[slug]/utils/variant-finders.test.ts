@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { findVariantByAllAttributes, findVariantByColorAndSize } from "./variant-finders";
+import {
+  findInStockVariantForColorChange,
+  findVariantByAllAttributes,
+  findVariantByColorAndSize,
+} from "./variant-finders";
 import type { Product, ProductVariant } from "../types";
 
 const buildVariant = (
@@ -81,5 +85,56 @@ describe("variant-finders", () => {
     const selectedAttributes = new Map<string, string>([["material", "mat-silk"]]);
     const variant = findVariantByAllAttributes(baseProduct, "red", "m", selectedAttributes);
     expect(variant?.id).toBe("v-red-m-cotton");
+  });
+
+  it("on color change prefers in-stock variant and keeps preferred storage/sim when possible", () => {
+    const phoneProduct: Product = {
+      id: "p-phone",
+      slug: "iphone",
+      title: "iPhone",
+      media: [],
+      variants: [
+        buildVariant("black-256-esim-oos", 0, [
+          { key: "color", attribute: "color", value: "Black" },
+          { key: "storage", attribute: "storage", value: "256GB", valueId: "st-256" },
+          { key: "sim", attribute: "sim", value: "eSIM", valueId: "sim-esim" },
+        ]),
+        buildVariant("black-256-dual", 3, [
+          { key: "color", attribute: "color", value: "Black" },
+          { key: "storage", attribute: "storage", value: "256GB", valueId: "st-256" },
+          { key: "sim", attribute: "sim", value: "Dual SIM", valueId: "sim-dual" },
+        ]),
+        buildVariant("black-128-esim", 2, [
+          { key: "color", attribute: "color", value: "Black" },
+          { key: "storage", attribute: "storage", value: "128GB", valueId: "st-128" },
+          { key: "sim", attribute: "sim", value: "eSIM", valueId: "sim-esim" },
+        ]),
+        buildVariant("blue-256-esim", 5, [
+          { key: "color", attribute: "color", value: "Blue" },
+          { key: "storage", attribute: "storage", value: "256GB", valueId: "st-256" },
+          { key: "sim", attribute: "sim", value: "eSIM", valueId: "sim-esim" },
+        ]),
+        buildVariant("blue-128-dual", 4, [
+          { key: "color", attribute: "color", value: "Blue" },
+          { key: "storage", attribute: "storage", value: "128GB", valueId: "st-128" },
+          { key: "sim", attribute: "sim", value: "Dual SIM", valueId: "sim-dual" },
+        ]),
+      ],
+    };
+
+    const preferred = new Map<string, string>([
+      ["storage", "st-256"],
+      ["sim", "sim-esim"],
+    ]);
+
+    // Exact preferred combo is in stock for Blue → keep both storage and SIM.
+    expect(
+      findInStockVariantForColorChange(phoneProduct, "blue", null, preferred)?.id,
+    ).toBe("blue-256-esim");
+
+    // Exact preferred combo is OOS for Black → keep storage, switch SIM to in-stock.
+    expect(
+      findInStockVariantForColorChange(phoneProduct, "black", null, preferred)?.id,
+    ).toBe("black-256-dual");
   });
 });

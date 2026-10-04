@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CatalogQueryError } from "@/lib/catalog/catalog-query-error";
+import { SHOP_PAGE_DEFAULT_LIMIT } from "@/lib/catalog/catalog.constants";
 import {
   buildProductListFiltersFromUrlSearchParams,
   buildShopProductFiltersFromSearchParams,
@@ -16,6 +17,11 @@ describe("buildShopProductFiltersFromSearchParams", () => {
     expect(f.category).toBe("phones");
     expect(f.sort).toBe("name-asc");
     expect(f.lang).toBe("hy");
+  });
+
+  it("uses the shop default limit when URL has no limit", () => {
+    const f = buildShopProductFiltersFromSearchParams({ category: "phones" }, "en");
+    expect(f.limit).toBe(SHOP_PAGE_DEFAULT_LIMIT);
   });
 
   it("rejects invalid page, prices, and unknown sort", () => {

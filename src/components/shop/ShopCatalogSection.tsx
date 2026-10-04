@@ -4,7 +4,7 @@ import { buildProductListCacheKey } from '@/lib/shop/product-list-cache-key';
 import { getCachedProductList, type ProductListPayload } from '@/lib/services/products-list-cached';
 import { ShopCatalogArea } from '@/components/shop/ShopCatalogArea';
 import { isCatalogQueryError } from '@/lib/catalog/catalog-query-error';
-import { CATALOG_DEFAULT_LIMIT, CATALOG_DEFAULT_PAGE } from '@/lib/catalog/catalog.constants';
+import { CATALOG_DEFAULT_PAGE, SHOP_PAGE_DEFAULT_LIMIT } from '@/lib/catalog/catalog.constants';
 
 interface ShopCatalogSectionProps {
   searchParams: Record<string, string | undefined>;
@@ -16,7 +16,7 @@ const EMPTY_LIST_PAYLOAD: ProductListPayload = {
   meta: {
     total: 0,
     page: CATALOG_DEFAULT_PAGE,
-    limit: CATALOG_DEFAULT_LIMIT,
+    limit: SHOP_PAGE_DEFAULT_LIMIT,
     totalPages: 0,
   },
 };

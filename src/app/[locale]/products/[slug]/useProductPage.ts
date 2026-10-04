@@ -17,7 +17,12 @@ import { useProductCalculations } from './hooks/useProductCalculations';
 import { getVariantMainImageIndex } from './utils/variant-media';
 import { resolveCompareCategoryId } from '../../../../lib/shop/compare-storage';
 import { getMissingRequiredAttributeKeys } from './utils/required-attribute-selection';
-import { findVariantByAllAttributesStrict, findVariantByAllAttributes, findVariantByColorAndSize } from './utils/variant-finders';
+import {
+  findInStockVariantForColorChange,
+  findVariantByAllAttributesStrict,
+  findVariantByAllAttributes,
+  findVariantByColorAndSize,
+} from './utils/variant-finders';
 import { resolveProductAttributeLabel } from './utils';
 import type { Product } from './types';
 
@@ -231,7 +236,7 @@ export function useProductPage({
       return;
     }
 
-    const variant = findVariantByColorAndSize(product, colorFromUrl, null);
+    const variant = findInStockVariantForColorChange(product, colorFromUrl);
     if (variant) {
       applyVariantSelection(variant);
       appliedUrlColorKeyRef.current = urlColorKey;

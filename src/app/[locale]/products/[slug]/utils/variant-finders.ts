@@ -227,6 +227,92 @@ function findVariantByAllAttributesFallback(
   return product.variants.find((v) => v.stock > 0) || product.variants[0] || null;
 }
 
+function optionMatchesSelectedValue(
+  variant: ProductVariant,
+  attrKey: string,
+  selectedValue: string,
+): boolean {
+  const normalizedSelectedValue = selectedValue.toLowerCase().trim();
+  const options =
+    variant.options?.filter((opt) => opt.key === attrKey || opt.attribute === attrKey) ?? [];
 
+  return options.some((option) => {
+    if (option.valueId && option.valueId === selectedValue) {
+      return true;
+    }
+    return option.value?.toLowerCase().trim() === normalizedSelectedValue;
+  });
+}
 
+function scorePreferredAttributes(
+  variant: ProductVariant,
+  preferredSize: string | null,
+  preferredAttributes: Map<string, string>,
+): number {
+  let score = 0;
+  const normalizedSize = preferredSize?.toLowerCase().trim();
 
+  if (normalizedSize) {
+    const variantSize = getOptionValue(variant.options, 'size');
+    if (variantSize === normalizedSize) {
+      score += 1;
+    }
+  }
+
+  preferredAttributes.forEach((value, key) => {
+    if (key === 'color' || key === 'size' || !value) return;
+    if (optionMatchesSelectedValue(variant, key, value)) {
+      score += 1;
+    }
+  });
+
+  return score;
+}
+
+/**
+ * After a color change, pick the best variant for that color.
+ * Prefers stock > 0, then keeps as many current size/sim/storage values as possible.
+ */
+export function findInStockVariantForColorChange(
+  product: Product | null,
+  color: string,
+  preferredSize: string | null = null,
+  preferredAttributes: Map<string, string> = new Map(),
+): ProductVariant | null {
+  if (!product?.variants?.length || !color) return null;
+
+  const normalizedColor = color.toLowerCase().trim();
+  const colorVariants = product.variants.filter((variant) =>
+    variantHasColor(variant, normalizedColor, product),
+  );
+  if (colorVariants.length === 0) return null;
+
+  const exactMatch = findVariantByAllAttributesStrict(
+    product,
+    normalizedColor,
+    preferredSize,
+    preferredAttributes,
+  );
+  if (exactMatch && exactMatch.stock > 0) {
+    return exactMatch;
+  }
+
+  const inStockVariants = colorVariants.filter((variant) => variant.stock > 0);
+  const candidates = inStockVariants.length > 0 ? inStockVariants : colorVariants;
+
+  let bestVariant = candidates[0] ?? null;
+  let bestScore = bestVariant
+    ? scorePreferredAttributes(bestVariant, preferredSize, preferredAttributes)
+    : -1;
+
+  for (let index = 1; index < candidates.length; index += 1) {
+    const candidate = candidates[index];
+    const score = scorePreferredAttributes(candidate, preferredSize, preferredAttributes);
+    if (score > bestScore) {
+      bestVariant = candidate;
+      bestScore = score;
+    }
+  }
+
+  return bestVariant;
+}

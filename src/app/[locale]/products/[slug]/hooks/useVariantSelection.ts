@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getOptionValue } from '../utils/variant-helpers';
-import { findVariantByColorAndSize } from '../utils/variant-finders';
-import { handleColorSelect as handleColorSelectUtil } from '../utils/image-switching';
+import { findInStockVariantForColorChange } from '../utils/variant-finders';
 import type { Product, ProductVariant, VariantOption } from '../types';
 
 interface UseVariantSelectionProps {
@@ -58,7 +57,7 @@ function resolveInitialVariant(
   }
 
   if (colorFromUrl) {
-    const fromColor = findVariantByColorAndSize(product, colorFromUrl, null);
+    const fromColor = findInStockVariantForColorChange(product, colorFromUrl);
     if (fromColor) return fromColor;
   }
 
@@ -67,7 +66,7 @@ function resolveInitialVariant(
 
 export function useVariantSelection({
   product,
-  setCurrentImageIndex,
+  setCurrentImageIndex: _setCurrentImageIndex,
   colorFromUrl = null,
   variantIdFromUrl = null,
 }: UseVariantSelectionProps) {
@@ -128,15 +127,29 @@ export function useVariantSelection({
   }, []);
 
   const handleColorSelect = useCallback((color: string) => {
-    handleColorSelectUtil(
-      color,
+    if (!color) return;
+
+    const normalizedColor = color.toLowerCase().trim();
+    if (!product?.variants?.length) {
+      setSelectedColor(normalizedColor);
+      return;
+    }
+
+    // Color change must also snap SIM/storage/size onto an in-stock combo for that color.
+    const nextVariant = findInStockVariantForColorChange(
       product,
-      [],
-      null,
-      setSelectedColor,
-      setCurrentImageIndex,
+      normalizedColor,
+      selectedSize,
+      selectedAttributeValues,
     );
-  }, [product, setCurrentImageIndex]);
+
+    if (nextVariant) {
+      applyVariantSelection(nextVariant);
+      return;
+    }
+
+    setSelectedColor(normalizedColor);
+  }, [product, selectedSize, selectedAttributeValues, applyVariantSelection]);
 
   const handleSizeSelect = useCallback((size: string) => {
     setSelectedSize(size.toLowerCase().trim());

@@ -11,6 +11,7 @@ import { isCatalogQueryError } from '@/lib/catalog/catalog-query-error';
 import type { ProductFilters } from '@/lib/services/products-find-query/types';
 import type { LanguageCode } from '@/lib/language';
 import type { ReactNode } from 'react';
+import { SHOP_PAGE_DEFAULT_LIMIT } from '@/lib/catalog/catalog.constants';
 
 const SHOP_CATEGORY_FILTER_LIMIT = 100;
 
@@ -29,7 +30,7 @@ const EMPTY_FILTERS: ProductsFiltersData = {
 };
 
 function defaultShopFilters(language: LanguageCode): ProductFilters {
-  return { lang: language, page: 1, limit: 12, sort: 'default' };
+  return { lang: language, page: 1, limit: SHOP_PAGE_DEFAULT_LIMIT, sort: 'default' };
 }
 
 function parseShopFilters(
