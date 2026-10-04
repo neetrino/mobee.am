@@ -1,6 +1,27 @@
 import { createAttribute, updateAttributeTranslation } from "./admin-attributes-write/attribute-operations";
 import { addAttributeValue, updateAttributeValue } from "./admin-attributes-write/value-operations";
-import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
+import {
+  syncProductListingReadModelByAttributeId,
+  syncProductListingReadModelByAttributeValueId,
+} from "@/lib/read-model/product-read-model-sync";
+import { invalidateProductReadCaches } from "@/lib/services/read-through-json-cache";
+import { logger } from "@/lib/utils/logger";
+
+/**
+ * Keep storefront read models fresh without blocking the admin response
+ * on a full catalog rebuild.
+ */
+function scheduleAttributeReadModelSync(
+  task: () => Promise<void>,
+  context: Record<string, string>,
+): void {
+  void task().catch((error: unknown) => {
+    logger.error("Attribute read-model sync failed", {
+      ...context,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
+}
 
 /**
  * Service for admin attribute write operations
@@ -17,7 +38,11 @@ class AdminAttributesWriteService {
     locale?: string;
   }) {
     const result = await createAttribute(data);
-    await rebuildProductListingReadModel();
+    // New attribute is unused by products yet — cache invalidation is enough.
+    scheduleAttributeReadModelSync(
+      () => invalidateProductReadCaches(),
+      { operation: "createAttribute" },
+    );
     return result;
   }
 
@@ -32,7 +57,10 @@ class AdminAttributesWriteService {
     }
   ) {
     const result = await updateAttributeTranslation(attributeId, data);
-    await rebuildProductListingReadModel();
+    scheduleAttributeReadModelSync(
+      () => syncProductListingReadModelByAttributeId(attributeId),
+      { operation: "updateAttributeTranslation", attributeId },
+    );
     return result;
   }
 
@@ -44,7 +72,11 @@ class AdminAttributesWriteService {
     data: { label: string; locale?: string }
   ) {
     const result = await addAttributeValue(attributeId, data);
-    await rebuildProductListingReadModel();
+    // New value is unused until assigned to variants.
+    scheduleAttributeReadModelSync(
+      () => invalidateProductReadCaches(),
+      { operation: "addAttributeValue", attributeId },
+    );
     return result;
   }
 
@@ -62,7 +94,11 @@ class AdminAttributesWriteService {
     }
   ) {
     const result = await updateAttributeValue(attributeId, valueId, data);
-    await rebuildProductListingReadModel();
+    // Color/label/image changes affect listing facets — sync only affected products.
+    scheduleAttributeReadModelSync(
+      () => syncProductListingReadModelByAttributeValueId(valueId),
+      { operation: "updateAttributeValue", attributeId, valueId },
+    );
     return result;
   }
 }

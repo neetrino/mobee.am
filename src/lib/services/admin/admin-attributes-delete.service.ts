@@ -1,7 +1,16 @@
 import { db } from "@white-shop/db";
-import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
+import { invalidateProductReadCaches } from "@/lib/services/read-through-json-cache";
 import { AppError } from "@/lib/errors/app-error";
 import { logger } from "@/lib/utils/logger";
+
+function scheduleCacheInvalidation(context: Record<string, string>): void {
+  void invalidateProductReadCaches().catch((error: unknown) => {
+    logger.error("Attribute delete cache invalidation failed", {
+      ...context,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
+}
 
 class AdminAttributesDeleteService {
   /**
@@ -144,7 +153,7 @@ class AdminAttributesDeleteService {
         timestamp: new Date().toISOString(),
       });
       
-      await rebuildProductListingReadModel();
+      scheduleCacheInvalidation({ operation: "deleteAttribute", attributeId });
       return { success: true };
     } catch (error: unknown) {
       const err = error as { status?: number; type?: string; code?: string; name?: string };
@@ -244,7 +253,10 @@ class AdminAttributesDeleteService {
       const translation = attribute.translations[0];
       const values = attribute.values || [];
 
-      await rebuildProductListingReadModel();
+      scheduleCacheInvalidation({
+        operation: "deleteAttributeValue",
+        attributeValueId,
+      });
       return {
         id: attribute.id,
         key: attribute.key,

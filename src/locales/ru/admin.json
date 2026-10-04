@@ -147,6 +147,8 @@
     "filterable": "Фильтруемый",
     "values": "{count} значение",
     "valuesPlural": "{count} значений",
+    "productsUsingAttribute": "{count} товаров",
+    "productsUsingValue": "{count} товаров",
     "deleteAttribute": "Удалить атрибут",
     "addNewValue": "Добавить новое значение (например, Красный, Синий, Большой, Маленький)",
     "add": "Добавить",

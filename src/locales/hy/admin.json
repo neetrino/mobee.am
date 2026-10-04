@@ -147,6 +147,8 @@
     "filterable": "Զտելի",
     "values": "{count} արժեք",
     "valuesPlural": "{count} արժեք",
+    "productsUsingAttribute": "{count} ապրանք",
+    "productsUsingValue": "{count} ապրանք",
     "deleteAttribute": "Ջնջել ատրիբուտ",
     "addNewValue": "Ավելացնել նոր արժեք (օր.՝ Կարմիր, Կապույտ, Մեծ, Փոքր)",
     "add": "Ավելացնել",

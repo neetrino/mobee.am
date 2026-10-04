@@ -195,6 +195,45 @@ export async function syncProductListingReadModelByBrand(brandId: string): Promi
   await syncProductListingReadModelBatch(products.map((row) => row.id));
 }
 
+/**
+ * Sync listing/PDP rows for products that use a specific attribute value.
+ */
+export async function syncProductListingReadModelByAttributeValueId(
+  attributeValueId: string,
+): Promise<void> {
+  if (!attributeValueId) return;
+
+  const options = await db.productVariantOption.findMany({
+    where: { valueId: attributeValueId },
+    select: { variant: { select: { productId: true } } },
+  });
+
+  const productIds = options.map((option) => option.variant.productId);
+  await syncProductListingReadModelBatch(productIds);
+}
+
+/**
+ * Sync listing/PDP rows for products that use any value of an attribute.
+ */
+export async function syncProductListingReadModelByAttributeId(
+  attributeId: string,
+): Promise<void> {
+  if (!attributeId) return;
+
+  const options = await db.productVariantOption.findMany({
+    where: {
+      OR: [
+        { attributeId },
+        { attributeValue: { attributeId } },
+      ],
+    },
+    select: { variant: { select: { productId: true } } },
+  });
+
+  const productIds = options.map((option) => option.variant.productId);
+  await syncProductListingReadModelBatch(productIds);
+}
+
 export async function syncProductListingReadModelByCategoryIds(
   categoryIds: string[],
 ): Promise<void> {
