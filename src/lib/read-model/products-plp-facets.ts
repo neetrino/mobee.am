@@ -6,6 +6,9 @@ import { CATALOG_SIZE_ORDER } from "@/lib/catalog/catalog.constants";
 import { adminSettingsService } from "@/lib/services/admin/admin-settings.service";
 import { buildListingRowWhere } from "@/lib/read-model/products-plp-read-model-where";
 import type { ListingColorFacetValue } from "@/lib/read-model/product-listing-row-tokens";
+import { fetchAttributeFacetLightRows } from "@/lib/catalog/fetch-attribute-facet-rows";
+import { aggregateAttributeFacets } from "@/lib/catalog/catalog-facet-aggregate";
+import { loadFilterableAttributeMeta } from "@/lib/catalog/load-filterable-attribute-meta";
 
 type ListingFacetRow = {
   productId: string;
@@ -57,8 +60,11 @@ function matchesColorAndSize(row: ListingFacetRow, colors: string[], sizes: stri
   return matchesTokens(row.sizeTokens, sizes);
 }
 
+type LoadAttributeMeta = typeof loadFilterableAttributeMeta;
+
 export async function getCatalogFacetsFromReadModel(
   filters: ProductFilters,
+  loadAttributeMeta: LoadAttributeMeta = loadFilterableAttributeMeta,
 ) {
   const query = normalizeCatalogQuery(filters);
   let stepSize: number | null = null;
@@ -86,6 +92,7 @@ export async function getCatalogFacetsFromReadModel(
     brands: [],
     colors: [],
     sizes: [],
+    attrs: {},
     minPrice: undefined,
     maxPrice: undefined,
   };
@@ -95,6 +102,7 @@ export async function getCatalogFacetsFromReadModel(
       colors: [],
       sizes: [],
       brands: [],
+      attributes: [],
       priceRange: { min: 0, max: 0, hasProducts: false, stepSize, stepSizePerCurrency },
     };
   }
@@ -137,11 +145,27 @@ export async function getCatalogFacetsFromReadModel(
   const sizeRows = rows.filter(
     (row) => matchesBrand(row, query) && matchesColorAndSize(row, query.colors, []) && matchesPrice(row, query),
   );
+  const attrCandidateIds = rows
+    .filter(
+      (row) =>
+        matchesBrand(row, query) &&
+        matchesColorAndSize(row, query.colors, query.sizes) &&
+        matchesPrice(row, query),
+    )
+    .map((row) => row.productId);
+
+  const [attributeMeta, attrLightRows] = await Promise.all([
+    loadAttributeMeta(query.lang),
+    attrCandidateIds.length > 0
+      ? fetchAttributeFacetLightRows(attrCandidateIds)
+      : Promise.resolve([]),
+  ]);
 
   return {
     colors: aggregateListingColors(colorRows),
     sizes: aggregateListingSizes(sizeRows),
     brands: aggregateListingBrands(brandRows),
+    attributes: aggregateAttributeFacets(attrLightRows, query.lang, attributeMeta),
     priceRange: {
       ...boundsFromRows(priceRows),
       stepSize,

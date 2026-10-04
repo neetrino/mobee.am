@@ -24,6 +24,7 @@ export function productFiltersToApiParams(filters: ProductFilters): Record<strin
   }
   if (filters.colors) p.colors = filters.colors;
   if (filters.sizes) p.sizes = filters.sizes;
+  if (filters.attrs) p.attrs = filters.attrs;
   if (filters.brand) p.brand = filters.brand;
   if (filters.sort && filters.sort !== "default") p.sort = filters.sort;
   if (filters.ids?.length) p.ids = filters.ids.join(",");

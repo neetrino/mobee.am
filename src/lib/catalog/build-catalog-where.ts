@@ -112,7 +112,11 @@ export async function buildCatalogWhere(
   }
 
   if (scope.includeOptions) {
-    const optionWhere = buildVariantOptionWhere(query.colors, query.sizes);
+    const optionWhere = buildVariantOptionWhere(
+      query.colors,
+      query.sizes,
+      query.attrs,
+    );
     if (optionWhere) {
       parts.push(optionWhere);
     }

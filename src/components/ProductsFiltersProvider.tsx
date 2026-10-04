@@ -49,7 +49,21 @@ export interface ProductsFiltersData {
   colors: ColorOption[];
   sizes: SizeOption[];
   brands: BrandOption[];
+  attributes: AttributeFacetOption[];
   priceRange: PriceRangeOption;
+}
+
+export interface AttributeFacetValueOption {
+  value: string;
+  label: string;
+  count: number;
+}
+
+export interface AttributeFacetOption {
+  key: string;
+  name: string;
+  position: number;
+  values: AttributeFacetValueOption[];
 }
 
 /** Top categories for shop sidebar (shared fetch, avoids duplicate /categories/top). */
@@ -75,6 +89,7 @@ const DEFAULT_FILTERS: ProductsFiltersData = {
   colors: [],
   sizes: [],
   brands: [],
+  attributes: [],
   priceRange: { min: 0, max: 0, hasProducts: false, stepSize: null, stepSizePerCurrency: null },
 };
 const SHOP_CATEGORY_FILTER_LIMIT = '100';
@@ -87,6 +102,7 @@ interface ProductsFiltersProviderProps {
   brand?: string;
   colors?: string;
   sizes?: string;
+  attrs?: string;
   filter?: string;
   initialFiltersData?: ProductsFiltersData;
   initialTopCategories?: ShopTopCategoryOption[];
@@ -102,6 +118,7 @@ function buildFiltersKeyFromProps(
   brand?: string,
   colors?: string,
   sizes?: string,
+  attrs?: string,
   filter?: string,
   lang?: string,
 ): string {
@@ -114,6 +131,7 @@ function buildFiltersKeyFromProps(
     brand,
     colors,
     sizes,
+    attrs,
     filter,
   };
   return buildProductFiltersCacheKey(input);
@@ -127,6 +145,7 @@ export function ProductsFiltersProvider({
   brand,
   colors,
   sizes,
+  attrs,
   filter,
   initialFiltersData,
   initialTopCategories,
@@ -147,7 +166,7 @@ export function ProductsFiltersProvider({
       const lang = getStoredLanguage();
       const params = productFiltersToFacetParams(
         parseCatalogHttpParams(
-          { category, search, minPrice, maxPrice, brand, colors, sizes, filter },
+          { category, search, minPrice, maxPrice, brand, colors, sizes, attrs, filter },
           lang,
         ),
       );
@@ -163,6 +182,7 @@ export function ProductsFiltersProvider({
         colors: filtersRes.colors ?? [],
         sizes: filtersRes.sizes ?? [],
         brands: filtersRes.brands ?? [],
+        attributes: filtersRes.attributes ?? [],
         priceRange: filtersRes.priceRange ?? DEFAULT_FILTERS.priceRange,
       });
       setTopCategories(topRes.data ?? []);
@@ -173,7 +193,7 @@ export function ProductsFiltersProvider({
     } finally {
       setLoading(false);
     }
-  }, [category, search, minPrice, maxPrice, brand, colors, sizes, filter]);
+  }, [category, search, minPrice, maxPrice, brand, colors, sizes, attrs, filter]);
 
   useEffect(() => {
     const lang = getStoredLanguage();
@@ -185,6 +205,7 @@ export function ProductsFiltersProvider({
       brand,
       colors,
       sizes,
+      attrs,
       filter,
       lang,
     );
@@ -204,6 +225,7 @@ export function ProductsFiltersProvider({
     brand,
     colors,
     sizes,
+    attrs,
     filter,
     fetchFilters,
     initialFiltersKey,

@@ -1,5 +1,9 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
+import {
+  getAttributeProductCountMap,
+  getAttributeValueProductCountMap,
+} from "@/lib/services/admin/attribute-value-product-counts";
 import { ensureColorsColumnsExist } from "@/lib/services/admin/admin-attributes-write/migration";
 
 class AdminAttributesReadService {
@@ -142,8 +146,33 @@ class AdminAttributesReadService {
       }
     }
 
+    const attributeList = Array.isArray(attributes) ? attributes : [];
+    const attributeIds = attributeList.map((attribute: { id: string }) => attribute.id);
+    const valueIds = attributeList.flatMap(
+      (attribute: { values?: Array<{ id: string }> }) =>
+        (Array.isArray(attribute.values) ? attribute.values : []).map((value) => value.id),
+    );
+
+    const [valueProductCounts, attributeProductCounts] = await Promise.all([
+      getAttributeValueProductCountMap(valueIds),
+      getAttributeProductCountMap(attributeIds),
+    ]);
+
     return {
-      data: attributes.map((attribute: { id: string; key: string; type: string; filterable: boolean; translations?: Array<{ name: string }>; values?: Array<{ id: string; value: string; translations?: Array<{ label: string }>; colors?: any; imageUrl?: string | null }> }) => {
+      data: attributeList.map((attribute: {
+        id: string;
+        key: string;
+        type: string;
+        filterable: boolean;
+        translations?: Array<{ name: string }>;
+        values?: Array<{
+          id: string;
+          value: string;
+          translations?: Array<{ label: string }>;
+          colors?: unknown;
+          imageUrl?: string | null;
+        }>;
+      }) => {
         const translations = Array.isArray(attribute.translations) ? attribute.translations : [];
         const translation = translations[0] || null;
         const values = Array.isArray(attribute.values) ? attribute.values : [];
@@ -153,29 +182,28 @@ class AdminAttributesReadService {
           name: translation?.name || attribute.key,
           type: attribute.type,
           filterable: attribute.filterable,
-          values: values.map((value: any) => {
+          productCount: attributeProductCounts.get(attribute.id) ?? 0,
+          values: values.map((value) => {
             const valueTranslations = Array.isArray(value.translations) ? value.translations : [];
             const valueTranslation = valueTranslations[0] || null;
             const colorsData = value.colors;
             let colorsArray: string[] = [];
-            
+
             if (colorsData) {
               if (Array.isArray(colorsData)) {
-                colorsArray = colorsData;
-              } else if (typeof colorsData === 'string') {
+                colorsArray = colorsData as string[];
+              } else if (typeof colorsData === "string") {
                 try {
                   colorsArray = JSON.parse(colorsData);
-                } catch (e) {
+                } catch {
                   logger.warn("Failed to parse attribute colors JSON");
                   colorsArray = [];
                 }
-              } else if (typeof colorsData === 'object') {
-                // If it's already an object (from Prisma JSONB), use it directly
-                colorsArray = Array.isArray(colorsData) ? colorsData : [];
+              } else if (typeof colorsData === "object") {
+                colorsArray = Array.isArray(colorsData) ? (colorsData as string[]) : [];
               }
             }
-            
-            // Ensure colorsArray is always an array of strings
+
             if (!Array.isArray(colorsArray)) {
               colorsArray = [];
             }
@@ -186,6 +214,7 @@ class AdminAttributesReadService {
               label: valueTranslation?.label || value.value,
               colors: colorsArray,
               imageUrl: value.imageUrl || null,
+              productCount: valueProductCounts.get(value.id) ?? 0,
             };
           }),
         };

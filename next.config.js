@@ -159,6 +159,8 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: http: blob:",
               "connect-src 'self' https:",
+              // Image/variant tooling (and some Next bundles) spawn Web Workers from blob: URLs
+              "worker-src 'self' blob:",
               "frame-src 'self' https://www.google.com https://maps.google.com",
               "frame-ancestors 'none'",
             ].join('; '),
@@ -247,8 +249,10 @@ const nextConfig = {
     root: path.resolve(__dirname, '.'),
   },
   experimental: {
+    // dynamic: 0 — admin catalog edits (variants/prices) must not linger in the
+    // client Router Cache when soft-navigating back to PDP / listing pages.
     staleTimes: {
-      dynamic: 60,
+      dynamic: 0,
       static: 300,
     },
   },

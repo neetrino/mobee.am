@@ -158,6 +158,16 @@ export type Settings = $Result.DefaultSelection<Prisma.$SettingsPayload>
  * 
  */
 export type ContactMessage = $Result.DefaultSelection<Prisma.$ContactMessagePayload>
+/**
+ * Model ProductListingRow
+ * 
+ */
+export type ProductListingRow = $Result.DefaultSelection<Prisma.$ProductListingRowPayload>
+/**
+ * Model ProductPdpRow
+ * 
+ */
+export type ProductPdpRow = $Result.DefaultSelection<Prisma.$ProductPdpRowPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -571,6 +581,26 @@ export class PrismaClient<
     * ```
     */
   get contactMessage(): Prisma.ContactMessageDelegate<ExtArgs>;
+
+  /**
+   * `prisma.productListingRow`: Exposes CRUD operations for the **ProductListingRow** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProductListingRows
+    * const productListingRows = await prisma.productListingRow.findMany()
+    * ```
+    */
+  get productListingRow(): Prisma.ProductListingRowDelegate<ExtArgs>;
+
+  /**
+   * `prisma.productPdpRow`: Exposes CRUD operations for the **ProductPdpRow** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProductPdpRows
+    * const productPdpRows = await prisma.productPdpRow.findMany()
+    * ```
+    */
+  get productPdpRow(): Prisma.ProductPdpRowDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1040,7 +1070,9 @@ export namespace Prisma {
     ProductReview: 'ProductReview',
     PromoCode: 'PromoCode',
     Settings: 'Settings',
-    ContactMessage: 'ContactMessage'
+    ContactMessage: 'ContactMessage',
+    ProductListingRow: 'ProductListingRow',
+    ProductPdpRow: 'ProductPdpRow'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1056,7 +1088,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "address" | "category" | "categoryTranslation" | "brand" | "brandTranslation" | "attribute" | "attributeTranslation" | "attributeValue" | "attributeValueTranslation" | "product" | "productTranslation" | "productVariant" | "productVariantOption" | "productLabel" | "productAttribute" | "cart" | "cartItem" | "order" | "orderItem" | "payment" | "orderEvent" | "stockMovement" | "auditLog" | "outboxEvent" | "productReview" | "promoCode" | "settings" | "contactMessage"
+      modelProps: "user" | "address" | "category" | "categoryTranslation" | "brand" | "brandTranslation" | "attribute" | "attributeTranslation" | "attributeValue" | "attributeValueTranslation" | "product" | "productTranslation" | "productVariant" | "productVariantOption" | "productLabel" | "productAttribute" | "cart" | "cartItem" | "order" | "orderItem" | "payment" | "orderEvent" | "stockMovement" | "auditLog" | "outboxEvent" | "productReview" | "promoCode" | "settings" | "contactMessage" | "productListingRow" | "productPdpRow"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3087,6 +3119,146 @@ export namespace Prisma {
           count: {
             args: Prisma.ContactMessageCountArgs<ExtArgs>
             result: $Utils.Optional<ContactMessageCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProductListingRow: {
+        payload: Prisma.$ProductListingRowPayload<ExtArgs>
+        fields: Prisma.ProductListingRowFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProductListingRowFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProductListingRowFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload>
+          }
+          findFirst: {
+            args: Prisma.ProductListingRowFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProductListingRowFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload>
+          }
+          findMany: {
+            args: Prisma.ProductListingRowFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload>[]
+          }
+          create: {
+            args: Prisma.ProductListingRowCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload>
+          }
+          createMany: {
+            args: Prisma.ProductListingRowCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ProductListingRowCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload>[]
+          }
+          delete: {
+            args: Prisma.ProductListingRowDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload>
+          }
+          update: {
+            args: Prisma.ProductListingRowUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProductListingRowDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProductListingRowUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProductListingRowUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductListingRowPayload>
+          }
+          aggregate: {
+            args: Prisma.ProductListingRowAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProductListingRow>
+          }
+          groupBy: {
+            args: Prisma.ProductListingRowGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProductListingRowGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProductListingRowCountArgs<ExtArgs>
+            result: $Utils.Optional<ProductListingRowCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProductPdpRow: {
+        payload: Prisma.$ProductPdpRowPayload<ExtArgs>
+        fields: Prisma.ProductPdpRowFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProductPdpRowFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProductPdpRowFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload>
+          }
+          findFirst: {
+            args: Prisma.ProductPdpRowFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProductPdpRowFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload>
+          }
+          findMany: {
+            args: Prisma.ProductPdpRowFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload>[]
+          }
+          create: {
+            args: Prisma.ProductPdpRowCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload>
+          }
+          createMany: {
+            args: Prisma.ProductPdpRowCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ProductPdpRowCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload>[]
+          }
+          delete: {
+            args: Prisma.ProductPdpRowDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload>
+          }
+          update: {
+            args: Prisma.ProductPdpRowUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProductPdpRowDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProductPdpRowUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProductPdpRowUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductPdpRowPayload>
+          }
+          aggregate: {
+            args: Prisma.ProductPdpRowAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProductPdpRow>
+          }
+          groupBy: {
+            args: Prisma.ProductPdpRowGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProductPdpRowGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProductPdpRowCountArgs<ExtArgs>
+            result: $Utils.Optional<ProductPdpRowCountAggregateOutputType> | number
           }
         }
       }
@@ -33892,6 +34064,2276 @@ export namespace Prisma {
 
 
   /**
+   * Model ProductListingRow
+   */
+
+  export type AggregateProductListingRow = {
+    _count: ProductListingRowCountAggregateOutputType | null
+    _avg: ProductListingRowAvgAggregateOutputType | null
+    _sum: ProductListingRowSumAggregateOutputType | null
+    _min: ProductListingRowMinAggregateOutputType | null
+    _max: ProductListingRowMaxAggregateOutputType | null
+  }
+
+  export type ProductListingRowAvgAggregateOutputType = {
+    price: number | null
+    compareAtPrice: number | null
+    originalPrice: number | null
+    priceSort: number | null
+    discountPercent: number | null
+    stock: number | null
+    warrantyYears: number | null
+  }
+
+  export type ProductListingRowSumAggregateOutputType = {
+    price: number | null
+    compareAtPrice: number | null
+    originalPrice: number | null
+    priceSort: number | null
+    discountPercent: number | null
+    stock: number | null
+    warrantyYears: number | null
+  }
+
+  export type ProductListingRowMinAggregateOutputType = {
+    id: string | null
+    productId: string | null
+    locale: string | null
+    slug: string | null
+    title: string | null
+    subtitle: string | null
+    brandId: string | null
+    brandSlug: string | null
+    brandName: string | null
+    primaryCategoryId: string | null
+    price: number | null
+    compareAtPrice: number | null
+    originalPrice: number | null
+    priceSort: number | null
+    hasPrice: boolean | null
+    priceOnRequest: boolean | null
+    discountPercent: number | null
+    featured: boolean | null
+    hasMarcoListingImage: boolean | null
+    defaultVariantId: string | null
+    stock: number | null
+    inStock: boolean | null
+    image: string | null
+    searchText: string | null
+    warrantyYears: number | null
+    publishedAt: Date | null
+    productCreatedAt: Date | null
+    productUpdatedAt: Date | null
+    isPublished: boolean | null
+    deletedAt: Date | null
+    rebuiltAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProductListingRowMaxAggregateOutputType = {
+    id: string | null
+    productId: string | null
+    locale: string | null
+    slug: string | null
+    title: string | null
+    subtitle: string | null
+    brandId: string | null
+    brandSlug: string | null
+    brandName: string | null
+    primaryCategoryId: string | null
+    price: number | null
+    compareAtPrice: number | null
+    originalPrice: number | null
+    priceSort: number | null
+    hasPrice: boolean | null
+    priceOnRequest: boolean | null
+    discountPercent: number | null
+    featured: boolean | null
+    hasMarcoListingImage: boolean | null
+    defaultVariantId: string | null
+    stock: number | null
+    inStock: boolean | null
+    image: string | null
+    searchText: string | null
+    warrantyYears: number | null
+    publishedAt: Date | null
+    productCreatedAt: Date | null
+    productUpdatedAt: Date | null
+    isPublished: boolean | null
+    deletedAt: Date | null
+    rebuiltAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProductListingRowCountAggregateOutputType = {
+    id: number
+    productId: number
+    locale: number
+    slug: number
+    title: number
+    subtitle: number
+    brandId: number
+    brandSlug: number
+    brandName: number
+    primaryCategoryId: number
+    categoryIds: number
+    categorySlugs: number
+    price: number
+    compareAtPrice: number
+    originalPrice: number
+    priceSort: number
+    hasPrice: number
+    priceOnRequest: number
+    discountPercent: number
+    featured: number
+    hasMarcoListingImage: number
+    defaultVariantId: number
+    stock: number
+    inStock: number
+    image: number
+    labels: number
+    colors: number
+    colorTokens: number
+    sizeTokens: number
+    variantComboTokens: number
+    searchText: number
+    warrantyYears: number
+    publishedAt: number
+    productCreatedAt: number
+    productUpdatedAt: number
+    isPublished: number
+    deletedAt: number
+    rebuiltAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ProductListingRowAvgAggregateInputType = {
+    price?: true
+    compareAtPrice?: true
+    originalPrice?: true
+    priceSort?: true
+    discountPercent?: true
+    stock?: true
+    warrantyYears?: true
+  }
+
+  export type ProductListingRowSumAggregateInputType = {
+    price?: true
+    compareAtPrice?: true
+    originalPrice?: true
+    priceSort?: true
+    discountPercent?: true
+    stock?: true
+    warrantyYears?: true
+  }
+
+  export type ProductListingRowMinAggregateInputType = {
+    id?: true
+    productId?: true
+    locale?: true
+    slug?: true
+    title?: true
+    subtitle?: true
+    brandId?: true
+    brandSlug?: true
+    brandName?: true
+    primaryCategoryId?: true
+    price?: true
+    compareAtPrice?: true
+    originalPrice?: true
+    priceSort?: true
+    hasPrice?: true
+    priceOnRequest?: true
+    discountPercent?: true
+    featured?: true
+    hasMarcoListingImage?: true
+    defaultVariantId?: true
+    stock?: true
+    inStock?: true
+    image?: true
+    searchText?: true
+    warrantyYears?: true
+    publishedAt?: true
+    productCreatedAt?: true
+    productUpdatedAt?: true
+    isPublished?: true
+    deletedAt?: true
+    rebuiltAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProductListingRowMaxAggregateInputType = {
+    id?: true
+    productId?: true
+    locale?: true
+    slug?: true
+    title?: true
+    subtitle?: true
+    brandId?: true
+    brandSlug?: true
+    brandName?: true
+    primaryCategoryId?: true
+    price?: true
+    compareAtPrice?: true
+    originalPrice?: true
+    priceSort?: true
+    hasPrice?: true
+    priceOnRequest?: true
+    discountPercent?: true
+    featured?: true
+    hasMarcoListingImage?: true
+    defaultVariantId?: true
+    stock?: true
+    inStock?: true
+    image?: true
+    searchText?: true
+    warrantyYears?: true
+    publishedAt?: true
+    productCreatedAt?: true
+    productUpdatedAt?: true
+    isPublished?: true
+    deletedAt?: true
+    rebuiltAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProductListingRowCountAggregateInputType = {
+    id?: true
+    productId?: true
+    locale?: true
+    slug?: true
+    title?: true
+    subtitle?: true
+    brandId?: true
+    brandSlug?: true
+    brandName?: true
+    primaryCategoryId?: true
+    categoryIds?: true
+    categorySlugs?: true
+    price?: true
+    compareAtPrice?: true
+    originalPrice?: true
+    priceSort?: true
+    hasPrice?: true
+    priceOnRequest?: true
+    discountPercent?: true
+    featured?: true
+    hasMarcoListingImage?: true
+    defaultVariantId?: true
+    stock?: true
+    inStock?: true
+    image?: true
+    labels?: true
+    colors?: true
+    colorTokens?: true
+    sizeTokens?: true
+    variantComboTokens?: true
+    searchText?: true
+    warrantyYears?: true
+    publishedAt?: true
+    productCreatedAt?: true
+    productUpdatedAt?: true
+    isPublished?: true
+    deletedAt?: true
+    rebuiltAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ProductListingRowAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductListingRow to aggregate.
+     */
+    where?: ProductListingRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductListingRows to fetch.
+     */
+    orderBy?: ProductListingRowOrderByWithRelationInput | ProductListingRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProductListingRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductListingRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductListingRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProductListingRows
+    **/
+    _count?: true | ProductListingRowCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ProductListingRowAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProductListingRowSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProductListingRowMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProductListingRowMaxAggregateInputType
+  }
+
+  export type GetProductListingRowAggregateType<T extends ProductListingRowAggregateArgs> = {
+        [P in keyof T & keyof AggregateProductListingRow]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProductListingRow[P]>
+      : GetScalarType<T[P], AggregateProductListingRow[P]>
+  }
+
+
+
+
+  export type ProductListingRowGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductListingRowWhereInput
+    orderBy?: ProductListingRowOrderByWithAggregationInput | ProductListingRowOrderByWithAggregationInput[]
+    by: ProductListingRowScalarFieldEnum[] | ProductListingRowScalarFieldEnum
+    having?: ProductListingRowScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProductListingRowCountAggregateInputType | true
+    _avg?: ProductListingRowAvgAggregateInputType
+    _sum?: ProductListingRowSumAggregateInputType
+    _min?: ProductListingRowMinAggregateInputType
+    _max?: ProductListingRowMaxAggregateInputType
+  }
+
+  export type ProductListingRowGroupByOutputType = {
+    id: string
+    productId: string
+    locale: string
+    slug: string
+    title: string
+    subtitle: string | null
+    brandId: string | null
+    brandSlug: string | null
+    brandName: string | null
+    primaryCategoryId: string | null
+    categoryIds: string[]
+    categorySlugs: string[]
+    price: number
+    compareAtPrice: number | null
+    originalPrice: number | null
+    priceSort: number
+    hasPrice: boolean
+    priceOnRequest: boolean
+    discountPercent: number
+    featured: boolean
+    hasMarcoListingImage: boolean
+    defaultVariantId: string | null
+    stock: number
+    inStock: boolean
+    image: string | null
+    labels: JsonValue
+    colors: JsonValue
+    colorTokens: string[]
+    sizeTokens: string[]
+    variantComboTokens: string[]
+    searchText: string
+    warrantyYears: number | null
+    publishedAt: Date | null
+    productCreatedAt: Date
+    productUpdatedAt: Date
+    isPublished: boolean
+    deletedAt: Date | null
+    rebuiltAt: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: ProductListingRowCountAggregateOutputType | null
+    _avg: ProductListingRowAvgAggregateOutputType | null
+    _sum: ProductListingRowSumAggregateOutputType | null
+    _min: ProductListingRowMinAggregateOutputType | null
+    _max: ProductListingRowMaxAggregateOutputType | null
+  }
+
+  type GetProductListingRowGroupByPayload<T extends ProductListingRowGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProductListingRowGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProductListingRowGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProductListingRowGroupByOutputType[P]>
+            : GetScalarType<T[P], ProductListingRowGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProductListingRowSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productId?: boolean
+    locale?: boolean
+    slug?: boolean
+    title?: boolean
+    subtitle?: boolean
+    brandId?: boolean
+    brandSlug?: boolean
+    brandName?: boolean
+    primaryCategoryId?: boolean
+    categoryIds?: boolean
+    categorySlugs?: boolean
+    price?: boolean
+    compareAtPrice?: boolean
+    originalPrice?: boolean
+    priceSort?: boolean
+    hasPrice?: boolean
+    priceOnRequest?: boolean
+    discountPercent?: boolean
+    featured?: boolean
+    hasMarcoListingImage?: boolean
+    defaultVariantId?: boolean
+    stock?: boolean
+    inStock?: boolean
+    image?: boolean
+    labels?: boolean
+    colors?: boolean
+    colorTokens?: boolean
+    sizeTokens?: boolean
+    variantComboTokens?: boolean
+    searchText?: boolean
+    warrantyYears?: boolean
+    publishedAt?: boolean
+    productCreatedAt?: boolean
+    productUpdatedAt?: boolean
+    isPublished?: boolean
+    deletedAt?: boolean
+    rebuiltAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["productListingRow"]>
+
+  export type ProductListingRowSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productId?: boolean
+    locale?: boolean
+    slug?: boolean
+    title?: boolean
+    subtitle?: boolean
+    brandId?: boolean
+    brandSlug?: boolean
+    brandName?: boolean
+    primaryCategoryId?: boolean
+    categoryIds?: boolean
+    categorySlugs?: boolean
+    price?: boolean
+    compareAtPrice?: boolean
+    originalPrice?: boolean
+    priceSort?: boolean
+    hasPrice?: boolean
+    priceOnRequest?: boolean
+    discountPercent?: boolean
+    featured?: boolean
+    hasMarcoListingImage?: boolean
+    defaultVariantId?: boolean
+    stock?: boolean
+    inStock?: boolean
+    image?: boolean
+    labels?: boolean
+    colors?: boolean
+    colorTokens?: boolean
+    sizeTokens?: boolean
+    variantComboTokens?: boolean
+    searchText?: boolean
+    warrantyYears?: boolean
+    publishedAt?: boolean
+    productCreatedAt?: boolean
+    productUpdatedAt?: boolean
+    isPublished?: boolean
+    deletedAt?: boolean
+    rebuiltAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["productListingRow"]>
+
+  export type ProductListingRowSelectScalar = {
+    id?: boolean
+    productId?: boolean
+    locale?: boolean
+    slug?: boolean
+    title?: boolean
+    subtitle?: boolean
+    brandId?: boolean
+    brandSlug?: boolean
+    brandName?: boolean
+    primaryCategoryId?: boolean
+    categoryIds?: boolean
+    categorySlugs?: boolean
+    price?: boolean
+    compareAtPrice?: boolean
+    originalPrice?: boolean
+    priceSort?: boolean
+    hasPrice?: boolean
+    priceOnRequest?: boolean
+    discountPercent?: boolean
+    featured?: boolean
+    hasMarcoListingImage?: boolean
+    defaultVariantId?: boolean
+    stock?: boolean
+    inStock?: boolean
+    image?: boolean
+    labels?: boolean
+    colors?: boolean
+    colorTokens?: boolean
+    sizeTokens?: boolean
+    variantComboTokens?: boolean
+    searchText?: boolean
+    warrantyYears?: boolean
+    publishedAt?: boolean
+    productCreatedAt?: boolean
+    productUpdatedAt?: boolean
+    isPublished?: boolean
+    deletedAt?: boolean
+    rebuiltAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $ProductListingRowPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProductListingRow"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      productId: string
+      locale: string
+      slug: string
+      title: string
+      subtitle: string | null
+      brandId: string | null
+      brandSlug: string | null
+      brandName: string | null
+      primaryCategoryId: string | null
+      categoryIds: string[]
+      categorySlugs: string[]
+      price: number
+      compareAtPrice: number | null
+      originalPrice: number | null
+      priceSort: number
+      hasPrice: boolean
+      priceOnRequest: boolean
+      discountPercent: number
+      featured: boolean
+      hasMarcoListingImage: boolean
+      defaultVariantId: string | null
+      stock: number
+      inStock: boolean
+      image: string | null
+      labels: Prisma.JsonValue
+      colors: Prisma.JsonValue
+      colorTokens: string[]
+      sizeTokens: string[]
+      variantComboTokens: string[]
+      searchText: string
+      warrantyYears: number | null
+      publishedAt: Date | null
+      productCreatedAt: Date
+      productUpdatedAt: Date
+      isPublished: boolean
+      deletedAt: Date | null
+      rebuiltAt: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["productListingRow"]>
+    composites: {}
+  }
+
+  type ProductListingRowGetPayload<S extends boolean | null | undefined | ProductListingRowDefaultArgs> = $Result.GetResult<Prisma.$ProductListingRowPayload, S>
+
+  type ProductListingRowCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<ProductListingRowFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: ProductListingRowCountAggregateInputType | true
+    }
+
+  export interface ProductListingRowDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProductListingRow'], meta: { name: 'ProductListingRow' } }
+    /**
+     * Find zero or one ProductListingRow that matches the filter.
+     * @param {ProductListingRowFindUniqueArgs} args - Arguments to find a ProductListingRow
+     * @example
+     * // Get one ProductListingRow
+     * const productListingRow = await prisma.productListingRow.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProductListingRowFindUniqueArgs>(args: SelectSubset<T, ProductListingRowFindUniqueArgs<ExtArgs>>): Prisma__ProductListingRowClient<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one ProductListingRow that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {ProductListingRowFindUniqueOrThrowArgs} args - Arguments to find a ProductListingRow
+     * @example
+     * // Get one ProductListingRow
+     * const productListingRow = await prisma.productListingRow.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProductListingRowFindUniqueOrThrowArgs>(args: SelectSubset<T, ProductListingRowFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProductListingRowClient<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first ProductListingRow that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductListingRowFindFirstArgs} args - Arguments to find a ProductListingRow
+     * @example
+     * // Get one ProductListingRow
+     * const productListingRow = await prisma.productListingRow.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProductListingRowFindFirstArgs>(args?: SelectSubset<T, ProductListingRowFindFirstArgs<ExtArgs>>): Prisma__ProductListingRowClient<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first ProductListingRow that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductListingRowFindFirstOrThrowArgs} args - Arguments to find a ProductListingRow
+     * @example
+     * // Get one ProductListingRow
+     * const productListingRow = await prisma.productListingRow.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProductListingRowFindFirstOrThrowArgs>(args?: SelectSubset<T, ProductListingRowFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProductListingRowClient<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more ProductListingRows that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductListingRowFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProductListingRows
+     * const productListingRows = await prisma.productListingRow.findMany()
+     * 
+     * // Get first 10 ProductListingRows
+     * const productListingRows = await prisma.productListingRow.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const productListingRowWithIdOnly = await prisma.productListingRow.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProductListingRowFindManyArgs>(args?: SelectSubset<T, ProductListingRowFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a ProductListingRow.
+     * @param {ProductListingRowCreateArgs} args - Arguments to create a ProductListingRow.
+     * @example
+     * // Create one ProductListingRow
+     * const ProductListingRow = await prisma.productListingRow.create({
+     *   data: {
+     *     // ... data to create a ProductListingRow
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProductListingRowCreateArgs>(args: SelectSubset<T, ProductListingRowCreateArgs<ExtArgs>>): Prisma__ProductListingRowClient<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many ProductListingRows.
+     * @param {ProductListingRowCreateManyArgs} args - Arguments to create many ProductListingRows.
+     * @example
+     * // Create many ProductListingRows
+     * const productListingRow = await prisma.productListingRow.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProductListingRowCreateManyArgs>(args?: SelectSubset<T, ProductListingRowCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ProductListingRows and returns the data saved in the database.
+     * @param {ProductListingRowCreateManyAndReturnArgs} args - Arguments to create many ProductListingRows.
+     * @example
+     * // Create many ProductListingRows
+     * const productListingRow = await prisma.productListingRow.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ProductListingRows and only return the `id`
+     * const productListingRowWithIdOnly = await prisma.productListingRow.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ProductListingRowCreateManyAndReturnArgs>(args?: SelectSubset<T, ProductListingRowCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a ProductListingRow.
+     * @param {ProductListingRowDeleteArgs} args - Arguments to delete one ProductListingRow.
+     * @example
+     * // Delete one ProductListingRow
+     * const ProductListingRow = await prisma.productListingRow.delete({
+     *   where: {
+     *     // ... filter to delete one ProductListingRow
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProductListingRowDeleteArgs>(args: SelectSubset<T, ProductListingRowDeleteArgs<ExtArgs>>): Prisma__ProductListingRowClient<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one ProductListingRow.
+     * @param {ProductListingRowUpdateArgs} args - Arguments to update one ProductListingRow.
+     * @example
+     * // Update one ProductListingRow
+     * const productListingRow = await prisma.productListingRow.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProductListingRowUpdateArgs>(args: SelectSubset<T, ProductListingRowUpdateArgs<ExtArgs>>): Prisma__ProductListingRowClient<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more ProductListingRows.
+     * @param {ProductListingRowDeleteManyArgs} args - Arguments to filter ProductListingRows to delete.
+     * @example
+     * // Delete a few ProductListingRows
+     * const { count } = await prisma.productListingRow.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProductListingRowDeleteManyArgs>(args?: SelectSubset<T, ProductListingRowDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProductListingRows.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductListingRowUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProductListingRows
+     * const productListingRow = await prisma.productListingRow.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProductListingRowUpdateManyArgs>(args: SelectSubset<T, ProductListingRowUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProductListingRow.
+     * @param {ProductListingRowUpsertArgs} args - Arguments to update or create a ProductListingRow.
+     * @example
+     * // Update or create a ProductListingRow
+     * const productListingRow = await prisma.productListingRow.upsert({
+     *   create: {
+     *     // ... data to create a ProductListingRow
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProductListingRow we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProductListingRowUpsertArgs>(args: SelectSubset<T, ProductListingRowUpsertArgs<ExtArgs>>): Prisma__ProductListingRowClient<$Result.GetResult<Prisma.$ProductListingRowPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of ProductListingRows.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductListingRowCountArgs} args - Arguments to filter ProductListingRows to count.
+     * @example
+     * // Count the number of ProductListingRows
+     * const count = await prisma.productListingRow.count({
+     *   where: {
+     *     // ... the filter for the ProductListingRows we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProductListingRowCountArgs>(
+      args?: Subset<T, ProductListingRowCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProductListingRowCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProductListingRow.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductListingRowAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProductListingRowAggregateArgs>(args: Subset<T, ProductListingRowAggregateArgs>): Prisma.PrismaPromise<GetProductListingRowAggregateType<T>>
+
+    /**
+     * Group by ProductListingRow.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductListingRowGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProductListingRowGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProductListingRowGroupByArgs['orderBy'] }
+        : { orderBy?: ProductListingRowGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProductListingRowGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductListingRowGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProductListingRow model
+   */
+  readonly fields: ProductListingRowFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProductListingRow.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProductListingRowClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProductListingRow model
+   */ 
+  interface ProductListingRowFieldRefs {
+    readonly id: FieldRef<"ProductListingRow", 'String'>
+    readonly productId: FieldRef<"ProductListingRow", 'String'>
+    readonly locale: FieldRef<"ProductListingRow", 'String'>
+    readonly slug: FieldRef<"ProductListingRow", 'String'>
+    readonly title: FieldRef<"ProductListingRow", 'String'>
+    readonly subtitle: FieldRef<"ProductListingRow", 'String'>
+    readonly brandId: FieldRef<"ProductListingRow", 'String'>
+    readonly brandSlug: FieldRef<"ProductListingRow", 'String'>
+    readonly brandName: FieldRef<"ProductListingRow", 'String'>
+    readonly primaryCategoryId: FieldRef<"ProductListingRow", 'String'>
+    readonly categoryIds: FieldRef<"ProductListingRow", 'String[]'>
+    readonly categorySlugs: FieldRef<"ProductListingRow", 'String[]'>
+    readonly price: FieldRef<"ProductListingRow", 'Float'>
+    readonly compareAtPrice: FieldRef<"ProductListingRow", 'Float'>
+    readonly originalPrice: FieldRef<"ProductListingRow", 'Float'>
+    readonly priceSort: FieldRef<"ProductListingRow", 'Float'>
+    readonly hasPrice: FieldRef<"ProductListingRow", 'Boolean'>
+    readonly priceOnRequest: FieldRef<"ProductListingRow", 'Boolean'>
+    readonly discountPercent: FieldRef<"ProductListingRow", 'Int'>
+    readonly featured: FieldRef<"ProductListingRow", 'Boolean'>
+    readonly hasMarcoListingImage: FieldRef<"ProductListingRow", 'Boolean'>
+    readonly defaultVariantId: FieldRef<"ProductListingRow", 'String'>
+    readonly stock: FieldRef<"ProductListingRow", 'Int'>
+    readonly inStock: FieldRef<"ProductListingRow", 'Boolean'>
+    readonly image: FieldRef<"ProductListingRow", 'String'>
+    readonly labels: FieldRef<"ProductListingRow", 'Json'>
+    readonly colors: FieldRef<"ProductListingRow", 'Json'>
+    readonly colorTokens: FieldRef<"ProductListingRow", 'String[]'>
+    readonly sizeTokens: FieldRef<"ProductListingRow", 'String[]'>
+    readonly variantComboTokens: FieldRef<"ProductListingRow", 'String[]'>
+    readonly searchText: FieldRef<"ProductListingRow", 'String'>
+    readonly warrantyYears: FieldRef<"ProductListingRow", 'Int'>
+    readonly publishedAt: FieldRef<"ProductListingRow", 'DateTime'>
+    readonly productCreatedAt: FieldRef<"ProductListingRow", 'DateTime'>
+    readonly productUpdatedAt: FieldRef<"ProductListingRow", 'DateTime'>
+    readonly isPublished: FieldRef<"ProductListingRow", 'Boolean'>
+    readonly deletedAt: FieldRef<"ProductListingRow", 'DateTime'>
+    readonly rebuiltAt: FieldRef<"ProductListingRow", 'DateTime'>
+    readonly createdAt: FieldRef<"ProductListingRow", 'DateTime'>
+    readonly updatedAt: FieldRef<"ProductListingRow", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProductListingRow findUnique
+   */
+  export type ProductListingRowFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductListingRow to fetch.
+     */
+    where: ProductListingRowWhereUniqueInput
+  }
+
+  /**
+   * ProductListingRow findUniqueOrThrow
+   */
+  export type ProductListingRowFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductListingRow to fetch.
+     */
+    where: ProductListingRowWhereUniqueInput
+  }
+
+  /**
+   * ProductListingRow findFirst
+   */
+  export type ProductListingRowFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductListingRow to fetch.
+     */
+    where?: ProductListingRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductListingRows to fetch.
+     */
+    orderBy?: ProductListingRowOrderByWithRelationInput | ProductListingRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductListingRows.
+     */
+    cursor?: ProductListingRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductListingRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductListingRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductListingRows.
+     */
+    distinct?: ProductListingRowScalarFieldEnum | ProductListingRowScalarFieldEnum[]
+  }
+
+  /**
+   * ProductListingRow findFirstOrThrow
+   */
+  export type ProductListingRowFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductListingRow to fetch.
+     */
+    where?: ProductListingRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductListingRows to fetch.
+     */
+    orderBy?: ProductListingRowOrderByWithRelationInput | ProductListingRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductListingRows.
+     */
+    cursor?: ProductListingRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductListingRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductListingRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductListingRows.
+     */
+    distinct?: ProductListingRowScalarFieldEnum | ProductListingRowScalarFieldEnum[]
+  }
+
+  /**
+   * ProductListingRow findMany
+   */
+  export type ProductListingRowFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductListingRows to fetch.
+     */
+    where?: ProductListingRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductListingRows to fetch.
+     */
+    orderBy?: ProductListingRowOrderByWithRelationInput | ProductListingRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProductListingRows.
+     */
+    cursor?: ProductListingRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductListingRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductListingRows.
+     */
+    skip?: number
+    distinct?: ProductListingRowScalarFieldEnum | ProductListingRowScalarFieldEnum[]
+  }
+
+  /**
+   * ProductListingRow create
+   */
+  export type ProductListingRowCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * The data needed to create a ProductListingRow.
+     */
+    data: XOR<ProductListingRowCreateInput, ProductListingRowUncheckedCreateInput>
+  }
+
+  /**
+   * ProductListingRow createMany
+   */
+  export type ProductListingRowCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProductListingRows.
+     */
+    data: ProductListingRowCreateManyInput | ProductListingRowCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductListingRow createManyAndReturn
+   */
+  export type ProductListingRowCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many ProductListingRows.
+     */
+    data: ProductListingRowCreateManyInput | ProductListingRowCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductListingRow update
+   */
+  export type ProductListingRowUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * The data needed to update a ProductListingRow.
+     */
+    data: XOR<ProductListingRowUpdateInput, ProductListingRowUncheckedUpdateInput>
+    /**
+     * Choose, which ProductListingRow to update.
+     */
+    where: ProductListingRowWhereUniqueInput
+  }
+
+  /**
+   * ProductListingRow updateMany
+   */
+  export type ProductListingRowUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProductListingRows.
+     */
+    data: XOR<ProductListingRowUpdateManyMutationInput, ProductListingRowUncheckedUpdateManyInput>
+    /**
+     * Filter which ProductListingRows to update
+     */
+    where?: ProductListingRowWhereInput
+  }
+
+  /**
+   * ProductListingRow upsert
+   */
+  export type ProductListingRowUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * The filter to search for the ProductListingRow to update in case it exists.
+     */
+    where: ProductListingRowWhereUniqueInput
+    /**
+     * In case the ProductListingRow found by the `where` argument doesn't exist, create a new ProductListingRow with this data.
+     */
+    create: XOR<ProductListingRowCreateInput, ProductListingRowUncheckedCreateInput>
+    /**
+     * In case the ProductListingRow was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProductListingRowUpdateInput, ProductListingRowUncheckedUpdateInput>
+  }
+
+  /**
+   * ProductListingRow delete
+   */
+  export type ProductListingRowDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+    /**
+     * Filter which ProductListingRow to delete.
+     */
+    where: ProductListingRowWhereUniqueInput
+  }
+
+  /**
+   * ProductListingRow deleteMany
+   */
+  export type ProductListingRowDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductListingRows to delete
+     */
+    where?: ProductListingRowWhereInput
+  }
+
+  /**
+   * ProductListingRow without action
+   */
+  export type ProductListingRowDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductListingRow
+     */
+    select?: ProductListingRowSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ProductPdpRow
+   */
+
+  export type AggregateProductPdpRow = {
+    _count: ProductPdpRowCountAggregateOutputType | null
+    _min: ProductPdpRowMinAggregateOutputType | null
+    _max: ProductPdpRowMaxAggregateOutputType | null
+  }
+
+  export type ProductPdpRowMinAggregateOutputType = {
+    id: string | null
+    productId: string | null
+    locale: string | null
+    slug: string | null
+    isPublished: boolean | null
+    productUpdatedAt: Date | null
+    rebuiltAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProductPdpRowMaxAggregateOutputType = {
+    id: string | null
+    productId: string | null
+    locale: string | null
+    slug: string | null
+    isPublished: boolean | null
+    productUpdatedAt: Date | null
+    rebuiltAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProductPdpRowCountAggregateOutputType = {
+    id: number
+    productId: number
+    locale: number
+    slug: number
+    slugs: number
+    payload: number
+    isPublished: number
+    productUpdatedAt: number
+    rebuiltAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ProductPdpRowMinAggregateInputType = {
+    id?: true
+    productId?: true
+    locale?: true
+    slug?: true
+    isPublished?: true
+    productUpdatedAt?: true
+    rebuiltAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProductPdpRowMaxAggregateInputType = {
+    id?: true
+    productId?: true
+    locale?: true
+    slug?: true
+    isPublished?: true
+    productUpdatedAt?: true
+    rebuiltAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProductPdpRowCountAggregateInputType = {
+    id?: true
+    productId?: true
+    locale?: true
+    slug?: true
+    slugs?: true
+    payload?: true
+    isPublished?: true
+    productUpdatedAt?: true
+    rebuiltAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ProductPdpRowAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductPdpRow to aggregate.
+     */
+    where?: ProductPdpRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductPdpRows to fetch.
+     */
+    orderBy?: ProductPdpRowOrderByWithRelationInput | ProductPdpRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProductPdpRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductPdpRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductPdpRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProductPdpRows
+    **/
+    _count?: true | ProductPdpRowCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProductPdpRowMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProductPdpRowMaxAggregateInputType
+  }
+
+  export type GetProductPdpRowAggregateType<T extends ProductPdpRowAggregateArgs> = {
+        [P in keyof T & keyof AggregateProductPdpRow]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProductPdpRow[P]>
+      : GetScalarType<T[P], AggregateProductPdpRow[P]>
+  }
+
+
+
+
+  export type ProductPdpRowGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductPdpRowWhereInput
+    orderBy?: ProductPdpRowOrderByWithAggregationInput | ProductPdpRowOrderByWithAggregationInput[]
+    by: ProductPdpRowScalarFieldEnum[] | ProductPdpRowScalarFieldEnum
+    having?: ProductPdpRowScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProductPdpRowCountAggregateInputType | true
+    _min?: ProductPdpRowMinAggregateInputType
+    _max?: ProductPdpRowMaxAggregateInputType
+  }
+
+  export type ProductPdpRowGroupByOutputType = {
+    id: string
+    productId: string
+    locale: string
+    slug: string
+    slugs: string[]
+    payload: JsonValue
+    isPublished: boolean
+    productUpdatedAt: Date
+    rebuiltAt: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: ProductPdpRowCountAggregateOutputType | null
+    _min: ProductPdpRowMinAggregateOutputType | null
+    _max: ProductPdpRowMaxAggregateOutputType | null
+  }
+
+  type GetProductPdpRowGroupByPayload<T extends ProductPdpRowGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProductPdpRowGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProductPdpRowGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProductPdpRowGroupByOutputType[P]>
+            : GetScalarType<T[P], ProductPdpRowGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProductPdpRowSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productId?: boolean
+    locale?: boolean
+    slug?: boolean
+    slugs?: boolean
+    payload?: boolean
+    isPublished?: boolean
+    productUpdatedAt?: boolean
+    rebuiltAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["productPdpRow"]>
+
+  export type ProductPdpRowSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productId?: boolean
+    locale?: boolean
+    slug?: boolean
+    slugs?: boolean
+    payload?: boolean
+    isPublished?: boolean
+    productUpdatedAt?: boolean
+    rebuiltAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["productPdpRow"]>
+
+  export type ProductPdpRowSelectScalar = {
+    id?: boolean
+    productId?: boolean
+    locale?: boolean
+    slug?: boolean
+    slugs?: boolean
+    payload?: boolean
+    isPublished?: boolean
+    productUpdatedAt?: boolean
+    rebuiltAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $ProductPdpRowPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProductPdpRow"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      productId: string
+      locale: string
+      slug: string
+      slugs: string[]
+      payload: Prisma.JsonValue
+      isPublished: boolean
+      productUpdatedAt: Date
+      rebuiltAt: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["productPdpRow"]>
+    composites: {}
+  }
+
+  type ProductPdpRowGetPayload<S extends boolean | null | undefined | ProductPdpRowDefaultArgs> = $Result.GetResult<Prisma.$ProductPdpRowPayload, S>
+
+  type ProductPdpRowCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<ProductPdpRowFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: ProductPdpRowCountAggregateInputType | true
+    }
+
+  export interface ProductPdpRowDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProductPdpRow'], meta: { name: 'ProductPdpRow' } }
+    /**
+     * Find zero or one ProductPdpRow that matches the filter.
+     * @param {ProductPdpRowFindUniqueArgs} args - Arguments to find a ProductPdpRow
+     * @example
+     * // Get one ProductPdpRow
+     * const productPdpRow = await prisma.productPdpRow.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProductPdpRowFindUniqueArgs>(args: SelectSubset<T, ProductPdpRowFindUniqueArgs<ExtArgs>>): Prisma__ProductPdpRowClient<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one ProductPdpRow that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {ProductPdpRowFindUniqueOrThrowArgs} args - Arguments to find a ProductPdpRow
+     * @example
+     * // Get one ProductPdpRow
+     * const productPdpRow = await prisma.productPdpRow.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProductPdpRowFindUniqueOrThrowArgs>(args: SelectSubset<T, ProductPdpRowFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProductPdpRowClient<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first ProductPdpRow that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductPdpRowFindFirstArgs} args - Arguments to find a ProductPdpRow
+     * @example
+     * // Get one ProductPdpRow
+     * const productPdpRow = await prisma.productPdpRow.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProductPdpRowFindFirstArgs>(args?: SelectSubset<T, ProductPdpRowFindFirstArgs<ExtArgs>>): Prisma__ProductPdpRowClient<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first ProductPdpRow that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductPdpRowFindFirstOrThrowArgs} args - Arguments to find a ProductPdpRow
+     * @example
+     * // Get one ProductPdpRow
+     * const productPdpRow = await prisma.productPdpRow.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProductPdpRowFindFirstOrThrowArgs>(args?: SelectSubset<T, ProductPdpRowFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProductPdpRowClient<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more ProductPdpRows that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductPdpRowFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProductPdpRows
+     * const productPdpRows = await prisma.productPdpRow.findMany()
+     * 
+     * // Get first 10 ProductPdpRows
+     * const productPdpRows = await prisma.productPdpRow.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const productPdpRowWithIdOnly = await prisma.productPdpRow.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProductPdpRowFindManyArgs>(args?: SelectSubset<T, ProductPdpRowFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a ProductPdpRow.
+     * @param {ProductPdpRowCreateArgs} args - Arguments to create a ProductPdpRow.
+     * @example
+     * // Create one ProductPdpRow
+     * const ProductPdpRow = await prisma.productPdpRow.create({
+     *   data: {
+     *     // ... data to create a ProductPdpRow
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProductPdpRowCreateArgs>(args: SelectSubset<T, ProductPdpRowCreateArgs<ExtArgs>>): Prisma__ProductPdpRowClient<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many ProductPdpRows.
+     * @param {ProductPdpRowCreateManyArgs} args - Arguments to create many ProductPdpRows.
+     * @example
+     * // Create many ProductPdpRows
+     * const productPdpRow = await prisma.productPdpRow.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProductPdpRowCreateManyArgs>(args?: SelectSubset<T, ProductPdpRowCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ProductPdpRows and returns the data saved in the database.
+     * @param {ProductPdpRowCreateManyAndReturnArgs} args - Arguments to create many ProductPdpRows.
+     * @example
+     * // Create many ProductPdpRows
+     * const productPdpRow = await prisma.productPdpRow.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ProductPdpRows and only return the `id`
+     * const productPdpRowWithIdOnly = await prisma.productPdpRow.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ProductPdpRowCreateManyAndReturnArgs>(args?: SelectSubset<T, ProductPdpRowCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a ProductPdpRow.
+     * @param {ProductPdpRowDeleteArgs} args - Arguments to delete one ProductPdpRow.
+     * @example
+     * // Delete one ProductPdpRow
+     * const ProductPdpRow = await prisma.productPdpRow.delete({
+     *   where: {
+     *     // ... filter to delete one ProductPdpRow
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProductPdpRowDeleteArgs>(args: SelectSubset<T, ProductPdpRowDeleteArgs<ExtArgs>>): Prisma__ProductPdpRowClient<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one ProductPdpRow.
+     * @param {ProductPdpRowUpdateArgs} args - Arguments to update one ProductPdpRow.
+     * @example
+     * // Update one ProductPdpRow
+     * const productPdpRow = await prisma.productPdpRow.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProductPdpRowUpdateArgs>(args: SelectSubset<T, ProductPdpRowUpdateArgs<ExtArgs>>): Prisma__ProductPdpRowClient<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more ProductPdpRows.
+     * @param {ProductPdpRowDeleteManyArgs} args - Arguments to filter ProductPdpRows to delete.
+     * @example
+     * // Delete a few ProductPdpRows
+     * const { count } = await prisma.productPdpRow.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProductPdpRowDeleteManyArgs>(args?: SelectSubset<T, ProductPdpRowDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProductPdpRows.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductPdpRowUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProductPdpRows
+     * const productPdpRow = await prisma.productPdpRow.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProductPdpRowUpdateManyArgs>(args: SelectSubset<T, ProductPdpRowUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProductPdpRow.
+     * @param {ProductPdpRowUpsertArgs} args - Arguments to update or create a ProductPdpRow.
+     * @example
+     * // Update or create a ProductPdpRow
+     * const productPdpRow = await prisma.productPdpRow.upsert({
+     *   create: {
+     *     // ... data to create a ProductPdpRow
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProductPdpRow we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProductPdpRowUpsertArgs>(args: SelectSubset<T, ProductPdpRowUpsertArgs<ExtArgs>>): Prisma__ProductPdpRowClient<$Result.GetResult<Prisma.$ProductPdpRowPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of ProductPdpRows.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductPdpRowCountArgs} args - Arguments to filter ProductPdpRows to count.
+     * @example
+     * // Count the number of ProductPdpRows
+     * const count = await prisma.productPdpRow.count({
+     *   where: {
+     *     // ... the filter for the ProductPdpRows we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProductPdpRowCountArgs>(
+      args?: Subset<T, ProductPdpRowCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProductPdpRowCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProductPdpRow.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductPdpRowAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProductPdpRowAggregateArgs>(args: Subset<T, ProductPdpRowAggregateArgs>): Prisma.PrismaPromise<GetProductPdpRowAggregateType<T>>
+
+    /**
+     * Group by ProductPdpRow.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductPdpRowGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProductPdpRowGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProductPdpRowGroupByArgs['orderBy'] }
+        : { orderBy?: ProductPdpRowGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProductPdpRowGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductPdpRowGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProductPdpRow model
+   */
+  readonly fields: ProductPdpRowFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProductPdpRow.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProductPdpRowClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProductPdpRow model
+   */ 
+  interface ProductPdpRowFieldRefs {
+    readonly id: FieldRef<"ProductPdpRow", 'String'>
+    readonly productId: FieldRef<"ProductPdpRow", 'String'>
+    readonly locale: FieldRef<"ProductPdpRow", 'String'>
+    readonly slug: FieldRef<"ProductPdpRow", 'String'>
+    readonly slugs: FieldRef<"ProductPdpRow", 'String[]'>
+    readonly payload: FieldRef<"ProductPdpRow", 'Json'>
+    readonly isPublished: FieldRef<"ProductPdpRow", 'Boolean'>
+    readonly productUpdatedAt: FieldRef<"ProductPdpRow", 'DateTime'>
+    readonly rebuiltAt: FieldRef<"ProductPdpRow", 'DateTime'>
+    readonly createdAt: FieldRef<"ProductPdpRow", 'DateTime'>
+    readonly updatedAt: FieldRef<"ProductPdpRow", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProductPdpRow findUnique
+   */
+  export type ProductPdpRowFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductPdpRow to fetch.
+     */
+    where: ProductPdpRowWhereUniqueInput
+  }
+
+  /**
+   * ProductPdpRow findUniqueOrThrow
+   */
+  export type ProductPdpRowFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductPdpRow to fetch.
+     */
+    where: ProductPdpRowWhereUniqueInput
+  }
+
+  /**
+   * ProductPdpRow findFirst
+   */
+  export type ProductPdpRowFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductPdpRow to fetch.
+     */
+    where?: ProductPdpRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductPdpRows to fetch.
+     */
+    orderBy?: ProductPdpRowOrderByWithRelationInput | ProductPdpRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductPdpRows.
+     */
+    cursor?: ProductPdpRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductPdpRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductPdpRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductPdpRows.
+     */
+    distinct?: ProductPdpRowScalarFieldEnum | ProductPdpRowScalarFieldEnum[]
+  }
+
+  /**
+   * ProductPdpRow findFirstOrThrow
+   */
+  export type ProductPdpRowFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductPdpRow to fetch.
+     */
+    where?: ProductPdpRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductPdpRows to fetch.
+     */
+    orderBy?: ProductPdpRowOrderByWithRelationInput | ProductPdpRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductPdpRows.
+     */
+    cursor?: ProductPdpRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductPdpRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductPdpRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductPdpRows.
+     */
+    distinct?: ProductPdpRowScalarFieldEnum | ProductPdpRowScalarFieldEnum[]
+  }
+
+  /**
+   * ProductPdpRow findMany
+   */
+  export type ProductPdpRowFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * Filter, which ProductPdpRows to fetch.
+     */
+    where?: ProductPdpRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductPdpRows to fetch.
+     */
+    orderBy?: ProductPdpRowOrderByWithRelationInput | ProductPdpRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProductPdpRows.
+     */
+    cursor?: ProductPdpRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductPdpRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductPdpRows.
+     */
+    skip?: number
+    distinct?: ProductPdpRowScalarFieldEnum | ProductPdpRowScalarFieldEnum[]
+  }
+
+  /**
+   * ProductPdpRow create
+   */
+  export type ProductPdpRowCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * The data needed to create a ProductPdpRow.
+     */
+    data: XOR<ProductPdpRowCreateInput, ProductPdpRowUncheckedCreateInput>
+  }
+
+  /**
+   * ProductPdpRow createMany
+   */
+  export type ProductPdpRowCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProductPdpRows.
+     */
+    data: ProductPdpRowCreateManyInput | ProductPdpRowCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductPdpRow createManyAndReturn
+   */
+  export type ProductPdpRowCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many ProductPdpRows.
+     */
+    data: ProductPdpRowCreateManyInput | ProductPdpRowCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductPdpRow update
+   */
+  export type ProductPdpRowUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * The data needed to update a ProductPdpRow.
+     */
+    data: XOR<ProductPdpRowUpdateInput, ProductPdpRowUncheckedUpdateInput>
+    /**
+     * Choose, which ProductPdpRow to update.
+     */
+    where: ProductPdpRowWhereUniqueInput
+  }
+
+  /**
+   * ProductPdpRow updateMany
+   */
+  export type ProductPdpRowUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProductPdpRows.
+     */
+    data: XOR<ProductPdpRowUpdateManyMutationInput, ProductPdpRowUncheckedUpdateManyInput>
+    /**
+     * Filter which ProductPdpRows to update
+     */
+    where?: ProductPdpRowWhereInput
+  }
+
+  /**
+   * ProductPdpRow upsert
+   */
+  export type ProductPdpRowUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * The filter to search for the ProductPdpRow to update in case it exists.
+     */
+    where: ProductPdpRowWhereUniqueInput
+    /**
+     * In case the ProductPdpRow found by the `where` argument doesn't exist, create a new ProductPdpRow with this data.
+     */
+    create: XOR<ProductPdpRowCreateInput, ProductPdpRowUncheckedCreateInput>
+    /**
+     * In case the ProductPdpRow was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProductPdpRowUpdateInput, ProductPdpRowUncheckedUpdateInput>
+  }
+
+  /**
+   * ProductPdpRow delete
+   */
+  export type ProductPdpRowDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+    /**
+     * Filter which ProductPdpRow to delete.
+     */
+    where: ProductPdpRowWhereUniqueInput
+  }
+
+  /**
+   * ProductPdpRow deleteMany
+   */
+  export type ProductPdpRowDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductPdpRows to delete
+     */
+    where?: ProductPdpRowWhereInput
+  }
+
+  /**
+   * ProductPdpRow without action
+   */
+  export type ProductPdpRowDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductPdpRow
+     */
+    select?: ProductPdpRowSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -34378,6 +36820,69 @@ export namespace Prisma {
   };
 
   export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
+
+
+  export const ProductListingRowScalarFieldEnum: {
+    id: 'id',
+    productId: 'productId',
+    locale: 'locale',
+    slug: 'slug',
+    title: 'title',
+    subtitle: 'subtitle',
+    brandId: 'brandId',
+    brandSlug: 'brandSlug',
+    brandName: 'brandName',
+    primaryCategoryId: 'primaryCategoryId',
+    categoryIds: 'categoryIds',
+    categorySlugs: 'categorySlugs',
+    price: 'price',
+    compareAtPrice: 'compareAtPrice',
+    originalPrice: 'originalPrice',
+    priceSort: 'priceSort',
+    hasPrice: 'hasPrice',
+    priceOnRequest: 'priceOnRequest',
+    discountPercent: 'discountPercent',
+    featured: 'featured',
+    hasMarcoListingImage: 'hasMarcoListingImage',
+    defaultVariantId: 'defaultVariantId',
+    stock: 'stock',
+    inStock: 'inStock',
+    image: 'image',
+    labels: 'labels',
+    colors: 'colors',
+    colorTokens: 'colorTokens',
+    sizeTokens: 'sizeTokens',
+    variantComboTokens: 'variantComboTokens',
+    searchText: 'searchText',
+    warrantyYears: 'warrantyYears',
+    publishedAt: 'publishedAt',
+    productCreatedAt: 'productCreatedAt',
+    productUpdatedAt: 'productUpdatedAt',
+    isPublished: 'isPublished',
+    deletedAt: 'deletedAt',
+    rebuiltAt: 'rebuiltAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ProductListingRowScalarFieldEnum = (typeof ProductListingRowScalarFieldEnum)[keyof typeof ProductListingRowScalarFieldEnum]
+
+
+  export const ProductPdpRowScalarFieldEnum: {
+    id: 'id',
+    productId: 'productId',
+    locale: 'locale',
+    slug: 'slug',
+    slugs: 'slugs',
+    payload: 'payload',
+    isPublished: 'isPublished',
+    productUpdatedAt: 'productUpdatedAt',
+    rebuiltAt: 'rebuiltAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ProductPdpRowScalarFieldEnum = (typeof ProductPdpRowScalarFieldEnum)[keyof typeof ProductPdpRowScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -37025,6 +39530,320 @@ export namespace Prisma {
     message?: StringWithAggregatesFilter<"ContactMessage"> | string
     createdAt?: DateTimeWithAggregatesFilter<"ContactMessage"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ContactMessage"> | Date | string
+  }
+
+  export type ProductListingRowWhereInput = {
+    AND?: ProductListingRowWhereInput | ProductListingRowWhereInput[]
+    OR?: ProductListingRowWhereInput[]
+    NOT?: ProductListingRowWhereInput | ProductListingRowWhereInput[]
+    id?: StringFilter<"ProductListingRow"> | string
+    productId?: StringFilter<"ProductListingRow"> | string
+    locale?: StringFilter<"ProductListingRow"> | string
+    slug?: StringFilter<"ProductListingRow"> | string
+    title?: StringFilter<"ProductListingRow"> | string
+    subtitle?: StringNullableFilter<"ProductListingRow"> | string | null
+    brandId?: StringNullableFilter<"ProductListingRow"> | string | null
+    brandSlug?: StringNullableFilter<"ProductListingRow"> | string | null
+    brandName?: StringNullableFilter<"ProductListingRow"> | string | null
+    primaryCategoryId?: StringNullableFilter<"ProductListingRow"> | string | null
+    categoryIds?: StringNullableListFilter<"ProductListingRow">
+    categorySlugs?: StringNullableListFilter<"ProductListingRow">
+    price?: FloatFilter<"ProductListingRow"> | number
+    compareAtPrice?: FloatNullableFilter<"ProductListingRow"> | number | null
+    originalPrice?: FloatNullableFilter<"ProductListingRow"> | number | null
+    priceSort?: FloatFilter<"ProductListingRow"> | number
+    hasPrice?: BoolFilter<"ProductListingRow"> | boolean
+    priceOnRequest?: BoolFilter<"ProductListingRow"> | boolean
+    discountPercent?: IntFilter<"ProductListingRow"> | number
+    featured?: BoolFilter<"ProductListingRow"> | boolean
+    hasMarcoListingImage?: BoolFilter<"ProductListingRow"> | boolean
+    defaultVariantId?: StringNullableFilter<"ProductListingRow"> | string | null
+    stock?: IntFilter<"ProductListingRow"> | number
+    inStock?: BoolFilter<"ProductListingRow"> | boolean
+    image?: StringNullableFilter<"ProductListingRow"> | string | null
+    labels?: JsonFilter<"ProductListingRow">
+    colors?: JsonFilter<"ProductListingRow">
+    colorTokens?: StringNullableListFilter<"ProductListingRow">
+    sizeTokens?: StringNullableListFilter<"ProductListingRow">
+    variantComboTokens?: StringNullableListFilter<"ProductListingRow">
+    searchText?: StringFilter<"ProductListingRow"> | string
+    warrantyYears?: IntNullableFilter<"ProductListingRow"> | number | null
+    publishedAt?: DateTimeNullableFilter<"ProductListingRow"> | Date | string | null
+    productCreatedAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+    productUpdatedAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+    isPublished?: BoolFilter<"ProductListingRow"> | boolean
+    deletedAt?: DateTimeNullableFilter<"ProductListingRow"> | Date | string | null
+    rebuiltAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+    createdAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+    updatedAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+  }
+
+  export type ProductListingRowOrderByWithRelationInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    subtitle?: SortOrderInput | SortOrder
+    brandId?: SortOrderInput | SortOrder
+    brandSlug?: SortOrderInput | SortOrder
+    brandName?: SortOrderInput | SortOrder
+    primaryCategoryId?: SortOrderInput | SortOrder
+    categoryIds?: SortOrder
+    categorySlugs?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrderInput | SortOrder
+    originalPrice?: SortOrderInput | SortOrder
+    priceSort?: SortOrder
+    hasPrice?: SortOrder
+    priceOnRequest?: SortOrder
+    discountPercent?: SortOrder
+    featured?: SortOrder
+    hasMarcoListingImage?: SortOrder
+    defaultVariantId?: SortOrderInput | SortOrder
+    stock?: SortOrder
+    inStock?: SortOrder
+    image?: SortOrderInput | SortOrder
+    labels?: SortOrder
+    colors?: SortOrder
+    colorTokens?: SortOrder
+    sizeTokens?: SortOrder
+    variantComboTokens?: SortOrder
+    searchText?: SortOrder
+    warrantyYears?: SortOrderInput | SortOrder
+    publishedAt?: SortOrderInput | SortOrder
+    productCreatedAt?: SortOrder
+    productUpdatedAt?: SortOrder
+    isPublished?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProductListingRowWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    productId_locale?: ProductListingRowProductIdLocaleCompoundUniqueInput
+    locale_slug?: ProductListingRowLocaleSlugCompoundUniqueInput
+    AND?: ProductListingRowWhereInput | ProductListingRowWhereInput[]
+    OR?: ProductListingRowWhereInput[]
+    NOT?: ProductListingRowWhereInput | ProductListingRowWhereInput[]
+    productId?: StringFilter<"ProductListingRow"> | string
+    locale?: StringFilter<"ProductListingRow"> | string
+    slug?: StringFilter<"ProductListingRow"> | string
+    title?: StringFilter<"ProductListingRow"> | string
+    subtitle?: StringNullableFilter<"ProductListingRow"> | string | null
+    brandId?: StringNullableFilter<"ProductListingRow"> | string | null
+    brandSlug?: StringNullableFilter<"ProductListingRow"> | string | null
+    brandName?: StringNullableFilter<"ProductListingRow"> | string | null
+    primaryCategoryId?: StringNullableFilter<"ProductListingRow"> | string | null
+    categoryIds?: StringNullableListFilter<"ProductListingRow">
+    categorySlugs?: StringNullableListFilter<"ProductListingRow">
+    price?: FloatFilter<"ProductListingRow"> | number
+    compareAtPrice?: FloatNullableFilter<"ProductListingRow"> | number | null
+    originalPrice?: FloatNullableFilter<"ProductListingRow"> | number | null
+    priceSort?: FloatFilter<"ProductListingRow"> | number
+    hasPrice?: BoolFilter<"ProductListingRow"> | boolean
+    priceOnRequest?: BoolFilter<"ProductListingRow"> | boolean
+    discountPercent?: IntFilter<"ProductListingRow"> | number
+    featured?: BoolFilter<"ProductListingRow"> | boolean
+    hasMarcoListingImage?: BoolFilter<"ProductListingRow"> | boolean
+    defaultVariantId?: StringNullableFilter<"ProductListingRow"> | string | null
+    stock?: IntFilter<"ProductListingRow"> | number
+    inStock?: BoolFilter<"ProductListingRow"> | boolean
+    image?: StringNullableFilter<"ProductListingRow"> | string | null
+    labels?: JsonFilter<"ProductListingRow">
+    colors?: JsonFilter<"ProductListingRow">
+    colorTokens?: StringNullableListFilter<"ProductListingRow">
+    sizeTokens?: StringNullableListFilter<"ProductListingRow">
+    variantComboTokens?: StringNullableListFilter<"ProductListingRow">
+    searchText?: StringFilter<"ProductListingRow"> | string
+    warrantyYears?: IntNullableFilter<"ProductListingRow"> | number | null
+    publishedAt?: DateTimeNullableFilter<"ProductListingRow"> | Date | string | null
+    productCreatedAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+    productUpdatedAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+    isPublished?: BoolFilter<"ProductListingRow"> | boolean
+    deletedAt?: DateTimeNullableFilter<"ProductListingRow"> | Date | string | null
+    rebuiltAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+    createdAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+    updatedAt?: DateTimeFilter<"ProductListingRow"> | Date | string
+  }, "id" | "productId_locale" | "locale_slug">
+
+  export type ProductListingRowOrderByWithAggregationInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    subtitle?: SortOrderInput | SortOrder
+    brandId?: SortOrderInput | SortOrder
+    brandSlug?: SortOrderInput | SortOrder
+    brandName?: SortOrderInput | SortOrder
+    primaryCategoryId?: SortOrderInput | SortOrder
+    categoryIds?: SortOrder
+    categorySlugs?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrderInput | SortOrder
+    originalPrice?: SortOrderInput | SortOrder
+    priceSort?: SortOrder
+    hasPrice?: SortOrder
+    priceOnRequest?: SortOrder
+    discountPercent?: SortOrder
+    featured?: SortOrder
+    hasMarcoListingImage?: SortOrder
+    defaultVariantId?: SortOrderInput | SortOrder
+    stock?: SortOrder
+    inStock?: SortOrder
+    image?: SortOrderInput | SortOrder
+    labels?: SortOrder
+    colors?: SortOrder
+    colorTokens?: SortOrder
+    sizeTokens?: SortOrder
+    variantComboTokens?: SortOrder
+    searchText?: SortOrder
+    warrantyYears?: SortOrderInput | SortOrder
+    publishedAt?: SortOrderInput | SortOrder
+    productCreatedAt?: SortOrder
+    productUpdatedAt?: SortOrder
+    isPublished?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ProductListingRowCountOrderByAggregateInput
+    _avg?: ProductListingRowAvgOrderByAggregateInput
+    _max?: ProductListingRowMaxOrderByAggregateInput
+    _min?: ProductListingRowMinOrderByAggregateInput
+    _sum?: ProductListingRowSumOrderByAggregateInput
+  }
+
+  export type ProductListingRowScalarWhereWithAggregatesInput = {
+    AND?: ProductListingRowScalarWhereWithAggregatesInput | ProductListingRowScalarWhereWithAggregatesInput[]
+    OR?: ProductListingRowScalarWhereWithAggregatesInput[]
+    NOT?: ProductListingRowScalarWhereWithAggregatesInput | ProductListingRowScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ProductListingRow"> | string
+    productId?: StringWithAggregatesFilter<"ProductListingRow"> | string
+    locale?: StringWithAggregatesFilter<"ProductListingRow"> | string
+    slug?: StringWithAggregatesFilter<"ProductListingRow"> | string
+    title?: StringWithAggregatesFilter<"ProductListingRow"> | string
+    subtitle?: StringNullableWithAggregatesFilter<"ProductListingRow"> | string | null
+    brandId?: StringNullableWithAggregatesFilter<"ProductListingRow"> | string | null
+    brandSlug?: StringNullableWithAggregatesFilter<"ProductListingRow"> | string | null
+    brandName?: StringNullableWithAggregatesFilter<"ProductListingRow"> | string | null
+    primaryCategoryId?: StringNullableWithAggregatesFilter<"ProductListingRow"> | string | null
+    categoryIds?: StringNullableListFilter<"ProductListingRow">
+    categorySlugs?: StringNullableListFilter<"ProductListingRow">
+    price?: FloatWithAggregatesFilter<"ProductListingRow"> | number
+    compareAtPrice?: FloatNullableWithAggregatesFilter<"ProductListingRow"> | number | null
+    originalPrice?: FloatNullableWithAggregatesFilter<"ProductListingRow"> | number | null
+    priceSort?: FloatWithAggregatesFilter<"ProductListingRow"> | number
+    hasPrice?: BoolWithAggregatesFilter<"ProductListingRow"> | boolean
+    priceOnRequest?: BoolWithAggregatesFilter<"ProductListingRow"> | boolean
+    discountPercent?: IntWithAggregatesFilter<"ProductListingRow"> | number
+    featured?: BoolWithAggregatesFilter<"ProductListingRow"> | boolean
+    hasMarcoListingImage?: BoolWithAggregatesFilter<"ProductListingRow"> | boolean
+    defaultVariantId?: StringNullableWithAggregatesFilter<"ProductListingRow"> | string | null
+    stock?: IntWithAggregatesFilter<"ProductListingRow"> | number
+    inStock?: BoolWithAggregatesFilter<"ProductListingRow"> | boolean
+    image?: StringNullableWithAggregatesFilter<"ProductListingRow"> | string | null
+    labels?: JsonWithAggregatesFilter<"ProductListingRow">
+    colors?: JsonWithAggregatesFilter<"ProductListingRow">
+    colorTokens?: StringNullableListFilter<"ProductListingRow">
+    sizeTokens?: StringNullableListFilter<"ProductListingRow">
+    variantComboTokens?: StringNullableListFilter<"ProductListingRow">
+    searchText?: StringWithAggregatesFilter<"ProductListingRow"> | string
+    warrantyYears?: IntNullableWithAggregatesFilter<"ProductListingRow"> | number | null
+    publishedAt?: DateTimeNullableWithAggregatesFilter<"ProductListingRow"> | Date | string | null
+    productCreatedAt?: DateTimeWithAggregatesFilter<"ProductListingRow"> | Date | string
+    productUpdatedAt?: DateTimeWithAggregatesFilter<"ProductListingRow"> | Date | string
+    isPublished?: BoolWithAggregatesFilter<"ProductListingRow"> | boolean
+    deletedAt?: DateTimeNullableWithAggregatesFilter<"ProductListingRow"> | Date | string | null
+    rebuiltAt?: DateTimeWithAggregatesFilter<"ProductListingRow"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"ProductListingRow"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ProductListingRow"> | Date | string
+  }
+
+  export type ProductPdpRowWhereInput = {
+    AND?: ProductPdpRowWhereInput | ProductPdpRowWhereInput[]
+    OR?: ProductPdpRowWhereInput[]
+    NOT?: ProductPdpRowWhereInput | ProductPdpRowWhereInput[]
+    id?: StringFilter<"ProductPdpRow"> | string
+    productId?: StringFilter<"ProductPdpRow"> | string
+    locale?: StringFilter<"ProductPdpRow"> | string
+    slug?: StringFilter<"ProductPdpRow"> | string
+    slugs?: StringNullableListFilter<"ProductPdpRow">
+    payload?: JsonFilter<"ProductPdpRow">
+    isPublished?: BoolFilter<"ProductPdpRow"> | boolean
+    productUpdatedAt?: DateTimeFilter<"ProductPdpRow"> | Date | string
+    rebuiltAt?: DateTimeFilter<"ProductPdpRow"> | Date | string
+    createdAt?: DateTimeFilter<"ProductPdpRow"> | Date | string
+    updatedAt?: DateTimeFilter<"ProductPdpRow"> | Date | string
+  }
+
+  export type ProductPdpRowOrderByWithRelationInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    slugs?: SortOrder
+    payload?: SortOrder
+    isPublished?: SortOrder
+    productUpdatedAt?: SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProductPdpRowWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    productId_locale?: ProductPdpRowProductIdLocaleCompoundUniqueInput
+    AND?: ProductPdpRowWhereInput | ProductPdpRowWhereInput[]
+    OR?: ProductPdpRowWhereInput[]
+    NOT?: ProductPdpRowWhereInput | ProductPdpRowWhereInput[]
+    productId?: StringFilter<"ProductPdpRow"> | string
+    locale?: StringFilter<"ProductPdpRow"> | string
+    slug?: StringFilter<"ProductPdpRow"> | string
+    slugs?: StringNullableListFilter<"ProductPdpRow">
+    payload?: JsonFilter<"ProductPdpRow">
+    isPublished?: BoolFilter<"ProductPdpRow"> | boolean
+    productUpdatedAt?: DateTimeFilter<"ProductPdpRow"> | Date | string
+    rebuiltAt?: DateTimeFilter<"ProductPdpRow"> | Date | string
+    createdAt?: DateTimeFilter<"ProductPdpRow"> | Date | string
+    updatedAt?: DateTimeFilter<"ProductPdpRow"> | Date | string
+  }, "id" | "productId_locale">
+
+  export type ProductPdpRowOrderByWithAggregationInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    slugs?: SortOrder
+    payload?: SortOrder
+    isPublished?: SortOrder
+    productUpdatedAt?: SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ProductPdpRowCountOrderByAggregateInput
+    _max?: ProductPdpRowMaxOrderByAggregateInput
+    _min?: ProductPdpRowMinOrderByAggregateInput
+  }
+
+  export type ProductPdpRowScalarWhereWithAggregatesInput = {
+    AND?: ProductPdpRowScalarWhereWithAggregatesInput | ProductPdpRowScalarWhereWithAggregatesInput[]
+    OR?: ProductPdpRowScalarWhereWithAggregatesInput[]
+    NOT?: ProductPdpRowScalarWhereWithAggregatesInput | ProductPdpRowScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ProductPdpRow"> | string
+    productId?: StringWithAggregatesFilter<"ProductPdpRow"> | string
+    locale?: StringWithAggregatesFilter<"ProductPdpRow"> | string
+    slug?: StringWithAggregatesFilter<"ProductPdpRow"> | string
+    slugs?: StringNullableListFilter<"ProductPdpRow">
+    payload?: JsonWithAggregatesFilter<"ProductPdpRow">
+    isPublished?: BoolWithAggregatesFilter<"ProductPdpRow"> | boolean
+    productUpdatedAt?: DateTimeWithAggregatesFilter<"ProductPdpRow"> | Date | string
+    rebuiltAt?: DateTimeWithAggregatesFilter<"ProductPdpRow"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"ProductPdpRow"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ProductPdpRow"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -39844,6 +42663,405 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ProductListingRowCreateInput = {
+    id?: string
+    productId: string
+    locale: string
+    slug: string
+    title: string
+    subtitle?: string | null
+    brandId?: string | null
+    brandSlug?: string | null
+    brandName?: string | null
+    primaryCategoryId?: string | null
+    categoryIds?: ProductListingRowCreatecategoryIdsInput | string[]
+    categorySlugs?: ProductListingRowCreatecategorySlugsInput | string[]
+    price?: number
+    compareAtPrice?: number | null
+    originalPrice?: number | null
+    priceSort?: number
+    hasPrice?: boolean
+    priceOnRequest?: boolean
+    discountPercent?: number
+    featured?: boolean
+    hasMarcoListingImage?: boolean
+    defaultVariantId?: string | null
+    stock?: number
+    inStock?: boolean
+    image?: string | null
+    labels?: JsonNullValueInput | InputJsonValue
+    colors?: JsonNullValueInput | InputJsonValue
+    colorTokens?: ProductListingRowCreatecolorTokensInput | string[]
+    sizeTokens?: ProductListingRowCreatesizeTokensInput | string[]
+    variantComboTokens?: ProductListingRowCreatevariantComboTokensInput | string[]
+    searchText?: string
+    warrantyYears?: number | null
+    publishedAt?: Date | string | null
+    productCreatedAt: Date | string
+    productUpdatedAt: Date | string
+    isPublished?: boolean
+    deletedAt?: Date | string | null
+    rebuiltAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProductListingRowUncheckedCreateInput = {
+    id?: string
+    productId: string
+    locale: string
+    slug: string
+    title: string
+    subtitle?: string | null
+    brandId?: string | null
+    brandSlug?: string | null
+    brandName?: string | null
+    primaryCategoryId?: string | null
+    categoryIds?: ProductListingRowCreatecategoryIdsInput | string[]
+    categorySlugs?: ProductListingRowCreatecategorySlugsInput | string[]
+    price?: number
+    compareAtPrice?: number | null
+    originalPrice?: number | null
+    priceSort?: number
+    hasPrice?: boolean
+    priceOnRequest?: boolean
+    discountPercent?: number
+    featured?: boolean
+    hasMarcoListingImage?: boolean
+    defaultVariantId?: string | null
+    stock?: number
+    inStock?: boolean
+    image?: string | null
+    labels?: JsonNullValueInput | InputJsonValue
+    colors?: JsonNullValueInput | InputJsonValue
+    colorTokens?: ProductListingRowCreatecolorTokensInput | string[]
+    sizeTokens?: ProductListingRowCreatesizeTokensInput | string[]
+    variantComboTokens?: ProductListingRowCreatevariantComboTokensInput | string[]
+    searchText?: string
+    warrantyYears?: number | null
+    publishedAt?: Date | string | null
+    productCreatedAt: Date | string
+    productUpdatedAt: Date | string
+    isPublished?: boolean
+    deletedAt?: Date | string | null
+    rebuiltAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProductListingRowUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    brandId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
+    categoryIds?: ProductListingRowUpdatecategoryIdsInput | string[]
+    categorySlugs?: ProductListingRowUpdatecategorySlugsInput | string[]
+    price?: FloatFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    originalPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    priceSort?: FloatFieldUpdateOperationsInput | number
+    hasPrice?: BoolFieldUpdateOperationsInput | boolean
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
+    discountPercent?: IntFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    hasMarcoListingImage?: BoolFieldUpdateOperationsInput | boolean
+    defaultVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    stock?: IntFieldUpdateOperationsInput | number
+    inStock?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    labels?: JsonNullValueInput | InputJsonValue
+    colors?: JsonNullValueInput | InputJsonValue
+    colorTokens?: ProductListingRowUpdatecolorTokensInput | string[]
+    sizeTokens?: ProductListingRowUpdatesizeTokensInput | string[]
+    variantComboTokens?: ProductListingRowUpdatevariantComboTokensInput | string[]
+    searchText?: StringFieldUpdateOperationsInput | string
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rebuiltAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductListingRowUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    brandId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
+    categoryIds?: ProductListingRowUpdatecategoryIdsInput | string[]
+    categorySlugs?: ProductListingRowUpdatecategorySlugsInput | string[]
+    price?: FloatFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    originalPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    priceSort?: FloatFieldUpdateOperationsInput | number
+    hasPrice?: BoolFieldUpdateOperationsInput | boolean
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
+    discountPercent?: IntFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    hasMarcoListingImage?: BoolFieldUpdateOperationsInput | boolean
+    defaultVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    stock?: IntFieldUpdateOperationsInput | number
+    inStock?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    labels?: JsonNullValueInput | InputJsonValue
+    colors?: JsonNullValueInput | InputJsonValue
+    colorTokens?: ProductListingRowUpdatecolorTokensInput | string[]
+    sizeTokens?: ProductListingRowUpdatesizeTokensInput | string[]
+    variantComboTokens?: ProductListingRowUpdatevariantComboTokensInput | string[]
+    searchText?: StringFieldUpdateOperationsInput | string
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rebuiltAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductListingRowCreateManyInput = {
+    id?: string
+    productId: string
+    locale: string
+    slug: string
+    title: string
+    subtitle?: string | null
+    brandId?: string | null
+    brandSlug?: string | null
+    brandName?: string | null
+    primaryCategoryId?: string | null
+    categoryIds?: ProductListingRowCreatecategoryIdsInput | string[]
+    categorySlugs?: ProductListingRowCreatecategorySlugsInput | string[]
+    price?: number
+    compareAtPrice?: number | null
+    originalPrice?: number | null
+    priceSort?: number
+    hasPrice?: boolean
+    priceOnRequest?: boolean
+    discountPercent?: number
+    featured?: boolean
+    hasMarcoListingImage?: boolean
+    defaultVariantId?: string | null
+    stock?: number
+    inStock?: boolean
+    image?: string | null
+    labels?: JsonNullValueInput | InputJsonValue
+    colors?: JsonNullValueInput | InputJsonValue
+    colorTokens?: ProductListingRowCreatecolorTokensInput | string[]
+    sizeTokens?: ProductListingRowCreatesizeTokensInput | string[]
+    variantComboTokens?: ProductListingRowCreatevariantComboTokensInput | string[]
+    searchText?: string
+    warrantyYears?: number | null
+    publishedAt?: Date | string | null
+    productCreatedAt: Date | string
+    productUpdatedAt: Date | string
+    isPublished?: boolean
+    deletedAt?: Date | string | null
+    rebuiltAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProductListingRowUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    brandId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
+    categoryIds?: ProductListingRowUpdatecategoryIdsInput | string[]
+    categorySlugs?: ProductListingRowUpdatecategorySlugsInput | string[]
+    price?: FloatFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    originalPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    priceSort?: FloatFieldUpdateOperationsInput | number
+    hasPrice?: BoolFieldUpdateOperationsInput | boolean
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
+    discountPercent?: IntFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    hasMarcoListingImage?: BoolFieldUpdateOperationsInput | boolean
+    defaultVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    stock?: IntFieldUpdateOperationsInput | number
+    inStock?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    labels?: JsonNullValueInput | InputJsonValue
+    colors?: JsonNullValueInput | InputJsonValue
+    colorTokens?: ProductListingRowUpdatecolorTokensInput | string[]
+    sizeTokens?: ProductListingRowUpdatesizeTokensInput | string[]
+    variantComboTokens?: ProductListingRowUpdatevariantComboTokensInput | string[]
+    searchText?: StringFieldUpdateOperationsInput | string
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rebuiltAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductListingRowUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    brandId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryCategoryId?: NullableStringFieldUpdateOperationsInput | string | null
+    categoryIds?: ProductListingRowUpdatecategoryIdsInput | string[]
+    categorySlugs?: ProductListingRowUpdatecategorySlugsInput | string[]
+    price?: FloatFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    originalPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    priceSort?: FloatFieldUpdateOperationsInput | number
+    hasPrice?: BoolFieldUpdateOperationsInput | boolean
+    priceOnRequest?: BoolFieldUpdateOperationsInput | boolean
+    discountPercent?: IntFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    hasMarcoListingImage?: BoolFieldUpdateOperationsInput | boolean
+    defaultVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    stock?: IntFieldUpdateOperationsInput | number
+    inStock?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    labels?: JsonNullValueInput | InputJsonValue
+    colors?: JsonNullValueInput | InputJsonValue
+    colorTokens?: ProductListingRowUpdatecolorTokensInput | string[]
+    sizeTokens?: ProductListingRowUpdatesizeTokensInput | string[]
+    variantComboTokens?: ProductListingRowUpdatevariantComboTokensInput | string[]
+    searchText?: StringFieldUpdateOperationsInput | string
+    warrantyYears?: NullableIntFieldUpdateOperationsInput | number | null
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rebuiltAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductPdpRowCreateInput = {
+    id?: string
+    productId: string
+    locale: string
+    slug: string
+    slugs?: ProductPdpRowCreateslugsInput | string[]
+    payload: JsonNullValueInput | InputJsonValue
+    isPublished?: boolean
+    productUpdatedAt: Date | string
+    rebuiltAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProductPdpRowUncheckedCreateInput = {
+    id?: string
+    productId: string
+    locale: string
+    slug: string
+    slugs?: ProductPdpRowCreateslugsInput | string[]
+    payload: JsonNullValueInput | InputJsonValue
+    isPublished?: boolean
+    productUpdatedAt: Date | string
+    rebuiltAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProductPdpRowUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    slugs?: ProductPdpRowUpdateslugsInput | string[]
+    payload?: JsonNullValueInput | InputJsonValue
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    productUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rebuiltAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductPdpRowUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    slugs?: ProductPdpRowUpdateslugsInput | string[]
+    payload?: JsonNullValueInput | InputJsonValue
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    productUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rebuiltAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductPdpRowCreateManyInput = {
+    id?: string
+    productId: string
+    locale: string
+    slug: string
+    slugs?: ProductPdpRowCreateslugsInput | string[]
+    payload: JsonNullValueInput | InputJsonValue
+    isPublished?: boolean
+    productUpdatedAt: Date | string
+    rebuiltAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProductPdpRowUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    slugs?: ProductPdpRowUpdateslugsInput | string[]
+    payload?: JsonNullValueInput | InputJsonValue
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    productUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rebuiltAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductPdpRowUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    locale?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    slugs?: ProductPdpRowUpdateslugsInput | string[]
+    payload?: JsonNullValueInput | InputJsonValue
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    productUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rebuiltAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -41804,6 +45022,194 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type ProductListingRowProductIdLocaleCompoundUniqueInput = {
+    productId: string
+    locale: string
+  }
+
+  export type ProductListingRowLocaleSlugCompoundUniqueInput = {
+    locale: string
+    slug: string
+  }
+
+  export type ProductListingRowCountOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    subtitle?: SortOrder
+    brandId?: SortOrder
+    brandSlug?: SortOrder
+    brandName?: SortOrder
+    primaryCategoryId?: SortOrder
+    categoryIds?: SortOrder
+    categorySlugs?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrder
+    originalPrice?: SortOrder
+    priceSort?: SortOrder
+    hasPrice?: SortOrder
+    priceOnRequest?: SortOrder
+    discountPercent?: SortOrder
+    featured?: SortOrder
+    hasMarcoListingImage?: SortOrder
+    defaultVariantId?: SortOrder
+    stock?: SortOrder
+    inStock?: SortOrder
+    image?: SortOrder
+    labels?: SortOrder
+    colors?: SortOrder
+    colorTokens?: SortOrder
+    sizeTokens?: SortOrder
+    variantComboTokens?: SortOrder
+    searchText?: SortOrder
+    warrantyYears?: SortOrder
+    publishedAt?: SortOrder
+    productCreatedAt?: SortOrder
+    productUpdatedAt?: SortOrder
+    isPublished?: SortOrder
+    deletedAt?: SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProductListingRowAvgOrderByAggregateInput = {
+    price?: SortOrder
+    compareAtPrice?: SortOrder
+    originalPrice?: SortOrder
+    priceSort?: SortOrder
+    discountPercent?: SortOrder
+    stock?: SortOrder
+    warrantyYears?: SortOrder
+  }
+
+  export type ProductListingRowMaxOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    subtitle?: SortOrder
+    brandId?: SortOrder
+    brandSlug?: SortOrder
+    brandName?: SortOrder
+    primaryCategoryId?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrder
+    originalPrice?: SortOrder
+    priceSort?: SortOrder
+    hasPrice?: SortOrder
+    priceOnRequest?: SortOrder
+    discountPercent?: SortOrder
+    featured?: SortOrder
+    hasMarcoListingImage?: SortOrder
+    defaultVariantId?: SortOrder
+    stock?: SortOrder
+    inStock?: SortOrder
+    image?: SortOrder
+    searchText?: SortOrder
+    warrantyYears?: SortOrder
+    publishedAt?: SortOrder
+    productCreatedAt?: SortOrder
+    productUpdatedAt?: SortOrder
+    isPublished?: SortOrder
+    deletedAt?: SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProductListingRowMinOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    title?: SortOrder
+    subtitle?: SortOrder
+    brandId?: SortOrder
+    brandSlug?: SortOrder
+    brandName?: SortOrder
+    primaryCategoryId?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrder
+    originalPrice?: SortOrder
+    priceSort?: SortOrder
+    hasPrice?: SortOrder
+    priceOnRequest?: SortOrder
+    discountPercent?: SortOrder
+    featured?: SortOrder
+    hasMarcoListingImage?: SortOrder
+    defaultVariantId?: SortOrder
+    stock?: SortOrder
+    inStock?: SortOrder
+    image?: SortOrder
+    searchText?: SortOrder
+    warrantyYears?: SortOrder
+    publishedAt?: SortOrder
+    productCreatedAt?: SortOrder
+    productUpdatedAt?: SortOrder
+    isPublished?: SortOrder
+    deletedAt?: SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProductListingRowSumOrderByAggregateInput = {
+    price?: SortOrder
+    compareAtPrice?: SortOrder
+    originalPrice?: SortOrder
+    priceSort?: SortOrder
+    discountPercent?: SortOrder
+    stock?: SortOrder
+    warrantyYears?: SortOrder
+  }
+
+  export type ProductPdpRowProductIdLocaleCompoundUniqueInput = {
+    productId: string
+    locale: string
+  }
+
+  export type ProductPdpRowCountOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    slugs?: SortOrder
+    payload?: SortOrder
+    isPublished?: SortOrder
+    productUpdatedAt?: SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProductPdpRowMaxOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    isPublished?: SortOrder
+    productUpdatedAt?: SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProductPdpRowMinOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    locale?: SortOrder
+    slug?: SortOrder
+    isPublished?: SortOrder
+    productUpdatedAt?: SortOrder
+    rebuiltAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type UserCreaterolesInput = {
     set: string[]
   }
@@ -43742,6 +47148,60 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutReviewsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutReviewsInput, UserUpdateWithoutReviewsInput>, UserUncheckedUpdateWithoutReviewsInput>
+  }
+
+  export type ProductListingRowCreatecategoryIdsInput = {
+    set: string[]
+  }
+
+  export type ProductListingRowCreatecategorySlugsInput = {
+    set: string[]
+  }
+
+  export type ProductListingRowCreatecolorTokensInput = {
+    set: string[]
+  }
+
+  export type ProductListingRowCreatesizeTokensInput = {
+    set: string[]
+  }
+
+  export type ProductListingRowCreatevariantComboTokensInput = {
+    set: string[]
+  }
+
+  export type ProductListingRowUpdatecategoryIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type ProductListingRowUpdatecategorySlugsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type ProductListingRowUpdatecolorTokensInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type ProductListingRowUpdatesizeTokensInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type ProductListingRowUpdatevariantComboTokensInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type ProductPdpRowCreateslugsInput = {
+    set: string[]
+  }
+
+  export type ProductPdpRowUpdateslugsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -51270,6 +54730,14 @@ export namespace Prisma {
      * @deprecated Use ContactMessageDefaultArgs instead
      */
     export type ContactMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ContactMessageDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ProductListingRowDefaultArgs instead
+     */
+    export type ProductListingRowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProductListingRowDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ProductPdpRowDefaultArgs instead
+     */
+    export type ProductPdpRowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProductPdpRowDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

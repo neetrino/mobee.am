@@ -1,7 +1,8 @@
 import { ProductFilters, ProductWithRelations } from "./products-find-query.service";
 import { normalizeCatalogQuery } from "@/lib/catalog/catalog-query";
 import { productMatchesBrandTokens } from "@/lib/catalog/brand-where";
-import { variantMatchesColorAndSize, type CatalogOptionLike } from "@/lib/catalog/variant-option-where";
+import { variantMatchesColorSizeAndAttrs, type CatalogOptionLike } from "@/lib/catalog/variant-option-where";
+import { catalogAttrSelectionIsEmpty } from "@/lib/catalog/catalog-attrs";
 import { rowMatchesPriceFilter } from "@/lib/catalog/catalog-price";
 import { sortCatalogRows } from "@/lib/catalog/catalog-sort";
 import { productHasMarcoListingImage } from "../products/marco-product-image";
@@ -28,15 +29,20 @@ function matchesCatalogFilters(
   if (!productMatchesBrandTokens(row, query.brands)) {
     return false;
   }
-  if (query.colors.length > 0 || query.sizes.length > 0) {
+  if (
+    query.colors.length > 0 ||
+    query.sizes.length > 0 ||
+    !catalogAttrSelectionIsEmpty(query.attrs)
+  ) {
     const variants = Array.isArray(product.variants) ? product.variants : [];
     const matched = variants.some((variant) =>
-          variantMatchesColorAndSize(
-            variant.options as CatalogOptionLike[],
-            query.colors,
-            query.sizes,
-            query.lang,
-          ),
+      variantMatchesColorSizeAndAttrs(
+        variant.options as CatalogOptionLike[],
+        query.colors,
+        query.sizes,
+        query.attrs,
+        query.lang,
+      ),
     );
     if (!matched) {
       return false;

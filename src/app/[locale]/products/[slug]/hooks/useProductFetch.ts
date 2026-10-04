@@ -129,15 +129,15 @@ export function useProductFetch({
       uiLanguage,
     );
 
+    // SSR / Router Cache snapshot is for instant paint only. Always refresh from the
+    // live products API so admin variant edits (create/update/delete) show on PDP.
     if (localeMatchesInitial && initialProduct) {
       setProduct(initialProduct);
       setShellProduct(null);
       setLoading(false);
       setFetchPending(false);
-      return;
-    }
-
-    if (!hasInitialProduct) {
+      void fetchProduct({ background: true });
+    } else if (!hasInitialProduct) {
       const cachedShell = readProductCardCache(slug);
       if (cachedShell) {
         setShellProduct(cachedShell);

@@ -19,6 +19,7 @@ describe("GET /api/v1/products/filters", () => {
         colors: [],
         sizes: [],
         brands: [{ id: "b1", name: "Apple", count: 31 }],
+        attributes: [],
         priceRange: {
           min: 10,
           max: 20,
@@ -44,6 +45,7 @@ describe("GET /api/v1/products/filters", () => {
         colors: [],
         sizes: [],
         brands: [],
+        attributes: [],
         priceRange: {
           min: 0,
           max: 0,

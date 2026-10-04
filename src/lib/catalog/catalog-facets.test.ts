@@ -86,6 +86,7 @@ describe("getCatalogFacets", () => {
         stepSize: null,
         stepSizePerCurrency: null,
       }),
+      loadAttributeMeta: async () => new Map(),
     };
     await expect(
       getCatalogFacets({ category: "phones,ghost", lang: "en" }, port),
@@ -105,6 +106,7 @@ describe("getCatalogFacets", () => {
         stepSize: null,
         stepSizePerCurrency: null,
       }),
+      loadAttributeMeta: async () => new Map(),
     };
     await getCatalogFacets({ filter: "new", lang: "en" }, port);
     await getCatalogFacets({ filter: "featured", lang: "en" }, port);

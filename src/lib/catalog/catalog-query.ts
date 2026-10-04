@@ -13,6 +13,10 @@ import {
   CATALOG_MAX_SIZE_TOKENS,
 } from "./catalog.constants";
 import { normalizeFilterTokens } from "./filter-tokens";
+import {
+  parseCatalogAttrsParam,
+  type CatalogAttrSelection,
+} from "./catalog-attrs";
 
 export type CanonicalCatalogQuery = {
   page: number;
@@ -24,6 +28,7 @@ export type CanonicalCatalogQuery = {
   brands: string[];
   colors: string[];
   sizes: string[];
+  attrs: CatalogAttrSelection;
   minPrice?: number;
   maxPrice?: number;
   sort: ProductSortOption;
@@ -121,6 +126,7 @@ export function normalizeCatalogQuery(filters: ProductFilters): CanonicalCatalog
       (token) => token.toUpperCase(),
       CATALOG_MAX_SIZE_TOKENS,
     ),
+    attrs: parseCatalogAttrsParam(filters.attrs),
     minPrice: parseFiniteNumber(filters.minPrice),
     maxPrice: parseFiniteNumber(filters.maxPrice),
     sort: parseProductSortOption(filters.sort),

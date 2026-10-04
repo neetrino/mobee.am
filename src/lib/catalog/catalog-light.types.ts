@@ -6,6 +6,8 @@ export type CatalogLightVariant = {
   imageUrl?: string | null;
   media?: unknown;
   options?: CatalogOptionLike[];
+  /** Legacy/admin JSONB attribute map — used as facet fallback when options lack a key. */
+  attributes?: unknown;
 };
 
 export type CatalogLightRow = {

@@ -7,6 +7,7 @@ import { ShopMobileFiltersDrawer } from '@/components/shop/ShopMobileFiltersDraw
 import { SITE_CONTENT_GUTTERS_CLASS } from '@/components/header-strip-layout';
 import { SHOP_PAGE_FOOTER_GAP_CLASS } from './shop-layout.constants';
 import { ShopFiltersAsideFallback, ShopCatalogFallback } from './shop-page-fallbacks';
+import { parseCatalogAttrsParam } from '@/lib/catalog/catalog-attrs';
 
 interface ProductsPageProps {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -21,8 +22,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   const colors = params?.colors;
   const brands = params?.brand;
+  const sizes = params?.sizes;
   const selectedColors = colors ? colors.split(',').map((c: string) => c.trim().toLowerCase()) : [];
   const selectedBrands = brands ? brands.split(',').map((b: string) => b.trim()) : [];
+  const selectedSizes = sizes
+    ? sizes.split(',').map((s: string) => s.trim().toUpperCase()).filter(Boolean)
+    : [];
+  const selectedAttrs = parseCatalogAttrsParam(params?.attrs);
   const categoryParam = params?.category;
   const selectedCategories = categoryParam
     ? categoryParam.split(',').map((c: string) => c.trim()).filter(Boolean)
@@ -36,6 +42,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     selectedCategories,
     selectedBrands,
     selectedColors,
+    selectedSizes,
+    selectedAttrs,
   };
 
   return (

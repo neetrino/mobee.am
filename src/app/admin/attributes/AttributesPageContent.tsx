@@ -3,6 +3,10 @@
 import { useMemo, useState } from 'react';
 import { Card, Input, Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../lib/i18n-client';
+import {
+  filterAttributesBySearch,
+  getVisibleValuesForSearch,
+} from './filterAttributesBySearch';
 import { useAttributes } from './useAttributes';
 import { ValueEditForm } from './ValueEditForm';
 
@@ -53,22 +57,12 @@ export function AttributesPageContent() {
   } = useAttributes();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const hasActiveSearch = searchQuery.trim().length > 0;
 
-  const filteredAttributes = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) {
-      return attributes;
-    }
-    return attributes.filter((attr) => {
-      if (attr.name.toLowerCase().includes(q) || attr.key.toLowerCase().includes(q)) {
-        return true;
-      }
-      return attr.values.some(
-        (v) =>
-          v.label.toLowerCase().includes(q) || v.value.toLowerCase().includes(q),
-      );
-    });
-  }, [attributes, searchQuery]);
+  const filteredAttributeResults = useMemo(
+    () => filterAttributesBySearch(attributes, searchQuery),
+    [attributes, searchQuery],
+  );
 
   return (
     <div>
@@ -190,12 +184,27 @@ export function AttributesPageContent() {
                   {t('admin.attributes.createAttribute')}
                 </Button>
               </div>
-            ) : filteredAttributes.length === 0 ? (
+            ) : filteredAttributeResults.length === 0 ? (
               <p className="py-6 text-center text-sm text-gray-500">{t('admin.attributes.noSearchResults')}</p>
             ) : (
               <div className="space-y-4">
-            {filteredAttributes.map((attribute) => {
-              const isExpanded = expandedAttributes.has(attribute.id);
+            {filteredAttributeResults.map(({ attribute, matchedByAttribute, matchedValues }) => {
+              const isExpanded =
+                hasActiveSearch || expandedAttributes.has(attribute.id);
+              const visibleValues = getVisibleValuesForSearch(
+                attribute,
+                matchedByAttribute,
+                matchedValues,
+                hasActiveSearch,
+              );
+              const valuesCount =
+                hasActiveSearch && !matchedByAttribute
+                  ? visibleValues.length
+                  : attribute.values.length;
+              const valuesCountLabel =
+                valuesCount === 1
+                  ? t('admin.attributes.values')
+                  : t('admin.attributes.valuesPlural');
               return (
                 <div
                   key={attribute.id}
@@ -273,10 +282,10 @@ export function AttributesPageContent() {
                               )}
                             </div>
                             <p className="text-sm text-gray-500 mt-1">
-                              {attribute.values.length === 1 
-                                ? t('admin.attributes.values').replace('{count}', attribute.values.length.toString())
-                                : t('admin.attributes.valuesPlural').replace('{count}', attribute.values.length.toString())
-                              }
+                              {valuesCountLabel.replace('{count}', String(valuesCount))}
+                              {typeof attribute.productCount === 'number'
+                                ? ` · ${t('admin.attributes.productsUsingAttribute').replace('{count}', String(attribute.productCount))}`
+                                : null}
                             </p>
                           </>
                         )}
@@ -369,11 +378,11 @@ export function AttributesPageContent() {
                       </div>
 
                       {/* Values List */}
-                      {attribute.values.length === 0 ? (
+                      {visibleValues.length === 0 ? (
                         <p className="text-sm text-gray-500 py-4 text-center">{t('admin.attributes.noValuesYet')}</p>
                       ) : (
                         <div className="space-y-2">
-                          {attribute.values.map((value) => {
+                          {visibleValues.map((value) => {
                             const isExpanded = expandedValueId === value.id;
                             return (
                               <div
@@ -398,6 +407,12 @@ export function AttributesPageContent() {
                                       />
                                     ) : null}
                                     <span className="text-sm font-medium text-gray-900">{value.label}</span>
+                                    <span className="rounded-supersudo bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                                      {t('admin.attributes.productsUsingValue').replace(
+                                        '{count}',
+                                        String(value.productCount ?? 0),
+                                      )}
+                                    </span>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <button

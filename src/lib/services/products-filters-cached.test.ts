@@ -40,7 +40,7 @@ describe("buildProductFiltersCacheKey", () => {
       lang: "en",
     });
     expect(a).toBe(b);
-    expect(a.startsWith("cache:products:filters:v1:")).toBe(true);
+    expect(a.startsWith("cache:products:filters:v2:")).toBe(true);
   });
 
   it("normalizes multi-category param order for cache key", () => {
@@ -61,6 +61,7 @@ describe("getCachedProductFilters", () => {
       colors: [],
       sizes: [],
       brands: [],
+      attributes: [],
       priceRange: { min: 0, max: 100, hasProducts: true, stepSize: null, stepSizePerCurrency: null },
     };
     vi.mocked(cacheService.get).mockResolvedValue(JSON.stringify(payload));
@@ -76,6 +77,7 @@ describe("getCachedProductFilters", () => {
       colors: [{ value: "black", label: "Black", count: 2 }],
       sizes: [],
       brands: [],
+      attributes: [],
       priceRange: { min: 0, max: 5000, hasProducts: true, stepSize: 100, stepSizePerCurrency: null },
     };
     vi.mocked(cacheService.get).mockResolvedValue(null);
@@ -85,6 +87,26 @@ describe("getCachedProductFilters", () => {
     expect(out.cacheStatus).toBe("MISS");
     expect(out.result).toEqual(payload);
     expect(cacheService.setex).toHaveBeenCalled();
+  });
+
+  it("refetches when cached payload is missing attributes", async () => {
+    const stale = {
+      colors: [],
+      sizes: [],
+      brands: [],
+      priceRange: { min: 0, max: 100, hasProducts: true, stepSize: null, stepSizePerCurrency: null },
+    };
+    const fresh = {
+      ...stale,
+      attributes: [{ key: "storage", name: "Storage", position: 1, values: [{ value: "256GB", label: "256GB", count: 2 }] }],
+    };
+    vi.mocked(cacheService.get).mockResolvedValue(JSON.stringify(stale));
+    vi.mocked(productsService.getFilters).mockResolvedValue(fresh);
+
+    const out = await getCachedProductFilters({ lang: "en" });
+    expect(out.cacheStatus).toBe("MISS");
+    expect(out.result.attributes).toHaveLength(1);
+    expect(productsService.getFilters).toHaveBeenCalled();
   });
 
   it("does not cache a database failure", async () => {

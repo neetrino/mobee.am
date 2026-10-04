@@ -12,6 +12,8 @@ export interface AttributeValue {
   label: string;
   colors?: string[];
   imageUrl?: string | null;
+  /** Distinct non-deleted products that use this value in a variant. */
+  productCount?: number;
 }
 
 export interface Attribute {
@@ -20,6 +22,8 @@ export interface Attribute {
   name: string;
   type: string;
   filterable: boolean;
+  /** Distinct non-deleted products that use any value of this attribute. */
+  productCount?: number;
   values: AttributeValue[];
 }
 
@@ -53,16 +57,23 @@ export function useAttributes() {
   const [imageUploading, setImageUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchAttributes = useCallback(async () => {
+  const fetchAttributes = useCallback(async (options?: { silent?: boolean }) => {
+    const silent = options?.silent === true;
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       const response = await apiClient.get<{ data: Attribute[] }>('/api/v1/admin/attributes');
       setAttributes(response.data || []);
     } catch (err) {
       console.error('[ADMIN] Error fetching attributes:', err);
-      setAttributes([]);
+      if (!silent) {
+        setAttributes([]);
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -94,7 +105,7 @@ export function useAttributes() {
       console.log('✅ [ADMIN] Attribute created successfully');
       setShowAddForm(false);
       setFormData({ name: '' });
-      fetchAttributes();
+      void fetchAttributes({ silent: true });
       showToast(t('admin.attributes.createdSuccess'), 'success');
     } catch (err: any) {
       console.error('❌ [ADMIN] Error creating attribute:', err);
@@ -115,7 +126,7 @@ export function useAttributes() {
       console.log(`🗑️ [ADMIN] Deleting attribute: ${attributeName} (${attributeId})`);
       await apiClient.delete(`/api/v1/admin/attributes/${attributeId}`);
       console.log('✅ [ADMIN] Attribute deleted successfully');
-      fetchAttributes();
+      void fetchAttributes({ silent: true });
       showToast(t('admin.attributes.deletedSuccess'), 'success');
     } catch (err: any) {
       console.error('❌ [ADMIN] Error deleting attribute:', err);
@@ -142,7 +153,7 @@ export function useAttributes() {
       console.log('✅ [ADMIN] Attribute name updated successfully');
       setEditingAttribute(null);
       setEditingAttributeName('');
-      fetchAttributes();
+      void fetchAttributes({ silent: true });
       showToast(t('admin.attributes.nameUpdatedSuccess') || 'Attribute name updated successfully', 'success');
     } catch (err: any) {
       console.error('❌ [ADMIN] Error updating attribute name:', err);
@@ -211,7 +222,7 @@ export function useAttributes() {
       setValueError(null);
       setAddingValueTo(null);
       showToast(t('admin.attributes.valueAddedSuccess'), 'success');
-      fetchAttributes();
+      void fetchAttributes({ silent: true });
     } catch (err: any) {
       console.error('❌ [ADMIN] Error adding value:', err);
       const errorMessage = err?.data?.detail || err?.message || t('admin.attributes.failedToAddValue');
@@ -242,7 +253,7 @@ export function useAttributes() {
       console.log(`🗑️ [ADMIN] Deleting value: ${valueLabel} (${valueId})`);
       await apiClient.delete(`/api/v1/admin/attributes/${attributeId}/values/${valueId}`);
       console.log('✅ [ADMIN] Value deleted successfully');
-      fetchAttributes();
+      void fetchAttributes({ silent: true });
       setDeletingValue(null);
       showToast(t('admin.attributes.valueDeletedSuccess'), 'success');
     } catch (err: any) {
@@ -261,20 +272,41 @@ export function useAttributes() {
     if (!editingValue) return;
 
     try {
-      console.log('✏️ [ADMIN] Updating value:', { 
-        valueId: editingValue.value.id, 
-        attributeId: editingValue.attributeId,
-        data,
-        colorsType: typeof data.colors,
-        colorsIsArray: Array.isArray(data.colors),
-        colorsLength: data.colors?.length
-      });
       await apiClient.patch(`/api/v1/admin/attributes/${editingValue.attributeId}/values/${editingValue.value.id}`, {
         ...data,
         locale: 'en',
       });
-      console.log('✅ [ADMIN] Value updated successfully');
-      fetchAttributes();
+
+      const valueId = editingValue.value.id;
+      const attributeId = editingValue.attributeId;
+      const nextLabel = data.label ?? editingValue.value.label;
+      const nextColors = data.colors ?? editingValue.value.colors ?? [];
+      const nextImageUrl =
+        data.imageUrl !== undefined ? data.imageUrl : editingValue.value.imageUrl ?? null;
+
+      // Optimistic local update so the UI closes immediately without a full-page reload spinner.
+      setAttributes((prev) =>
+        prev.map((attribute) => {
+          if (attribute.id !== attributeId) {
+            return attribute;
+          }
+          return {
+            ...attribute,
+            values: attribute.values.map((value) =>
+              value.id === valueId
+                ? {
+                    ...value,
+                    label: nextLabel,
+                    colors: nextColors,
+                    imageUrl: nextImageUrl,
+                  }
+                : value,
+            ),
+          };
+        }),
+      );
+
+      void fetchAttributes({ silent: true });
       showToast(t('admin.attributes.valueUpdatedSuccess'), 'success');
     } catch (err: any) {
       console.error('❌ [ADMIN] Error updating value:', err);
@@ -343,22 +375,45 @@ export function useAttributes() {
   };
 
   const handleSaveInlineValue = async () => {
-    if (!editingValue) return;
+    if (!editingValue || savingValue) return;
 
-    try {
-      setSavingValue(true);
-      await handleUpdateValue({
-        label: editingLabel.trim() !== editingValue.value.label ? editingLabel.trim() : undefined,
-        colors: editingColors.length > 0 ? editingColors : undefined,
-        imageUrl: editingImageUrl,
-      });
-      // Close the expanded form
+    const trimmedLabel = editingLabel.trim();
+    if (!trimmedLabel) {
+      showToast(t('admin.attributes.fillName'), 'warning');
+      return;
+    }
+
+    const previous = editingValue.value;
+    const previousColors = previous.colors ?? [];
+    const labelChanged = trimmedLabel !== previous.label;
+    const colorsChanged =
+      previousColors.length !== editingColors.length ||
+      previousColors.some((color, index) => color !== editingColors[index]);
+    const previousImageUrl = previous.imageUrl ?? null;
+    const imageChanged = editingImageUrl !== previousImageUrl;
+
+    if (!labelChanged && !colorsChanged && !imageChanged) {
       setExpandedValueId(null);
       setEditingValue(null);
       setEditingLabel('');
       setEditingColors([]);
       setEditingImageUrl(null);
-    } catch (error: any) {
+      return;
+    }
+
+    try {
+      setSavingValue(true);
+      await handleUpdateValue({
+        label: labelChanged ? trimmedLabel : undefined,
+        colors: colorsChanged ? editingColors : undefined,
+        imageUrl: imageChanged ? editingImageUrl : undefined,
+      });
+      setExpandedValueId(null);
+      setEditingValue(null);
+      setEditingLabel('');
+      setEditingColors([]);
+      setEditingImageUrl(null);
+    } catch (error: unknown) {
       console.error('❌ [ADMIN] Error saving value:', error);
     } finally {
       setSavingValue(false);

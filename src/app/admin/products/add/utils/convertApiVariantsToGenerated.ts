@@ -1,6 +1,12 @@
 import { convertPrice, type CurrencyCode } from "@/lib/currency";
 import type { Attribute, GeneratedVariant } from "../types";
 
+type ApiAttributeValueItem = {
+  valueId?: string;
+  id?: string;
+  value?: string;
+};
+
 export interface ApiProductVariant {
   id?: string;
   price?: number | string | null;
@@ -9,7 +15,7 @@ export interface ApiProductVariant {
   sku?: string | null;
   imageUrl?: string | null;
   published?: boolean;
-  attributes?: Record<string, Array<{ valueId?: string; id?: string; value?: string }>>;
+  attributes?: Record<string, string | ApiAttributeValueItem[] | unknown>;
   options?: Array<{
     attributeId?: string;
     attributeKey?: string;
@@ -25,6 +31,112 @@ export interface ApiProductVariant {
   }>;
 }
 
+function addUniqueValueId(selectedValueIds: string[], valueId: string | undefined): void {
+  if (!valueId || selectedValueIds.includes(valueId)) {
+    return;
+  }
+  selectedValueIds.push(valueId);
+}
+
+function resolveValueIdByLabel(attribute: Attribute, label: string): string | undefined {
+  const normalized = label.trim().toLowerCase();
+  const found = attribute.values.find(
+    (item) =>
+      item.value.trim().toLowerCase() === normalized ||
+      item.label.trim().toLowerCase() === normalized
+  );
+  return found?.id;
+}
+
+function collectFromOptions(
+  variant: ApiProductVariant,
+  attributes: Attribute[],
+  selectedValueIds: string[]
+): void {
+  if (!Array.isArray(variant.options)) {
+    return;
+  }
+
+  for (const opt of variant.options) {
+    let attributeId = opt.attributeId;
+    let valueId = opt.valueId;
+    let attributeKey = opt.attributeKey;
+
+    if (!attributeId && opt.attributeValue) {
+      attributeId = opt.attributeValue.attributeId || opt.attributeValue.attribute?.id;
+    }
+    if (!valueId && opt.attributeValue) {
+      valueId = opt.attributeValue.id || opt.attributeValue.valueId;
+    }
+    if (!attributeKey && opt.attributeValue?.attribute?.key) {
+      attributeKey = opt.attributeValue.attribute.key;
+    }
+
+    if (!attributeId && attributeKey) {
+      const foundAttr = attributes.find((item) => item.key === attributeKey);
+      if (foundAttr) {
+        attributeId = foundAttr.id;
+      }
+    }
+
+    if (!valueId && opt.value) {
+      const foundAttr =
+        (attributeId ? attributes.find((item) => item.id === attributeId) : undefined) ||
+        (attributeKey ? attributes.find((item) => item.key === attributeKey) : undefined);
+      if (foundAttr) {
+        valueId = resolveValueIdByLabel(foundAttr, opt.value);
+      }
+    }
+
+    addUniqueValueId(selectedValueIds, valueId);
+  }
+}
+
+function collectFromJsonAttributes(
+  variant: ApiProductVariant,
+  attributes: Attribute[],
+  selectedValueIds: string[]
+): void {
+  if (!variant.attributes || typeof variant.attributes !== "object" || Array.isArray(variant.attributes)) {
+    return;
+  }
+
+  for (const [attributeKey, raw] of Object.entries(variant.attributes)) {
+    const attribute = attributes.find((item) => item.key === attributeKey);
+    if (!attribute) {
+      continue;
+    }
+
+    if (typeof raw === "string" && raw.trim()) {
+      addUniqueValueId(selectedValueIds, resolveValueIdByLabel(attribute, raw));
+      continue;
+    }
+
+    if (!Array.isArray(raw)) {
+      continue;
+    }
+
+    for (const attrValue of raw) {
+      if (!attrValue || typeof attrValue !== "object") {
+        if (typeof attrValue === "string" && attrValue.trim()) {
+          addUniqueValueId(selectedValueIds, resolveValueIdByLabel(attribute, attrValue));
+        }
+        continue;
+      }
+
+      const item = attrValue as ApiAttributeValueItem;
+      const valueId = item.valueId || item.id;
+      if (valueId) {
+        addUniqueValueId(selectedValueIds, valueId);
+        continue;
+      }
+      if (item.value) {
+        addUniqueValueId(selectedValueIds, resolveValueIdByLabel(attribute, item.value));
+      }
+    }
+  }
+}
+
 function extractSelectedValueIds(
   variant: ApiProductVariant,
   attributes: Attribute[],
@@ -32,92 +144,9 @@ function extractSelectedValueIds(
 ): string[] {
   const selectedValueIds: string[] = [];
 
-  if (variant.attributes && typeof variant.attributes === "object") {
-    Object.keys(variant.attributes).forEach((attributeKey) => {
-      const attribute = attributes.find((item) => item.key === attributeKey);
-      if (!attribute) {
-        return;
-      }
-
-      const attributeValues = variant.attributes?.[attributeKey];
-      if (!Array.isArray(attributeValues)) {
-        return;
-      }
-
-      attributeValues.forEach((attrValue) => {
-        const valueId = attrValue.valueId || attrValue.id;
-        const value = attrValue.value;
-
-        if (valueId && !selectedValueIds.includes(valueId)) {
-          selectedValueIds.push(valueId);
-          return;
-        }
-
-        if (value) {
-          const foundValue = attribute.values.find(
-            (item) => item.value === value || item.label === value
-          );
-          if (foundValue && !selectedValueIds.includes(foundValue.id)) {
-            selectedValueIds.push(foundValue.id);
-          }
-        }
-      });
-    });
-  }
-
-  if (selectedValueIds.length === 0 && variant.options && Array.isArray(variant.options)) {
-    const attributeValueMap: Record<string, Set<string>> = {};
-
-    variant.options.forEach((opt) => {
-      let attributeId = opt.attributeId;
-      let valueId = opt.valueId;
-      const attributeKey = opt.attributeKey;
-
-      if (!attributeId && opt.attributeValue) {
-        attributeId =
-          opt.attributeValue.attributeId ||
-          opt.attributeValue.attribute?.id ||
-          opt.attributeValue.attributeId;
-      }
-      if (!valueId && opt.attributeValue) {
-        valueId = opt.attributeValue.id || opt.attributeValue.valueId;
-      }
-
-      if (!attributeId && opt.attributeKey) {
-        const foundAttr = attributes.find((item) => item.key === opt.attributeKey);
-        if (foundAttr) {
-          attributeId = foundAttr.id;
-        }
-      }
-
-      if (attributeId && !valueId && opt.value) {
-        const foundAttr = attributes.find((item) => item.id === attributeId);
-        if (foundAttr) {
-          const foundValue = foundAttr.values.find(
-            (item) => item.value === opt.value || item.label === opt.value
-          );
-          if (foundValue) {
-            valueId = foundValue.id;
-          }
-        }
-      }
-
-      if (attributeKey && valueId) {
-        if (!attributeValueMap[attributeKey]) {
-          attributeValueMap[attributeKey] = new Set();
-        }
-        attributeValueMap[attributeKey].add(valueId);
-      }
-    });
-
-    Object.values(attributeValueMap).forEach((valueIdSet) => {
-      valueIdSet.forEach((valueId) => {
-        if (!selectedValueIds.includes(valueId)) {
-          selectedValueIds.push(valueId);
-        }
-      });
-    });
-  }
+  // Relational options are the source of truth; JSONB fills gaps.
+  collectFromOptions(variant, attributes, selectedValueIds);
+  collectFromJsonAttributes(variant, attributes, selectedValueIds);
 
   if (selectedValueIds.length === 0) {
     console.warn(
