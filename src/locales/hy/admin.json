@@ -494,6 +494,7 @@
       "noAttributesAvailable": "Ատրիբուտներ չկան",
       "attributeSelected": "{count} ատրիբուտ ընտրված",
       "attributesSelected": "{count} ատրիբուտ ընտրված",
+      "valuesPlaceholder": "արժեքներ",
       "generatedVariants": "Գեներացված տարբերակներ",
       "applyPriceToAll": "Կիրառել գինը բոլորին",
       "applyStockToAll": "Կիրառել պաշարը բոլորին",

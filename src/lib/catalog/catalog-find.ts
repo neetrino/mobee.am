@@ -11,6 +11,7 @@ import { selectCatalogPage } from "./select-catalog-page";
 import type { CatalogLightRow } from "./catalog-light.types";
 import { isProductListingReadModelReady } from "@/lib/read-model/read-model-ready";
 import { findCatalogProductPageFromReadModel } from "@/lib/read-model/products-plp-query";
+import { catalogAttrSelectionIsEmpty } from "./catalog-attrs";
 
 const EMPTY_DISCOUNTS: ProductDiscountContext = {
   globalDiscount: 0,
@@ -78,10 +79,15 @@ export async function findCatalogProductPage(
   filters: ProductFilters,
   port: CatalogFindPort = defaultPort,
 ): Promise<CatalogFindResult> {
-  if (port === defaultPort && (await isProductListingReadModelReady())) {
+  const queryPreview = normalizeCatalogQuery(filters);
+  const canUseReadModel =
+    port === defaultPort &&
+    catalogAttrSelectionIsEmpty(queryPreview.attrs) &&
+    (await isProductListingReadModelReady());
+  if (canUseReadModel) {
     return findCatalogProductPageFromReadModel(filters);
   }
-  const query = normalizeCatalogQuery(filters);
+  const query = queryPreview;
   const { where, bestsellerProductIds } = await port.buildWhere(query);
   if (where === null) {
     return emptyResult(query);

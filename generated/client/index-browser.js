@@ -510,6 +510,63 @@ exports.Prisma.ContactMessageScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ProductListingRowScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  locale: 'locale',
+  slug: 'slug',
+  title: 'title',
+  subtitle: 'subtitle',
+  brandId: 'brandId',
+  brandSlug: 'brandSlug',
+  brandName: 'brandName',
+  primaryCategoryId: 'primaryCategoryId',
+  categoryIds: 'categoryIds',
+  categorySlugs: 'categorySlugs',
+  price: 'price',
+  compareAtPrice: 'compareAtPrice',
+  originalPrice: 'originalPrice',
+  priceSort: 'priceSort',
+  hasPrice: 'hasPrice',
+  priceOnRequest: 'priceOnRequest',
+  discountPercent: 'discountPercent',
+  featured: 'featured',
+  hasMarcoListingImage: 'hasMarcoListingImage',
+  defaultVariantId: 'defaultVariantId',
+  stock: 'stock',
+  inStock: 'inStock',
+  image: 'image',
+  labels: 'labels',
+  colors: 'colors',
+  colorTokens: 'colorTokens',
+  sizeTokens: 'sizeTokens',
+  variantComboTokens: 'variantComboTokens',
+  searchText: 'searchText',
+  warrantyYears: 'warrantyYears',
+  publishedAt: 'publishedAt',
+  productCreatedAt: 'productCreatedAt',
+  productUpdatedAt: 'productUpdatedAt',
+  isPublished: 'isPublished',
+  deletedAt: 'deletedAt',
+  rebuiltAt: 'rebuiltAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProductPdpRowScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  locale: 'locale',
+  slug: 'slug',
+  slugs: 'slugs',
+  payload: 'payload',
+  isPublished: 'isPublished',
+  productUpdatedAt: 'productUpdatedAt',
+  rebuiltAt: 'rebuiltAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -570,7 +627,9 @@ exports.Prisma.ModelName = {
   ProductReview: 'ProductReview',
   PromoCode: 'PromoCode',
   Settings: 'Settings',
-  ContactMessage: 'ContactMessage'
+  ContactMessage: 'ContactMessage',
+  ProductListingRow: 'ProductListingRow',
+  ProductPdpRow: 'ProductPdpRow'
 };
 
 /**

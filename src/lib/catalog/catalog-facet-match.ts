@@ -4,22 +4,31 @@ import type { CanonicalCatalogQuery } from "./catalog-query";
 import type { CatalogLightRow } from "./catalog-light.types";
 import { productMatchesBrandTokens } from "./brand-where";
 import { rowMatchesPriceFilter } from "./catalog-price";
-import { variantMatchesColorAndSize } from "./variant-option-where";
+import { variantMatchesColorSizeAndAttrs } from "./variant-option-where";
+import {
+  catalogAttrSelectionIsEmpty,
+  type CatalogAttrSelection,
+} from "./catalog-attrs";
 
-export type FacetOmitDimension = "brand" | "colors" | "sizes" | "price";
+export type FacetOmitDimension = "brand" | "colors" | "sizes" | "price" | "attrs";
 
 function rowMatchesOptions(
   row: CatalogLightRow,
   colors: string[],
   sizes: string[],
+  attrs: CatalogAttrSelection,
   lang: string,
 ): boolean {
-  if (colors.length === 0 && sizes.length === 0) {
+  if (
+    colors.length === 0 &&
+    sizes.length === 0 &&
+    catalogAttrSelectionIsEmpty(attrs)
+  ) {
     return true;
   }
   const variants = Array.isArray(row.variants) ? row.variants : [];
   return variants.some((variant) =>
-    variantMatchesColorAndSize(variant.options, colors, sizes, lang),
+    variantMatchesColorSizeAndAttrs(variant.options, colors, sizes, attrs, lang),
   );
 }
 
@@ -40,7 +49,8 @@ export function rowMatchesFacetQuery(
   }
   const colors = omit.has("colors") ? [] : query.colors;
   const sizes = omit.has("sizes") ? [] : query.sizes;
-  if (!rowMatchesOptions(row, colors, sizes, query.lang)) {
+  const attrs = omit.has("attrs") ? {} : query.attrs;
+  if (!rowMatchesOptions(row, colors, sizes, attrs, query.lang)) {
     return false;
   }
   if (!omit.has("price")) {

@@ -10,6 +10,7 @@ export type ProductFiltersCacheInput = {
   brand?: string;
   colors?: string;
   sizes?: string;
+  attrs?: string;
   filter?: string;
 };
 
@@ -31,6 +32,9 @@ export function buildProductFiltersCacheKey(filters: ProductFiltersCacheInput): 
   }
   if (filters.sizes) {
     pairs.push(["sizes", normalizeCommaListCacheValue(filters.sizes)]);
+  }
+  if (filters.attrs) {
+    pairs.push(["attrs", normalizeCommaListCacheValue(filters.attrs)]);
   }
   if (filters.filter) {
     pairs.push(["filter", filters.filter]);

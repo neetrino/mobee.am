@@ -6,6 +6,7 @@ import {
 } from "./catalog.constants";
 import { CatalogQueryError } from "./catalog-query-error";
 import { catalogCategoryParam, normalizeCatalogQuery } from "./catalog-query";
+import { serializeCatalogAttrsParam } from "./catalog-attrs";
 
 const POSITIVE_INT_RE = /^[1-9]\d*$/;
 const NON_NEGATIVE_NUMBER_RE = /^(?:0|[1-9]\d*)(?:\.\d+)?$/;
@@ -111,6 +112,7 @@ export function parseCatalogHttpParams(
     maxPrice,
     colors: params.colors,
     sizes: params.sizes,
+    attrs: params.attrs,
     brand: params.brand,
     sort: parseHttpSort(params.sort),
     page,
@@ -127,6 +129,7 @@ export function parseCatalogHttpParams(
     maxPrice: canonical.maxPrice,
     colors: canonical.colors.length > 0 ? canonical.colors.join(",") : undefined,
     sizes: canonical.sizes.length > 0 ? canonical.sizes.join(",") : undefined,
+    attrs: serializeCatalogAttrsParam(canonical.attrs),
     brand: canonical.brands.length > 0 ? canonical.brands.join(",") : undefined,
     sort: canonical.sort,
     page: canonical.page,
@@ -149,6 +152,7 @@ export function searchParamsToRecord(
     maxPrice: searchParams.get("maxPrice") ?? undefined,
     colors: searchParams.get("colors") ?? undefined,
     sizes: searchParams.get("sizes") ?? undefined,
+    attrs: searchParams.get("attrs") ?? undefined,
     brand: searchParams.get("brand") ?? undefined,
     sort: searchParams.get("sort") ?? undefined,
   };

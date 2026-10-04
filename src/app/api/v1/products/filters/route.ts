@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
       brand: parsed.brand,
       colors: parsed.colors,
       sizes: parsed.sizes,
+      attrs: parsed.attrs,
       filter: parsed.filter,
     };
 

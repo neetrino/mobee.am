@@ -3,6 +3,10 @@ import {
   CATALOG_ATTRIBUTE_COLOR,
   CATALOG_ATTRIBUTE_SIZE,
 } from "./catalog.constants";
+import {
+  variantMatchesCatalogAttrs,
+  type CatalogAttrSelection,
+} from "./catalog-attrs";
 
 export type CatalogOptionLike = {
   attributeKey?: string | null;
@@ -134,13 +138,18 @@ function someOptionWhere(
 }
 
 /**
- * Color and size must match on the same published variant (no cross-variant false match).
+ * Color, size, and generic attrs must match on the same published variant
+ * (no cross-variant false match).
  */
 export function buildVariantOptionWhere(
   colors: string[],
   sizes: string[],
+  attrs: CatalogAttrSelection = {},
 ): Prisma.ProductWhereInput | null {
-  if (colors.length === 0 && sizes.length === 0) {
+  const attrEntries = Object.entries(attrs).filter(
+    ([, values]) => values.length > 0,
+  );
+  if (colors.length === 0 && sizes.length === 0 && attrEntries.length === 0) {
     return null;
   }
 
@@ -150,6 +159,9 @@ export function buildVariantOptionWhere(
   }
   if (sizes.length > 0) {
     variantAnd.push(someOptionWhere(CATALOG_ATTRIBUTE_SIZE, sizes));
+  }
+  for (const [key, values] of attrEntries) {
+    variantAnd.push(someOptionWhere(key, values));
   }
 
   const variantWhere: Prisma.ProductVariantWhereInput =
@@ -162,6 +174,19 @@ export function buildVariantOptionWhere(
       some: variantWhere,
     },
   };
+}
+
+export function variantMatchesColorSizeAndAttrs(
+  options: CatalogOptionLike[] | undefined,
+  colors: string[],
+  sizes: string[],
+  attrs: CatalogAttrSelection,
+  lang: string,
+): boolean {
+  if (!variantMatchesColorAndSize(options, colors, sizes, lang)) {
+    return false;
+  }
+  return variantMatchesCatalogAttrs(options, attrs, lang);
 }
 
 export function variantMatchesColorAndSize(

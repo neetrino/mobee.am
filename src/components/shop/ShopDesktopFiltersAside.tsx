@@ -5,10 +5,8 @@ import type { CSSProperties } from 'react';
 import { useTranslation } from '@/lib/i18n-client';
 import { useDesktopViewport } from '@/components/hooks/useDesktopViewport';
 import {
-  SHOP_FILTER_SIDEBAR_BODY_SCROLL_CLASS,
-  SHOP_FILTER_SIDEBAR_BOTTOM_OFFSET_CSS,
-  SHOP_FILTER_SIDEBAR_SCROLL_CLASS,
-  SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
+  SHOP_FILTER_SIDEBAR_BODY_CLASS,
+  SHOP_FILTER_SIDEBAR_CLASS,
   SHOP_FILTER_SIDEBAR_WIDTH_CSS,
 } from '@/app/[locale]/shop/shop-layout.constants';
 import type { ShopFilterSectionsProps } from './ShopFilterSections';
@@ -29,7 +27,7 @@ const ShopFilterSections = dynamic(
 type ShopDesktopFiltersAsideProps = ShopFilterSectionsProps;
 
 /**
- * Desktop-only filter aside — skipped on mobile to avoid filter JS/API on first paint.
+ * Desktop-only filter aside — natural height, scrolls with the page (Marco-style).
  */
 export function ShopDesktopFiltersAside(props: ShopDesktopFiltersAsideProps) {
   const { t } = useTranslation();
@@ -41,21 +39,14 @@ export function ShopDesktopFiltersAside(props: ShopDesktopFiltersAsideProps) {
 
   const style = {
     ['--shop-filter-aside-width']: SHOP_FILTER_SIDEBAR_WIDTH_CSS,
-    ['--shop-filter-sidebar-top-offset']: SHOP_FILTER_SIDEBAR_TOP_OFFSET_CSS,
-    ['--shop-filter-sidebar-bottom-offset']: SHOP_FILTER_SIDEBAR_BOTTOM_OFFSET_CSS,
   } as CSSProperties;
 
   return (
-    <aside
-      className={`lg:w-[var(--shop-filter-aside-width)] lg:flex-shrink-0 lg:self-start lg:sticky lg:top-[var(--shop-filter-sidebar-top-offset)] lg:border-r lg:border-[#e7e7e7] lg:pr-0 lg:bg-white ${SHOP_FILTER_SIDEBAR_SCROLL_CLASS}`}
-      style={style}
-    >
-      <div className="shrink-0 bg-white px-6 pt-6 pb-4">
-        <h2 className="text-xl font-bold leading-7 tracking-[-0.02em] text-[#0F172B]">
+    <aside className={SHOP_FILTER_SIDEBAR_CLASS} style={style} data-shop-filter-aside>
+      <div className={SHOP_FILTER_SIDEBAR_BODY_CLASS}>
+        <h2 className="mb-6 text-xl font-bold leading-7 tracking-[-0.02em] text-[#0F172B]">
           {t('products.filters.sidebar.title')}
         </h2>
-      </div>
-      <div className={SHOP_FILTER_SIDEBAR_BODY_SCROLL_CLASS}>
         <ShopFilterSections {...props} />
       </div>
     </aside>

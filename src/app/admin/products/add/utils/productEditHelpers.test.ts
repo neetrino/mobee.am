@@ -36,6 +36,39 @@ const baseSnapshot: EditableProductSnapshot = {
   productType: "variable",
 };
 
+const convertAttrs = [
+  {
+    id: "attr-color",
+    key: "color",
+    name: "Color",
+    type: "select",
+    values: [
+      { id: "val-red", value: "red", label: "Red" },
+      { id: "val-blue", value: "blue", label: "Blue" },
+    ],
+  },
+  {
+    id: "attr-storage",
+    key: "storage",
+    name: "Storage",
+    type: "select",
+    values: [
+      { id: "val-256", value: "256GB", label: "256GB" },
+      { id: "val-512", value: "512GB", label: "512GB" },
+    ],
+  },
+  {
+    id: "attr-sim",
+    key: "sim",
+    name: "SIM",
+    type: "select",
+    values: [
+      { id: "val-esim", value: "eSIM", label: "eSIM" },
+      { id: "val-nano", value: "Nano-SIM", label: "Nano-SIM" },
+    ],
+  },
+];
+
 describe("convertApiVariantsToGenerated", () => {
   it("preserves databaseVariantId with one row per API variant", () => {
     const rows = convertApiVariantsToGenerated(
@@ -55,18 +88,7 @@ describe("convertApiVariantsToGenerated", () => {
           options: [{ attributeKey: "color", valueId: "val-blue", value: "blue" }],
         },
       ],
-      [
-        {
-          id: "attr-color",
-          key: "color",
-          name: "Color",
-          type: "select",
-          values: [
-            { id: "val-red", value: "red", label: "Red" },
-            { id: "val-blue", value: "blue", label: "Blue" },
-          ],
-        },
-      ],
+      convertAttrs,
       "AMD"
     );
 
@@ -75,6 +97,54 @@ describe("convertApiVariantsToGenerated", () => {
     expect(rows[1]?.databaseVariantId).toBe("db-v2");
     expect(rows[0]?.sku).toBe("SKU-RED");
     expect(rows[1]?.sku).toBe("SKU-BLUE");
+  });
+
+  it("merges relational options even when JSONB already has a color array", () => {
+    const rows = convertApiVariantsToGenerated(
+      [
+        {
+          id: "db-v1",
+          price: 10,
+          stock: 1,
+          sku: "11112",
+          attributes: {
+            color: [{ valueId: "val-blue", value: "blue", attributeKey: "color" }],
+          },
+          options: [
+            { attributeKey: "color", valueId: "val-blue", value: "blue" },
+            { attributeKey: "storage", valueId: "val-256", value: "256GB" },
+            { attributeKey: "sim", valueId: "val-esim", value: "eSIM" },
+          ],
+        },
+      ],
+      convertAttrs,
+      "AMD"
+    );
+
+    expect(rows[0]?.selectedValueIds).toEqual(
+      ["val-256", "val-blue", "val-esim"].sort()
+    );
+  });
+
+  it("resolves string JSONB storage/sim labels to catalog value ids", () => {
+    const rows = convertApiVariantsToGenerated(
+      [
+        {
+          id: "db-v1",
+          price: 10,
+          stock: 1,
+          sku: "11103",
+          attributes: { color: "red", storage: "256GB", sim: "eSIM" },
+          options: [],
+        },
+      ],
+      convertAttrs,
+      "AMD"
+    );
+
+    expect(rows[0]?.selectedValueIds).toEqual(
+      ["val-256", "val-esim", "val-red"].sort()
+    );
   });
 });
 
@@ -325,5 +395,70 @@ describe("databaseVariantId preservation", () => {
     expect(payload.variants?.update?.[0]?.id).toBe("db-v1");
     expect(payload.variants?.update?.[0]?.stock).toBe(10);
     expect(payload.variants?.update?.[0]?.sku).toBeUndefined();
+  });
+});
+
+describe("variable variant create diff", () => {
+  it("emits variants.create for every new processed row without databaseVariantId", () => {
+    const current: EditableProductSnapshot = {
+      ...baseSnapshot,
+      variants: [
+        baseSnapshot.variants[0],
+        {
+          uiId: "ui-v2",
+          selectedValueIds: ["val-blue", "val-512"],
+          price: "1200",
+          compareAtPrice: "",
+          stock: "2",
+          sku: "SHIRT-BLUE-512",
+          image: null,
+          published: true,
+        },
+      ],
+    };
+
+    const payload = buildPartialProductUpdatePayload({
+      initial: baseSnapshot,
+      current,
+      processedVariants: [
+        {
+          databaseVariantId: "db-v1",
+          price: 1000,
+          stock: 5,
+          sku: "SHIRT-RED",
+          published: true,
+          options: [{ attributeKey: "color", value: "red", valueId: "val-red" }],
+        },
+        {
+          price: 1200,
+          stock: 2,
+          sku: "SHIRT-BLUE-512",
+          published: true,
+          options: [
+            { attributeKey: "color", value: "blue", valueId: "val-blue" },
+            { attributeKey: "storage", value: "512GB", valueId: "val-512" },
+          ],
+        },
+        {
+          // Expanded combo from one UI row — must not be dropped
+          price: 1300,
+          stock: 1,
+          sku: "SHIRT-BLUE-1TB",
+          published: true,
+          options: [
+            { attributeKey: "color", value: "blue", valueId: "val-blue" },
+            { attributeKey: "storage", value: "1TB", valueId: "val-1tb" },
+          ],
+        },
+      ],
+      media: baseSnapshot.media,
+    });
+
+    expect(payload.variants?.create).toHaveLength(2);
+    expect(payload.variants?.create?.[0]?.sku).toBe("SHIRT-BLUE-512");
+    expect(payload.variants?.create?.[1]?.sku).toBe("SHIRT-BLUE-1TB");
+    expect(payload.variants?.create?.[0]?.published).toBe(true);
+    expect(payload.variants?.update).toBeUndefined();
+    expect(payload.variants?.deleteIds).toBeUndefined();
   });
 });

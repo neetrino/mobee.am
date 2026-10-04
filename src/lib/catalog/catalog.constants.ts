@@ -25,8 +25,20 @@ export const CATALOG_MAX_COLOR_TOKENS = 40;
 /** Maximum size tokens from `sizes=`. */
 export const CATALOG_MAX_SIZE_TOKENS = 40;
 
+/** Maximum distinct attribute keys from `attrs=`. */
+export const CATALOG_MAX_ATTR_KEYS = 20;
+
+/** Maximum values kept per attribute key in `attrs=`. */
+export const CATALOG_MAX_ATTR_VALUES_PER_KEY = 40;
+
 /** Maximum characters kept from `search=` after trim. */
 export const CATALOG_MAX_SEARCH_CHARS = 200;
+
+/** Minimum product rows on one shop page (desktop grid). */
+export const SHOP_MIN_PRODUCT_ROWS = 4;
+
+/** Desktop shop grid columns used for page-size = rows × columns. */
+export const SHOP_DESKTOP_GRID_COLUMNS = 3;
 
 /** `filter=new` window in days. */
 export const CATALOG_NEW_ARRIVAL_DAYS = 30;
@@ -49,4 +61,5 @@ export const CATALOG_SIZE_ORDER = [
 ] as const;
 
 export const CATALOG_LIST_CACHE_PREFIX = "cache:products:plp:v1";
-export const CATALOG_FILTERS_CACHE_PREFIX = "cache:products:filters:v1";
+/** v2: facet payload includes generic `attributes` (storage/sim/…). */
+export const CATALOG_FILTERS_CACHE_PREFIX = "cache:products:filters:v2";

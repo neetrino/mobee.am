@@ -24,6 +24,7 @@ const EMPTY_FILTERS: ProductsFiltersData = {
   colors: [],
   sizes: [],
   brands: [],
+  attributes: [],
   priceRange: { min: 0, max: 0, hasProducts: false, stepSize: null, stepSizePerCurrency: null },
 };
 
@@ -63,6 +64,7 @@ export async function ShopFiltersShell({
     brand: filters.brand,
     colors: filters.colors,
     sizes: filters.sizes,
+    attrs: filters.attrs,
     filter: filters.filter,
   };
   const initialFiltersKey = buildProductFiltersCacheKey(filterInput);
@@ -74,7 +76,27 @@ export async function ShopFiltersShell({
   let initialFiltersData = EMPTY_FILTERS;
   try {
     const { result } = await getCachedProductFilters(filterInput);
-    initialFiltersData = result as ProductsFiltersData;
+    const priceRange = result.priceRange ?? EMPTY_FILTERS.priceRange;
+    const stepSizePerCurrency = priceRange.stepSizePerCurrency
+      ? Object.fromEntries(
+          Object.entries(priceRange.stepSizePerCurrency).filter(
+            (entry): entry is [string, number] => typeof entry[1] === "number",
+          ),
+        )
+      : null;
+    initialFiltersData = {
+      colors: result.colors ?? [],
+      sizes: result.sizes ?? [],
+      brands: result.brands ?? [],
+      attributes: result.attributes ?? [],
+      priceRange: {
+        min: priceRange.min,
+        max: priceRange.max,
+        hasProducts: priceRange.hasProducts,
+        stepSize: priceRange.stepSize ?? null,
+        stepSizePerCurrency,
+      },
+    };
   } catch (error: unknown) {
     if (!isCatalogQueryError(error)) {
       throw error;
@@ -98,6 +120,7 @@ export async function ShopFiltersShell({
       brand={filters.brand}
       colors={filters.colors}
       sizes={filters.sizes}
+      attrs={filters.attrs}
       filter={filters.filter}
       initialFiltersData={initialFiltersData}
       initialTopCategories={initialTopCategories}

@@ -492,6 +492,7 @@
       "noAttributesAvailable": "No attributes available",
       "attributeSelected": "{count} attribute selected",
       "attributesSelected": "{count} attributes selected",
+      "valuesPlaceholder": "values",
       "generatedVariants": "Generated Variants",
       "applyPriceToAll": "Apply Price to All",
       "applyStockToAll": "Apply Stock to All",

@@ -21,6 +21,7 @@ import { warmShopPaginationNavigation } from '@/lib/navigation/storefront-prefet
 import { useShopCatalog, type ShopCatalogProduct } from './useShopCatalog';
 import { useSmoothScrollToTopOnPageChange } from './useSmoothScrollToTopOnPageChange';
 import { usePlpViewportPdpSync } from './usePlpViewportPdpSync';
+import { useShopPageLimitFromFilters } from './useShopPageLimitFromFilters';
 
 type ShopPaginationPageItemsProps = {
   items: PaginationPageItem[];
@@ -168,6 +169,7 @@ export function ShopCatalogArea({
   });
   const { t } = useTranslation();
   usePlpViewportPdpSync(!loading && (productsData?.data.length ?? 0) > 0);
+  useShopPageLimitFromFilters();
 
   const page = parseInt(searchParams.get('page') || '1', 10);
   const sort = parseProductSortOption(searchParams.get('sort') ?? undefined);

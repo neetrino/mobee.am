@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  aggregateAttributeFacets,
   aggregateColorFacets,
   aggregateSizeFacets,
 } from "./catalog-facet-aggregate";
@@ -20,6 +21,16 @@ function sizeOption(value: string) {
     attributeValue: {
       value,
       attribute: { key: "size" },
+      translations: [{ locale: "en", label: value }],
+    },
+  };
+}
+
+function attrOption(key: string, value: string) {
+  return {
+    attributeValue: {
+      value,
+      attribute: { key },
       translations: [{ locale: "en", label: value }],
     },
   };
@@ -71,5 +82,51 @@ describe("aggregateSizeFacets product counts", () => {
       ],
     };
     expect(aggregateSizeFacets([row], "en")).toEqual([{ value: "M", count: 1 }]);
+  });
+});
+
+describe("aggregateAttributeFacets", () => {
+  it("includes attributes used by products even without filterable meta", () => {
+    const row: CatalogLightRow = {
+      id: "p1",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      variants: [
+        {
+          price: 10,
+          options: [attrOption("storage", "256GB"), colorOption("Black")],
+        },
+      ],
+    };
+    const facets = aggregateAttributeFacets([row], "en", new Map());
+    expect(facets).toEqual([
+      expect.objectContaining({
+        key: "storage",
+        name: "Storage",
+        values: [expect.objectContaining({ value: "256GB", count: 1 })],
+      }),
+    ]);
+  });
+
+  it("reads jsonb attributes when options omit the key", () => {
+    const row: CatalogLightRow = {
+      id: "p1",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      variants: [
+        {
+          price: 10,
+          options: [],
+          attributes: {
+            ram: [{ valueId: "1", value: "8GB", attributeKey: "ram" }],
+          },
+        },
+      ],
+    };
+    const facets = aggregateAttributeFacets([row], "en", new Map());
+    expect(facets).toEqual([
+      expect.objectContaining({
+        key: "ram",
+        values: [expect.objectContaining({ value: "8GB", count: 1 })],
+      }),
+    ]);
   });
 });

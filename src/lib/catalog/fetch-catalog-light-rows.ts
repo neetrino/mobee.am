@@ -57,6 +57,7 @@ const CATALOG_FACET_LIGHT_SELECT = {
           },
         },
       },
+      attributes: true,
     },
   },
 } as const;

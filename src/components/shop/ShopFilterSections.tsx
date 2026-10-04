@@ -4,6 +4,8 @@ import { PriceFilter } from '@/components/PriceFilter';
 import { CategoryFilter } from '@/components/CategoryFilter';
 import { BrandFilter } from '@/components/BrandFilter';
 import { ColorFilter } from '@/components/ColorFilter';
+import { SizeFilter } from '@/components/SizeFilter';
+import { AttributeFiltersList } from '@/components/AttributeFilter';
 import { SHOP_FILTER_SECTIONS_STACK_CLASS } from '@/app/[locale]/shop/shop-layout.constants';
 
 export type ShopFilterSectionsProps = {
@@ -14,9 +16,14 @@ export type ShopFilterSectionsProps = {
   selectedCategories: string[];
   selectedBrands: string[];
   selectedColors: string[];
+  selectedSizes: string[];
+  selectedAttrs: Record<string, string[]>;
   padded?: boolean;
 };
 
+/**
+ * Marco-style order: Brands → Price → Colors → Attributes → Categories (last).
+ */
 export function ShopFilterSections({
   currentMinPrice,
   currentMaxPrice,
@@ -25,22 +32,15 @@ export function ShopFilterSections({
   selectedCategories,
   selectedBrands,
   selectedColors,
+  selectedSizes,
+  selectedAttrs,
   padded = false,
 }: ShopFilterSectionsProps) {
   return (
-    <div className={`${SHOP_FILTER_SECTIONS_STACK_CLASS}${padded ? ' p-4' : ''}`}>
-      <PriceFilter
-        currentMinPrice={currentMinPrice}
-        currentMaxPrice={currentMaxPrice}
-        category={category}
-        search={search}
-      />
-      <CategoryFilter
-        selectedCategories={selectedCategories}
-        search={search}
-        minPrice={currentMinPrice}
-        maxPrice={currentMaxPrice}
-      />
+    <div
+      data-shop-filter-sections
+      className={`${SHOP_FILTER_SECTIONS_STACK_CLASS}${padded ? ' p-4' : ''}`}
+    >
       <BrandFilter
         category={category}
         search={search}
@@ -48,12 +48,26 @@ export function ShopFilterSections({
         maxPrice={currentMaxPrice}
         selectedBrands={selectedBrands}
       />
+      <PriceFilter
+        currentMinPrice={currentMinPrice}
+        currentMaxPrice={currentMaxPrice}
+        category={category}
+        search={search}
+      />
       <ColorFilter
         category={category}
         search={search}
         minPrice={currentMinPrice}
         maxPrice={currentMaxPrice}
         selectedColors={selectedColors}
+      />
+      <SizeFilter selectedSizes={selectedSizes} />
+      <AttributeFiltersList selectedAttrs={selectedAttrs} />
+      <CategoryFilter
+        selectedCategories={selectedCategories}
+        search={search}
+        minPrice={currentMinPrice}
+        maxPrice={currentMaxPrice}
       />
     </div>
   );

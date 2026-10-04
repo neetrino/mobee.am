@@ -49,6 +49,9 @@ export function buildProductListCacheKey(filters: ProductFilters): string {
   if (filters.sizes) {
     pairs.push(["sizes", normalizeCommaListCacheValue(filters.sizes)]);
   }
+  if (filters.attrs) {
+    pairs.push(["attrs", normalizeCommaListCacheValue(filters.attrs)]);
+  }
   if (filters.sort && filters.sort !== "default") {
     pairs.push(["sort", filters.sort]);
   }

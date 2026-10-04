@@ -16,15 +16,19 @@ import { fetchCatalogLightRows } from "./fetch-catalog-light-rows";
 import type { CatalogLightRow } from "./catalog-light.types";
 import { selectFacetRows } from "./catalog-facet-match";
 import {
+  aggregateAttributeFacets,
   aggregateBrandFacets,
   aggregateColorFacets,
   aggregateSizeFacets,
   computeCatalogPriceBounds,
+  type CatalogAttributeFacet,
   type CatalogBrandFacet,
   type CatalogColorFacet,
   type CatalogPriceBounds,
   type CatalogSizeFacet,
 } from "./catalog-facet-aggregate";
+import { loadFilterableAttributeMeta } from "./load-filterable-attribute-meta";
+import { catalogAttrSelectionIsEmpty } from "./catalog-attrs";
 import { isProductListingReadModelReady } from "@/lib/read-model/read-model-ready";
 import { getCatalogFacetsFromReadModel } from "@/lib/read-model/products-plp-facets";
 
@@ -32,6 +36,7 @@ export type CatalogFacetsResult = {
   colors: CatalogColorFacet[];
   sizes: CatalogSizeFacet[];
   brands: CatalogBrandFacet[];
+  attributes: CatalogAttributeFacet[];
   priceRange: CatalogPriceBounds & {
     stepSize: number | null;
     stepSizePerCurrency: Record<string, number | undefined> | null;
@@ -48,6 +53,9 @@ export type CatalogFacetsPort = {
     stepSize: number | null;
     stepSizePerCurrency: Record<string, number | undefined> | null;
   }>;
+  loadAttributeMeta: (lang: string) => Promise<
+    Awaited<ReturnType<typeof loadFilterableAttributeMeta>>
+  >;
 };
 
 const emptyBounds: CatalogPriceBounds = { min: 0, max: 0, hasProducts: false };
@@ -60,6 +68,7 @@ function emptyFacets(
     colors: [],
     sizes: [],
     brands: [],
+    attributes: [],
     priceRange: { ...emptyBounds, stepSize, stepSizePerCurrency },
   };
 }
@@ -91,20 +100,27 @@ const defaultPort: CatalogFacetsPort = {
         : null,
     };
   },
+  loadAttributeMeta: loadFilterableAttributeMeta,
 };
 
 /**
  * Facets share catalog semantics including filter=new|featured|bestseller.
- * Brand/color/size counts omit only their own filter dimension.
+ * Brand/color/size/attr counts omit only their own filter dimension.
  */
 export async function getCatalogFacets(
   filters: ProductFilters,
   port: CatalogFacetsPort = defaultPort,
 ): Promise<CatalogFacetsResult> {
-  if (port === defaultPort && (await isProductListingReadModelReady())) {
-    return getCatalogFacetsFromReadModel(filters);
-  }
   const query = normalizeCatalogQuery(filters);
+  // Generic attrs are not projected on ProductListingRow yet — use light-row path.
+  const canUseReadModel =
+    port === defaultPort &&
+    catalogAttrSelectionIsEmpty(query.attrs) &&
+    (await isProductListingReadModelReady());
+  if (canUseReadModel) {
+    return getCatalogFacetsFromReadModel(filters, port.loadAttributeMeta);
+  }
+
   let stepSize: number | null = null;
   let stepSizePerCurrency: Record<string, number | undefined> | null = null;
   try {
@@ -121,21 +137,24 @@ export async function getCatalogFacets(
     return emptyFacets(stepSize, stepSizePerCurrency);
   }
 
-  const [rows, discounts] = await Promise.all([
+  const [rows, discounts, attributeMeta] = await Promise.all([
     port.fetchLightRows(where),
     port.loadDiscounts(),
+    port.loadAttributeMeta(query.lang),
   ]);
 
   const priceRows = selectFacetRows(rows, query, discounts, "price");
   const brandRows = selectFacetRows(rows, query, discounts, "brand");
   const colorRows = selectFacetRows(rows, query, discounts, "colors");
   const sizeRows = selectFacetRows(rows, query, discounts, "sizes");
+  const attrRows = selectFacetRows(rows, query, discounts, "attrs");
   const bounds = computeCatalogPriceBounds(priceRows, discounts);
 
   return {
     colors: aggregateColorFacets(colorRows, query.lang),
     sizes: aggregateSizeFacets(sizeRows, query.lang),
     brands: aggregateBrandFacets(brandRows, query.lang),
+    attributes: aggregateAttributeFacets(attrRows, query.lang, attributeMeta),
     priceRange: { ...bounds, stepSize, stepSizePerCurrency },
   };
 }

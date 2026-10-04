@@ -17,7 +17,9 @@ class AdminProductsUpdateService {
     const result = await updateProduct(productId, data);
 
     if (result.didUpdate) {
-      revalidateProductCache(productId, result.productSlug);
+      // Await so Next.js path revalidation finishes before the admin client navigates
+      // back to the storefront (Router Cache / soft navigation would otherwise stay stale).
+      await revalidateProductCache(productId, result.productSlug);
     }
 
     return {

@@ -1,20 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Check } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/lib/i18n/navigation';
-import { Card } from '@shop/ui';
-import { apiClient } from '../lib/api-client';
-import { getStoredLanguage } from '../lib/language';
-import { useTranslation } from '../lib/i18n-client';
+import { getStoredLanguage } from '@/lib/language';
+import { useTranslation } from '@/lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
-import { facetParamsFromUrlSearchParams } from '@/lib/shop/product-filters-to-api-params';
+import { ShopFilterSectionHeader } from './shop/ShopFilterSectionHeader';
+import { warmShopNavigationFromSearchParams } from '@/lib/navigation/storefront-prefetch';
 
 interface SizeFilterProps {
-  category?: string;
-  search?: string;
-  minPrice?: string;
-  maxPrice?: string;
   selectedSizes?: string[];
 }
 
@@ -23,8 +19,7 @@ interface SizeOption {
   count: number;
 }
 
-
-export function SizeFilter({ category, search, minPrice, maxPrice, selectedSizes = [] }: SizeFilterProps) {
+export function SizeFilter({ selectedSizes = [] }: SizeFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
@@ -34,118 +29,104 @@ export function SizeFilter({ category, search, minPrice, maxPrice, selectedSizes
   const [selected, setSelected] = useState<string[]>(selectedSizes);
 
   useEffect(() => {
+    setSelected(selectedSizes);
+  }, [selectedSizes]);
+
+  useEffect(() => {
     if (filtersContext?.data?.sizes) {
-      setSizes(filtersContext.data.sizes);
+      setSizes(filtersContext.data.sizes.filter((item) => item.count > 0));
       setLoading(false);
       return;
     }
     if (filtersContext === null) {
-      fetchSizes();
-    } else {
-      setLoading(filtersContext.loading);
-    }
-  }, [category, search, minPrice, maxPrice, filtersContext?.data?.sizes, filtersContext?.loading, filtersContext === null]);
-
-  useEffect(() => {
-    setSelected(selectedSizes);
-  }, [selectedSizes]);
-
-  const fetchSizes = async () => {
-    try {
-      setLoading(true);
-      const language = getStoredLanguage();
-      const params = facetParamsFromUrlSearchParams(searchParams.entries(), language);
-
-      // Fetch filters from API
-      const response = await apiClient.get<{ colors: unknown[]; sizes: SizeOption[] }>('/api/v1/products/filters', { params });
-      
-      setSizes(response.sizes || []);
-    } catch (error) {
       setSizes([]);
-    } finally {
       setLoading(false);
+      return;
     }
-  };
+    setLoading(filtersContext.loading);
+  }, [filtersContext?.data?.sizes, filtersContext?.loading, filtersContext]);
 
-  const handleSizeToggle = (sizeValue: string) => {
-    const newSelected = selected.includes(sizeValue)
-      ? selected.filter((s) => s !== sizeValue)
-      : [...selected, sizeValue];
-
-    setSelected(newSelected);
-    applyFilters(newSelected);
-  };
-
-  const applyFilters = (sizesToApply: string[]) => {
-    // Ստեղծում ենք նոր URLSearchParams URL-ի հիման վրա, որպեսզի պահպանենք բոլոր params-ները
+  const applySizes = (next: string[]) => {
     const params = new URLSearchParams(searchParams.toString());
-    
-    // Թարմացնում ենք sizes պարամետրը
-    if (sizesToApply.length > 0) {
-      params.set('sizes', sizesToApply.join(','));
+    if (next.length > 0) {
+      params.set('sizes', next.join(','));
     } else {
       params.delete('sizes');
     }
-    
-    // Reset page to 1 when filters change
     params.delete('page');
-
-    router.push(`/shop?${params.toString()}`);
+    const href = warmShopNavigationFromSearchParams(router, params, getStoredLanguage());
+    router.push(href);
   };
 
-  if (loading) {
+  const handleToggle = (sizeValue: string) => {
+    const next = selected.includes(sizeValue)
+      ? selected.filter((item) => item !== sizeValue)
+      : [...selected, sizeValue];
+    setSelected(next);
+    applySizes(next);
+  };
+
+  const clearSizes = () => {
+    setSelected([]);
+    applySizes([]);
+  };
+
+  if (loading && sizes.length === 0) {
     return (
-      <Card className="p-4 mb-6">
-        <h3 className="text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">{t('products.filters.size.title')}</h3>
-        <div className="text-sm text-gray-500">{t('products.filters.size.loading')}</div>
-      </Card>
+      <section className="border-b border-[#E2E8F0] pb-6">
+        <ShopFilterSectionHeader
+          title={t('products.filters.size.title')}
+          showClear={selected.length > 0}
+          onClear={clearSizes}
+        />
+        <div className="mt-3 text-sm text-gray-500">{t('products.filters.size.loading')}</div>
+      </section>
     );
   }
 
-  return (
-    <Card className="p-4 mb-6">
-      <h3 className="text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">{t('products.filters.size.title')}</h3>
-      {sizes.length === 0 ? (
-        <div className="text-sm text-gray-500 py-4 text-center">
-          {t('products.filters.size.noSizes')}
-        </div>
-      ) : (
-        <div className="space-y-2 max-h-64 overflow-y-auto">
-          {sizes.map((size) => {
-            const isSelected = selected.includes(size.value);
+  if (sizes.length === 0) {
+    return null;
+  }
 
-            return (
-              <button
-                key={size.value}
-                onClick={() => handleSizeToggle(size.value)}
-                className={`w-full flex items-center justify-between py-2 px-1 rounded transition-colors group ${
+  return (
+    <section className="border-b border-[#E2E8F0] pb-6">
+      <ShopFilterSectionHeader
+        title={t('products.filters.size.title')}
+        showClear={selected.length > 0}
+        onClear={clearSizes}
+      />
+      <div className="mt-4 space-y-3">
+        {sizes.map((size) => {
+          const isSelected = selected.includes(size.value);
+          return (
+            <button
+              key={size.value}
+              type="button"
+              onClick={() => handleToggle(size.value)}
+              className="group -mx-2 flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[#EFF6FF]"
+            >
+              <span
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded border-2 transition-colors ${
                   isSelected
-                    ? 'bg-blue-50 hover:bg-blue-100 border border-blue-200'
-                    : 'hover:bg-gray-50'
+                    ? 'border-[#2CA1E2] bg-white'
+                    : 'border-[#CAD5E2] bg-white group-hover:border-[#2CA1E2]'
                 }`}
+                aria-hidden
               >
-                <span
-                  className={`text-sm group-hover:text-gray-700 ${
-                    isSelected ? 'text-blue-900 font-medium' : 'text-gray-900'
-                  }`}
-                >
-                  {size.value}
-                </span>
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full ${
-                    isSelected
-                      ? 'text-blue-700 bg-blue-100'
-                      : 'text-gray-500 bg-gray-100'
-                  }`}
-                >
-                  {size.count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </Card>
+                {isSelected ? (
+                  <Check className="h-4 w-4 text-[#2CA1E2]" strokeWidth={2.5} aria-hidden />
+                ) : null}
+              </span>
+              <span className="flex-1 truncate text-base leading-6 tracking-[-0.02em] text-[#314158] transition-colors group-hover:text-[#0F172B]">
+                {size.value}
+              </span>
+              <span className="text-base leading-6 tracking-[-0.02em] text-[#90A1B9]">
+                ({size.count})
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
-

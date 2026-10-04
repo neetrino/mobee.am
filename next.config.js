@@ -249,8 +249,10 @@ const nextConfig = {
     root: path.resolve(__dirname, '.'),
   },
   experimental: {
+    // dynamic: 0 — admin catalog edits (variants/prices) must not linger in the
+    // client Router Cache when soft-navigating back to PDP / listing pages.
     staleTimes: {
-      dynamic: 60,
+      dynamic: 0,
       static: 300,
     },
   },

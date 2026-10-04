@@ -314,15 +314,12 @@ function buildVariableVariantUpdates(
     }
   }
 
-  const newCurrentVariants = current.variants.filter((variant) => !variant.databaseVariantId);
+  // Source of truth for creates: processed rows without a DB id.
+  // Do not index-pair against UI snapshots — one GeneratedVariant can expand into
+  // multiple processed combinations (color × storage, etc.).
   const newProcessedVariants = processedVariants.filter((variant) => !variant.databaseVariantId);
 
-  newCurrentVariants.forEach((_, index) => {
-    const processed = newProcessedVariants[index];
-    if (!processed) {
-      return;
-    }
-
+  for (const processed of newProcessedVariants) {
     create.push({
       price: processed.price,
       stock: processed.stock,
@@ -332,7 +329,7 @@ function buildVariableVariantUpdates(
       published: processed.published ?? true,
       options: processed.options,
     });
-  });
+  }
 
   const deleteIds = [...initialByDbId.keys()].filter((id) => !currentByDbId.has(id));
 

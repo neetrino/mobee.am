@@ -12,6 +12,8 @@ export interface ProductFilters {
   maxPrice?: number;
   colors?: string;
   sizes?: string;
+  /** Generic attribute filters: `key:value,key:value` (not color/size). */
+  attrs?: string;
   brand?: string;
   sort?: ProductSortOption;
   page?: number;
