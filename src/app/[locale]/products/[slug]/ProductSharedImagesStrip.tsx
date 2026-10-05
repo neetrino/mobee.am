@@ -41,14 +41,14 @@ export function ProductSharedImagesStrip({
               isActive ? "border-gray-900" : "border-transparent hover:border-gray-300"
             }`}
           >
-            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-gray-200 bg-white p-1 product-2col:h-14 product-2col:w-14">
+            <span className="group/shared flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-white bg-gradient-to-br from-white to-gray-100 p-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] ring-1 ring-black/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.9)] product-2col:h-14 product-2col:w-14">
               {failedIndices.has(index) ? (
                 <ProductImagePlaceholder className="h-full w-full" aria-label="" />
               ) : (
                 <img
                   src={image}
                   alt=""
-                  className="h-full w-full object-contain"
+                  className="h-full w-full object-contain transition-transform duration-200 group-hover/shared:scale-110"
                   onError={() => onImageError(index)}
                 />
               )}
