@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   detectSwipeDirection,
   getCarouselIndexFromScrollLeft,
+  getImageGroupRange,
   getNextImageIndex,
   getPreviousImageIndex,
   zoomIn,
@@ -38,5 +39,19 @@ describe("product-image-gallery.utils", () => {
     expect(getCarouselIndexFromScrollLeft(310, 320, 3)).toBe(1);
     expect(getCarouselIndexFromScrollLeft(640, 320, 3)).toBe(2);
     expect(getCarouselIndexFromScrollLeft(9999, 320, 3)).toBe(2);
+  });
+});
+
+describe("getImageGroupRange", () => {
+  it("keeps navigation inside variant images", () => {
+    expect(getImageGroupRange(1, 3, 5)).toEqual({ start: 0, length: 3 });
+  });
+
+  it("keeps navigation inside shared images", () => {
+    expect(getImageGroupRange(4, 3, 5)).toEqual({ start: 3, length: 2 });
+  });
+
+  it("uses the whole gallery when there are no shared images", () => {
+    expect(getImageGroupRange(2, 4, 4)).toEqual({ start: 0, length: 4 });
   });
 });

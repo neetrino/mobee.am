@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { Product, ProductVariant } from "../types";
-import { getVariantMedia } from "../utils/variant-media";
+import { getVariantGallery, type VariantGallery } from "../utils/variant-media";
 
 /**
  * Returns gallery URLs for the selected variant (or default/fallback product media).
@@ -8,9 +8,9 @@ import { getVariantMedia } from "../utils/variant-media";
 export function useProductImages(
   product: Product | null,
   selectedVariant: ProductVariant | null | undefined,
-): string[] {
+): VariantGallery {
   return useMemo(
-    () => getVariantMedia(product, selectedVariant),
+    () => getVariantGallery(product, selectedVariant),
     [product, selectedVariant],
   );
 }

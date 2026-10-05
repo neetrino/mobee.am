@@ -128,7 +128,7 @@ export function useProductPage({
     return null;
   }, [product, currentVariant, selectedColor, selectedSize, selectedAttributeValues]);
 
-  const images = useProductImages(product, galleryVariant);
+  const { images, sharedImageCount } = useProductImages(product, galleryVariant);
 
   const {
     price,
@@ -304,6 +304,7 @@ export function useProductPage({
     product,
     loading,
     images,
+    sharedImageCount,
     currentImageIndex,
     setCurrentImageIndex,
     thumbnailStartIndex,

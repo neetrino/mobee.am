@@ -19,6 +19,26 @@ export function getPreviousImageIndex(currentIndex: number, totalImages: number)
   return (currentIndex - 1 + totalImages) % totalImages;
 }
 
+export interface ImageGroupRange {
+  start: number;
+  length: number;
+}
+
+/**
+ * Gallery is split into variant images `[0, sharedStart)` and shared images `[sharedStart, total)`;
+ * returns the group containing `currentIndex` so arrow navigation stays inside it.
+ */
+export function getImageGroupRange(
+  currentIndex: number,
+  sharedStart: number,
+  totalImages: number,
+): ImageGroupRange {
+  if (currentIndex >= sharedStart && sharedStart < totalImages) {
+    return { start: sharedStart, length: totalImages - sharedStart };
+  }
+  return { start: 0, length: Math.min(sharedStart, totalImages) };
+}
+
 export function zoomIn(currentScale: number): number {
   return Math.min(MAX_ZOOM_SCALE, Number((currentScale + ZOOM_STEP).toFixed(2)));
 }

@@ -68,6 +68,7 @@ export function ProductPageClient({
     product,
     loading,
     images,
+    sharedImageCount,
     currentImageIndex,
     setCurrentImageIndex,
     thumbnailStartIndex,
@@ -267,6 +268,7 @@ export function ProductPageClient({
           <ProductImageGallery
             key={galleryVariant?.id ?? selectedColor ?? product.id}
             images={images}
+            sharedImageCount={sharedImageCount}
             product={product}
             discountPercent={discountPercent}
             language={language}
