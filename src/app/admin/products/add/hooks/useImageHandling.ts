@@ -186,8 +186,10 @@ export function useImageHandling({
         return;
       }
 
+      const uploadedUrls = await uploadProductImages(uploadedImages);
+
       setImageUrls((prev) => {
-        const newImageUrls = [...prev, ...uploadedImages];
+        const newImageUrls = [...prev, ...uploadedUrls];
         if (prev.length === 0 && newImageUrls.length > 0) {
           setFeaturedImageIndex(0);
           setMainProductImage(newImageUrls[0]);
@@ -305,8 +307,9 @@ export function useImageHandling({
         imagesCount: uploadedImages.length,
       });
 
-      addColorImages(colorImageTarget.variantId, colorImageTarget.colorValue, uploadedImages);
-      console.log('✅ [ADMIN] Color images added to state:', uploadedImages.length);
+      const uploadedUrls = await uploadProductImages(uploadedImages);
+      addColorImages(colorImageTarget.variantId, colorImageTarget.colorValue, uploadedUrls);
+      console.log('✅ [ADMIN] Color images added to state:', uploadedUrls.length);
     } catch (error: any) {
       console.error('❌ [ADMIN] Error uploading color images:', error);
       setImageUploadError(error?.message || t('admin.products.add.failedToProcessImages'));

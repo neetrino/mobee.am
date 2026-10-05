@@ -11,11 +11,13 @@ import type { Product } from "./types";
 import {
   detectSwipeDirection,
   getCarouselIndexFromScrollLeft,
+  getImageGroupRange,
   getNextImageIndex,
   getPreviousImageIndex,
   zoomIn,
   zoomOut,
 } from "./product-image-gallery.utils";
+import { ProductSharedImagesStrip } from "./ProductSharedImagesStrip";
 
 const PDP_MOBILE_GALLERY_SCROLL_CLASS =
   "flex h-full w-full overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] scrollbar-hide snap-x snap-mandatory [touch-action:pan-x_pan-y]";
@@ -24,6 +26,8 @@ const PDP_MOBILE_GALLERY_SLIDE_CLASS =
 
 interface ProductImageGalleryProps {
   images: string[];
+  /** Trailing `images` shown under the main image instead of the thumbnail rail. */
+  sharedImageCount: number;
   product: Product;
   discountPercent: number | null;
   language: LanguageCode;
@@ -41,14 +45,15 @@ const THUMBNAILS_PER_VIEW = 3;
  * and align it to the rail’s former start so size does not grow.
  */
 const PDP_SINGLE_IMAGE_MAIN_SLOT_CLASS =
-  "order-1 flex w-full shrink-0 justify-center product-2col:order-1 product-2col:block product-2col:min-w-0 product-2col:w-[calc(100%-7.25rem)] product-2col:max-w-[calc(100%-7.25rem)] product-2col:shrink-0 product-2col:self-start";
+  "order-1 flex w-full shrink-0 flex-col items-center product-2col:order-1 product-2col:block product-2col:min-w-0 product-2col:w-[calc(100%-7.25rem)] product-2col:max-w-[calc(100%-7.25rem)] product-2col:shrink-0 product-2col:self-start";
 
 const PDP_MULTI_IMAGE_MAIN_SLOT_CLASS =
-  "order-1 flex w-full shrink-0 justify-center product-2col:order-2 product-2col:block product-2col:min-w-0 product-2col:flex-1";
+  "order-1 flex w-full shrink-0 flex-col items-center product-2col:order-2 product-2col:block product-2col:min-w-0 product-2col:flex-1";
 
 
 export function ProductImageGallery({
   images,
+  sharedImageCount,
   product,
   discountPercent,
   language,
@@ -70,14 +75,20 @@ export function ProductImageGallery({
 
   const mainImageFailed = failedIndices.has(currentImageIndex);
   const currentSrc = images[currentImageIndex];
-  const hasMultipleImages = images.length > 1;
+  const railImages = images.slice(0, images.length - sharedImageCount);
+  const sharedImages = images.slice(railImages.length);
+  const hasRailThumbnails = railImages.length > 1;
+  const activeGroup = getImageGroupRange(currentImageIndex, railImages.length, images.length);
+  const hasMultipleImages = activeGroup.length > 1;
 
   const goToPreviousImage = () => {
-    onImageIndexChange(getPreviousImageIndex(currentImageIndex, images.length));
+    const offset = getPreviousImageIndex(currentImageIndex - activeGroup.start, activeGroup.length);
+    onImageIndexChange(activeGroup.start + offset);
   };
 
   const goToNextImage = () => {
-    onImageIndexChange(getNextImageIndex(currentImageIndex, images.length));
+    const offset = getNextImageIndex(currentImageIndex - activeGroup.start, activeGroup.length);
+    onImageIndexChange(activeGroup.start + offset);
   };
 
   const scrollMobileCarouselToIndex = useCallback(
@@ -133,7 +144,7 @@ export function ProductImageGallery({
 
   // Auto-scroll thumbnails to show selected image
   useEffect(() => {
-    if (images.length > THUMBNAILS_PER_VIEW) {
+    if (railImages.length > THUMBNAILS_PER_VIEW && currentImageIndex < railImages.length) {
       if (currentImageIndex < thumbnailStartIndex) {
         // Selected image is above visible range - scroll up
         onThumbnailStartIndexChange(currentImageIndex);
@@ -142,10 +153,10 @@ export function ProductImageGallery({
         onThumbnailStartIndexChange(currentImageIndex - THUMBNAILS_PER_VIEW + 1);
       }
     }
-  }, [currentImageIndex, images.length, thumbnailStartIndex, onThumbnailStartIndexChange]);
+  }, [currentImageIndex, railImages.length, thumbnailStartIndex, onThumbnailStartIndexChange]);
 
   // Show only 3 thumbnails at a time, scrollable with navigation arrows
-  const visibleThumbnails = images.slice(thumbnailStartIndex, thumbnailStartIndex + THUMBNAILS_PER_VIEW);
+  const visibleThumbnails = railImages.slice(thumbnailStartIndex, thumbnailStartIndex + THUMBNAILS_PER_VIEW);
 
   useEffect(() => {
     if (!showZoom) {
@@ -178,10 +189,10 @@ export function ProductImageGallery({
     <>
       <div className="flex flex-col gap-4 product-2col:flex-row product-2col:items-start product-2col:gap-5">
         {/* Thumbnails: below main on mobile, left column on desktop — hidden when only one image */}
-        {hasMultipleImages ? (
+        {hasRailThumbnails ? (
         <div className="group/thumbs order-2 flex w-full shrink-0 flex-col gap-2 product-2col:order-1 product-2col:w-24 product-2col:gap-3">
           <div className="flex min-w-0 flex-row items-center gap-2 product-2col:flex-col product-2col:items-stretch">
-            {images.length > THUMBNAILS_PER_VIEW && (
+            {railImages.length > THUMBNAILS_PER_VIEW && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -231,14 +242,14 @@ export function ProductImageGallery({
               );
             })}
             </div>
-            {images.length > THUMBNAILS_PER_VIEW && (
+            {railImages.length > THUMBNAILS_PER_VIEW && (
               <button
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   const newStart = Math.min(
-                    images.length - THUMBNAILS_PER_VIEW,
+                    railImages.length - THUMBNAILS_PER_VIEW,
                     thumbnailStartIndex + 1,
                   );
                   onThumbnailStartIndexChange(newStart);
@@ -248,7 +259,7 @@ export function ProductImageGallery({
                     onImageIndexChange(newStart + THUMBNAILS_PER_VIEW - 1);
                   }
                 }}
-                disabled={thumbnailStartIndex >= images.length - THUMBNAILS_PER_VIEW}
+                disabled={thumbnailStartIndex >= railImages.length - THUMBNAILS_PER_VIEW}
                 className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-100 text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-200 disabled:cursor-default disabled:opacity-30 product-2col:hidden"
                 aria-label={t(language, "common.ariaLabels.nextThumbnail")}
               >
@@ -258,7 +269,7 @@ export function ProductImageGallery({
           </div>
 
           {/* Navigation Arrows - Scroll thumbnails (desktop hover strip) */}
-          {images.length > THUMBNAILS_PER_VIEW && (
+          {railImages.length > THUMBNAILS_PER_VIEW && (
             <div className="hidden flex-row justify-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover/thumbs:opacity-100 product-2col:flex">
               <button 
                 type="button"
@@ -299,7 +310,7 @@ export function ProductImageGallery({
                   e.preventDefault();
                   e.stopPropagation();
                   // Scroll thumbnails down
-                  const newStart = Math.min(images.length - THUMBNAILS_PER_VIEW, thumbnailStartIndex + 1);
+                  const newStart = Math.min(railImages.length - THUMBNAILS_PER_VIEW, thumbnailStartIndex + 1);
                   onThumbnailStartIndexChange(newStart);
                   // Also update current image if needed
                   if (currentImageIndex < newStart) {
@@ -308,7 +319,7 @@ export function ProductImageGallery({
                     onImageIndexChange(newStart + THUMBNAILS_PER_VIEW - 1);
                   }
                 }}
-                disabled={thumbnailStartIndex >= images.length - THUMBNAILS_PER_VIEW}
+                disabled={thumbnailStartIndex >= railImages.length - THUMBNAILS_PER_VIEW}
                 className="pointer-events-none flex h-8 w-8 cursor-pointer items-center justify-center rounded border border-gray-300 bg-gray-100 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:cursor-default disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:bg-gray-100 disabled:hover:shadow-none group-hover/thumbs:pointer-events-auto"
                 aria-label={t(language, 'common.ariaLabels.nextThumbnail')}
               >
@@ -333,14 +344,14 @@ export function ProductImageGallery({
         
         <div
           className={
-            hasMultipleImages
+            hasRailThumbnails
               ? PDP_MULTI_IMAGE_MAIN_SLOT_CLASS
               : PDP_SINGLE_IMAGE_MAIN_SLOT_CLASS
           }
         >
           <div
             className={`group relative flex aspect-square w-full max-w-sm items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm product-2col:max-w-none ${
-              hasMultipleImages ? "mx-auto" : "mx-auto product-2col:mx-0"
+              hasRailThumbnails ? "mx-auto" : "mx-auto product-2col:mx-0"
             }`}
             data-pdp-cart-fly-source
           >
@@ -445,6 +456,14 @@ export function ProductImageGallery({
               </button>
             </div>
           </div>
+          <ProductSharedImagesStrip
+            images={sharedImages}
+            startIndex={railImages.length}
+            currentImageIndex={currentImageIndex}
+            failedIndices={failedIndices}
+            onImageIndexChange={onImageIndexChange}
+            onImageError={markFailed}
+          />
         </div>
       </div>
 

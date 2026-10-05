@@ -100,6 +100,35 @@ export function getVariantMedia(
   );
 }
 
+export interface VariantGallery {
+  /** Variant images followed by `sharedImageCount` shared product images. */
+  images: string[];
+  sharedImageCount: number;
+}
+
+/**
+ * Multi-variant products keep variant images in the main gallery and expose
+ * shared product images separately so they can be shown for every variant.
+ */
+export function getVariantGallery(
+  product: Product | null,
+  selectedVariant: ProductVariant | null | undefined,
+): VariantGallery {
+  const variantImages = getVariantMedia(product, selectedVariant);
+  const hasOwnVariantImages =
+    selectedVariant != null && collectVariantImageUrls(selectedVariant).length > 0;
+
+  if (!product || !hasOwnVariantImages || !isMultiVariantProduct(product) || isDysonProduct(product)) {
+    return { images: variantImages, sharedImageCount: 0 };
+  }
+
+  const variantSet = new Set(variantImages);
+  const sharedImages = dedupeUrls(collectProductMediaUrls(product)).filter(
+    (url) => !variantSet.has(url),
+  );
+  return { images: [...variantImages, ...sharedImages], sharedImageCount: sharedImages.length };
+}
+
 export function getVariantMainImageIndex(
   selectedVariant: ProductVariant | null | undefined,
   images: string[],

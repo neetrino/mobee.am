@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getVariantMainImageIndex, getVariantMedia } from './variant-media';
+import { getVariantGallery, getVariantMainImageIndex, getVariantMedia } from './variant-media';
 import type { Product, ProductVariant } from '../types';
 
 const baseProduct: Product = {
@@ -146,6 +146,40 @@ describe('getVariantMedia', () => {
     expect(getVariantMedia(dysonProduct, variant)).toEqual([
       'https://r2.example/products/dyson/main.png',
     ]);
+  });
+});
+
+describe('getVariantGallery', () => {
+  const variantWithImages: ProductVariant = {
+    id: 'v1',
+    sku: 'mc-1',
+    price: 100,
+    stock: 5,
+    available: true,
+    options: [{ key: 'color', attribute: 'color', value: 'black' }],
+    imageUrl: 'https://r2.example/products/mobilecentre/1/main.png',
+  };
+
+  it('appends shared product images after variant images for multi-variant products', () => {
+    expect(getVariantGallery(multiVariantProduct, variantWithImages)).toEqual({
+      images: [
+        'https://r2.example/products/mobilecentre/1/main.png',
+        'https://r2.example/products/p1/fallback.png',
+      ],
+      sharedImageCount: 1,
+    });
+  });
+
+  it('keeps shared count zero when variant has no own images', () => {
+    const variant: ProductVariant = { ...variantWithImages, imageUrl: undefined };
+    expect(getVariantGallery(multiVariantProduct, variant)).toEqual({
+      images: ['https://r2.example/products/p1/fallback.png'],
+      sharedImageCount: 0,
+    });
+  });
+
+  it('keeps shared count zero for single-variant products', () => {
+    expect(getVariantGallery(baseProduct, variantWithImages).sharedImageCount).toBe(0);
   });
 });
 
