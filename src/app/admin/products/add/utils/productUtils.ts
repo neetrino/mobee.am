@@ -2,14 +2,9 @@
  * Utility functions for product management
  */
 
-export const generateSlug = (title: string): string => {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-|]/g, '') // Allow pipe character (|) in slug
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-};
+import { toSlug } from '@/lib/utils/slug';
+
+export const generateSlug = (title: string): string => toSlug(title);
 
 /**
  * Generate all combinations of selected attribute values

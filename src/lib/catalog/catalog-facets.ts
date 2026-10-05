@@ -121,18 +121,12 @@ export async function getCatalogFacets(
     return getCatalogFacetsFromReadModel(filters, port.loadAttributeMeta);
   }
 
-  let stepSize: number | null = null;
-  let stepSizePerCurrency: Record<string, number | undefined> | null = null;
-  try {
-    const settings = await port.loadPriceFilterSettings();
-    stepSize = settings.stepSize;
-    stepSizePerCurrency = settings.stepSizePerCurrency;
-  } catch {
-    stepSize = null;
-    stepSizePerCurrency = null;
-  }
-
-  const { where } = await port.buildWhere(query);
+  const [{ stepSize, stepSizePerCurrency }, { where }] = await Promise.all([
+    port
+      .loadPriceFilterSettings()
+      .catch(() => ({ stepSize: null, stepSizePerCurrency: null })),
+    port.buildWhere(query),
+  ]);
   if (where === null) {
     return emptyFacets(stepSize, stepSizePerCurrency);
   }

@@ -12,6 +12,7 @@ export interface ProductFilters {
   maxPrice?: number;
   sort?: string;
   stockStatus?: "all" | "inStock" | "outOfStock";
+  locale?: string;
 }
 
 

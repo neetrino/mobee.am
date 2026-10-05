@@ -829,6 +829,12 @@
     "saving": "Сохранение...",
     "back": "Назад",
     "backToAdmin": "Вернуться в панель администратора",
-    "unknownErrorFallback": "Неизвестная ошибка"
+    "unknownErrorFallback": "Неизвестная ошибка",
+    "translations": "Переводы",
+    "sharedSlugHint": "Slug общий для всех языков.",
+    "contentLocale": "Язык контента",
+    "contentLocaleHint": "Переключите язык, чтобы редактировать переводы. Сохранение записывает только активный язык.",
+    "contentLocaleHintNames": "Названия и подписи сохраняются для выбранного языка.",
+    "contentLocaleHintProduct": "Название, slug и описание сохраняются для выбранного языка."
   }
 }

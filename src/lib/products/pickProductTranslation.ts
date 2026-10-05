@@ -1,3 +1,5 @@
+import { localizeProductTitle } from "../product-title-i18n";
+
 type ProductTranslationLike = {
   locale: string;
   title?: string | null;
@@ -52,5 +54,8 @@ export function resolveProductDisplayTitle(
   translations: readonly ProductTranslationLike[],
   lang: string,
 ): string {
-  return pickProductTranslation(translations, lang)?.title?.trim() || "";
+  return localizeProductTitle(
+    pickProductTranslation(translations, lang)?.title?.trim() || "",
+    lang,
+  );
 }

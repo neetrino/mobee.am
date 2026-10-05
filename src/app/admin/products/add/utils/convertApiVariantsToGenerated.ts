@@ -1,4 +1,5 @@
 import { convertPrice, type CurrencyCode } from "@/lib/currency";
+import { smartSplitUrls } from "@/lib/utils/image-utils";
 import type { Attribute, GeneratedVariant } from "../types";
 
 type ApiAttributeValueItem = {
@@ -14,6 +15,7 @@ export interface ApiProductVariant {
   stock?: number | string | null;
   sku?: string | null;
   imageUrl?: string | null;
+  media?: string[];
   published?: boolean;
   attributes?: Record<string, string | ApiAttributeValueItem[] | unknown>;
   options?: Array<{
@@ -158,21 +160,11 @@ function extractSelectedValueIds(
   return selectedValueIds.sort();
 }
 
-function extractVariantImage(variant: ApiProductVariant): string | null {
-  if (!variant.imageUrl) {
-    return null;
-  }
-
-  if (typeof variant.imageUrl === "string" && variant.imageUrl.startsWith("data:")) {
-    return variant.imageUrl;
-  }
-
-  const imageUrls =
-    typeof variant.imageUrl === "string"
-      ? variant.imageUrl.split(",").map((url) => url.trim()).filter(Boolean)
-      : [];
-
-  return imageUrls.length > 0 ? imageUrls[0] : null;
+/** Same order as the storefront gallery: imageUrl entries first, then variant media. */
+function extractVariantImages(variant: ApiProductVariant): string[] {
+  const fromImageUrl = typeof variant.imageUrl === "string" ? smartSplitUrls(variant.imageUrl) : [];
+  const fromMedia = Array.isArray(variant.media) ? variant.media.filter(Boolean) : [];
+  return Array.from(new Set([...fromImageUrl, ...fromMedia]));
 }
 
 /**
@@ -210,7 +202,7 @@ export function convertApiVariantsToGenerated(
           ? String(variant.stock)
           : "0",
       sku: variant.sku?.trim() ?? "",
-      image: extractVariantImage(variant),
+      images: extractVariantImages(variant),
     };
   });
 }

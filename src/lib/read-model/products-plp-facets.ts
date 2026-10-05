@@ -6,12 +6,17 @@ import { CATALOG_SIZE_ORDER } from "@/lib/catalog/catalog.constants";
 import { adminSettingsService } from "@/lib/services/admin/admin-settings.service";
 import { buildListingRowWhere } from "@/lib/read-model/products-plp-read-model-where";
 import type { ListingColorFacetValue } from "@/lib/read-model/product-listing-row-tokens";
-import { fetchAttributeFacetLightRows } from "@/lib/catalog/fetch-attribute-facet-rows";
-import { aggregateAttributeFacets } from "@/lib/catalog/catalog-facet-aggregate";
+import {
+  aggregateAttributeFacetEntries,
+  parseAttributeFacetEntries,
+  type AttributeFacetEntry,
+} from "@/lib/catalog/catalog-attribute-facets";
 import { loadFilterableAttributeMeta } from "@/lib/catalog/load-filterable-attribute-meta";
+import { resolveListingAttributeFacetEntries } from "@/lib/read-model/products-plp-attribute-facets";
 
 type ListingFacetRow = {
   productId: string;
+  attributeFacets: AttributeFacetEntry[] | null;
   brandId: string | null;
   brandName: string | null;
   colorTokens: string[];
@@ -62,29 +67,33 @@ function matchesColorAndSize(row: ListingFacetRow, colors: string[], sizes: stri
 
 type LoadAttributeMeta = typeof loadFilterableAttributeMeta;
 
-export async function getCatalogFacetsFromReadModel(
-  filters: ProductFilters,
-  loadAttributeMeta: LoadAttributeMeta = loadFilterableAttributeMeta,
-) {
-  const query = normalizeCatalogQuery(filters);
-  let stepSize: number | null = null;
-  let stepSizePerCurrency: Record<string, number | undefined> | null = null;
+type PriceStepSettings = {
+  stepSize: number | null;
+  stepSizePerCurrency: Record<string, number | undefined> | null;
+};
+
+async function loadPriceStepSettings(): Promise<PriceStepSettings> {
   try {
     const settings = await adminSettingsService.getPriceFilterSettings();
-    stepSize = settings.stepSize ?? null;
-    stepSizePerCurrency = settings.stepSizePerCurrency
-      ? {
-          USD: settings.stepSizePerCurrency.USD ?? undefined,
-          AMD: settings.stepSizePerCurrency.AMD ?? undefined,
-          RUB: settings.stepSizePerCurrency.RUB ?? undefined,
-          GEL: settings.stepSizePerCurrency.GEL ?? undefined,
-        }
-      : null;
+    return {
+      stepSize: settings.stepSize ?? null,
+      stepSizePerCurrency: settings.stepSizePerCurrency
+        ? {
+            USD: settings.stepSizePerCurrency.USD ?? undefined,
+            AMD: settings.stepSizePerCurrency.AMD ?? undefined,
+            RUB: settings.stepSizePerCurrency.RUB ?? undefined,
+            GEL: settings.stepSizePerCurrency.GEL ?? undefined,
+          }
+        : null,
+    };
   } catch {
-    stepSize = null;
-    stepSizePerCurrency = null;
+    return { stepSize: null, stepSizePerCurrency: null };
   }
+}
 
+async function fetchListingFacetRows(
+  query: CanonicalCatalogQuery,
+): Promise<ListingFacetRow[] | null> {
   const needsBestsellers = query.filter === "bestseller" || query.sort === "bestseller";
   const bestsellerProductIds = needsBestsellers ? await getBestsellerProductIdsRanked() : [];
   const baseQuery: CanonicalCatalogQuery = {
@@ -98,13 +107,7 @@ export async function getCatalogFacetsFromReadModel(
   };
   const where = await buildListingRowWhere(baseQuery, bestsellerProductIds);
   if (where === null) {
-    return {
-      colors: [],
-      sizes: [],
-      brands: [],
-      attributes: [],
-      priceRange: { min: 0, max: 0, hasProducts: false, stepSize, stepSizePerCurrency },
-    };
+    return null;
   }
 
   const rawRows = await db.productListingRow.findMany({
@@ -119,10 +122,12 @@ export async function getCatalogFacetsFromReadModel(
       colors: true,
       priceSort: true,
       hasPrice: true,
+      attributeFacets: true,
     },
   });
-  const rows: ListingFacetRow[] = rawRows.map((row) => ({
+  return rawRows.map((row) => ({
     productId: row.productId,
+    attributeFacets: parseAttributeFacetEntries(row.attributeFacets),
     brandId: row.brandId,
     brandName: row.brandName,
     colorTokens: row.colorTokens,
@@ -132,6 +137,32 @@ export async function getCatalogFacetsFromReadModel(
     priceSort: row.priceSort,
     hasPrice: row.hasPrice,
   }));
+}
+
+/**
+ * Shop sidebar facets from ProductListingRow. Settings, attribute meta and
+ * listing rows load concurrently; attribute facets come from the projected column.
+ */
+export async function getCatalogFacetsFromReadModel(
+  filters: ProductFilters,
+  loadAttributeMeta: LoadAttributeMeta = loadFilterableAttributeMeta,
+) {
+  const query = normalizeCatalogQuery(filters);
+  const [{ stepSize, stepSizePerCurrency }, attributeMeta, rows] = await Promise.all([
+    loadPriceStepSettings(),
+    loadAttributeMeta(query.lang),
+    fetchListingFacetRows(query),
+  ]);
+
+  if (rows === null) {
+    return {
+      colors: [],
+      sizes: [],
+      brands: [],
+      attributes: [],
+      priceRange: { min: 0, max: 0, hasProducts: false, stepSize, stepSizePerCurrency },
+    };
+  }
 
   const priceRows = rows.filter(
     (row) => matchesBrand(row, query) && matchesColorAndSize(row, query.colors, query.sizes),
@@ -145,27 +176,19 @@ export async function getCatalogFacetsFromReadModel(
   const sizeRows = rows.filter(
     (row) => matchesBrand(row, query) && matchesColorAndSize(row, query.colors, []) && matchesPrice(row, query),
   );
-  const attrCandidateIds = rows
-    .filter(
-      (row) =>
-        matchesBrand(row, query) &&
-        matchesColorAndSize(row, query.colors, query.sizes) &&
-        matchesPrice(row, query),
-    )
-    .map((row) => row.productId);
-
-  const [attributeMeta, attrLightRows] = await Promise.all([
-    loadAttributeMeta(query.lang),
-    attrCandidateIds.length > 0
-      ? fetchAttributeFacetLightRows(attrCandidateIds)
-      : Promise.resolve([]),
-  ]);
+  const attrCandidateRows = rows.filter(
+    (row) =>
+      matchesBrand(row, query) &&
+      matchesColorAndSize(row, query.colors, query.sizes) &&
+      matchesPrice(row, query),
+  );
+  const attrEntries = await resolveListingAttributeFacetEntries(attrCandidateRows, query.lang);
 
   return {
     colors: aggregateListingColors(colorRows),
     sizes: aggregateListingSizes(sizeRows),
     brands: aggregateListingBrands(brandRows),
-    attributes: aggregateAttributeFacets(attrLightRows, query.lang, attributeMeta),
+    attributes: aggregateAttributeFacetEntries(attrEntries, attributeMeta),
     priceRange: {
       ...boundsFromRows(priceRows),
       stepSize,

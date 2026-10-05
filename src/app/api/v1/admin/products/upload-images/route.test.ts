@@ -84,6 +84,24 @@ describe("/api/v1/admin/products/upload-images", () => {
     expect(uploadToR2).not.toHaveBeenCalled();
   });
 
+  it("returns 503 instead of inline urls in production when R2 is not configured", async () => {
+    vi.mocked(isR2Configured).mockReturnValue(false);
+    vi.stubEnv("NODE_ENV", "production");
+    const req = new NextRequest("http://localhost:3000/api/v1/admin/products/upload-images", {
+      method: "POST",
+      body: JSON.stringify({
+        images: [TEST_PNG_DATA_URL],
+      }),
+      headers: { "content-type": "application/json" },
+    });
+
+    const res = await POST(req);
+    vi.unstubAllEnvs();
+
+    expect(res.status).toBe(503);
+    expect(uploadToR2).not.toHaveBeenCalled();
+  });
+
   it("uploads via R2 when configured", async () => {
     vi.mocked(isR2Configured).mockReturnValue(true);
     vi.mocked(uploadToR2).mockResolvedValue("https://cdn.example.com/products/image.jpg");

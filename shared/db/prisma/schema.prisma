@@ -4,6 +4,9 @@ generator client {
   output   = "../generated/client"
   // Vercel serverless uses rhel-openssl-3.0.x; "native" keeps local dev (Windows/Linux) engines
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  // Loads nested includes in one SQL query (LATERAL JOIN) instead of one query per relation;
+  // each query costs a full DB round trip, so deep includes were the main latency source.
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -711,6 +714,8 @@ model ProductListingRow {
   colorTokens            String[]  @default([])
   sizeTokens             String[]  @default([])
   variantComboTokens     String[]  @default([])
+  /// Distinct `[attributeKey, displayValue]` pairs for shop attribute facets; null = not projected yet.
+  attributeFacets        Json?
   searchText             String    @default("")
   warrantyYears          Int?
   publishedAt            DateTime?

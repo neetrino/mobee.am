@@ -1,13 +1,18 @@
 import { db } from "@white-shop/db";
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  parseAdminContentLocale,
+} from "@/lib/admin/admin-content-locale";
 import { logger } from "@/lib/utils/logger";
 import { toSlug } from "@/lib/utils/slug";
 import { syncProductListingReadModelByBrand } from "@/lib/read-model/product-read-model-sync";
 
 class AdminBrandsService {
   /**
-   * Get brands for admin
+   * Get brands for admin (names resolved for the requested content locale).
    */
-  async getBrands() {
+  async getBrands(localeInput?: string) {
+    const locale = parseAdminContentLocale(localeInput, DEFAULT_ADMIN_CONTENT_LOCALE);
     const brands = await db.brand.findMany({
       where: {
         deletedAt: null,
@@ -17,9 +22,7 @@ class AdminBrandsService {
         slug: true,
         logoUrl: true,
         translations: {
-          where: { locale: "en" },
-          take: 1,
-          select: { name: true },
+          select: { locale: true, name: true },
         },
       },
       orderBy: {
@@ -33,15 +36,27 @@ class AdminBrandsService {
           id: string;
           slug: string;
           logoUrl: string | null;
-          translations?: Array<{ name: string }>;
+          translations?: Array<{ locale: string; name: string }>;
         }) => {
         const translations = Array.isArray(brand.translations) ? brand.translations : [];
-        const translation = translations[0] || null;
+        const translation =
+          translations.find((row) => row.locale === locale) ||
+          translations.find((row) => row.locale === DEFAULT_ADMIN_CONTENT_LOCALE) ||
+          translations[0] ||
+          null;
+        const names = { hy: "", en: "", ru: "" };
+        for (const row of translations) {
+          if (row.locale === "hy" || row.locale === "en" || row.locale === "ru") {
+            names[row.locale] = row.name;
+          }
+        }
         return {
           id: brand.id,
           name: translation?.name || "",
+          names,
           slug: brand.slug,
           logoUrl: brand.logoUrl,
+          locale,
         };
       }),
     };
@@ -54,8 +69,13 @@ class AdminBrandsService {
     name: string;
     locale?: string;
     logoUrl?: string;
+    names?: Partial<Record<"hy" | "en" | "ru", string>>;
   }) {
-    const locale = data.locale || "en";
+    const locale = parseAdminContentLocale(data.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
+    const namesMap: Partial<Record<"hy" | "en" | "ru", string>> = {
+      ...(data.names || {}),
+      [locale]: data.name,
+    };
     
     // Generate base slug from name (ReDoS-safe)
     const baseSlug = toSlug(data.name);
@@ -91,10 +111,13 @@ class AdminBrandsService {
         logoUrl: data.logoUrl || undefined,
         published: true,
         translations: {
-          create: {
-            locale,
-            name: data.name,
-          },
+          create: (["hy", "en", "ru"] as const)
+            .map((loc) => {
+              const name = (namesMap[loc] || "").trim();
+              if (!name) return null;
+              return { locale: loc, name };
+            })
+            .filter((row): row is { locale: "hy" | "en" | "ru"; name: string } => row !== null),
         },
       },
       include: {
@@ -126,6 +149,7 @@ class AdminBrandsService {
       name?: string;
       locale?: string;
       logoUrl?: string;
+      names?: Partial<Record<"hy" | "en" | "ru", string>>;
     }
   ) {
     logger.info("updateBrand called", { brandId });
@@ -146,37 +170,46 @@ class AdminBrandsService {
       };
     }
 
-    const locale = data.locale || "en";
-    const updateData: any = {};
+    const locale = parseAdminContentLocale(data.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
+    const updateData: { logoUrl?: string | null } = {};
 
     // Update logo URL if provided
     if (data.logoUrl !== undefined) {
       updateData.logoUrl = data.logoUrl || null;
     }
 
-    // Update translation if name is provided
+    const namesToWrite: Partial<Record<"hy" | "en" | "ru", string>> = {
+      ...(data.names || {}),
+    };
     if (data.name !== undefined) {
-      const brandTranslations = Array.isArray(brand.translations) ? brand.translations : [];
-      const existingTranslation = brandTranslations.find(
-        (t: { locale: string }) => t.locale === locale
-      );
+      namesToWrite[locale as "hy" | "en" | "ru"] = data.name;
+    }
 
-      if (existingTranslation) {
-        // Update existing translation
-        await db.brandTranslation.update({
-          where: { id: existingTranslation.id },
-          data: { name: data.name },
-        });
-      } else {
-        // Create new translation
-        await db.brandTranslation.create({
-          data: {
-            brandId: brand.id,
-            locale,
-            name: data.name,
-          },
-        });
+    for (const loc of ["hy", "en", "ru"] as const) {
+      const nextName = namesToWrite[loc];
+      if (nextName === undefined) {
+        continue;
       }
+      const trimmed = nextName.trim();
+      if (!trimmed) {
+        continue;
+      }
+      await db.brandTranslation.upsert({
+        where: {
+          brandId_locale: {
+            brandId: brand.id,
+            locale: loc,
+          },
+        },
+        create: {
+          brandId: brand.id,
+          locale: loc,
+          name: trimmed,
+        },
+        update: {
+          name: trimmed,
+        },
+      });
     }
 
     // Update brand base data if needed

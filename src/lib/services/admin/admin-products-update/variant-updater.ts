@@ -10,6 +10,7 @@ import {
   ownershipError,
   notFoundError,
   processVariantImageUrl,
+  buildVariantMediaFromImageUrl,
 } from "./variant-helpers";
 import type { UpdateVariantInput, VariantsUpdateOps } from "./types";
 
@@ -25,7 +26,7 @@ export async function updateVariantPartial(
 ): Promise<void> {
   const existing = await tx.productVariant.findUnique({
     where: { id: variant.id },
-    select: { id: true, productId: true },
+    select: { id: true, productId: true, media: true },
   });
 
   if (!existing) {
@@ -54,7 +55,9 @@ export async function updateVariantPartial(
     data.published = variant.published;
   }
   if (variant.imageUrl !== undefined) {
-    data.imageUrl = processVariantImageUrl(variant.imageUrl);
+    const processedImageUrl = processVariantImageUrl(variant.imageUrl) ?? null;
+    data.imageUrl = processedImageUrl;
+    data.media = buildVariantMediaFromImageUrl(processedImageUrl, existing.media);
   }
 
   if (variant.options !== undefined) {

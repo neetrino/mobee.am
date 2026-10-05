@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 import { safeParseAdminProductUpdate } from "@/lib/schemas/admin-product-update.schema";
+import { localeFromSearchParams } from "@/lib/admin/admin-content-locale";
+import { buildInlineImageProblem, findInlineImagePath } from "@/lib/security/inline-image-guard";
 import { runApiRoute } from "@/lib/errors/run-api-route";
 import { logger } from "@/lib/utils/logger";
 
@@ -20,7 +22,8 @@ export async function GET(
     }
 
     const { id } = await params;
-    const product = await adminService.getProductById(id);
+    const locale = localeFromSearchParams(req.nextUrl.searchParams);
+    const product = await adminService.getProductById(id, locale);
 
     return NextResponse.json(product);
   });
@@ -42,6 +45,11 @@ export async function PUT(
 
     const { id } = await params;
     const body: unknown = await req.json();
+
+    const inlineImagePath = findInlineImagePath(body);
+    if (inlineImagePath) {
+      return NextResponse.json(buildInlineImageProblem(inlineImagePath, req.url), { status: 400 });
+    }
 
     const parsed = safeParseAdminProductUpdate(body);
     if (!parsed.success) {

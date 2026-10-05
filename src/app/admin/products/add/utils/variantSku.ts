@@ -1,3 +1,5 @@
+import type { GeneratedVariant } from "../types";
+
 export interface ResolveVariantSkuInput {
   databaseVariantId?: string;
   userSku: string;
@@ -45,4 +47,60 @@ export function ensureUniqueSku(sku: string, usedSkus: Set<string>): string {
 
   usedSkus.add(candidate);
   return candidate;
+}
+
+/**
+ * Builds a positional variant SKU: `{slug}-{position}` (e.g. `iphone-15-2`).
+ * Returns an empty string while the slug is not known yet.
+ */
+export function buildVariantSku(slug: string, position: number): string {
+  const base = slug.trim();
+  return base ? `${base}-${position}` : "";
+}
+
+/**
+ * Next free positional SKU for a newly added variant.
+ */
+export function nextVariantSku(slug: string, variants: GeneratedVariant[]): string {
+  const taken = new Set(variants.map((variant) => variant.sku.trim()));
+  let position = variants.length + 1;
+  while (taken.has(buildVariantSku(slug, position))) {
+    position++;
+  }
+  return buildVariantSku(slug, position);
+}
+
+function readAutoSkuPosition(sku: string, slug: string): number | null {
+  const prefix = `${slug.trim()}-`;
+  if (!slug.trim() || !sku.startsWith(prefix)) {
+    return null;
+  }
+  const suffix = sku.slice(prefix.length);
+  return /^\d+$/.test(suffix) ? Number(suffix) : null;
+}
+
+/**
+ * Re-prefixes auto-generated SKUs (`{prevSlug}-{n}` or empty) with the new slug.
+ * Manually edited SKUs are left untouched.
+ */
+export function resyncVariantSkus(
+  variants: GeneratedVariant[],
+  prevSlug: string,
+  nextSlug: string
+): GeneratedVariant[] {
+  let changed = false;
+  const updated = variants.map((variant, index) => {
+    const sku = variant.sku.trim();
+    const position = sku ? readAutoSkuPosition(sku, prevSlug) : index + 1;
+    if (position === null) {
+      return variant;
+    }
+    const nextSku = buildVariantSku(nextSlug, position);
+    if (nextSku === variant.sku) {
+      return variant;
+    }
+    changed = true;
+    return { ...variant, sku: nextSku };
+  });
+  return changed ? updated : variants;
 }

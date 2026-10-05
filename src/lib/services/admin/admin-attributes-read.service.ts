@@ -1,4 +1,8 @@
 import { db } from "@white-shop/db";
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  parseAdminContentLocale,
+} from "@/lib/admin/admin-content-locale";
 import { logger } from "@/lib/utils/logger";
 import {
   getAttributeProductCountMap,
@@ -7,7 +11,9 @@ import {
 import { ensureColorsColumnsExist } from "@/lib/services/admin/admin-attributes-write/migration";
 
 class AdminAttributesReadService {
-  async getAttributes() {
+  async getAttributes(localeInput?: string) {
+    const locale = parseAdminContentLocale(localeInput, DEFAULT_ADMIN_CONTENT_LOCALE);
+
     try {
       await ensureColorsColumnsExist();
     } catch {
@@ -19,13 +25,13 @@ class AdminAttributesReadService {
       attributes = await db.attribute.findMany({
         include: {
           translations: {
-            where: { locale: "en" },
+            where: { locale },
             take: 1,
           },
           values: {
             include: {
               translations: {
-                where: { locale: "en" },
+                where: { locale },
                 take: 1,
               },
             },
@@ -38,15 +44,16 @@ class AdminAttributesReadService {
           position: "asc",
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorObj = error as { code?: string; message?: string };
       // If attribute_values.colors column doesn't exist, fetch without it
-      if (error?.code === 'P2022' || error?.message?.includes('attribute_values.colors') || error?.message?.includes('does not exist')) {
+      if (errorObj?.code === 'P2022' || errorObj?.message?.includes('attribute_values.colors') || errorObj?.message?.includes('does not exist')) {
         logger.warn("attribute_values.colors column not found; fetching without it");
         // Fetch attributes first
         const attributesList = await db.attribute.findMany({
           include: {
             translations: {
-              where: { locale: "en" },
+              where: { locale },
               take: 1,
             },
           },
@@ -57,7 +64,13 @@ class AdminAttributesReadService {
 
         // Fetch values separately without colors and imageUrl using Prisma
         // Try with select first, if it fails (because Prisma tries to select colors), use raw query
-        let allValues: any[];
+        let allValues: Array<{
+          id: string;
+          attributeId: string;
+          value: string;
+          position: number;
+          translations?: Array<{ label: string; attributeValueId?: string }>;
+        }>;
         try {
           allValues = await db.attributeValue.findMany({
             select: {
@@ -66,7 +79,7 @@ class AdminAttributesReadService {
               value: true,
               position: true,
               translations: {
-                where: { locale: "en" },
+                where: { locale },
                 take: 1,
               },
             },
@@ -74,7 +87,7 @@ class AdminAttributesReadService {
               position: "asc",
             },
           });
-        } catch (selectError: any) {
+        } catch {
           // If select also fails, use raw query with correct column name
           // Try with quoted name first, then without quotes
           logger.warn("Using raw query for attribute values");
@@ -87,8 +100,13 @@ class AdminAttributesReadService {
                 av.position
               FROM attribute_values av
               ORDER BY av.position ASC
-            ` as any[];
-          } catch (rawError: any) {
+            ` as Array<{
+              id: string;
+              attributeId: string;
+              value: string;
+              position: number;
+            }>;
+          } catch {
             // If quoted name doesn't work, try without quotes (snake_case)
             logger.warn("Retrying attribute values with snake_case column name");
             allValues = await db.$queryRaw`
@@ -99,39 +117,44 @@ class AdminAttributesReadService {
                 av.position
               FROM attribute_values av
               ORDER BY av.position ASC
-            ` as any[];
+            ` as Array<{
+              id: string;
+              attributeId: string;
+              value: string;
+              position: number;
+            }>;
           }
           
           // Fetch translations separately
-          const valueIds = allValues.map((v: any) => v.id);
+          const valueIds = allValues.map((v) => v.id);
           const valueTranslations = valueIds.length > 0 
             ? await db.attributeValueTranslation.findMany({
                 where: {
                   attributeValueId: { in: valueIds },
-                  locale: "en",
+                  locale,
                 },
               })
             : [];
           
           // Add translations to values
-          allValues = allValues.map((val: any) => ({
+          allValues = allValues.map((val) => ({
             ...val,
-            translations: valueTranslations.filter((t: any) => t.attributeValueId === val.id),
+            translations: valueTranslations.filter((t) => t.attributeValueId === val.id),
           }));
         }
 
         // Combine attributes with their values
-        attributes = attributesList.map((attr: any) => {
+        attributes = attributesList.map((attr) => {
           const attrValues = allValues
-            .filter((val: any) => val.attributeId === attr.id)
-            .map((val: any) => {
+            .filter((val) => val.attributeId === attr.id)
+            .map((val) => {
               return {
                 id: val.id,
                 attributeId: val.attributeId,
                 value: val.value,
                 position: val.position,
-                colors: null, // Add null for compatibility
-                imageUrl: null, // Add null for compatibility
+                colors: null,
+                imageUrl: null,
                 translations: Array.isArray(val.translations) ? val.translations : [],
               };
             });
@@ -183,6 +206,7 @@ class AdminAttributesReadService {
           type: attribute.type,
           filterable: attribute.filterable,
           productCount: attributeProductCounts.get(attribute.id) ?? 0,
+          locale,
           values: values.map((value) => {
             const valueTranslations = Array.isArray(value.translations) ? value.translations : [];
             const valueTranslation = valueTranslations[0] || null;

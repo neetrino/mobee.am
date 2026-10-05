@@ -18,6 +18,7 @@ import {
 } from '../utils/variantImageCollector';
 import { hasVariantsWithAttributes } from '../utils/productTypeDetector';
 import { buildFormData } from '../utils/productFormDataBuilder';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 
 interface UseProductEditModeProps {
   productId: string | null;
@@ -33,6 +34,8 @@ interface UseProductEditModeProps {
   setProductType: (type: 'simple' | 'variable') => void;
   setSimpleProductData: (data: any) => void;
   setSimpleProductDatabaseVariantId: (id: string | undefined) => void;
+  locale: AdminContentLocale;
+  onTranslationsLoaded?: (translations: Record<string, { title: string; slug: string; descriptionHtml: string | null }>) => void;
 }
 
 export function useProductEditMode({
@@ -49,6 +52,8 @@ export function useProductEditMode({
   setProductType,
   setSimpleProductData,
   setSimpleProductDatabaseVariantId,
+  locale,
+  onTranslationsLoaded,
 }: UseProductEditModeProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -59,7 +64,21 @@ export function useProductEditMode({
         try {
           setLoadingProduct(true);
           console.log('📥 [ADMIN] Loading product for edit:', productId);
-          const product = await apiClient.get<ProductData>(`/api/v1/admin/products/${productId}`);
+          const product = await apiClient.get<ProductData>(`/api/v1/admin/products/${productId}?locale=${encodeURIComponent(locale)}`);
+          if (product.translations && onTranslationsLoaded) {
+            onTranslationsLoaded(
+              Object.fromEntries(
+                Object.entries(product.translations).map(([key, value]) => [
+                  key,
+                  {
+                    title: value.title || '',
+                    slug: value.slug || '',
+                    descriptionHtml: value.descriptionHtml || null,
+                  },
+                ]),
+              ),
+            );
+          }
 
           const colorDataMap = new Map<string, ColorData>();
           let firstPrice = '';
@@ -299,5 +318,6 @@ export function useProductEditMode({
     setSimpleProductData,
     setSimpleProductDatabaseVariantId,
     t,
+    onTranslationsLoaded,
   ]);
 }

@@ -3,6 +3,7 @@ import { apiClient } from '@/lib/api-client';
 import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
 import { CURRENCIES, type CurrencyCode } from '@/lib/currency';
 import type { Brand, Category, Attribute } from '../types';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 
 interface UseProductDataLoadingProps {
   setBrands: (brands: Brand[]) => void;
@@ -16,6 +17,7 @@ interface UseProductDataLoadingProps {
   setCategoriesExpanded: (expanded: boolean) => void;
   brandsExpanded: boolean;
   setBrandsExpanded: (expanded: boolean) => void;
+  locale: AdminContentLocale;
 }
 
 export function useProductDataLoading({
@@ -30,6 +32,7 @@ export function useProductDataLoading({
   setCategoriesExpanded,
   brandsExpanded,
   setBrandsExpanded,
+  locale,
 }: UseProductDataLoadingProps) {
   // Close attributes dropdown when clicking outside
   useEffect(() => {
@@ -73,9 +76,9 @@ export function useProductDataLoading({
       try {
         console.log('📥 [ADMIN] Fetching brands, categories, and attributes...');
         const [brandsRes, categoriesRes, attributesRes] = await Promise.all([
-          fetchAdminReference<{ data: Brand[] }>('brands'),
-          fetchAdminReference<{ data: Category[] }>('categories'),
-          apiClient.get<{ data: Attribute[] }>('/api/v1/admin/attributes'),
+          fetchAdminReference<{ data: Brand[] }>('brands', { locale }),
+          fetchAdminReference<{ data: Category[] }>('categories', { locale }),
+          apiClient.get<{ data: Attribute[] }>(`/api/v1/admin/attributes?locale=${encodeURIComponent(locale)}`),
         ]);
         setBrands(brandsRes.data || []);
         setCategories(categoriesRes.data || []);
@@ -132,7 +135,7 @@ export function useProductDataLoading({
       }
     };
     fetchData();
-  }, [setBrands, setCategories, setAttributes]);
+  }, [setBrands, setCategories, setAttributes, locale]);
 
   // Close category dropdown when clicking outside
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
+import { localeFromSearchParams } from "@/lib/admin/admin-content-locale";
 import { runApiRoute } from "@/lib/errors/run-api-route";
 
 /**
@@ -14,7 +15,8 @@ export async function GET(req: NextRequest) {
       return authResult;
     }
 
-    const result = await adminService.getAttributes();
+    const locale = localeFromSearchParams(req.nextUrl.searchParams);
+    const result = await adminService.getAttributes(locale);
     return NextResponse.json(result);
   });
 }

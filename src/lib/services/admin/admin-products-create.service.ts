@@ -346,7 +346,7 @@ class AdminProductsCreateService {
             publishedAt: data.published ? new Date() : undefined,
             translations: {
               create: {
-                locale: data.locale || "en",
+                locale: data.locale || "hy",
                 title: data.title,
                 slug: data.slug,
                 subtitle: data.subtitle || undefined,

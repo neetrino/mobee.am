@@ -3,6 +3,7 @@
 import type { ChangeEvent } from 'react';
 import { processImageFile } from '../../../../../lib/utils/image-utils';
 import type { Variant, GeneratedVariant } from '../types';
+import { uploadProductImages } from '../utils/uploadProductImages';
 
 interface UseImageHandlingProps {
   imageUrls: string[];
@@ -210,9 +211,10 @@ export function useImageHandling({
       return;
     }
 
-    const file = files[0];
-    if (!file.type.startsWith('image/')) {
-      setImageUploadError(`"${file.name}" is not an image file`);
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+    const nonImageFile = files.find((file) => !file.type.startsWith('image/'));
+    if (imageFiles.length === 0) {
+      setImageUploadError(`"${nonImageFile?.name ?? ''}" is not an image file`);
       if (event.target) {
         event.target.value = '';
       }
@@ -220,27 +222,33 @@ export function useImageHandling({
     }
 
     setImageUploadLoading(true);
-    setImageUploadError(null);
+    setImageUploadError(nonImageFile ? `"${nonImageFile.name}" is not an image file` : null);
     try {
-      console.log('🖼️ [VARIANT IMAGE] Processing variant image:', {
-        variantId,
-        fileName: file.name,
-        originalSize: `${Math.round(file.size / 1024)}KB`,
-      });
+      const dataUrls = await Promise.all(
+        imageFiles.map((file) =>
+          processImageFile(file, {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            fileType: 'image/jpeg',
+            initialQuality: 0.8,
+          })
+        )
+      );
+      const uploadedUrls = await uploadProductImages(dataUrls);
 
-      const base64 = await processImageFile(file, {
-        maxSizeMB: 2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        fileType: 'image/jpeg',
-        initialQuality: 0.8,
-      });
-
-      setGeneratedVariants((prev) => prev.map((v) => (v.id === variantId ? { ...v, image: base64 } : v)));
-      console.log('✅ [VARIANT BUILDER] Variant image uploaded and processed for variant:', variantId);
-    } catch (error: any) {
-      console.error('❌ [VARIANT IMAGE] Error processing variant image:', error);
-      setImageUploadError(error?.message || t('admin.products.add.failedToProcessImage'));
+      setGeneratedVariants((prev) =>
+        prev.map((v) =>
+          v.id === variantId
+            ? { ...v, images: [...v.images, ...uploadedUrls.filter((url) => !v.images.includes(url))] }
+            : v
+        )
+      );
+    } catch (error: unknown) {
+      console.error('❌ [VARIANT IMAGE] Error uploading variant images:', error);
+      setImageUploadError(
+        error instanceof Error && error.message ? error.message : t('admin.products.add.failedToProcessImage')
+      );
     } finally {
       setImageUploadLoading(false);
       if (event.target) {

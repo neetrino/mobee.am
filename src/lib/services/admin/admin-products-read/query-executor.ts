@@ -2,27 +2,35 @@ import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 import {
   PRODUCT_VARIANT_DB_SELECT,
+  PRODUCT_VARIANT_DISPLAY_ORDER,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
 } from "@/lib/database/productVariantDb.constants";
 import { ensureProductVariantAttributesColumn } from "../../../utils/db-ensure";
 import { logger } from "../../../utils/logger";
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  parseAdminContentLocale,
+} from "@/lib/admin/admin-content-locale";
 
 /**
  * Base include configuration for product list queries
  */
-const getProductListInclude = () => ({
-  translations: {
-    where: { locale: "en" },
-    take: 1,
-  },
-  variants: {
-    where: { published: true },
-    take: 1,
-    orderBy: { price: "asc" as const },
-    select: PRODUCT_VARIANT_DB_SELECT,
-  },
-  labels: true,
-});
+const getProductListInclude = (localeInput?: string) => {
+  const locale = parseAdminContentLocale(localeInput, DEFAULT_ADMIN_CONTENT_LOCALE);
+  return {
+    translations: {
+      where: { locale },
+      take: 1,
+    },
+    variants: {
+      where: { published: true },
+      take: 1,
+      orderBy: { price: "asc" as const },
+      select: PRODUCT_VARIANT_DB_SELECT,
+    },
+    labels: true,
+  };
+};
 
 /**
  * Base include configuration for product detail queries
@@ -41,9 +49,7 @@ const getProductDetailInclude = () => ({
   },
   variants: {
     select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
-    orderBy: {
-      position: "asc" as const,
-    },
+    orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
   },
   labels: true,
 });
@@ -86,9 +92,11 @@ export async function executeProductListQuery(
   where: Prisma.ProductWhereInput,
   orderBy: Prisma.ProductOrderByWithRelationInput,
   skip: number,
-  take: number
+  take: number,
+  localeInput?: string,
 ) {
   const queryStartTime = Date.now();
+  const listInclude = getProductListInclude(localeInput);
   
   try {
     logger.debug('Fetching products...');
@@ -97,7 +105,7 @@ export async function executeProductListQuery(
       skip,
       take,
       orderBy,
-      include: getProductListInclude(),
+      include: listInclude,
     });
     
     const productsTime = Date.now() - queryStartTime;
@@ -140,7 +148,7 @@ export async function executeProductListQuery(
           skip,
           take,
           orderBy,
-          include: getProductListInclude(),
+          include: listInclude,
         });
         
         const productsTime = Date.now() - queryStartTime;

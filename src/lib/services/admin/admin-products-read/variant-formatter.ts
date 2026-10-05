@@ -5,6 +5,7 @@
 
 import { mergeAdminVariantAttributes } from "./variant-formatter-attributes";
 import type { AdminVariantOption } from "./variant-formatter-attributes";
+import { extractVariantMediaUrls } from "../admin-products-update/variant-helpers";
 
 export function formatVariantForAdmin(variant: {
   id: string;
@@ -13,6 +14,7 @@ export function formatVariantForAdmin(variant: {
   stock: number;
   sku: string | null;
   imageUrl: string | null;
+  media?: unknown;
   published: boolean | null;
   attributes: unknown;
   options?: AdminVariantOption[];
@@ -32,6 +34,7 @@ export function formatVariantForAdmin(variant: {
     color: merged.color,
     size: merged.size,
     imageUrl: variant.imageUrl || "",
+    media: extractVariantMediaUrls(variant.media),
     published: variant.published || false,
     attributes: merged.attributes,
     options,

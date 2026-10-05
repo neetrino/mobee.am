@@ -3,6 +3,9 @@ import { invalidateProductReadCaches } from "@/lib/services/read-through-json-ca
 import { AppError } from "@/lib/errors/app-error";
 import { logger } from "@/lib/utils/logger";
 
+/** Soft-deleted products must not block deletion (matches admin product counts). */
+const ACTIVE_VARIANT_FILTER = { variant: { product: { deletedAt: null } } } as const;
+
 function scheduleCacheInvalidation(context: Record<string, string>): void {
   void invalidateProductReadCaches().catch((error: unknown) => {
     logger.error("Attribute delete cache invalidation failed", {
@@ -57,7 +60,7 @@ class AdminAttributesDeleteService {
       if (db.productAttribute) {
         try {
           productAttributesCount = await db.productAttribute.count({
-            where: { attributeId },
+            where: { attributeId, product: { deletedAt: null } },
           });
           logger.info('📊 [ADMIN ATTRIBUTES DELETE SERVICE] Product attributes count:', { value: productAttributesCount });
         } catch (countError: any) {
@@ -69,7 +72,7 @@ class AdminAttributesDeleteService {
           // Եթե count-ը չի աշխատում, փորձում ենք findMany-ով
           try {
             const productAttributes = await db.productAttribute.findMany({
-              where: { attributeId },
+              where: { attributeId, product: { deletedAt: null } },
               select: { id: true },
             });
             productAttributesCount = productAttributes.length;
@@ -111,6 +114,7 @@ class AdminAttributesDeleteService {
           variantOptionsCount = await db.productVariantOption.count({
             where: {
               valueId: { in: valueIds },
+              ...ACTIVE_VARIANT_FILTER,
             },
           });
           logger.info('📊 [ADMIN ATTRIBUTES DELETE SERVICE] Variant options count:', { value: variantOptionsCount });
@@ -124,6 +128,7 @@ class AdminAttributesDeleteService {
           const variantOptions = await db.productVariantOption.findMany({
             where: {
               valueId: { in: valueIds },
+              ...ACTIVE_VARIANT_FILTER,
             },
             select: { id: true },
           });
@@ -209,6 +214,7 @@ class AdminAttributesDeleteService {
       const variantOptionsCount = await db.productVariantOption.count({
         where: {
           valueId: attributeValueId,
+          ...ACTIVE_VARIANT_FILTER,
         },
       });
 

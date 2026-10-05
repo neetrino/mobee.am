@@ -1,6 +1,9 @@
 import { db, Prisma } from "@white-shop/db";
 import { loadProductDiscountContext } from "@/lib/services/products-find-transform.service";
-import { PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL } from "@/lib/database/productVariantDb.constants";
+import {
+  PRODUCT_VARIANT_DISPLAY_ORDER,
+  PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
+} from "@/lib/database/productVariantDb.constants";
 import {
   buildProductListingRowsForLocales,
   type CategoryAncestry,
@@ -72,6 +75,7 @@ const listingSelect = {
   },
   variants: {
     where: { published: true },
+    orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
     select: {
       ...PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
       media: true,
@@ -90,6 +94,7 @@ function toListingCreateManyData(
     ...row,
     labels: (row.labels ?? []) as Prisma.InputJsonValue,
     colors: row.colors as Prisma.InputJsonValue,
+    attributeFacets: row.attributeFacets as Prisma.InputJsonValue,
   }));
 }
 

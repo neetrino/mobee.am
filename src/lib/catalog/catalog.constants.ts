@@ -63,6 +63,12 @@ export const CATALOG_NEW_ARRIVAL_DAYS = 30;
 export const CATALOG_ATTRIBUTE_COLOR = "color";
 export const CATALOG_ATTRIBUTE_SIZE = "size";
 
+/** Import bookkeeping keys stored in variant JSONB; never shown as shop facets. */
+export const CATALOG_NON_FACET_ATTRIBUTE_KEYS: ReadonlySet<string> = new Set([
+  "source_sku",
+  "model_code",
+]);
+
 export const CATALOG_EMPTY_TOKENS = ["undefined", "null"] as const;
 
 export const CATALOG_KNOWN_FILTERS = ["new", "featured", "bestseller"] as const;
@@ -77,6 +83,6 @@ export const CATALOG_SIZE_ORDER = [
   "XXXL",
 ] as const;
 
-export const CATALOG_LIST_CACHE_PREFIX = "cache:products:plp:v1";
+export const CATALOG_LIST_CACHE_PREFIX = "cache:products:plp:v2";
 /** v2: facet payload includes generic `attributes` (storage/sim/…). */
 export const CATALOG_FILTERS_CACHE_PREFIX = "cache:products:filters:v2";

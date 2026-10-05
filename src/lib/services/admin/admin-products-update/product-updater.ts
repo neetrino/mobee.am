@@ -167,7 +167,7 @@ export async function updateProductTranslation(
     return;
   }
 
-  const locale = ops.locale || "en";
+  const locale = ops.locale || "hy";
   await tx.productTranslation.upsert({
     where: {
       productId_locale: {

@@ -2,6 +2,7 @@ import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 import {
   PRODUCT_VARIANT_DB_SELECT,
+  PRODUCT_VARIANT_DISPLAY_ORDER,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
 } from "@/lib/database/productVariantDb.constants";
@@ -42,6 +43,7 @@ function getListingInclude(ctx: QueryExecutionContext) {
     },
     variants: {
       where: { published: true },
+      orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
       select: {
         ...PRODUCT_VARIANT_DB_SELECT,
         options: {
@@ -103,6 +105,7 @@ const getBaseInclude = () => ({
     where: {
       published: true,
     },
+    orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
     select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
   },
   labels: true,
@@ -122,6 +125,7 @@ const getBaseIncludeWithoutAttributeValue = () => ({
     where: {
       published: true,
     },
+    orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
     select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
   },
 });
@@ -356,6 +360,7 @@ async function executeWithoutAttributeValue(
       ...getListingInclude(ctx),
       variants: {
         where: { published: true },
+        orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
         select: {
           ...PRODUCT_VARIANT_DB_SELECT,
           options: true,

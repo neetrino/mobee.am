@@ -1,10 +1,35 @@
 import { logger } from "../../../utils/logger";
 import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  parseAdminContentLocale,
+  type AdminContentLocale,
+} from "@/lib/admin/admin-content-locale";
 import type { ProductFilters } from "./types";
 import { buildProductWhereClause, buildProductOrderByClause } from "./query-builder";
 import { executeProductListQuery, executeProductDetailQuery } from "./query-executor";
 import { formatProductForList } from "./product-formatter";
 import { formatVariantForAdmin } from "./variant-formatter";
+
+type ProductTranslationRow = {
+  locale: string;
+  title?: string;
+  slug?: string;
+  subtitle?: string | null;
+  descriptionHtml?: string | null;
+};
+
+function pickTranslation(
+  translations: ProductTranslationRow[],
+  locale: AdminContentLocale,
+): ProductTranslationRow | null {
+  return (
+    translations.find((row) => row.locale === locale) ||
+    translations.find((row) => row.locale === DEFAULT_ADMIN_CONTENT_LOCALE) ||
+    translations[0] ||
+    null
+  );
+}
 
 /**
  * Get products for admin
@@ -12,6 +37,7 @@ import { formatVariantForAdmin } from "./variant-formatter";
 export async function getProducts(filters: ProductFilters) {
   logger.info('getProducts called with filters', { filters });
   const startTime = Date.now();
+  const locale = parseAdminContentLocale(filters.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
   
   const page = filters.page || 1;
   const limit = filters.limit || 20;
@@ -22,7 +48,7 @@ export async function getProducts(filters: ProductFilters) {
 
   logger.debug('Executing database queries...', { where: JSON.stringify(where, null, 2) });
 
-  const { products, total } = await executeProductListQuery(where, orderBy, skip, limit);
+  const { products, total } = await executeProductListQuery(where, orderBy, skip, limit, locale);
 
   const data = products.map(formatProductForList);
 
@@ -36,6 +62,7 @@ export async function getProducts(filters: ProductFilters) {
       page,
       limit,
       totalPages: Math.ceil(total / limit),
+      locale,
     },
   };
 }
@@ -43,7 +70,8 @@ export async function getProducts(filters: ProductFilters) {
 /**
  * Get product by ID
  */
-export async function getProductById(productId: string) {
+export async function getProductById(productId: string, localeInput?: string) {
+  const locale = parseAdminContentLocale(localeInput, DEFAULT_ADMIN_CONTENT_LOCALE);
   const product = await executeProductDetailQuery(productId);
 
   if (!product) {
@@ -55,22 +83,17 @@ export async function getProductById(productId: string) {
     };
   }
 
-  // Безопасное получение translation с проверкой на существование массива
   const productWithRelations = product as typeof product & {
-    translations?: Array<{ locale: string; title?: string; slug?: string; subtitle?: string | null; descriptionHtml?: string | null }>;
+    translations?: ProductTranslationRow[];
     labels?: Array<{ id: string; type: string; value: string; position: string; color: string | null }>;
     variants?: Array<unknown>;
   };
   const translations = Array.isArray(productWithRelations.translations) ? productWithRelations.translations : [];
-  const translation = translations.find((t: { locale: string }) => t.locale === "en") || translations[0] || null;
+  const translation = pickTranslation(translations, locale);
 
-  // Безопасное получение labels с проверкой на существование массива
   const labels = Array.isArray(productWithRelations.labels) ? productWithRelations.labels : [];
-  
-  // Безопасное получение variants с проверкой на существование массива
   const variants = Array.isArray(productWithRelations.variants) ? productWithRelations.variants : [];
   
-  // Get all attribute IDs from productAttributes relation
   const productAttributes = Array.isArray((product as { productAttributes?: unknown[] }).productAttributes)
     ? (product as unknown as { productAttributes: Array<{ attributeId?: string; attribute?: { id: string } }> }).productAttributes
     : [];
@@ -78,27 +101,41 @@ export async function getProductById(productId: string) {
     .map((pa) => pa.attributeId || pa.attribute?.id)
     .filter((id): id is string => !!id);
   
-  // Also include attributeIds from product.attributeIds if available (backward compatibility)
   const legacyAttributeIds = Array.isArray((product as { attributeIds?: unknown[] }).attributeIds)
     ? (product as { attributeIds: string[] }).attributeIds
     : [];
   
-  // Merge both sources and remove duplicates
   const allAttributeIds = Array.from(new Set([...attributeIds, ...legacyAttributeIds]));
+
+  const translationsByLocale = Object.fromEntries(
+    translations.map((row) => [
+      row.locale,
+      {
+        title: row.title || "",
+        slug: row.slug || "",
+        subtitle: row.subtitle || null,
+        descriptionHtml: row.descriptionHtml || null,
+      },
+    ]),
+  );
 
   return {
     id: product.id,
+    locale,
     title: translation?.title || "",
     slug: translation?.slug || "",
     subtitle: translation?.subtitle || null,
     descriptionHtml: translation?.descriptionHtml || null,
+    translations: translationsByLocale,
     brandId: product.brandId || null,
     primaryCategoryId: product.primaryCategoryId || null,
     categoryIds: product.categoryIds || [],
-    attributeIds: allAttributeIds, // All attribute IDs that this product has
+    attributeIds: allAttributeIds,
     published: product.published,
     featured: product.featured ?? false,
-    warrantyYears: normalizeProductWarrantyYears(product.warrantyYears),
+    warrantyYears: normalizeProductWarrantyYears(
+      (product as { warrantyYears?: number | null }).warrantyYears,
+    ),
     media: Array.isArray(product.media) ? product.media : [],
     labels: labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({
       id: label.id,
@@ -110,7 +147,3 @@ export async function getProductById(productId: string) {
     variants: variants.map((v) => formatVariantForAdmin(v as Parameters<typeof formatVariantForAdmin>[0])),
   };
 }
-
-
-
-

@@ -76,7 +76,7 @@ async function runProductUpdateTransaction(
         await applyVariantOperations(
           ops.variants,
           productId,
-          ops.locale || "en",
+          ops.locale || "hy",
           tx
         );
       }
@@ -143,7 +143,7 @@ export async function updateProduct(
         id: productId,
         updatedAt: existing.updatedAt,
         didUpdate: false,
-        productSlug: await fetchProductSlug(productId, ops.locale || "en"),
+        productSlug: await fetchProductSlug(productId, ops.locale || "hy"),
       };
     }
 
@@ -177,7 +177,7 @@ export async function updateProduct(
 
     const productSlug =
       ops.basic?.slug ||
-      (await fetchProductSlug(productId, ops.locale || "en"));
+      (await fetchProductSlug(productId, ops.locale || "hy"));
 
     return {
       success: true,

@@ -1,7 +1,10 @@
+import type { AdminLocaleTextMap } from '@/lib/admin/admin-content-locale';
+
 export interface Category {
   id: string;
   slug: string;
   title: string;
+  titles?: AdminLocaleTextMap;
   parentId: string | null;
   position?: number;
   requiresSizes?: boolean;
@@ -16,11 +19,10 @@ export interface CategoryWithLevel extends Category {
 }
 
 export interface CategoryFormData {
-  title: string;
+  titles: AdminLocaleTextMap;
   slug: string;
   parentId: string;
   requiresSizes: boolean;
   subcategoryIds: string[];
   imageUrl: string | null;
 }
-

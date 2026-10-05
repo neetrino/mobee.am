@@ -9,7 +9,7 @@ export interface EditableVariantSnapshot {
   compareAtPrice: string;
   stock: string;
   sku: string;
-  image: string | null;
+  images: string[];
   published: boolean;
 }
 
@@ -90,7 +90,7 @@ function normalizeVariant(variant: GeneratedVariant): EditableVariantSnapshot {
     compareAtPrice: variant.compareAtPrice.trim(),
     stock: variant.stock.trim(),
     sku: variant.sku.trim(),
-    image: variant.image,
+    images: [...variant.images],
     published: true,
   };
 }

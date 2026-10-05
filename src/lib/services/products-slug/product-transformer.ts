@@ -13,6 +13,7 @@ import { hasDisplayPrice } from "../../products/variant-price-display";
 import { pickCategoryTranslation } from "../../pickCategoryTranslation";
 import { localizeCategoryTitle } from "../../category-title-i18n";
 import { pickProductTranslation } from "../../products/pickProductTranslation";
+import { localizeProductTitle } from "../../product-title-i18n";
 import type { LanguageCode } from "../../language";
 
 function normalizeAttributeValueColors(colors: unknown): string[] | null {
@@ -234,14 +235,6 @@ function transformVariants(
 
       const variantImageUrl = transformVariantImageUrl(variant);
       const variantMedia = transformVariantMedia(variant);
-      
-      if (variantImageUrl) {
-        logger.debug('Variant has imageUrl', {
-          variantId: variant.id,
-          sku: variant.sku,
-          imageUrl: variantImageUrl.substring(0, 50) + (variantImageUrl.length > 50 ? '...' : ''),
-        });
-      }
 
       return {
         id: variant.id,
@@ -396,7 +389,7 @@ export async function transformProduct(
   return {
     id: product.id,
     slug: translation?.slug || "",
-    title: translation?.title || "",
+    title: localizeProductTitle(translation?.title || "", lang),
     subtitle: translation?.subtitle || null,
     description: translation?.descriptionHtml || null,
     sourceDescription: hyTranslation?.descriptionHtml || null,

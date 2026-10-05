@@ -64,12 +64,21 @@ export interface ProductLabel {
   color?: string | null;
 }
 
+export interface ProductTranslationFields {
+  title: string;
+  slug: string;
+  subtitle?: string | null;
+  descriptionHtml?: string | null;
+}
+
 export interface ProductData {
   id: string;
+  locale?: string;
   title: string;
   slug: string;
   subtitle?: string;
   descriptionHtml?: string;
+  translations?: Record<string, ProductTranslationFields>;
   brandId?: string | null;
   primaryCategoryId?: string | null;
   categoryIds?: string[];
@@ -100,7 +109,7 @@ export interface GeneratedVariant {
   compareAtPrice: string;
   stock: string;
   sku: string;
-  image: string | null;
+  images: string[];
 }
 
 

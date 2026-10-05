@@ -9,6 +9,7 @@ import {
 } from './filterAttributesBySearch';
 import { useAttributes } from './useAttributes';
 import { ValueEditForm } from './ValueEditForm';
+import { DEFAULT_ADMIN_CONTENT_LOCALE } from '@/lib/admin/admin-content-locale';
 
 export function AttributesPageContent() {
   const { t } = useTranslation();
@@ -54,7 +55,7 @@ export function AttributesPageContent() {
     handleRemoveImage,
     handleSaveInlineValue,
     toggleExpand,
-  } = useAttributes();
+  } = useAttributes(DEFAULT_ADMIN_CONTENT_LOCALE);
 
   const [searchQuery, setSearchQuery] = useState('');
   const hasActiveSearch = searchQuery.trim().length > 0;

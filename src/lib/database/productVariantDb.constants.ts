@@ -24,6 +24,16 @@ export const PRODUCT_VARIANT_DB_SELECT = {
   updatedAt: true,
 } satisfies Prisma.ProductVariantSelect;
 
+/**
+ * Deterministic variant order (admin `position`, then creation). Without an explicit
+ * order PostgreSQL returns rows in arbitrary order, which reshuffles card swatches.
+ */
+export const PRODUCT_VARIANT_DISPLAY_ORDER = [
+  { position: "asc" },
+  { createdAt: "asc" },
+  { id: "asc" },
+] satisfies Prisma.ProductVariantOrderByWithRelationInput[];
+
 export const PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL = {
   ...PRODUCT_VARIANT_DB_SELECT,
   media: true,

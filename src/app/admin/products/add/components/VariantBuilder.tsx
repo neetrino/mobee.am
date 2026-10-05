@@ -6,6 +6,8 @@ import { useTranslation } from '../../../../../lib/i18n-client';
 import { getColorHex } from '../../../../../lib/colorMap';
 import { CURRENCIES, type CurrencyCode } from '../../../../../lib/currency';
 import type { Attribute, GeneratedVariant } from '../types';
+import { buildVariantSku } from '../utils/variantSku';
+import { VariantImagesCell } from './VariantImagesCell';
 
 interface VariantBuilderProps {
   generatedVariants: GeneratedVariant[];
@@ -112,33 +114,9 @@ export function VariantBuilder({
                   onClick={() => {
                     const skuPrefix = prompt(t('admin.products.add.enterSkuPrefix'));
                     if (skuPrefix !== null) {
-                      const baseSlug = skuPrefix || slug || generateSlug(title) || 'PROD';
+                      const baseSlug = skuPrefix.trim() || slug || generateSlug(title);
                       onVariantUpdate((prev) =>
-                        prev.map((variant) => {
-                          const valueParts: string[] = [];
-                          Array.from(selectedAttributesForVariants).forEach((attributeId) => {
-                            const attribute = attributes.find((a) => a.id === attributeId);
-                            if (!attribute) return;
-
-                            const selectedIds = variant.selectedValueIds.filter((id) =>
-                              attribute.values.some((v) => v.id === id)
-                            );
-
-                            selectedIds.forEach((valueId) => {
-                              const value = attribute.values.find((v) => v.id === valueId);
-                              if (value) {
-                                valueParts.push(value.value.toUpperCase().replace(/\s+/g, '-'));
-                              }
-                            });
-                          });
-
-                          const sku =
-                            valueParts.length > 0
-                              ? `${baseSlug.toUpperCase()}-${valueParts.join('-')}`
-                              : `${baseSlug.toUpperCase()}`;
-
-                          return { ...variant, sku };
-                        })
+                        prev.map((variant, index) => ({ ...variant, sku: buildVariantSku(baseSlug, index + 1) }))
                       );
                     }
                   }}
@@ -324,61 +302,26 @@ export function VariantBuilder({
                             className="w-24 text-xs"
                           />
                         </td>
-                        <td className="px-2 py-2 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            {variant.image ? (
-                              <div className="relative inline-block">
-                                <img
-                                  src={variant.image}
-                                  alt="Variant image"
-                                  className="w-12 h-12 object-cover border border-gray-300 rounded-supersudo"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    onVariantUpdate((prev) =>
-                                      prev.map((v) => (v.id === variant.id ? { ...v, image: null } : v))
-                                    );
-                                    if (variantImageInputRefs.current?.[variant.id]) {
-                                      variantImageInputRefs.current[variant.id]!.value = '';
-                                    }
-                                  }}
-                                  className="absolute -right-1 -top-1 rounded-full bg-admin-500 p-0.5 text-white transition-colors hover:bg-admin-600"
-                                  title={t('admin.products.add.removeImage')}
-                                >
-                                  <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                  </svg>
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => variantImageInputRefs.current?.[variant.id]?.click()}
-                                disabled={imageUploadLoading}
-                                className="flex cursor-pointer items-center gap-1 rounded-supersudo border border-admin-500 bg-admin-500 px-2 py-1 text-xs font-medium text-white shadow-sm hover:border-admin-600 hover:bg-admin-600 focus:outline-none focus:ring-2 focus:ring-admin-400 focus:ring-offset-1 disabled:cursor-default disabled:opacity-50"
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                </svg>
-                                <span className="hidden sm:inline">
-                                  {imageUploadLoading ? t('admin.products.add.uploading') : t('admin.products.add.uploadImage')}
-                                </span>
-                                <span className="sm:hidden">+</span>
-                              </button>
-                            )}
-                            <input
-                              ref={(el) => {
-                                if (variantImageInputRefs.current) {
-                                  variantImageInputRefs.current[variant.id] = el;
-                                }
-                              }}
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => onVariantImageUpload(variant.id, e)}
-                              className="hidden"
-                            />
-                          </div>
+                        <td className="px-2 py-2">
+                          <VariantImagesCell
+                            variantId={variant.id}
+                            images={variant.images}
+                            imageUploadLoading={imageUploadLoading}
+                            inputRef={(el) => {
+                              if (variantImageInputRefs.current) {
+                                variantImageInputRefs.current[variant.id] = el;
+                              }
+                            }}
+                            onPickFiles={() => variantImageInputRefs.current?.[variant.id]?.click()}
+                            onUpload={onVariantImageUpload}
+                            onRemove={(imageUrl) => {
+                              onVariantUpdate((prev) =>
+                                prev.map((v) =>
+                                  v.id === variant.id ? { ...v, images: v.images.filter((img) => img !== imageUrl) } : v
+                                )
+                              );
+                            }}
+                          />
                         </td>
                         <td className="px-2 py-2 whitespace-nowrap">
                           <button

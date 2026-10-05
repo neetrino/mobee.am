@@ -832,6 +832,12 @@
     "saving": "Պահվում է...",
     "back": "Վերադառնալ",
     "backToAdmin": "Վերադառնալ ադմինիստրատորի վահան",
-    "unknownErrorFallback": "Անհայտ սխալ"
+    "unknownErrorFallback": "Անհայտ սխալ",
+    "translations": "Թարգմանություններ",
+    "sharedSlugHint": "Slug-ը նույնն է բոլոր լեզուների համար։",
+    "contentLocale": "Կոնտենտի լեզու",
+    "contentLocaleHint": "Փոխի՛ր լեզուն՝ թարգմանությունները խմբագրելու համար։ Պահպանումը գրում է միայն ակտիվ լեզուն։",
+    "contentLocaleHintNames": "Անուններն ու պիտակները պահվում են ընտրված լեզվով։",
+    "contentLocaleHintProduct": "Վերնագիրը, slug-ը և նկարագրությունը պահվում են ընտրված լեզվով։"
   }
 }

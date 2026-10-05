@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { apiClient } from '../../../../../lib/api-client';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import type { Attribute } from '../types';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 
 interface UseProductAttributeHandlersProps {
   attributes: Attribute[];
   setAttributes: (updater: (prev: Attribute[]) => Attribute[]) => void;
   getColorAttribute: () => Attribute | undefined;
   getSizeAttribute: () => Attribute | undefined;
+  locale: AdminContentLocale;
 }
 
 export function useProductAttributeHandlers({
@@ -15,6 +17,7 @@ export function useProductAttributeHandlers({
   setAttributes,
   getColorAttribute,
   getSizeAttribute,
+  locale,
 }: UseProductAttributeHandlersProps) {
   const { t } = useTranslation();
   const [newColorName, setNewColorName] = useState('');
@@ -41,7 +44,7 @@ export function useProductAttributeHandlers({
       setAddingColor(true);
       const response = await apiClient.post<{ data: Attribute }>(`/api/v1/admin/attributes/${colorAttribute.id}/values`, {
         label: newColorName.trim(),
-        locale: 'en',
+        locale,
       });
       
       if (response.data) {
@@ -78,7 +81,7 @@ export function useProductAttributeHandlers({
       setAddingSize(true);
       const response = await apiClient.post<{ data: Attribute }>(`/api/v1/admin/attributes/${sizeAttribute.id}/values`, {
         label: newSizeName.trim(),
-        locale: 'en',
+        locale,
       });
       
       if (response.data) {

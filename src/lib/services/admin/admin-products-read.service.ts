@@ -15,8 +15,8 @@ class AdminProductsReadService {
   /**
    * Get product by ID
    */
-  async getProductById(productId: string) {
-    return getProductById(productId);
+  async getProductById(productId: string, locale?: string) {
+    return getProductById(productId, locale);
   }
 }
 
