@@ -1,4 +1,8 @@
 import { db } from "@white-shop/db";
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  parseAdminContentLocale,
+} from "@/lib/admin/admin-content-locale";
 import { logger } from "../../../utils/logger";
 import { ensureColorsColumnsExist } from "./migration";
 import { formatAttribute } from "./utils";
@@ -25,7 +29,7 @@ export async function addAttributeValue(
     };
   }
 
-  const locale = data.locale || "en";
+  const locale = parseAdminContentLocale(data.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
 
   // Use label as value (normalized)
   const value = data.label.trim().toLowerCase().replace(/\s+/g, '-');
@@ -140,7 +144,7 @@ export async function updateAttributeValue(
     };
   }
 
-  const locale = data.locale || "en";
+  const locale = parseAdminContentLocale(data.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
   const updateData: {
     colors?: string[];
     imageUrl?: string | null;

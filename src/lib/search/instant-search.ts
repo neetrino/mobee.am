@@ -1,6 +1,6 @@
 import { db } from "@white-shop/db";
 import type { Prisma } from "@white-shop/db";
-import { buildSearchWhere } from "@/lib/catalog/search-where";
+import { buildListingRowSearchWhere, buildSearchWhere } from "@/lib/catalog/search-where";
 import { localizeCategoryTitle } from "@/lib/category-title-i18n";
 import { DEFAULT_LANGUAGE, type LanguageCode } from "@/lib/language";
 import { pickCategoryTranslation } from "@/lib/pickCategoryTranslation";
@@ -61,11 +61,7 @@ function listingSearchWhere(
     locale,
     isPublished: true,
     deletedAt: null,
-    OR: [
-      { searchText: { contains: term, mode: "insensitive" } },
-      { title: { contains: term, mode: "insensitive" } },
-      { slug: { contains: term, mode: "insensitive" } },
-    ],
+    ...buildListingRowSearchWhere(term),
   };
 }
 

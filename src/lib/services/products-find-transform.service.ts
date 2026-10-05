@@ -14,6 +14,7 @@ import {
 import { pickCategoryTranslation } from "../pickCategoryTranslation";
 import { localizeCategoryTitle } from "../category-title-i18n";
 import { pickProductTranslation } from "../products/pickProductTranslation";
+import { localizeProductTitle } from "../product-title-i18n";
 import type { LanguageCode } from "../language";
 
 import { CATALOG_DISCOUNT_CACHE_KEY } from "@/lib/catalog/catalog.constants";
@@ -311,7 +312,7 @@ class ProductsFindTransformService {
       return {
         id: product.id,
         slug: translation?.slug || "",
-        title: translation?.title || "",
+        title: localizeProductTitle(translation?.title || "", lang),
         subtitle: translation?.subtitle || "",
         primaryCategoryId: product.primaryCategoryId ?? null,
         categoryIds: Array.isArray(product.categoryIds) ? [...product.categoryIds] : [],

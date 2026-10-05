@@ -3,10 +3,14 @@
 import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
+import { AdminTranslationTabs } from '../../../components/AdminTranslationTabs';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 
 interface BasicInformationProps {
   productType: 'simple' | 'variable';
   setProductType: (type: 'simple' | 'variable') => void;
+  translationLocale: AdminContentLocale;
+  onTranslationLocaleChange: (locale: AdminContentLocale) => void;
   title: string;
   slug: string;
   descriptionHtml: string;
@@ -19,6 +23,8 @@ interface BasicInformationProps {
 export function BasicInformation({
   productType,
   setProductType,
+  translationLocale,
+  onTranslationLocaleChange,
   title,
   slug,
   descriptionHtml,
@@ -41,10 +47,17 @@ export function BasicInformation({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.products.add.basicInformation')}</h2>
+      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+        {t('admin.products.add.basicInformation')}
+      </h2>
       <div className="space-y-4">
+        <AdminTranslationTabs
+          value={translationLocale}
+          onChange={onTranslationLocaleChange}
+        />
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="mb-1 block text-sm font-medium text-gray-700">
             {t('admin.products.add.title')} *
           </label>
           <Input
@@ -57,8 +70,12 @@ export function BasicInformation({
         </div>
 
         <div>
-          <span className="block text-sm font-medium text-gray-700 mb-1">{t('admin.products.add.productType')} *</span>
-          <p className="text-xs text-gray-500 mb-2">{t('admin.products.add.productTypeHintShort')}</p>
+          <span className="mb-1 block text-sm font-medium text-gray-700">
+            {t('admin.products.add.productType')} *
+          </span>
+          <p className="mb-2 text-xs text-gray-500">
+            {t('admin.products.add.productTypeHintShort')}
+          </p>
           <div className="inline-flex w-full max-w-md rounded-supersudo border border-gray-200 bg-gray-50 p-0.5">
             <button
               type="button"
@@ -86,7 +103,9 @@ export function BasicInformation({
             {t('admin.products.add.urlSlugSection')}
           </summary>
           <div className="mt-3 pb-1">
-            <label className="block text-xs font-medium text-gray-600 mb-1">{t('admin.products.add.slug')} *</label>
+            <label className="mb-1 block text-xs font-medium text-gray-600">
+              {t('admin.products.add.slug')} *
+            </label>
             <Input
               type="text"
               value={slug}
@@ -94,6 +113,9 @@ export function BasicInformation({
               required
               placeholder={t('admin.products.add.productSlugPlaceholder')}
             />
+            <p className="mt-1 text-xs text-gray-500">
+              {t('admin.common.sharedSlugHint')}
+            </p>
           </div>
         </details>
 
@@ -102,9 +124,11 @@ export function BasicInformation({
             {t('admin.products.add.descriptionOptionalSection')}
           </summary>
           <div className="mt-3 pb-1">
-            <label className="block text-xs font-medium text-gray-600 mb-1">{t('admin.products.add.description')}</label>
+            <label className="mb-1 block text-xs font-medium text-gray-600">
+              {t('admin.products.add.description')}
+            </label>
             <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-supersudo focus:outline-none focus:ring-2 focus:ring-admin"
+              className="w-full rounded-supersudo border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-admin"
               rows={5}
               value={descriptionHtml}
               onChange={onDescriptionChange}
@@ -116,5 +140,3 @@ export function BasicInformation({
     </div>
   );
 }
-
-

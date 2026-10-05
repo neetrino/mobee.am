@@ -11,10 +11,18 @@ import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
 import { BrandLogoField } from './components/BrandLogoField';
+import { AdminTranslationTabs } from '../components/AdminTranslationTabs';
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  emptyAdminLocaleTextMap,
+  type AdminContentLocale,
+  type AdminLocaleTextMap,
+} from '@/lib/admin/admin-content-locale';
 
 interface Brand {
   id: string;
   name: string;
+  names?: AdminLocaleTextMap;
   slug: string;
   logoUrl: string | null;
 }
@@ -25,7 +33,11 @@ function BrandsSection() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
-  const [formData, setFormData] = useState({ name: '', logoUrl: null as string | null });
+  const [translationLocale, setTranslationLocale] = useState<AdminContentLocale>(DEFAULT_ADMIN_CONTENT_LOCALE);
+  const [formData, setFormData] = useState({
+    names: emptyAdminLocaleTextMap(),
+    logoUrl: null as string | null,
+  });
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -57,6 +69,7 @@ function BrandsSection() {
   useEffect(() => {
     fetchBrands();
   }, [fetchBrands]);
+
 
   const handleDeleteBrand = async (brandId: string, brandName: string) => {
     if (!(await confirmDialog({
@@ -90,26 +103,40 @@ function BrandsSection() {
 
   const handleOpenAddModal = () => {
     setEditingBrand(null);
-    setFormData({ name: '', logoUrl: null });
+    setTranslationLocale(DEFAULT_ADMIN_CONTENT_LOCALE);
+    setFormData({ names: emptyAdminLocaleTextMap(), logoUrl: null });
     setShowModal(true);
   };
 
   const handleOpenEditModal = (brand: Brand) => {
     setEditingBrand(brand);
-    setFormData({ name: brand.name, logoUrl: brand.logoUrl });
+    setTranslationLocale(DEFAULT_ADMIN_CONTENT_LOCALE);
+    setFormData({
+      names: brand.names ?? {
+        hy: brand.name,
+        en: '',
+        ru: '',
+      },
+      logoUrl: brand.logoUrl,
+    });
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingBrand(null);
-    setFormData({ name: '', logoUrl: null });
+    setTranslationLocale(DEFAULT_ADMIN_CONTENT_LOCALE);
+    setFormData({ names: emptyAdminLocaleTextMap(), logoUrl: null });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name.trim()) {
+
+    const primaryName =
+      formData.names.hy.trim() ||
+      formData.names.en.trim() ||
+      formData.names.ru.trim();
+    if (!primaryName) {
       showToast(t('admin.brands.nameRequired'), 'warning');
       return;
     }
@@ -117,39 +144,45 @@ function BrandsSection() {
     setSubmitting(true);
     try {
       if (editingBrand) {
-        // Update existing brand
-        console.log('🔄 [ADMIN] Updating brand:', editingBrand.id);
         await apiClient.put(`/api/v1/admin/brands/${editingBrand.id}`, {
-          name: formData.name.trim(),
+          name: primaryName,
+          names: formData.names,
           logoUrl: formData.logoUrl,
+          locale: DEFAULT_ADMIN_CONTENT_LOCALE,
         });
-        console.log('✅ [ADMIN] Brand updated successfully');
         showToast(t('admin.brands.updatedSuccess'), 'success');
       } else {
-        // Create new brand
-        console.log('➕ [ADMIN] Creating brand:', formData.name);
         await apiClient.post('/api/v1/admin/brands', {
-          name: formData.name.trim(),
+          name: primaryName,
+          names: formData.names,
           logoUrl: formData.logoUrl,
+          locale: DEFAULT_ADMIN_CONTENT_LOCALE,
         });
-        console.log('✅ [ADMIN] Brand created successfully');
         showToast(t('admin.brands.createdSuccess'), 'success');
       }
       
       invalidateAdminReferenceCache('brands');
       fetchBrands();
       handleCloseModal();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [ADMIN] Error saving brand:', err);
       let errorMessage = 'Unknown error occurred';
-      if (err.data?.detail) {
-        errorMessage = err.data.detail;
-      } else if (err.detail) {
-        errorMessage = err.detail;
-      } else if (err.message) {
-        errorMessage = err.message;
-      } else if (err.response?.data?.detail) {
-        errorMessage = err.response.data.detail;
+      if (err && typeof err === 'object') {
+        const errorObj = err as {
+          data?: { detail?: string };
+          detail?: string;
+          message?: string;
+          response?: { data?: { detail?: string } };
+        };
+        if (errorObj.data?.detail) {
+          errorMessage = errorObj.data.detail;
+        } else if (errorObj.detail) {
+          errorMessage = errorObj.detail;
+        } else if (errorObj.message) {
+          errorMessage = errorObj.message;
+        } else if (errorObj.response?.data?.detail) {
+          errorMessage = errorObj.response.data.detail;
+        }
       }
       showToast(t('admin.brands.errorSaving') + '\n\n' + errorMessage, 'error');
     } finally {
@@ -297,6 +330,11 @@ function BrandsSection() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <AdminTranslationTabs
+                value={translationLocale}
+                onChange={setTranslationLocale}
+              />
+
               <div>
                 <label htmlFor="brand-name" className="mb-1 block text-sm font-medium text-gray-700">
                   {t('admin.brands.brandName')}
@@ -304,8 +342,13 @@ function BrandsSection() {
                 <input
                   id="brand-name"
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.names[translationLocale]}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      names: { ...formData.names, [translationLocale]: e.target.value },
+                    })
+                  }
                   className="w-full rounded-supersudo border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-admin"
                   placeholder={t('admin.brands.enterBrandName')}
                   required

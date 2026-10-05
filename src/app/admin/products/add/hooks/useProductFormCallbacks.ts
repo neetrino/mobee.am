@@ -3,8 +3,9 @@
  */
 
 import type { ChangeEvent } from 'react';
-import type { Category, GeneratedVariant } from '../types';
-import { generateSlug } from '../utils/productUtils';
+import type { Attribute, Category, GeneratedVariant } from '../types';
+import { syncSlugWithTitle } from '@/lib/utils/slug';
+import { nextVariantSku } from '../utils/variantSku';
 
 interface UseProductFormCallbacksProps {
   formData: {
@@ -13,6 +14,7 @@ interface UseProductFormCallbacksProps {
     primaryCategoryId: string;
   };
   categories: Category[];
+  attributes: Attribute[];
   selectedAttributesForVariants: Set<string>;
   selectedAttributeValueIds: Record<string, string[]>;
   generatedVariants: GeneratedVariant[];
@@ -22,11 +24,13 @@ interface UseProductFormCallbacksProps {
   setGeneratedVariants: (value: GeneratedVariant[] | ((prev: GeneratedVariant[]) => GeneratedVariant[])) => void;
   setSimpleProductData: (value: any | ((prev: any) => any)) => void;
   checkIsClothingCategory: (categoryId: string, categories: Category[]) => boolean;
+  isEditMode: boolean;
 }
 
 export function useProductFormCallbacks({
   formData,
   categories,
+  attributes,
   selectedAttributesForVariants,
   selectedAttributeValueIds,
   generatedVariants: _generatedVariants,
@@ -36,29 +40,39 @@ export function useProductFormCallbacks({
   setGeneratedVariants,
   setSimpleProductData: _setSimpleProductData,
   checkIsClothingCategory,
+  isEditMode,
 }: UseProductFormCallbacksProps) {
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const title = e.target.value;
     setFormData((prev) => ({
       ...prev,
       title,
-      slug: prev.slug || generateSlug(title),
+      slug: isEditMode ? prev.slug : syncSlugWithTitle(prev.title, prev.slug, title),
     }));
   };
 
   const isClothingCategory = () => checkIsClothingCategory(formData.primaryCategoryId, categories);
 
-  const handleAttributeToggle = (attributeId: string, checked: boolean) => {
-    const newSet = new Set(selectedAttributesForVariants);
-    if (checked) {
-      newSet.add(attributeId);
-    } else {
-      newSet.delete(attributeId);
-      const newValueIds = { ...selectedAttributeValueIds };
-      delete newValueIds[attributeId];
-      setSelectedAttributeValueIds(newValueIds);
+  const stripAttributeValuesFromVariants = (attributeId: string) => {
+    const attribute = attributes.find((item) => item.id === attributeId);
+    if (!attribute) {
+      return;
     }
-    setSelectedAttributesForVariants(newSet);
+    const removedValueIds = new Set(attribute.values.map((value) => value.id));
+    setGeneratedVariants((prev) =>
+      prev.map((variant) => ({
+        ...variant,
+        selectedValueIds: variant.selectedValueIds.filter((valueId) => !removedValueIds.has(valueId)),
+      }))
+    );
+  };
+
+  const handleAttributeToggle = (attributeId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedAttributesForVariants(new Set(selectedAttributesForVariants).add(attributeId));
+      return;
+    }
+    handleAttributeRemove(attributeId);
   };
 
   const handleAttributeRemove = (attributeId: string) => {
@@ -68,6 +82,7 @@ export function useProductFormCallbacks({
     delete newValueIds[attributeId];
     setSelectedAttributeValueIds(newValueIds);
     setSelectedAttributesForVariants(newSet);
+    stripAttributeValuesFromVariants(attributeId);
   };
 
   const handleVariantDelete = (variantId: string) => {
@@ -75,16 +90,16 @@ export function useProductFormCallbacks({
   };
 
   const handleVariantAdd = () => {
-    const newVariant: GeneratedVariant = {
-      id: `variant-${Date.now()}-${Math.random()}`,
-      selectedValueIds: [],
-      price: '0.00',
-      compareAtPrice: '0.00',
-      stock: '0',
-      sku: 'PROD',
-      image: null,
-    };
     setGeneratedVariants((prev) => {
+      const newVariant: GeneratedVariant = {
+        id: `variant-${Date.now()}-${Math.random()}`,
+        selectedValueIds: [],
+        price: '0.00',
+        compareAtPrice: '0.00',
+        stock: '0',
+        sku: nextVariantSku(formData.slug, prev),
+        images: [],
+      };
       const updated = [...prev, newVariant];
       console.log('✅ [VARIANT BUILDER] New manual variant added:', {
         newVariantId: newVariant.id,

@@ -27,11 +27,22 @@ if (!databaseUrl.includes("client_encoding")) {
   process.env.DATABASE_URL = urlWithEncoding;
 }
 
-const PRISMA_LOG_DEV: Array<"query" | "error" | "warn"> = ["query", "error", "warn"];
-const PRISMA_LOG_PROD: Array<"error"> = ["error"];
+type PrismaLogLevel = "query" | "error" | "warn";
+
+const PRISMA_LOG_DEV: PrismaLogLevel[] = ["error", "warn"];
+const PRISMA_LOG_DEV_WITH_QUERIES: PrismaLogLevel[] = ["query", "error", "warn"];
+const PRISMA_LOG_PROD: PrismaLogLevel[] = ["error"];
+
+/** Per-query SQL logging is opt-in (`PRISMA_LOG_QUERIES=1`): it floods the terminal and slows dev. */
+function resolvePrismaLogLevels(): PrismaLogLevel[] {
+  if (process.env.NODE_ENV !== "development") {
+    return PRISMA_LOG_PROD;
+  }
+  return process.env.PRISMA_LOG_QUERIES === "1" ? PRISMA_LOG_DEV_WITH_QUERIES : PRISMA_LOG_DEV;
+}
 
 const PRISMA_CLIENT_OPTIONS = {
-  log: process.env.NODE_ENV === "development" ? PRISMA_LOG_DEV : PRISMA_LOG_PROD,
+  log: resolvePrismaLogLevels(),
   errorFormat: "pretty" as const,
 };
 

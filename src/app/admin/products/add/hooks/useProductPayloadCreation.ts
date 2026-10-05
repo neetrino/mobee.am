@@ -5,8 +5,40 @@ import type { PartialProductUpdateInput } from '@/lib/schemas/admin-product-upda
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
 import { hasPartialUpdateWork } from '../utils/productUpdateDiff';
+import type { ProductTranslationWrite } from '../utils/productTranslationDrafts';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 
 const ADMIN_PRODUCTS_LIST_CACHE_PREFIX = '/supersudo/products';
+const TRANSLATIONS_SYNC_FAILED_MESSAGE = 'Ապրանքը պահպանվեց, բայց որոշ թարգմանություններ չթարմացվեցին';
+
+/**
+ * Writes changed locale translations in parallel (each is an independent row).
+ * Returns false when any write failed; the product itself is already saved.
+ */
+async function syncTranslations(productId: string, writes: ProductTranslationWrite[]): Promise<boolean> {
+  if (writes.length === 0) {
+    return true;
+  }
+  const results = await Promise.allSettled(
+    writes.map((write) => apiClient.put(`/api/v1/admin/products/${productId}`, write)),
+  );
+  const failed = results.filter((result) => result.status === 'rejected');
+  if (failed.length > 0) {
+    console.error('❌ [ADMIN] Translation sync failed:', failed);
+  }
+  return failed.length === 0;
+}
+
+function extractCreatedProductId(product: unknown): string | null {
+  if (!product || typeof product !== 'object') {
+    return null;
+  }
+  const record = product as { id?: unknown; data?: { id?: unknown } };
+  if (typeof record.id === 'string') {
+    return record.id;
+  }
+  return typeof record.data?.id === 'string' ? record.data.id : null;
+}
 
 function invalidateProductsListCache(): void {
   invalidateAdminSessionCacheByPrefix(ADMIN_PRODUCTS_LIST_CACHE_PREFIX);
@@ -52,6 +84,8 @@ interface CreateAndSubmitPayloadProps {
   setLoading: (loading: boolean) => void;
   router: AppRouterInstance;
   partialPayload?: PartialProductUpdateInput;
+  locale: AdminContentLocale;
+  translationWrites: ProductTranslationWrite[];
 }
 
 /** Toast duration when post-save `creationMessages` are shown (longer copy). */
@@ -71,6 +105,8 @@ export async function createAndSubmitPayload({
   setLoading,
   router,
   partialPayload,
+  locale,
+  translationWrites,
 }: CreateAndSubmitPayloadProps): Promise<void> {
   const baseMessage = isEditMode
     ? 'Ապրանքը հաջողությամբ թարմացվեց!'
@@ -78,19 +114,30 @@ export async function createAndSubmitPayload({
   const extra = creationMessages.length ? `\n\n${creationMessages.join('\n')}` : '';
   const toastDuration = creationMessages.length ? PRODUCT_SAVE_TOAST_WITH_EXTRA_LINES_MS : undefined;
 
+  const finishSave = (translationsSynced: boolean): void => {
+    invalidateProductsListCache();
+    if (translationsSynced) {
+      showToast(`${baseMessage}${extra}`, 'success', toastDuration);
+    } else {
+      showToast(TRANSLATIONS_SYNC_FAILED_MESSAGE, 'warning');
+    }
+    router.push('/supersudo/products');
+  };
+
   try {
     if (isEditMode && productId && partialPayload) {
-      if (!hasPartialUpdateWork(partialPayload)) {
+      const hasProductWork = hasPartialUpdateWork(partialPayload);
+      if (!hasProductWork && translationWrites.length === 0) {
         showToast(baseMessage, 'success', toastDuration);
         router.push('/supersudo/products');
         return;
       }
 
-      const product = await apiClient.put(`/api/v1/admin/products/${productId}`, partialPayload);
-      console.log('✅ [ADMIN] Product partially updated:', product);
-      invalidateProductsListCache();
-      showToast(`${baseMessage}${extra}`, 'success', toastDuration);
-      router.push('/supersudo/products');
+      if (hasProductWork) {
+        const product = await apiClient.put(`/api/v1/admin/products/${productId}`, partialPayload);
+        console.log('✅ [ADMIN] Product partially updated:', product);
+      }
+      finishSave(await syncTranslations(productId, translationWrites));
       return;
     }
 
@@ -104,7 +151,7 @@ export async function createAndSubmitPayload({
       published: isEditMode ? formData.published : true,
       featured: formData.featured,
       warrantyYears: formData.warrantyYears,
-      locale: 'en',
+      locale,
       variants,
       attributeIds: attributeIds.length > 0 ? attributeIds : undefined,
     };
@@ -126,17 +173,20 @@ export async function createAndSubmitPayload({
         color: label.color || null,
       }));
 
+    let savedProductId = productId;
     if (isEditMode && productId) {
       const product = await apiClient.put(`/api/v1/admin/products/${productId}`, payload);
       console.log('✅ [ADMIN] Product updated:', product);
     } else {
       const product = await apiClient.post('/api/v1/admin/products', payload);
       console.log('✅ [ADMIN] Product created:', product);
+      savedProductId = extractCreatedProductId(product);
     }
 
-    invalidateProductsListCache();
-    showToast(`${baseMessage}${extra}`, 'success', toastDuration);
-    router.push('/supersudo/products');
+    const translationsSynced = savedProductId
+      ? await syncTranslations(savedProductId, translationWrites)
+      : translationWrites.length === 0;
+    finishSave(translationsSynced);
   } catch (err: unknown) {
     console.error('❌ [ADMIN] Error saving product:', err);
 

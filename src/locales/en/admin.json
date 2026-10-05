@@ -829,7 +829,13 @@
     "saving": "Saving...",
     "back": "Back",
     "backToAdmin": "Back to Admin Dashboard",
-    "unknownErrorFallback": "Unknown error"
+    "unknownErrorFallback": "Unknown error",
+    "translations": "Translations",
+    "sharedSlugHint": "Slug is shared across all languages.",
+    "contentLocale": "Content language",
+    "contentLocaleHint": "Switch language to edit translations. Save writes the active language only.",
+    "contentLocaleHintNames": "Names and labels are saved for the selected language.",
+    "contentLocaleHintProduct": "Title, slug and description are saved for the selected language."
   }
 }
 

@@ -2,6 +2,7 @@ import { apiClient } from '@/lib/api-client';
 import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '@/lib/i18n-client';
 import type { Brand, Category } from '../types';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 
 interface UseBrandAndCategoryCreationProps {
   formData: {
@@ -15,6 +16,7 @@ interface UseBrandAndCategoryCreationProps {
   setBrands: (updater: (prev: Brand[]) => Brand[]) => void;
   setCategories: (updater: (prev: Category[]) => Category[]) => void;
   setLoading: (loading: boolean) => void;
+  locale: AdminContentLocale;
 }
 
 export function useBrandAndCategoryCreation({
@@ -26,6 +28,7 @@ export function useBrandAndCategoryCreation({
   setBrands,
   setCategories,
   setLoading,
+  locale,
 }: UseBrandAndCategoryCreationProps) {
   const { t } = useTranslation();
 
@@ -45,7 +48,7 @@ export function useBrandAndCategoryCreation({
         console.log('🏷️ [ADMIN] Creating new brand:', newBrandName);
         const brandResponse = await apiClient.post<{ data: Brand }>('/api/v1/admin/brands', {
           name: newBrandName.trim(),
-          locale: 'en',
+          locale,
         });
         if (brandResponse.data) {
           if (!finalBrandIds.includes(brandResponse.data.id)) {
@@ -69,7 +72,7 @@ export function useBrandAndCategoryCreation({
         console.log('📁 [ADMIN] Creating new category:', newCategoryName);
         const categoryResponse = await apiClient.post<{ data: Category }>('/api/v1/admin/categories', {
           title: newCategoryName.trim(),
-          locale: 'en',
+          locale,
           requiresSizes: false,
         });
         if (categoryResponse.data) {

@@ -209,6 +209,22 @@ export async function POST(req: NextRequest) {
     }
 
     const r2Health = getR2HealthStatus();
+    if (!r2Health.configured && process.env.NODE_ENV === "production") {
+      logger.error("Admin upload images: R2 is not configured in production", {
+        missing: r2Health.missing,
+      });
+      return NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/service-unavailable",
+          title: "Image storage unavailable",
+          status: 503,
+          detail: "Image storage (R2) is not configured",
+          instance: req.url,
+        },
+        { status: 503 }
+      );
+    }
+
     if (!r2Health.configured) {
       logger.warn("Admin upload images: storage fallback to inline mode", {
         missing: r2Health.missing,

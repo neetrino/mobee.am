@@ -5,6 +5,7 @@ import {
   getCachedAdminReferenceResponse,
   invalidateAdminReferenceServerCache,
 } from "@/lib/admin/admin-reference-server-cache";
+import { localeFromSearchParams } from "@/lib/admin/admin-content-locale";
 import { runApiRoute } from "@/lib/errors/run-api-route";
 import { invalidateHomeBrandsCache } from "@/lib/services/home-brands-cached";
 
@@ -19,8 +20,11 @@ export async function GET(req: NextRequest) {
       return authResult;
     }
 
-    const result = await getCachedAdminReferenceResponse("brands", () =>
-      adminService.getBrands(),
+    const locale = localeFromSearchParams(req.nextUrl.searchParams);
+    const result = await getCachedAdminReferenceResponse(
+      "brands",
+      () => adminService.getBrands(locale),
+      locale,
     );
     return NextResponse.json(result);
   });

@@ -9,7 +9,6 @@ import { CategoriesHeader } from './components/CategoriesHeader';
 import { CategoriesList } from './components/CategoriesList';
 import { AddCategoryModal } from './components/AddCategoryModal';
 import { EditCategoryModal } from './components/EditCategoryModal';
-
 export default function CategoriesPage() {
   const { t } = useTranslation();
   const { categories, loading, fetchCategories } = useCategories();
@@ -19,6 +18,8 @@ export default function CategoriesPage() {
     showEditModal,
     editingCategory,
     formData,
+    translationLocale,
+    setTranslationLocale,
     saving,
     setShowAddModal,
     setShowEditModal,
@@ -108,6 +109,8 @@ export default function CategoriesPage() {
       </div>
 
       <AddCategoryModal
+          translationLocale={translationLocale}
+          onTranslationLocaleChange={setTranslationLocale}
         isOpen={showAddModal}
         formData={formData}
         categories={categories}
@@ -121,6 +124,8 @@ export default function CategoriesPage() {
       />
 
       <EditCategoryModal
+          translationLocale={translationLocale}
+          onTranslationLocaleChange={setTranslationLocale}
         isOpen={showEditModal}
         editingCategory={editingCategory}
         formData={formData}

@@ -1,4 +1,8 @@
 import { db } from "@white-shop/db";
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  parseAdminContentLocale,
+} from "@/lib/admin/admin-content-locale";
 import { logger } from "../../../utils/logger";
 import { formatAttribute } from "./utils";
 
@@ -28,7 +32,7 @@ export async function createAttribute(data: {
     };
   }
 
-  const locale = data.locale || "en";
+  const locale = parseAdminContentLocale(data.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
 
   const attribute = await db.attribute.create({
     data: {
@@ -71,11 +75,13 @@ export async function updateAttributeTranslation(
 ) {
   logger.info('Updating attribute translation', { attributeId, name: data.name });
 
+  const locale = parseAdminContentLocale(data.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
+
   const attribute = await db.attribute.findUnique({
     where: { id: attributeId },
     include: {
       translations: {
-        where: { locale: data.locale || "en" },
+        where: { locale },
       },
     },
   });
@@ -88,8 +94,6 @@ export async function updateAttributeTranslation(
       detail: `Attribute with id '${attributeId}' does not exist`,
     };
   }
-
-  const locale = data.locale || "en";
 
   // Use upsert to handle both create and update cases
   await db.attributeTranslation.upsert({

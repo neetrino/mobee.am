@@ -6,6 +6,7 @@ import {
   getCachedAdminReferenceResponse,
   invalidateAdminReferenceServerCache,
 } from "@/lib/admin/admin-reference-server-cache";
+import { localeFromSearchParams } from "@/lib/admin/admin-content-locale";
 import { runApiRoute } from "@/lib/errors/run-api-route";
 
 /**
@@ -21,8 +22,11 @@ export async function GET(req: NextRequest) {
       }
       markAuthComplete(authResult.source);
 
-      const result = await getCachedAdminReferenceResponse("categories", () =>
-        adminService.getCategories(),
+      const locale = localeFromSearchParams(req.nextUrl.searchParams);
+      const result = await getCachedAdminReferenceResponse(
+        "categories",
+        () => adminService.getCategories(locale),
+        locale,
       );
       return NextResponse.json(result);
     });

@@ -3,6 +3,7 @@ import type { CanonicalCatalogQuery } from "@/lib/catalog/catalog-query";
 import { CATALOG_NEW_ARRIVAL_DAYS } from "@/lib/catalog/catalog.constants";
 import { CatalogQueryError } from "@/lib/catalog/catalog-query-error";
 import { resolveBrandIds } from "@/lib/catalog/brand-where";
+import { buildListingRowSearchWhere } from "@/lib/catalog/search-where";
 import { findCategoryBySlug } from "@/lib/services/products-find-query/category-utils";
 import { listingColorSizeComboTokens } from "@/lib/read-model/product-listing-row-tokens";
 
@@ -50,14 +51,7 @@ export async function buildListingRowWhere(
   }
 
   if (query.search) {
-    const term = query.search.trim();
-    parts.push({
-      OR: [
-        { searchText: { contains: term, mode: "insensitive" } },
-        { title: { contains: term, mode: "insensitive" } },
-        { slug: { contains: term, mode: "insensitive" } },
-      ],
-    });
+    parts.push(buildListingRowSearchWhere(query.search));
   }
 
   if (query.categorySlugs.length > 0) {

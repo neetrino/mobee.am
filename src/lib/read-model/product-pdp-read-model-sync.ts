@@ -1,6 +1,7 @@
 import { db, Prisma } from "@white-shop/db";
 import { transformProduct } from "@/lib/services/products-slug/product-transformer";
 import type { ProductWithFullRelations } from "@/lib/services/products-slug/types";
+import { PRODUCT_VARIANT_DISPLAY_ORDER } from "@/lib/database/productVariantDb.constants";
 import { PRODUCT_LISTING_READ_MODEL_DEFAULT_LOCALES } from "@/lib/read-model/product-read-model-locales";
 
 const pdpInclude = {
@@ -9,6 +10,7 @@ const pdpInclude = {
   categories: { include: { translations: true } },
   variants: {
     where: { published: true },
+    orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
     include: {
       options: {
         include: {

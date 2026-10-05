@@ -306,7 +306,7 @@ export default function ProductsPage() {
   return (
     <div className="mx-auto w-full max-w-7xl">
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('admin.products.title')}</h1>
             {(search || selectedCategories.size > 0 || skuSearch || stockFilter !== 'all') && (
               <button

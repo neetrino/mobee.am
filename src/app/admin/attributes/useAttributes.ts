@@ -5,6 +5,7 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { showToast } from '../../../components/Toast';
 import { confirmDialog } from '../../../components/ConfirmDialog';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 
 export interface AttributeValue {
   id: string;
@@ -27,7 +28,7 @@ export interface Attribute {
   values: AttributeValue[];
 }
 
-export function useAttributes() {
+export function useAttributes(locale: AdminContentLocale) {
   const { t } = useTranslation();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +64,7 @@ export function useAttributes() {
       if (!silent) {
         setLoading(true);
       }
-      const response = await apiClient.get<{ data: Attribute[] }>('/api/v1/admin/attributes');
+      const response = await apiClient.get<{ data: Attribute[] }>(`/api/v1/admin/attributes?locale=${encodeURIComponent(locale)}`);
       setAttributes(response.data || []);
     } catch (err) {
       console.error('[ADMIN] Error fetching attributes:', err);
@@ -75,7 +76,7 @@ export function useAttributes() {
         setLoading(false);
       }
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     fetchAttributes();
@@ -99,7 +100,7 @@ export function useAttributes() {
         key: autoKey,
         type: 'select',
         filterable: true,
-        locale: 'en',
+        locale,
       });
       
       console.log('✅ [ADMIN] Attribute created successfully');
@@ -148,7 +149,7 @@ export function useAttributes() {
       console.log(`✏️ [ADMIN] Updating attribute name: ${attributeId} -> ${trimmedName}`);
       await apiClient.patch(`/api/v1/admin/attributes/${attributeId}/translations`, {
         name: trimmedName,
-        locale: 'en',
+        locale,
       });
       console.log('✅ [ADMIN] Attribute name updated successfully');
       setEditingAttribute(null);
@@ -214,7 +215,7 @@ export function useAttributes() {
       console.log('➕ [ADMIN] Adding value to attribute:', attributeId, trimmedValue);
       await apiClient.post(`/api/v1/admin/attributes/${attributeId}/values`, {
         label: trimmedValue,
-        locale: 'en',
+        locale,
       });
       
       console.log('✅ [ADMIN] Value added successfully');
@@ -274,7 +275,7 @@ export function useAttributes() {
     try {
       await apiClient.patch(`/api/v1/admin/attributes/${editingValue.attributeId}/values/${editingValue.value.id}`, {
         ...data,
-        locale: 'en',
+        locale,
       });
 
       const valueId = editingValue.value.id;

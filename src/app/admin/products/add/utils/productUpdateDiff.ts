@@ -207,9 +207,7 @@ function buildVariantFieldUpdatesFromSnapshots(
     update.sku = processed.sku.trim();
   }
 
-  const prevImage = previous.image ?? null;
-  const nextImage = current.image ?? null;
-  if (prevImage !== nextImage) {
+  if (!arraysEqual(previous.images, current.images)) {
     update.imageUrl = processed.imageUrl ?? null;
   }
 
@@ -241,7 +239,7 @@ function buildSimpleVariantUpdates(
     compareAtPrice: simpleInitial.compareAtPrice,
     stock: simpleInitial.quantity,
     sku: simpleInitial.sku,
-    image: null,
+    images: [],
     published: true,
   };
 
@@ -253,7 +251,7 @@ function buildSimpleVariantUpdates(
     compareAtPrice: simpleCurrent.compareAtPrice,
     stock: simpleCurrent.quantity,
     sku: simpleCurrent.sku,
-    image: null,
+    images: [],
     published: true,
   };
 
@@ -353,7 +351,7 @@ export function buildPartialProductUpdatePayload(
   const { initial, current, processedVariants, media } = input;
 
   const payload: PartialProductUpdateInput = {
-    locale: input.locale ?? "en",
+    locale: input.locale ?? "hy",
   };
 
   const basic = buildBasicDiff(initial, current);

@@ -16,6 +16,12 @@ import { useVariantConversionToFormData } from './useVariantConversionToFormData
 import { useVariantValidation } from './useVariantValidation';
 import { processImagesForSubmit } from './useImageProcessingForSubmit';
 import { createAndSubmitPayload } from './useProductPayloadCreation';
+import {
+  prepareTranslationSubmit,
+  type ProductTranslationBaselines,
+  type ProductTranslationDrafts,
+} from '../utils/productTranslationDrafts';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 
 function mergeAttributeIdsForProductSubmit(
   selectedIds: Set<string>,
@@ -125,6 +131,9 @@ interface UseProductFormHandlersProps {
   getColorAttribute: () => Attribute | undefined;
   getSizeAttribute: () => Attribute | undefined;
   isClothingCategory: () => boolean;
+  locale: AdminContentLocale;
+  translationDraftsRef: MutableRefObject<ProductTranslationDrafts>;
+  translationBaselinesRef: MutableRefObject<ProductTranslationBaselines>;
 }
 
 export function useProductFormHandlers({
@@ -150,6 +159,9 @@ export function useProductFormHandlers({
   getColorAttribute,
   getSizeAttribute,
   isClothingCategory,
+  locale,
+  translationDraftsRef,
+  translationBaselinesRef,
 }: UseProductFormHandlersProps) {
   const router = useRouter();
 
@@ -162,6 +174,7 @@ export function useProductFormHandlers({
     setBrands,
     setCategories,
     setLoading,
+    locale,
   });
 
   const { convertGeneratedVariantsToFormData } = useVariantConversionToFormData({
@@ -196,7 +209,7 @@ export function useProductFormHandlers({
       price: variantPriceUSD,
       compareAtPrice: variantCompareAtPriceUSD,
       stock: parseInt(genVariant.stock || '0') || 0,
-      imageUrl: genVariant.image || undefined,
+      imageUrl: genVariant.images.length > 0 ? genVariant.images.join(',') : undefined,
       published: true,
     };
 
@@ -470,6 +483,14 @@ export function useProductFormHandlers({
         sizeAttribute?.id
       );
 
+      const { primaryLocale, primaryFormData, translationWrites } = prepareTranslationSubmit({
+        drafts: translationDraftsRef.current,
+        baselines: translationBaselinesRef.current,
+        activeLocale: locale,
+        formData: currentFormData,
+        isEditMode,
+      });
+
       if (isEditMode && productId) {
         const initialSnapshot = initialEditableProductRef.current;
         if (!initialSnapshot) {
@@ -480,7 +501,7 @@ export function useProductFormHandlers({
 
         const currentSnapshot = buildEditableProductSnapshot({
           formData: {
-            ...currentFormData,
+            ...primaryFormData,
             brandIds: finalBrandIds,
             primaryCategoryId: finalPrimaryCategoryId,
           },
@@ -496,10 +517,11 @@ export function useProductFormHandlers({
           current: currentSnapshot,
           processedVariants: finalVariantsForApi,
           media: finalMedia,
+          locale: primaryLocale,
         });
 
         await createAndSubmitPayload({
-          formData: currentFormData,
+          formData: primaryFormData,
           finalBrandIds,
           finalPrimaryCategoryId,
           variants: finalVariantsForApi,
@@ -512,12 +534,14 @@ export function useProductFormHandlers({
           setLoading,
           router,
           partialPayload,
+          locale: primaryLocale,
+          translationWrites,
         });
         return;
       }
 
       await createAndSubmitPayload({
-        formData: currentFormData,
+        formData: primaryFormData,
         finalBrandIds,
         finalPrimaryCategoryId,
         variants: finalVariantsForApi.map((variant) => ({
@@ -537,6 +561,8 @@ export function useProductFormHandlers({
         creationMessages,
         setLoading,
         router,
+        locale: primaryLocale,
+        translationWrites,
       });
     } catch (err: unknown) {
       console.error('❌ [ADMIN] Error saving product:', err);

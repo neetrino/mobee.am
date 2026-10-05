@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useCallback, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -19,6 +19,15 @@ import { useProductFormHandlers } from './hooks/useProductFormHandlers';
 import { useProductFormCallbacks } from './hooks/useProductFormCallbacks';
 import { useInitialProductSnapshot } from './hooks/useInitialProductSnapshot';
 import { isClothingCategory as checkIsClothingCategory, generateSlug } from './utils/productUtils';
+import {
+  baselinesFromTranslations,
+  type ProductTranslationBaselines,
+  type ProductTranslationDrafts,
+} from './utils/productTranslationDrafts';
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  type AdminContentLocale,
+} from '@/lib/admin/admin-content-locale';
 
 const AddProductFormContent = dynamic(
   () => import('./components/AddProductFormContent').then((module) => ({ default: module.AddProductFormContent })),
@@ -35,8 +44,50 @@ function AddProductPageContent() {
   const searchParams = useSearchParams();
   const productId = searchParams.get('id');
   const isEditMode = !!productId;
+  const [translationLocale, setTranslationLocale] = useState<AdminContentLocale>(
+    DEFAULT_ADMIN_CONTENT_LOCALE,
+  );
+  const translationDraftsRef = useRef<ProductTranslationDrafts>({});
+  const translationBaselinesRef = useRef<ProductTranslationBaselines>({});
 
   const formState = useProductFormState();
+  const { formData, setFormData } = formState;
+
+  const handleTranslationsLoaded = useCallback(
+    (translations: Record<string, { title: string; slug: string; descriptionHtml: string | null }>) => {
+      const baselines = baselinesFromTranslations(translations);
+      translationBaselinesRef.current = baselines;
+      translationDraftsRef.current = Object.fromEntries(
+        Object.entries(baselines).map(([locale, row]) => [
+          locale,
+          { title: row.title, descriptionHtml: row.descriptionHtml },
+        ]),
+      );
+    },
+    [],
+  );
+
+  const currentTitle = formData.title;
+  const currentDescriptionHtml = formData.descriptionHtml;
+  const handleTranslationLocaleChange = useCallback(
+    (nextLocale: AdminContentLocale) => {
+      translationDraftsRef.current[translationLocale] = {
+        title: currentTitle,
+        descriptionHtml: currentDescriptionHtml,
+      };
+      const next = translationDraftsRef.current[nextLocale] || {
+        title: '',
+        descriptionHtml: '',
+      };
+      setFormData((prev) => ({
+        ...prev,
+        title: next.title,
+        descriptionHtml: next.descriptionHtml,
+      }));
+      setTranslationLocale(nextLocale);
+    },
+    [translationLocale, currentTitle, currentDescriptionHtml, setFormData],
+  );
 
   useProductDataLoading({
     setBrands: formState.setBrands,
@@ -50,6 +101,7 @@ function AddProductPageContent() {
     setCategoriesExpanded: formState.setCategoriesExpanded,
     brandsExpanded: formState.brandsExpanded,
     setBrandsExpanded: formState.setBrandsExpanded,
+    locale: DEFAULT_ADMIN_CONTENT_LOCALE,
   });
 
   useProductEditMode({
@@ -66,6 +118,8 @@ function AddProductPageContent() {
     setProductType: formState.setProductType,
     setSimpleProductData: formState.setSimpleProductData,
     setSimpleProductDatabaseVariantId: formState.setSimpleProductDatabaseVariantId,
+    locale: DEFAULT_ADMIN_CONTENT_LOCALE,
+    onTranslationsLoaded: handleTranslationsLoaded,
   });
 
   useProductVariantConversion({
@@ -101,6 +155,7 @@ function AddProductPageContent() {
   } = useProductFormCallbacks({
     formData: formState.formData,
     categories: formState.categories,
+    attributes: formState.attributes,
     selectedAttributesForVariants: formState.selectedAttributesForVariants,
     selectedAttributeValueIds: formState.selectedAttributeValueIds,
     generatedVariants: formState.generatedVariants,
@@ -110,6 +165,7 @@ function AddProductPageContent() {
     setGeneratedVariants: formState.setGeneratedVariants,
     setSimpleProductData: formState.setSimpleProductData,
     checkIsClothingCategory,
+    isEditMode,
   });
 
   const {
@@ -149,6 +205,7 @@ function AddProductPageContent() {
     setAttributes: formState.setAttributes,
     getColorAttribute,
     getSizeAttribute,
+    locale: translationLocale,
   });
 
   const { initialEditableProductRef, isSnapshotReady } = useInitialProductSnapshot({
@@ -187,6 +244,9 @@ function AddProductPageContent() {
     getColorAttribute,
     getSizeAttribute,
     isClothingCategory,
+    locale: translationLocale,
+    translationDraftsRef,
+    translationBaselinesRef,
   });
 
   if (formState.loadingProduct) {
@@ -229,9 +289,18 @@ function AddProductPageContent() {
           fileInputRef={formState.fileInputRef}
           attributesDropdownRef={formState.attributesDropdownRef}
           variantImageInputRefs={formState.variantImageInputRefs}
+          translationLocale={translationLocale}
+          onTranslationLocaleChange={handleTranslationLocaleChange}
           onTitleChange={handleTitleChange}
           onSlugChange={(e) => formState.setFormData((prev) => ({ ...prev, slug: e.target.value }))}
-          onDescriptionChange={(e) => formState.setFormData((prev) => ({ ...prev, descriptionHtml: e.target.value }))}
+          onDescriptionChange={(e) => {
+            const descriptionHtml = e.target.value;
+            translationDraftsRef.current[translationLocale] = {
+              title: formState.formData.title,
+              descriptionHtml,
+            };
+            formState.setFormData((prev) => ({ ...prev, descriptionHtml }));
+          }}
           onProductTypeChange={formState.setProductType}
           onUploadImages={handleUploadImages}
           onRemoveImage={removeImageUrl}

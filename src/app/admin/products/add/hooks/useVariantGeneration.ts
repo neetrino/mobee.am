@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Attribute, GeneratedVariant } from '../types';
 import { generateSlug } from '../utils/productUtils';
+import { buildVariantSku, resyncVariantSkus } from '../utils/variantSku';
 
 interface UseVariantGenerationProps {
   selectedAttributesForVariants: Set<string>;
@@ -27,6 +28,18 @@ export function useVariantGeneration({
   productId,
   setGeneratedVariants,
 }: UseVariantGenerationProps) {
+  const effectiveSlug = formDataSlug || generateSlug(formDataTitle);
+  const prevSlugRef = useRef(effectiveSlug);
+
+  useEffect(() => {
+    const prevSlug = prevSlugRef.current;
+    prevSlugRef.current = effectiveSlug;
+    if (isEditMode || prevSlug === effectiveSlug) {
+      return;
+    }
+    setGeneratedVariants((prev) => resyncVariantSkus(prev, prevSlug, effectiveSlug));
+  }, [effectiveSlug, isEditMode, setGeneratedVariants]);
+
   const generateVariantsFromAttributes = () => {
     console.log('🚀 [VARIANT BUILDER] Generating single variant with all attributes...');
 
@@ -53,28 +66,7 @@ export function useVariantGeneration({
         allSelectedValueIds.push(...selectedIds);
       });
 
-      const baseSlug = formDataSlug || generateSlug(formDataTitle) || 'PROD';
-      let sku = `${baseSlug}`;
-
-      if (allSelectedValueIds.length > 0) {
-        const valueParts: string[] = [];
-        selectedAttrs.forEach((attributeId) => {
-          const attribute = attributes.find((a) => a.id === attributeId);
-          if (!attribute) return;
-
-          const selectedIds = selectedAttributeValueIds[attributeId] || [];
-          selectedIds.forEach((valueId) => {
-            const value = attribute.values.find((v) => v.id === valueId);
-            if (value) {
-              valueParts.push(value.value.toUpperCase().replace(/\s+/g, '-'));
-            }
-          });
-        });
-
-        if (valueParts.length > 0) {
-          sku = `${baseSlug}-${valueParts.join('-')}`;
-        }
-      }
+      const sku = buildVariantSku(effectiveSlug, 1);
 
       const autoVariant: GeneratedVariant = {
         id: variantId,
@@ -84,7 +76,7 @@ export function useVariantGeneration({
         compareAtPrice: existingAutoVariant?.compareAtPrice || '',
         stock: existingAutoVariant?.stock || '',
         sku: existingAutoVariant?.sku || sku,
-        image: existingAutoVariant?.image || null,
+        images: existingAutoVariant?.images ?? [],
       };
 
       const result = [autoVariant];

@@ -22,7 +22,7 @@ export async function PATCH(
 
     const result = await adminService.updateAttributeTranslation(attributeId, {
       name: body.name,
-      locale: body.locale || "en",
+      locale: body.locale,
     });
 
     return NextResponse.json({ data: result }, { status: 200 });

@@ -4,7 +4,7 @@ import {
   processVariantOptions,
   parseVariantPrices,
 } from "./variant-processor";
-import { processVariantImageUrl } from "./variant-helpers";
+import { buildVariantMediaFromImageUrl, processVariantImageUrl } from "./variant-helpers";
 import type { CreateVariantInput } from "./types";
 
 /**
@@ -46,6 +46,7 @@ export async function createVariant(
       compareAtPrice,
       stock: isNaN(stock) ? 0 : stock,
       imageUrl: processedVariantImageUrl ?? undefined,
+      media: buildVariantMediaFromImageUrl(processedVariantImageUrl ?? null, []),
       published: variant.published !== false,
       attributes: (attributesJson || undefined) as
         | Prisma.InputJsonValue

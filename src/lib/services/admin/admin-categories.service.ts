@@ -5,17 +5,44 @@ import {
   extractCategoryImageUrl,
 } from "@/lib/categoryMedia";
 import { categoryLocaleTitlesToWrite } from "@/lib/category-locale-sync";
-import { DEFAULT_LANGUAGE } from "@/lib/language";
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  parseAdminContentLocale,
+} from "@/lib/admin/admin-content-locale";
 import { getCategoryProductCountMap } from "@/lib/services/admin/category-product-counts";
 import { invalidateCategoryCaches } from "@/lib/services/read-through-json-cache";
 import { toSlug } from "@/lib/utils/slug";
-import { rebuildProductListingReadModel } from "@/lib/read-model/product-read-model-sync";
-
-const ADMIN_CATEGORY_LOCALE = DEFAULT_LANGUAGE;
+import { syncProductListingReadModelByCategoryIds } from "@/lib/read-model/product-read-model-sync";
 
 async function clearCategoriesCache(): Promise<void> {
   await invalidateCategoryCaches();
-  await rebuildProductListingReadModel();
+}
+
+/**
+ * Listing rows embed category ids/slugs of all ancestors, so a slug/parent change
+ * affects products of the whole subtree. Only those products are re-synced.
+ */
+async function syncCategorySubtreeProducts(rootCategoryIds: string[]): Promise<void> {
+  const categories = await db.category.findMany({
+    where: { deletedAt: null },
+    select: { id: true, parentId: true },
+  });
+  const childrenByParent = new Map<string, string[]>();
+  for (const category of categories) {
+    if (!category.parentId) continue;
+    const siblings = childrenByParent.get(category.parentId) ?? [];
+    siblings.push(category.id);
+    childrenByParent.set(category.parentId, siblings);
+  }
+  const subtree = new Set<string>();
+  const queue = [...rootCategoryIds];
+  while (queue.length > 0) {
+    const id = queue.pop() as string;
+    if (subtree.has(id)) continue;
+    subtree.add(id);
+    queue.push(...(childrenByParent.get(id) ?? []));
+  }
+  await syncProductListingReadModelByCategoryIds([...subtree]);
 }
 
 function resolveCategorySlug(explicitSlug: string | undefined, title: string): string {
@@ -26,42 +53,38 @@ function resolveCategorySlug(explicitSlug: string | undefined, title: string): s
   return toSlug(title);
 }
 
-async function syncCategoryLocaleTranslations(input: {
+/**
+ * Upsert one locale title (+ optional slug sync across all locales).
+ * Does not overwrite other locales' titles when admin edits a specific language.
+ */
+async function upsertCategoryLocaleTranslation(input: {
   categoryId: string;
   locale: string;
   nextTitle: string;
   nextSlug: string;
   syncSlugOnAllLocales: boolean;
 }): Promise<void> {
-  const writes = categoryLocaleTitlesToWrite(input.nextTitle);
-  if (!writes.some((row) => row.locale === input.locale)) {
-    writes.unshift({ locale: "hy", title: input.nextTitle });
-  }
-
-  for (const write of writes) {
-    const title = write.locale === input.locale ? input.nextTitle : write.title;
-    await db.categoryTranslation.upsert({
-      where: {
-        categoryId_locale: {
-          categoryId: input.categoryId,
-          locale: write.locale,
-        },
-      },
-      create: {
+  await db.categoryTranslation.upsert({
+    where: {
+      categoryId_locale: {
         categoryId: input.categoryId,
-        locale: write.locale,
-        title,
-        slug: input.nextSlug,
-        fullPath: input.nextSlug,
+        locale: input.locale,
       },
-      update: {
-        title,
-        ...(input.syncSlugOnAllLocales
-          ? { slug: input.nextSlug, fullPath: input.nextSlug }
-          : {}),
-      },
-    });
-  }
+    },
+    create: {
+      categoryId: input.categoryId,
+      locale: input.locale,
+      title: input.nextTitle,
+      slug: input.nextSlug,
+      fullPath: input.nextSlug,
+    },
+    update: {
+      title: input.nextTitle,
+      ...(input.syncSlugOnAllLocales
+        ? { slug: input.nextSlug, fullPath: input.nextSlug }
+        : {}),
+    },
+  });
 
   if (!input.syncSlugOnAllLocales) {
     return;
@@ -73,11 +96,45 @@ async function syncCategoryLocaleTranslations(input: {
   });
 }
 
+/**
+ * Seed known auto-translations on create without overwriting the active locale title.
+ */
+async function seedCategoryLocaleTitlesOnCreate(input: {
+  categoryId: string;
+  locale: string;
+  sourceTitle: string;
+  slug: string;
+}): Promise<void> {
+  const writes = categoryLocaleTitlesToWrite(input.sourceTitle);
+  for (const write of writes) {
+    if (write.locale === input.locale) {
+      continue;
+    }
+    await db.categoryTranslation.upsert({
+      where: {
+        categoryId_locale: {
+          categoryId: input.categoryId,
+          locale: write.locale,
+        },
+      },
+      create: {
+        categoryId: input.categoryId,
+        locale: write.locale,
+        title: write.title,
+        slug: input.slug,
+        fullPath: input.slug,
+      },
+      update: {},
+    });
+  }
+}
+
 class AdminCategoriesService {
   /**
    * Get categories for admin
    */
-  async getCategories() {
+  async getCategories(localeInput?: string) {
+    const locale = parseAdminContentLocale(localeInput, DEFAULT_ADMIN_CONTENT_LOCALE);
     const categories = await db.category.findMany({
       where: {
         deletedAt: null,
@@ -90,9 +147,7 @@ class AdminCategoriesService {
         homeStripPosition: true,
         media: true,
         translations: {
-          where: { locale: ADMIN_CATEGORY_LOCALE },
-          take: 1,
-          select: { title: true, slug: true },
+          select: { locale: true, title: true, slug: true },
         },
       },
       orderBy: {
@@ -111,18 +166,29 @@ class AdminCategoriesService {
         requiresSizes: boolean | null;
         homeStripPosition: number | null;
         media: unknown;
-        translations?: Array<{ title: string; slug: string }>;
+        translations?: Array<{ locale: string; title: string; slug: string }>;
       }) => {
         const translations = Array.isArray(category.translations) ? category.translations : [];
-        const translation = translations[0] || null;
+        const translation =
+          translations.find((row) => row.locale === locale) ||
+          translations.find((row) => row.locale === DEFAULT_ADMIN_CONTENT_LOCALE) ||
+          translations[0] ||
+          null;
         const parentId =
           category.parentId && activeCategoryIds.has(category.parentId)
             ? category.parentId
             : null;
 
+        const titles = { hy: "", en: "", ru: "" };
+        for (const row of translations) {
+          if (row.locale === "hy" || row.locale === "en" || row.locale === "ru") {
+            titles[row.locale] = row.title;
+          }
+        }
         return {
           id: category.id,
           title: translation?.title || "",
+          titles,
           slug: translation?.slug || "",
           parentId,
           position: category.position,
@@ -130,6 +196,7 @@ class AdminCategoriesService {
           showOnHomePage: category.homeStripPosition !== null,
           imageUrl: extractCategoryImageUrl(category.media),
           productCount: productCountMap.get(category.id) ?? 0,
+          locale,
         };
       }),
     };
@@ -145,8 +212,13 @@ class AdminCategoriesService {
     parentId?: string;
     requiresSizes?: boolean;
     imageUrl?: string | null;
+    titles?: Partial<Record<"hy" | "en" | "ru", string>>;
   }) {
-    const locale = data.locale || ADMIN_CATEGORY_LOCALE;
+    const locale = parseAdminContentLocale(data.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
+    const titlesMap: Partial<Record<"hy" | "en" | "ru", string>> = {
+      ...(data.titles || {}),
+      [locale]: data.title,
+    };
     
     // Validate parent category exists if parentId is provided
     if (data.parentId) {
@@ -177,8 +249,33 @@ class AdminCategoriesService {
     await this.assertSlugAvailable(slug, locale);
 
     const nextPosition = await this.getNextSiblingPosition(data.parentId ?? null);
+    const trimmedTitle = data.title.trim();
 
-    const localeTitles = categoryLocaleTitlesToWrite(data.title);
+    const translationCreates = (["hy", "en", "ru"] as const)
+      .map((loc) => {
+        const title = (titlesMap[loc] || "").trim();
+        if (!title) return null;
+        return {
+          locale: loc,
+          title,
+          slug,
+          fullPath: slug,
+        };
+      })
+      .filter(
+        (row): row is { locale: "hy" | "en" | "ru"; title: string; slug: string; fullPath: string } =>
+          row !== null,
+      );
+
+    if (translationCreates.length === 0) {
+      translationCreates.push({
+        locale,
+        title: trimmedTitle,
+        slug,
+        fullPath: slug,
+      });
+    }
+
     const category = await db.category.create({
       data: {
         parentId: data.parentId || undefined,
@@ -187,17 +284,19 @@ class AdminCategoriesService {
         published: true,
         media: buildCategoryMediaFromImageUrl(data.imageUrl ?? null),
         translations: {
-          create: localeTitles.map((row) => ({
-            locale: row.locale,
-            title: row.locale === locale ? data.title.trim() : row.title,
-            slug,
-            fullPath: slug,
-          })),
+          create: translationCreates,
         },
       },
       include: {
         translations: true,
       },
+    });
+
+    await seedCategoryLocaleTitlesOnCreate({
+      categoryId: category.id,
+      locale,
+      sourceTitle: trimmedTitle,
+      slug,
     });
 
     const refreshedCategory = await db.category.findUnique({
@@ -229,20 +328,15 @@ class AdminCategoriesService {
   /**
    * Get category by ID with children
    */
-  async getCategoryById(categoryId: string) {
+  async getCategoryById(categoryId: string, localeInput?: string) {
+    const locale = parseAdminContentLocale(localeInput, DEFAULT_ADMIN_CONTENT_LOCALE);
     const category = await db.category.findUnique({
       where: { id: categoryId },
       include: {
-        translations: {
-          where: { locale: ADMIN_CATEGORY_LOCALE },
-          take: 1,
-        },
+        translations: true,
         children: {
           include: {
-            translations: {
-              where: { locale: ADMIN_CATEGORY_LOCALE },
-              take: 1,
-            },
+            translations: true,
           },
         },
       },
@@ -253,18 +347,40 @@ class AdminCategoriesService {
     }
 
     const translations = Array.isArray(category.translations) ? category.translations : [];
-    const translation = translations[0] || null;
+    const translation =
+      translations.find((t: { locale: string }) => t.locale === locale) ||
+      translations.find((t: { locale: string }) => t.locale === DEFAULT_ADMIN_CONTENT_LOCALE) ||
+      translations[0] ||
+      null;
+
+    const titles = { hy: "", en: "", ru: "" };
+    for (const row of translations) {
+      if (row.locale === "hy" || row.locale === "en" || row.locale === "ru") {
+        titles[row.locale] = row.title;
+      }
+    }
 
     return {
       id: category.id,
       title: translation?.title || "",
+      titles,
       slug: translation?.slug || "",
       parentId: category.parentId,
       requiresSizes: category.requiresSizes || false,
       imageUrl: extractCategoryImageUrl(category.media),
-      children: category.children.map((child: { id: string; parentId: string | null; requiresSizes: boolean | null; translations?: Array<{ title: string; slug: string }> }) => {
+      locale,
+      children: category.children.map((child: {
+        id: string;
+        parentId: string | null;
+        requiresSizes: boolean | null;
+        translations?: Array<{ locale: string; title: string; slug: string }>;
+      }) => {
         const childTranslations = Array.isArray(child.translations) ? child.translations : [];
-        const childTranslation = childTranslations[0] || null;
+        const childTranslation =
+          childTranslations.find((t) => t.locale === locale) ||
+          childTranslations.find((t) => t.locale === DEFAULT_ADMIN_CONTENT_LOCALE) ||
+          childTranslations[0] ||
+          null;
         return {
           id: child.id,
           title: childTranslation?.title || "",
@@ -287,8 +403,9 @@ class AdminCategoriesService {
     requiresSizes?: boolean;
     subcategoryIds?: string[];
     imageUrl?: string | null;
+    titles?: Partial<Record<"hy" | "en" | "ru", string>>;
   }) {
-    const locale = data.locale || ADMIN_CATEGORY_LOCALE;
+    const locale = parseAdminContentLocale(data.locale, DEFAULT_ADMIN_CONTENT_LOCALE);
     
     const category = await db.category.findUnique({
       where: { id: categoryId },
@@ -349,6 +466,13 @@ class AdminCategoriesService {
         };
       }
     }
+
+    const previousChildIds = (
+      await db.category.findMany({
+        where: { parentId: categoryId, deletedAt: null },
+        select: { id: true },
+      })
+    ).map((child) => child.id);
 
     // Update subcategories if provided
     if (data.subcategoryIds !== undefined) {
@@ -438,13 +562,29 @@ class AdminCategoriesService {
       }
 
       await this.assertSlugAvailable(nextSlug, locale, categoryId);
-      await syncCategoryLocaleTranslations({
-        categoryId: category.id,
-        locale,
-        nextTitle,
-        nextSlug,
-        syncSlugOnAllLocales: data.slug !== undefined,
-      });
+
+      const titlesToWrite: Partial<Record<"hy" | "en" | "ru", string>> = {
+        ...(data.titles || {}),
+      };
+      if (data.title !== undefined) {
+        titlesToWrite[locale as "hy" | "en" | "ru"] = nextTitle;
+      }
+
+      const localesToWrite = (["hy", "en", "ru"] as const).filter(
+        (loc) => (titlesToWrite[loc] || "").trim().length > 0,
+      );
+      const writeLocales = localesToWrite.length > 0 ? localesToWrite : [locale as "hy" | "en" | "ru"];
+
+      for (const loc of writeLocales) {
+        const titleForLocale = (titlesToWrite[loc] || nextTitle).trim();
+        await upsertCategoryLocaleTranslation({
+          categoryId: category.id,
+          locale: loc,
+          nextTitle: titleForLocale,
+          nextSlug,
+          syncSlugOnAllLocales: data.slug !== undefined,
+        });
+      }
     }
 
     // Update category base data
@@ -459,6 +599,7 @@ class AdminCategoriesService {
     const categoryTranslations = Array.isArray(updatedCategory.translations) ? updatedCategory.translations : [];
     const translation = categoryTranslations.find((t: { locale: string }) => t.locale === locale) || categoryTranslations[0] || null;
     await clearCategoriesCache();
+    await syncCategorySubtreeProducts([categoryId, ...previousChildIds]);
 
     return {
       data: {
@@ -741,6 +882,7 @@ class AdminCategoriesService {
       },
     });
     await clearCategoriesCache();
+    await syncCategorySubtreeProducts([categoryId]);
 
     logger.info('✅ [ADMIN SERVICE] Category deleted:', { value: categoryId });
     return { success: true };

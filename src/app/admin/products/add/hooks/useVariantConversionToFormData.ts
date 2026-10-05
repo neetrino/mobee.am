@@ -104,9 +104,7 @@ export function useVariantConversionToFormData({
             }
           });
           
-          if (variant.image) {
-            colorData.images.push(variant.image);
-          }
+          colorData.images.push(...variant.images);
           
           colors.push(colorData);
         } else {
@@ -141,9 +139,7 @@ export function useVariantConversionToFormData({
               });
             });
             
-            if (variant.image) {
-              colorData.images.push(variant.image);
-            }
+            colorData.images.push(...variant.images);
             
             if (colorData.images.length > 0 || variant.stock) {
               colors.push(colorData);
@@ -151,11 +147,11 @@ export function useVariantConversionToFormData({
           }
         }
         
-        if (variant.image && colors.length > 0) {
+        if (colors.length > 0) {
           const firstColor = colors[0];
-          if (!firstColor.images.includes(variant.image)) {
-            firstColor.images.push(variant.image);
-          }
+          variant.images
+            .filter((img) => !firstColor.images.includes(img))
+            .forEach((img) => firstColor.images.push(img));
         }
         
         let variantSku = variant.sku ? variant.sku.trim() : '';

@@ -1,4 +1,6 @@
 import { dedupedAdminRequest } from '@/lib/admin/admin-request-dedup';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
+import { ADMIN_CONTENT_LOCALES } from '@/lib/admin/admin-content-locale';
 
 /**
  * Short-lived in-memory cache for stable admin reference GET data (client-side only).
@@ -19,10 +21,20 @@ interface CacheEntry<T> {
   expiresAt: number;
 }
 
-const cache = new Map<AdminReferenceCacheKey, CacheEntry<unknown>>();
+const cache = new Map<string, CacheEntry<unknown>>();
 
 function isExpired(entry: CacheEntry<unknown>): boolean {
   return Date.now() >= entry.expiresAt;
+}
+
+function buildClientCacheKey(
+  key: AdminReferenceCacheKey,
+  locale?: AdminContentLocale,
+): string {
+  if (locale && (key === 'categories' || key === 'brands')) {
+    return `${key}:${locale}`;
+  }
+  return key;
 }
 
 /**
@@ -31,14 +43,16 @@ function isExpired(entry: CacheEntry<unknown>): boolean {
 export async function getCachedAdminReference<T>(
   key: AdminReferenceCacheKey,
   fetcher: () => Promise<T>,
+  locale?: AdminContentLocale,
 ): Promise<T> {
-  const existing = cache.get(key);
+  const cacheKey = buildClientCacheKey(key, locale);
+  const existing = cache.get(cacheKey);
   if (existing && !isExpired(existing)) {
     return existing.value as T;
   }
 
-  const value = await dedupedAdminRequest(`admin-ref:${key}`, fetcher);
-  cache.set(key, {
+  const value = await dedupedAdminRequest(`admin-ref:${cacheKey}`, fetcher);
+  cache.set(cacheKey, {
     value,
     expiresAt: Date.now() + ADMIN_REFERENCE_CACHE_TTL_MS,
   });
@@ -58,6 +72,13 @@ export function invalidateAdminReferenceCache(
 
   const keys = Array.isArray(key) ? key : [key];
   for (const entryKey of keys) {
+    if (entryKey === 'categories' || entryKey === 'brands') {
+      for (const locale of ADMIN_CONTENT_LOCALES) {
+        cache.delete(buildClientCacheKey(entryKey, locale));
+      }
+      cache.delete(entryKey);
+      continue;
+    }
     cache.delete(entryKey);
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 import { invalidateAdminReferenceServerCache } from "@/lib/admin/admin-reference-server-cache";
+import { localeFromSearchParams } from "@/lib/admin/admin-content-locale";
 import { runApiRoute } from "@/lib/errors/run-api-route";
 
 /**
@@ -19,7 +20,8 @@ export async function GET(
     }
 
     const { id } = await params;
-    const category = await adminService.getCategoryById(id);
+    const locale = localeFromSearchParams(req.nextUrl.searchParams);
+    const category = await adminService.getCategoryById(id, locale);
 
     if (!category) {
       return NextResponse.json(

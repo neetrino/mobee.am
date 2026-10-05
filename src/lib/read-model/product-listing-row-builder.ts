@@ -6,6 +6,10 @@ import type { ProductDiscountContext } from "@/lib/services/products-find-transf
 import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
 import type { CatalogOptionLike } from "@/lib/catalog/variant-option-where";
 import {
+  collectAttributeFacetEntries,
+  type AttributeFacetEntry,
+} from "@/lib/catalog/catalog-attribute-facets";
+import {
   collectCategorySlugsForLocale,
   expandCategoryIdsWithAncestors,
   type CategoryAncestry,
@@ -31,6 +35,7 @@ export type ListingRowVariantInput = {
   sku?: string | null;
   published?: boolean | null;
   options?: CatalogOptionLike[] | null;
+  attributes?: unknown;
 };
 
 export type ListingRowProductInput = {
@@ -98,6 +103,7 @@ export type ProductListingRowWrite = {
   colorTokens: string[];
   sizeTokens: string[];
   variantComboTokens: string[];
+  attributeFacets: AttributeFacetEntry[];
   searchText: string;
   warrantyYears: number | null;
   publishedAt: Date | null;
@@ -208,6 +214,13 @@ function buildRowForLocale(
     colorTokens: collectListingColorTokens(allOptions, locale),
     sizeTokens: collectListingSizeTokens(allOptions, locale),
     variantComboTokens: collectListingComboTokens(publishedVariants, locale),
+    attributeFacets: collectAttributeFacetEntries(
+      publishedVariants.map((variant) => ({
+        options: variant.options ?? undefined,
+        attributes: variant.attributes,
+      })),
+      locale,
+    ),
     searchText: buildListingSearchText([
       translation?.title,
       translation?.subtitle,

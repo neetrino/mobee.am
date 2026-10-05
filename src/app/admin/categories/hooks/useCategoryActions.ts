@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { apiClient } from '../../../../lib/api-client';
 import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
-import { DEFAULT_LANGUAGE } from '../../../../lib/language';
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  emptyAdminLocaleTextMap,
+  type AdminContentLocale,
+} from '@/lib/admin/admin-content-locale';
 import { logger } from '../../../../lib/utils/logger';
 import { showToast } from '../../../../components/Toast';
 import { confirmDialog } from '../../../../components/ConfirmDialog';
@@ -13,6 +17,8 @@ interface UseCategoryActionsReturn {
   showEditModal: boolean;
   editingCategory: Category | null;
   formData: CategoryFormData;
+  translationLocale: AdminContentLocale;
+  setTranslationLocale: (locale: AdminContentLocale) => void;
   saving: boolean;
   setShowAddModal: (show: boolean) => void;
   setShowEditModal: (show: boolean) => void;
@@ -32,7 +38,7 @@ interface UseCategoryActionsReturn {
 }
 
 const initialFormData: CategoryFormData = {
-  title: '',
+  titles: emptyAdminLocaleTextMap(),
   slug: '',
   parentId: '',
   requiresSizes: false,
@@ -48,6 +54,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [translationLocale, setTranslationLocale] = useState<AdminContentLocale>(DEFAULT_ADMIN_CONTENT_LOCALE);
   const [formData, setFormData] = useState<CategoryFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
   const [reordering, setReordering] = useState(false);
@@ -55,10 +62,17 @@ export function useCategoryActions(): UseCategoryActionsReturn {
 
   const resetForm = () => {
     setFormData(initialFormData);
+    setTranslationLocale(DEFAULT_ADMIN_CONTENT_LOCALE);
   };
 
+
+
   const handleAddCategory = async (fetchCategories: () => Promise<void>) => {
-    if (!formData.title.trim()) {
+    const primaryTitle =
+      formData.titles.hy.trim() ||
+      formData.titles.en.trim() ||
+      formData.titles.ru.trim();
+    if (!primaryTitle) {
       showToast(t('admin.categories.titleRequired'), 'warning');
       return;
     }
@@ -66,12 +80,13 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     setSaving(true);
     try {
       await apiClient.post('/api/v1/admin/categories', {
-        title: formData.title.trim(),
+        title: primaryTitle,
+        titles: formData.titles,
         slug: formData.slug.trim() || undefined,
         parentId: formData.parentId || undefined,
         requiresSizes: formData.requiresSizes,
         imageUrl: formData.imageUrl,
-        locale: DEFAULT_LANGUAGE,
+        locale: DEFAULT_ADMIN_CONTENT_LOCALE,
       });
       setShowAddModal(false);
       resetForm();
@@ -98,8 +113,14 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       const response = await apiClient.get<{ data: Category }>(`/api/v1/admin/categories/${category.id}`);
       const categoryWithChildren = response.data;
 
+      const withTitles = categoryWithChildren as Category & { titles?: CategoryFormData['titles'] };
+      setTranslationLocale(DEFAULT_ADMIN_CONTENT_LOCALE);
       setFormData({
-        title: category.title,
+        titles: withTitles.titles || {
+          hy: categoryWithChildren.title || category.title,
+          en: '',
+          ru: '',
+        },
         slug: categoryWithChildren.slug || category.slug,
         parentId: category.parentId || '',
         requiresSizes: category.requiresSizes || false,
@@ -108,8 +129,13 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       });
     } catch (err: unknown) {
       logger.error('Error fetching category children', { error: err });
+      setTranslationLocale(DEFAULT_ADMIN_CONTENT_LOCALE);
       setFormData({
-        title: category.title,
+        titles: category.titles || {
+          hy: category.title,
+          en: '',
+          ru: '',
+        },
         slug: category.slug,
         parentId: category.parentId || '',
         requiresSizes: category.requiresSizes || false,
@@ -122,7 +148,11 @@ export function useCategoryActions(): UseCategoryActionsReturn {
   };
 
   const handleUpdateCategory = async (fetchCategories: () => Promise<void>) => {
-    if (!editingCategory || !formData.title.trim()) {
+    const primaryTitle =
+      formData.titles.hy.trim() ||
+      formData.titles.en.trim() ||
+      formData.titles.ru.trim();
+    if (!editingCategory || !primaryTitle) {
       showToast(t('admin.categories.titleRequired'), 'warning');
       return;
     }
@@ -135,13 +165,14 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     setSaving(true);
     try {
       await apiClient.put(`/api/v1/admin/categories/${editingCategory.id}`, {
-        title: formData.title.trim(),
+        title: primaryTitle,
+        titles: formData.titles,
         slug: formData.slug.trim(),
         parentId: formData.parentId || null,
         requiresSizes: formData.requiresSizes,
         subcategoryIds: formData.subcategoryIds,
         imageUrl: formData.imageUrl,
-        locale: DEFAULT_LANGUAGE,
+        locale: DEFAULT_ADMIN_CONTENT_LOCALE,
       });
       setShowEditModal(false);
       setEditingCategory(null);
@@ -253,6 +284,8 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     showEditModal,
     editingCategory,
     formData,
+    translationLocale,
+    setTranslationLocale,
     saving,
     setShowAddModal,
     setShowEditModal,

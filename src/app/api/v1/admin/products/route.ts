@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApiContext } from "@/lib/middleware/admin-api-auth";
 import { adminService } from "@/lib/services/admin.service";
 import { runApiRoute } from "@/lib/errors/run-api-route";
+import { buildInlineImageProblem, findInlineImagePath } from "@/lib/security/inline-image-guard";
 
 /**
  * Валидация и нормализация параметров запроса для GET /api/v1/admin/products
@@ -19,6 +20,7 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
     maxPrice?: number;
     sort?: string;
     stockStatus?: "all" | "inStock" | "outOfStock";
+    locale?: string;
   };
   error?: {
     type: string;
@@ -113,6 +115,7 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
       maxPrice,
       sort: searchParams.get("sort")?.trim() || undefined,
       stockStatus,
+      locale: searchParams.get("locale")?.trim() || undefined,
     },
   };
 }
@@ -192,6 +195,11 @@ export async function POST(req: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    const inlineImagePath = findInlineImagePath(body);
+    if (inlineImagePath) {
+      return NextResponse.json(buildInlineImageProblem(inlineImagePath, req.url), { status: 400 });
     }
 
     if (!body.title || typeof body.title !== "string" || body.title.trim().length === 0) {

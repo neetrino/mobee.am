@@ -17,6 +17,54 @@ export function processVariantImageUrl(
   return processedUrls.length > 0 ? processedUrls.join(",") : null;
 }
 
+function readMediaAlt(item: unknown): string | undefined {
+  if (!item || typeof item !== "object" || !("alt" in item)) {
+    return undefined;
+  }
+  const alt = (item as { alt?: unknown }).alt;
+  return typeof alt === "string" && alt.trim() ? alt : undefined;
+}
+
+/**
+ * Extracts processed image URLs from a variant `media` JSON array.
+ */
+export function extractVariantMediaUrls(media: unknown): string[] {
+  if (!Array.isArray(media)) {
+    return [];
+  }
+  return media
+    .map((item) =>
+      typeof item === "string" || (item && typeof item === "object")
+        ? processImageUrl(item as string | { url?: string })
+        : null
+    )
+    .filter((url): url is string => url !== null);
+}
+
+/**
+ * Builds variant `media` from the processed comma-separated imageUrl, keeping alt text of existing entries.
+ */
+export function buildVariantMediaFromImageUrl(
+  processedImageUrl: string | null,
+  existingMedia: unknown
+): Array<{ url: string; alt?: string }> {
+  const altByUrl = new Map<string, string>();
+  if (Array.isArray(existingMedia)) {
+    for (const item of existingMedia) {
+      const url = extractVariantMediaUrls([item])[0];
+      const alt = readMediaAlt(item);
+      if (url && alt) {
+        altByUrl.set(url, alt);
+      }
+    }
+  }
+
+  return smartSplitUrls(processedImageUrl).map((url) => {
+    const alt = altByUrl.get(url);
+    return alt ? { url, alt } : { url };
+  });
+}
+
 export function ownershipError(variantId: string): never {
   throw {
     status: 403,

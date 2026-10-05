@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
+import {
+  DEFAULT_ADMIN_CONTENT_LOCALE,
+  type AdminContentLocale,
+} from '@/lib/admin/admin-content-locale';
 import { logger } from '../../../../lib/utils/logger';
 import type { Category } from '../types';
 
@@ -17,7 +21,7 @@ interface UseCategoriesReturn {
 /**
  * Hook for fetching and managing categories
  */
-export function useCategories(): UseCategoriesReturn {
+export function useCategories(locale: AdminContentLocale = DEFAULT_ADMIN_CONTENT_LOCALE): UseCategoriesReturn {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +35,7 @@ export function useCategories(): UseCategoriesReturn {
       }
       setError(null);
       logger.debug('Fetching categories');
-      const response = await fetchAdminReference<{ data: Category[] }>('categories');
+      const response = await fetchAdminReference<{ data: Category[] }>('categories', { locale });
       setCategories(response.data || []);
       logger.info('Categories loaded', { count: response.data?.length || 0 });
     } catch (err: unknown) {
@@ -43,7 +47,7 @@ export function useCategories(): UseCategoriesReturn {
         setLoading(false);
       }
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     fetchCategories();

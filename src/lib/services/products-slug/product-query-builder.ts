@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import {
+  PRODUCT_VARIANT_DISPLAY_ORDER,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
   PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
 } from "@/lib/database/productVariantDb.constants";
@@ -26,6 +27,7 @@ const getBaseInclude = () => ({
     where: {
       published: true,
     },
+    orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
     select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_FULL,
   },
   labels: true,
@@ -40,6 +42,7 @@ const getBaseIncludeWithoutAttributeValue = () => ({
     where: {
       published: true,
     },
+    orderBy: PRODUCT_VARIANT_DISPLAY_ORDER,
     select: PRODUCT_VARIANT_SELECT_WITH_OPTIONS_TRUE,
   },
 });

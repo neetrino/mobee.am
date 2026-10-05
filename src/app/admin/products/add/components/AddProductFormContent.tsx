@@ -15,6 +15,7 @@ import type {
 } from '../types';
 import type { CurrencyCode } from '@/lib/currency';
 import type { ProductWarrantyYears } from '@/lib/constants/product-warranty';
+import type { AdminContentLocale } from '@/lib/admin/admin-content-locale';
 import { BasicInformation } from './BasicInformation';
 import { CategoriesBrands } from './CategoriesBrands';
 import { SimpleProductFields } from './SimpleProductFields';
@@ -78,6 +79,8 @@ interface AddProductFormContentProps {
   fileInputRef: React.RefObject<HTMLInputElement>;
   attributesDropdownRef: React.RefObject<HTMLDivElement>;
   variantImageInputRefs: React.MutableRefObject<Record<string, HTMLInputElement | null>>;
+  translationLocale: AdminContentLocale;
+  onTranslationLocaleChange: (locale: AdminContentLocale) => void;
   onTitleChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onSlugChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onDescriptionChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
@@ -145,6 +148,8 @@ export function AddProductFormContent({
   fileInputRef,
   attributesDropdownRef,
   variantImageInputRefs,
+  translationLocale,
+  onTranslationLocaleChange,
   onTitleChange,
   onSlugChange,
   onDescriptionChange,
@@ -192,6 +197,8 @@ export function AddProductFormContent({
         <BasicInformation
           productType={productType}
           setProductType={onProductTypeChange}
+          translationLocale={translationLocale}
+          onTranslationLocaleChange={onTranslationLocaleChange}
           title={formData.title}
           slug={formData.slug}
           descriptionHtml={formData.descriptionHtml}

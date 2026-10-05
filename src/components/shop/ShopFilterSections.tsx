@@ -22,7 +22,7 @@ export type ShopFilterSectionsProps = {
 };
 
 /**
- * Marco-style order: Brands → Price → Colors → Attributes → Categories (last).
+ * Order: Categories → Brands → Price → Colors → Sizes → Attributes.
  */
 export function ShopFilterSections({
   currentMinPrice,
@@ -41,6 +41,12 @@ export function ShopFilterSections({
       data-shop-filter-sections
       className={`${SHOP_FILTER_SECTIONS_STACK_CLASS}${padded ? ' p-4' : ''}`}
     >
+      <CategoryFilter
+        selectedCategories={selectedCategories}
+        search={search}
+        minPrice={currentMinPrice}
+        maxPrice={currentMaxPrice}
+      />
       <BrandFilter
         category={category}
         search={search}
@@ -63,12 +69,6 @@ export function ShopFilterSections({
       />
       <SizeFilter selectedSizes={selectedSizes} />
       <AttributeFiltersList selectedAttrs={selectedAttrs} />
-      <CategoryFilter
-        selectedCategories={selectedCategories}
-        search={search}
-        minPrice={currentMinPrice}
-        maxPrice={currentMaxPrice}
-      />
     </div>
   );
 }

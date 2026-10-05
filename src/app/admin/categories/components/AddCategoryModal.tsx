@@ -6,12 +6,17 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { AdminFormSelectDropdown } from '../../components/AdminFormSelectDropdown';
 import type { Category, CategoryFormData } from '../types';
 import { CategoryImageField } from './CategoryImageField';
+import { AdminTranslationTabs } from '../../components/AdminTranslationTabs';
+import { filledLocaleEntries, type AdminContentLocale } from '@/lib/admin/admin-content-locale';
+import { syncSlugWithTitle } from '@/lib/utils/slug';
 
 interface AddCategoryModalProps {
   isOpen: boolean;
   formData: CategoryFormData;
   categories: Category[];
   saving: boolean;
+  translationLocale: AdminContentLocale;
+  onTranslationLocaleChange: (locale: AdminContentLocale) => void;
   onClose: () => void;
   onFormDataChange: (data: CategoryFormData) => void;
   onSubmit: () => Promise<void>;
@@ -22,6 +27,8 @@ export function AddCategoryModal({
   formData,
   categories,
   saving,
+  translationLocale,
+  onTranslationLocaleChange,
   onClose,
   onFormDataChange,
   onSubmit,
@@ -50,14 +57,28 @@ export function AddCategoryModal({
             {t('admin.categories.addCategory')}
           </h3>
           <div className="space-y-4">
+            <AdminTranslationTabs
+              value={translationLocale}
+              onChange={onTranslationLocaleChange}
+            />
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 {t('admin.categories.categoryTitle')} *
               </label>
               <Input
                 type="text"
-                value={formData.title}
-                onChange={(e) => onFormDataChange({ ...formData, title: e.target.value })}
+                value={formData.titles[translationLocale]}
+                onChange={(e) =>
+                  onFormDataChange({
+                    ...formData,
+                    titles: { ...formData.titles, [translationLocale]: e.target.value },
+                    slug: syncSlugWithTitle(
+                      formData.titles[translationLocale],
+                      formData.slug,
+                      e.target.value,
+                    ),
+                  })
+                }
                 placeholder={t('admin.categories.categoryTitlePlaceholder')}
                 className="w-full"
               />
@@ -73,7 +94,7 @@ export function AddCategoryModal({
                 placeholder={t('admin.categories.categorySlugPlaceholder')}
                 className="w-full"
               />
-              <p className="mt-1 text-xs text-gray-500">{t('admin.categories.categorySlugHint')}</p>
+              <p className="mt-1 text-xs text-gray-500">{t('admin.common.sharedSlugHint')}</p>
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="add-category-parent-trigger">
@@ -111,7 +132,7 @@ export function AddCategoryModal({
             <Button
               variant="admin"
               onClick={onSubmit}
-              disabled={saving || !formData.title.trim()}
+              disabled={saving || filledLocaleEntries(formData.titles).length === 0}
               className="flex-1"
             >
               {saving ? t('admin.categories.creating') : t('admin.categories.createCategory')}
