@@ -1,6 +1,5 @@
 ﻿'use client';
 
-import { useRouter } from 'next/navigation';
 import { AdminTableSkeleton } from '../../components/AdminTableSkeleton';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { resolveAdminProductThumbnailSrc } from '@/app/admin/admin-uniform-product-thumbnail.constants';
@@ -43,6 +42,7 @@ interface ProductsTableProps {
   meta: ProductsResponse['meta'] | null;
   page: number;
   setPage: (page: number | ((prev: number) => number)) => void;
+  onEditProduct: (productId: string) => void;
 }
 
 export function ProductsTable({
@@ -62,9 +62,9 @@ export function ProductsTable({
   meta,
   page,
   setPage,
+  onEditProduct,
 }: ProductsTableProps) {
   const { t } = useTranslation();
-  const router = useRouter();
 
   return (
     <Card className="overflow-hidden">
@@ -123,11 +123,11 @@ export function ProductsTable({
                       </span>
                     </button> 
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
                     <button
                       type="button"
                       onClick={() => handleHeaderSort('stock')}
-                      className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800"
+                      className="inline-flex items-center justify-center gap-1 text-gray-500 hover:text-gray-800"
                     >
                       <span>{t('admin.products.stock')}</span>
                       <span className="flex flex-col gap-0.5">
@@ -158,11 +158,11 @@ export function ProductsTable({
                       </span>
                     </button>
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
                     <button
                       type="button"
                       onClick={() => handleHeaderSort('price')}
-                      className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800"
+                      className="inline-flex items-center justify-center gap-1 text-gray-500 hover:text-gray-800"
                     >
                       <span>{t('admin.products.price')}</span>
                       <span className="flex flex-col gap-0.5">
@@ -193,7 +193,7 @@ export function ProductsTable({
                       </span>
                     </button>
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
                     {t('admin.products.category')}
                   </th>
                   <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -276,9 +276,9 @@ export function ProductsTable({
                         </div>
                       </div>
                     </td>
-                    <td className="px-3 py-4">
+                    <td className="px-3 py-4 text-center">
                       {product.colorStocks && product.colorStocks.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap justify-center gap-2">
                           {product.colorStocks.map((colorStock) => (
                             <div
                               key={colorStock.color}
@@ -295,8 +295,8 @@ export function ProductsTable({
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      <div className="flex flex-col">
+                    <td className="whitespace-nowrap px-3 py-4 text-center">
+                      <div className="flex flex-col items-center">
                         <div className="text-sm font-medium text-gray-900">
                           {formatPrice(product.price, currency)}
                         </div>
@@ -313,11 +313,11 @@ export function ProductsTable({
                         ) : null}
                       </div>
                     </td>
-                    <td className="px-3 py-4">
+                    <td className="px-3 py-4 text-center">
                       {productCategories.length === 0 ? (
                         <span className="text-sm text-gray-400">{t('admin.products.noCategory')}</span>
                       ) : (
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap justify-center gap-1.5">
                           {productCategories.map((category) => (
                             <span
                               key={category.id}
@@ -358,7 +358,7 @@ export function ProductsTable({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => router.push(`/supersudo/products/add?id=${product.id}`)}
+                          onClick={() => onEditProduct(product.id)}
                           aria-label={t('admin.products.edit')}
                           title={t('admin.products.edit')}
                           className="p-2 text-admin-600 hover:text-admin-800 hover:bg-admin-50"

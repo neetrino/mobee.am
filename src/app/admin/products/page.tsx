@@ -1,7 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState, useMemo } from 'react';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
 import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
@@ -16,11 +15,13 @@ import { useProductHandlers } from './hooks/useProductHandlers';
 import type { Product, ProductsResponse, Category } from './types';
 import { showToast } from '@/components/Toast';
 import { useAdminPageNavDebug } from '../hooks/useAdminPageNavDebug';
+import { AdminSideSheet } from '../components/AdminSideSheet';
+import { AdminContentSkeleton } from '../components/AdminContentSkeleton';
+import { AddProductPageContent } from './add/page';
 
 export default function ProductsPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin } = useAuth();
-  const router = useRouter();
   const initialProductsCache = readAdminSessionCache<ProductsResponse>(
     buildAdminSessionCacheKey('/supersudo/products', DEFAULT_PRODUCTS_LIST_PARAMS),
   );
@@ -42,6 +43,11 @@ export default function ProductsPage() {
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [_togglingAllFeatured, setTogglingAllFeatured] = useState(false);
   const [currency, setCurrency] = useState<CurrencyCode>('USD');
+  const [editor, setEditor] = useState<{ open: boolean; productId: string | null; session: number }>({
+    open: false,
+    productId: null,
+    session: 0,
+  });
 
   useAdminPageNavDebug(loading || categoriesLoading);
 
@@ -347,7 +353,13 @@ export default function ProductsPage() {
         {/* Add New Product Button */}
         <div className="mb-6">
           <button
-            onClick={() => router.push('/supersudo/products/add')}
+            onClick={() =>
+              setEditor((current) => ({
+                open: true,
+                productId: null,
+                session: current.session + 1,
+              }))
+            }
             className="w-full px-4 py-3 bg-admin text-white rounded-supersudo hover:bg-admin-600 transition-colors flex items-center justify-center gap-2 font-medium text-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -375,7 +387,38 @@ export default function ProductsPage() {
           meta={meta}
           page={page}
           setPage={setPage}
+          onEditProduct={(productId) =>
+            setEditor((current) => ({
+              open: true,
+              productId,
+              session: current.session + 1,
+            }))
+          }
         />
+        <AdminSideSheet
+          open={editor.open}
+          onClose={() => setEditor((current) => ({ ...current, open: false }))}
+          title={
+            editor.productId
+              ? t('admin.products.add.editProduct')
+              : t('admin.products.add.addNewProduct')
+          }
+          closeLabel={t('admin.common.close')}
+          desktopWidthClassName="lg:w-[78%]"
+          mobileWidthClassName="w-full max-w-none"
+        >
+          <Suspense fallback={<AdminContentSkeleton lines={6} />}>
+            <AddProductPageContent
+              key={`${editor.session}`}
+              embedded
+              productId={editor.productId}
+              onExit={() => {
+                setEditor((current) => ({ ...current, open: false }));
+                void fetchProducts(true);
+              }}
+            />
+          </Suspense>
+        </AdminSideSheet>
       </div>
   );
 }

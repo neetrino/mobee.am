@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
+import { AdminSideSheet } from '../../../components/AdminSideSheet';
 import { Button } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { getColorHex } from '../../../../../lib/colorMap';
@@ -127,19 +127,22 @@ export function ValueSelectionModal({
   };
 
   return (
-    <AnimatedModalPortal
-      isOpen={isOpen}
+    <AdminSideSheet
+      open={isOpen}
       onClose={onClose}
-      closeAriaLabel="Close"
-      labelledBy="value-selection-modal-title"
-      dialogFrameClassName="fixed left-1/2 top-1/2 z-10 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 px-4"
-      panelClassName="max-h-[90vh] w-full overflow-y-auto rounded-supersudo bg-white shadow-xl"
+      title={active ? `${t('admin.products.add.selectValues')} ${active.attribute.name}` : t('admin.products.add.selectValues')}
+      closeLabel={t('admin.common.close')}
+      desktopWidthClassName="lg:w-[50%]"
+      mobileWidthClassName="w-[92%] max-w-lg"
+      footer={
+        <div className="flex items-center justify-end">
+          <Button type="button" variant="outline" onClick={onClose}>
+            {t('admin.common.close')}
+          </Button>
+        </div>
+      }
     >
-      {({ requestClose }) => {
-        if (!active) {
-          return null;
-        }
-
+      {active ? (() => {
         const { variant: activeVariant, attribute: activeAttribute } = active;
         const isColor = activeAttribute.key === 'color';
         const selectedValueIds = activeVariant.selectedValueIds.filter((id) => {
@@ -147,26 +150,7 @@ export function ValueSelectionModal({
         });
 
         return (
-          <>
-            {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white p-6">
-              <h3 id="value-selection-modal-title" className="text-xl font-semibold text-gray-900">
-                {t('admin.products.add.selectValues')} {activeAttribute.name}
-              </h3>
-              <button
-                type="button"
-                onClick={requestClose}
-                className="text-gray-400 transition-colors hover:text-admin-600"
-                aria-label="Close"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="p-6">
+            <div>
               {/* "All" option */}
               <label className="mb-3 flex cursor-pointer items-center gap-2 rounded-supersudo border border-gray-200 p-2 hover:bg-gray-50">
                 <input
@@ -224,16 +208,8 @@ export function ValueSelectionModal({
                 })}
               </div>
             </div>
-
-            {/* Footer */}
-            <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-gray-200 bg-white p-6">
-              <Button type="button" variant="outline" onClick={requestClose}>
-                {t('admin.common.close')}
-              </Button>
-            </div>
-          </>
         );
-      }}
-    </AnimatedModalPortal>
+      })() : null}
+    </AdminSideSheet>
   );
 }

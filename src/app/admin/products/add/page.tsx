@@ -1,10 +1,12 @@
 ﻿'use client';
 
 import { Suspense, useCallback, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { AdminContentSkeleton } from '../../components/AdminContentSkeleton';
+import { AdminSideSheet } from '../../components/AdminSideSheet';
 import { PageHeader } from './components/PageHeader';
 import { useProductFormState } from './hooks/useProductFormState';
 import { useProductDataLoading } from './hooks/useProductDataLoading';
@@ -39,10 +41,18 @@ const ValueSelectionModal = dynamic(
   { loading: () => null },
 );
 
-function AddProductPageContent() {
+export function AddProductPageContent({
+  productId: productIdProp = null,
+  onExit,
+  embedded = false,
+}: {
+  productId?: string | null;
+  onExit?: () => void;
+  embedded?: boolean;
+}) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const productId = searchParams.get('id');
+  const productId = embedded ? productIdProp : searchParams.get('id');
   const isEditMode = !!productId;
   const [translationLocale, setTranslationLocale] = useState<AdminContentLocale>(
     DEFAULT_ADMIN_CONTENT_LOCALE,
@@ -247,6 +257,7 @@ function AddProductPageContent() {
     locale: translationLocale,
     translationDraftsRef,
     translationBaselinesRef,
+    onExit,
   });
 
   if (formState.loadingProduct) {
@@ -260,7 +271,7 @@ function AddProductPageContent() {
   return (
     <>
       <div className="mx-auto w-full max-w-7xl">
-        <PageHeader isEditMode={isEditMode} />
+        {embedded ? null : <PageHeader isEditMode={isEditMode} />}
 
         <AddProductFormContent
           formData={formState.formData}
@@ -338,6 +349,7 @@ function AddProductPageContent() {
           isClothingCategory={isClothingCategory}
           generateSlug={generateSlug}
           handleSubmit={handleSubmit}
+          onCancel={onExit}
         />
       </div>
 
@@ -356,10 +368,36 @@ function AddProductPageContent() {
   );
 }
 
+function AddProductRouteSheet() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const productId = searchParams.get('id');
+  const leave = () => {
+    router.push('/supersudo/products');
+  };
+  const title = productId
+    ? t('admin.products.add.editProduct')
+    : t('admin.products.add.addNewProduct');
+
+  return (
+    <AdminSideSheet
+      open
+      onClose={leave}
+      title={title}
+      closeLabel={t('admin.common.close')}
+      desktopWidthClassName="lg:w-[78%]"
+      mobileWidthClassName="w-full max-w-none"
+    >
+      <AddProductPageContent embedded productId={productId} onExit={leave} />
+    </AdminSideSheet>
+  );
+}
+
 export default function AddProductPage() {
   return (
     <Suspense fallback={<AdminContentSkeleton lines={6} />}>
-      <AddProductPageContent />
+      <AddProductRouteSheet />
     </Suspense>
   );
 }

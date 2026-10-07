@@ -1,6 +1,9 @@
 'use client';
 
+import { useContext } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/app/admin/lib/adminShopUi';
+import { AdminSheetFooterSlotContext } from '../../../components/AdminSideSheet';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { useRouter } from 'next/navigation';
 
@@ -8,20 +11,23 @@ interface FormActionsProps {
   loading: boolean;
   isEditMode: boolean;
   isSnapshotReady?: boolean;
+  onCancel?: () => void;
 }
 
-export function FormActions({ loading, isEditMode, isSnapshotReady = true }: FormActionsProps) {
+export function FormActions({ loading, isEditMode, isSnapshotReady = true, onCancel }: FormActionsProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const footerSlot = useContext(AdminSheetFooterSlotContext);
 
-  return (
-    <div className="sticky bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg -mx-6 -mb-6 px-6 py-4 mt-8 backdrop-blur-sm bg-white/95">
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-full">
+  const actions = (
+    <div className="border-t border-gray-200 bg-white px-5 py-4">
+      <div className="flex gap-3">
         <Button
           type="submit"
+          form="admin-product-form"
           variant="admin"
           disabled={loading || (isEditMode && !isSnapshotReady)}
-          className="flex-1 w-full sm:w-auto order-2 sm:order-1 !bg-admin-500 !text-white shadow-sm hover:!bg-admin-600 focus:!ring-admin-400 focus:!ring-offset-2 border-0"
+          className="flex-1 !bg-admin-500 !text-white shadow-sm hover:!bg-admin-600 focus:!ring-admin-400 focus:!ring-offset-2 border-0"
         >
           {loading
             ? isEditMode
@@ -34,14 +40,20 @@ export function FormActions({ loading, isEditMode, isSnapshotReady = true }: For
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push('/supersudo/products')}
-          className="w-full sm:w-auto order-1 sm:order-2"
+          onClick={() => (onCancel ? onCancel() : router.push('/supersudo/products'))}
+          className="shrink-0"
         >
           {t('admin.common.cancel')}
         </Button>
       </div>
     </div>
   );
+
+  if (footerSlot) {
+    return createPortal(actions, footerSlot);
+  }
+
+  return actions;
 }
 
 

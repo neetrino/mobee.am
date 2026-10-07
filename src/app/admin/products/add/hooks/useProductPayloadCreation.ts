@@ -83,6 +83,7 @@ interface CreateAndSubmitPayloadProps {
   creationMessages: string[];
   setLoading: (loading: boolean) => void;
   router: AppRouterInstance;
+  onExit?: () => void;
   partialPayload?: PartialProductUpdateInput;
   locale: AdminContentLocale;
   translationWrites: ProductTranslationWrite[];
@@ -104,6 +105,7 @@ export async function createAndSubmitPayload({
   creationMessages,
   setLoading,
   router,
+  onExit,
   partialPayload,
   locale,
   translationWrites,
@@ -121,6 +123,10 @@ export async function createAndSubmitPayload({
     } else {
       showToast(TRANSLATIONS_SYNC_FAILED_MESSAGE, 'warning');
     }
+    if (onExit) {
+      onExit();
+      return;
+    }
     router.push('/supersudo/products');
   };
 
@@ -129,6 +135,10 @@ export async function createAndSubmitPayload({
       const hasProductWork = hasPartialUpdateWork(partialPayload);
       if (!hasProductWork && translationWrites.length === 0) {
         showToast(baseMessage, 'success', toastDuration);
+        if (onExit) {
+          onExit();
+          return;
+        }
         router.push('/supersudo/products');
         return;
       }

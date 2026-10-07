@@ -7,7 +7,7 @@ import { apiClient } from '../../../lib/api-client';
 import { fetchAdminReference } from '@/lib/admin/admin-reference-api';
 import { invalidateAdminReferenceCache } from '@/lib/admin/admin-reference-cache';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
+import { AdminSideSheet } from '../components/AdminSideSheet';
 import { showToast } from '@/components/Toast';
 import { confirmDialog } from '@/components/ConfirmDialog';
 import { BrandLogoField } from './components/BrandLogoField';
@@ -303,33 +303,24 @@ function BrandsSection() {
         </>
       )}
 
-      <AnimatedModalPortal
-        isOpen={showModal}
+      <AdminSideSheet
+        open={showModal}
         onClose={handleCloseModal}
-        closeAriaLabel={t('admin.brands.cancel')}
+        title={editingBrand ? t('admin.brands.editBrand') : t('admin.brands.addNewBrand')}
+        closeLabel={t('admin.brands.cancel')}
         blockClose={submitting}
-        labelledBy="brand-modal-title"
-        panelClassName="w-full max-w-md rounded-supersudo bg-white p-6 shadow-xl"
+        footer={
+          <div className="flex items-center justify-end gap-3">
+            <Button type="button" variant="outline" onClick={handleCloseModal} disabled={submitting}>
+              {t('admin.brands.cancel')}
+            </Button>
+            <Button type="submit" form="admin-brand-form" variant="admin" disabled={submitting}>
+              {submitting ? t('admin.brands.saving') : (editingBrand ? t('admin.brands.update') : t('admin.brands.create'))}
+            </Button>
+          </div>
+        }
       >
-        {({ requestClose }) => (
-          <>
-            <div className="mb-4 flex items-center justify-between">
-              <h3 id="brand-modal-title" className="text-lg font-semibold text-gray-900">
-                {editingBrand ? t('admin.brands.editBrand') : t('admin.brands.addNewBrand')}
-              </h3>
-              <button
-                type="button"
-                onClick={requestClose}
-                className="text-gray-400 transition-colors hover:text-admin-600"
-                aria-label={t('admin.brands.cancel')}
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form id="admin-brand-form" onSubmit={handleSubmit} className="space-y-4">
               <AdminTranslationTabs
                 value={translationLocale}
                 onChange={setTranslationLocale}
@@ -360,27 +351,8 @@ function BrandsSection() {
                 onChange={(logoUrl) => setFormData({ ...formData, logoUrl })}
               />
 
-              <div className="flex items-center justify-end gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={requestClose}
-                  disabled={submitting}
-                >
-                  {t('admin.brands.cancel')}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="admin"
-                  disabled={submitting}
-                >
-                  {submitting ? t('admin.brands.saving') : (editingBrand ? t('admin.brands.update') : t('admin.brands.create'))}
-                </Button>
-              </div>
             </form>
-          </>
-        )}
-      </AnimatedModalPortal>
+      </AdminSideSheet>
     </>
   );
 }

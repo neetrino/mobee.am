@@ -134,6 +134,7 @@ interface UseProductFormHandlersProps {
   locale: AdminContentLocale;
   translationDraftsRef: MutableRefObject<ProductTranslationDrafts>;
   translationBaselinesRef: MutableRefObject<ProductTranslationBaselines>;
+  onExit?: () => void;
 }
 
 export function useProductFormHandlers({
@@ -162,6 +163,7 @@ export function useProductFormHandlers({
   locale,
   translationDraftsRef,
   translationBaselinesRef,
+  onExit,
 }: UseProductFormHandlersProps) {
   const router = useRouter();
 
@@ -533,6 +535,7 @@ export function useProductFormHandlers({
           creationMessages,
           setLoading,
           router,
+          onExit,
           partialPayload,
           locale: primaryLocale,
           translationWrites,
@@ -561,6 +564,7 @@ export function useProductFormHandlers({
         creationMessages,
         setLoading,
         router,
+        onExit,
         locale: primaryLocale,
         translationWrites,
       });
