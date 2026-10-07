@@ -134,7 +134,7 @@ export function AdminSideSheet({
     <div
       ref={rootRef}
       data-admin-side-sheet=""
-      className="fixed inset-0 z-[200] flex justify-end overscroll-none"
+      className="fixed inset-0 z-[300] flex justify-end overscroll-none"
       role="dialog"
       aria-modal="true"
       aria-labelledby="admin-side-sheet-title"
