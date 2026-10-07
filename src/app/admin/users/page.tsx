@@ -262,13 +262,13 @@ export default function UsersPage() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('admin.users.contact')}
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
                         {t('admin.users.orders')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
                         {t('admin.users.status')}
                       </th>
-                      <th className="min-w-[7.5rem] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-normal">
+                      <th className="min-w-[7.5rem] whitespace-normal px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
                         {t('admin.users.created')}
                       </th>
                     </tr>
@@ -295,10 +295,10 @@ export default function UsersPage() {
                             <div className="text-sm text-gray-500">{user.phone}</div>
                           )}
                         </td>
-                        <td className="px-16 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                        <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-900">
                           {user.ordersCount ?? 0}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="whitespace-nowrap px-6 py-4 text-center">
                           <button
                             type="button"
                             onClick={() =>
@@ -308,7 +308,7 @@ export default function UsersPage() {
                                 `${user.firstName} ${user.lastName}`,
                               )
                             }
-                            className={`ml-[25px] relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                               user.blocked
                                 ? 'bg-gray-300 focus:ring-gray-400'
                                 : 'bg-green-500 focus:ring-green-500'
@@ -324,7 +324,7 @@ export default function UsersPage() {
                             />
                           </button>
                         </td>
-                        <td className="min-w-[7.5rem] px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                        <td className="min-w-[7.5rem] whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                       </tr>
