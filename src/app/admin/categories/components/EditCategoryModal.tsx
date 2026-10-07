@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
+import { AdminSideSheet } from '../../components/AdminSideSheet';
 import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { AdminFormSelectDropdown } from '../../components/AdminFormSelectDropdown';
@@ -55,24 +55,31 @@ export function EditCategoryModal({
     : [{ value: '', label: t('admin.categories.rootCategory') }];
 
   return (
-    <AnimatedModalPortal
-      isOpen={modalOpen}
+    <AdminSideSheet
+      open={modalOpen}
       onClose={onClose}
-      closeAriaLabel={t('admin.common.cancel')}
+      title={t('admin.categories.editCategory')}
+      closeLabel={t('admin.common.cancel')}
       blockClose={saving}
-      labelledBy="edit-category-modal-title"
-      panelClassName="max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-supersudo bg-white p-6"
+      footer={
+        categorySnapshot ? (
+          <div className="flex gap-3">
+            <Button
+              variant="admin"
+              onClick={onSubmit}
+              disabled={saving || filledLocaleEntries(formData.titles).length === 0 || !formData.slug.trim()}
+              className="flex-1"
+            >
+              {saving ? t('admin.categories.updating') : t('admin.categories.updateCategory')}
+            </Button>
+            <Button variant="ghost" onClick={onClose} disabled={saving}>
+              {t('admin.common.cancel')}
+            </Button>
+          </div>
+        ) : null
+      }
     >
-      {({ requestClose }) => {
-        if (!categorySnapshot) {
-          return null;
-        }
-
-        return (
-          <>
-            <h3 id="edit-category-modal-title" className="mb-4 text-lg font-semibold text-gray-900">
-              {t('admin.categories.editCategory')}
-            </h3>
+      {categorySnapshot ? (
             <div className="space-y-4">
               <AdminTranslationTabs
                 value={translationLocale}
@@ -181,26 +188,7 @@ export function EditCategoryModal({
                 </div>
               </div>
             </div>
-            <div className="mt-6 flex gap-3">
-              <Button
-                variant="admin"
-                onClick={onSubmit}
-                disabled={saving || filledLocaleEntries(formData.titles).length === 0 || !formData.slug.trim()}
-                className="flex-1"
-              >
-                {saving ? t('admin.categories.updating') : t('admin.categories.updateCategory')}
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={requestClose}
-                disabled={saving}
-              >
-                {t('admin.common.cancel')}
-              </Button>
-            </div>
-          </>
-        );
-      }}
-    </AnimatedModalPortal>
+      ) : null}
+    </AdminSideSheet>
   );
 }

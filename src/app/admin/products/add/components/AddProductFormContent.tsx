@@ -119,6 +119,7 @@ interface AddProductFormContentProps {
   isClothingCategory: () => boolean;
   generateSlug: (text: string) => string;
   handleSubmit: (e: React.FormEvent) => void;
+  onCancel?: () => void;
 }
 
 export function AddProductFormContent({
@@ -188,12 +189,13 @@ export function AddProductFormContent({
   isClothingCategory,
   generateSlug,
   handleSubmit,
+  onCancel,
 }: AddProductFormContentProps) {
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6 pb-24 sm:pb-24">
-      <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10">
+    <Card className="p-6">
+      <form id="admin-product-form" onSubmit={handleSubmit} className="space-y-8 sm:space-y-10">
         <BasicInformation
           productType={productType}
           setProductType={onProductTypeChange}
@@ -322,7 +324,7 @@ export function AddProductFormContent({
           </div>
         </details>
 
-        <FormActions loading={loading} isEditMode={isEditMode} isSnapshotReady={isSnapshotReady} />
+        <FormActions loading={loading} isEditMode={isEditMode} isSnapshotReady={isSnapshotReady} onCancel={onCancel} />
       </form>
     </Card>
   );

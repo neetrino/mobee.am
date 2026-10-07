@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { AnimatedModalPortal } from '@/components/AnimatedModalPortal';
+import { AdminSideSheet } from '../../components/AdminSideSheet';
 import { Button, Input } from '@/app/admin/lib/adminShopUi';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { AdminFormSelectDropdown } from '../../components/AdminFormSelectDropdown';
@@ -43,19 +43,28 @@ export function AddCategoryModal({
   ];
 
   return (
-    <AnimatedModalPortal
-      isOpen={isOpen}
+    <AdminSideSheet
+      open={isOpen}
       onClose={onClose}
-      closeAriaLabel={t('admin.common.cancel')}
+      title={t('admin.categories.addCategory')}
+      closeLabel={t('admin.common.cancel')}
       blockClose={saving}
-      labelledBy="add-category-modal-title"
-      panelClassName="max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-supersudo bg-white p-6"
+      footer={
+        <div className="flex gap-3">
+          <Button
+            variant="admin"
+            onClick={onSubmit}
+            disabled={saving || filledLocaleEntries(formData.titles).length === 0}
+            className="flex-1"
+          >
+            {saving ? t('admin.categories.creating') : t('admin.categories.createCategory')}
+          </Button>
+          <Button variant="ghost" onClick={onClose} disabled={saving}>
+            {t('admin.common.cancel')}
+          </Button>
+        </div>
+      }
     >
-      {({ requestClose }) => (
-        <>
-          <h3 id="add-category-modal-title" className="mb-4 text-lg font-semibold text-gray-900">
-            {t('admin.categories.addCategory')}
-          </h3>
           <div className="space-y-4">
             <AdminTranslationTabs
               value={translationLocale}
@@ -128,25 +137,6 @@ export function AddCategoryModal({
               </label>
             </div>
           </div>
-          <div className="mt-6 flex gap-3">
-            <Button
-              variant="admin"
-              onClick={onSubmit}
-              disabled={saving || filledLocaleEntries(formData.titles).length === 0}
-              className="flex-1"
-            >
-              {saving ? t('admin.categories.creating') : t('admin.categories.createCategory')}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={requestClose}
-              disabled={saving}
-            >
-              {t('admin.common.cancel')}
-            </Button>
-          </div>
-        </>
-      )}
-    </AnimatedModalPortal>
+    </AdminSideSheet>
   );
 }

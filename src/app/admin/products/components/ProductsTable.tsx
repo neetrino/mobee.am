@@ -1,6 +1,5 @@
 ﻿'use client';
 
-import { useRouter } from 'next/navigation';
 import { AdminTableSkeleton } from '../../components/AdminTableSkeleton';
 import { Card, Button } from '@/app/admin/lib/adminShopUi';
 import { resolveAdminProductThumbnailSrc } from '@/app/admin/admin-uniform-product-thumbnail.constants';
@@ -43,6 +42,7 @@ interface ProductsTableProps {
   meta: ProductsResponse['meta'] | null;
   page: number;
   setPage: (page: number | ((prev: number) => number)) => void;
+  onEditProduct: (productId: string) => void;
 }
 
 export function ProductsTable({
@@ -62,9 +62,9 @@ export function ProductsTable({
   meta,
   page,
   setPage,
+  onEditProduct,
 }: ProductsTableProps) {
   const { t } = useTranslation();
-  const router = useRouter();
 
   return (
     <Card className="overflow-hidden">
@@ -358,7 +358,7 @@ export function ProductsTable({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => router.push(`/supersudo/products/add?id=${product.id}`)}
+                          onClick={() => onEditProduct(product.id)}
                           aria-label={t('admin.products.edit')}
                           title={t('admin.products.edit')}
                           className="p-2 text-admin-600 hover:text-admin-800 hover:bg-admin-50"
