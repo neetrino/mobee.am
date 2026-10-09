@@ -77,6 +77,7 @@ export function useVariantGeneration({
         stock: existingAutoVariant?.stock || '',
         sku: existingAutoVariant?.sku || sku,
         images: existingAutoVariant?.images ?? [],
+        isMain: existingAutoVariant?.isMain,
       };
 
       const result = [autoVariant];

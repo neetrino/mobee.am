@@ -11,6 +11,7 @@ export interface EditableVariantSnapshot {
   sku: string;
   images: string[];
   published: boolean;
+  isMain: boolean;
 }
 
 export interface EditableProductSnapshot {
@@ -92,6 +93,7 @@ function normalizeVariant(variant: GeneratedVariant): EditableVariantSnapshot {
     sku: variant.sku.trim(),
     images: [...variant.images],
     published: true,
+    isMain: variant.isMain === true,
   };
 }
 

@@ -73,6 +73,7 @@ interface CreateAndSubmitPayloadProps {
     sku: string;
     imageUrl?: string | null;
     published?: boolean;
+    isMain?: boolean;
     options?: Array<{ attributeKey: string; value: string; valueId?: string }>;
   }>;
   attributeIds: string[];

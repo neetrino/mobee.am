@@ -17,6 +17,7 @@ export interface ApiProductVariant {
   imageUrl?: string | null;
   media?: string[];
   published?: boolean;
+  isMain?: boolean;
   attributes?: Record<string, string | ApiAttributeValueItem[] | unknown>;
   options?: Array<{
     attributeId?: string;
@@ -203,6 +204,7 @@ export function convertApiVariantsToGenerated(
           : "0",
       sku: variant.sku?.trim() ?? "",
       images: extractVariantImages(variant),
+      isMain: variant.isMain === true,
     };
   });
 }

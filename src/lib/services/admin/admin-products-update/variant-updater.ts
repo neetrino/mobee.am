@@ -6,6 +6,7 @@ import {
 } from "./variant-processor";
 import { applyLegacyVariantReplace } from "./variant-legacy-updater";
 import { createVariant } from "./variant-create";
+import { clearMainVariantIfReassigned } from "./variant-main";
 import {
   ownershipError,
   notFoundError,
@@ -53,6 +54,9 @@ export async function updateVariantPartial(
   }
   if (variant.published !== undefined) {
     data.published = variant.published;
+  }
+  if (variant.isMain !== undefined) {
+    data.isMain = variant.isMain;
   }
   if (variant.imageUrl !== undefined) {
     const processedImageUrl = processVariantImageUrl(variant.imageUrl) ?? null;
@@ -127,6 +131,8 @@ export async function applyVariantOperations(
   locale: string,
   tx: Prisma.TransactionClient
 ): Promise<void> {
+  await clearMainVariantIfReassigned(variants, productId, tx);
+
   if (variants.legacyReplace !== undefined) {
     await applyLegacyVariantReplace(
       variants.legacyReplace,

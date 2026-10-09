@@ -16,6 +16,7 @@ export function formatVariantForAdmin(variant: {
   imageUrl: string | null;
   media?: unknown;
   published: boolean | null;
+  isMain?: boolean | null;
   attributes: unknown;
   options?: AdminVariantOption[];
 }) {
@@ -36,6 +37,7 @@ export function formatVariantForAdmin(variant: {
     imageUrl: variant.imageUrl || "",
     media: extractVariantMediaUrls(variant.media),
     published: variant.published || false,
+    isMain: variant.isMain === true,
     attributes: merged.attributes,
     options,
     colorValues: merged.colorValues,

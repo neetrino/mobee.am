@@ -36,6 +36,7 @@ const createVariantSchema = z.object({
   compareAtPrice: numberLike.nullable().optional(),
   stock: numberLike,
   published: z.boolean().optional(),
+  isMain: z.boolean().optional(),
   imageUrl: z.string().nullable().optional(),
   options: z.array(variantOptionSchema).optional(),
   color: z.string().optional(),
@@ -49,6 +50,7 @@ const updateVariantSchema = z.object({
   compareAtPrice: numberLike.nullable().optional(),
   stock: numberLike.optional(),
   published: z.boolean().optional(),
+  isMain: z.boolean().optional(),
   imageUrl: z.string().nullable().optional(),
   options: z.array(variantOptionSchema).optional(),
 });
@@ -118,6 +120,7 @@ const legacyVariantSchema = z.object({
   compareAtPrice: numberLike.nullable().optional(),
   stock: numberLike,
   published: z.boolean().optional(),
+  isMain: z.boolean().optional(),
   imageUrl: z.string().nullable().optional(),
   options: z.array(variantOptionSchema).optional(),
   color: z.string().optional(),

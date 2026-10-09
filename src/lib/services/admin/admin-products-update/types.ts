@@ -22,6 +22,7 @@ export interface CreateVariantInput {
   compareAtPrice?: string | number | null;
   stock: string | number;
   published?: boolean;
+  isMain?: boolean;
   imageUrl?: string | null;
   options?: VariantOptionInput[];
   color?: string;
@@ -35,6 +36,7 @@ export interface UpdateVariantInput {
   compareAtPrice?: string | number | null;
   stock?: string | number;
   published?: boolean;
+  isMain?: boolean;
   imageUrl?: string | null;
   options?: VariantOptionInput[];
 }
@@ -47,6 +49,7 @@ export interface LegacyVariantInput {
   compareAtPrice?: string | number | null;
   stock: string | number;
   published?: boolean;
+  isMain?: boolean;
   imageUrl?: string | null;
   options?: VariantOptionInput[];
   color?: string;

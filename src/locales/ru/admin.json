@@ -527,7 +527,9 @@
       "enterSkuPrefix": "Введите префикс SKU (будет добавлено -color-size, если применимо):",
       "actions": "Действия",
       "delete": "Удалить",
-      "deleteVariant": "Удалить вариант"
+      "deleteVariant": "Удалить вариант",
+      "mainVariant": "Главный",
+      "mainVariantHint": "Этот вариант показывается на карточке товара"
     }
   },
   "settings": {

@@ -138,6 +138,7 @@ function mapProductHit(
       priceOnRequest: boolean | null;
       compareAtPrice: number | null;
       imageUrl: string | null;
+      isMain: boolean;
     }>;
     categories: Array<{
       id: string;
@@ -197,6 +198,7 @@ async function searchProductsFallback(
           priceOnRequest: true,
           compareAtPrice: true,
           imageUrl: true,
+          isMain: true,
         },
       },
       categories: {

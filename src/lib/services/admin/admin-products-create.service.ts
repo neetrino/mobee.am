@@ -118,6 +118,7 @@ class AdminProductsCreateService {
       size?: string;
       imageUrl?: string;
       published?: boolean;
+      isMain?: boolean;
       options?: Array<{
         attributeKey: string;
         value: string;
@@ -127,6 +128,8 @@ class AdminProductsCreateService {
   }) {
     try {
       logger.info("Creating product");
+
+      const mainVariantIndex = data.variants.findIndex((variant) => variant.isMain === true);
 
       const result = await db.$transaction(async (tx: any) => {
         // Track used SKUs within this transaction to ensure uniqueness
@@ -267,6 +270,7 @@ class AdminProductsCreateService {
               stock: isNaN(stock) ? 0 : stock,
               imageUrl: processedVariantImageUrl,
               published: variant.published !== false,
+              isMain: variantIndex === mainVariantIndex,
               attributes: attributesJson, // JSONB column
               options: {
                 create: options,
