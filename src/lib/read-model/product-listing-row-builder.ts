@@ -1,6 +1,10 @@
 import { processImageUrl } from "@/lib/utils/image-utils";
 import { productHasMarcoListingImage } from "@/lib/products/marco-product-image";
-import { hasDisplayPrice, pickListingPriceVariant } from "@/lib/products/variant-price-display";
+import {
+  hasDisplayPrice,
+  pickListingPriceVariant,
+  selectablePriceVariants,
+} from "@/lib/products/variant-price-display";
 import { computeEffectiveVariantPrice, resolveAppliedDiscountPercent } from "@/lib/services/products-effective-price";
 import type { ProductDiscountContext } from "@/lib/services/products-find-transform.service";
 import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
@@ -133,7 +137,7 @@ function listingPrice(
   discountPercent: number,
 ): number | null {
   let min: number | null = null;
-  for (const variant of variants) {
+  for (const variant of selectablePriceVariants(variants)) {
     if (!hasDisplayPrice(variant)) continue;
     const effective = computeEffectiveVariantPrice(variant.price, discountPercent);
     if (!Number.isFinite(effective)) continue;

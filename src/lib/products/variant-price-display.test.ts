@@ -36,6 +36,20 @@ describe('variant-price-display', () => {
     ).toBe(120);
   });
 
+  it('ignores option-less variants when selectable variants exist', () => {
+    const variants = [
+      { price: 560, options: [], attributes: null },
+      { price: 1062.25, options: [{ key: 'color' }], attributes: null },
+      { price: 1080, options: [], attributes: { color: 'Grey' } },
+    ];
+    expect(minPricedVariantPrice(variants)).toBe(1062.25);
+    expect(pickListingPriceVariant(variants)?.price).toBe(1062.25);
+  });
+
+  it('falls back to all variants when none carry options', () => {
+    expect(minPricedVariantPrice([{ price: 300 }, { price: 200 }])).toBe(200);
+  });
+
   it('assertVariantPurchasable throws for priceOnRequest', () => {
     expect(() => assertVariantPurchasable({ price: 0, priceOnRequest: true })).toThrow();
   });
