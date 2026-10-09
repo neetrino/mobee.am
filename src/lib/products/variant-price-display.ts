@@ -16,26 +16,51 @@ export function hasPurchasablePrice(variant: VariantPriceFields | null | undefin
   return hasDisplayPrice(variant);
 }
 
-/** Cheapest variant with a real price; null if none. */
-export function pickListingPriceVariant<T extends VariantPriceFields>(
+/** Optional variant selector data; used to skip variants the PDP cannot select. */
+export type VariantSelectorFields = {
+  options?: readonly unknown[] | null;
+  attributes?: unknown;
+};
+
+function hasSelectorData(variant: VariantSelectorFields): boolean {
+  if (Array.isArray(variant.options) && variant.options.length > 0) return true;
+  const attrs = variant.attributes;
+  return Boolean(attrs) && typeof attrs === 'object' && Object.keys(attrs as object).length > 0;
+}
+
+/**
+ * Variants that participate in listing price: when some variants carry options/attributes,
+ * option-less leftovers are unselectable on the PDP and must not drive the card price.
+ */
+export function selectablePriceVariants<T extends VariantSelectorFields>(variants: T[]): T[] {
+  const selectable = variants.filter(hasSelectorData);
+  return selectable.length > 0 ? selectable : variants;
+}
+
+/** Cheapest selectable variant with a real price; null if none. */
+export function pickListingPriceVariant<T extends VariantPriceFields & VariantSelectorFields>(
   variants: T[],
   preferred?: T | null,
 ): T | null {
   if (preferred && hasDisplayPrice(preferred)) return preferred;
-  const priced = variants.filter(hasDisplayPrice);
+  const priced = selectablePriceVariants(variants).filter(hasDisplayPrice);
   if (priced.length === 0) return null;
   return [...priced].sort((a, b) => (a.price ?? 0) - (b.price ?? 0))[0];
 }
 
-/** Minimum list price among priced variants, or null. */
-export function minPricedVariantPrice(variants: VariantPriceFields[]): number | null {
-  const priced = variants.filter(hasDisplayPrice);
+/** Minimum list price among selectable priced variants, or null. */
+export function minPricedVariantPrice(
+  variants: Array<VariantPriceFields & VariantSelectorFields>,
+): number | null {
+  const priced = selectablePriceVariants(variants).filter(hasDisplayPrice);
   if (priced.length === 0) return null;
   return Math.min(...priced.map((v) => v.price as number));
 }
 
 /** Sort key for price sorts — no-price products sort last. */
-export function listPriceSortKey(variants: VariantPriceFields[]): number {
+export function listPriceSortKey(
+  variants: Array<VariantPriceFields & VariantSelectorFields>,
+): number {
   const min = minPricedVariantPrice(variants);
   return min ?? Number.POSITIVE_INFINITY;
 }
