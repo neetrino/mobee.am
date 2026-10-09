@@ -126,6 +126,7 @@ async function updateOrCreateLegacyVariant(
         stock: isNaN(stock) ? 0 : stock,
         imageUrl: processedImageUrl ?? undefined,
         published: variant.published !== false,
+        isMain: variant.isMain,
         attributes: (attributesJson || undefined) as
           | Prisma.InputJsonValue
           | undefined,
@@ -143,6 +144,7 @@ async function updateOrCreateLegacyVariant(
       compareAtPrice,
       stock,
       published: variant.published,
+      isMain: variant.isMain,
       imageUrl: variant.imageUrl,
       options: variant.options,
       color: variant.color,

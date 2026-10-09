@@ -110,6 +110,7 @@ export interface GeneratedVariant {
   stock: string;
   sku: string;
   images: string[];
+  isMain?: boolean; // Shown on the storefront product card; at most one per product
 }
 
 

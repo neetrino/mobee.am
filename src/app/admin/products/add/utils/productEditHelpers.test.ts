@@ -30,6 +30,7 @@ const baseSnapshot: EditableProductSnapshot = {
       sku: "SHIRT-RED",
       images: [],
       published: true,
+      isMain: false,
     },
   ],
   media: ["https://cdn.example/a.jpg"],
@@ -396,6 +397,18 @@ describe("databaseVariantId preservation", () => {
     expect(payload.variants?.update?.[0]?.stock).toBe(10);
     expect(payload.variants?.update?.[0]?.sku).toBeUndefined();
   });
+
+  it("emits isMain only when the main flag changes", () => {
+    const processedVariants = [{ databaseVariantId: "db-v1", price: 1000, stock: 5, sku: "SHIRT-RED", isMain: true }];
+    const payload = buildPartialProductUpdatePayload({
+      initial: baseSnapshot,
+      current: { ...baseSnapshot, variants: [{ ...baseSnapshot.variants[0], isMain: true }] },
+      processedVariants,
+      media: baseSnapshot.media,
+    });
+
+    expect(payload.variants?.update).toEqual([{ id: "db-v1", isMain: true }]);
+  });
 });
 
 describe("variable variant create diff", () => {
@@ -413,6 +426,7 @@ describe("variable variant create diff", () => {
           sku: "SHIRT-BLUE-512",
           images: [],
           published: true,
+          isMain: false,
         },
       ],
     };

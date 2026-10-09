@@ -281,6 +281,8 @@ model ProductVariant {
   media          Json[]                 @default([])
   position       Int                    @default(0)
   published      Boolean                @default(true)
+  // Drives the storefront product card; at most one per product (partial unique index in migration)
+  isMain         Boolean                @default(false)
   attributes     Json?                  // JSONB: Stores variant attributes as { "color": [...], "size": [...] }
   // External source tracking (MobileCentre and future sources)
   source         String?

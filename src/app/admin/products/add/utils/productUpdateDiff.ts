@@ -9,6 +9,7 @@ export interface ProcessedVariantForSubmit {
   sku: string;
   imageUrl?: string | null;
   published?: boolean;
+  isMain?: boolean;
   options?: Array<{ attributeKey: string; value: string; valueId?: string }>;
 }
 
@@ -215,6 +216,10 @@ function buildVariantFieldUpdatesFromSnapshots(
     update.options = processed.options;
   }
 
+  if (previous.isMain !== current.isMain) {
+    update.isMain = current.isMain;
+  }
+
   return update;
 }
 
@@ -241,6 +246,7 @@ function buildSimpleVariantUpdates(
     sku: simpleInitial.sku,
     images: [],
     published: true,
+    isMain: false,
   };
 
   const currentVariantSnapshot: EditableVariantSnapshot = {
@@ -253,6 +259,7 @@ function buildSimpleVariantUpdates(
     sku: simpleCurrent.sku,
     images: [],
     published: true,
+    isMain: false,
   };
 
   const updateFields = buildVariantFieldUpdatesFromSnapshots(
@@ -325,6 +332,7 @@ function buildVariableVariantUpdates(
       compareAtPrice: processed.compareAtPrice ?? null,
       imageUrl: processed.imageUrl ?? null,
       published: processed.published ?? true,
+      isMain: processed.isMain === true,
       options: processed.options,
     });
   }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { selectablePriceVariants } from '@/lib/products/variant-price-display';
 import { getOptionValue } from '../utils/variant-helpers';
 import { findInStockVariantForColorChange } from '../utils/variant-finders';
 import type { Product, ProductVariant, VariantOption } from '../types';
@@ -38,7 +39,8 @@ function buildAttributeValuesFromVariant(variant: ProductVariant): {
 
 function getDefaultVariant(product: Product): ProductVariant | null {
   if (!product.variants?.length) return null;
-  return product.variants.find((variant) => variant.stock > 0) ?? product.variants[0] ?? null;
+  const candidates = selectablePriceVariants(product.variants);
+  return candidates.find((variant) => variant.stock > 0) ?? candidates[0] ?? null;
 }
 
 function resolveInitialVariant(

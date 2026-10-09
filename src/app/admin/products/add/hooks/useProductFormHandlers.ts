@@ -213,6 +213,7 @@ export function useProductFormHandlers({
       stock: parseInt(genVariant.stock || '0') || 0,
       imageUrl: genVariant.images.length > 0 ? genVariant.images.join(',') : undefined,
       published: true,
+      isMain: genVariant.isMain === true,
     };
 
     if (genVariant.databaseVariantId) {
@@ -291,6 +292,7 @@ export function useProductFormHandlers({
 
       return {
         ...basePayload,
+        isMain: basePayload.isMain && comboIndex === 0,
         sku,
         options: variantOptions.length > 0 ? variantOptions : undefined,
       };
@@ -554,6 +556,7 @@ export function useProductFormHandlers({
           sku: variant.sku,
           imageUrl: variant.imageUrl,
           published: variant.published,
+          isMain: variant.isMain,
           options: variant.options,
         })),
         attributeIds,

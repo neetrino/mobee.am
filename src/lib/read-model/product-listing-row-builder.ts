@@ -1,10 +1,6 @@
 import { processImageUrl } from "@/lib/utils/image-utils";
 import { productHasMarcoListingImage } from "@/lib/products/marco-product-image";
-import {
-  hasDisplayPrice,
-  pickListingPriceVariant,
-  selectablePriceVariants,
-} from "@/lib/products/variant-price-display";
+import { hasDisplayPrice, pickListingPriceVariant } from "@/lib/products/variant-price-display";
 import { computeEffectiveVariantPrice, resolveAppliedDiscountPercent } from "@/lib/services/products-effective-price";
 import type { ProductDiscountContext } from "@/lib/services/products-find-transform.service";
 import { normalizeProductWarrantyYears } from "@/lib/constants/product-warranty";
@@ -38,6 +34,7 @@ export type ListingRowVariantInput = {
   media?: unknown;
   sku?: string | null;
   published?: boolean | null;
+  isMain?: boolean | null;
   options?: CatalogOptionLike[] | null;
   attributes?: unknown;
 };
@@ -133,17 +130,12 @@ function firstMediaUrl(media: unknown): string | null {
 }
 
 function listingPrice(
-  variants: ListingRowVariantInput[],
+  variant: ListingRowVariantInput | null,
   discountPercent: number,
 ): number | null {
-  let min: number | null = null;
-  for (const variant of selectablePriceVariants(variants)) {
-    if (!hasDisplayPrice(variant)) continue;
-    const effective = computeEffectiveVariantPrice(variant.price, discountPercent);
-    if (!Number.isFinite(effective)) continue;
-    if (min === null || effective < min) min = effective;
-  }
-  return min;
+  if (!variant || !hasDisplayPrice(variant)) return null;
+  const effective = computeEffectiveVariantPrice(variant.price, discountPercent);
+  return Number.isFinite(effective) ? effective : null;
 }
 
 function resolveTranslation<T extends { locale: string }>(
@@ -170,9 +162,9 @@ function buildRowForLocale(
   );
   const discountPercent = resolveAppliedDiscountPercent(product, discounts);
   const priceVariant = pickListingPriceVariant(publishedVariants);
-  const minPrice = listingPrice(publishedVariants, discountPercent);
-  const hasPrice = minPrice !== null;
-  const original = hasPrice && discountPercent > 0 ? (priceVariant?.price ?? minPrice) : null;
+  const cardPrice = listingPrice(priceVariant, discountPercent);
+  const hasPrice = cardPrice !== null;
+  const original = hasPrice && discountPercent > 0 ? (priceVariant?.price ?? cardPrice) : null;
   const allOptions = publishedVariants.flatMap((variant) => variant.options ?? []);
   const ownCategoryIds = [
     ...new Set(
@@ -200,10 +192,10 @@ function buildRowForLocale(
     primaryCategoryId: product.primaryCategoryId ?? null,
     categoryIds,
     categorySlugs: collectCategorySlugsForLocale(categoryIds, locale, ancestry.slugByIdLocale),
-    price: minPrice ?? 0,
+    price: cardPrice ?? 0,
     compareAtPrice: priceVariant?.compareAtPrice ?? null,
     originalPrice: original,
-    priceSort: minPrice ?? 0,
+    priceSort: cardPrice ?? 0,
     hasPrice,
     priceOnRequest: Boolean(priceVariant?.priceOnRequest) && !hasPrice,
     discountPercent: hasPrice && discountPercent > 0 ? discountPercent : 0,

@@ -37,12 +37,30 @@ export function selectablePriceVariants<T extends VariantSelectorFields>(variant
   return selectable.length > 0 ? selectable : variants;
 }
 
-/** Cheapest selectable variant with a real price; null if none. */
-export function pickListingPriceVariant<T extends VariantPriceFields & VariantSelectorFields>(
-  variants: T[],
-  preferred?: T | null,
-): T | null {
+/** Admin "main" flag; the main variant drives the product card when it is published and priced. */
+export type VariantMainFields = {
+  isMain?: boolean | null;
+  published?: boolean | null;
+};
+
+function findMainPricedVariant<T extends VariantPriceFields & VariantMainFields>(variants: T[]): T | null {
+  return (
+    variants.find(
+      (variant) => variant.isMain === true && variant.published !== false && hasDisplayPrice(variant),
+    ) ?? null
+  );
+}
+
+/**
+ * Card variant: `preferred` (e.g. color-filter match), then the admin main variant,
+ * then the cheapest selectable variant with a real price; null if none.
+ */
+export function pickListingPriceVariant<
+  T extends VariantPriceFields & VariantSelectorFields & VariantMainFields,
+>(variants: T[], preferred?: T | null): T | null {
   if (preferred && hasDisplayPrice(preferred)) return preferred;
+  const main = findMainPricedVariant(variants);
+  if (main) return main;
   const priced = selectablePriceVariants(variants).filter(hasDisplayPrice);
   if (priced.length === 0) return null;
   return [...priced].sort((a, b) => (a.price ?? 0) - (b.price ?? 0))[0];
@@ -57,12 +75,11 @@ export function minPricedVariantPrice(
   return Math.min(...priced.map((v) => v.price as number));
 }
 
-/** Sort key for price sorts — no-price products sort last. */
+/** Sort key for price sorts (the card price) — no-price products sort last. */
 export function listPriceSortKey(
-  variants: Array<VariantPriceFields & VariantSelectorFields>,
+  variants: Array<VariantPriceFields & VariantSelectorFields & VariantMainFields>,
 ): number {
-  const min = minPricedVariantPrice(variants);
-  return min ?? Number.POSITIVE_INFINITY;
+  return pickListingPriceVariant(variants)?.price ?? Number.POSITIVE_INFINITY;
 }
 
 export const PRICE_UNAVAILABLE_DETAIL =

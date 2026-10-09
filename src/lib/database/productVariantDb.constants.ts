@@ -19,6 +19,7 @@ export const PRODUCT_VARIANT_DB_SELECT = {
   imageUrl: true,
   position: true,
   published: true,
+  isMain: true,
   attributes: true,
   createdAt: true,
   updatedAt: true,

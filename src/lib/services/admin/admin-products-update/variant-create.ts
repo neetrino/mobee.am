@@ -48,6 +48,7 @@ export async function createVariant(
       imageUrl: processedVariantImageUrl ?? undefined,
       media: buildVariantMediaFromImageUrl(processedVariantImageUrl ?? null, []),
       published: variant.published !== false,
+      isMain: variant.isMain === true,
       attributes: (attributesJson || undefined) as
         | Prisma.InputJsonValue
         | undefined,

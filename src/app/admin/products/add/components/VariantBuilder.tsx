@@ -7,7 +7,9 @@ import { getColorHex } from '../../../../../lib/colorMap';
 import { CURRENCIES, type CurrencyCode } from '../../../../../lib/currency';
 import type { Attribute, GeneratedVariant } from '../types';
 import { buildVariantSku } from '../utils/variantSku';
+import { setMainVariant } from '../utils/mainVariant';
 import { VariantImagesCell } from './VariantImagesCell';
+import { VariantMainCell } from './VariantMainCell';
 
 interface VariantBuilderProps {
   generatedVariants: GeneratedVariant[];
@@ -130,6 +132,12 @@ export function VariantBuilder({
               <table className="w-full divide-y divide-gray-200 bg-white">
                 <thead className="bg-gray-50">
                   <tr>
+                    <th
+                      className="w-14 px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-gray-500"
+                      title={t('admin.products.add.mainVariantHint')}
+                    >
+                      {t('admin.products.add.mainVariant')}
+                    </th>
                     {attributesToShow.map((attributeId) => {
                       const attribute = attributes.find((a) => a.id === attributeId);
                       return attribute ? (
@@ -167,6 +175,10 @@ export function VariantBuilder({
 
                     return (
                       <tr key={variant.id} className="hover:bg-gray-50">
+                        <VariantMainCell
+                          checked={variant.isMain === true}
+                          onChange={(checked) => onVariantUpdate((prev) => setMainVariant(prev, variant.id, checked))}
+                        />
                         {variantAttributesToShow.map((attributeId) => {
                           const attribute = attributes.find((a) => a.id === attributeId);
                           if (!attribute) return null;

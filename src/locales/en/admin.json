@@ -527,7 +527,9 @@
       "enterDefaultPrice": "Enter default price for all variants:",
       "enterDefaultStock": "Enter default stock for all variants:",
       "enterSkuPrefix": "Enter SKU prefix (will auto-add -color-size if applicable):",
-      "deleteVariant": "Delete variant"
+      "deleteVariant": "Delete variant",
+      "mainVariant": "Main",
+      "mainVariantHint": "This variant is shown on the product card"
     }
   },
   "settings": {
